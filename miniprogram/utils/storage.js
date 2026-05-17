@@ -1289,14 +1289,40 @@ function loadSurfaceDepthEvents() {
   return Array.isArray(list) ? list : [];
 }
 
+function inferSurfaceDepthCapability(input = {}) {
+  const surface = String(input.surface || '').trim() || 'home';
+  const dimensionId = String(input.dimensionId || input.id || '').trim();
+  const route = String(input.route || '').trim();
+  const pack = buildSurfaceDepthPack(surface, { capabilityEvidenceLedger: input.capabilityEvidenceLedger || null });
+  const capabilityCards = Array.isArray(pack.capabilityCards) ? pack.capabilityCards : [];
+  const picked = capabilityCards.find((item) => item && item.id && dimensionId && item.id === dimensionId)
+    || capabilityCards.find((item) => item && item.route && route && item.route === route)
+    || (pack.capabilityLedgerSummary && pack.capabilityLedgerSummary.nextCapability)
+    || capabilityCards[0]
+    || {};
+  return {
+    capability_id: picked.id || '',
+    capability_label: picked.label || '',
+    capability_route: picked.route || '',
+    capability_evidence_line: picked.evidenceLine || '',
+    capability_next_action: picked.nextAction || ''
+  };
+}
+
 function recordSurfaceDepthAction(input = {}) {
   const surface = String(input.surface || '').trim() || 'unknown';
   const dimensionId = String(input.dimensionId || input.id || '').trim() || 'next_action';
+  const capability = inferSurfaceDepthCapability(Object.assign({}, input, { surface, dimensionId }));
   const item = {
     id: input.eventId || `surface_${Date.now()}_${randomPart()}`,
     event: 'surface_depth_action',
     surface,
     dimension_id: dimensionId,
+    capability_id: input.capabilityId || capability.capability_id,
+    capability_label: input.capabilityLabel || capability.capability_label,
+    capability_route: input.capabilityRoute || capability.capability_route,
+    capability_evidence_line: input.capabilityEvidenceLine || capability.capability_evidence_line,
+    capability_next_action: input.capabilityNextAction || capability.capability_next_action,
     label: input.label || input.displayLabel || '',
     route: input.route || '',
     readiness: input.readiness || '',
@@ -1313,12 +1339,15 @@ function buildSurfaceDepthActionSummary() {
   const list = loadSurfaceDepthEvents();
   const surfaceCounts = {};
   const dimensionCounts = {};
+  const capabilityCounts = {};
   list.forEach((item) => {
     if (item.surface) surfaceCounts[item.surface] = (surfaceCounts[item.surface] || 0) + 1;
     if (item.dimension_id) dimensionCounts[item.dimension_id] = (dimensionCounts[item.dimension_id] || 0) + 1;
+    if (item.capability_id) capabilityCounts[item.capability_id] = (capabilityCounts[item.capability_id] || 0) + 1;
   });
   const topSurface = topCountKey(surfaceCounts);
   const topDimension = topCountKey(dimensionCounts);
+  const topCapability = topCountKey(capabilityCounts);
   const recent = list.slice(0, 5).map((item) => Object.assign({}, item, {
     displayLabel: item.label || item.dimension_id || item.surface || '下一步'
   }));
@@ -1328,6 +1357,8 @@ function buildSurfaceDepthActionSummary() {
     latest,
     topSurface,
     topDimension,
+    topCapability,
+    capabilityCounts,
     recent,
     routeEvidenceLabel: '路线证据',
     latestActionLabel: '最近一步',
@@ -6304,6 +6335,7 @@ module.exports = {
   appendModuleFeedback,
   moduleFeedbackMap,
   loadSurfaceDepthEvents,
+  inferSurfaceDepthCapability,
   recordSurfaceDepthAction,
   buildSurfaceDepthActionSummary,
   loadUnifiedActionEvents,
