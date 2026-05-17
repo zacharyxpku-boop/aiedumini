@@ -109,6 +109,8 @@
             <view class="receipt-diagnostic-title">{{thinkingReceipt.visualSocraticMatrix.title}}</view>
             <view class="receipt-board-avoid">{{thinkingReceipt.visualSocraticMatrix.visualBoundary}}</view>
             <view class="receipt-board-line" wx:for="{{thinkingReceipt.visualSocraticMatrix.boardMoves}}" wx:key="id">{{item.order}}. {{item.drawAction}}：{{item.evidence}}</view>
+            <view class="receipt-board-line" wx:if="{{thinkingReceipt.visualSocraticMatrix.blackboardBlueprint}}">{{thinkingReceipt.visualSocraticMatrix.blackboardBlueprint.openingQuestion}}</view>
+            <view class="receipt-board-parent" wx:if="{{thinkingReceipt.visualSocraticMatrix.blackboardBlueprint}}">{{thinkingReceipt.visualSocraticMatrix.blackboardBlueprint.stopRule}}</view>
             <view class="receipt-board-parent" wx:for="{{thinkingReceipt.visualSocraticMatrix.socraticQuestions}}" wx:key="id">追问{{item.order}}：{{item.question}}</view>
             <view class="receipt-board-line">{{thinkingReceipt.visualSocraticMatrix.fallback.whenSilent}}</view>
             <view class="receipt-board-avoid">{{thinkingReceipt.visualSocraticMatrix.fallback.whenAsksAnswer}}</view>

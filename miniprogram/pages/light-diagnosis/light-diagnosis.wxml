@@ -72,6 +72,19 @@
     <view class="meta-line">{{diagnosis.subjectLabel}} · {{diagnosis.stuckStepLabel}}</view>
     <view class="meta-line">题型：{{diagnosis.typeLabel}}</view>
     <view class="suggestion">{{diagnosis.suggestedFirstStep}}</view>
+    <view class="global-depth-card" wx:if="{{diagnosis.visualBlackboard}}">
+      <view class="global-depth-title">{{diagnosis.visualBlackboard.title}}</view>
+      <view class="global-depth-summary">{{diagnosis.visualBlackboard.boundary}}</view>
+      <view class="global-depth-note">{{diagnosis.visualBlackboard.openingQuestion}}</view>
+      <view class="global-depth-grid">
+        <view class="global-depth-chip ready" wx:for="{{diagnosis.visualBlackboard.layers}}" wx:key="id">
+          <text>{{item.order}}. {{item.label}}</text>
+          <text>{{item.drawAction}}</text>
+          <text>{{item.parentQuestion}}</text>
+        </view>
+      </view>
+      <view class="global-depth-note">{{diagnosis.visualBlackboard.stopRule}}</view>
+    </view>
     <view class="boundary">{{diagnosis.boundary}}</view>
     <input value="{{childStepText}}" bindinput="onChildStepInput" placeholder="我先..." />
     <button bindtap="confirm">确认第一步</button>

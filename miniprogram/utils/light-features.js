@@ -230,6 +230,14 @@ function buildLightDiagnosis(inputText = '', options = {}) {
   const normalized = normalizeLightDiagnosisOptions(options);
   const taskType = taskTypeFromLightDiagnosis(normalized.subject, normalized.stuckStep, inputText);
   const suggestion = suggestLightDiagnosisStep(normalized.subject, normalized.stuckStep);
+  const visualBlackboard = storage.buildFirstStepBlackboardBlueprint
+    ? storage.buildFirstStepBlackboardBlueprint({
+      subject: normalized.subject,
+      taskType,
+      sourceText: inputText,
+      firstStep: suggestion
+    })
+    : null;
   return {
     title: '手动选题型',
     requiresManualConfirmation: true,
@@ -241,6 +249,7 @@ function buildLightDiagnosis(inputText = '', options = {}) {
     taskType,
     typeLabel: storage.taskTypeLabel ? storage.taskTypeLabel(taskType) : '当前题型',
     suggestedFirstStep: suggestion,
+    visualBlackboard,
     boundary: '这不是解题答案，只是准备开始的第一步。'
   };
 }

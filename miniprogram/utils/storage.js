@@ -2547,6 +2547,18 @@ function buildSubjectSkillDepth(input = {}) {
     label: spec.label,
     firstStep,
     blackboard: spec.blackboard.map((text, index) => ({ order: index + 1, text })),
+    blackboardBlueprint: buildFirstStepBlackboardBlueprint({
+      subjectSkillDepth: {
+        taskType,
+        label: spec.label,
+        firstStep,
+        evidenceRequired: spec.evidenceRequired.slice(),
+        route: taskType === 'writing_process' ? '/pages/focus/focus' : taskType === 'unknown' ? '/pages/tutor/tutor' : '/pages/arcade/arcade'
+      },
+      subject: input.subject || '',
+      sourceText,
+      firstStep
+    }),
     socraticQuestions: spec.socratic.slice(),
     gameDrills: spec.game.slice(),
     reportSignal: spec.report,
@@ -2738,6 +2750,11 @@ function buildVisualSocraticMatrix(input = {}) {
     subjectLabel: curriculum.subjectLabel,
     taskType: subjectDepth.taskType,
     boardMoves,
+    blackboardBlueprint: buildFirstStepBlackboardBlueprint(Object.assign({}, input, {
+      subjectSkillDepth: subjectDepth,
+      curriculumSpine: curriculum,
+      boardMoves
+    })),
     socraticQuestions,
     socraticAssessment,
     fallback,
@@ -2746,6 +2763,50 @@ function buildVisualSocraticMatrix(input = {}) {
     reportLine: curriculum.reportLine,
     shareLine: curriculum.shareLine,
     route: curriculum.route
+  };
+}
+
+function buildFirstStepBlackboardBlueprint(input = {}) {
+  const subjectDepth = input.subjectSkillDepth || buildSubjectSkillDepth(input);
+  const curriculum = input.curriculumSpine || buildCurriculumSpine(Object.assign({}, input, { subjectSkillDepth: subjectDepth }));
+  const boardMoves = Array.isArray(input.boardMoves) && input.boardMoves.length
+    ? input.boardMoves
+    : (Array.isArray(curriculum.progression) ? curriculum.progression : []).slice(0, 3).map((node) => ({
+      id: node.id,
+      order: node.order,
+      label: node.label,
+      evidence: node.evidence,
+      drawAction: `只标出「${node.label}」这一笔`
+    }));
+  const firstMove = boardMoves[0] || { label: '第一步', evidence: subjectDepth.firstStep || '孩子自己的第一步' };
+  return {
+    id: `first_step_blackboard_${curriculum.subjectId}_${subjectDepth.taskType || 'unknown'}`,
+    title: `${curriculum.subjectLabel}第一步小黑板`,
+    boundary: '只画第一笔和证据点，不讲完整答案。',
+    openingQuestion: `先看第一步小黑板这一笔：${firstMove.label}在哪里？`,
+    firstStroke: {
+      label: firstMove.label,
+      drawAction: firstMove.drawAction || `只标出「${firstMove.label}」这一笔`,
+      evidence: firstMove.evidence || subjectDepth.firstStep,
+      childReply: `孩子要能说出：我先处理「${firstMove.label}」。`
+    },
+    layers: boardMoves.slice(0, 3).map((move, index) => ({
+      id: move.id || `layer_${index + 1}`,
+      order: index + 1,
+      label: move.label,
+      drawAction: move.drawAction || `只标出「${move.label}」这一笔`,
+      evidence: move.evidence,
+      parentQuestion: index === 0
+        ? `你第一步先看「${move.label}」吗？`
+        : `这一笔有什么证据？`
+    })),
+    stopRule: '孩子能说出第一步就停；说不出时退回更小的一笔。',
+    wrongCauseReturn: `如果同类题又错，先回到「${firstMove.label}」这一笔，不加题量。`,
+    reportLine: `${curriculum.subjectLabel}报告只记录第一笔证据：${firstMove.evidence || subjectDepth.firstStep}。`,
+    gameHook: `轻练习优先生成 3 张「${firstMove.label}」主动回忆卡。`,
+    shareLine: `分享时只带走第一步小黑板和家长追问，不带完整答案。`,
+    evidenceRequired: ['first_stroke_marked', 'child_first_step', 'parent_one_question', 'next_day_revisit'],
+    route: curriculum.route || subjectDepth.route || '/pages/tutor/tutor'
   };
 }
 
@@ -6968,6 +7029,7 @@ module.exports = {
   buildSocraticAssessmentMatrix,
   buildCurriculumSpine,
   buildVisualSocraticMatrix,
+  buildFirstStepBlackboardBlueprint,
   buildLightEntrySeedBank,
   buildSubjectSeedLibrary,
   childStepQuality,
