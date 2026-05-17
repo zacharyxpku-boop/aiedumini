@@ -976,6 +976,17 @@
           <view>{{dailyShareCard.shareChallengePlan.successRule}}</view>
           <view>{{dailyShareCard.shareChallengePlan.failureFallback}}</view>
         </view>
+        <view class="share-conversation-card" wx:if="{{communityShareRelayBoard}}">
+          <view class="share-conversation-title">{{communityShareRelayBoard.title}}</view>
+          <view>{{communityShareRelayBoard.summary}}</view>
+          <view>{{communityShareRelayBoard.noRankingLine}}</view>
+          <view>{{communityShareRelayBoard.privacyBoundary}}</view>
+          <view>{{communityShareRelayBoard.peerSafeLine}}</view>
+          <view wx:for="{{communityShareRelayBoard.lanes}}" wx:key="id">{{item.label}}：{{item.action}}｜{{item.evidence}}</view>
+          <view wx:for="{{communityShareRelayBoard.recentRuns}}" wx:key="id">接力记录：{{item.code}} · {{item.evidence}}</view>
+          <view>{{communityShareRelayBoard.contractLine}}</view>
+          <view>{{communityShareRelayBoard.returnPathLine}}</view>
+        </view>
         <view class="share-invite">{{dailyShareCard.inviteLine}}</view>
         <view class="wechat-share-row">
           <button

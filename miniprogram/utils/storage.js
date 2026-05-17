@@ -4619,6 +4619,61 @@ function buildShareChallengePlan(input = {}) {
   };
 }
 
+function buildCommunityShareRelayBoard(input = {}) {
+  const plan = input.shareChallengePlan || buildShareChallengePlan(input);
+  const shareRuns = loadShareRuns();
+  const incoming = loadIncomingShare();
+  const recentRuns = shareRuns.slice(0, 5);
+  const relayEvidenceCount = recentRuns.filter((item) => item && (item.share_intent || item.type || item.payload)).length;
+  const lanes = [
+    {
+      id: 'sender',
+      label: '发起者',
+      action: plan.communityChallengeCard ? plan.communityChallengeCard.firstStep : plan.goal,
+      evidence: '只分享第一步和回访动作',
+      route: '/pages/profile/profile?from=community_relay'
+    },
+    {
+      id: 'receiver',
+      label: '接收者',
+      action: incoming && incoming.share_code ? (incoming.action_label || '用自己的材料复刻同类第一步') : '等待一张可接力的学习动作卡',
+      evidence: incoming && incoming.share_code ? `已接到 ${incoming.share_code}` : '还没有回流记录',
+      route: '/pages/home/home?from=community_relay'
+    },
+    {
+      id: 'parent',
+      label: '家长',
+      action: plan.parentEvidenceLine || '只看今晚动作、错因和明天回访',
+      evidence: '不看排名、不看完整对话、不晒分',
+      route: '/pages/profile/profile?from=community_parent'
+    }
+  ];
+  return {
+    id: 'community_share_relay_board',
+    title: '社区轻接力看板',
+    summary: relayEvidenceCount
+      ? `已有 ${relayEvidenceCount} 条分享或回流证据，继续按第一步接力，不比较分数。`
+      : '先把分享做成学习动作卡，不做邀请链接和排行榜。',
+    ready: relayEvidenceCount > 0 || !!(incoming && incoming.share_code),
+    noRankingLine: plan.noRankingLine || '不排行、不晒分，只看有没有说清第一步。',
+    privacyBoundary: plan.privacyBoundary,
+    peerSafeLine: plan.peerSafeLine,
+    relayEvidenceCount,
+    lanes,
+    recentRuns: recentRuns.map((item) => ({
+      id: item.id || item.share_code || item.code,
+      label: item.share_intent || item.type || 'share',
+      code: item.share_code || item.code || '',
+      evidence: item.path || item.title || '分享/回流记录'
+    })),
+    actions: plan.shareRelayActions || [],
+    contractLine: plan.evidenceContractLine,
+    returnPathLine: Array.isArray(plan.returnPathContract)
+      ? plan.returnPathContract.map((item) => `${item.label}:${item.text}`).join(' / ')
+      : ''
+  };
+}
+
 function saveIncomingShare(share = {}) {
   const code = share.share_code || share.code || '';
   if (!code) return null;
@@ -7589,6 +7644,7 @@ module.exports = {
   loadShareRuns,
   loadIncomingShare,
   buildShareChallengePlan,
+  buildCommunityShareRelayBoard,
   saveIncomingShare,
   appendShareRun,
   loadClientIdentity,

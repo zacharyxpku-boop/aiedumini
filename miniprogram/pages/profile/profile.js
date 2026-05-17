@@ -1230,6 +1230,14 @@ Page({
     }) : null;
     learningReportSummary = buildLearningReportSummary(learningReportState || {}, capabilityEvidenceLedger, subjectSkillDepth, curriculumSpine, visualSocraticMatrix, courseUnitMap);
     const dailyShareCard = buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCauseSummary, todayFocus, globalEvidenceBrief, reportDailyActionQueue, unifiedNextAction, capabilityEvidenceLedger, subjectSkillDepth, curriculumSpine, visualSocraticMatrix, courseUnitMap);
+    const communityShareRelayBoard = storage.buildCommunityShareRelayBoard
+      ? storage.buildCommunityShareRelayBoard({
+        focus: todayFocus,
+        dailyShareCard,
+        shareChallengePlan: dailyShareCard && dailyShareCard.shareChallengePlan,
+        subjectSkillDepth
+      })
+      : null;
     if (dailyShareCard && dailyShareCard.code && dailyShareCard.code !== lastGeneratedShareCode) {
       lastGeneratedShareCode = dailyShareCard.code;
       sendMiniEvent({
@@ -1346,6 +1354,7 @@ Page({
       parentLoopProof: buildParentLoopProof(reviewSummary, moduleSummary, tutorSummary, thinkingSummary, factorySummary),
       gameProfileCard,
       dailyShareCard,
+      communityShareRelayBoard,
       commercialUnlockCard: buildCommercialUnlockCard(reviewSummary, tutorSummary, thinkingSummary, wrongCauseSummary),
       profileReadinessSnapshot,
       capabilityEvidenceLedger,
