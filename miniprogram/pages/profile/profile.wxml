@@ -634,6 +634,13 @@
           <text>{{learningReportSummary.courseUnitDecisionBoard.sevenDayReviewLine}}</text>
           <text>{{learningReportSummary.courseUnitDecisionBoard.shareContract}}</text>
         </view>
+        <view class="parent-brief-block" wx:if="{{learningReportSummary.courseUnitMasteryTrajectory}}">
+          <text class="parent-brief-label">{{learningReportSummary.courseUnitMasteryTrajectory.title}}</text>
+          <text>{{learningReportSummary.courseUnitMasteryTrajectory.summary}}</text>
+          <text>{{learningReportSummary.courseUnitTrajectoryLine}}</text>
+          <text wx:if="{{learningReportSummary.courseUnitTrajectoryParentLine}}">{{learningReportSummary.courseUnitTrajectoryParentLine}}</text>
+          <text wx:for="{{learningReportSummary.courseUnitTrajectoryRows}}" wx:key="id">{{item.masteryLine}} · 下一证据：{{item.nextEvidence}} · 家长：{{item.parentInterventionLevel}}</text>
+        </view>
         <view class="parent-brief-block">
           <text class="parent-brief-label">学业矩阵</text>
           <text>{{learningReportSummary.diagnosisLine}}</text>

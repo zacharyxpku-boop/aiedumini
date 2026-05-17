@@ -5590,6 +5590,66 @@ function buildCourseUnitMap(options = {}) {
   };
 }
 
+function buildCourseUnitMasteryTrajectory(options = {}) {
+  const courseUnitMap = options.courseUnitMap || buildCourseUnitMap(options);
+  const active = courseUnitMap && courseUnitMap.active ? courseUnitMap.active : null;
+  const reviewCards = loadReviewCards();
+  const thinkingReceipts = loadThinkingReceipts();
+  const gameProfile = loadGameProfile();
+  const parentReflection = buildParentReflectionSummary();
+  const reviewedToday = Number(gameProfile.reviewed_today || gameProfile.reviewedToday || 0);
+  const totalEvidence = reviewCards.length + thinkingReceipts.length + reviewedToday + Number(parentReflection.childRecalledFirstStep || 0);
+  const subjectEvidence = active
+    ? reviewCards.filter((card) => {
+      const text = `${card.subject || ''} ${card.stuckPointText || ''} ${card.prompt || ''} ${card.taskType || ''}`;
+      return text.indexOf(active.id) >= 0 || text.indexOf(active.label) >= 0;
+    }).length
+    : 0;
+  const units = active && Array.isArray(active.units) ? active.units : [];
+  const trajectories = units.map((unit, index) => {
+    const evidenceCount = subjectEvidence + Math.max(0, totalEvidence - index);
+    const masteryScore = Math.max(12, Math.min(96, 28 + evidenceCount * 7 + reviewedToday * 3 - index * 4));
+    const regressionRisk = masteryScore >= 75 ? '低' : masteryScore >= 52 ? '中' : '高';
+    const parentInterventionLevel = regressionRisk === '高' ? '陪问一句' : regressionRisk === '中' ? '明天复核' : '只看证据';
+    const nextEvidence = masteryScore >= 75
+      ? unit.practiceLoop.transfer
+      : masteryScore >= 52
+        ? unit.practiceLoop.nextDay
+        : unit.diagnosticProbes[0];
+    return {
+      id: unit.id,
+      unitLabel: unit.unitLabel,
+      subjectLabel: unit.subjectLabel,
+      masteryScore,
+      masteryLine: `${unit.subjectLabel}/${unit.unitLabel} 当前掌握度 ${masteryScore}，风险 ${regressionRisk}。`,
+      regressionRisk,
+      parentInterventionLevel,
+      nextEvidence,
+      evidenceContract: unit.reportContract,
+      route: unit.recallRoute || unit.route || '/pages/review/review'
+    };
+  });
+  const weakest = trajectories.slice().sort((a, b) => a.masteryScore - b.masteryScore)[0] || null;
+  const strongest = trajectories.slice().sort((a, b) => b.masteryScore - a.masteryScore)[0] || null;
+  return {
+    id: 'course_unit_mastery_trajectory',
+    title: '单元级长期画像轨迹',
+    subjectLabel: active ? active.label : '',
+    ready: trajectories.length > 0,
+    evidenceCount: totalEvidence,
+    summary: weakest
+      ? `先看 ${weakest.unitLabel}：${weakest.parentInterventionLevel}，下一证据是「${weakest.nextEvidence}」。`
+      : '先选择一个课程单元，再沉淀第一步、错因和回访证据。',
+    weakest,
+    strongest,
+    trajectories,
+    parentLine: weakest
+      ? `家长今晚只管 ${weakest.unitLabel}：${weakest.parentInterventionLevel}，不扩到整科刷题。`
+      : '',
+    reportLine: `报告按单元跟踪掌握度、回退风险、下一证据和家长介入等级，不做排名。`
+  };
+}
+
 function detectAvoidancePattern(patternInput = loadTaskTypePattern()) {
   const byTaskType = (patternInput && patternInput.byTaskType) || {};
   const candidates = Object.keys(byTaskType).map((type) => {
@@ -7436,6 +7496,7 @@ module.exports = {
   buildLightEntrySeedBank,
   buildSubjectSeedLibrary,
   buildCourseUnitMap,
+  buildCourseUnitMasteryTrajectory,
   childStepQuality,
   normalizeFirstStepEvidence,
   saveChildArticulatedStep,
