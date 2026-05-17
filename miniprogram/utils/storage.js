@@ -5972,7 +5972,23 @@ function buildSurfaceDepthPack(surface = 'home', options = {}) {
   const capabilityRoute = capabilityLedger && capabilityLedger.nextCapability && capabilityLedger.nextCapability.route
     ? capabilityLedger.nextCapability.route
     : (currentModule && currentModule.route ? currentModule.route : '/pages/home/home');
-  const familyLine = `${current.benchmark} ${storyLine} ${evidenceLine} ${capabilityLine}`;
+  const surfaceLoop = {
+    title: '入口闭环',
+    entry: current.title,
+    action: current.nextAction,
+    evidence: currentModule && currentModule.ready
+      ? (currentModule.evidenceLine || evidenceLine)
+      : (currentModule && currentModule.gapLine ? currentModule.gapLine : evidenceLine),
+    parent: capabilityLedger && capabilityLedger.parentLine
+      ? capabilityLedger.parentLine
+      : (learningQuestArc && learningQuestArc.parentHook) || '家长只问一句，确认孩子能不能说出第一步。',
+    next: capabilityLedger && capabilityLedger.nextCapability
+      ? capabilityLedger.nextCapability.nextAction
+      : (currentModule && currentModule.route ? `继续到 ${currentModule.displayLabel}` : current.nextAction),
+    route: currentModule && currentModule.route ? currentModule.route : capabilityRoute
+  };
+  const loopLine = `闭环：进入${surfaceLoop.entry} → ${surfaceLoop.action} → 留下证据：${surfaceLoop.evidence} → 家长看：${surfaceLoop.parent} → 下一步：${surfaceLoop.next}`;
+  const familyLine = `${current.benchmark} ${storyLine} ${evidenceLine} ${capabilityLine} ${loopLine}`;
   return {
     surface,
     title: current.title,
@@ -5984,6 +6000,8 @@ function buildSurfaceDepthPack(surface = 'home', options = {}) {
     routeLine,
     capabilityLine,
     capabilityRoute,
+    surfaceLoop,
+    loopLine,
     familyLine,
     readyCount,
     totalCount: visibleCards.length,
