@@ -2513,6 +2513,46 @@ function buildCurriculumSpine(input = {}) {
   };
 }
 
+function buildVisualSocraticMatrix(input = {}) {
+  const subjectDepth = input.subjectSkillDepth || buildSubjectSkillDepth(input);
+  const curriculum = input.curriculumSpine || buildCurriculumSpine(Object.assign({}, input, { subjectSkillDepth: subjectDepth }));
+  const progression = Array.isArray(curriculum.progression) ? curriculum.progression : [];
+  const boardMoves = progression.slice(0, 3).map((node) => ({
+    id: node.id,
+    order: node.order,
+    label: node.label,
+    drawAction: `在小黑板只标出「${node.label}」这一笔`,
+    evidence: node.evidence,
+    prompt: `你能先指出${node.label}在哪里吗？`
+  }));
+  const socraticQuestions = (subjectDepth.socraticQuestions || []).slice(0, 3).map((question, index) => ({
+    id: `probe_${index + 1}`,
+    order: index + 1,
+    question,
+    intent: index === 0 ? '定位卡点' : index === 1 ? '要求证据' : '检查迁移',
+    stopRule: '孩子能说出自己的第一步就停，不继续代讲完整答案。'
+  }));
+  const fallback = {
+    whenSilent: `如果孩子说不出来，退回到「${curriculum.currentNode.label}」：${curriculum.currentNode.evidence}`,
+    whenAsksAnswer: '如果孩子直接要答案，只给第一笔小黑板和一个追问，不给完整过程。',
+    whenWrongAgain: `如果同类题又错，下一轮游戏只练「${curriculum.currentNode.label}」。`
+  };
+  return {
+    id: `visual_socratic_${curriculum.subjectId}_${subjectDepth.taskType || 'unknown'}`,
+    title: `${curriculum.subjectLabel}第一步图解`,
+    subjectLabel: curriculum.subjectLabel,
+    taskType: subjectDepth.taskType,
+    boardMoves,
+    socraticQuestions,
+    fallback,
+    visualBoundary: '这是第一步小黑板，不是全科自动板书讲题。',
+    parentLine: curriculum.parentDecisionLine,
+    reportLine: curriculum.reportLine,
+    shareLine: curriculum.shareLine,
+    route: curriculum.route
+  };
+}
+
 function childStepQuality(text = '') {
   const value = String(text || '').trim();
   const compact = value.replace(/\s+/g, '');
@@ -6521,6 +6561,7 @@ module.exports = {
   suggestedStepForTaskType,
   buildSubjectSkillDepth,
   buildCurriculumSpine,
+  buildVisualSocraticMatrix,
   childStepQuality,
   normalizeFirstStepEvidence,
   saveChildArticulatedStep,

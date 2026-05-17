@@ -145,6 +145,25 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
       title: selected && selected.text ? selected.text : ''
     })
     : null;
+  const curriculumSpine = storage.buildCurriculumSpine
+    ? storage.buildCurriculumSpine({
+      sourceText: latestUserText,
+      thought: latestUserText,
+      subject: selected && selected.subject ? selected.subject : '',
+      title: selected && selected.text ? selected.text : '',
+      subjectSkillDepth
+    })
+    : null;
+  const visualSocraticMatrix = storage.buildVisualSocraticMatrix
+    ? storage.buildVisualSocraticMatrix({
+      sourceText: latestUserText,
+      thought: latestUserText,
+      subject: selected && selected.subject ? selected.subject : '',
+      title: selected && selected.text ? selected.text : '',
+      subjectSkillDepth,
+      curriculumSpine
+    })
+    : null;
   const studentFirst = userMessages.some((item) => String(item.text || '').length >= 8 && !/答案|直接|代写|帮我写/.test(String(item.text || '')));
   const blockedAnswer = (masterySignal && masterySignal.status === 'blocked_answer_request')
     || (pasteRisk && pasteRisk.level === 'high');
@@ -165,6 +184,8 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
     status: proofSentence ? '已可自己复述' : blockedAnswer ? '已拦住答案捷径' : '还在等一句自己的话',
     firstStepBoard,
     subjectSkillDepth,
+    curriculumSpine,
+    visualSocraticMatrix,
     checks: [
       { id: 'first', label: '先有自己的想法', done: studentFirst, detail: studentFirst ? '已经说出一步或一个问题' : '还需要先交出自己的第一步' },
       { id: 'cause', label: '已经说出错因', done: namedWrongCause, detail: namedWrongCause ? '对话里出现了明确错因' : '还要把错因说具体' },

@@ -98,6 +98,14 @@
             <view class="receipt-board-parent">家长只问：{{thinkingReceipt.subjectSkillDepth.parentQuestion}}</view>
             <view class="receipt-board-avoid">{{thinkingReceipt.subjectSkillDepth.reportSignal}}</view>
           </view>
+          <view class="receipt-first-step-board" wx:if="{{thinkingReceipt.visualSocraticMatrix}}">
+            <view class="receipt-diagnostic-title">{{thinkingReceipt.visualSocraticMatrix.title}}</view>
+            <view class="receipt-board-avoid">{{thinkingReceipt.visualSocraticMatrix.visualBoundary}}</view>
+            <view class="receipt-board-line" wx:for="{{thinkingReceipt.visualSocraticMatrix.boardMoves}}" wx:key="id">{{item.order}}. {{item.drawAction}}：{{item.evidence}}</view>
+            <view class="receipt-board-parent" wx:for="{{thinkingReceipt.visualSocraticMatrix.socraticQuestions}}" wx:key="id">追问{{item.order}}：{{item.question}}</view>
+            <view class="receipt-board-line">{{thinkingReceipt.visualSocraticMatrix.fallback.whenSilent}}</view>
+            <view class="receipt-board-avoid">{{thinkingReceipt.visualSocraticMatrix.fallback.whenAsksAnswer}}</view>
+          </view>
           <view class="receipt-contract" wx:if="{{thinkingReceipt.socratic_contract}}">
             <view class="receipt-diagnostic-title">{{thinkingReceipt.socratic_contract.title}}</view>
             <view class="receipt-diagnostic-line">为什么这样问：{{thinkingReceipt.socratic_contract.whyThisQuestion}}</view>

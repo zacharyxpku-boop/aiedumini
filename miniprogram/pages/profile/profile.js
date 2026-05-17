@@ -357,7 +357,7 @@ function buildShareCode(profile, reviewSummary, gameProfileCard) {
   return hash.toString(36).slice(0, 6).toUpperCase();
 }
 
-function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCauseSummary, todayFocus, globalEvidenceBrief, reportDailyActionQueue, unifiedNextAction, capabilityEvidenceLedger, subjectSkillDepth, curriculumSpine) {
+function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCauseSummary, todayFocus, globalEvidenceBrief, reportDailyActionQueue, unifiedNextAction, capabilityEvidenceLedger, subjectSkillDepth, curriculumSpine, visualSocraticMatrix) {
   const review = reviewSummary || {};
   const game = gameProfileCard || {};
   const progress = review.progress || {};
@@ -500,6 +500,14 @@ function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCause
       visualBoardLine: curriculumSpine.visualBoardLine,
       progression: curriculumSpine.progression || []
     } : null,
+    visualSocraticMatrix: visualSocraticMatrix ? {
+      title: visualSocraticMatrix.title,
+      visualBoundary: visualSocraticMatrix.visualBoundary,
+      parentLine: visualSocraticMatrix.parentLine,
+      reportLine: visualSocraticMatrix.reportLine,
+      boardMoves: visualSocraticMatrix.boardMoves || [],
+      socraticQuestions: visualSocraticMatrix.socraticQuestions || []
+    } : null,
     capabilityGap: nextCapability ? {
       id: nextCapability.id,
       label: nextCapability.label,
@@ -560,6 +568,7 @@ function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCause
       subject_depth_first_step: subjectSkillDepth && subjectSkillDepth.firstStep,
       curriculum_subject: curriculumSpine && curriculumSpine.subjectLabel,
       curriculum_current_node: curriculumSpine && curriculumSpine.currentNode && curriculumSpine.currentNode.label,
+      visual_socratic_subject: visualSocraticMatrix && visualSocraticMatrix.subjectLabel,
       mode: 'same_identity',
       challenge: 'arcade'
     }
@@ -631,7 +640,7 @@ function buildProfileSafeSummary(todayFocus, focusHistory = [], profileEmptyGuid
   };
 }
 
-function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, subjectSkillDepth, curriculumSpine) {
+function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, subjectSkillDepth, curriculumSpine, visualSocraticMatrix) {
   const globalEvidenceBrief = storage.buildGlobalEvidenceBrief ? storage.buildGlobalEvidenceBrief() : null;
   const capabilityLedger = capabilityEvidenceLedger || (storage.buildCapabilityEvidenceLedger ? storage.buildCapabilityEvidenceLedger({ globalEvidenceBrief }) : null);
   const nextCapability = capabilityLedger && capabilityLedger.nextCapability ? capabilityLedger.nextCapability : null;
@@ -712,6 +721,9 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     curriculumReportLine: curriculumSpine && curriculumSpine.reportLine ? curriculumSpine.reportLine : '',
     curriculumParentDecisionLine: curriculumSpine && curriculumSpine.parentDecisionLine ? curriculumSpine.parentDecisionLine : '',
     curriculumVisualBoardLine: curriculumSpine && curriculumSpine.visualBoardLine ? curriculumSpine.visualBoardLine : '',
+    visualSocraticMatrix,
+    visualSocraticReportLine: visualSocraticMatrix && visualSocraticMatrix.reportLine ? visualSocraticMatrix.reportLine : '',
+    visualSocraticBoundary: visualSocraticMatrix && visualSocraticMatrix.visualBoundary ? visualSocraticMatrix.visualBoundary : '',
     parentScript: solutionMap.parentScript || plan.parentLine || '家长先问一句：这一步你准备先看哪里？',
     childScript: solutionMap.childScript || plan.childLine || '我先说出第一步。',
     nextEvidenceLine: Array.isArray(solutionMap.nextEvidenceRequired) && solutionMap.nextEvidenceRequired.length
@@ -1007,6 +1019,9 @@ Page({
     const curriculumSpine = storage.buildCurriculumSpine
       ? storage.buildCurriculumSpine(Object.assign({}, todayFocus || {}, { subjectSkillDepth }))
       : null;
+    const visualSocraticMatrix = storage.buildVisualSocraticMatrix
+      ? storage.buildVisualSocraticMatrix(Object.assign({}, todayFocus || {}, { subjectSkillDepth, curriculumSpine }))
+      : null;
     const learningDepthMap = storage.buildLearningDepthMap ? storage.buildLearningDepthMap() : null;
     const learningQuestArc = storage.buildLearningQuestArc ? storage.buildLearningQuestArc() : null;
     const moduleFlowCompass = storage.buildModuleFlowCompass ? storage.buildModuleFlowCompass() : null;
@@ -1022,8 +1037,8 @@ Page({
       lightFeatureEvidence,
       thinkingSummary
     }) : null;
-    learningReportSummary = buildLearningReportSummary(learningReportState || {}, capabilityEvidenceLedger, subjectSkillDepth, curriculumSpine);
-    const dailyShareCard = buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCauseSummary, todayFocus, globalEvidenceBrief, reportDailyActionQueue, unifiedNextAction, capabilityEvidenceLedger, subjectSkillDepth, curriculumSpine);
+    learningReportSummary = buildLearningReportSummary(learningReportState || {}, capabilityEvidenceLedger, subjectSkillDepth, curriculumSpine, visualSocraticMatrix);
+    const dailyShareCard = buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCauseSummary, todayFocus, globalEvidenceBrief, reportDailyActionQueue, unifiedNextAction, capabilityEvidenceLedger, subjectSkillDepth, curriculumSpine, visualSocraticMatrix);
     if (dailyShareCard && dailyShareCard.code && dailyShareCard.code !== lastGeneratedShareCode) {
       lastGeneratedShareCode = dailyShareCard.code;
       sendMiniEvent({
@@ -1112,6 +1127,7 @@ Page({
       learningReportSummary,
       subjectSkillDepth,
       curriculumSpine,
+      visualSocraticMatrix,
       reportDailyActionQueue,
       learningReportInput: Object.assign({}, this.data.learningReportInput, {
         mode: (learningReportState && learningReportState.reportProgress && learningReportState.reportProgress.mode) || this.data.learningReportInput.mode || 'fast',

@@ -596,6 +596,8 @@
           <text wx:if="{{learningReportSummary.subjectSkillDepthEvidence}}">题型证据：{{learningReportSummary.subjectSkillDepthEvidence}}</text>
           <text wx:if="{{learningReportSummary.curriculumReportLine}}">课程骨架：{{learningReportSummary.curriculumReportLine}}</text>
           <text wx:if="{{learningReportSummary.curriculumVisualBoardLine}}">{{learningReportSummary.curriculumVisualBoardLine}}</text>
+          <text wx:if="{{learningReportSummary.visualSocraticReportLine}}">图解追问：{{learningReportSummary.visualSocraticReportLine}}</text>
+          <text wx:if="{{learningReportSummary.visualSocraticBoundary}}">{{learningReportSummary.visualSocraticBoundary}}</text>
         </view>
         <view class="parent-brief-block">
           <text class="parent-brief-label">学业矩阵</text>
@@ -825,6 +827,12 @@
           <view>{{dailyShareCard.curriculumSpine.shareLine}}</view>
           <view>{{dailyShareCard.curriculumSpine.parentDecisionLine}}</view>
           <view wx:for="{{dailyShareCard.curriculumSpine.progression}}" wx:key="id">{{item.order}}. {{item.label}}：{{item.evidence}}</view>
+        </view>
+        <view class="share-conversation-card" wx:if="{{dailyShareCard.visualSocraticMatrix}}">
+          <view class="share-conversation-title">{{dailyShareCard.visualSocraticMatrix.title}}</view>
+          <view>{{dailyShareCard.visualSocraticMatrix.visualBoundary}}</view>
+          <view wx:for="{{dailyShareCard.visualSocraticMatrix.boardMoves}}" wx:key="id">{{item.order}}. {{item.drawAction}}</view>
+          <view wx:for="{{dailyShareCard.visualSocraticMatrix.socraticQuestions}}" wx:key="id">追问{{item.order}}：{{item.question}}</view>
         </view>
         <view class="share-conversation-card" wx:if="{{dailyShareCard.capabilityGap}}">
           <view class="share-conversation-title">{{dailyShareCard.capabilityGap.label}}</view>
