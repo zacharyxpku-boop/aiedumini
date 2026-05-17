@@ -266,6 +266,39 @@ function buildQuestionTypeSocraticPath(taskType = 'unknown', item = {}, probe = 
   };
 }
 
+function buildQuestionTypeCoverageAtlas(activeTaskType = 'unknown') {
+  const taskTypes = Object.keys(MISCONCEPTION_MAP);
+  const paths = taskTypes.map((taskType) => {
+    const path = buildQuestionTypeSocraticPath(taskType, { level: 2 }, diagnosticProbe(taskType, 2));
+    return {
+      id: path.id,
+      taskType,
+      title: path.title,
+      active: taskType === activeTaskType,
+      probeCount: path.probeBank.length,
+      visualMoveCount: path.visualMoves.length,
+      fallbackCount: path.fallbackLadder.length,
+      firstProbe: path.probeBank[0] ? path.probeBank[0].question : '',
+      firstBoardMove: path.visualMoves[0] ? path.visualMoves[0].boardMove : '',
+      evidenceContractLine: path.evidenceContractLine,
+      noFullAnswerBoundary: path.noFullAnswerBoundary
+    };
+  });
+  const active = paths.find((item) => item.taskType === activeTaskType) || paths.find((item) => item.taskType === 'unknown') || paths[0];
+  return {
+    id: 'question_type_coverage_atlas',
+    title: '题型级追问覆盖图谱',
+    summary: `已覆盖 ${paths.length} 类题型，每类都有误区轴、第一步小黑板和失败兜底。`,
+    activeTaskType: active ? active.taskType : 'unknown',
+    activeLine: active ? `${active.firstProbe}｜${active.firstBoardMove}` : '',
+    paths,
+    totalProbeCount: paths.reduce((sum, item) => sum + item.probeCount, 0),
+    totalVisualMoveCount: paths.reduce((sum, item) => sum + item.visualMoveCount, 0),
+    totalFallbackCount: paths.reduce((sum, item) => sum + item.fallbackCount, 0),
+    boundary: '只做第一步追问和可视化提示，不给完整答案，不承诺全科自动板书讲题。'
+  };
+}
+
 function buildSocraticContract(taskType, item, probe) {
   const normalized = normalizeLevel(item && item.level);
   const nextQuestions = {
@@ -464,6 +497,7 @@ module.exports = {
   buildSocraticContract,
   buildSocraticFallbackPlan,
   buildQuestionTypeSocraticPath,
+  buildQuestionTypeCoverageAtlas,
   MISCONCEPTION_MAP,
   detectTaskType,
   buildTutorReply,

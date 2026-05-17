@@ -118,6 +118,13 @@
             <view class="receipt-board-avoid">{{thinkingReceipt.question_type_socratic_path.evidenceContractLine}}</view>
             <view class="receipt-board-avoid">{{thinkingReceipt.question_type_socratic_path.noFullAnswerBoundary}}</view>
           </view>
+          <view class="receipt-first-step-board" wx:if="{{thinkingReceipt.questionTypeCoverageAtlas}}">
+            <view class="receipt-diagnostic-title">{{thinkingReceipt.questionTypeCoverageAtlas.title}}</view>
+            <view class="receipt-board-avoid">{{thinkingReceipt.questionTypeCoverageAtlas.summary}}</view>
+            <view class="receipt-board-line">当前轴：{{thinkingReceipt.questionTypeCoverageAtlas.activeLine}}</view>
+            <view class="receipt-board-parent" wx:for="{{thinkingReceipt.questionTypeCoverageAtlas.paths}}" wx:key="id">{{item.taskType}}：{{item.probeCount}} 追问 / {{item.visualMoveCount}} 小黑板 / {{item.fallbackCount}} 兜底</view>
+            <view class="receipt-board-avoid">{{thinkingReceipt.questionTypeCoverageAtlas.boundary}}</view>
+          </view>
           <view class="receipt-first-step-board" wx:if="{{thinkingReceipt.visualSocraticMatrix}}">
             <view class="receipt-diagnostic-title">{{thinkingReceipt.visualSocraticMatrix.title}}</view>
             <view class="receipt-board-avoid">{{thinkingReceipt.visualSocraticMatrix.visualBoundary}}</view>

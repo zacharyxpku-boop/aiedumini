@@ -176,6 +176,9 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
   const activeCourseUnit = courseUnitMap && courseUnitMap.active && Array.isArray(courseUnitMap.active.units)
     ? courseUnitMap.active.units[0]
     : null;
+  const questionTypeCoverageAtlas = tutorLadder.buildQuestionTypeCoverageAtlas
+    ? tutorLadder.buildQuestionTypeCoverageAtlas(subjectSkillDepth && subjectSkillDepth.taskType ? subjectSkillDepth.taskType : 'unknown')
+    : null;
   const studentFirst = userMessages.some((item) => String(item.text || '').length >= 8 && !/答案|直接|代写|帮我写/.test(String(item.text || '')));
   const blockedAnswer = (masterySignal && masterySignal.status === 'blocked_answer_request')
     || (pasteRisk && pasteRisk.level === 'high');
@@ -232,6 +235,7 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
     visualSocraticMatrix,
     courseUnitMap,
     activeCourseUnit,
+    questionTypeCoverageAtlas,
     handoffPlan,
     checks: [
       { id: 'first', label: '先有自己的想法', done: studentFirst, detail: studentFirst ? '已经说出一步或一个问题' : '还需要先交出自己的第一步' },
@@ -681,6 +685,12 @@ Page({
         question_type_axis: result.question_type_socratic_path && result.question_type_socratic_path.activeAxis,
         question_type_probe_count: result.question_type_socratic_path && Array.isArray(result.question_type_socratic_path.probeBank)
           ? result.question_type_socratic_path.probeBank.length
+          : 0,
+        question_type_coverage_count: diagnosticReceipt.questionTypeCoverageAtlas && Array.isArray(diagnosticReceipt.questionTypeCoverageAtlas.paths)
+          ? diagnosticReceipt.questionTypeCoverageAtlas.paths.length
+          : 0,
+        question_type_coverage_probes: diagnosticReceipt.questionTypeCoverageAtlas
+          ? diagnosticReceipt.questionTypeCoverageAtlas.totalProbeCount
           : 0,
         course_unit_subject: diagnosticReceipt.courseUnitMap && diagnosticReceipt.courseUnitMap.active
           ? diagnosticReceipt.courseUnitMap.active.label
