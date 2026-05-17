@@ -496,6 +496,96 @@ function buildMemoryFeedbackController(cards = [], events = [], result = {}, ret
   };
 }
 
+function buildRecallIntensityPlan(weakKey = '第一步', needsRepair = false, result = {}) {
+  const accuracy = Number.isFinite(Number(result.accuracy)) ? Number(result.accuracy) : 0;
+  const wrong = Math.max(0, Number(result.wrong || 0));
+  const tier = needsRepair || wrong > 0 || accuracy < 80 ? 'repair' : 'stretch';
+  return {
+    id: 'recall_intensity_plan',
+    tier,
+    title: tier === 'repair' ? '三轮修复节奏' : '三轮迁移节奏',
+    rounds: [
+      { id: 'now', label: '现在', size: tier === 'repair' ? 3 : 4, rule: `只回忆「${weakKey}」第一步，答不出就降到二选一。`, route: '/pages/review/review' },
+      { id: 'tomorrow', label: '明天', size: 1, rule: `只抽最不稳 1 张，确认不是当场会、转身忘。`, route: '/pages/review/review' },
+      { id: 'day7', label: '第 7 天', size: 1, rule: tier === 'repair' ? '仍不稳就继续降阶，不加题量。' : '换一题小变式，确认能迁移。', route: '/pages/tutor/tutor' }
+    ],
+    stopRule: '同一错因连续两次卡住，停止刷题，回到第一步小黑板。',
+    releaseRule: '连续两次能自己说清第一步，才释放变式练习。'
+  };
+}
+
+function buildWrongCauseReplayDeck(cards = [], weakKey = '第一步') {
+  const safeCards = Array.isArray(cards) ? cards : [];
+  const picked = safeCards
+    .filter((card) => {
+      const text = [card.wrongCauseLabel, card.weakPoint, card.question, card.front].filter(Boolean).join(' ');
+      return !weakKey || text.indexOf(weakKey) >= 0 || card.leech || Number(card.lapses || 0) > 0;
+    })
+    .slice(0, 4);
+  const source = picked.length ? picked : safeCards.slice(0, 4);
+  const deck = source.map((card, index) => ({
+    id: card.id || `replay_${index + 1}`,
+    order: index + 1,
+    label: card.wrongCauseLabel || card.weakPoint || weakKey,
+    prompt: card.question || card.front || `复述「${weakKey}」第一步`,
+    repairMove: card.nextAction || card.checkpoint || `先说出「${weakKey}」的一步小动作。`,
+    route: '/pages/review/review'
+  }));
+  while (deck.length < 3) {
+    const order = deck.length + 1;
+    deck.push({
+      id: `synthetic_replay_${order}`,
+      order,
+      label: weakKey,
+      prompt: `第 ${order} 张错因返场：${weakKey}`,
+      repairMove: `先复述「${weakKey}」第一步，再看答案。`,
+      route: '/pages/review/review'
+    });
+  }
+  return {
+    id: 'wrong_cause_replay_deck',
+    title: '错因返场牌组',
+    cards: deck.slice(0, 4),
+    rule: '返场牌只修同一错因，不混入新难题。',
+    evidenceRequired: ['wrong_cause_label', 'repair_move', 'next_day_revisit']
+  };
+}
+
+function buildXpFeedbackPolicy(memoryFeedbackController = {}, result = {}) {
+  const triggered = !!memoryFeedbackController.triggered;
+  const xp = Math.max(0, Number(result.xp || 0));
+  return {
+    id: 'xp_feedback_policy',
+    title: triggered ? 'XP 降噪规则' : 'XP 巩固规则',
+    rewardLine: triggered
+      ? '本轮只奖励主动回忆和错因修复，不奖励题量。'
+      : '本轮 XP 可以记录掌握，但仍要等次日回访确认。',
+    throttleLine: triggered
+      ? `已写入 ${xp} XP；若同错因继续错，下一轮 XP 上限降低。`
+      : `已写入 ${xp} XP；下一轮看迁移，不看刷题数量。`,
+    parentLine: '家长看 XP 只看行为证据，不把 XP 当成绩排名。',
+    evidenceRequired: ['active_recall_xp', 'wrong_cause_repair_xp', 'next_day_confirmed']
+  };
+}
+
+function buildQuestArcRunway(questCadence = [], retention = {}, weakKey = '第一步') {
+  const quests = Array.isArray(questCadence) ? questCadence : [];
+  return {
+    id: 'quest_arc_runway',
+    title: '任务弧跑道',
+    stages: quests.map((quest, index) => ({
+      id: quest.id || `quest_${index + 1}`,
+      order: index + 1,
+      label: quest.label || '任务',
+      status: Number(quest.done || 0) >= Number(quest.target || 1) ? 'done' : 'next',
+      nextAction: quest.reward || `完成「${weakKey}」的一步回忆`,
+      route: index === 0 ? '/pages/review/review' : index === 1 ? '/pages/tutor/tutor' : '/pages/profile/profile'
+    })),
+    bossLine: `本轮 boss 不是难题，是「${retention.weakKey || weakKey}」能否跨天复述。`,
+    completionRule: '主动回忆、错因修复、家长复盘三段都出现，才算一轮闭环。'
+  };
+}
+
 function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], result = {}, challenge = {}, questSet = {}, options = {}) {
   const safeCards = Array.isArray(cards) ? cards : [];
   const safeEvents = Array.isArray(events) ? events : [];
@@ -539,8 +629,12 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
   ];
   const memoryFeedbackController = buildMemoryFeedbackController(safeCards, safeEvents, result, retention, {
     weakKey,
-    targetAccuracy: challenge.targetAccuracy || 80
+      targetAccuracy: challenge.targetAccuracy || 80
   });
+  const recallIntensityPlan = buildRecallIntensityPlan(weakKey, needsRepair, result);
+  const wrongCauseReplayDeck = buildWrongCauseReplayDeck(safeCards, weakKey);
+  const xpFeedbackPolicy = buildXpFeedbackPolicy(memoryFeedbackController, result);
+  const questArcRunway = buildQuestArcRunway(questCadence, retention, weakKey);
   return {
     title: needsRepair ? '高频修复循环' : '高频巩固循环',
     mode: needsRepair ? 'repair_recall' : 'mastery_recall',
@@ -551,13 +645,17 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
     spacedReviewPlan,
     questCadence,
     memoryFeedbackController,
+    recallIntensityPlan,
+    wrongCauseReplayDeck,
+    xpFeedbackPolicy,
+    questArcRunway,
     xpRule: 'XP 只奖励主动回忆、错因修复和次日回访，不奖励盲刷题量。',
     leechRule: needsRepair
       ? `同一错因连续 2 次错，会降到第一步小黑板。`
       : '连续 2 次说清第一步，才进入变式练习。',
     parentShareLine: `家长复盘只看：孩子能否自己说出「${weakKey}」的第一步。`,
     nextRoute: needsRepair ? '/pages/review/review' : '/pages/tutor/tutor',
-    evidenceRequired: ['active_recall_cards', 'spaced_review_plan', 'wrong_cause_return', 'quest_cadence', 'memory_feedback_controller', 'parent_share_line'],
+    evidenceRequired: ['active_recall_cards', 'spaced_review_plan', 'wrong_cause_return', 'quest_cadence', 'memory_feedback_controller', 'recall_intensity_plan', 'wrong_cause_replay_deck', 'xp_feedback_policy', 'quest_arc_runway', 'parent_share_line'],
     weakKey
   };
 }
@@ -573,6 +671,10 @@ module.exports = {
   buildGameRetentionLoop,
   buildHighFrequencyPracticeLoop,
   buildMemoryFeedbackController,
+  buildQuestArcRunway,
+  buildRecallIntensityPlan,
+  buildWrongCauseReplayDeck,
+  buildXpFeedbackPolicy,
   buildKnowledgeGap,
   calculateXP,
   capDailyXP,

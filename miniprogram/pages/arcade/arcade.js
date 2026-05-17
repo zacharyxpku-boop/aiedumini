@@ -787,6 +787,18 @@ Page({
       memory_feedback_triggered: highFrequencyPracticeLoop && highFrequencyPracticeLoop.memoryFeedbackController
         ? highFrequencyPracticeLoop.memoryFeedbackController.triggered
         : false,
+      recall_intensity_tier: highFrequencyPracticeLoop && highFrequencyPracticeLoop.recallIntensityPlan
+        ? highFrequencyPracticeLoop.recallIntensityPlan.tier
+        : '',
+      wrong_cause_replay_count: highFrequencyPracticeLoop && highFrequencyPracticeLoop.wrongCauseReplayDeck
+        ? highFrequencyPracticeLoop.wrongCauseReplayDeck.cards.length
+        : 0,
+      xp_feedback_policy: highFrequencyPracticeLoop && highFrequencyPracticeLoop.xpFeedbackPolicy
+        ? highFrequencyPracticeLoop.xpFeedbackPolicy.title
+        : '',
+      quest_arc_runway_stages: highFrequencyPracticeLoop && highFrequencyPracticeLoop.questArcRunway
+        ? highFrequencyPracticeLoop.questArcRunway.stages.length
+        : 0,
       share_code: incomingShare && incomingShare.share_code ? incomingShare.share_code : ''
     });
     if (storage.saveTodaySession) {
@@ -859,6 +871,18 @@ Page({
         memory_feedback_triggered: highFrequencyPracticeLoop && highFrequencyPracticeLoop.memoryFeedbackController
           ? highFrequencyPracticeLoop.memoryFeedbackController.triggered
           : false,
+        recall_intensity_tier: highFrequencyPracticeLoop && highFrequencyPracticeLoop.recallIntensityPlan
+          ? highFrequencyPracticeLoop.recallIntensityPlan.tier
+          : '',
+        wrong_cause_replay_count: highFrequencyPracticeLoop && highFrequencyPracticeLoop.wrongCauseReplayDeck
+          ? highFrequencyPracticeLoop.wrongCauseReplayDeck.cards.length
+          : 0,
+        xp_feedback_policy: highFrequencyPracticeLoop && highFrequencyPracticeLoop.xpFeedbackPolicy
+          ? highFrequencyPracticeLoop.xpFeedbackPolicy.title
+          : '',
+        quest_arc_runway_stages: highFrequencyPracticeLoop && highFrequencyPracticeLoop.questArcRunway
+          ? highFrequencyPracticeLoop.questArcRunway.stages.length
+          : 0,
         boss_gap: this.data.adaptiveChallenge && this.data.adaptiveChallenge.bossCard
           ? this.data.adaptiveChallenge.bossCard.key
           : '',

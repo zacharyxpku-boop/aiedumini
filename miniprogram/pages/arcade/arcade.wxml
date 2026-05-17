@@ -328,6 +328,38 @@
           <view class="retention-loop-step">{{highFrequencyPracticeLoop.memoryFeedbackController.xpThrottle}}</view>
           <view class="retention-loop-step">{{highFrequencyPracticeLoop.memoryFeedbackController.nextReview}}</view>
         </view>
+        <view class="high-frequency-section" wx:if="{{highFrequencyPracticeLoop.recallIntensityPlan}}">
+          <view class="high-frequency-label">{{highFrequencyPracticeLoop.recallIntensityPlan.title}}</view>
+          <view class="high-frequency-item" wx:for="{{highFrequencyPracticeLoop.recallIntensityPlan.rounds}}" wx:key="id">
+            <text>{{item.label}} · {{item.size}} 张</text>
+            <text>{{item.rule}}</text>
+          </view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.recallIntensityPlan.stopRule}}</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.recallIntensityPlan.releaseRule}}</view>
+        </view>
+        <view class="high-frequency-section" wx:if="{{highFrequencyPracticeLoop.wrongCauseReplayDeck}}">
+          <view class="high-frequency-label">{{highFrequencyPracticeLoop.wrongCauseReplayDeck.title}}</view>
+          <view class="high-frequency-item" wx:for="{{highFrequencyPracticeLoop.wrongCauseReplayDeck.cards}}" wx:key="id">
+            <text>{{item.order}}. {{item.label}}</text>
+            <text>{{item.repairMove}}</text>
+          </view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.wrongCauseReplayDeck.rule}}</view>
+        </view>
+        <view class="memory-feedback-card" wx:if="{{highFrequencyPracticeLoop.xpFeedbackPolicy}}">
+          <view class="high-frequency-label">{{highFrequencyPracticeLoop.xpFeedbackPolicy.title}}</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.xpFeedbackPolicy.rewardLine}}</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.xpFeedbackPolicy.throttleLine}}</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.xpFeedbackPolicy.parentLine}}</view>
+        </view>
+        <view class="high-frequency-section" wx:if="{{highFrequencyPracticeLoop.questArcRunway}}">
+          <view class="high-frequency-label">{{highFrequencyPracticeLoop.questArcRunway.title}}</view>
+          <view class="high-frequency-item" wx:for="{{highFrequencyPracticeLoop.questArcRunway.stages}}" wx:key="id">
+            <text>{{item.order}}. {{item.label}} · {{item.status}}</text>
+            <text>{{item.nextAction}}</text>
+          </view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.questArcRunway.bossLine}}</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.questArcRunway.completionRule}}</view>
+        </view>
         <view class="retention-loop-foot">{{highFrequencyPracticeLoop.parentShareLine}}</view>
       </view>
       <view class="next-action-card" wx:if="{{challengeBrief.resultLine}}">
