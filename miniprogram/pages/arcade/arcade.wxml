@@ -302,6 +302,27 @@
         <view class="retention-loop-step">{{gameRetentionLoop.tomorrowLine}}</view>
         <view class="retention-loop-foot">{{gameRetentionLoop.xpLine}} {{gameRetentionLoop.habitCue}}</view>
       </view>
+      <view class="retention-loop-card high-frequency-card" wx:if="{{highFrequencyPracticeLoop}}">
+        <view class="retention-loop-kicker">高频回忆计划</view>
+        <view class="retention-loop-title">{{highFrequencyPracticeLoop.title}}</view>
+        <view class="retention-loop-line">{{highFrequencyPracticeLoop.summaryLine}}</view>
+        <view class="high-frequency-section">
+          <view class="high-frequency-label">主动回忆卡</view>
+          <view class="high-frequency-item" wx:for="{{highFrequencyPracticeLoop.recallCards}}" wx:key="id">
+            <text>{{item.order}}. {{item.prompt}}</text>
+            <text>{{item.firstStep}}</text>
+          </view>
+        </view>
+        <view class="high-frequency-section">
+          <view class="high-frequency-label">间隔回访</view>
+          <view class="high-frequency-item" wx:for="{{highFrequencyPracticeLoop.spacedReviewPlan}}" wx:key="id">
+            <text>{{item.label}}：{{item.action}}</text>
+          </view>
+        </view>
+        <view class="retention-loop-step">{{highFrequencyPracticeLoop.xpRule}}</view>
+        <view class="retention-loop-step">{{highFrequencyPracticeLoop.leechRule}}</view>
+        <view class="retention-loop-foot">{{highFrequencyPracticeLoop.parentShareLine}}</view>
+      </view>
       <view class="next-action-card" wx:if="{{challengeBrief.resultLine}}">
         <view class="next-action-title">目标回看</view>
         <view class="next-action-body">{{challengeBrief.resultLine}}</view>

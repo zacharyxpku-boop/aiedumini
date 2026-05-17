@@ -1126,6 +1126,34 @@
   color: rgba(255, 255, 255, 0.66);
 }
 
+.high-frequency-card {
+  background: rgba(242, 212, 121, 0.10);
+}
+
+.high-frequency-section {
+  margin-top: 16rpx;
+  display: grid;
+  gap: 10rpx;
+}
+
+.high-frequency-label {
+  color: rgba(242, 212, 121, 0.9);
+  font-size: 21rpx;
+  font-weight: 950;
+}
+
+.high-frequency-item {
+  display: grid;
+  gap: 4rpx;
+  padding: 14rpx 16rpx;
+  border-radius: 18rpx;
+  background: rgba(255, 255, 255, 0.10);
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 22rpx;
+  font-weight: 760;
+  line-height: 1.36;
+}
+
 .next-action-title {
   color: #F2D479;
   font-size: 24rpx;

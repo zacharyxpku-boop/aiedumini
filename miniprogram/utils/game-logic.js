@@ -444,6 +444,67 @@ function buildGameRetentionLoop(profile = {}, result = {}, challenge = {}, quest
   };
 }
 
+function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], result = {}, challenge = {}, questSet = {}, options = {}) {
+  const safeCards = Array.isArray(cards) ? cards : [];
+  const safeEvents = Array.isArray(events) ? events : [];
+  const now = options.now || new Date();
+  const retention = options.retentionLoop || buildGameRetentionLoop(profile, result, challenge, questSet, options);
+  const gaps = buildKnowledgeGap(safeEvents, safeCards);
+  const dueCards = safeCards
+    .filter((card) => !card.next_review || new Date(card.next_review).getTime() <= new Date(now).getTime())
+    .slice(0, 6);
+  const weakKey = retention.weakKey || (gaps[0] && gaps[0].key) || questSet.weakKey || '第一步';
+  const sourceCards = dueCards.length ? dueCards : safeCards.slice(0, 6);
+  const recallCards = sourceCards.slice(0, 3).map((card, index) => ({
+    id: card.id || `recall_${index + 1}`,
+    order: index + 1,
+    prompt: card.question || card.front || card.weakPoint || `回忆 ${weakKey} 的第一步`,
+    firstStep: card.checkpoint || card.nextAction || card.next_practice || `先说清 ${weakKey} 的第一步。`,
+    wrongCause: card.wrongCauseLabel || card.weakPoint || weakKey,
+    route: '/pages/review/review'
+  }));
+  while (recallCards.length < 3) {
+    const order = recallCards.length + 1;
+    recallCards.push({
+      id: `synthetic_recall_${order}`,
+      order,
+      prompt: `第 ${order} 次回忆：${weakKey}`,
+      firstStep: `只说 ${weakKey} 的第一步，不直接看答案。`,
+      wrongCause: weakKey,
+      route: '/pages/review/review'
+    });
+  }
+  const needsRepair = retention.mode === 'repair' || Number(result.wrong || 0) > 0 || Number(result.accuracy || 0) < Number(challenge.targetAccuracy || 80);
+  const spacedReviewPlan = [
+    { id: 'same_day', label: '今晚', action: `再回忆 3 张 ${weakKey} 卡，只说第一步。`, route: '/pages/arcade/arcade' },
+    { id: 'next_day', label: '明天', action: `只回访最不稳的 1 张卡：${weakKey}。`, route: '/pages/review/review' },
+    { id: 'day_7', label: '第 7 天', action: '用一题小变式确认能不能迁移。', route: '/pages/tutor/tutor' }
+  ];
+  const questCadence = [
+    { id: 'recall', label: '主动回忆', target: 3, done: Math.min(3, Number(result.correct || 0)), reward: '说出第一步才给 XP' },
+    { id: 'repair', label: '错因修复', target: needsRepair ? 1 : 0, done: needsRepair ? 0 : 1, reward: '错因回到复习队列' },
+    { id: 'share', label: '家长复盘', target: 1, done: 0, reward: '生成可分享的行动证据' }
+  ];
+  return {
+    title: needsRepair ? '高频修复循环' : '高频巩固循环',
+    mode: needsRepair ? 'repair_recall' : 'mastery_recall',
+    summaryLine: needsRepair
+      ? `下一轮不加题量，围绕「${weakKey}」做 3 张主动回忆。`
+      : `本轮先沉淀掌握证据，再用间隔回访防止遗忘。`,
+    recallCards,
+    spacedReviewPlan,
+    questCadence,
+    xpRule: 'XP 只奖励主动回忆、错因修复和次日回访，不奖励盲刷题量。',
+    leechRule: needsRepair
+      ? `同一错因连续 2 次错，会降到第一步小黑板。`
+      : '连续 2 次说清第一步，才进入变式练习。',
+    parentShareLine: `家长复盘只看：孩子能否自己说出「${weakKey}」的第一步。`,
+    nextRoute: needsRepair ? '/pages/review/review' : '/pages/tutor/tutor',
+    evidenceRequired: ['active_recall_cards', 'spaced_review_plan', 'wrong_cause_return', 'quest_cadence', 'parent_share_line'],
+    weakKey
+  };
+}
+
 module.exports = {
   ACHIEVEMENTS,
   DAY_MS,
@@ -453,6 +514,7 @@ module.exports = {
   buildAdaptiveChallenge,
   buildDailyQuestSet,
   buildGameRetentionLoop,
+  buildHighFrequencyPracticeLoop,
   buildKnowledgeGap,
   calculateXP,
   capDailyXP,

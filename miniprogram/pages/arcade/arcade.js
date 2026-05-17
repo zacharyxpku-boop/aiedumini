@@ -44,6 +44,7 @@ Page({
     result: null,
     resultAdvice: null,
     gameRetentionLoop: null,
+    highFrequencyPracticeLoop: null,
     emptyGuide: null,
     feedbackText: '',
     expandedMatrix: false,
@@ -744,6 +745,17 @@ Page({
         { weakKey: repairFocus && repairFocus.title ? repairFocus.title : '' }
       )
       : null;
+    const highFrequencyPracticeLoop = gameLogic.buildHighFrequencyPracticeLoop
+      ? gameLogic.buildHighFrequencyPracticeLoop(
+        gameRetention && gameRetention.profile ? gameRetention.profile : profile,
+        this.data.cards,
+        storage.loadReviewEvents ? storage.loadReviewEvents() : [],
+        savedResult,
+        this.data.adaptiveChallenge,
+        this.data.dailyQuestSet,
+        { retentionLoop: gameRetentionLoop, weakKey: repairFocus && repairFocus.title ? repairFocus.title : '' }
+      )
+      : null;
     const questArcSignal = storage.recordQuestArcGameSignal
       ? storage.recordQuestArcGameSignal({
         mission: this.data.questArcMission,
@@ -766,6 +778,8 @@ Page({
       retention_mode: gameRetentionLoop && gameRetentionLoop.mode,
       retention_next_route: gameRetentionLoop && gameRetentionLoop.nextRoute,
       retention_weak_key: gameRetentionLoop && gameRetentionLoop.weakKey,
+      high_frequency_mode: highFrequencyPracticeLoop && highFrequencyPracticeLoop.mode,
+      high_frequency_next_route: highFrequencyPracticeLoop && highFrequencyPracticeLoop.nextRoute,
       share_code: incomingShare && incomingShare.share_code ? incomingShare.share_code : ''
     });
     if (storage.saveTodaySession) {
@@ -798,7 +812,8 @@ Page({
           streak: gameRetention && gameRetention.profile ? Number(gameRetention.profile.streak || 0) : 0,
           newlyUnlocked: gameRetention && gameRetention.newlyUnlocked ? gameRetention.newlyUnlocked.map((item) => item.id) : [],
           rewardLine,
-          gameRetentionLoop
+          gameRetentionLoop,
+          highFrequencyPracticeLoop
         }
       });
     }
@@ -827,6 +842,10 @@ Page({
         retention_evidence: gameRetentionLoop && Array.isArray(gameRetentionLoop.evidenceRequired)
           ? gameRetentionLoop.evidenceRequired.join(',')
           : '',
+        high_frequency_mode: highFrequencyPracticeLoop && highFrequencyPracticeLoop.mode,
+        high_frequency_evidence: highFrequencyPracticeLoop && Array.isArray(highFrequencyPracticeLoop.evidenceRequired)
+          ? highFrequencyPracticeLoop.evidenceRequired.join(',')
+          : '',
         boss_gap: this.data.adaptiveChallenge && this.data.adaptiveChallenge.bossCard
           ? this.data.adaptiveChallenge.bossCard.key
           : '',
@@ -846,6 +865,7 @@ Page({
       result: savedResult,
       resultAdvice: arcade.buildRoundAdvice(savedResult, savedResult.gameType),
       gameRetentionLoop,
+      highFrequencyPracticeLoop,
       challengeBrief: Object.assign({}, this.data.challengeBrief || {}, {
         resultLine: savedResult.accuracy >= Number((this.data.challengeBrief && this.data.challengeBrief.targetAccuracy) || 80)
           ? '本局达到目标，剧情线证据已写回。'
@@ -888,6 +908,7 @@ Page({
       repairFocus: null,
       result: null,
       resultAdvice: null,
+      highFrequencyPracticeLoop: null,
       emptyGuide: this.emptyGuide(this.data.selectedGame, round),
       feedbackText: '新一局开始。'
     });
