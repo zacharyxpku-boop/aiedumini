@@ -4643,6 +4643,15 @@ function saveIncomingShare(share = {}) {
     relay_privacy: share.relay_privacy || '',
     relay_review: share.relay_review || '',
     relay_first_step: share.relay_first_step || '',
+    course_unit_label: share.course_unit_label || '',
+    course_unit_subject: share.course_unit_subject || '',
+    course_unit_tier: share.course_unit_tier || '',
+    course_unit_parent_decision: share.course_unit_parent_decision || '',
+    course_unit_report_contract: share.course_unit_report_contract || '',
+    course_unit_share_contract: share.course_unit_share_contract || '',
+    course_unit_blackboard: share.course_unit_blackboard || '',
+    course_unit_recall_route: share.course_unit_recall_route || '',
+    course_unit_game_route: share.course_unit_game_route || '',
     created_at: share.created_at || new Date().toISOString()
   };
   set(KEYS.incomingShare, record);

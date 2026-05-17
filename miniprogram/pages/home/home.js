@@ -168,7 +168,16 @@ Page({
         challenge_route: safeDecodeShareParam(query.challenge_route),
         relay_privacy: safeDecodeShareParam(query.relay_privacy),
         relay_review: safeDecodeShareParam(query.relay_review),
-        relay_first_step: safeDecodeShareParam(query.relay_first_step)
+        relay_first_step: safeDecodeShareParam(query.relay_first_step),
+        course_unit_label: safeDecodeShareParam(query.course_unit_label),
+        course_unit_subject: safeDecodeShareParam(query.course_unit_subject),
+        course_unit_tier: safeDecodeShareParam(query.course_unit_tier),
+        course_unit_parent_decision: safeDecodeShareParam(query.course_unit_parent_decision),
+        course_unit_report_contract: safeDecodeShareParam(query.course_unit_report_contract),
+        course_unit_share_contract: safeDecodeShareParam(query.course_unit_share_contract),
+        course_unit_blackboard: safeDecodeShareParam(query.course_unit_blackboard),
+        course_unit_recall_route: safeDecodeShareParam(query.course_unit_recall_route),
+        course_unit_game_route: safeDecodeShareParam(query.course_unit_game_route)
       }) : {
         code: query.share,
         share_code: query.share,
@@ -187,6 +196,15 @@ Page({
         relay_privacy: safeDecodeShareParam(query.relay_privacy),
         relay_review: safeDecodeShareParam(query.relay_review),
         relay_first_step: safeDecodeShareParam(query.relay_first_step),
+        course_unit_label: safeDecodeShareParam(query.course_unit_label),
+        course_unit_subject: safeDecodeShareParam(query.course_unit_subject),
+        course_unit_tier: safeDecodeShareParam(query.course_unit_tier),
+        course_unit_parent_decision: safeDecodeShareParam(query.course_unit_parent_decision),
+        course_unit_report_contract: safeDecodeShareParam(query.course_unit_report_contract),
+        course_unit_share_contract: safeDecodeShareParam(query.course_unit_share_contract),
+        course_unit_blackboard: safeDecodeShareParam(query.course_unit_blackboard),
+        course_unit_recall_route: safeDecodeShareParam(query.course_unit_recall_route),
+        course_unit_game_route: safeDecodeShareParam(query.course_unit_game_route),
         action_label: query.action === 'wrong_cause_revisit'
           ? '明天先回看这张错因卡'
           : query.action === 'due_card_revisit'
@@ -222,7 +240,12 @@ Page({
             challenge_route: safeDecodeShareParam(query.challenge_route),
             relay_privacy: safeDecodeShareParam(query.relay_privacy),
             relay_review: safeDecodeShareParam(query.relay_review),
-            relay_first_step: safeDecodeShareParam(query.relay_first_step)
+            relay_first_step: safeDecodeShareParam(query.relay_first_step),
+            course_unit_label: safeDecodeShareParam(query.course_unit_label),
+            course_unit_subject: safeDecodeShareParam(query.course_unit_subject),
+            course_unit_parent_decision: safeDecodeShareParam(query.course_unit_parent_decision),
+            course_unit_report_contract: safeDecodeShareParam(query.course_unit_report_contract),
+            course_unit_share_contract: safeDecodeShareParam(query.course_unit_share_contract)
           }
         });
       }
@@ -245,7 +268,12 @@ Page({
           challenge_route: safeDecodeShareParam(query.challenge_route),
           relay_privacy: safeDecodeShareParam(query.relay_privacy),
           relay_review: safeDecodeShareParam(query.relay_review),
-          relay_first_step: safeDecodeShareParam(query.relay_first_step)
+          relay_first_step: safeDecodeShareParam(query.relay_first_step),
+          course_unit_label: safeDecodeShareParam(query.course_unit_label),
+          course_unit_subject: safeDecodeShareParam(query.course_unit_subject),
+          course_unit_parent_decision: safeDecodeShareParam(query.course_unit_parent_decision),
+          course_unit_report_contract: safeDecodeShareParam(query.course_unit_report_contract),
+          course_unit_share_contract: safeDecodeShareParam(query.course_unit_share_contract)
         }
       }).catch(() => {});
       this.setData({
@@ -760,16 +788,24 @@ Page({
     const actionLabel = incoming.action_label || '先接住这张学习复盘卡';
     const actionDetail = incoming.action_detail || incoming.capability_next_action || '用自己的材料走一遍：第一步、轻练、回访。';
     const challengeRoute = navigation.normalizeRoute(incoming.challenge_route || incoming.capability_route || '/pages/arcade/arcade');
+    const unitRoute = navigation.normalizeRoute(incoming.course_unit_game_route || incoming.course_unit_recall_route || challengeRoute);
     const firstStep = incoming.relay_first_step || incoming.challenge_goal || actionLabel;
     const privacyLine = incoming.relay_privacy || '分享只带学习动作和回访证据，不带孩子完整对话、分数、原题照片。';
     const reviewLine = incoming.relay_review || '第 7 天用 1 道小变式确认能不能迁移。';
+    const unitLine = incoming.course_unit_label
+      ? `${incoming.course_unit_subject || '当前学科'} · ${incoming.course_unit_label}`
+      : '';
     return {
       title: '回流接力板',
-      summary: '朋友分享的不是排名，是一个可复用的小动作。先选一条路，按点会留下接力证据。',
-      evidenceLine: incoming.capability_label || incoming.challenge_goal || actionLabel,
+      summary: unitLine ? `这张卡带回一个单元动作：${unitLine}。先复用第一步，不看排名。` : '朋友分享的不是排名，是一个可复用的小动作。先选一条路，按点会留下接力证据。',
+      evidenceLine: incoming.course_unit_share_contract || incoming.capability_label || incoming.challenge_goal || actionLabel,
       firstStepLine: `先做第一步：${firstStep}`,
       privacyLine,
       reviewLine,
+      unitLine,
+      unitDecisionLine: incoming.course_unit_parent_decision || '',
+      unitReportLine: incoming.course_unit_report_contract || '',
+      unitBlackboardLine: incoming.course_unit_blackboard || '',
       returnContractLine: '接力成立条件：主动回忆、错因回退、明天回访三件事至少完成一件并留下记录。',
       actions: [
         {
@@ -781,9 +817,9 @@ Page({
         },
         {
           id: 'challenge',
-          label: '轻挑战',
-          route: challengeRoute,
-          reason: incoming.challenge_goal || actionLabel,
+          label: incoming.course_unit_label ? '练这个单元' : '轻挑战',
+          route: unitRoute,
+          reason: incoming.course_unit_parent_decision || incoming.challenge_goal || actionLabel,
           evidence: incoming.challenge_rule || '5分钟轻回访'
         },
         {

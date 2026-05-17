@@ -363,6 +363,8 @@
         <view class="share-body" wx:if="{{incomingShare.relay_first_step}}">第一步：{{incomingShare.relay_first_step}}</view>
         <view class="share-body" wx:if="{{incomingShare.relay_review}}">7 天复核：{{incomingShare.relay_review}}</view>
         <view class="share-body" wx:if="{{incomingShare.relay_privacy}}">{{incomingShare.relay_privacy}}</view>
+        <view class="share-body" wx:if="{{incomingShare.course_unit_label}}">单元：{{incomingShare.course_unit_subject}} · {{incomingShare.course_unit_label}}</view>
+        <view class="share-body" wx:if="{{incomingShare.course_unit_parent_decision}}">{{incomingShare.course_unit_parent_decision}}</view>
       </view>
       <button class="share-button" bindtap="goSharedChallenge">去轻挑战</button>
       <view class="share-relay-board" wx:if="{{incomingShareRelay}}">
@@ -371,6 +373,10 @@
         <view class="share-relay-evidence">{{incomingShareRelay.firstStepLine}}</view>
         <view class="share-relay-evidence">{{incomingShareRelay.privacyLine}}</view>
         <view class="share-relay-evidence">{{incomingShareRelay.reviewLine}}</view>
+        <view class="share-relay-evidence" wx:if="{{incomingShareRelay.unitLine}}">单元接力：{{incomingShareRelay.unitLine}}</view>
+        <view class="share-relay-evidence" wx:if="{{incomingShareRelay.unitDecisionLine}}">{{incomingShareRelay.unitDecisionLine}}</view>
+        <view class="share-relay-evidence" wx:if="{{incomingShareRelay.unitReportLine}}">{{incomingShareRelay.unitReportLine}}</view>
+        <view class="share-relay-evidence" wx:if="{{incomingShareRelay.unitBlackboardLine}}">{{incomingShareRelay.unitBlackboardLine}}</view>
         <view class="share-relay-evidence">{{incomingShareRelay.returnContractLine}}</view>
         <view class="share-relay-grid">
           <button

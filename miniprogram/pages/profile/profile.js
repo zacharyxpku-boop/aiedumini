@@ -357,7 +357,7 @@ function buildShareCode(profile, reviewSummary, gameProfileCard) {
   return hash.toString(36).slice(0, 6).toUpperCase();
 }
 
-function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCauseSummary, todayFocus, globalEvidenceBrief, reportDailyActionQueue, unifiedNextAction, capabilityEvidenceLedger, subjectSkillDepth, curriculumSpine, visualSocraticMatrix) {
+function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCauseSummary, todayFocus, globalEvidenceBrief, reportDailyActionQueue, unifiedNextAction, capabilityEvidenceLedger, subjectSkillDepth, curriculumSpine, visualSocraticMatrix, courseUnitMap) {
   const review = reviewSummary || {};
   const game = gameProfileCard || {};
   const progress = review.progress || {};
@@ -408,9 +408,13 @@ function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCause
   const challengeQuery = shareChallengePlan && shareChallengePlan.query
     ? `&challenge_goal=${encodeURIComponent(shareChallengePlan.query.challenge_goal || '')}&challenge_rule=${encodeURIComponent(shareChallengePlan.query.challenge_rule || '')}&challenge_route=${encodeURIComponent(shareChallengePlan.query.challenge_route || '')}&relay_privacy=${encodeURIComponent(shareChallengePlan.query.relay_privacy || '')}&relay_review=${encodeURIComponent(shareChallengePlan.query.relay_review || '')}&relay_first_step=${encodeURIComponent(shareChallengePlan.query.relay_first_step || '')}`
     : '';
-  const path = `/pages/home/home?share=${code}&from=daily_card&challenge=arcade&mode=same_identity&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}`;
-  const parentPath = `/pages/home/home?share=${code}&from=parent_card&mode=parent_recap&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}`;
-  const peerPath = `/pages/home/home?share=${code}&from=peer_challenge&challenge=arcade&mode=same_identity&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}`;
+  const courseUnitDecision = buildCourseUnitDecisionBoard(courseUnitMap);
+  const courseUnitQuery = courseUnitDecision
+    ? `&course_unit_label=${encodeURIComponent(courseUnitDecision.unitLabel || '')}&course_unit_subject=${encodeURIComponent(courseUnitDecision.subjectLabel || '')}&course_unit_tier=${encodeURIComponent(courseUnitDecision.tier || '')}&course_unit_parent_decision=${encodeURIComponent(courseUnitDecision.parentTonightDecision || '')}&course_unit_report_contract=${encodeURIComponent(courseUnitDecision.reportContract || '')}&course_unit_share_contract=${encodeURIComponent(courseUnitDecision.shareContract || '')}&course_unit_blackboard=${encodeURIComponent(courseUnitDecision.blackboardLine || '')}&course_unit_recall_route=${encodeURIComponent(courseUnitDecision.recallRoute || '')}&course_unit_game_route=${encodeURIComponent(courseUnitDecision.gameRoute || '')}`
+    : '';
+  const path = `/pages/home/home?share=${code}&from=daily_card&challenge=arcade&mode=same_identity&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}${courseUnitQuery}`;
+  const parentPath = `/pages/home/home?share=${code}&from=parent_card&mode=parent_recap&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}${courseUnitQuery}`;
+  const peerPath = `/pages/home/home?share=${code}&from=peer_challenge&challenge=arcade&mode=same_identity&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}${courseUnitQuery}`;
   const parentShareTitle = todayFocus && todayFocus.title
     ? `今晚先看这一处：${storage.formatIssueType(todayFocus.issueType || '卡点')} · ${todayFocus.title}`
     : '给家里看的今日学习复盘';
@@ -520,6 +524,7 @@ function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCause
       boardMoves: visualSocraticMatrix.boardMoves || [],
       socraticQuestions: visualSocraticMatrix.socraticQuestions || []
     } : null,
+    courseUnitDecision,
     capabilityGap: nextCapability ? {
       id: nextCapability.id,
       label: nextCapability.label,
@@ -587,6 +592,15 @@ function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCause
       curriculum_subject: curriculumSpine && curriculumSpine.subjectLabel,
       curriculum_current_node: curriculumSpine && curriculumSpine.currentNode && curriculumSpine.currentNode.label,
       visual_socratic_subject: visualSocraticMatrix && visualSocraticMatrix.subjectLabel,
+      course_unit_label: courseUnitDecision && courseUnitDecision.unitLabel,
+      course_unit_subject: courseUnitDecision && courseUnitDecision.subjectLabel,
+      course_unit_tier: courseUnitDecision && courseUnitDecision.tier,
+      course_unit_parent_decision: courseUnitDecision && courseUnitDecision.parentTonightDecision,
+      course_unit_report_contract: courseUnitDecision && courseUnitDecision.reportContract,
+      course_unit_share_contract: courseUnitDecision && courseUnitDecision.shareContract,
+      course_unit_blackboard: courseUnitDecision && courseUnitDecision.blackboardLine,
+      course_unit_recall_route: courseUnitDecision && courseUnitDecision.recallRoute,
+      course_unit_game_route: courseUnitDecision && courseUnitDecision.gameRoute,
       mode: 'same_identity',
       challenge: 'arcade'
     }
@@ -1207,7 +1221,7 @@ Page({
       capabilityEvidenceLedger
     }) : null;
     learningReportSummary = buildLearningReportSummary(learningReportState || {}, capabilityEvidenceLedger, subjectSkillDepth, curriculumSpine, visualSocraticMatrix, courseUnitMap);
-    const dailyShareCard = buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCauseSummary, todayFocus, globalEvidenceBrief, reportDailyActionQueue, unifiedNextAction, capabilityEvidenceLedger, subjectSkillDepth, curriculumSpine, visualSocraticMatrix);
+    const dailyShareCard = buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCauseSummary, todayFocus, globalEvidenceBrief, reportDailyActionQueue, unifiedNextAction, capabilityEvidenceLedger, subjectSkillDepth, curriculumSpine, visualSocraticMatrix, courseUnitMap);
     if (dailyShareCard && dailyShareCard.code && dailyShareCard.code !== lastGeneratedShareCode) {
       lastGeneratedShareCode = dailyShareCard.code;
       sendMiniEvent({
