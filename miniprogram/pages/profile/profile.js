@@ -649,6 +649,8 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
   const overview = draft.overview || {};
   const plan = draft.recommendationPlan || {};
   const solutionMap = reportState.solutionMap || draft.solutionMap || {};
+  const longTermPortrait = reportState.longTermPortrait || draft.longTermPortrait || {};
+  const classroomDecisionBoard = reportState.classroomDecisionBoard || draft.classroomDecisionBoard || {};
   const matrix = Array.isArray(draft.diagnosisMatrix) ? draft.diagnosisMatrix : [];
   const tendencies = Array.isArray(draft.capabilityTendencies) ? draft.capabilityTendencies : [];
   const mainDiagnosis = matrix.find((item) => item.status === '需要支持') || matrix[0] || null;
@@ -724,6 +726,17 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     visualSocraticMatrix,
     visualSocraticReportLine: visualSocraticMatrix && visualSocraticMatrix.reportLine ? visualSocraticMatrix.reportLine : '',
     visualSocraticBoundary: visualSocraticMatrix && visualSocraticMatrix.visualBoundary ? visualSocraticMatrix.visualBoundary : '',
+    longTermPortrait,
+    longTermPortraitLine: longTermPortrait.learnerPattern || '',
+    longTermPortraitStabilityLine: longTermPortrait.stabilityLine || '',
+    longTermPortraitRiskLine: longTermPortrait.riskWatch || '',
+    longTermPortraitEvidence: Array.isArray(longTermPortrait.evidenceToCollect) ? longTermPortrait.evidenceToCollect : [],
+    classroomDecisionBoard,
+    classroomDecisionLine: classroomDecisionBoard.decisionLine || '',
+    classroomTeacherLens: classroomDecisionBoard.teacherLens || '',
+    classroomParentLens: classroomDecisionBoard.parentLens || '',
+    classroomEvidenceRule: classroomDecisionBoard.evidenceRule || '',
+    classroomStopRule: classroomDecisionBoard.stopRule || '',
     parentScript: solutionMap.parentScript || plan.parentLine || '家长先问一句：这一步你准备先看哪里？',
     childScript: solutionMap.childScript || plan.childLine || '我先说出第一步。',
     nextEvidenceLine: Array.isArray(solutionMap.nextEvidenceRequired) && solutionMap.nextEvidenceRequired.length

@@ -565,6 +565,74 @@ function buildSolutionMap(parts, matrix, recommendationPlan) {
   };
 }
 
+function buildLongTermLearningPortrait(parts = {}, matrix = [], tendencies = []) {
+  const diagnosis = Array.isArray(matrix) ? matrix : [];
+  const trendItems = Array.isArray(tendencies) ? tendencies : [];
+  const weakest = diagnosis.find((item) => item.status === '需要支持') || diagnosis[0] || {};
+  const stable = diagnosis.find((item) => item.status === '相对稳定') || diagnosis.find((item) => item.status === '优势') || {};
+  const scores = parts.parsedScores || {};
+  const subjects = Object.keys(scores);
+  const evidenceCount = [
+    parts.reportSources && parts.reportSources.length,
+    subjects.length,
+    parts.assessmentAnswers && parts.assessmentAnswers.length,
+    parts.behaviorSignals && Object.keys(parts.behaviorSignals).length,
+    parts.emotionSignals && Object.keys(parts.emotionSignals).length
+  ].reduce((sum, item) => sum + Number(item || 0), 0);
+  const stability = evidenceCount >= 18 ? 'high' : evidenceCount >= 8 ? 'medium' : 'low';
+  const nextEvidence = [];
+  if (!subjects.length) nextEvidence.push('补一份最近成绩或错题');
+  if (!parts.assessmentAnswers || parts.assessmentAnswers.length < 8) nextEvidence.push('补完 8 个快速画像问题');
+  if (!parts.behaviorSignals || !Object.keys(parts.behaviorSignals).length) nextEvidence.push('补一次孩子真实做题过程');
+  if (!nextEvidence.length) nextEvidence.push('7 天后用新错题更新画像');
+
+  return {
+    title: '长期学习画像',
+    stability,
+    stabilityLine: stability === 'high'
+      ? '资料足够形成阶段性判断，但仍要用下一次错题验证。'
+      : stability === 'medium'
+        ? '已能判断主要卡点，长期趋势还需要连续 7 天证据。'
+        : '当前只是快速画像，不能当作定论。',
+    learnerPattern: weakest.mainCause
+      ? `当前最需要观察的是：${weakest.subject || '当前学科'} 的 ${weakest.mainCause}。`
+      : '先观察孩子能否说出第一步，再判断长期模式。',
+    stableStrength: stable.subject
+      ? `${stable.subject} 暂时可作为信心入口，不急着加难度。`
+      : '还没有稳定强项，先从最小可完成动作建立信心。',
+    riskWatch: weakest.secondaryCause
+      ? `连续两次出现 ${weakest.secondaryCause} 时，需要降低题量，改成一步追问。`
+      : '如果孩子开始沉默或只要答案，立刻退回第一步小黑板。',
+    evidenceToCollect: nextEvidence.slice(0, 3),
+    trendLines: trendItems.slice(0, 3).map((item) => `${item.label}: ${item.description}`),
+    nextReviewCadence: '每 7 天更新一次，不按单次分数下结论。'
+  };
+}
+
+function buildClassroomDecisionBoard(parts = {}, matrix = [], recommendationPlan = {}, solutionMap = {}) {
+  const diagnosis = Array.isArray(matrix) ? matrix : [];
+  const primary = diagnosis.find((item) => item.status === '需要支持') || diagnosis[0] || {};
+  const plan = recommendationPlan || {};
+  const solution = solutionMap || {};
+  const cause = primary.mainCause || solution.rootCause || '第一步不清';
+  const subject = primary.subject || solution.targetSubject || '当前学科';
+  return {
+    title: '课堂级决策板',
+    decisionLine: `${subject} 暂不加题量，先处理 ${cause}。`,
+    teacherLens: '像老师备课一样看：先找一个可观察动作，而不是直接看对错率。',
+    parentLens: solution.parentScript || plan.parentLine || '家长今晚只问一句：这一步你准备先看哪里？',
+    intervention: plan.cta && plan.cta.label
+      ? `${plan.cta.label}: ${plan.cta.reason || '把报告落到一个小动作'}`
+      : '先用点拨页让孩子说出第一步。',
+    evidenceRule: Array.isArray(solution.nextEvidenceRequired) && solution.nextEvidenceRequired.length
+      ? solution.nextEvidenceRequired.join(' / ')
+      : 'child_first_step / wrong_cause_card / next_day_revisit',
+    stopRule: '如果连续两次答不上来，不继续讲答案，改用小黑板画第一步。',
+    nextConferenceQuestion: `下次复盘只问：${subject} 这类题，孩子能否自己说出第一步？`,
+    shareableSummary: `${subject} 的下一次干预重点是 ${cause}，用 7 天证据复核，不按一次表现定性。`
+  };
+}
+
 function buildLearningReportDraft(input = {}) {
   const sources = normalizeReportSources(input);
   const allText = [input.sourceText || '', input.scoreText || ''].concat(sources.map((source) => source.text || '')).join('\n');
@@ -595,6 +663,8 @@ function buildLearningReportDraft(input = {}) {
   const overview = buildOverview(parts, capabilityTendencies, diagnosisMatrix);
   const recommendationPlan = buildRecommendationPlan(parts, diagnosisMatrix);
   const solutionMap = buildSolutionMap(parts, diagnosisMatrix, recommendationPlan);
+  const longTermPortrait = buildLongTermLearningPortrait(parts, diagnosisMatrix, capabilityTendencies);
+  const classroomDecisionBoard = buildClassroomDecisionBoard(parts, diagnosisMatrix, recommendationPlan, solutionMap);
   const missing = missingItems(parts);
   const reportDraft = {
     id: input.id || `learning_report_${String(nowIso(input.now)).slice(0, 10).replace(/-/g, '')}`,
@@ -621,6 +691,8 @@ function buildLearningReportDraft(input = {}) {
     })),
     recommendationPlan,
     solutionMap,
+    longTermPortrait,
+    classroomDecisionBoard,
     generatedAt: nowIso(input.now),
     missingItems: missing,
     sourceIntegrity: {
@@ -649,6 +721,8 @@ function buildLearningReportDraft(input = {}) {
     diagnosisMatrix,
     recommendationPlan,
     solutionMap,
+    longTermPortrait,
+    classroomDecisionBoard,
     reportCompleteness: completeness,
     reportStatus: {
       state: completeness >= 30 ? 'ready' : 'draft',
@@ -670,6 +744,8 @@ module.exports = {
   parseScoreTableText,
   scoreAssessmentAnswers,
   buildLearningReportDraft,
+  buildLongTermLearningPortrait,
+  buildClassroomDecisionBoard,
   normalizeReportSources,
   confidenceLabel
 };
