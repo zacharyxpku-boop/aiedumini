@@ -5584,6 +5584,8 @@ function buildSurfaceDepthPack(surface = 'home', options = {}) {
   const acceptance = buildAcceptanceReport(options);
   const readiness = buildProductReadiness(options);
   const moduleFlowCompass = buildModuleFlowCompass(options);
+  const globalEvidenceBrief = options.globalEvidenceBrief || buildGlobalEvidenceBrief(options);
+  const learningQuestArc = options.learningQuestArc || buildLearningQuestArc(options);
   const checklist = Array.isArray(acceptance.functionalityChecklist) ? acceptance.functionalityChecklist : [];
   const map = checklist.reduce((acc, item) => {
     if (item && item.id) acc[item.id] = item;
@@ -5731,13 +5733,26 @@ function buildSurfaceDepthPack(surface = 'home', options = {}) {
   });
   const readyCount = cards.filter((item) => item.ready).length;
   const currentModule = cards.find((item) => !item.ready) || cards[0] || null;
+  const storyLine = learningQuestArc && learningQuestArc.currentLabel
+    ? `当前剧情：${learningQuestArc.currentLabel} - ${learningQuestArc.currentTitle || learningQuestArc.currentBody || ''}`
+    : '当前剧情：先留下第一步，再把练习、家长复盘和隔天回看接起来。';
+  const evidenceLine = globalEvidenceBrief && globalEvidenceBrief.reportLine
+    ? `证据线：${globalEvidenceBrief.reportLine}`
+    : '证据线：先补一条真实学习证据。';
+  const routeLine = globalEvidenceBrief && globalEvidenceBrief.shareLine
+    ? `流转线：${globalEvidenceBrief.shareLine}`
+    : `流转线：下一步进入 ${currentModule && currentModule.displayLabel ? currentModule.displayLabel : current.nextAction}`;
+  const familyLine = `${current.benchmark} ${storyLine} ${evidenceLine}`;
   return {
     surface,
     title: current.title,
     summary: current.summary,
     nextAction: current.nextAction,
     benchmarkLine: current.benchmark,
-    familyLine: current.benchmark,
+    storyLine,
+    evidenceLine,
+    routeLine,
+    familyLine,
     readyCount,
     totalCount: cards.length,
     progress: cards.length ? Math.round((readyCount / cards.length) * 100) : 0,
