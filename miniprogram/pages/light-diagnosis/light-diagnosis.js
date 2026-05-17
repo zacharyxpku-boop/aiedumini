@@ -25,12 +25,14 @@ Page({
     showRetryGuide: false,
     diagnosis: null,
     result: null,
-    surfaceDepthPack: null
+    surfaceDepthPack: null,
+    lightSeedBank: null
   },
 
   onLoad() {
     this.setData({
-      surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('light_diagnosis') : null
+      surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('light_diagnosis') : null,
+      lightSeedBank: storage.buildLightEntrySeedBank ? storage.buildLightEntrySeedBank('light_diagnosis') : null
     });
   },
 

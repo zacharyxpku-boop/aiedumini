@@ -25,6 +25,17 @@
     <view class="global-depth-note">{{surfaceDepthPack.familyLine}}</view>
   </view>
 
+  <view class="global-depth-card" wx:if="{{lightSeedBank}}">
+    <view class="global-depth-title">{{lightSeedBank.title}}</view>
+    <view class="global-depth-summary">{{lightSeedBank.summary}}</view>
+    <view class="global-depth-grid">
+      <view class="global-depth-chip ready" wx:for="{{lightSeedBank.seeds}}" wx:key="id">
+        <text>{{item.label}}</text>
+        <text>{{item.firstStep}}</text>
+      </view>
+    </view>
+  </view>
+
   <view class="light-list">
     <view class="light-item" wx:for="{{session.items}}" wx:key="id">
       <text>{{index + 1}}. {{item.prompt}}</text>

@@ -14,12 +14,14 @@ Page({
     currentIndex: 0,
     voiceState: 'idle',
     voiceLine: '先输入今晚要听写的词语。',
-    surfaceDepthPack: null
+    surfaceDepthPack: null,
+    lightSeedBank: null
   },
 
   onLoad() {
     this.setData({
-      surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('dictation') : null
+      surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('dictation') : null,
+      lightSeedBank: storage.buildLightEntrySeedBank ? storage.buildLightEntrySeedBank('dictation') : null
     });
   },
 

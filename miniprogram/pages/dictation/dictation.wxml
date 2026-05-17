@@ -19,6 +19,17 @@
     <view class="global-depth-note">{{surfaceDepthPack.familyLine}}</view>
   </view>
 
+  <view class="global-depth-card" wx:if="{{lightSeedBank}}">
+    <view class="global-depth-title">{{lightSeedBank.title}}</view>
+    <view class="global-depth-summary">{{lightSeedBank.summary}}</view>
+    <view class="global-depth-grid">
+      <view class="global-depth-chip ready" wx:for="{{lightSeedBank.seeds}}" wx:key="id">
+        <text>{{item.label}}</text>
+        <text>{{item.firstStep}}</text>
+      </view>
+    </view>
+  </view>
+
   <textarea value="{{wordsText}}" bindinput="onWordsInput" placeholder="输入词语，用空格或顿号分开" />
   <button bindtap="build">生成听写</button>
   <view class="voice-card">

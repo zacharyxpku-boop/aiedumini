@@ -4806,6 +4806,74 @@ function buildLightFeatureEvidenceSummary(options = {}) {
   };
 }
 
+const LIGHT_ENTRY_SEED_BANK = {
+  daily_math: {
+    label: '口算',
+    route: '/pages/daily-math/daily-math',
+    taskSeeds: [
+      { id: 'symbol_scan', label: '符号先看清', taskType: 'daily_math', wrongCause: '漏看符号', firstStep: '先圈加减乘除符号。' },
+      { id: 'carry_check', label: '进退位检查', taskType: 'daily_math', wrongCause: '进退位漏掉', firstStep: '先标出需要进位或退位的位置。' },
+      { id: 'estimate_guard', label: '估算护栏', taskType: 'daily_math', wrongCause: '答案量级不对', firstStep: '先估一个大概范围。' }
+    ]
+  },
+  dictation: {
+    label: '听写',
+    route: '/pages/dictation/dictation',
+    taskSeeds: [
+      { id: 'sound_shape', label: '音形对应', taskType: 'dictation', wrongCause: '听到音但字形不稳', firstStep: '先说这个词最容易错的那一笔。' },
+      { id: 'meaning_anchor', label: '意思锚点', taskType: 'dictation', wrongCause: '词义不清', firstStep: '先用这个词说一句短句。' },
+      { id: 'repeat_rhythm', label: '复听节奏', taskType: 'dictation', wrongCause: '听一次就下笔', firstStep: '先听两遍，再写第一个字。' }
+    ]
+  },
+  light_diagnosis: {
+    label: '手动选题',
+    route: '/pages/light-diagnosis/light-diagnosis',
+    taskSeeds: [
+      { id: 'type_confirm', label: '先判题型', taskType: 'unknown', wrongCause: '题型没确认', firstStep: '先说这题像哪一类。' },
+      { id: 'ask_sentence', label: '问题句定位', taskType: 'math_word_problem', wrongCause: '没看清问什么', firstStep: '先圈题目真正问的句子。' },
+      { id: 'start_position', label: '下手位置', taskType: 'unknown', wrongCause: '第一步太大', firstStep: '先写一个能马上做的小动作。' }
+    ]
+  }
+};
+
+function buildLightEntrySeedBank(feature = 'daily_math', options = {}) {
+  const bank = LIGHT_ENTRY_SEED_BANK[feature] || LIGHT_ENTRY_SEED_BANK.light_diagnosis;
+  const events = loadLightFeatureEvents().filter((event) => !feature || event.feature === feature);
+  const latest = events[0] || null;
+  const seeds = bank.taskSeeds.map((seed, index) => {
+    const depth = buildSubjectSkillDepth({
+      taskType: seed.taskType,
+      sourceText: seed.wrongCause,
+      firstStep: seed.firstStep
+    });
+    return {
+      id: `${feature}_${seed.id}`,
+      order: index + 1,
+      label: seed.label,
+      taskType: seed.taskType,
+      wrongCause: seed.wrongCause,
+      firstStep: seed.firstStep,
+      parentQuestion: depth.parentQuestion,
+      evidenceRequired: depth.evidenceRequired,
+      route: bank.route
+    };
+  });
+  return {
+    id: `light_seed_${feature}`,
+    feature,
+    label: bank.label,
+    title: `${bank.label}题型种子`,
+    summary: latest
+      ? `最近记录会优先回到「${latest.childArticulatedStep || latest.systemSuggestedStep || latest.stuckPointText || bank.label}」。`
+      : '先从 3 个可复用小题型里选一个，留下第一步证据。',
+    seeds,
+    reusableCount: seeds.length,
+    latestEvidence: latest,
+    route: bank.route,
+    nextAction: latest ? '带着最近第一步回到修卡点' : '先完成一条轻入口第一步'
+  };
+}
+
 function detectAvoidancePattern(patternInput = loadTaskTypePattern()) {
   const byTaskType = (patternInput && patternInput.byTaskType) || {};
   const candidates = Object.keys(byTaskType).map((type) => {
@@ -6648,6 +6716,7 @@ module.exports = {
   buildSocraticAssessmentMatrix,
   buildCurriculumSpine,
   buildVisualSocraticMatrix,
+  buildLightEntrySeedBank,
   childStepQuality,
   normalizeFirstStepEvidence,
   saveChildArticulatedStep,

@@ -8,13 +8,15 @@ Page({
     answers: [],
     result: null,
     transitionPrompt: null,
-    surfaceDepthPack: null
+    surfaceDepthPack: null,
+    lightSeedBank: null
   },
 
   onLoad() {
     this.setData({
       session: lightFeatures.buildDailyMath(),
-      surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('daily_math') : null
+      surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('daily_math') : null,
+      lightSeedBank: storage.buildLightEntrySeedBank ? storage.buildLightEntrySeedBank('daily_math') : null
     });
   },
 
@@ -24,7 +26,8 @@ Page({
       answers: [],
       result: null,
       transitionPrompt: null,
-      surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('daily_math') : null
+      surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('daily_math') : null,
+      lightSeedBank: storage.buildLightEntrySeedBank ? storage.buildLightEntrySeedBank('daily_math') : null
     });
   },
 
