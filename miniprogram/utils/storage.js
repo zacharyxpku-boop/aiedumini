@@ -2368,11 +2368,93 @@ const SUBJECT_SKILL_DEPTH = {
   }
 };
 
+const SOCRATIC_ASSESSMENT_MATRIX = {
+  math_word_problem: {
+    misconceptionChecks: ['把问题句当条件', '数量关系没说清', '单位没统一'],
+    probeSequence: ['先圈问题句', '再说两个量怎么连起来', '最后检查单位'],
+    recoveryMoves: ['只保留一个数字和问题句', '让孩子补一句数量关系', '换一个更小数字再问第一步'],
+    transferCheck: '换一组数字后，孩子还能先说数量关系。',
+    evidenceTag: 'math_relation_probe'
+  },
+  equation_setup: {
+    misconceptionChecks: ['未知数含义不清', '等量关系错位', '式子和题意脱节'],
+    probeSequence: ['先问 x 表示什么', '再问左右两边什么相等', '最后让孩子读回方程含义'],
+    recoveryMoves: ['把 x 写成一句中文', '画出等量两边', '只列关系不急着求解'],
+    transferCheck: '换一个未知量后，孩子还能说清 x 的含义。',
+    evidenceTag: 'equation_model_probe'
+  },
+  reading_question: {
+    misconceptionChecks: ['题型没判断', '证据句找错', '答案超出原文'],
+    probeSequence: ['先判断问法', '再回文找证据句', '最后删掉无依据的话'],
+    recoveryMoves: ['只读题干关键词', '给出两个候选证据句让孩子选', '让孩子复述原文一句'],
+    transferCheck: '换一段文本后，孩子还能先定位证据句。',
+    evidenceTag: 'reading_evidence_probe'
+  },
+  english_sentence: {
+    misconceptionChecks: ['主语找错', '谓语找错', '时态线索忽略'],
+    probeSequence: ['先问谁做动作', '再找真正谓语', '最后看时间或修饰线索'],
+    recoveryMoves: ['遮住修饰语只看主干', '把句子拆成主语和动作', '只检查一个时态信号'],
+    transferCheck: '换一句话后，孩子还能先找主谓骨架。',
+    evidenceTag: 'english_sentence_probe'
+  },
+  writing_process: {
+    misconceptionChecks: ['中心句不清', '理由堆叠无顺序', '例子不能支撑观点'],
+    probeSequence: ['先说中心句', '再列两个理由', '最后补一个具体例子'],
+    recoveryMoves: ['只写一句最短中心句', '删掉和中心无关的理由', '用生活例子补证据'],
+    transferCheck: '换一个题目后，孩子还能先写中心句。',
+    evidenceTag: 'writing_structure_probe'
+  },
+  unknown: {
+    misconceptionChecks: ['没有说题目问什么', '第一步太大', '不知道下次检查点'],
+    probeSequence: ['先说题目问什么', '再说第一步', '最后说下次检查点'],
+    recoveryMoves: ['把任务缩成一句话', '只问从哪里开始', '让孩子说一个可检查动作'],
+    transferCheck: '换一个任务后，孩子还能先说第一步。',
+    evidenceTag: 'general_first_step_probe'
+  }
+};
+
+function buildSocraticAssessmentMatrix(input = {}) {
+  const sourceText = input.sourceText || input.stuckPointText || input.thought || input.title || input.text || '';
+  const taskType = input.taskType || detectTaskType(sourceText, input.subject || input.issueType || '');
+  const spec = SOCRATIC_ASSESSMENT_MATRIX[taskType] || SOCRATIC_ASSESSMENT_MATRIX.unknown;
+  return {
+    id: `socratic_assessment_${taskType}`,
+    taskType,
+    title: '题型追问评测',
+    misconceptionChecks: spec.misconceptionChecks.map((text, index) => ({
+      id: `${taskType}_mis_${index + 1}`,
+      order: index + 1,
+      text
+    })),
+    probeSequence: spec.probeSequence.map((text, index) => ({
+      id: `${taskType}_probe_${index + 1}`,
+      order: index + 1,
+      text,
+      stopRule: index === 0 ? '孩子能说出第一步就停，不继续代讲。' : '只追问证据，不直接给答案。'
+    })),
+    recoveryMoves: spec.recoveryMoves.map((text, index) => ({
+      id: `${taskType}_recovery_${index + 1}`,
+      order: index + 1,
+      text
+    })),
+    transferCheck: spec.transferCheck,
+    fallbackPolicy: {
+      whenSilent: spec.recoveryMoves[0],
+      whenAsksAnswer: '只给第一步小黑板和一个追问，不给完整答案。',
+      whenWrongAgain: spec.recoveryMoves[2] || spec.recoveryMoves[0]
+    },
+    evidenceRequired: ['misconception_check', 'probe_sequence', spec.evidenceTag, 'transfer_check'],
+    evidenceTag: spec.evidenceTag,
+    route: '/pages/tutor/tutor'
+  };
+}
+
 function buildSubjectSkillDepth(input = {}) {
   const sourceText = input.sourceText || input.stuckPointText || input.thought || input.title || input.text || '';
   const taskType = input.taskType || detectTaskType(sourceText, input.subject || input.issueType || '');
   const spec = SUBJECT_SKILL_DEPTH[taskType] || SUBJECT_SKILL_DEPTH.unknown;
   const firstStep = sanitizeMiniActionText(input.childArticulatedStep || input.systemSuggestedStep || input.firstStep || suggestedStepForTaskType(taskType));
+  const socraticAssessment = buildSocraticAssessmentMatrix(Object.assign({}, input, { taskType }));
   return {
     id: `subject_depth_${taskType}`,
     taskType,
@@ -2384,6 +2466,7 @@ function buildSubjectSkillDepth(input = {}) {
     reportSignal: spec.report,
     parentQuestion: spec.parent,
     evidenceRequired: spec.evidenceRequired.slice(),
+    socraticAssessment,
     gameBias: taskType === 'unknown' ? 'balanced' : 'repair',
     route: taskType === 'writing_process' ? '/pages/focus/focus' : taskType === 'unknown' ? '/pages/tutor/tutor' : '/pages/arcade/arcade',
     shareLine: `${spec.label}：先做「${firstStep}」，再留下 ${spec.evidenceRequired[0]} 证据。`
@@ -2516,6 +2599,7 @@ function buildCurriculumSpine(input = {}) {
 function buildVisualSocraticMatrix(input = {}) {
   const subjectDepth = input.subjectSkillDepth || buildSubjectSkillDepth(input);
   const curriculum = input.curriculumSpine || buildCurriculumSpine(Object.assign({}, input, { subjectSkillDepth: subjectDepth }));
+  const socraticAssessment = input.socraticAssessment || subjectDepth.socraticAssessment || buildSocraticAssessmentMatrix(Object.assign({}, input, { taskType: subjectDepth.taskType }));
   const progression = Array.isArray(curriculum.progression) ? curriculum.progression : [];
   const boardMoves = progression.slice(0, 3).map((node) => ({
     id: node.id,
@@ -2544,6 +2628,7 @@ function buildVisualSocraticMatrix(input = {}) {
     taskType: subjectDepth.taskType,
     boardMoves,
     socraticQuestions,
+    socraticAssessment,
     fallback,
     visualBoundary: '这是第一步小黑板，不是全科自动板书讲题。',
     parentLine: curriculum.parentDecisionLine,
@@ -6560,6 +6645,7 @@ module.exports = {
   firstStepTemplatesForTaskType,
   suggestedStepForTaskType,
   buildSubjectSkillDepth,
+  buildSocraticAssessmentMatrix,
   buildCurriculumSpine,
   buildVisualSocraticMatrix,
   childStepQuality,
