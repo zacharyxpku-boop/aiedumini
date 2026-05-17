@@ -203,6 +203,69 @@ function diagnosticProbe(taskType, level) {
   };
 }
 
+function buildQuestionTypeSocraticPath(taskType = 'unknown', item = {}, probe = {}) {
+  const normalizedType = MISCONCEPTION_MAP[taskType] ? taskType : 'unknown';
+  const misconceptionMap = MISCONCEPTION_MAP[normalizedType] || MISCONCEPTION_MAP.unknown;
+  const prompt = TASK_TYPE_PROMPTS[normalizedType] || TASK_TYPE_PROMPTS.unknown;
+  const axes = Object.keys(misconceptionMap);
+  const level = normalizeLevel(item && item.level);
+  const probeBank = axes.map((axis, index) => ({
+    id: `${normalizedType}_${axis}`,
+    order: index + 1,
+    axis,
+    misconception: misconceptionMap[axis],
+    question: index === 0 ? prompt : `这一步卡住时，先检查：${misconceptionMap[axis]}`,
+    evidence: axis === 'transfer_check' ? 'transfer_prompt_answered' : `socratic_${axis}`,
+    stopRule: '孩子能说出第一步或证据句就停，不继续给完整答案。'
+  }));
+  const visualMoves = probeBank.slice(0, 3).map((bank, index) => ({
+    id: `${bank.id}_visual`,
+    order: index + 1,
+    label: index === 0 ? '定位' : index === 1 ? '证据' : '迁移',
+    boardMove: `小黑板只画「${bank.axis}」这一笔`,
+    parentPrompt: `你能指出这一步对应哪里吗？`,
+    avoid: '不写完整解法，不替孩子组织最终答案。'
+  }));
+  const fallbackLadder = [
+    {
+      id: 'silent',
+      label: '沉默',
+      trigger: '孩子沉默或说不会',
+      move: '降到二选一，让孩子选 A 或 B',
+      route: '/pages/tutor/tutor?from=socratic_path'
+    },
+    {
+      id: 'answer_request',
+      label: '要答案',
+      trigger: '孩子要求直接答案或代写',
+      move: '拦住答案，只问题目问什么',
+      route: '/pages/tutor/tutor?from=socratic_answer_boundary'
+    },
+    {
+      id: 'wrong_again',
+      label: '同错因再错',
+      trigger: '同一轴连续两次卡住',
+      move: '回到修卡点和轻回访，不加题量',
+      route: '/pages/review/review?from=socratic_path'
+    }
+  ];
+  return {
+    id: `question_type_socratic_path_${normalizedType}`,
+    title: '题型级追问路径',
+    taskType: normalizedType,
+    level,
+    scaleLine: `已覆盖 ${axes.length} 个题型误区轴；当前只输出第一步追问和小黑板动作。`,
+    activeAxis: probe.axis || axes[Math.max(0, level - 1)] || axes[0],
+    probeBank,
+    visualMoves,
+    fallbackLadder,
+    evidenceContractLine: '证据合同：误区轴 + 孩子第一步 + 失败兜底 + 次日回访。',
+    parentCheckLine: '家长只检查孩子是否能说出第一步，不检查完整答案。',
+    noFullAnswerBoundary: '不提供完整答案、不代写、不生成全科自动板书。',
+    route: level >= 4 ? '/pages/review/review?from=socratic_path' : '/pages/tutor/tutor?from=socratic_path'
+  };
+}
+
 function buildSocraticContract(taskType, item, probe) {
   const normalized = normalizeLevel(item && item.level);
   const nextQuestions = {
@@ -307,6 +370,7 @@ function buildTutorReply(text, options = {}) {
   if (isAnswerRequest(text)) {
     const item = ladderItem(1);
     const probe = diagnosticProbe(taskType, item.level);
+    const questionTypePath = buildQuestionTypeSocraticPath(taskType, item, probe);
     const socraticContract = buildSocraticContract(taskType, item, probe);
     const socraticFallbackPlan = buildSocraticFallbackPlan(taskType, item, probe, { answerBlocked: true });
     return {
@@ -316,6 +380,7 @@ function buildTutorReply(text, options = {}) {
       coach_step: item.step,
       coach_step_label: stepIntro(item),
       diagnostic_probe: probe,
+      question_type_socratic_path: questionTypePath,
       socratic_contract: socraticContract,
       socratic_fallback_plan: socraticFallbackPlan,
       allowed_moves: probe.allowedMoves,
@@ -335,6 +400,7 @@ function buildTutorReply(text, options = {}) {
   const level = classifyHintLevel(text, messages, currentHintLevel);
   const item = ladderItem(level);
   const probe = diagnosticProbe(taskType, item.level);
+  const questionTypePath = buildQuestionTypeSocraticPath(taskType, item, probe);
   const socraticContract = buildSocraticContract(taskType, item, probe);
   const stuckCount = countRecentStuck(messages, text);
   const socraticFallbackPlan = buildSocraticFallbackPlan(taskType, item, probe, { stuckCount });
@@ -349,6 +415,7 @@ function buildTutorReply(text, options = {}) {
     coach_step: item.step,
     coach_step_label: stepIntro(item),
     diagnostic_probe: probe,
+    question_type_socratic_path: questionTypePath,
     socratic_contract: socraticContract,
     socratic_fallback_plan: socraticFallbackPlan,
     allowed_moves: probe.allowedMoves,
@@ -396,6 +463,7 @@ module.exports = {
   diagnosticProbe,
   buildSocraticContract,
   buildSocraticFallbackPlan,
+  buildQuestionTypeSocraticPath,
   MISCONCEPTION_MAP,
   detectTaskType,
   buildTutorReply,

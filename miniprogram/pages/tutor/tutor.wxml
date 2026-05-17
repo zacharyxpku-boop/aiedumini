@@ -103,7 +103,20 @@
             <view class="receipt-board-line" wx:for="{{thinkingReceipt.subjectSkillDepth.socraticAssessment.misconceptionChecks}}" wx:key="id">误区{{item.order}}：{{item.text}}</view>
             <view class="receipt-board-parent" wx:for="{{thinkingReceipt.subjectSkillDepth.socraticAssessment.probeSequence}}" wx:key="id">追问{{item.order}}：{{item.text}}</view>
             <view class="receipt-board-line" wx:for="{{thinkingReceipt.subjectSkillDepth.socraticAssessment.recoveryMoves}}" wx:key="id">答不上来：{{item.text}}</view>
+            <view class="receipt-board-line" wx:for="{{thinkingReceipt.subjectSkillDepth.socraticAssessment.questionTypeRubric}}" wx:key="id">题型轴{{item.order}}：{{item.misconception}}｜{{item.probe}}</view>
+            <view class="receipt-board-parent" wx:for="{{thinkingReceipt.subjectSkillDepth.socraticAssessment.visualExplanationSteps}}" wx:key="id">{{item.boardMove}}｜{{item.childReply}}</view>
+            <view class="receipt-board-line" wx:for="{{thinkingReceipt.subjectSkillDepth.socraticAssessment.fallbackLadder}}" wx:key="id">兜底：{{item.label}}｜{{item.move}}</view>
             <view class="receipt-board-avoid">迁移检查：{{thinkingReceipt.subjectSkillDepth.socraticAssessment.transferCheck}}</view>
+            <view class="receipt-board-avoid">{{thinkingReceipt.subjectSkillDepth.socraticAssessment.evidenceContractLine}}</view>
+          </view>
+          <view class="receipt-first-step-board" wx:if="{{thinkingReceipt.question_type_socratic_path}}">
+            <view class="receipt-diagnostic-title">{{thinkingReceipt.question_type_socratic_path.title}}</view>
+            <view class="receipt-board-avoid">{{thinkingReceipt.question_type_socratic_path.scaleLine}}</view>
+            <view class="receipt-board-line" wx:for="{{thinkingReceipt.question_type_socratic_path.probeBank}}" wx:key="id">追问轴{{item.order}}：{{item.misconception}}</view>
+            <view class="receipt-board-parent" wx:for="{{thinkingReceipt.question_type_socratic_path.visualMoves}}" wx:key="id">{{item.boardMove}}｜{{item.parentPrompt}}</view>
+            <view class="receipt-board-line" wx:for="{{thinkingReceipt.question_type_socratic_path.fallbackLadder}}" wx:key="id">失败兜底：{{item.label}}｜{{item.move}}</view>
+            <view class="receipt-board-avoid">{{thinkingReceipt.question_type_socratic_path.evidenceContractLine}}</view>
+            <view class="receipt-board-avoid">{{thinkingReceipt.question_type_socratic_path.noFullAnswerBoundary}}</view>
           </view>
           <view class="receipt-first-step-board" wx:if="{{thinkingReceipt.visualSocraticMatrix}}">
             <view class="receipt-diagnostic-title">{{thinkingReceipt.visualSocraticMatrix.title}}</view>

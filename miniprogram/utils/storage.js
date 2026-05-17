@@ -2724,11 +2724,33 @@ function buildSocraticAssessmentMatrix(input = {}) {
       text
     })),
     transferCheck: spec.transferCheck,
+    questionTypeRubric: spec.misconceptionChecks.map((text, index) => ({
+      id: `${taskType}_rubric_${index + 1}`,
+      order: index + 1,
+      misconception: text,
+      probe: spec.probeSequence[index] || spec.probeSequence[0],
+      recovery: spec.recoveryMoves[index] || spec.recoveryMoves[0],
+      evidence: index === 0 ? spec.evidenceTag : `${spec.evidenceTag}_${index + 1}`
+    })),
+    visualExplanationSteps: spec.probeSequence.slice(0, 3).map((text, index) => ({
+      id: `${taskType}_visual_probe_${index + 1}`,
+      order: index + 1,
+      boardMove: `小黑板只画第 ${index + 1} 笔：${text}`,
+      childReply: index === 0 ? '孩子先说第一步' : '孩子补一句证据',
+      avoid: '不写完整答案'
+    })),
+    fallbackLadder: [
+      { id: 'silent', label: '沉默', move: spec.recoveryMoves[0], route: '/pages/tutor/tutor' },
+      { id: 'answer_request', label: '要答案', move: '只给第一步小黑板和一个追问，不给完整答案。', route: '/pages/tutor/tutor' },
+      { id: 'wrong_again', label: '同错因再错', move: spec.recoveryMoves[2] || spec.recoveryMoves[0], route: '/pages/review/review' }
+    ],
     fallbackPolicy: {
       whenSilent: spec.recoveryMoves[0],
       whenAsksAnswer: '只给第一步小黑板和一个追问，不给完整答案。',
       whenWrongAgain: spec.recoveryMoves[2] || spec.recoveryMoves[0]
     },
+    evidenceContractLine: `证据合同：${spec.evidenceTag} + child_first_step + fallback_trigger + next_day_revisit。`,
+    parentCheckLine: '家长只问第一步和证据，不追完整答案。',
     evidenceRequired: ['misconception_check', 'probe_sequence', spec.evidenceTag, 'transfer_check'],
     evidenceTag: spec.evidenceTag,
     route: '/pages/tutor/tutor'
