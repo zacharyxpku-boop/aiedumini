@@ -96,6 +96,25 @@
           </view>
         </view>
 
+        <view class="family-summary-card capability-ledger-card" wx:if="{{capabilityMaturityQueue}}">
+          <view class="family-summary-title">{{capabilityMaturityQueue.title}}</view>
+          <view class="family-summary-body family-readable">
+            <view class="parent-brief-block">
+              <text class="parent-brief-label">商用厚度</text>
+              <text>{{capabilityMaturityQueue.readyCount}} / {{capabilityMaturityQueue.totalCount}} · {{capabilityMaturityQueue.summary}}</text>
+            </view>
+            <view class="parent-brief-block" wx:if="{{capabilityMaturityQueue.next}}">
+              <text class="parent-brief-label">先补这里</text>
+              <text>{{capabilityMaturityQueue.next.label}} · {{capabilityMaturityQueue.next.nextAction}}</text>
+              <button class="profile-small-primary" data-id="{{capabilityMaturityQueue.next.id}}" data-route="{{capabilityMaturityQueue.next.route}}" bindtap="runCapabilityMaturityAction">去推进</button>
+            </view>
+            <view class="module-flow-mini-grid">
+              <view class="module-flow-mini-chip {{item.ready ? 'ready' : ''}}" wx:for="{{capabilityMaturityQueue.items}}" wx:key="id" data-id="{{item.id}}" data-route="{{item.route}}" bindtap="runCapabilityMaturityAction">{{item.label}} {{item.score}}%</view>
+            </view>
+            <view class="parent-brief-reason">{{capabilityMaturityQueue.positioningLine}}</view>
+          </view>
+        </view>
+
       <view class="parent-hero-actions">
         <button class="parent-hero-primary" data-action="review" bindtap="runParentReportAction">{{profileViewModel.primaryCta}}</button>
         <view class="route-next-lite profile-next-lite" wx:if="{{profileViewModel.nextStep}}">{{profileViewModel.nextStep}}</view>
@@ -180,7 +199,7 @@
             <text class="parent-brief-label">下一步</text>
             <text>{{learningDepthMap.nextBestAction}}</text>
           </view>
-          <view class="parent-brief-reason">{{learningDepthMap.benchmarkDepthLine}}</view>
+          <view class="parent-brief-reason">{{learningDepthMap.summary}}</view>
         </view>
       </view>
 
@@ -199,7 +218,7 @@
             <text class="parent-brief-label">{{item.displayLabel}}</text>
             <text>{{item.done ? '已接上' : '下一步'}} · {{item.body}}</text>
           </view>
-          <view class="parent-brief-reason">{{learningQuestArc.benchmarkHook}}</view>
+          <view class="parent-brief-reason">{{learningQuestArc.parentHook}}</view>
         </view>
       </view>
 
@@ -221,7 +240,7 @@
           <view class="module-flow-mini-grid">
             <view class="module-flow-mini-chip {{item.ready ? 'ready' : ''}}" wx:for="{{moduleFlowCompass.modules}}" wx:key="id">{{item.displayLabel}}</view>
           </view>
-          <view class="parent-brief-reason">{{moduleFlowCompass.benchmarkLine}}</view>
+          <view class="parent-brief-reason">{{moduleFlowCompass.summary}}</view>
         </view>
       </view>
 

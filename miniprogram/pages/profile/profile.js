@@ -1144,6 +1144,12 @@ Page({
       lightFeatureEvidence,
       thinkingSummary
     }) : null;
+    const capabilityMaturityQueue = storage.buildCapabilityMaturityQueue ? storage.buildCapabilityMaturityQueue({
+      globalEvidenceBrief,
+      learningQuestArc,
+      moduleFlowCompass,
+      capabilityEvidenceLedger
+    }) : null;
     learningReportSummary = buildLearningReportSummary(learningReportState || {}, capabilityEvidenceLedger, subjectSkillDepth, curriculumSpine, visualSocraticMatrix);
     const dailyShareCard = buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCauseSummary, todayFocus, globalEvidenceBrief, reportDailyActionQueue, unifiedNextAction, capabilityEvidenceLedger, subjectSkillDepth, curriculumSpine, visualSocraticMatrix);
     if (dailyShareCard && dailyShareCard.code && dailyShareCard.code !== lastGeneratedShareCode) {
@@ -1264,6 +1270,7 @@ Page({
       commercialUnlockCard: buildCommercialUnlockCard(reviewSummary, tutorSummary, thinkingSummary, wrongCauseSummary),
       profileReadinessSnapshot,
       capabilityEvidenceLedger,
+      capabilityMaturityQueue,
       lightFeatureEvidence,
       parentActionGuide,
       learningDepthMap,
@@ -2113,6 +2120,35 @@ Page({
       });
     }
     navigation.navigateLearningRoute(next.route || '/pages/tutor/tutor');
+  },
+
+  runCapabilityMaturityAction(event) {
+    const dataset = event.currentTarget.dataset || {};
+    const queue = this.data.capabilityMaturityQueue || {};
+    const items = Array.isArray(queue.items) ? queue.items : [];
+    const item = items.find((entry) => entry.id === dataset.id) || queue.next || {};
+    const route = dataset.route || item.route || '/pages/tutor/tutor';
+    const action = Object.assign({
+      source: 'capability_maturity_queue',
+      sourceLabel: '全局能力厚度队列',
+      actionLabel: item.nextAction || '先补这一条能力证据',
+      reasonLine: item.competitorLine || '',
+      evidenceLine: item.evidenceLine || '',
+      route
+    }, item.actionPayload || {});
+    if (storage.recordUnifiedNextAction) {
+      storage.recordUnifiedNextAction(Object.assign({}, action, { surface: 'profile' }));
+    }
+    if (storage.recordSurfaceDepthAction) {
+      storage.recordSurfaceDepthAction({
+        surface: item.surface || 'profile',
+        dimensionId: item.id || 'capability_maturity_queue',
+        label: item.label || action.actionLabel,
+        route,
+        readiness: 'capability_maturity_queue'
+      });
+    }
+    navigation.navigateLearningRoute(route);
   },
 
   runFamilyDecisionBridgeAction(event) {

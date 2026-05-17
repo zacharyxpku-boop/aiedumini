@@ -103,6 +103,7 @@ Page({
     learningQuestArc: null,
     moduleFlowCompass: null,
     surfaceDepthPack: null,
+    capabilityMaturityQueue: null,
     unifiedNextAction: null,
     learningLoopCards: [
       {
@@ -394,6 +395,7 @@ Page({
       learningQuestArc: storage.buildLearningQuestArc ? storage.buildLearningQuestArc() : null,
       moduleFlowCompass: storage.buildModuleFlowCompass ? storage.buildModuleFlowCompass() : null,
       surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('home') : null,
+      capabilityMaturityQueue: storage.buildCapabilityMaturityQueue ? storage.buildCapabilityMaturityQueue() : null,
       unifiedNextAction: storage.buildUnifiedNextActionController ? storage.buildUnifiedNextActionController({ surface: 'home' }) : null,
       todayFocus,
       tonightPlan,
@@ -465,7 +467,10 @@ Page({
     return importIntake.IMPORT_CHIPS
       .filter((item) => keep.includes(item.id))
       .slice(0, 3)
-      .map((item, index) => Object.assign({}, item, { warmClass: index === 1 ? 'warm' : '' }));
+      .map((item, index) => Object.assign({}, item, {
+        displayLabel: item.label || item.text || '',
+        warmClass: index === 1 ? 'warm' : ''
+      }));
   },
 
   buildWeaknessVerdict(state, topMust, reviewSummary, thinkingSummary, modulePath) {
@@ -1208,6 +1213,35 @@ Page({
       });
     }
     navigation.navigateLearningRoute(next.route || '/pages/tutor/tutor');
+  },
+
+  runCapabilityMaturityAction(event) {
+    const dataset = event.currentTarget.dataset || {};
+    const queue = this.data.capabilityMaturityQueue || {};
+    const items = Array.isArray(queue.items) ? queue.items : [];
+    const item = items.find((entry) => entry.id === dataset.id) || queue.next || {};
+    const route = dataset.route || item.route || '/pages/tutor/tutor';
+    const action = Object.assign({
+      source: 'capability_maturity_queue',
+      sourceLabel: '全局能力厚度队列',
+      actionLabel: item.nextAction || '先补这一条能力证据',
+      reasonLine: item.competitorLine || '',
+      evidenceLine: item.evidenceLine || '',
+      route
+    }, item.actionPayload || {});
+    if (storage.recordUnifiedNextAction) {
+      storage.recordUnifiedNextAction(Object.assign({}, action, { surface: 'home' }));
+    }
+    if (storage.recordSurfaceDepthAction) {
+      storage.recordSurfaceDepthAction({
+        surface: item.surface || 'home',
+        dimensionId: item.id || 'capability_maturity_queue',
+        label: item.label || action.actionLabel,
+        route,
+        readiness: 'capability_maturity_queue'
+      });
+    }
+    navigation.navigateLearningRoute(route);
   },
 
   toggleCompanionPicker() {

@@ -168,6 +168,23 @@
         </view>
         <view class="surface-depth-note">{{unifiedNextAction.readinessLine}}</view>
       </view>
+      <view class="surface-depth-card" wx:if="{{capabilityMaturityQueue}}">
+        <view class="surface-depth-head">
+          <view>
+            <view class="surface-depth-title">{{capabilityMaturityQueue.title}}</view>
+            <view class="surface-depth-subtitle">{{capabilityMaturityQueue.summary}}</view>
+          </view>
+          <view class="surface-depth-score">{{capabilityMaturityQueue.readyCount}}/{{capabilityMaturityQueue.totalCount}}</view>
+        </view>
+        <view class="surface-depth-next" data-id="{{capabilityMaturityQueue.next.id}}" data-route="{{capabilityMaturityQueue.next.route}}" bindtap="runCapabilityMaturityAction">{{capabilityMaturityQueue.reportLine}}</view>
+        <view class="surface-depth-grid">
+          <view class="surface-depth-chip {{item.ready ? 'ready' : ''}}" wx:for="{{capabilityMaturityQueue.items}}" wx:key="id" data-id="{{item.id}}" data-route="{{item.route}}" bindtap="runCapabilityMaturityAction">
+            <text class="surface-depth-chip-title">{{item.displayLabel}} · {{item.score}}%</text>
+            <text class="surface-depth-chip-line">{{item.nextAction}}</text>
+          </view>
+        </view>
+        <view class="surface-depth-note">{{capabilityMaturityQueue.positioningLine}}</view>
+      </view>
       <view class="quest-arc-card" wx:if="{{learningQuestArc}}">
         <view class="quest-arc-head">
           <view>
@@ -279,7 +296,7 @@
         </view>
       </view>
       <view class="quick-actions compact home-secondary-actions" wx:if="{{showCompanionPicker}}">
-        <view class="quick-action {{item.warmClass}}" wx:for="{{promptChips}}" wx:key="id" data-id="{{item.id}}" bindtap="applyPromptChip">{{item.label}}</view>
+        <view class="quick-action {{item.warmClass}}" wx:for="{{promptChips}}" wx:key="id" data-id="{{item.id}}" bindtap="applyPromptChip">{{item.displayLabel}}</view>
       </view>
     </view>
 
@@ -352,13 +369,13 @@
             wx:for="{{incomingShareRelay.actions}}"
             wx:key="id"
             data-id="{{item.id}}"
-            data-label="{{item.label}}"
+            data-label="{{item.displayLabel}}"
             data-route="{{item.route}}"
             data-reason="{{item.reason}}"
             data-evidence="{{item.evidence}}"
             bindtap="runIncomingShareRelayAction"
           >
-            <text class="share-relay-label">{{item.label}}</text>
+            <text class="share-relay-label">{{item.displayLabel}}</text>
             <text class="share-relay-reason">{{item.reason}}</text>
           </button>
         </view>

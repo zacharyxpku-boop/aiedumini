@@ -1650,6 +1650,153 @@ function buildCapabilityEvidenceLedger(options = {}) {
   };
 }
 
+function buildCapabilityMaturityQueue(options = {}) {
+  const globalEvidenceBrief = options.globalEvidenceBrief || buildGlobalEvidenceBrief(options);
+  const learningQuestArc = options.learningQuestArc || buildLearningQuestArc(options);
+  const moduleFlowCompass = options.moduleFlowCompass || buildModuleFlowCompass(options);
+  const capabilityLedger = options.capabilityEvidenceLedger || buildCapabilityEvidenceLedger(Object.assign({}, options, {
+    globalEvidenceBrief,
+    learningQuestArc,
+    moduleFlowCompass
+  }));
+  const ledgerRows = Array.isArray(capabilityLedger.rows) ? capabilityLedger.rows : [];
+  const surfaceSpecs = [
+    {
+      id: 'socratic_depth',
+      label: '苏格拉底点拨',
+      surface: 'tutor',
+      route: '/pages/tutor/tutor',
+      capabilities: ['socratic', 'module_flow', 'parent_action', 'next_action'],
+      competitorLine: '对标 Khanmigo：不追求替孩子整题讲完，而是持续追问第一步、误区、迁移证据。',
+      nextAction: '先完成一轮带误区判断的追问，并把回执接到修卡点。'
+    },
+    {
+      id: 'game_retention',
+      label: '游戏化回忆',
+      surface: 'arcade',
+      route: '/pages/arcade/arcade',
+      capabilities: ['game', 'socratic', 'parent_action', 'next_action'],
+      competitorLine: '对标 Gizmo：主动回忆和间隔复习要成为主循环，不只是小游戏外壳。',
+      nextAction: '打一局后必须写回错因、第一步和下一次回访。'
+    },
+    {
+      id: 'report_decision',
+      label: '家长决策报告',
+      surface: 'profile',
+      route: '/pages/profile/profile',
+      capabilities: ['report', 'parent_action', 'share', 'next_action'],
+      competitorLine: '对标 Khanmigo 家长/教师视角：报告必须变成今晚行动和 7 天复核规则。',
+      nextAction: '把报告结论执行成一条今日行动，并生成家长只问一句。'
+    },
+    {
+      id: 'repair_to_recall',
+      label: '修卡到回忆',
+      surface: 'review',
+      route: '/pages/review/review',
+      capabilities: ['socratic', 'game', 'report', 'module_flow', 'next_action'],
+      competitorLine: '对标成熟错题系统：错因不是静态标签，要回到同类变式和隔天回看。',
+      nextAction: '先修一张真实卡点，再进入轻练或家长复盘。'
+    },
+    {
+      id: 'light_entry_scale',
+      label: '轻入口题型库',
+      surface: 'light_diagnosis',
+      route: '/pages/light-diagnosis/light-diagnosis',
+      capabilities: ['light_entry', 'socratic', 'module_flow', 'next_action'],
+      competitorLine: '借鉴千问可视化方向，但只做第一步种子库和错因图解，不承诺全科自动板书讲题。',
+      nextAction: '从口算、听写或手动诊断补一条可复用第一步模型。'
+    },
+    {
+      id: 'share_return_loop',
+      label: '分享回流',
+      surface: 'profile',
+      route: '/pages/profile/profile',
+      capabilities: ['share', 'parent_action', 'next_action', 'surface_action'],
+      competitorLine: '分享不是拉新按钮，而是把家庭行动卡带回下一次学习。',
+      nextAction: '发一张带能力缺口和下一步的家庭行动卡。'
+    },
+    {
+      id: 'material_factory',
+      label: '材料到资产',
+      surface: 'tools',
+      route: '/pages/tools/tools',
+      capabilities: ['light_entry', 'module_flow', 'game', 'next_action'],
+      competitorLine: '对标 Gizmo 的导入能力：现阶段先把本地材料稳定转成复习资产。',
+      nextAction: '把一段材料或错题转成可回访卡，而不是停在输入框。'
+    },
+    {
+      id: 'trust_boundary',
+      label: '信任边界',
+      surface: 'legal',
+      route: '/pages/legal/legal',
+      capabilities: ['parent_action', 'report', 'share', 'next_action'],
+      competitorLine: '商用前信任边界必须清楚：未成年人、隐私、AI 边界和家长控制都要可解释。',
+      nextAction: '确认边界后回到家长复盘或补一条真实材料。'
+    }
+  ];
+  const items = surfaceSpecs.map((spec) => {
+    const pack = buildSurfaceDepthPack(spec.surface, Object.assign({}, options, {
+      globalEvidenceBrief,
+      learningQuestArc,
+      moduleFlowCompass,
+      capabilityEvidenceLedger: capabilityLedger
+    }));
+    const rows = spec.capabilities
+      .map((id) => ledgerRows.find((row) => row && row.id === id))
+      .filter(Boolean);
+    const readyRows = rows.filter((row) => row.ready);
+    const score = rows.length ? Math.round((readyRows.length / rows.length) * 100) : 0;
+    const missing = rows.find((row) => !row.ready) || rows[0] || {};
+    return {
+      id: spec.id,
+      label: spec.label,
+      displayLabel: spec.label,
+      surface: spec.surface,
+      route: spec.route,
+      ready: score >= 75 && pack.surfaceReadiness !== 'thin',
+      score,
+      readiness: pack.surfaceReadiness,
+      evidenceLine: pack.evidenceLine || (missing.evidenceLine || ''),
+      nextAction: missing.ready ? spec.nextAction : (missing.nextAction || spec.nextAction),
+      nextCapability: missing.label || spec.label,
+      competitorLine: spec.competitorLine,
+      moatLine: `${spec.label} 的护城河不是功能名，而是：动作 -> 证据 -> 回访 -> 家长决策持续复利。`,
+      visibleProof: rows.map((row) => ({
+        id: row.id,
+        label: row.label,
+        ready: !!row.ready,
+        evidenceLine: row.evidenceLine,
+        route: row.route
+      })),
+      actionPayload: {
+        source: 'capability_maturity_queue',
+        actionLabel: spec.nextAction,
+        reasonLine: spec.competitorLine,
+        evidenceLine: pack.evidenceLine || '',
+        route: spec.route
+      }
+    };
+  }).sort((a, b) => {
+    if (a.ready !== b.ready) return a.ready ? 1 : -1;
+    return a.score - b.score;
+  });
+  const readyCount = items.filter((item) => item.ready).length;
+  const next = items.find((item) => !item.ready) || items[0] || null;
+  return {
+    title: '全局能力厚度队列',
+    summary: `已达标 ${readyCount}/${items.length} 个关键能力面。先补 ${next ? next.label : '真实学习证据'}，再谈更大范围竞品能力。`,
+    benchmarkLine: '方向：家庭晚间作业闭环 + 第一手证据账本 + 家长低压行动板；借鉴竞品机制，不复制竞品定位。',
+    positioningLine: '方向：家庭晚间作业闭环 + 第一手证据账本 + 家长低压行动板；借鉴竞品机制，不复制竞品定位。',
+    readyCount,
+    totalCount: items.length,
+    progress: items.length ? Math.round((readyCount / items.length) * 100) : 0,
+    next,
+    items,
+    reportLine: next ? `${next.label}：${next.nextAction}` : '关键能力面已经闭合，继续沉淀真实学习数据。',
+    generatedAt: options.now ? new Date(options.now).toISOString() : new Date().toISOString()
+  };
+}
+
 function buildEvidenceRouteBias(options = {}) {
   const brief = options.globalEvidenceBrief || buildGlobalEvidenceBrief(options);
   const incomingShare = options.incomingShare || loadIncomingShare() || null;
@@ -7190,6 +7337,7 @@ module.exports = {
   buildLearningDepthMap,
   buildGlobalEvidenceBrief,
   buildCapabilityEvidenceLedger,
+  buildCapabilityMaturityQueue,
   buildUnifiedNextActionController,
   buildLearningQuestArc,
   buildQuestArcGameBridge,
