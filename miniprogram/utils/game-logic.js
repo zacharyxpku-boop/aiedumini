@@ -444,6 +444,58 @@ function buildGameRetentionLoop(profile = {}, result = {}, challenge = {}, quest
   };
 }
 
+function buildMemoryFeedbackController(cards = [], events = [], result = {}, retention = {}, options = {}) {
+  const safeCards = Array.isArray(cards) ? cards : [];
+  const safeEvents = Array.isArray(events) ? events : [];
+  const wrong = Math.max(0, Number(result.wrong || 0));
+  const accuracy = Number.isFinite(Number(result.accuracy)) ? Number(result.accuracy) : 0;
+  const stickyCards = safeCards.filter((card) => card.leech || Number(card.lapses || 0) >= 2);
+  const recentWrongCauseEvents = safeEvents
+    .filter((event) => /wrong|错|repair|leech|again/.test(String(event.type || event.event || event.name || '')))
+    .slice(-6);
+  const weakKey = retention.weakKey || options.weakKey || (stickyCards[0] && (stickyCards[0].wrongCauseLabel || stickyCards[0].weakPoint)) || '第一步';
+  const triggered = wrong > 0 || stickyCards.length > 0 || accuracy < Number(options.targetAccuracy || 80);
+  const severity = stickyCards.length >= 2 || wrong >= 3 || accuracy < 50
+    ? 'high'
+    : triggered
+      ? 'watch'
+      : 'stable';
+  const triggerSignals = [
+    wrong > 0 ? `本局错 ${wrong} 张` : '',
+    stickyCards.length ? `${stickyCards.length} 张顽固错因卡` : '',
+    recentWrongCauseEvents.length >= 2 ? `最近 ${recentWrongCauseEvents.length} 次错因事件` : ''
+  ].filter(Boolean);
+  return {
+    id: 'memory_feedback_controller',
+    title: triggered ? '记忆负反馈已启动' : '记忆反馈稳定',
+    severity,
+    triggered,
+    weakKey,
+    triggerSignals: triggerSignals.length ? triggerSignals : ['本局暂未触发降级'],
+    interventionSteps: triggered
+      ? [
+        `暂停加题量，只练「${weakKey}」的第一步`,
+        '错因卡回到今天和明天的回访队列',
+        '连续两次说清第一步后，再开放变式练习'
+      ]
+      : [
+        '保持 3 张主动回忆',
+        '明天回访 1 张最不稳的卡',
+        '第 7 天做一题小变式'
+      ],
+    xpThrottle: triggered
+      ? '本轮 XP 只给主动回忆和错因修复，不奖励盲刷题量。'
+      : '本轮 XP 可进入巩固，但仍以次日回访为准。',
+    nextReview: triggered
+      ? `下一次先回到「${weakKey}」小黑板。`
+      : '下一次可做小变式，但仍要先说第一步。',
+    parentLine: triggered
+      ? `家长复盘只问：${weakKey} 这一步，你明天还能自己说出来吗？`
+      : '家长只确认孩子是否能复述第一步，不追问分数。',
+    evidenceRequired: ['wrong_cause_return', 'xp_throttle', 'next_day_revisit', 'parent_feedback_line']
+  };
+}
+
 function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], result = {}, challenge = {}, questSet = {}, options = {}) {
   const safeCards = Array.isArray(cards) ? cards : [];
   const safeEvents = Array.isArray(events) ? events : [];
@@ -485,6 +537,10 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
     { id: 'repair', label: '错因修复', target: needsRepair ? 1 : 0, done: needsRepair ? 0 : 1, reward: '错因回到复习队列' },
     { id: 'share', label: '家长复盘', target: 1, done: 0, reward: '生成可分享的行动证据' }
   ];
+  const memoryFeedbackController = buildMemoryFeedbackController(safeCards, safeEvents, result, retention, {
+    weakKey,
+    targetAccuracy: challenge.targetAccuracy || 80
+  });
   return {
     title: needsRepair ? '高频修复循环' : '高频巩固循环',
     mode: needsRepair ? 'repair_recall' : 'mastery_recall',
@@ -494,13 +550,14 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
     recallCards,
     spacedReviewPlan,
     questCadence,
+    memoryFeedbackController,
     xpRule: 'XP 只奖励主动回忆、错因修复和次日回访，不奖励盲刷题量。',
     leechRule: needsRepair
       ? `同一错因连续 2 次错，会降到第一步小黑板。`
       : '连续 2 次说清第一步，才进入变式练习。',
     parentShareLine: `家长复盘只看：孩子能否自己说出「${weakKey}」的第一步。`,
     nextRoute: needsRepair ? '/pages/review/review' : '/pages/tutor/tutor',
-    evidenceRequired: ['active_recall_cards', 'spaced_review_plan', 'wrong_cause_return', 'quest_cadence', 'parent_share_line'],
+    evidenceRequired: ['active_recall_cards', 'spaced_review_plan', 'wrong_cause_return', 'quest_cadence', 'memory_feedback_controller', 'parent_share_line'],
     weakKey
   };
 }
@@ -515,6 +572,7 @@ module.exports = {
   buildDailyQuestSet,
   buildGameRetentionLoop,
   buildHighFrequencyPracticeLoop,
+  buildMemoryFeedbackController,
   buildKnowledgeGap,
   calculateXP,
   capDailyXP,

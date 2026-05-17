@@ -610,6 +610,7 @@ Page({
     const diagnosticReceipt = Object.assign({}, receipt, {
       diagnostic_probe: result && result.diagnostic_probe ? result.diagnostic_probe : null,
       socratic_contract: result && result.socratic_contract ? result.socratic_contract : null,
+      socratic_fallback_plan: result && result.socratic_fallback_plan ? result.socratic_fallback_plan : null,
       allowed_moves: result && result.allowed_moves ? result.allowed_moves : [],
       transfer_prompt: result && result.transfer_prompt ? result.transfer_prompt : ''
     });
@@ -629,6 +630,7 @@ Page({
         probe_prompt: result.diagnostic_probe.prompt || '',
         probe_goal: result.diagnostic_probe.goal || '',
         socratic_contract: result.socratic_contract || null,
+        socratic_fallback_mode: result.socratic_fallback_plan && result.socratic_fallback_plan.mode,
         allowed_moves: result.allowed_moves || [],
         transfer_prompt: result.transfer_prompt || ''
       });

@@ -321,6 +321,13 @@
         </view>
         <view class="retention-loop-step">{{highFrequencyPracticeLoop.xpRule}}</view>
         <view class="retention-loop-step">{{highFrequencyPracticeLoop.leechRule}}</view>
+        <view class="memory-feedback-card" wx:if="{{highFrequencyPracticeLoop.memoryFeedbackController}}">
+          <view class="high-frequency-label">{{highFrequencyPracticeLoop.memoryFeedbackController.title}}</view>
+          <view class="retention-loop-step" wx:for="{{highFrequencyPracticeLoop.memoryFeedbackController.triggerSignals}}" wx:key="*this">{{item}}</view>
+          <view class="retention-loop-step" wx:for="{{highFrequencyPracticeLoop.memoryFeedbackController.interventionSteps}}" wx:key="*this">{{item}}</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.memoryFeedbackController.xpThrottle}}</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.memoryFeedbackController.nextReview}}</view>
+        </view>
         <view class="retention-loop-foot">{{highFrequencyPracticeLoop.parentShareLine}}</view>
       </view>
       <view class="next-action-card" wx:if="{{challengeBrief.resultLine}}">

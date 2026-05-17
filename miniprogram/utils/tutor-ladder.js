@@ -233,6 +233,45 @@ function buildSocraticContract(taskType, item, probe) {
   };
 }
 
+function buildSocraticFallbackPlan(taskType, item, probe, context = {}) {
+  const normalized = normalizeLevel(item && item.level);
+  const stuckCount = Number(context.stuckCount || 0);
+  const answerBlocked = !!context.answerBlocked;
+  const mode = answerBlocked
+    ? 'answer_boundary'
+    : stuckCount >= 3 || normalized >= 4
+      ? 'low_threshold'
+      : 'normal_probe';
+  const baseQuestion = probe && probe.prompt ? probe.prompt : (TASK_TYPE_PROMPTS[taskType] || TASK_TYPE_PROMPTS.unknown);
+  const firstMove = answerBlocked
+    ? '先停住最终答案，只让孩子圈题目问什么。'
+    : mode === 'low_threshold'
+      ? '把问题降到二选一：A 找已知条件，B 看题目问什么。'
+      : '只问一个第一步问题，不连续追问。';
+  return {
+    id: `socratic_fallback_${taskType || 'unknown'}_${mode}`,
+    title: mode === 'answer_boundary' ? '答案捷径兜底' : mode === 'low_threshold' ? '沉默降级兜底' : '第一步兜底',
+    mode,
+    trigger: answerBlocked ? '孩子直接要答案或要求代写' : stuckCount >= 3 ? '孩子连续卡住或沉默' : '孩子还没说出可执行第一步',
+    firstMove,
+    microChoices: [
+      { id: 'a', label: 'A', text: '先找题目给了什么' },
+      { id: 'b', label: 'B', text: '先看题目问什么' }
+    ],
+    parentScript: answerBlocked
+      ? '家长只说：我们不抄答案，你先说题目问什么。'
+      : '家长只说：选 A 或 B 就行，不用完整做完。',
+    blackboardMove: `小黑板只写第一笔：${baseQuestion}`,
+    recoveryRoute: normalized >= 4 ? '/pages/arcade/arcade?from=socratic_fallback' : '/pages/tutor/tutor?from=socratic_fallback',
+    evidenceRequired: [
+      'fallback_trigger',
+      'child_micro_choice',
+      probe && probe.evidenceNeeded ? probe.evidenceNeeded : 'student_states_next_small_step'
+    ],
+    stopRule: '孩子选出 A/B 并说一句理由就停止，不继续讲完整答案。'
+  };
+}
+
 function stepIntro(item) {
   const level = normalizeLevel(item && item.level);
   const title = item && item.title ? item.title : '看清第一步';
@@ -269,6 +308,7 @@ function buildTutorReply(text, options = {}) {
     const item = ladderItem(1);
     const probe = diagnosticProbe(taskType, item.level);
     const socraticContract = buildSocraticContract(taskType, item, probe);
+    const socraticFallbackPlan = buildSocraticFallbackPlan(taskType, item, probe, { answerBlocked: true });
     return {
       reply: withStepIntro(item, '我不能直接替你写答案，但可以陪你先找第一步。先说题目问什么，或者圈出一个已知条件。'),
       hint_level: 1,
@@ -277,6 +317,7 @@ function buildTutorReply(text, options = {}) {
       coach_step_label: stepIntro(item),
       diagnostic_probe: probe,
       socratic_contract: socraticContract,
+      socratic_fallback_plan: socraticFallbackPlan,
       allowed_moves: probe.allowedMoves,
       transfer_prompt: probe.transferPrompt,
       next_action: '先说题目问什么，或者圈出一个已知条件。',
@@ -296,6 +337,7 @@ function buildTutorReply(text, options = {}) {
   const probe = diagnosticProbe(taskType, item.level);
   const socraticContract = buildSocraticContract(taskType, item, probe);
   const stuckCount = countRecentStuck(messages, text);
+  const socraticFallbackPlan = buildSocraticFallbackPlan(taskType, item, probe, { stuckCount });
   const reply = stuckCount >= 3
     ? `我们把门槛再降一点。先看${target}：下面两个选项选一个就行，A 先找已知条件，B 先看题目问什么。选完我给一个相似例子。`
     : item.reply;
@@ -308,6 +350,7 @@ function buildTutorReply(text, options = {}) {
     coach_step_label: stepIntro(item),
     diagnostic_probe: probe,
     socratic_contract: socraticContract,
+    socratic_fallback_plan: socraticFallbackPlan,
     allowed_moves: probe.allowedMoves,
     transfer_prompt: probe.transferPrompt,
     next_action: item.level >= 5 ? '把方法做成复习卡或生成一道小变式。' : '先回一句你的第一步。',
@@ -352,6 +395,7 @@ module.exports = {
   stepIntro,
   diagnosticProbe,
   buildSocraticContract,
+  buildSocraticFallbackPlan,
   MISCONCEPTION_MAP,
   detectTaskType,
   buildTutorReply,

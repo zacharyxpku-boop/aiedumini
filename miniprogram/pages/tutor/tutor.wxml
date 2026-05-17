@@ -122,6 +122,17 @@
             <view class="receipt-diagnostic-sub">停止规则：{{thinkingReceipt.socratic_contract.stopRule}}</view>
             <view class="receipt-diagnostic-sub">沉淀证据：{{thinkingReceipt.socratic_contract.evidenceToSave}}</view>
           </view>
+          <view class="receipt-fallback-plan" wx:if="{{thinkingReceipt.socratic_fallback_plan}}">
+            <view class="receipt-diagnostic-title">{{thinkingReceipt.socratic_fallback_plan.title}}</view>
+            <view class="receipt-diagnostic-line">触发：{{thinkingReceipt.socratic_fallback_plan.trigger}}</view>
+            <view class="receipt-diagnostic-line">降级动作：{{thinkingReceipt.socratic_fallback_plan.firstMove}}</view>
+            <view class="receipt-choice-row">
+              <text wx:for="{{thinkingReceipt.socratic_fallback_plan.microChoices}}" wx:key="id">{{item.label}}：{{item.text}}</text>
+            </view>
+            <view class="receipt-diagnostic-sub">家长话术：{{thinkingReceipt.socratic_fallback_plan.parentScript}}</view>
+            <view class="receipt-diagnostic-sub">小黑板：{{thinkingReceipt.socratic_fallback_plan.blackboardMove}}</view>
+            <view class="receipt-diagnostic-sub">停止规则：{{thinkingReceipt.socratic_fallback_plan.stopRule}}</view>
+          </view>
           <view class="receipt-move-row" wx:if="{{thinkingReceipt.allowed_moves.length}}">
             <text wx:for="{{thinkingReceipt.allowed_moves}}" wx:key="*this">{{item}}</text>
           </view>

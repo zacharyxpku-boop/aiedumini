@@ -780,6 +780,12 @@ Page({
       retention_weak_key: gameRetentionLoop && gameRetentionLoop.weakKey,
       high_frequency_mode: highFrequencyPracticeLoop && highFrequencyPracticeLoop.mode,
       high_frequency_next_route: highFrequencyPracticeLoop && highFrequencyPracticeLoop.nextRoute,
+      memory_feedback_severity: highFrequencyPracticeLoop && highFrequencyPracticeLoop.memoryFeedbackController
+        ? highFrequencyPracticeLoop.memoryFeedbackController.severity
+        : '',
+      memory_feedback_triggered: highFrequencyPracticeLoop && highFrequencyPracticeLoop.memoryFeedbackController
+        ? highFrequencyPracticeLoop.memoryFeedbackController.triggered
+        : false,
       share_code: incomingShare && incomingShare.share_code ? incomingShare.share_code : ''
     });
     if (storage.saveTodaySession) {
@@ -846,6 +852,12 @@ Page({
         high_frequency_evidence: highFrequencyPracticeLoop && Array.isArray(highFrequencyPracticeLoop.evidenceRequired)
           ? highFrequencyPracticeLoop.evidenceRequired.join(',')
           : '',
+        memory_feedback_severity: highFrequencyPracticeLoop && highFrequencyPracticeLoop.memoryFeedbackController
+          ? highFrequencyPracticeLoop.memoryFeedbackController.severity
+          : '',
+        memory_feedback_triggered: highFrequencyPracticeLoop && highFrequencyPracticeLoop.memoryFeedbackController
+          ? highFrequencyPracticeLoop.memoryFeedbackController.triggered
+          : false,
         boss_gap: this.data.adaptiveChallenge && this.data.adaptiveChallenge.bossCard
           ? this.data.adaptiveChallenge.bossCard.key
           : '',
