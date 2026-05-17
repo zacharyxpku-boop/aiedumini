@@ -32,6 +32,20 @@
     </view>
   </view>
 
+  <view class="global-depth-card" wx:if="{{subjectSeedLibrary}}">
+    <view class="global-depth-title">七科第一步种子库</view>
+    <view class="global-depth-summary">{{subjectSeedLibrary.summary}}</view>
+    <view class="global-depth-note">覆盖数学、语文、英语、物理、化学、生物、地理。</view>
+    <view class="global-depth-note">{{subjectSeedLibrary.active.label}}：{{subjectSeedLibrary.active.depthLine}}</view>
+    <view class="global-depth-grid">
+      <view class="global-depth-chip ready" wx:for="{{subjectSeedLibrary.active.seeds}}" wx:key="id">
+        <text>{{item.subjectLabel}} · {{item.label}}</text>
+        <text>{{item.firstStep}}</text>
+        <text>{{item.parentQuestion}}</text>
+      </view>
+    </view>
+  </view>
+
   <view class="section-title">这道题是什么科目？</view>
   <view class="choice-row">
     <view class="choice-chip {{subject === item.id ? 'active' : ''}}" wx:for="{{subjectOptions}}" wx:key="id" data-id="{{item.id}}" bindtap="chooseSubject">{{item.label}}</view>

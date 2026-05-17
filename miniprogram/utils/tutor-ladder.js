@@ -44,6 +44,10 @@ const TASK_TYPE_RULES = [
   { id: 'equation_setup', patterns: /方程|等量关系|设x|未知数|列方程|解方程/i },
   { id: 'reading_question', patterns: /阅读|主旨|细节|原因|段意|中心句|概括/i },
   { id: 'english_sentence', patterns: /英语|单词|语法|句型|主语|谓语|时态|词性/i },
+  { id: 'physics_diagram', patterns: /物理|受力|电路|光路|运动|速度|压强|浮力|透镜/i },
+  { id: 'chemistry_experiment', patterns: /化学|反应|方程式|溶液|气体|沉淀|颜色|酸碱/i },
+  { id: 'biology_process', patterns: /生物|细胞|植物|人体|遗传|生态|光合|对照组/i },
+  { id: 'geography_map', patterns: /地理|地图|经纬|气候|公转|自转|昼夜|地形|图例/i },
   { id: 'writing_process', patterns: /作文|写作|开头|结尾|提纲|续写|作文题/i }
 ];
 
@@ -52,6 +56,10 @@ const TASK_TYPE_PROMPTS = {
   equation_setup: '先把未知数写出来，再找等量关系。',
   reading_question: '先看题目问的是细节、主旨还是原因。',
   english_sentence: '先找主语和谓语，再看时态。',
+  physics_diagram: '先定研究对象，再画第一根方向或状态标记。',
+  chemistry_experiment: '先列反应前后物质，再说看到的现象。',
+  biology_process: '先把结构和功能连起来，再排过程顺序。',
+  geography_map: '先看方向、图例和位置，再说第一条原因链。',
   writing_process: '先写一句最简单的开头，再慢慢补。',
   unknown: '先说你准备从哪一步开始。'
 };
@@ -114,6 +122,34 @@ const MISCONCEPTION_MAP = {
     error_check: '可能需要先只查一个错误点，而不是整句重写。',
     transfer_check: '需要换一个同结构句子检查。'
   },
+  physics_diagram: {
+    object_state: '可能还没确定研究对象和初末状态。',
+    diagram_first: '可能没有先画出第一根方向、力或光路。',
+    law_match: '可能公式和图示没有连起来。',
+    error_check: '可能需要先只检查一个方向或状态。',
+    transfer_check: '需要换一个小情境检查能否先画图。'
+  },
+  chemistry_experiment: {
+    substance_state: '可能还没有分清反应前后物质和状态。',
+    phenomenon_reason: '可能只记现象，没说现象来自哪里。',
+    equation_check: '可能方程式、条件和守恒没有对应。',
+    error_check: '可能需要先只查一个守恒点。',
+    transfer_check: '需要换一个实验现象检查能否先说物质和原因。'
+  },
+  biology_process: {
+    structure_function: '可能把结构名称和功能关系背散了。',
+    process_order: '可能过程顺序没有排清。',
+    evidence_reason: '可能现象和结论之间缺证据。',
+    error_check: '可能需要先只连一个结构和功能。',
+    transfer_check: '需要换一个生命过程检查能否先说结构功能。'
+  },
+  geography_map: {
+    map_reading: '可能没有先看方向、图例和位置。',
+    region_position: '可能区域特征没有定清。',
+    cause_chain: '可能因果链跳步，只背了结论。',
+    error_check: '可能需要先只找一个位置特征。',
+    transfer_check: '需要换一张图检查能否先定位。'
+  },
   writing_process: {
     one_sentence_start: '可能想一次写完整篇，先降到一句开头。',
     outline_anchor: '可能没有确定这段围绕哪一个意思。',
@@ -141,6 +177,10 @@ function diagnosticProbe(taskType, level) {
     equation_setup: ['unknown_value', 'equal_relation', 'first_equation', 'solve_check', 'transfer_check'],
     reading_question: ['question_type', 'text_evidence', 'sentence_anchor', 'answer_boundary', 'transfer_check'],
     english_sentence: ['subject_predicate', 'tense_signal', 'sentence_pattern', 'error_check', 'transfer_check'],
+    physics_diagram: ['object_state', 'diagram_first', 'law_match', 'error_check', 'transfer_check'],
+    chemistry_experiment: ['substance_state', 'phenomenon_reason', 'equation_check', 'error_check', 'transfer_check'],
+    biology_process: ['structure_function', 'process_order', 'evidence_reason', 'error_check', 'transfer_check'],
+    geography_map: ['map_reading', 'region_position', 'cause_chain', 'error_check', 'transfer_check'],
     writing_process: ['one_sentence_start', 'outline_anchor', 'example_detail', 'rewrite_check', 'transfer_check'],
     unknown: ['what_is_asked', 'first_step', 'blocking_point', 'similar_example', 'transfer_check']
   };
@@ -170,6 +210,10 @@ function buildSocraticContract(taskType, item, probe) {
     equation_setup: '未知数先设什么？哪两边应该相等？',
     reading_question: '这题问细节、原因还是主旨？原文哪一句能当证据？',
     english_sentence: '主语和谓语分别是什么？有没有时间词提示时态？',
+    physics_diagram: '研究对象是谁？你先在图上标哪一个方向或状态？',
+    chemistry_experiment: '反应前后分别有什么？看到的现象从哪里来？',
+    biology_process: '这个结构对应什么功能？过程先后顺序是什么？',
+    geography_map: '图上先看方向还是图例？这个区域的第一条原因链是什么？',
     writing_process: '这段先写哪一句开头？它围绕哪个要点？',
     unknown: '你准备先从哪里开始？只说第一步。'
   };

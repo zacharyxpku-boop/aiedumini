@@ -13,7 +13,11 @@ Page({
     subjectOptions: [
       { id: 'math', label: '数学' },
       { id: 'chinese', label: '语文' },
-      { id: 'english', label: '英语' }
+      { id: 'english', label: '英语' },
+      { id: 'physics', label: '物理' },
+      { id: 'chemistry', label: '化学' },
+      { id: 'biology', label: '生物' },
+      { id: 'geography', label: '地理' }
     ],
     stuckOptions: [
       { id: 'read', label: '看不懂题' },
@@ -26,13 +30,15 @@ Page({
     diagnosis: null,
     result: null,
     surfaceDepthPack: null,
-    lightSeedBank: null
+    lightSeedBank: null,
+    subjectSeedLibrary: null
   },
 
   onLoad() {
     this.setData({
       surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('light_diagnosis') : null,
-      lightSeedBank: storage.buildLightEntrySeedBank ? storage.buildLightEntrySeedBank('light_diagnosis') : null
+      lightSeedBank: storage.buildLightEntrySeedBank ? storage.buildLightEntrySeedBank('light_diagnosis') : null,
+      subjectSeedLibrary: storage.buildSubjectSeedLibrary ? storage.buildSubjectSeedLibrary({ subject: this.data.subject }) : null
     });
   },
 
@@ -57,7 +63,13 @@ Page({
   },
 
   chooseSubject(event) {
-    this.setData({ subject: event.currentTarget.dataset.id, diagnosis: null, result: null });
+    const subject = event.currentTarget.dataset.id;
+    this.setData({
+      subject,
+      diagnosis: null,
+      result: null,
+      subjectSeedLibrary: storage.buildSubjectSeedLibrary ? storage.buildSubjectSeedLibrary({ subject }) : this.data.subjectSeedLibrary
+    });
   },
 
   chooseStuckStep(event) {

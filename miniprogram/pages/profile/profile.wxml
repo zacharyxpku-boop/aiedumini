@@ -619,14 +619,19 @@
           <text wx:if="{{learningReportSummary.longTermPortraitStabilityLine}}">{{learningReportSummary.longTermPortraitStabilityLine}}</text>
           <text wx:if="{{learningReportSummary.longTermPortraitRiskLine}}">{{learningReportSummary.longTermPortraitRiskLine}}</text>
           <text wx:for="{{learningReportSummary.longTermPortraitEvidence}}" wx:key="*this">下次证据：{{item}}</text>
+          <text wx:for="{{learningReportSummary.longTermPortraitObservationLoop}}" wx:key="*this">观察闭环：{{item}}</text>
+          <text wx:if="{{learningReportSummary.longTermPortraitParentRule}}">家长判断：{{learningReportSummary.longTermPortraitParentRule}}</text>
         </view>
         <view class="parent-brief-block" wx:if="{{learningReportSummary.classroomDecisionLine}}">
           <text class="parent-brief-label">课堂级决策板</text>
           <text>{{learningReportSummary.classroomDecisionLine}}</text>
           <text wx:if="{{learningReportSummary.classroomTeacherLens}}">{{learningReportSummary.classroomTeacherLens}}</text>
           <text wx:if="{{learningReportSummary.classroomParentLens}}">家长：{{learningReportSummary.classroomParentLens}}</text>
+          <text wx:for="{{learningReportSummary.classroomObservation}}" wx:key="*this">{{item}}</text>
           <text wx:if="{{learningReportSummary.classroomEvidenceRule}}">证据：{{learningReportSummary.classroomEvidenceRule}}</text>
           <text wx:if="{{learningReportSummary.classroomStopRule}}">停止规则：{{learningReportSummary.classroomStopRule}}</text>
+          <text wx:if="{{learningReportSummary.classroomEscalationRule}}">升级规则：{{learningReportSummary.classroomEscalationRule}}</text>
+          <text wx:if="{{learningReportSummary.classroomSuccessRule}}">成功规则：{{learningReportSummary.classroomSuccessRule}}</text>
         </view>
         <view class="parent-brief-block">
           <text class="parent-brief-label">下一步方案</text>

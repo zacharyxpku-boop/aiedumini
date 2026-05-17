@@ -585,6 +585,15 @@ function buildLongTermLearningPortrait(parts = {}, matrix = [], tendencies = [])
   if (!parts.assessmentAnswers || parts.assessmentAnswers.length < 8) nextEvidence.push('补完 8 个快速画像问题');
   if (!parts.behaviorSignals || !Object.keys(parts.behaviorSignals).length) nextEvidence.push('补一次孩子真实做题过程');
   if (!nextEvidence.length) nextEvidence.push('7 天后用新错题更新画像');
+  const subjectName = weakest.subject || stable.subject || '当前学科';
+  const causeName = weakest.mainCause || '第一步不清';
+  [
+    `${subjectName} 同题型第一步回执`,
+    `${causeName} 是否连续出现两次`,
+    '家长是否只问一句而不代讲'
+  ].forEach((item) => {
+    if (!nextEvidence.includes(item)) nextEvidence.push(item);
+  });
 
   return {
     title: '长期学习画像',
@@ -603,8 +612,14 @@ function buildLongTermLearningPortrait(parts = {}, matrix = [], tendencies = [])
     riskWatch: weakest.secondaryCause
       ? `连续两次出现 ${weakest.secondaryCause} 时，需要降低题量，改成一步追问。`
       : '如果孩子开始沉默或只要答案，立刻退回第一步小黑板。',
-    evidenceToCollect: nextEvidence.slice(0, 3),
+    evidenceToCollect: nextEvidence.slice(0, 5),
     trendLines: trendItems.slice(0, 3).map((item) => `${item.label}: ${item.description}`),
+    observationLoop: [
+      '当天：只记录孩子第一步',
+      '次日：回访同题型是否还能说出第一步',
+      '第 7 天：用新错题确认是否迁移'
+    ],
+    parentDecisionRule: '连续两次能说清第一步才加题量；连续两次沉默就降到小黑板。',
     nextReviewCadence: '每 7 天更新一次，不按单次分数下结论。'
   };
 }
@@ -621,6 +636,11 @@ function buildClassroomDecisionBoard(parts = {}, matrix = [], recommendationPlan
     decisionLine: `${subject} 暂不加题量，先处理 ${cause}。`,
     teacherLens: '像老师备课一样看：先找一个可观察动作，而不是直接看对错率。',
     parentLens: solution.parentScript || plan.parentLine || '家长今晚只问一句：这一步你准备先看哪里？',
+    classLikeObservation: [
+      `观察点：${subject} 能否独立说出第一步`,
+      `干预点：${cause} 出现时立刻退回小黑板`,
+      '复核点：第二天同类题能否迁移'
+    ],
     intervention: plan.cta && plan.cta.label
       ? `${plan.cta.label}: ${plan.cta.reason || '把报告落到一个小动作'}`
       : '先用点拨页让孩子说出第一步。',
@@ -628,6 +648,8 @@ function buildClassroomDecisionBoard(parts = {}, matrix = [], recommendationPlan
       ? solution.nextEvidenceRequired.join(' / ')
       : 'child_first_step / wrong_cause_card / next_day_revisit',
     stopRule: '如果连续两次答不上来，不继续讲答案，改用小黑板画第一步。',
+    escalationRule: '如果 7 天内同一错因出现 3 次，先减少题量，改成 3 分钟轻练习和一次家长复盘。',
+    successRule: '如果连续 2 天能独立说出第一步，再进入变式练习，不提前加难题。',
     nextConferenceQuestion: `下次复盘只问：${subject} 这类题，孩子能否自己说出第一步？`,
     shareableSummary: `${subject} 的下一次干预重点是 ${cause}，用 7 天证据复核，不按一次表现定性。`
   };

@@ -182,7 +182,11 @@ function submitDictation(wordsText = '', firstStepText = '') {
 const SUBJECT_LABELS = {
   math: '数学',
   chinese: '语文',
-  english: '英语'
+  english: '英语',
+  physics: '物理',
+  chemistry: '化学',
+  biology: '生物',
+  geography: '地理'
 };
 
 const STUCK_LABELS = {
@@ -193,7 +197,7 @@ const STUCK_LABELS = {
 };
 
 function normalizeLightDiagnosisOptions(options = {}) {
-  const subject = ['math', 'chinese', 'english'].includes(options.subject) ? options.subject : 'math';
+  const subject = ['math', 'chinese', 'english', 'physics', 'chemistry', 'biology', 'geography'].includes(options.subject) ? options.subject : 'math';
   const stuckStep = ['read', 'formula', 'writing', 'other'].includes(options.stuckStep) ? options.stuckStep : 'read';
   return { subject, stuckStep };
 }
@@ -203,6 +207,10 @@ function suggestLightDiagnosisStep(subject, stuckStep) {
   if (stuckStep === 'formula') return '先写出题目问什么，把它变成一个问题句。';
   if (subject === 'english') return '先找主语和谓语，再看这一句在问什么。';
   if (subject === 'chinese') return '先看题目问的是细节、主旨还是原因。';
+  if (subject === 'physics') return '先画研究对象和方向，再标出已知和要求。';
+  if (subject === 'chemistry') return '先写反应前后物质，再看颜色、气体或沉淀怎么来。';
+  if (subject === 'biology') return '先说结构对应什么功能，再排过程顺序。';
+  if (subject === 'geography') return '先看方向和图例，再定位区域和原因链。';
   if (stuckStep === 'writing') return '先写一句最简单的开头，不急着写完整。';
   return '先圈出题干里已经给你的条件。';
 }
@@ -210,6 +218,10 @@ function suggestLightDiagnosisStep(subject, stuckStep) {
 function taskTypeFromLightDiagnosis(subject, stuckStep, inputText) {
   if (subject === 'english') return 'english_sentence';
   if (subject === 'chinese') return 'reading_question';
+  if (subject === 'physics') return 'physics_diagram';
+  if (subject === 'chemistry') return 'chemistry_experiment';
+  if (subject === 'biology') return 'biology_process';
+  if (subject === 'geography') return 'geography_map';
   if (stuckStep === 'formula') return 'equation_setup';
   return storage.detectTaskType(inputText, 'light_diagnosis');
 }

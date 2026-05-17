@@ -2285,6 +2285,22 @@ const FIRST_STEP_TEMPLATES = {
   english_sentence: [
     '先找主语和谓语。'
   ],
+  physics_diagram: [
+    '先画研究对象和方向。',
+    '先标出已知量和要求量。'
+  ],
+  chemistry_experiment: [
+    '先写清反应物和现象。',
+    '先判断颜色、气体或沉淀来自哪里。'
+  ],
+  biology_process: [
+    '先说结构对应的功能。',
+    '先按过程顺序排三步。'
+  ],
+  geography_map: [
+    '先在图上定位方向和位置。',
+    '先说这一现象的第一条原因链。'
+  ],
   writing_process: [
     '先写一句最简单的开头。'
   ],
@@ -2295,6 +2311,10 @@ const FIRST_STEP_TEMPLATES = {
 
 function detectTaskType(text = '', extra = '') {
   const value = `${text || ''} ${extra || ''}`.toLowerCase();
+  if (/物理|受力|电路|光路|运动|速度|压强|浮力|杠杆|透镜|physics|force|circuit/.test(value)) return 'physics_diagram';
+  if (/化学|反应|方程式|溶液|气体|沉淀|颜色|酸碱|离子|chemistry/.test(value)) return 'chemistry_experiment';
+  if (/生物|细胞|植物|人体|遗传|生态|光合|消化|对照组|biology/.test(value)) return 'biology_process';
+  if (/地理|地图|经纬|气候|公转|自转|昼夜|季风|地形|geography|map/.test(value)) return 'geography_map';
   if (/方程|等量|未知数|x|列方程|解方程/.test(value)) return 'equation_setup';
   if (/应用题|题干|条件|已知|问什么|关键词|数量关系|单位/.test(value)) return 'math_word_problem';
   if (/阅读|读不懂|主旨|细节|原因|文章|段落|题目问/.test(value)) return 'reading_question';
@@ -2348,6 +2368,42 @@ const SUBJECT_SKILL_DEPTH = {
     parent: '这句话谁做动作？动作词是哪一个？',
     evidenceRequired: ['subject_found', 'verb_found', 'tense_signal']
   },
+  physics_diagram: {
+    label: '物理图解',
+    blackboard: ['定研究对象', '标方向/状态', '匹配规律'],
+    socratic: ['研究对象是谁？', '图上先标哪个方向或状态？', '这一步对应哪条物理规律？'],
+    game: ['对象卡', '方向卡', '规律匹配卡'],
+    report: '物理题重点看对象、图示第一笔和规律匹配。不能只看公式有没有背。 ',
+    parent: '你先画的是哪个对象？箭头或状态为什么先标这里？',
+    evidenceRequired: ['object_selected', 'diagram_first_mark', 'law_match']
+  },
+  chemistry_experiment: {
+    label: '化学实验',
+    blackboard: ['列物质状态', '看实验现象', '回到守恒/条件'],
+    socratic: ['反应前有哪些物质？', '现象是颜色、气体还是沉淀？', '这一步和守恒或条件有什么关系？'],
+    game: ['物质状态卡', '现象原因卡', '守恒复核卡'],
+    report: '化学题重点看物质状态、实验现象和守恒条件。不能只背方程式。',
+    parent: '你先说反应前后分别有什么，再说现象从哪里来。',
+    evidenceRequired: ['substance_state', 'phenomenon_reason', 'conservation_check']
+  },
+  biology_process: {
+    label: '生物过程',
+    blackboard: ['找结构', '说功能', '排过程顺序'],
+    socratic: ['这个结构负责什么功能？', '过程先后顺序是什么？', '哪一个现象能支持结论？'],
+    game: ['结构功能卡', '过程排序卡', '证据解释卡'],
+    report: '生物题重点看结构功能、过程顺序和证据解释。不能只背名词。',
+    parent: '你先说这个结构有什么用，再排前后三步。',
+    evidenceRequired: ['structure_function', 'process_order', 'evidence_reason']
+  },
+  geography_map: {
+    label: '地理读图',
+    blackboard: ['读方向/图例', '定位区域', '串因果链'],
+    socratic: ['图上先看方向还是图例？', '这个区域的位置特征是什么？', '地形、气候或人类活动哪条先影响结果？'],
+    game: ['图例定位卡', '区域特征卡', '因果链卡'],
+    report: '地理题重点看读图定位、区域特征和因果链。不能只背结论。',
+    parent: '你先在图上指出位置，再说第一条原因。',
+    evidenceRequired: ['map_reading', 'region_position', 'cause_chain']
+  },
   writing_process: {
     label: '写作表达',
     blackboard: ['一句话立意', '列两个要点', '补例子'],
@@ -2397,6 +2453,34 @@ const SOCRATIC_ASSESSMENT_MATRIX = {
     transferCheck: '换一句话后，孩子还能先找主谓骨架。',
     evidenceTag: 'english_sentence_probe'
   },
+  physics_diagram: {
+    misconceptionChecks: ['研究对象没定', '方向或状态漏标', '公式和图示脱节'],
+    probeSequence: ['先问研究对象是谁', '再标第一根箭头或初末状态', '最后说对应哪条规律'],
+    recoveryMoves: ['只画一个对象', '只标一个方向或状态', '把公式翻译成图上的一句话'],
+    transferCheck: '换一个物理情境后，孩子还能先画对象和第一笔标注。',
+    evidenceTag: 'physics_diagram_probe'
+  },
+  chemistry_experiment: {
+    misconceptionChecks: ['只背方程式', '现象和原因断开', '守恒或条件没检查'],
+    probeSequence: ['先列反应前后物质', '再说看到的现象', '最后回到守恒或条件'],
+    recoveryMoves: ['把物质分成反应前/反应后', '只问颜色/气体/沉淀来自哪里', '先查一个守恒点'],
+    transferCheck: '换一个实验现象后，孩子还能先说物质和现象来源。',
+    evidenceTag: 'chemistry_experiment_probe'
+  },
+  biology_process: {
+    misconceptionChecks: ['结构功能混淆', '过程顺序错', '现象不能支持结论'],
+    probeSequence: ['先找结构', '再说功能', '最后按过程顺序解释现象'],
+    recoveryMoves: ['只连一个结构和一个功能', '把过程排成三步', '让孩子指出支持结论的现象'],
+    transferCheck: '换一个生命过程后，孩子还能先说结构功能关系。',
+    evidenceTag: 'biology_process_probe'
+  },
+  geography_map: {
+    misconceptionChecks: ['没读图例方向', '区域位置没定', '因果链跳步'],
+    probeSequence: ['先看方向和图例', '再定位区域', '最后串第一条因果链'],
+    recoveryMoves: ['遮住题干只看图例', '只找一个位置特征', '把原因链缩成两段'],
+    transferCheck: '换一张图后，孩子还能先定位并说第一条原因链。',
+    evidenceTag: 'geography_map_probe'
+  },
   writing_process: {
     misconceptionChecks: ['中心句不清', '理由堆叠无顺序', '例子不能支撑观点'],
     probeSequence: ['先说中心句', '再列两个理由', '最后补一个具体例子'],
@@ -2415,7 +2499,8 @@ const SOCRATIC_ASSESSMENT_MATRIX = {
 
 function buildSocraticAssessmentMatrix(input = {}) {
   const sourceText = input.sourceText || input.stuckPointText || input.thought || input.title || input.text || '';
-  const taskType = input.taskType || detectTaskType(sourceText, input.subject || input.issueType || '');
+  const detectedType = detectTaskType(sourceText, input.subject || input.issueType || '');
+  const taskType = input.taskType || (detectedType !== 'unknown' ? detectedType : taskTypeForSubject(input.subject)) || 'unknown';
   const spec = SOCRATIC_ASSESSMENT_MATRIX[taskType] || SOCRATIC_ASSESSMENT_MATRIX.unknown;
   return {
     id: `socratic_assessment_${taskType}`,
@@ -2451,7 +2536,8 @@ function buildSocraticAssessmentMatrix(input = {}) {
 
 function buildSubjectSkillDepth(input = {}) {
   const sourceText = input.sourceText || input.stuckPointText || input.thought || input.title || input.text || '';
-  const taskType = input.taskType || detectTaskType(sourceText, input.subject || input.issueType || '');
+  const detectedType = detectTaskType(sourceText, input.subject || input.issueType || '');
+  const taskType = input.taskType || (detectedType !== 'unknown' ? detectedType : taskTypeForSubject(input.subject)) || 'unknown';
   const spec = SUBJECT_SKILL_DEPTH[taskType] || SUBJECT_SKILL_DEPTH.unknown;
   const firstStep = sanitizeMiniActionText(input.childArticulatedStep || input.systemSuggestedStep || input.firstStep || suggestedStepForTaskType(taskType));
   const socraticAssessment = buildSocraticAssessmentMatrix(Object.assign({}, input, { taskType }));
@@ -2538,6 +2624,31 @@ const CURRICULUM_SPINE = {
     ]
   }
 };
+
+const SUBJECT_TASK_TYPE_MAP = {
+  math: 'math_word_problem',
+  chinese: 'reading_question',
+  english: 'english_sentence',
+  physics: 'physics_diagram',
+  chemistry: 'chemistry_experiment',
+  biology: 'biology_process',
+  geography: 'geography_map',
+  数学: 'math_word_problem',
+  语文: 'reading_question',
+  英语: 'english_sentence',
+  物理: 'physics_diagram',
+  化学: 'chemistry_experiment',
+  生物: 'biology_process',
+  地理: 'geography_map'
+};
+
+function taskTypeForSubject(subject = '') {
+  const raw = String(subject || '').trim();
+  if (!raw) return '';
+  if (SUBJECT_TASK_TYPE_MAP[raw]) return SUBJECT_TASK_TYPE_MAP[raw];
+  const lower = raw.toLowerCase();
+  return SUBJECT_TASK_TYPE_MAP[lower] || '';
+}
 
 function inferCurriculumSubject(input = {}, subjectSkillDepth = null) {
   const text = `${input.subject || ''} ${input.sourceText || ''} ${input.stuckPointText || ''} ${input.thought || ''} ${input.title || ''} ${(subjectSkillDepth && subjectSkillDepth.label) || ''}`;
@@ -3720,6 +3831,42 @@ function wrongCauseFromFirstStep(step = '', taskType = 'unknown') {
       nextPracticeText: '只写开头一句和两个要点，不追求整篇。'
     };
   }
+  if (/physics_diagram|物理|受力|电路|光路|方向|状态|研究对象/.test(text)) {
+    return {
+      id: 'visual_modeling',
+      label: '图示建模',
+      checkpoint: '先定研究对象，再画第一根方向、力或状态。',
+      parentPrompt: '你先画的是哪个对象？第一根标记为什么放这里？',
+      nextPracticeText: '做 1 道同类题，只画对象和第一根标记，不急着套公式。'
+    };
+  }
+  if (/chemistry_experiment|化学|反应|物质|现象|气体|沉淀|守恒/.test(text)) {
+    return {
+      id: 'phenomenon_reason',
+      label: '现象归因',
+      checkpoint: '先列反应前后物质，再说现象来自哪里。',
+      parentPrompt: '你看到的现象是颜色、气体还是沉淀？它从哪里来？',
+      nextPracticeText: '做 1 道同类题，只说物质和现象来源。'
+    };
+  }
+  if (/biology_process|生物|结构|功能|过程|对照组/.test(text)) {
+    return {
+      id: 'structure_process',
+      label: '结构过程',
+      checkpoint: '先把结构和功能连起来，再排过程顺序。',
+      parentPrompt: '这个结构有什么用？这一步前后分别是什么？',
+      nextPracticeText: '做 1 道同类题，只连一个结构和一个功能。'
+    };
+  }
+  if (/geography_map|地理|地图|图例|区域|原因链|方向/.test(text)) {
+    return {
+      id: 'map_cause_chain',
+      label: '读图因果',
+      checkpoint: '先看方向、图例和位置，再说第一条原因链。',
+      parentPrompt: '你先在图上定位哪里？第一条原因是什么？',
+      nextPracticeText: '换一张图，只做定位和一句原因。'
+    };
+  }
   return {
     id: 'first_step',
     label: '第一步确认',
@@ -4638,6 +4785,10 @@ function taskTypeLabel(type) {
     equation_setup: '列方程',
     reading_question: '阅读题',
     english_sentence: '英语句子',
+    physics_diagram: '物理图解',
+    chemistry_experiment: '化学实验',
+    biology_process: '生物过程',
+    geography_map: '地理读图',
     writing_process: '写作',
     dictation: '听写',
     daily_math: '口算',
@@ -4652,6 +4803,10 @@ function deepScaffoldingTemplates(type = 'unknown') {
     equation_setup: ['先把未知数写成 x。', '再找一句能表示相等关系的话。', '最后把两边分别写出来，不急着算。'],
     reading_question: ['先看题目问的是细节、主旨还是原因。', '再回到对应段落，找到题目里重复或相近的词。', '最后用自己的话说出这一句为什么相关。'],
     english_sentence: ['先找主语和谓语。', '再看动作发生在什么时候。', '最后看句子里有没有固定结构或连接词。'],
+    physics_diagram: ['先定研究对象。', '再画第一根方向、力或状态标记。', '最后说这一笔对应哪条规律。'],
+    chemistry_experiment: ['先列反应前后物质。', '再说看到的现象来自哪里。', '最后检查守恒或实验条件。'],
+    biology_process: ['先找结构。', '再说结构对应的功能。', '最后把过程排成三步。'],
+    geography_map: ['先看方向和图例。', '再定位区域特征。', '最后说第一条原因链。'],
     writing_process: ['先写一句最简单的开头。', '再补一个具体例子或画面。', '最后检查这一段是不是围绕同一个意思。'],
     dictation: ['先听清第一个词。', '再确认你先看的是拼音、字形还是意思。', '最后把不确定的那一笔圈出来。'],
     daily_math: ['先看清符号。', '再看有没有进位或退位。', '最后只检查这一步，不急着重做整题。'],
@@ -4871,6 +5026,56 @@ function buildLightEntrySeedBank(feature = 'daily_math', options = {}) {
     latestEvidence: latest,
     route: bank.route,
     nextAction: latest ? '带着最近第一步回到修卡点' : '先完成一条轻入口第一步'
+  };
+}
+
+function buildSubjectSeedLibrary(options = {}) {
+  const subjectIds = ['math', 'chinese', 'english', 'physics', 'chemistry', 'biology', 'geography'];
+  const subjects = subjectIds.map((subjectId) => {
+    const curriculum = CURRICULUM_SPINE[subjectId] || CURRICULUM_SPINE.math;
+    const taskType = taskTypeForSubject(subjectId) || 'unknown';
+    const depth = buildSubjectSkillDepth({
+      taskType,
+      subject: curriculum.label,
+      firstStep: suggestedStepForTaskType(taskType),
+      sourceText: `${curriculum.label} 七科第一步种子`
+    });
+    const seeds = curriculum.nodes.map((node, index) => ({
+      id: `${subjectId}_${node.id}`,
+      order: index + 1,
+      subjectId,
+      subjectLabel: curriculum.label,
+      label: node.label,
+      taskType,
+      firstStep: index === 0 ? depth.firstStep : `先处理「${node.label}」：${node.evidence}`,
+      wrongCause: index === 0 ? '不知道从哪里下手' : `${node.label}证据不足`,
+      parentQuestion: index === 0 ? depth.parentQuestion : `你能先说清「${node.label}」这一小步吗？`,
+      evidenceRequired: index === 0 ? depth.evidenceRequired : [node.id, 'child_first_step', 'next_day_revisit'],
+      blackboardLine: `${curriculum.label}小黑板：${node.label} -> ${node.evidence}`,
+      route: curriculum.route
+    }));
+    return {
+      id: subjectId,
+      label: curriculum.label,
+      taskType,
+      route: curriculum.route,
+      depthLine: depth.reportSignal,
+      visualBoundary: '只做第一步小黑板，不做全科自动板书讲题。',
+      seeds
+    };
+  });
+  const activeSubject = options.subject ? String(options.subject) : '';
+  const active = subjects.find((item) => item.id === activeSubject || item.label === activeSubject) || subjects[0];
+  return {
+    id: 'subject_seed_library',
+    title: '七科第一步种子库',
+    summary: '每科都只沉淀题型、错因、第一步、家长追问和证据，不承诺自动给完整答案。',
+    subjects,
+    active,
+    subjectCount: subjects.length,
+    seedCount: subjects.reduce((sum, item) => sum + item.seeds.length, 0),
+    nextAction: active ? `先选 ${active.label} 的一张第一步种子` : '先选一张第一步种子',
+    generatedAt: options.now ? new Date(options.now).toISOString() : rcNowIso()
   };
 }
 
@@ -6717,6 +6922,7 @@ module.exports = {
   buildCurriculumSpine,
   buildVisualSocraticMatrix,
   buildLightEntrySeedBank,
+  buildSubjectSeedLibrary,
   childStepQuality,
   normalizeFirstStepEvidence,
   saveChildArticulatedStep,
