@@ -45,6 +45,7 @@ Page({
     resultAdvice: null,
     gameRetentionLoop: null,
     highFrequencyPracticeLoop: null,
+    arcadeResultActionBridge: null,
     emptyGuide: null,
     feedbackText: '',
     expandedMatrix: false,
@@ -873,11 +874,19 @@ Page({
       mode: `arcade_${savedResult.gameType}`,
       profile: storage.loadGameProfile ? storage.loadGameProfile() : {}
     }).catch(() => {});
+    const arcadeResultActionBridge = this.buildArcadeResultActionBridge(savedResult, {
+      repairFocus,
+      gameRetentionLoop,
+      highFrequencyPracticeLoop,
+      wrongAnswers,
+      incomingShare
+    });
     this.setData({
       result: savedResult,
       resultAdvice: arcade.buildRoundAdvice(savedResult, savedResult.gameType),
       gameRetentionLoop,
       highFrequencyPracticeLoop,
+      arcadeResultActionBridge,
       challengeBrief: Object.assign({}, this.data.challengeBrief || {}, {
         resultLine: savedResult.accuracy >= Number((this.data.challengeBrief && this.data.challengeBrief.targetAccuracy) || 80)
           ? '本局达到目标，剧情线证据已写回。'
@@ -920,10 +929,57 @@ Page({
       repairFocus: null,
       result: null,
       resultAdvice: null,
+      arcadeResultActionBridge: null,
       highFrequencyPracticeLoop: null,
       emptyGuide: this.emptyGuide(this.data.selectedGame, round),
       feedbackText: '新一局开始。'
     });
+  },
+
+  buildArcadeResultActionBridge(result = {}, context = {}) {
+    const wrongCount = Array.isArray(context.wrongAnswers) ? context.wrongAnswers.length : Number(result.wrong || 0);
+    const retention = context.gameRetentionLoop || {};
+    const highFrequency = context.highFrequencyPracticeLoop || {};
+    const shareCode = context.incomingShare && context.incomingShare.share_code ? context.incomingShare.share_code : '';
+    const headline = result.passed
+      ? '这局可以收口：明天轻回看一张卡'
+      : '这局没过也有价值：错卡已经回队列';
+    const evidenceLine = [
+      `正确 ${Number(result.correct || 0)}/${Number(result.total || 0)}`,
+      wrongCount ? `错因 ${wrongCount} 条` : '没有新增错因',
+      result.xp ? `写入 ${result.xp} XP` : '已写入学习记录'
+    ].join(' · ');
+    const actions = [
+      {
+        id: 'review',
+        label: wrongCount ? '先修错卡' : '明天回看',
+        route: '/pages/review/review',
+        reason: wrongCount ? '错题回到修卡点，先拆第一步。' : '把今天会的内容变成长期记忆。',
+        capabilityId: 'game'
+      },
+      {
+        id: 'profile',
+        label: '给家长看',
+        route: '/pages/profile/profile',
+        reason: '把本局结果放进家长复盘，不只看分数。',
+        capabilityId: 'parent_action'
+      },
+      {
+        id: 'tutor',
+        label: '再问一步',
+        route: context.repairFocus ? '/pages/tutor/tutor?from=arcade_result_bridge' : '/pages/tutor/tutor?from=arcade_result_review',
+        reason: '卡住时回到苏格拉底第一步，不直接照抄结果。',
+        capabilityId: 'socratic'
+      }
+    ];
+    return {
+      title: '本局之后做什么',
+      headline,
+      evidenceLine,
+      tomorrowLine: retention.tomorrowLine || highFrequency.parentShareLine || '明天只回看最不稳的一张卡。',
+      shareLine: shareCode ? `来自分享接力 ${shareCode}，本局结果会继续承接。` : '家长页会显示本局证据和下一步。',
+      actions
+    };
   },
 
   runGuideAction(event) {
@@ -957,6 +1013,56 @@ Page({
       return;
     }
     this.goReview();
+  },
+
+  runArcadeResultBridgeAction(event) {
+    const dataset = event.currentTarget.dataset || {};
+    const bridge = this.data.arcadeResultActionBridge || {};
+    const route = dataset.route || '/pages/review/review';
+    const action = {
+      source: 'arcade_result_bridge',
+      sourceLabel: '轻练习结果行动桥',
+      actionId: dataset.id || 'review',
+      actionLabel: dataset.label || '明天回看',
+      route,
+      reasonLine: dataset.reason || bridge.headline || '',
+      evidenceLine: bridge.evidenceLine || '',
+      shareIntent: bridge.shareLine || ''
+    };
+    if (storage.recordUnifiedNextAction) {
+      storage.recordUnifiedNextAction(Object.assign({}, action, { surface: 'arcade' }));
+    }
+    if (storage.recordSurfaceDepthAction) {
+      storage.recordSurfaceDepthAction({
+        surface: 'arcade',
+        dimensionId: action.actionId,
+        label: action.actionLabel,
+        route,
+        readiness: 'arcade_result_bridge',
+        capabilityId: dataset.capabilityId || 'game'
+      });
+    }
+    if (storage.appendReviewEvent) {
+      storage.appendReviewEvent({
+        kind: 'arcade_result_bridge_action',
+        action_id: action.actionId,
+        route,
+        evidence: action.evidenceLine
+      });
+    }
+    api.submitEvent({
+      event: 'arcade_result_bridge_action',
+      source: 'arcade_result',
+      entity_id: action.actionId,
+      page: 'arcade',
+      payload: {
+        route,
+        action_label: action.actionLabel,
+        evidence: action.evidenceLine,
+        reason: action.reasonLine
+      }
+    }).catch(() => {});
+    navigation.navigateLearningRoute(route);
   },
 
   repairWrongCard() {

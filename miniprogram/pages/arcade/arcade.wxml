@@ -338,6 +338,26 @@
         <view class="next-action-title">{{resultAdvice.title}}</view>
         <view class="next-action-body">{{resultAdvice.body}}</view>
       </view>
+      <view class="arcade-result-bridge" wx:if="{{arcadeResultActionBridge}}">
+        <view class="bridge-kicker">{{arcadeResultActionBridge.title}}</view>
+        <view class="bridge-title">{{arcadeResultActionBridge.headline}}</view>
+        <view class="bridge-line">{{arcadeResultActionBridge.evidenceLine}}</view>
+        <view class="bridge-line">{{arcadeResultActionBridge.tomorrowLine}}</view>
+        <view class="bridge-share">{{arcadeResultActionBridge.shareLine}}</view>
+        <view class="bridge-action-grid">
+          <button
+            class="bridge-action"
+            wx:for="{{arcadeResultActionBridge.actions}}"
+            wx:key="id"
+            data-id="{{item.id}}"
+            data-label="{{item.label}}"
+            data-route="{{item.route}}"
+            data-reason="{{item.reason}}"
+            data-capability-id="{{item.capabilityId}}"
+            bindtap="runArcadeResultBridgeAction"
+          >{{item.label}}</button>
+        </view>
+      </view>
       <view class="result-actions">
         <button class="primary-btn" bindtap="restartRound">{{resultAdvice.primary}}</button>
         <button class="secondary-btn" bindtap="runResultSecondary">{{resultAdvice.secondary}}</button>

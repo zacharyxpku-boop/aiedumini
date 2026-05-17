@@ -252,6 +252,26 @@
           </view>
         </view>
 
+        <view class="post-repair-bridge-card" wx:if="{{postRepairBridge}}">
+          <view class="card-label">{{postRepairBridge.title}}</view>
+          <view class="post-repair-title">{{postRepairBridge.headline}}</view>
+          <view class="post-repair-line">{{postRepairBridge.evidenceLine}}</view>
+          <view class="post-repair-line">{{postRepairBridge.parentLine}}</view>
+          <view class="post-repair-actions">
+            <button
+              class="post-repair-action"
+              wx:for="{{postRepairBridge.actions}}"
+              wx:key="id"
+              data-id="{{item.id}}"
+              data-label="{{item.label}}"
+              data-route="{{item.route}}"
+              data-reason="{{item.reason}}"
+              data-capability-id="{{item.capabilityId}}"
+              bindtap="runPostRepairBridgeAction"
+            >{{item.label}}</button>
+          </view>
+        </view>
+
         <view class="review-question-card done-card" wx:if="{{done}}">
           <view class="card-label">今日完成</view>
           <view class="question-text">今天这轮结束了。</view>

@@ -75,6 +75,7 @@ Page({
     surfaceDepthPack: null,
     transferPractice: null,
     outcomeCheck: null,
+    postRepairBridge: null,
     companionPreference: null,
     companionCopy: { review: '咕点陪你只修这一小步，不讲完整答案。' },
     companionLine: '咕点：我懂你卡住了，我陪你先迈出第一步。',
@@ -143,6 +144,12 @@ Page({
       surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('review') : null,
       transferPractice: this.buildTransferPracticePanel(current),
       outcomeCheck: this.buildOutcomeCheckPanel(current),
+      postRepairBridge: this.buildPostRepairBridge(current, {
+        todayFocus,
+        done: !cards.length,
+        summary,
+        gameRunway
+      }),
       companionPreference,
       companionCopy: {
         review: storage.getCompanionStageCopy ? storage.getCompanionStageCopy('review_focus', companionPreference) : '咕点陪你只修这一小步，不讲完整答案。'
@@ -218,6 +225,47 @@ Page({
         { id: 'transfer', label: '换题也能用', field: 'transferWorked' },
         { id: 'tomorrow', label: '明天还记得', field: 'nextDayRemembered' }
       ]
+    };
+  },
+
+  buildPostRepairBridge(card, context = {}) {
+    const focus = context.todayFocus || this.data.todayFocus || {};
+    const summary = context.summary || this.data.summary || {};
+    const runway = context.gameRunway || this.data.gameRunway || {};
+    const cardTitle = card && (card.weakPoint || card.question) ? (card.weakPoint || card.question) : (focus.title || '今天这个卡点');
+    const completed = !!(focus && focus.repairStatus === 'completed') || !!context.done;
+    const evidenceLine = completed
+      ? '已留下第一步、回访卡和下一次复核入口。'
+      : `当前还有 ${Number(runway.due || (summary.dueCount || 0) || 0)} 张需要轻回访。`;
+    const actions = [
+      {
+        id: 'arcade',
+        label: '5分钟轻练',
+        route: '/pages/arcade/arcade',
+        reason: '把修过的卡点放进主动回忆，不靠照抄结果。',
+        capabilityId: 'game'
+      },
+      {
+        id: 'profile',
+        label: '给家长看',
+        route: '/pages/profile/profile',
+        reason: '让家长看到修复证据、迁移尝试和明天复核。',
+        capabilityId: 'parent_action'
+      },
+      {
+        id: 'tutor',
+        label: '再拆一步',
+        route: '/pages/tutor/tutor?from=review_post_repair',
+        reason: '如果还卡住，回到苏格拉底第一步。',
+        capabilityId: 'socratic'
+      }
+    ];
+    return {
+      title: completed ? '修完之后怎么收口' : '修卡点之后别断',
+      headline: completed ? '今天先到这里，明天只复核这一小步' : `围绕「${cardTitle}」继续补证据`,
+      evidenceLine,
+      parentLine: '家长只看三件事：孩子能否自己说第一步、能否换题、明天是否还记得。',
+      actions
     };
   },
 
@@ -734,6 +782,12 @@ Page({
       gameRunway: this.buildGameRunway(summary, done ? [] : cards.slice(nextIndex)),
       transferPractice: this.buildTransferPracticePanel(done ? null : cards[nextIndex]),
       outcomeCheck: this.buildOutcomeCheckPanel(done ? null : cards[nextIndex]),
+      postRepairBridge: this.buildPostRepairBridge(done ? current : cards[nextIndex], {
+        todayFocus: this.data.todayFocus,
+        done,
+        summary,
+        gameRunway: this.buildGameRunway(summary, done ? [] : cards.slice(nextIndex))
+      }),
       feedbackText,
       editQuestion: done ? '' : cards[nextIndex].question,
       editAnswer: done ? '' : cards[nextIndex].answer,
@@ -760,6 +814,11 @@ Page({
       current: target || current,
       transferPractice: this.buildTransferPracticePanel(target || current),
       outcomeCheck: this.buildOutcomeCheckPanel(target || current),
+      postRepairBridge: this.buildPostRepairBridge(target || current, {
+        todayFocus: this.data.todayFocus,
+        summary: this.data.summary,
+        gameRunway: this.data.gameRunway
+      }),
       feedbackText: '已写回迁移练习记录。下一步看孩子能不能换题也说出同一个第一步。'
     });
     this.syncQuietly();
@@ -780,6 +839,11 @@ Page({
     storage.recordOutcomeCheck(payload);
     this.setData({
       outcomeCheck: this.buildOutcomeCheckPanel(current),
+      postRepairBridge: this.buildPostRepairBridge(current, {
+        todayFocus: this.data.todayFocus,
+        summary: this.data.summary,
+        gameRunway: this.data.gameRunway
+      }),
       feedbackText: '已记录一次结果复核。这里看的是会不会迁移和隔天是否记得，不看最终答案。'
     });
     this.syncQuietly();
@@ -816,6 +880,12 @@ Page({
     this.setData({
       todayFocus: focus || this.data.todayFocus,
       gameRunway: Object.assign({}, this.data.gameRunway || {}, { percent: 100 }),
+      postRepairBridge: this.buildPostRepairBridge(this.data.current, {
+        todayFocus: focus || this.data.todayFocus,
+        done: true,
+        summary: this.data.summary,
+        gameRunway: Object.assign({}, this.data.gameRunway || {}, { percent: 100 })
+      }),
       feedbackText: '今天这个卡点先修到这里。明天只轻轻回看这一步。'
     });
   },
@@ -1064,6 +1134,56 @@ Page({
       editAnswer: card.answer || '',
       feedbackText: '已定位到待修卡片'
     });
+  },
+
+  runPostRepairBridgeAction(event) {
+    const dataset = event.currentTarget.dataset || {};
+    const bridge = this.data.postRepairBridge || {};
+    const route = dataset.route || '/pages/arcade/arcade';
+    const action = {
+      source: 'review_post_repair_bridge',
+      sourceLabel: '修卡后行动桥',
+      actionId: dataset.id || 'arcade',
+      actionLabel: dataset.label || '5分钟轻练',
+      route,
+      reasonLine: dataset.reason || bridge.headline || '',
+      evidenceLine: bridge.evidenceLine || '',
+      shareIntent: bridge.parentLine || ''
+    };
+    if (storage.recordUnifiedNextAction) {
+      storage.recordUnifiedNextAction(Object.assign({}, action, { surface: 'review' }));
+    }
+    if (storage.recordSurfaceDepthAction) {
+      storage.recordSurfaceDepthAction({
+        surface: 'review',
+        dimensionId: action.actionId,
+        label: action.actionLabel,
+        route,
+        readiness: 'review_post_repair_bridge',
+        capabilityId: dataset.capabilityId || 'game'
+      });
+    }
+    if (storage.appendReviewEvent) {
+      storage.appendReviewEvent({
+        kind: 'review_post_repair_bridge_action',
+        action_id: action.actionId,
+        route,
+        evidence: action.evidenceLine
+      });
+    }
+    api.submitEvent({
+      event: 'review_post_repair_bridge_action',
+      source: 'review_post_repair',
+      entity_id: action.actionId,
+      page: 'review',
+      payload: {
+        route,
+        action_label: action.actionLabel,
+        evidence: action.evidenceLine,
+        reason: action.reasonLine
+      }
+    }).catch(() => {});
+    navigation.navigateLearningRoute(route);
   },
 
   goTutor() {
