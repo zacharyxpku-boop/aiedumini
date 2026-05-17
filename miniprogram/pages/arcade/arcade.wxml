@@ -293,6 +293,15 @@
         <view class="repair-focus-body">{{repairFocus.decision}}</view>
       </view>
       <view class="result-copy">{{feedbackText}}</view>
+      <view class="retention-loop-card" wx:if="{{gameRetentionLoop}}">
+        <view class="retention-loop-kicker">连续练习闭环</view>
+        <view class="retention-loop-title">{{gameRetentionLoop.title}}</view>
+        <view class="retention-loop-line">{{gameRetentionLoop.loopLine}}</view>
+        <view class="retention-loop-step">{{gameRetentionLoop.nextRoundLine}}</view>
+        <view class="retention-loop-step">{{gameRetentionLoop.wrongCauseReturnLine}}</view>
+        <view class="retention-loop-step">{{gameRetentionLoop.tomorrowLine}}</view>
+        <view class="retention-loop-foot">{{gameRetentionLoop.xpLine}} {{gameRetentionLoop.habitCue}}</view>
+      </view>
       <view class="next-action-card" wx:if="{{challengeBrief.resultLine}}">
         <view class="next-action-title">目标回看</view>
         <view class="next-action-body">{{challengeBrief.resultLine}}</view>

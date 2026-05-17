@@ -393,6 +393,57 @@ function buildAdaptiveChallenge(cards = [], events = [], profile = {}, options =
   };
 }
 
+function buildGameRetentionLoop(profile = {}, result = {}, challenge = {}, questSet = {}, options = {}) {
+  const total = Math.max(1, Number(result.total || result.expectedTotal || 1));
+  const correct = Math.max(0, Number(result.correct || 0));
+  const wrong = Math.max(0, Number(result.wrong || Math.max(0, total - correct)));
+  const accuracy = Number.isFinite(Number(result.accuracy))
+    ? Number(result.accuracy)
+    : Math.round((correct / total) * 100);
+  const targetAccuracy = Number(challenge.targetAccuracy || 80);
+  const mode = challenge.mode || 'balanced';
+  const weakKey = (challenge.bossCard && (challenge.bossCard.nextAction || challenge.bossCard.key))
+    || questSet.weakKey
+    || options.weakKey
+    || '第一步';
+  const streak = Number((profile && profile.streak) || 0);
+  const reviewedToday = Number((profile && (profile.reviewed_today || profile.reviewedToday)) || 0);
+  const xp = Math.max(0, Number(result.xp || 0));
+  const needsRepair = wrong > 0 || accuracy < targetAccuracy;
+  const nextRoute = needsRepair ? '/pages/review/review' : (mode === 'stretch' ? '/pages/tutor/tutor' : '/pages/focus/focus');
+  const nextMode = needsRepair ? 'repair' : (mode === 'stretch' ? 'transfer' : 'steady');
+  const nextRoundSize = needsRepair
+    ? Math.max(3, Math.min(4, Number(challenge.roundSize || 4)))
+    : Math.max(4, Math.min(8, Number(challenge.roundSize || 6)));
+  const questNames = Array.isArray(questSet.quests)
+    ? questSet.quests.slice(0, 2).map((item) => item.id).filter(Boolean)
+    : [];
+
+  return {
+    title: needsRepair ? '下一局先修断点' : '下一步继续迁移',
+    mode: nextMode,
+    riskLevel: needsRepair ? 'attention' : 'stable',
+    loopLine: `本局 ${correct}/${total}，不是单次得分，会写回错因、复习队列和家长报告。`,
+    nextRoundLine: needsRepair
+      ? `下一局缩小到 ${nextRoundSize} 题，只练 ${weakKey}。`
+      : `下一步用 ${nextRoundSize} 题做迁移，确认孩子能换题也说出第一步。`,
+    wrongCauseReturnLine: needsRepair
+      ? `错的 ${wrong} 张会回到修卡点和间隔复习，不靠重刷蒙过。`
+      : '本局没有明显断点，保留为可分享的掌握证据。',
+    tomorrowLine: reviewedToday >= 6
+      ? '明天只回访最不稳的一张卡，避免把轻练习变成刷题。'
+      : '明天从同一张卡的第一步开始回访，家长只问一句。',
+    xpLine: xp > 0 ? `本局写入 ${xp} 点学习记录。` : '本局先写入行为证据，不做虚拟奖励交易。',
+    habitCue: streak > 0
+      ? `连续 ${streak} 天记录已保留，下一次只接着补一小步。`
+      : '先建立第一次回访记录，再谈连续习惯。',
+    nextRoute,
+    evidenceRequired: ['accuracy', 'wrong_answers_returned', 'next_round_plan', 'parent_report_signal'],
+    questAnchors: questNames,
+    weakKey
+  };
+}
+
 module.exports = {
   ACHIEVEMENTS,
   DAY_MS,
@@ -401,6 +452,7 @@ module.exports = {
   applySM2,
   buildAdaptiveChallenge,
   buildDailyQuestSet,
+  buildGameRetentionLoop,
   buildKnowledgeGap,
   calculateXP,
   capDailyXP,

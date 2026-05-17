@@ -43,6 +43,7 @@ Page({
     surfaceDepthPack: null,
     result: null,
     resultAdvice: null,
+    gameRetentionLoop: null,
     emptyGuide: null,
     feedbackText: '',
     expandedMatrix: false,
@@ -127,6 +128,7 @@ Page({
       curriculumSpine,
       result: null,
       resultAdvice: null,
+      gameRetentionLoop: null,
       emptyGuide: this.emptyGuide(selectedGame, round),
       feedbackText: (round.questions || round.tracks || round.pairs || []).length ? this.openingHint(selectedGame) : '还没有适合游戏化的真实学习卡。'
       ,
@@ -733,6 +735,15 @@ Page({
     const gameRetention = storage.recordGameSessionResult
       ? storage.recordGameSessionResult(savedResult, { gameType: savedResult.gameType })
       : null;
+    const gameRetentionLoop = gameLogic.buildGameRetentionLoop
+      ? gameLogic.buildGameRetentionLoop(
+        gameRetention && gameRetention.profile ? gameRetention.profile : profile,
+        savedResult,
+        this.data.adaptiveChallenge,
+        this.data.dailyQuestSet,
+        { weakKey: repairFocus && repairFocus.title ? repairFocus.title : '' }
+      )
+      : null;
     const questArcSignal = storage.recordQuestArcGameSignal
       ? storage.recordQuestArcGameSignal({
         mission: this.data.questArcMission,
@@ -752,6 +763,9 @@ Page({
       subject_depth_label: this.data.subjectSkillDepth && this.data.subjectSkillDepth.label,
       curriculum_subject: this.data.curriculumSpine && this.data.curriculumSpine.subjectLabel,
       curriculum_node: this.data.curriculumSpine && this.data.curriculumSpine.currentNode && this.data.curriculumSpine.currentNode.label,
+      retention_mode: gameRetentionLoop && gameRetentionLoop.mode,
+      retention_next_route: gameRetentionLoop && gameRetentionLoop.nextRoute,
+      retention_weak_key: gameRetentionLoop && gameRetentionLoop.weakKey,
       share_code: incomingShare && incomingShare.share_code ? incomingShare.share_code : ''
     });
     if (storage.saveTodaySession) {
@@ -783,7 +797,8 @@ Page({
           completed: true,
           streak: gameRetention && gameRetention.profile ? Number(gameRetention.profile.streak || 0) : 0,
           newlyUnlocked: gameRetention && gameRetention.newlyUnlocked ? gameRetention.newlyUnlocked.map((item) => item.id) : [],
-          rewardLine
+          rewardLine,
+          gameRetentionLoop
         }
       });
     }
@@ -807,6 +822,11 @@ Page({
         curriculum_node: this.data.curriculumSpine && this.data.curriculumSpine.currentNode && this.data.curriculumSpine.currentNode.label,
         quest_arc_stage: this.data.questArcMission && this.data.questArcMission.currentStage,
         quest_arc_mission: this.data.questArcMission && this.data.questArcMission.title,
+        retention_mode: gameRetentionLoop && gameRetentionLoop.mode,
+        retention_next_route: gameRetentionLoop && gameRetentionLoop.nextRoute,
+        retention_evidence: gameRetentionLoop && Array.isArray(gameRetentionLoop.evidenceRequired)
+          ? gameRetentionLoop.evidenceRequired.join(',')
+          : '',
         boss_gap: this.data.adaptiveChallenge && this.data.adaptiveChallenge.bossCard
           ? this.data.adaptiveChallenge.bossCard.key
           : '',
@@ -825,6 +845,7 @@ Page({
     this.setData({
       result: savedResult,
       resultAdvice: arcade.buildRoundAdvice(savedResult, savedResult.gameType),
+      gameRetentionLoop,
       challengeBrief: Object.assign({}, this.data.challengeBrief || {}, {
         resultLine: savedResult.accuracy >= Number((this.data.challengeBrief && this.data.challengeBrief.targetAccuracy) || 80)
           ? '本局达到目标，剧情线证据已写回。'
