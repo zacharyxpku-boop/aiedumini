@@ -1,0 +1,152 @@
+<view class="radar-page safe-bottom">
+  <view class="radar-bg"></view>
+
+  <view class="radar-header">
+    <view class="radar-header-left">
+      <button class="radar-back" bindtap="goProfile" aria-label="返回我的">
+        <text class="radar-back-icon">‹</text>
+      </button>
+      <view class="radar-heading">
+        <view class="radar-kicker">原点智学</view>
+        <view class="radar-heading-title">今晚先看这一点</view>
+      </view>
+    </view>
+    <view class="radar-header-actions">
+      <button class="radar-mode" data-action="goUpload" bindtap="runDecisionAction">
+        <text class="mode-dot"></text>
+        提效模式
+      </button>
+      <button class="radar-home" bindtap="goHome">首页</button>
+    </view>
+  </view>
+
+  <scroll-view class="radar-scroll" scroll-y enhanced show-scrollbar="{{false}}">
+    <view class="radar-content">
+      <view class="radar-hero" wx:if="{{parentActionHero}}">
+        <view class="radar-signal">
+          <text class="signal-pulse"></text>
+          先盯一个点
+        </view>
+        <view class="radar-hero-title">{{parentActionHero.focusTitle}}</view>
+        <view class="radar-hero-copy">{{parentActionHero.subtitle}}</view>
+
+        <scroll-view class="radar-metric-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+          <view class="radar-metric-row">
+            <view class="radar-metric-card weak">
+              <view class="metric-icon">!</view>
+              <view class="metric-label">现在最该先修</view>
+              <view class="metric-value">{{parentActionHero.weakName}}</view>
+            </view>
+            <view class="radar-metric-card focus">
+              <view class="metric-icon">◷</view>
+              <view class="metric-label">建议专注时长</view>
+              <view class="metric-value">{{parentActionHero.mustMinutes}}<text>m</text></view>
+            </view>
+            <view class="radar-metric-card save">
+              <view class="metric-icon">↘</view>
+              <view class="metric-label">减少返工时间</view>
+              <view class="metric-value">{{parentActionHero.savedMinutes}}<text>m</text></view>
+            </view>
+          </view>
+        </scroll-view>
+
+        <button class="radar-primary" data-action="{{parentActionHero.primaryAction}}" bindtap="runDecisionAction">
+          {{parentActionHero.primaryLabel}}
+          <text class="primary-arrow">→</text>
+        </button>
+      </view>
+
+      <view class="radar-glass-panel">
+        <view class="radar-mini-chart">
+          <canvas canvas-id="radarCanvas" class="radar-canvas"></canvas>
+        </view>
+        <view class="radar-glass-copy">
+          <view class="glass-title">为什么先看这里</view>
+          <view class="glass-body">这里只回答一个问题：今晚先从哪一步开始。其余信息先收起来。</view>
+        </view>
+      </view>
+
+
+    <view class="global-depth-card" wx:if="{{surfaceDepthPack}}">
+      <view class="global-depth-head">
+        <view>
+          <view class="global-depth-title">{{surfaceDepthPack.title}}</view>
+          <view class="global-depth-summary">{{surfaceDepthPack.summary}}</view>
+        </view>
+        <view class="global-depth-score">{{surfaceDepthPack.readyCount}}/{{surfaceDepthPack.totalCount}}</view>
+      </view>
+      <view class="global-depth-next" data-route="{{surfaceDepthPack.primaryRoute}}" bindtap="runSurfaceDepthAction">{{surfaceDepthPack.nextAction}}</view>
+      <view class="global-depth-grid">
+        <view class="global-depth-chip {{item.ready ? 'ready' : ''}}" wx:for="{{surfaceDepthPack.cards}}" wx:key="id" data-route="{{item.route}}" data-dimension-id="{{item.id}}" data-label="{{item.displayLabel}}" bindtap="runSurfaceDepthAction">
+          <text class="global-depth-chip-title">{{item.displayLabel}}</text>
+          <text class="global-depth-chip-line">{{item.ready ? item.evidenceLine : item.gapLine}}</text>
+        </view>
+      </view>
+      <view class="global-depth-note">{{surfaceDepthPack.familyLine}}</view>
+    </view>
+
+      <view class="radar-section" wx:if="{{decisionBoard}}">
+        <view class="radar-section-head">
+          <view class="radar-section-title">下一步安排</view>
+          <view class="radar-section-pill">高优优先</view>
+        </view>
+        <view class="radar-timeline">
+          <view class="timeline-line"></view>
+          <view class="timeline-item" wx:for="{{decisionBoard.cards}}" wx:key="id">
+            <view class="timeline-index {{index === 0 ? 'active' : ''}}">{{index + 1}}</view>
+            <view class="timeline-card {{index === 0 ? 'active' : ''}}">
+              <view class="timeline-top">
+                <view class="timeline-title">{{item.title}}</view>
+                <view class="timeline-meta">{{item.meta}}</view>
+              </view>
+              <view class="timeline-body">{{item.body}}</view>
+              <button class="timeline-action" data-action="{{item.action}}" bindtap="runDecisionAction">{{item.cta}}</button>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="radar-feedback-card">
+        <view>
+          <view class="feedback-title">今晚这一步排得准吗？</view>
+          <view class="feedback-body">点一下校准，下一次优先级会更贴合真实学习情况。</view>
+          <view class="feedback-status" wx:if="{{feedbackStatusMust[0]}}">{{feedbackStatusMust[0]}}</view>
+        </view>
+        <view class="feedback-actions">
+          <button class="feedback-btn" data-bucket="must_do" data-index="0" data-rating="accurate" bindtap="markFeedback">准</button>
+          <button class="feedback-btn ghost" data-bucket="must_do" data-index="0" data-rating="off" bindtap="markFeedback">要调</button>
+        </view>
+      </view>
+
+      <view class="radar-section growth" wx:if="{{growthPath}}">
+        <view class="radar-section-title">接下来几天怎么回访</view>
+        <scroll-view class="growth-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+          <view class="growth-row">
+            <view class="growth-card {{index === 0 ? 'active' : ''}}" wx:for="{{growthPath.steps}}" wx:key="id">
+              <view class="growth-tag">{{item.day}}</view>
+              <view class="growth-title">{{item.title}}</view>
+              <view class="growth-body">{{item.body}}</view>
+              <view class="growth-proof">{{item.proof}}</view>
+            </view>
+          </view>
+        </scroll-view>
+        <view class="parent-question">{{growthPath.parentQuestion}}</view>
+      </view>
+
+      <view class="radar-axis-card" wx:if="{{axes.length}}">
+        <view class="axis-title">这次卡点拆开看</view>
+        <view class="axis-list">
+          <view class="axis-item" wx:for="{{axes}}" wx:key="key">
+            <view class="axis-between">
+              <view>{{item.name}}</view>
+              <view>{{item.score}}</view>
+            </view>
+            <view class="axis-bar"><view class="axis-bar-fill" style="width: {{item.score}}%;"></view></view>
+          </view>
+        </view>
+      </view>
+
+      <view hidden>{{weaknessLoop.title}}{{weekly.headline}}</view>
+    </view>
+  </scroll-view>
+</view>

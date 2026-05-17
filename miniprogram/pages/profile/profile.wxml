@@ -1,0 +1,915 @@
+<view class="page safe-bottom profile-page">
+  <view class="page-positioning profile-positioning">
+    <view class="positioning-kicker">家长复盘</view>
+    <view class="positioning-title">家长今晚只问一句：刚才你第一步先看了哪里？</view>
+    <view class="positioning-flow">先看今晚真实证据，再决定去修卡点、专注舱或轻回访；不是报表墙。</view>
+  </view>
+  <view class="profile-glow glow-one"></view>
+  <view class="profile-glow glow-two"></view>
+
+  <scroll-view class="profile-scroll" scroll-y enhanced show-scrollbar="{{false}}">
+    <view class="profile-shell">
+      <view class="v1-topbar">
+        <view class="profile-brand">
+          <view class="profile-logo"><view class="profile-logo-leaf"></view></view>
+          <view class="profile-brand-copy">
+            <view class="profile-brand-name">我的</view>
+            <view class="profile-brand-sub">家长 5 秒复盘</view>
+          </view>
+        </view>
+        <view class="profile-pill"><text class="pill-dot"></text>真实记录</view>
+      </view>
+
+      <block wx:if="{{profilePanel === 'main'}}">
+      <view class="rc14-profile-first-screen">
+      <view class="parent-hero">
+        <view class="mine-hero-copy">
+          <view class="route-strip compact">{{profileViewModel.routePill}}</view>
+          <view class="companion-route-strip">{{profileViewModel.companionStrip}}</view>
+          <view class="parent-title">{{profileViewModel.title}}</view>
+          <view class="parent-subtitle">{{profileViewModel.subtitle}}</view>
+        </view>
+
+        <view class="family-summary-card rc14-main-card friend-profile-core">
+          <view class="family-summary-title">今晚卡住、只问一句、最近小结</view>
+          <view class="family-summary-body family-readable">
+            <view class="profile-empty-state" wx:if="{{profileSafeSummary.isEmpty}}">再用两晚后，咕点会帮你看见模式。</view>
+            <view class="parent-brief-block">
+              <text class="parent-brief-label">今晚卡住</text>
+              <text>{{profileSafeSummary.stuckLine}}</text>
+            </view>
+            <view class="parent-brief-block">
+              <text class="parent-brief-label">只问一句</text>
+              <text>{{profileSafeSummary.parentQuestion}}</text>
+              <button class="copy-action" bindtap="copyParentOneQuestion">复制</button>
+            </view>
+            <view class="parent-brief-block">
+              <text class="parent-brief-label">最近小结</text>
+              <text>{{profileSafeSummary.recentSummary}}</text>
+              <text wx:if="{{profileSafeSummary.threeNightSummary}}">{{profileSafeSummary.threeNightSummary}}</text>
+              <text wx:if="{{profileSafeSummary.sevenNightSummary}}">{{profileSafeSummary.sevenNightSummary}}</text>
+              <text wx:if="{{profileSafeSummary.weeklySummary}}">{{profileSafeSummary.weeklySummary}}</text>
+            </view>
+          </view>
+        </view>
+
+        <view class="family-summary-card profile-readiness-snapshot" wx:if="{{profileReadinessSnapshot}}">
+          <view class="family-summary-title">{{profileReadinessSnapshot.title}}</view>
+          <view class="family-summary-body family-readable">
+            <view class="parent-brief-block">
+              <text class="parent-brief-label">结论</text>
+              <text>{{profileReadinessSnapshot.conclusion}}</text>
+            </view>
+            <view class="parent-brief-block">
+              <text class="parent-brief-label">流转</text>
+              <text>{{profileReadinessSnapshot.flowLine}}</text>
+            </view>
+            <view class="parent-brief-block">
+              <text class="parent-brief-label">证据</text>
+              <text>{{profileReadinessSnapshot.evidenceLine}}</text>
+            </view>
+            <view class="parent-brief-block">
+              <text class="parent-brief-label">下一步</text>
+              <text>{{profileReadinessSnapshot.nextActionReason}}</text>
+              <button class="profile-small-primary" bindtap="runUnifiedNextAction">{{profileReadinessSnapshot.nextActionLabel}}</button>
+            </view>
+            <view class="parent-brief-reason">{{profileReadinessSnapshot.boundaryLine}}</view>
+          </view>
+        </view>
+
+      <view class="parent-hero-actions">
+        <button class="parent-hero-primary" data-action="review" bindtap="runParentReportAction">{{profileViewModel.primaryCta}}</button>
+        <view class="route-next-lite profile-next-lite" wx:if="{{profileViewModel.nextStep}}">{{profileViewModel.nextStep}}</view>
+      </view>
+      </view>
+      </view>
+      <view class="rc14-profile-after-first-screen"></view>
+
+      <view class="family-summary-card profile-subtle-card assessment-entry-card">
+        <view class="family-summary-title">孩子测评与学习方法建议</view>
+        <view class="family-summary-body family-readable">
+          <view class="parent-brief-block">
+            <text class="parent-brief-label">家长输入</text>
+            <text>成绩、测评描述、哪科卡住、学习方法哪里不顺，都放这里。</text>
+          </view>
+          <button class="focus-cabin-link" bindtap="startAssessmentFromProfile">录入成绩/测评</button>
+        </view>
+      </view>
+
+      <view class="family-summary-card profile-subtle-card" wx:if="{{showAdvancedProfile}}">
+        <view class="family-summary-title">服务状态</view>
+        <view class="family-summary-body family-readable">
+          <view class="parent-brief-block">
+            <text class="parent-brief-label">当前可用</text>
+            <text>作业点拨、专注舱、错题修复、轻回访和家长复盘已经连成闭环。资料越完整，学习画像越具体。</text>
+          </view>
+          <button class="focus-cabin-link" bindtap="inviteParentView">邀请另一位家长一起关注</button>
+          <button class="focus-cabin-link quiet" bindtap="contactSupport">反馈建议</button>
+          <view class="parent-invite-card" wx:if="{{parentInviteCard}}">
+            <view>{{parentInviteCard.title}}</view>
+            <view>{{parentInviteCard.badge}}</view>
+            <text>{{parentInviteCard.body}}</text>
+            <text>{{parentInviteCard.action}}</text>
+            <text>{{parentInviteCard.path}}</text>
+          </view>
+          <canvas canvas-id="weeklySummaryCanvas" class="weekly-summary-canvas"></canvas>
+        </view>
+      </view>
+
+      <view class="family-summary-card growth-memory-card profile-subtle-card" wx:if="{{profileViewModel.growthMemoryCard}}">
+        <view class="legacy-growth-anchor">今晚学习记录</view>
+        <view class="family-summary-title">{{profileViewModel.growthMemoryCard.title}}</view>
+        <view class="family-summary-body family-readable">
+          <view class="parent-brief-reason">{{profileViewModel.growthMemoryCard.body}}</view>
+          <view class="parent-brief-block" wx:if="{{profileViewModel.growthMemoryCard.tomorrow}}">
+            <text class="parent-brief-label">明天回访</text>
+            <text>{{profileViewModel.growthMemoryCard.tomorrow}}</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="family-summary-card profile-subtle-card light-evidence-card" wx:if="{{lightFeatureEvidence}}">
+        <view class="family-summary-title">{{lightFeatureEvidence.title}}</view>
+        <view class="family-summary-body family-readable">
+          <view class="parent-brief-block">
+            <text class="parent-brief-label">轻入口</text>
+            <text>{{lightFeatureEvidence.summary}}</text>
+          </view>
+          <view class="parent-brief-block">
+            <text class="parent-brief-label">可回流</text>
+            <text>{{lightFeatureEvidence.parentLine}}</text>
+          </view>
+          <view class="module-flow-mini-grid" wx:if="{{lightFeatureEvidence.cards.length}}">
+            <view class="module-flow-mini-chip ready" wx:for="{{lightFeatureEvidence.cards}}" wx:key="id">{{item.label}} {{item.count}}</view>
+          </view>
+          <view class="parent-brief-reason">{{lightFeatureEvidence.nextAction}}</view>
+        </view>
+      </view>
+
+      <view class="family-summary-card profile-subtle-card" wx:if="{{learningDepthMap && showAdvancedProfile}}">
+        <view class="family-summary-title">{{learningDepthMap.title}}</view>
+        <view class="family-summary-body family-readable">
+          <view class="parent-brief-block">
+            <text class="parent-brief-label">厚度进度</text>
+            <text>{{learningDepthMap.readyCount}} / {{learningDepthMap.totalCount}} · {{learningDepthMap.summary}}</text>
+          </view>
+          <view class="parent-brief-block" wx:for="{{learningDepthMap.dimensions}}" wx:key="id">
+            <text class="parent-brief-label">{{item.label}}</text>
+            <text>{{item.ready ? '已接上' : '待补齐'}} · {{item.evidence}}</text>
+          </view>
+          <view class="parent-brief-block">
+            <text class="parent-brief-label">下一步</text>
+            <text>{{learningDepthMap.nextBestAction}}</text>
+          </view>
+          <view class="parent-brief-reason">{{learningDepthMap.benchmarkDepthLine}}</view>
+        </view>
+      </view>
+
+      <view class="family-summary-card profile-subtle-card" wx:if="{{learningQuestArc && showAdvancedProfile}}">
+        <view class="family-summary-title">{{learningQuestArc.title}}</view>
+        <view class="family-summary-body family-readable">
+          <view class="parent-brief-block">
+            <text class="parent-brief-label">当前剧情</text>
+            <text>{{learningQuestArc.currentLabel}} · {{learningQuestArc.currentTitle}}</text>
+          </view>
+          <view class="parent-brief-block">
+            <text class="parent-brief-label">完成进度</text>
+            <text>{{learningQuestArc.doneCount}} / {{learningQuestArc.totalCount}} · {{learningQuestArc.summary}}</text>
+          </view>
+          <view class="parent-brief-block" wx:for="{{learningQuestArc.stages}}" wx:key="id">
+            <text class="parent-brief-label">{{item.displayLabel}}</text>
+            <text>{{item.done ? '已接上' : '下一步'}} · {{item.body}}</text>
+          </view>
+          <view class="parent-brief-reason">{{learningQuestArc.benchmarkHook}}</view>
+        </view>
+      </view>
+
+      <view class="family-summary-card profile-subtle-card" wx:if="{{moduleFlowCompass && showAdvancedProfile}}">
+        <view class="family-summary-title">模块流转罗盘</view>
+        <view class="family-summary-body family-readable">
+          <view class="parent-brief-block">
+            <text class="parent-brief-label">闭环进度</text>
+            <text>{{moduleFlowCompass.readyCount}} / {{moduleFlowCompass.totalCount}} · {{moduleFlowCompass.summary}}</text>
+          </view>
+          <view class="parent-brief-block">
+            <text class="parent-brief-label">当前断点</text>
+            <text>{{moduleFlowCompass.currentLabel}} · {{moduleFlowCompass.currentNextAction}}</text>
+          </view>
+          <view class="parent-brief-block">
+            <text class="parent-brief-label">证据</text>
+            <text>{{moduleFlowCompass.currentEvidence}}</text>
+          </view>
+          <view class="module-flow-mini-grid">
+            <view class="module-flow-mini-chip {{item.ready ? 'ready' : ''}}" wx:for="{{moduleFlowCompass.modules}}" wx:key="id">{{item.displayLabel}}</view>
+          </view>
+          <view class="parent-brief-reason">{{moduleFlowCompass.benchmarkLine}}</view>
+        </view>
+      </view>
+
+      <view class="family-summary-card profile-subtle-card" wx:if="{{surfaceDepthPack && showAdvancedProfile}}">
+        <view class="family-summary-title">{{surfaceDepthPack.title}}</view>
+        <view class="family-summary-body family-readable">
+          <view class="parent-brief-block">
+            <text class="parent-brief-label">板块结论</text>
+            <text>{{surfaceDepthPack.summary}}</text>
+          </view>
+          <view class="parent-brief-block">
+            <text class="parent-brief-label">下一步</text>
+            <text>{{surfaceDepthPack.nextAction}}</text>
+          </view>
+          <view class="module-flow-mini-grid">
+            <view class="module-flow-mini-chip {{item.ready ? 'ready' : ''}}" wx:for="{{surfaceDepthPack.cards}}" wx:key="id">{{item.displayLabel}}</view>
+          </view>
+          <view class="parent-brief-reason">{{surfaceDepthPack.familyLine}}</view>
+        </view>
+      </view>
+
+      <view class="family-summary-card profile-subtle-card" wx:if="{{unifiedNextAction && showAdvancedProfile}}">
+        <view class="family-summary-title">{{unifiedNextAction.title}}</view>
+        <view class="family-summary-body family-readable">
+          <view class="parent-brief-block">
+            <text class="parent-brief-label">{{unifiedNextAction.sourceLabel}}</text>
+            <text>{{unifiedNextAction.actionLabel}}</text>
+          </view>
+          <view class="parent-brief-block">
+            <text class="parent-brief-label">为什么</text>
+            <text>{{unifiedNextAction.reasonLine}}</text>
+          </view>
+          <view class="module-flow-mini-grid">
+            <view class="module-flow-mini-chip" wx:for="{{unifiedNextAction.candidates}}" wx:key="source">{{item.sourceLabel}}</view>
+          </view>
+          <view class="parent-brief-reason">{{unifiedNextAction.readinessLine}}</view>
+          <button class="profile-small-primary" bindtap="runUnifiedNextAction">{{unifiedNextAction.actionLabel}}</button>
+        </view>
+      </view>
+
+      <view class="family-summary-card profile-subtle-card" wx:if="{{surfaceDepthActionSummary && showAdvancedProfile}}">
+        <view class="family-summary-title">妯″潡琛屽姩璁板綍</view>
+        <view class="family-summary-body family-readable">
+          <view class="parent-brief-block">
+            <view wx:if="{{globalEvidenceBrief.latestUnifiedAction}}">
+              <text class="parent-brief-label">建议已执行</text>
+              <text>{{globalEvidenceBrief.latestUnifiedAction.displayLabel}}</text>
+            </view>
+            <text class="parent-brief-label">{{surfaceDepthActionSummary.routeEvidenceLabel}}</text>
+            <text>{{surfaceDepthActionSummary.label}}</text>
+          </view>
+          <view class="parent-brief-block">
+            <text class="parent-brief-label">{{surfaceDepthActionSummary.latestActionLabel}}</text>
+            <text>{{surfaceDepthActionSummary.parentLine}}</text>
+          </view>
+          <view class="module-flow-mini-grid">
+            <view class="module-flow-mini-chip" wx:for="{{surfaceDepthActionSummary.recent}}" wx:key="id">{{item.displayLabel}}</view>
+          </view>
+        </view>
+      </view>
+
+      <view class="family-summary-card profile-subtle-card" wx:if="{{parentActionGuide && showAdvancedProfile}}">
+        <view class="family-summary-title">家长行动指南</view>
+        <view class="family-summary-body family-readable">
+          <view class="parent-brief-block">
+            <text class="parent-brief-label">今晚复盘</text>
+            <text>{{parentActionGuide.tonightRecap}}</text>
+          </view>
+          <view class="parent-brief-block">
+            <text class="parent-brief-label">本周模式</text>
+            <text>{{parentActionGuide.weekPattern}}</text>
+          </view>
+          <view class="parent-brief-block">
+            <text class="parent-brief-label">下周一句</text>
+            <text>{{parentActionGuide.monthSuggestion}}</text>
+          </view>
+          <view class="parent-brief-block" wx:if="{{parentActionGuide.parentPhraseTraining}}">
+            <text class="parent-brief-label">今晚话术</text>
+            <text>{{parentActionGuide.parentPhraseTraining.tonightScript}}</text>
+          </view>
+          <view class="parent-brief-block" wx:if="{{parentActionGuide.parentPhraseTraining}}">
+            <text class="parent-brief-label">答不上来</text>
+            <text>{{parentActionGuide.parentPhraseTraining.cannotAnswerFallback}}</text>
+          </view>
+          <view class="parent-brief-block" wx:if="{{parentActionGuide.parentPhraseTraining}}">
+            <text class="parent-brief-label">先肯定</text>
+            <text>{{parentActionGuide.parentPhraseTraining.praiseLine}}</text>
+          </view>
+          <view class="parent-brief-block" wx:if="{{parentActionGuide.parentReflectionSummary}}">
+            <text class="parent-brief-label">追问回执</text>
+            <text>{{parentActionGuide.parentReflectionSummary.line}}</text>
+          </view>
+          <view class="parent-brief-block" wx:if="{{parentActionGuide.weeklyPatternSynthesis}}">
+            <text class="parent-brief-label">一周归因</text>
+            <text>{{parentActionGuide.weeklyPatternSynthesis.summary}}</text>
+          </view>
+          <view class="parent-brief-block" wx:if="{{parentActionGuide.learningDecisionPath}}">
+            <text class="parent-brief-label">下一步</text>
+            <text>{{parentActionGuide.learningDecisionPath.action}}：{{parentActionGuide.learningDecisionPath.reason}}</text>
+          </view>
+          <view class="parent-brief-block" wx:if="{{parentActionGuide.masteryRubric}}">
+            <text class="parent-brief-label">掌握度</text>
+            <text>{{parentActionGuide.masteryRubric.line}}</text>
+          </view>
+          <view class="parent-brief-block" wx:if="{{parentActionGuide.interventionPlaybook}}">
+            <text class="parent-brief-label">干预打法</text>
+            <text>{{parentActionGuide.interventionPlaybook.summary}}</text>
+          </view>
+          <view class="parent-brief-block" wx:if="{{parentActionGuide.outcomeReviewSummary}}">
+            <text class="parent-brief-label">结果复核</text>
+            <text>{{parentActionGuide.outcomeReviewSummary.line}}</text>
+          </view>
+          <view class="parent-brief-block" wx:for="{{parentActionGuide.sevenDayParentPlan}}" wx:key="day">
+            <text class="parent-brief-label">第 {{item.day}} 晚</text>
+            <text>{{item.action}}：{{item.script}}</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="family-summary-card profile-subtle-card" wx:if="{{isDevMode && isBetaTester && experienceChecklist && experienceChecklist.length}}">
+        <view class="family-summary-title">体验检查</view>
+        <view class="family-summary-body family-readable">
+          <view class="parent-brief-block" wx:for="{{experienceChecklist}}" wx:key="id">
+            <text class="parent-brief-label">{{item.label}}</text>
+            <text>{{item.done ? '已记录' : '待记录'}} · {{item.field}}</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="family-summary-card profile-subtle-card" wx:if="{{isDevMode && isBetaTester && experienceDashboard}}">
+        <view class="family-summary-title">体验记录</view>
+        <view class="family-summary-body family-readable">
+          <view class="parent-brief-block">
+            <text class="parent-brief-label">轻入口完成</text>
+            <text>{{experienceDashboard.lightEntryDAU}}</text>
+          </view>
+          <view class="parent-brief-block">
+            <text class="parent-brief-label">进入闭环</text>
+            <text>{{experienceDashboard.coreLoopEntryRate}}%</text>
+          </view>
+          <view class="parent-brief-block">
+            <text class="parent-brief-label">第一步质量</text>
+            <text>空白 {{experienceDashboard.firstStepQualityTrend.empty}} / 模糊 {{experienceDashboard.firstStepQualityTrend.vague}} / 部分 {{experienceDashboard.firstStepQualityTrend.partial}} / 可执行 {{experienceDashboard.firstStepQualityTrend.actionable}}</text>
+          </view>
+          <view class="parent-brief-block">
+            <text class="parent-brief-label">scaffoldingCompletionRate</text>
+            <text>{{experienceDashboard.scaffoldingCompletionRate.completionRate}}%</text>
+          </view>
+          <view class="parent-brief-block">
+            <text class="parent-brief-label">parentInterventionRate</text>
+            <text>直接讲 {{experienceDashboard.parentInterventionRate.directAnswerRate}}% / 用话术 {{experienceDashboard.parentInterventionRate.usedPhrase}} / 暂停 {{experienceDashboard.parentInterventionRate.pauseUsed}}</text>
+          </view>
+          <view class="parent-brief-block">
+            <text class="parent-brief-label">服务意向</text>
+            <text>{{experienceDashboard.serviceIntentRate.rate}}%</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="family-summary-card profile-subtle-card" wx:if="{{isDevMode && isBetaTester && developerFunnel}}">
+        <view class="family-summary-title">流程记录</view>
+        <view class="family-summary-body family-readable">
+          <view class="parent-brief-block" wx:for="{{developerFunnel.nodes}}" wx:key="node">
+            <text class="parent-brief-label">{{item.node}}</text>
+            <text>{{item.count}}</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="family-summary-card profile-subtle-card" wx:if="{{focusCabinSummary}}">
+        <view class="family-summary-title">今晚专注痕迹</view>
+        <view class="family-summary-body family-readable">
+          <view class="parent-brief-block">
+            <text class="parent-brief-label">做完这一小步</text>
+            <text>{{focusCabinSummary.tonightCompletionCount}} 段，累计 {{focusCabinSummary.totalFocusMinutes}} 分钟</text>
+          </view>
+          <view class="parent-brief-block" wx:if="{{latestFocusSession}}">
+            <text class="parent-brief-label">家长看一句</text>
+            <text>{{latestFocusSession.parentRecap}}</text>
+          </view>
+          <view class="parent-brief-reason" wx:else>还没有专注完成记录。可以让孩子先进专注舱坐 15 分钟。</view>
+          <button class="focus-cabin-link" bindtap="goFocus">打开专注舱</button>
+        </view>
+      </view>
+
+      <view class="process-summary-lite profile-secondary-process profile-subtle-card" wx:if="{{tutorProcessSummary && showAdvancedProfile}}">
+        <view class="process-summary-line">查看咕点怎么点拨：没有直接给结果，先让孩子说第一步。</view>
+        <view class="process-summary-items collapsed">
+          <view class="process-summary-item" wx:for="{{tutorProcessSummary.items}}" wx:key="id">
+            <text>{{item.label}}：</text>{{item.text}}
+          </view>
+        </view>
+      </view>
+
+      <view class="family-summary-card teacher-lite profile-subtle-card">
+        <view class="family-summary-title">咕点小纸条</view>
+        <view class="family-summary-body">{{todayFocus && todayFocus.helper ? todayFocus.helper : '先把今晚动作做准，再进入同类练 5 分钟。'}} 不直接讲最终结果。</view>
+      </view>
+
+      <view class="hero-identity-card mine-id-card soft-share-card profile-subtle-card" wx:if="{{dailyShareCard}}">
+        <view class="identity-top">
+          <view>
+            <view class="identity-kicker">今日复盘卡</view>
+            <view class="identity-name">{{dailyShareCard.identityTag}}</view>
+          </view>
+          <view class="identity-code">#{{dailyShareCard.inviteCode}}</view>
+        </view>
+        <view class="identity-line">{{dailyShareCard.subtitle || '整理一张给家里看的复盘卡。'}}</view>
+      </view>
+
+      <view class="profile-entry-grid" wx:if="{{showAdvancedProfile}}">
+        <button class="profile-entry-card family" data-panel="family" bindtap="openProfilePanel">
+          <view class="entry-kicker">家里看</view>
+          <view class="entry-title">卡点复盘</view>
+          <view class="entry-body" wx:if="{{parentReport}}">{{parentReport.weakPoint}}</view>
+        </button>
+        <button class="profile-entry-card teacher" data-panel="teacher" bindtap="openProfilePanel">
+          <view class="entry-kicker">下一步</view>
+          <view class="entry-title">家长只问一句</view>
+          <view class="entry-body">先把今晚动作做准</view>
+        </button>
+        <button class="profile-entry-card loop" data-panel="loop" bindtap="openProfilePanel">
+          <view class="entry-kicker">记录</view>
+          <view class="entry-title">学习闭环</view>
+          <view class="entry-body" wx:if="{{parentLoopProof}}">{{parentLoopProof.next}}</view>
+        </button>
+        <button class="profile-entry-card repair" data-panel="repair" bindtap="openProfilePanel">
+          <view class="entry-kicker">错题</view>
+          <view class="entry-title">错因修复</view>
+          <view class="entry-body" wx:if="{{wrongCauseSummary}}">{{wrongCauseSummary.label}}</view>
+        </button>
+        <button class="profile-entry-card assessment" data-panel="assessment" bindtap="openProfilePanel">
+          <view class="entry-kicker">测评</view>
+          <view class="entry-title">成绩与方法建议</view>
+          <view class="entry-body">上传成绩或描述学习状态，推荐孩子该先用哪个能力。</view>
+        </button>
+      </view>
+
+      <view class="parent-goal-card">
+        <view class="goal-head">
+          <view>
+            <view class="goal-kicker">家庭目标</view>
+            <view class="goal-title">{{parentGoal.label}}</view>
+          </view>
+          <button class="goal-tag" bindtap="toggleGoalOptions">{{showGoalOptions ? '收起' : '切换'}}</button>
+        </view>
+        <view class="goal-body">{{parentGoal.strategy}}</view>
+        <view class="goal-options" wx:if="{{showGoalOptions}}">
+          <button
+            class="goal-chip {{parentGoal.id === item.id ? 'active' : ''}}"
+            wx:for="{{parentGoals}}"
+            wx:key="id"
+            data-id="{{item.id}}"
+            bindtap="chooseParentGoal"
+          >
+            {{item.label}}
+          </button>
+        </view>
+      </view>
+
+      <view class="profile-main-actions" wx:if="{{showAdvancedProfile}}">
+          <button class="profile-main-share" data-panel="share" bindtap="openProfilePanel">整理今日复盘卡</button>
+          <button class="profile-main-review" bindtap="contactSupport">反馈建议</button>
+      </view>
+
+      <view class="lead-card profile-lead-card" wx:if="{{showAdvancedProfile && showLeadCard}}">
+        <view class="lead-title">申请人工复盘</view>
+        <view class="lead-body">把这周的追问、回访和错因记录整理成一次人工复盘。我们只看哪里值得继续修，不承诺结果。</view>
+        <input class="lead-input" value="{{lead.name}}" data-field="name" bindinput="onLeadInput" placeholder="称呼" />
+        <input class="lead-input" value="{{lead.phone}}" data-field="phone" bindinput="onLeadInput" placeholder="联系方式" />
+        <button class="lead-submit" bindtap="submitLead" loading="{{sending}}">提交复盘申请</button>
+      </view>
+      </block>
+
+      <block wx:else>
+      <view class="profile-panel-head">
+        <button class="profile-panel-back" bindtap="closeProfilePanel">返回</button>
+        <view>
+          <view class="profile-panel-kicker">我的</view>
+          <view class="profile-panel-title">{{profilePanelTitle}}</view>
+        </view>
+      </view>
+
+      <block wx:if="{{profilePanel === 'family'}}">
+      <view class="mine-section-title">
+        <view>
+          <view class="mine-section-kicker">给家里看的复盘</view>
+          <view class="mine-section-heading">孩子今晚卡在哪</view>
+        </view>
+        <view class="mine-section-tag" wx:if="{{parentReport}}">{{parentReport.recordStatusLabel}}</view>
+      </view>
+
+      <view class="parent-section-card family-diagnosis-card" wx:if="{{parentReport}}">
+        <view class="diagnosis-top">
+          <view>
+            <view class="diagnosis-label">当前重点</view>
+            <view class="diagnosis-title">{{parentReport.weakPoint}}</view>
+          </view>
+          <view class="diagnosis-score">
+            <text>{{parentReport.recordStatus}}</text>
+            <text>记录状态</text>
+          </view>
+        </view>
+
+        <view class="diagnosis-body">{{parentReport.label}}</view>
+
+        <view class="diagnosis-grid">
+          <view class="diagnosis-cell" wx:for="{{parentProofCards}}" wx:key="id">
+            <view class="diagnosis-value">{{item.value}}</view>
+            <view class="diagnosis-name">{{item.label}}</view>
+            <view class="diagnosis-note">{{item.note}}</view>
+          </view>
+        </view>
+
+        <view class="weekly-quote diagnosis-question">
+          <view class="quote-mark">“</view>
+          <view class="weekly-text" wx:if="{{hasParentEvidence}}">{{parentReport.inspectionLine}}</view>
+          <view class="weekly-text" wx:else>先录入一道真实错题，完成一次回访后，这里会生成可以一起看的问题。</view>
+          <view class="weekly-status">{{hasParentEvidence ? '来自真实记录' : '先完成一次点拨'}}</view>
+        </view>
+        <view class="weekly-quote diagnosis-question" wx:if="{{parentReport.thinkingProbeLine}}">
+          <view class="weekly-text">{{parentReport.thinkingProbeLine}}</view>
+          <view class="weekly-status">来自思路记录</view>
+        </view>
+      </view>
+      </block>
+
+      <block wx:if="{{profilePanel === 'assessment'}}">
+      <view class="parent-section-card assessment-card">
+        <view class="section-title-row compact">
+          <view class="section-stick green"></view>
+          <view>
+            <view class="parent-card-title">{{learningAssessment.title}}</view>
+            <view class="teacher-subtitle">{{learningAssessment.body}}</view>
+          </view>
+        </view>
+        <textarea
+          class="lead-input assessment-input"
+          value="{{learningAssessment.scoreInput}}"
+          maxlength="500"
+          auto-height
+          bindinput="onAssessmentInput"
+          placeholder="可粘贴成绩单识别文字、错题描述或测评摘要。例：数学 82，应用题总卡在列式；英语阅读题慢。"
+        />
+        <view class="teacher-actions report-mode-actions">
+          <button bindtap="recognizeLearningReportInput">整理资料草稿</button>
+        </view>
+        <view class="parent-brief-block">
+          <text class="parent-brief-label">资料整理</text>
+          <text>{{learningReportRecognitionSummary.modeLabel}} · {{learningReportRecognitionSummary.sourceLabel}} · {{learningReportRecognitionSummary.statusLine}}</text>
+          <text wx:if="{{learningReportRecognitionSummary.evidenceLine}}">依据：{{learningReportRecognitionSummary.evidenceLine}}</text>
+          <text wx:if="{{learningReportRecognitionSummary.promptLine}}">{{learningReportRecognitionSummary.promptLine}}</text>
+          <text wx:if="{{learningReportRecognitionSummary.missingLine}}">可补充：{{learningReportRecognitionSummary.missingLine}}</text>
+        </view>
+        <view class="teacher-actions report-mode-actions">
+          <button class="{{learningReportInput.mode === 'fast' ? 'active' : ''}}" data-mode="fast" bindtap="selectLearningReportMode">快速版</button>
+          <button class="{{learningReportInput.mode === 'standard' ? 'active' : ''}}" data-mode="standard" bindtap="selectLearningReportMode">标准版</button>
+          <button class="{{learningReportInput.mode === 'full' ? 'active' : ''}}" data-mode="full" bindtap="selectLearningReportMode">完整版</button>
+        </view>
+        <view class="parent-brief-block">
+          <text class="parent-brief-label">资料完整度</text>
+          <text>{{learningReportSummary.modeLabel}} · {{learningReportSummary.statusLabel}}</text>
+        </view>
+        <view class="parent-brief-block">
+          <text class="parent-brief-label">画像总览</text>
+          <text>{{learningReportSummary.overviewLine}}</text>
+          <text wx:if="{{learningReportSummary.evidenceLine}}">依据：{{learningReportSummary.evidenceLine}}</text>
+          <text wx:if="{{learningReportSummary.liveEvidenceLine}}">{{learningReportSummary.liveEvidenceLine}}</text>
+          <text wx:if="{{learningReportSummary.liveEvidenceSummary}}">{{learningReportSummary.liveEvidenceSummary}}</text>
+        </view>
+        <view class="parent-brief-block">
+          <text class="parent-brief-label">学业矩阵</text>
+          <text>{{learningReportSummary.diagnosisLine}}</text>
+        </view>
+        <view class="parent-brief-block">
+          <text class="parent-brief-label">结论依据</text>
+          <text>置信度：{{learningReportSummary.solutionConfidence}}</text>
+          <text wx:if="{{learningReportSummary.solutionEvidenceLine}}">依据：{{learningReportSummary.solutionEvidenceLine}}</text>
+          <text wx:if="{{learningReportSummary.solutionMissingLine}}">可补充：{{learningReportSummary.solutionMissingLine}}</text>
+        </view>
+        <view class="parent-brief-block" wx:if="{{learningReportSummary.tendencyLines.length}}">
+          <text class="parent-brief-label">能力倾向</text>
+          <text wx:for="{{learningReportSummary.tendencyLines}}" wx:key="*this">{{item}}</text>
+        </view>
+        <view class="parent-brief-block">
+          <text class="parent-brief-label">下一步方案</text>
+          <text>{{learningReportSummary.planLine}}</text>
+          <text>{{learningReportSummary.ctaReason}}</text>
+        </view>
+        <view class="parent-brief-block">
+          <text class="parent-brief-label">行动闭环</text>
+          <text>家长：{{learningReportSummary.parentScript}}</text>
+          <text>孩子：{{learningReportSummary.childScript}}</text>
+          <text>下次看：{{learningReportSummary.nextEvidenceLine}}</text>
+          <text>{{learningReportSummary.reviewTrigger}}</text>
+        </view>
+        <view class="report-action-board" wx:if="{{learningReportSummary.sevenDayActionBoard}}">
+          <view class="report-action-board-title">{{learningReportSummary.sevenDayActionBoard.title}}</view>
+          <view class="report-action-row" wx:if="{{learningReportSummary.reportTodayActionLine}}">
+            <text class="report-action-label">今日队列</text>
+            <text>{{learningReportSummary.reportTodayActionLine}}</text>
+          </view>
+          <view class="report-action-row">
+            <text class="report-action-label">今天</text>
+            <text>{{learningReportSummary.sevenDayActionBoard.today}}</text>
+          </view>
+          <view class="report-action-row">
+            <text class="report-action-label">明天</text>
+            <text>{{learningReportSummary.sevenDayActionBoard.tomorrow}}</text>
+          </view>
+          <view class="report-action-row">
+            <text class="report-action-label">第7天</text>
+            <text>{{learningReportSummary.sevenDayActionBoard.review}}</text>
+          </view>
+          <view class="report-action-row">
+            <text class="report-action-label">家长只问</text>
+            <text>{{learningReportSummary.sevenDayActionBoard.parentScript}}</text>
+          </view>
+          <view class="report-action-row">
+            <text class="report-action-label">证据</text>
+            <text>{{learningReportSummary.sevenDayActionBoard.evidenceLine}}</text>
+          </view>
+          <view class="report-day-strip" wx:if="{{learningReportSummary.sevenDayPlan.length}}">
+            <view class="report-day-chip" wx:for="{{learningReportSummary.sevenDayPlan}}" wx:key="day">
+              <text>第{{item.day}}天</text>
+              <text>{{item.minutes}}分钟</text>
+            </view>
+          </view>
+        </view>
+        <view class="parent-brief-block" wx:if="{{learningReportSummary.missingLine}}">
+          <text class="parent-brief-label">可补充项</text>
+          <text>{{learningReportSummary.missingLine}}</text>
+        </view>
+        <view class="parent-brief-block">
+          <text class="parent-brief-label">基础画像</text>
+          <input class="lead-input" value="{{learningReportInput.profileBasics.grade}}" data-section="profileBasics" data-field="grade" bindinput="onLearningReportFieldInput" placeholder="年级，例如：高三 / 初二" />
+          <input class="lead-input" value="{{learningReportInput.profileBasics.schoolType}}" data-section="profileBasics" data-field="schoolType" bindinput="onLearningReportFieldInput" placeholder="学校类型，例如：公办 / 民办 / 国际" />
+        </view>
+        <view class="parent-brief-block">
+          <text class="parent-brief-label">行为与情绪</text>
+          <input class="lead-input" value="{{learningReportInput.behaviorSignals.studyMinutes}}" data-section="behaviorSignals" data-field="studyMinutes" bindinput="onLearningReportFieldInput" placeholder="日均有效学习分钟数" />
+          <input class="lead-input" value="{{learningReportInput.behaviorSignals.sleepHours}}" data-section="behaviorSignals" data-field="sleepHours" bindinput="onLearningReportFieldInput" placeholder="睡眠小时数" />
+          <input class="lead-input" value="{{learningReportInput.emotionSignals.anxiety}}" data-section="emotionSignals" data-field="anxiety" bindinput="onLearningReportFieldInput" placeholder="考试焦虑：低 / 中 / 高" />
+        </view>
+        <view class="parent-brief-block">
+          <text class="parent-brief-label">兴趣与自我认知</text>
+          <textarea class="lead-input assessment-input" value="{{learningReportInput.interestSignals.tags}}" data-section="interestSignals" data-field="tags" auto-height bindinput="onLearningReportFieldInput" placeholder="兴趣、擅长点、想提升的学科。"></textarea>
+        </view>
+        <button class="focus-cabin-link quiet" bindtap="toggleLearningQuestionnaire">{{showLearningQuestionnaire ? '收起问卷' : '没有测评资料，补 15 个小问题'}}</button>
+        <view wx:if="{{showLearningQuestionnaire}}">
+          <view class="parent-brief-block" wx:for="{{learningReportQuestionnaire}}" wx:key="id">
+            <text class="parent-brief-label">{{index + 1}}. {{item.prompt}}</text>
+            <view class="teacher-actions report-question-actions">
+              <button
+                wx:for="{{item.options}}"
+                wx:for-item="option"
+                wx:key="id"
+                data-id="{{item.id}}"
+                data-option="{{option.id}}"
+                class="{{item.selectedOptionId === option.id ? 'active' : ''}}"
+                bindtap="answerLearningQuestion"
+              >
+                {{option.label}}
+              </button>
+            </view>
+          </view>
+        </view>
+        <view class="parent-brief-block">
+          <text class="parent-brief-label">先看什么</text>
+          <text>{{learningAssessment.talentLine}}</text>
+        </view>
+        <view class="parent-brief-block">
+          <text class="parent-brief-label">先问一句</text>
+          <text>{{learningAssessment.nextQuestion}}</text>
+        </view>
+        <view class="parent-brief-block">
+          <text class="parent-brief-label">推荐方法</text>
+          <text>{{learningAssessment.methodLine}}</text>
+        </view>
+        <view class="parent-brief-block" wx:if="{{learningAssessment.capability}}">
+          <text class="parent-brief-label">先用哪个能力</text>
+          <text>{{learningAssessment.capability.label}} · {{learningAssessment.capability.reason}}</text>
+        </view>
+        <view class="teacher-actions">
+          <button bindtap="generateLearningReport">生成学习画像</button>
+          <button bindtap="goLearningReportCta">{{learningReportSummary.ctaLabel}}</button>
+          <button data-action="tutor" bindtap="runParentReportAction">用咕点追问</button>
+          <button data-action="review" bindtap="runParentReportAction">去修卡点</button>
+        </view>
+      </view>
+      </block>
+
+      <block wx:if="{{profilePanel === 'teacher'}}">
+      <view class="parent-section-card teacher-card" wx:if="{{parentReport}}">
+        <view class="section-title-row compact">
+          <view class="section-stick yellow"></view>
+          <view>
+            <view class="parent-card-title">家长只问这一句</view>
+            <view class="teacher-subtitle">不是多做题，是先把下一步做准</view>
+          </view>
+        </view>
+
+        <view class="parent-timeline compact-timeline">
+          <view class="timeline-line"></view>
+          <view class="timeline-row" wx:for="{{parentTonightItems}}" wx:key="id">
+            <view class="timeline-dot {{item.level}}"></view>
+            <view class="timeline-copy">
+              <view class="timeline-label">{{index === 0 ? '先看哪里' : index === 1 ? '马上做什么' : '收尾检查'}}</view>
+              <view class="timeline-title">{{item.title}}</view>
+            </view>
+          </view>
+        </view>
+
+        <view class="teacher-actions">
+          <button data-action="tutor" bindtap="runParentReportAction">找作业点拨</button>
+          <button data-action="review" bindtap="runParentReportAction">去修卡点</button>
+        </view>
+      </view>
+      </block>
+
+      <block wx:if="{{profilePanel === 'loop'}}">
+      <view class="parent-section-card loop-proof-card" wx:if="{{parentLoopProof}}">
+        <view class="section-title-row compact">
+          <view class="section-stick green"></view>
+          <view class="parent-card-title">学习闭环记录</view>
+        </view>
+        <view class="loop-proof-label">{{parentLoopProof.label}}</view>
+        <view class="loop-proof-grid">
+          <view class="loop-proof-cell" wx:for="{{parentLoopProof.cards}}" wx:key="id">
+            <view class="loop-proof-value">{{item.value}}</view>
+            <view class="loop-proof-name">{{item.label}}</view>
+            <view class="loop-proof-body">{{item.body}}</view>
+          </view>
+        </view>
+        <view class="loop-proof-next">{{parentLoopProof.next}}</view>
+      </view>
+      </block>
+
+      <block wx:if="{{profilePanel === 'repair'}}">
+      <view class="wrong-title-row">
+        <view class="wrong-title">我的卡点修复</view>
+        <view class="wrong-subtitle">看见反复错在哪里，再举一反三</view>
+      </view>
+
+      <view class="wrong-cause-grid" wx:if="{{wrongCauseSummary}}">
+        <view class="wrong-cause-card {{item.level}}" wx:for="{{wrongCauseSummary.cards}}" wx:key="id">
+          <view class="wrong-icon {{item.level}}"></view>
+          <view class="wrong-cause-label">{{item.label}}</view>
+          <view class="wrong-cause-num {{wrongCauseSummary.total ? '' : 'pending'}}">{{item.display}}</view>
+        </view>
+      </view>
+      <view class="wrong-cause-note" wx:if="{{wrongCauseSummary}}">{{wrongCauseSummary.label}}</view>
+      </block>
+
+      <block wx:if="{{profilePanel === 'share'}}">
+      <view class="daily-share-card" wx:if="{{dailyShareCard}}">
+        <view class="share-card-top">
+          <view>
+            <view class="share-kicker">家长复盘卡</view>
+            <view class="share-title">{{dailyShareCard.identityTag}}</view>
+          </view>
+          <view class="share-code">复盘码 {{dailyShareCard.inviteCode}}</view>
+        </view>
+        <view class="share-headline">{{dailyShareCard.title}}</view>
+        <view class="share-subtitle">{{dailyShareCard.subtitle}}</view>
+        <view class="share-family-action-line" wx:if="{{dailyShareCard.unifiedNextAction}}">下一步：{{dailyShareCard.unifiedNextAction.actionLabel}}</view>
+        <view class="share-family-action-line" wx:if="{{dailyShareCard.globalEvidenceBrief}}">{{dailyShareCard.globalEvidenceBrief.shareLine}}</view>
+        <view class="share-family-action-line" wx:if="{{dailyShareCard.reportDailyAction.ready}}">今日行动：{{dailyShareCard.reportDailyAction.actionLine}}</view>
+        <view class="share-level-row">
+          <view class="share-level">{{dailyShareCard.levelText}}</view>
+          <view class="share-achievement">{{dailyShareCard.achievementText}}</view>
+        </view>
+        <view class="share-family-action" wx:if="{{dailyShareCard.familyActionCard}}">
+          <view class="share-family-action-title">{{dailyShareCard.familyActionCard.title}}</view>
+          <view class="share-family-action-line">{{dailyShareCard.familyActionCard.judgement}}</view>
+          <view class="share-family-action-line">今晚：{{dailyShareCard.familyActionCard.tonightAction}}</view>
+          <view class="share-family-action-line">家长只问：{{dailyShareCard.familyActionCard.parentQuestion}}</view>
+          <view class="share-family-action-line">明天复核：{{dailyShareCard.familyActionCard.tomorrowCheck}}</view>
+          <view class="share-family-action-evidence">{{dailyShareCard.familyActionCard.evidenceLine}}</view>
+          <view class="share-family-action-boundary">{{dailyShareCard.familyActionCard.boundary}}</view>
+        </view>
+        <view class="share-stat-grid">
+          <view class="share-stat" wx:for="{{dailyShareCard.stats}}" wx:key="id">
+            <view class="share-stat-value">{{item.value}}</view>
+            <view class="share-stat-label">{{item.label}}</view>
+          </view>
+        </view>
+        <view class="share-conversation-card" wx:if="{{dailyShareCard.parentConversationPlan}}">
+          <view class="share-conversation-title">今晚这样问</view>
+          <view>开场：{{dailyShareCard.parentConversationPlan.open}}</view>
+          <view>追问：{{dailyShareCard.parentConversationPlan.follow}}</view>
+          <view>边界：{{dailyShareCard.parentConversationPlan.avoid}}</view>
+          <view wx:if="{{dailyShareCard.shareOutcome}}">明天：{{dailyShareCard.shareOutcome.nextAction}}</view>
+        </view>
+        <view class="share-invite">{{dailyShareCard.inviteLine}}</view>
+        <view class="wechat-share-row">
+          <button
+            class="wechat-share-btn parent"
+            open-type="share"
+            data-intent="parent_card"
+            bindtap="setShareIntent"
+          >
+            发给家长看
+          </button>
+          <button
+            class="wechat-share-btn peer"
+            open-type="share"
+            data-intent="peer_challenge"
+            bindtap="setShareIntent"
+          >
+            继续轻回访
+          </button>
+        </view>
+        <view class="share-archive">{{dailyShareCard.shareArchiveLabel}}</view>
+        <view class="share-actions">
+          <button class="share-primary" open-type="share" data-intent="peer_challenge" bindtap="setShareIntent">{{dailyShareCard.shareButton}}</button>
+          <button class="share-secondary" data-action="arcade" bindtap="runParentReportAction">去轻回访</button>
+        </view>
+      </view>
+      </block>
+
+      <block wx:if="{{profilePanel === 'loop'}}">
+      <view class="parent-section-card game-profile-card" wx:if="{{gameProfileCard}}">
+        <view class="section-title-row compact">
+          <view class="section-stick yellow"></view>
+          <view class="parent-card-title">{{gameProfileCard.title}}</view>
+        </view>
+        <view class="game-profile-top">
+          <view>
+            <view class="game-level">连续 {{gameProfileCard.streak}} 天有记录</view>
+            <view class="game-level-sub">今天只看有没有说清第一步</view>
+          </view>
+          <view class="coin-pill">轻回访</view>
+        </view>
+        <view class="game-progress-track">
+          <view class="game-progress-fill" style="width: {{gameProfileCard.level.progress}}%;"></view>
+        </view>
+        <view class="game-profile-grid">
+          <view class="game-profile-cell">
+            <view class="game-profile-value">{{gameProfileCard.xp}}</view>
+            <view class="game-profile-label">回访</view>
+          </view>
+          <view class="game-profile-cell">
+            <view class="game-profile-value">{{gameProfileCard.streak}}</view>
+            <view class="game-profile-label">连续天</view>
+          </view>
+          <view class="game-profile-cell">
+            <view class="game-profile-value">{{gameProfileCard.lives}}</view>
+            <view class="game-profile-label">次数</view>
+          </view>
+          <view class="game-profile-cell">
+            <view class="game-profile-value">{{gameProfileCard.unlockedCount}}</view>
+            <view class="game-profile-label">记录</view>
+          </view>
+        </view>
+        <view class="achievement-line">{{gameProfileCard.achievementText}}</view>
+        <view class="leaderboard-notice">{{gameProfileCard.leaderboardNotice}}</view>
+      </view>
+      </block>
+
+      <block wx:if="{{profilePanel === 'family' && showAdvancedProfile}}">
+      <view class="parent-section-card unlock-card" wx:if="{{commercialUnlockCard}}">
+        <view class="section-title-row compact">
+          <view class="section-stick yellow"></view>
+          <view class="parent-card-title">{{commercialUnlockCard.title}}</view>
+        </view>
+        <view class="unlock-body">{{commercialUnlockCard.body}}</view>
+        <view class="unlock-progress">{{commercialUnlockCard.done}}/{{commercialUnlockCard.total}} 已完成</view>
+        <view class="unlock-step-row">
+          <view class="unlock-step {{item.done ? 'done' : ''}}" wx:for="{{commercialUnlockCard.steps}}" wx:key="id">
+            <view class="unlock-dot"></view>
+            <view class="unlock-label">{{item.label}}</view>
+          </view>
+        </view>
+        <button class="unlock-button" data-action="{{commercialUnlockCard.action}}" bindtap="runParentReportAction">{{commercialUnlockCard.cta}}</button>
+        <button class="unlock-secondary" wx:if="{{commercialUnlockCard.secondaryCta}}" data-action="{{commercialUnlockCard.secondaryAction}}" bindtap="runParentReportAction">{{commercialUnlockCard.secondaryCta}}</button>
+        <view class="lead-card" wx:if="{{showLeadCard}}">
+          <view class="lead-title">申请人工复盘</view>
+          <view class="lead-body">把这周的追问、回访和错因记录整理成一次人工复盘。我们只看哪里值得继续修，不承诺结果。</view>
+          <input class="lead-input" value="{{lead.name}}" data-field="name" bindinput="onLeadInput" placeholder="称呼" />
+          <input class="lead-input" value="{{lead.phone}}" data-field="phone" bindinput="onLeadInput" placeholder="联系方式" />
+          <button class="lead-submit" bindtap="submitLead" loading="{{sending}}">提交复盘申请</button>
+        </view>
+      </view>
+      </block>
+      </block>
+
+      <view class="section more-toggle">
+        <button class="manage-button" bindtap="toggleAdvancedProfile">更多建议</button>
+      </view>
+
+      <block wx:if="{{showAdvancedProfile}}">
+        <view class="section panel stack advanced-card">
+          <view class="v1-section-title">账号与同步</view>
+          <view class="v1-section-subtitle">这里保留本机记录、登录和同步入口，平时不用管。</view>
+          <view class="field">
+            <view class="label">孩子昵称</view>
+            <input class="input" value="{{profile.name}}" data-field="name" bindinput="onProfileInput" placeholder="可不填真实姓名" />
+          </view>
+          <view class="field">
+            <view class="label">年级</view>
+            <input class="input" value="{{profile.grade}}" data-field="grade" bindinput="onProfileInput" />
+          </view>
+          <button class="primary-button" bindtap="initSession">{{loginText}}</button>
+          <button class="secondary-button" bindtap="syncNow">同步本地记录</button>
+        </view>
+      </block>
+    </view>
+  </scroll-view>
+</view>

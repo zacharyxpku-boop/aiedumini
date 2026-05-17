@@ -1,0 +1,346 @@
+<view class="home-page">
+  <view class="home-bg home-bg-dots"></view>
+  <view class="home-glow gold"></view>
+  <view class="home-glow green"></view>
+
+  <view class="first-run-overlay" wx:if="{{showFirstRunOverlay}}" catchtap="closeFirstRunOverlay">
+    <view class="first-run-card">
+      <view>咕点不直接给答案</view>
+      <text>陪你先看清今晚第一步。</text>
+      <text>点一下继续，或等 3 秒自动收起。</text>
+    </view>
+  </view>
+
+  <view class="home-header">
+    <view class="home-brand">
+      <view class="home-title">原点私教</view>
+      <view class="home-subtitle">卡住了，先说一句</view>
+    </view>
+  </view>
+
+  <scroll-view scroll-y enhanced show-scrollbar="{{false}}" class="home-scroll">
+    <view class="rc14-home-first-screen-top">
+    <view class="flow-pill compact" aria-label="作业点拨流程">
+      <view class="flow-dot"></view>
+      <text>{{homeViewModel.routePill}}</text>
+    </view>
+    <view class="companion-route-strip">{{homeViewModel.companionStrip}}</view>
+
+    <view class="hero-center">
+      <view class="mascot-wrap">
+        <view class="spark spark-left"></view>
+        <view class="spark spark-right"></view>
+        <view class="mascot-glow"></view>
+        <view class="mascot">
+          <view class="mascot-ear left"></view>
+          <view class="mascot-ear right"></view>
+          <view class="mascot-antenna"><view></view></view>
+          <view class="mascot-face">
+            <view class="mascot-shine"></view>
+            <view class="mascot-eyes">
+              <view></view>
+              <view></view>
+            </view>
+            <view class="mascot-smile"></view>
+          </view>
+          <view class="mascot-blush left"></view>
+          <view class="mascot-blush right"></view>
+        </view>
+      </view>
+
+      <view class="hero-copy">
+        <view class="hero-title">{{homeViewModel.title}}</view>
+        <view class="hero-line">
+          <view class="hero-marker"></view>
+          <text>{{homeViewModel.subtitle}}</text>
+        </view>
+      </view>
+    </view>
+    </view>
+    <view class="rc14-home-after-first-screen-top"></view>
+
+      <view class="composer-shell">
+      <view class="rc14-home-first-screen-card friend-safe-shell">
+      <view class="yesterday-review-card" wx:if="{{yesterdayReviewCard}}" bindtap="continueYesterdayReview">
+        <view class="yesterday-review-kicker">轻回访</view>
+        <view class="yesterday-review-title">{{yesterdayReviewCard.noticeText}}</view>
+        <view class="yesterday-review-step">{{yesterdayReviewCard.childArticulatedStep}}</view>
+      </view>
+      <view class="friend-primary-grid" data-role="friend-safe-primary">
+        <view class="friend-primary-card {{item.id === 'focus' && !focusEntryReady ? 'is-disabled' : ''}}" wx:for="{{learningLoopCards}}" wx:key="id" data-action="{{item.action}}" bindtap="runPath">
+          <view class="friend-primary-title">{{item.title}}</view>
+          <view class="friend-primary-body">{{item.body}}</view>
+          <view class="friend-primary-cta">{{item.id === 'focus' && !focusEntryReady ? '先确认第一步' : item.cta}}</view>
+        </view>
+      </view>
+      <view class="composer-card rc14-main-card" wx:if="{{false}}" bindtap="goTutor">
+          <view class="composer-chat-head">
+          <view class="composer-avatar"><view></view><view></view></view>
+          <view class="composer-chat-copy">
+            <view class="composer-chat-title">{{homeViewModel.inputCard.title}}</view>
+            <view class="composer-chat-subtitle">{{homeViewModel.emptyState || homeViewModel.inputCard.helper}}</view>
+          </view>
+          <view class="composer-open-arrow">→</view>
+        </view>
+        <view class="composer-row" catchtap="noop">
+          <view class="mic-button" bindtap="goTutor" aria-label="语音输入">
+            <view class="mic-icon"></view>
+          </view>
+          <input
+            class="thought-input"
+            value="{{aiDraft}}"
+            maxlength="200"
+            bindinput="onAiDraftInput"
+            placeholder="{{homeViewModel.inputCard.placeholder}}"
+            confirm-type="send"
+            bindconfirm="submitAiDraft"
+          />
+          <view class="send-button" bindtap="submitAiDraft" aria-label="发送给作业点拨">
+            <view class="send-icon"></view>
+          </view>
+        </view>
+        <view class="coach-button route-primary" catchtap="planTonight">
+          <text>{{homeViewModel.primaryCta}}</text>
+          <view class="coach-arrow">→</view>
+        </view>
+        <view class="route-next-lite" wx:if="{{homeViewModel.nextStep}}" catchtap="goReview">
+          <text>{{homeViewModel.nextStep.text}}</text>
+          <text class="route-next-link">{{homeViewModel.nextStep.cta}}</text>
+        </view>
+        <view class="focus-entry-lite" wx:if="{{todayFocus}}" catchtap="goFocus">
+          <text>咕点陪你把这一小步做完</text>
+          <text class="route-next-link">进专注舱</text>
+        </view>
+        <view class="stuck-link" wx:if="{{!homeViewModel.nextStep}}" catchtap="goTutor">{{homeViewModel.secondaryAction}}</view>
+        <view class="companion-entry">
+          <view>
+            <text class="companion-entry-action">{{homeViewModel.teacherPickerLabel}}</text>
+          </view>
+          <text class="companion-entry-label">{{homeViewModel.teacherPickerHint}}</text>
+        </view>
+        <view class="focus-feedback" wx:if="{{focusFeedback}}">{{focusFeedback}}</view>
+      </view>
+      </view>
+      <view class="scenario-loop-pack" wx:if="{{localScenarioCases.length}}">
+        <view class="scenario-loop-head">
+          <view>
+            <view class="scenario-loop-title">不知道填什么，先用一题走通</view>
+            <view class="scenario-loop-subtitle">每题都会生成第一步提示、回访卡、迁移练习和家长一句话。</view>
+          </view>
+          <view class="scenario-loop-badge">本地样例</view>
+        </view>
+        <scroll-view scroll-x class="scenario-loop-scroll">
+          <view class="scenario-loop-row">
+            <view class="scenario-loop-card" wx:for="{{localScenarioCases}}" wx:key="id" data-id="{{item.id}}" bindtap="applyLocalScenarioCase">
+              <view class="scenario-loop-label">{{item.displayLabel}}</view>
+              <view class="scenario-loop-card-title">{{item.title}}</view>
+              <view class="scenario-loop-card-body">{{item.inputText}}</view>
+              <view class="scenario-loop-card-cta">用这题走一遍</view>
+            </view>
+          </view>
+        </scroll-view>
+      <view class="scenario-loop-result" wx:if="{{activeScenarioResult}}">
+          <view class="scenario-loop-done-row">
+            <view class="scenario-loop-done {{item.done ? 'done' : ''}}" wx:for="{{activeScenarioResult.flowSteps}}" wx:key="id">{{item.displayLabel}}</view>
+          </view>
+          <text>{{activeScenarioResult.parentPrompt}}</text>
+          <text>{{activeScenarioResult.outcomeStandard}}</text>
+          <view class="scenario-loop-actions">
+            <button class="scenario-loop-primary" bindtap="openScenarioReview">去修这张卡</button>
+            <button class="scenario-loop-secondary" bindtap="openScenarioProfile">看家长复盘</button>
+          </view>
+        </view>
+      </view>
+      <view class="surface-depth-card" wx:if="{{unifiedNextAction}}">
+        <view class="surface-depth-head">
+          <view>
+            <view class="surface-depth-title">{{unifiedNextAction.title}}</view>
+            <view class="surface-depth-subtitle">{{unifiedNextAction.summary}}</view>
+          </view>
+          <view class="surface-depth-score">{{unifiedNextAction.candidateCount}}</view>
+        </view>
+        <view class="surface-depth-next" bindtap="runUnifiedNextAction">{{unifiedNextAction.actionLabel}}</view>
+        <view class="surface-depth-grid">
+          <view class="surface-depth-chip" wx:for="{{unifiedNextAction.candidates}}" wx:key="source">
+            <text class="surface-depth-chip-title">{{item.sourceLabel}}</text>
+            <text class="surface-depth-chip-line">{{item.reasonLine}}</text>
+          </view>
+        </view>
+        <view class="surface-depth-note">{{unifiedNextAction.readinessLine}}</view>
+      </view>
+      <view class="quest-arc-card" wx:if="{{learningQuestArc}}">
+        <view class="quest-arc-head">
+          <view>
+            <view class="quest-arc-title">{{learningQuestArc.title}}</view>
+            <view class="quest-arc-subtitle">{{learningQuestArc.summary}}</view>
+          </view>
+          <view class="quest-arc-score">{{learningQuestArc.doneCount}}/{{learningQuestArc.totalCount}}</view>
+        </view>
+        <view class="quest-arc-progress">
+          <view class="quest-arc-progress-fill" style="width: {{learningQuestArc.progress}}%;"></view>
+        </view>
+        <view class="quest-arc-current">
+          <view class="quest-arc-current-label">{{learningQuestArc.currentLabel}}</view>
+          <view class="quest-arc-current-title">{{learningQuestArc.currentTitle}}</view>
+          <view class="quest-arc-current-body">{{learningQuestArc.currentBody}}</view>
+        </view>
+        <view class="quest-arc-stage-row">
+          <view class="quest-arc-stage {{item.done ? 'done' : ''}}" wx:for="{{learningQuestArc.stages}}" wx:key="id">{{item.displayLabel}}</view>
+        </view>
+        <view class="quest-arc-hooks">
+          <text>{{learningQuestArc.parentHook}}</text>
+          <text>{{learningQuestArc.reportHook}}</text>
+        </view>
+        <button class="quest-arc-action" bindtap="runQuestArcAction">{{learningQuestArc.currentActionLabel}}</button>
+      </view>
+      <view class="module-flow-card" wx:if="{{moduleFlowCompass}}">
+        <view class="module-flow-head">
+          <view>
+            <view class="module-flow-title">{{moduleFlowCompass.title}}</view>
+            <view class="module-flow-subtitle">{{moduleFlowCompass.summary}}</view>
+          </view>
+          <view class="module-flow-score">{{moduleFlowCompass.readyCount}}/{{moduleFlowCompass.totalCount}}</view>
+        </view>
+        <view class="module-flow-progress">
+          <view class="module-flow-progress-fill" style="width: {{moduleFlowCompass.progress}}%;"></view>
+        </view>
+        <view class="module-flow-current">
+          <view class="module-flow-current-label">{{moduleFlowCompass.currentLabel}}</view>
+          <view class="module-flow-current-title">{{moduleFlowCompass.currentNextAction}}</view>
+          <view class="module-flow-current-body">{{moduleFlowCompass.currentEvidence}}</view>
+        </view>
+        <view class="module-flow-grid">
+          <view class="module-flow-chip {{item.ready ? 'ready' : ''}}" wx:for="{{moduleFlowCompass.modules}}" wx:key="id">
+            <text>{{item.displayLabel}}</text>
+          </view>
+        </view>
+        <button class="module-flow-action" bindtap="runModuleFlowCompassAction">去补齐当前断点</button>
+      </view>
+      <view class="surface-depth-card" wx:if="{{surfaceDepthPack}}">
+        <view class="surface-depth-head">
+          <view>
+            <view class="surface-depth-title">{{surfaceDepthPack.title}}</view>
+            <view class="surface-depth-subtitle">{{surfaceDepthPack.summary}}</view>
+          </view>
+          <view class="surface-depth-score">{{surfaceDepthPack.readyCount}}/{{surfaceDepthPack.totalCount}}</view>
+        </view>
+        <view class="surface-depth-next" data-route="{{surfaceDepthPack.primaryRoute}}" bindtap="runSurfaceDepthAction">{{surfaceDepthPack.nextAction}}</view>
+        <view class="surface-depth-grid">
+          <view class="surface-depth-chip {{item.ready ? 'ready' : ''}}" wx:for="{{surfaceDepthPack.cards}}" wx:key="id" data-route="{{item.route}}" data-dimension-id="{{item.id}}" data-label="{{item.displayLabel}}" bindtap="runSurfaceDepthAction">
+            <text class="surface-depth-chip-title">{{item.displayLabel}}</text>
+            <text class="surface-depth-chip-line">{{item.ready ? item.evidenceLine : item.gapLine}}</text>
+          </view>
+        </view>
+        <view class="surface-depth-note">{{surfaceDepthPack.familyLine}}</view>
+      </view>
+      <view class="rc14-home-after-first-screen-card"></view>
+      <view class="learning-loop-map">
+        <view class="loop-map-head">
+          <view class="loop-map-title">咕点能陪你的四件事</view>
+          <view class="loop-map-subtitle">每个能力都能单独用；咕点把它们串成一条学习主线。</view>
+        </view>
+        <view class="loop-map-grid">
+          <view class="loop-map-card" wx:for="{{learningLoopCards}}" wx:key="id" data-action="{{item.action}}" bindtap="runPath">
+            <view class="loop-map-card-title">{{item.title}}</view>
+            <view class="loop-map-card-body">{{item.body}}</view>
+            <view class="loop-map-card-cta">{{item.cta}}</view>
+          </view>
+        </view>
+      </view>
+      <view class="home-secondary-toggle" bindtap="toggleLightTools">
+        <text>{{showLightTools ? '收起轻练习' : '有空再做轻练习'}}</text>
+        <text class="route-next-link">{{showLightTools ? '先回到今晚第一步' : '口算 / 听写 / 描述卡点'}}</text>
+      </view>
+      <view class="light-entry-grid" wx:if="{{showLightTools}}">
+        <view class="light-entry-card" bindtap="goDailyMath">
+          <view class="light-entry-title">每日轻口算</view>
+          <view class="light-entry-body">3 分钟，先看清符号再做。</view>
+        </view>
+        <view class="light-entry-card" bindtap="goDictation">
+          <view class="light-entry-title">听写小助手</view>
+          <view class="light-entry-body">先确认第一步，再开始写。</view>
+        </view>
+        <view class="light-entry-card" bindtap="goLightDiagnosis">
+          <view class="light-entry-title">手动选题型</view>
+          <view class="light-entry-body">手动确认题型后，只给第一步建议。</view>
+        </view>
+      </view>
+      <view class="parent-classroom" wx:if="{{showLightTools}}">
+        <view class="classroom-head">
+          <view>
+            <view class="classroom-title">家长小课堂</view>
+            <view class="classroom-subtitle">3 篇，先看今晚能用的一句话。</view>
+          </view>
+          <button bindtap="contactSupport">遇到问题</button>
+        </view>
+        <view class="classroom-card" wx:for="{{parentClassroom}}" wx:key="title">
+          <view>{{item.title}}</view>
+          <text>{{item.body}}</text>
+        </view>
+      </view>
+      <view class="quick-actions compact home-secondary-actions" wx:if="{{showCompanionPicker}}">
+        <view class="quick-action {{item.warmClass}}" wx:for="{{promptChips}}" wx:key="id" data-id="{{item.id}}" bindtap="applyPromptChip">{{item.label}}</view>
+      </view>
+    </view>
+
+    <view class="middle-guide compact home-below-fold-only">
+      <view class="guide-copy">
+        <view class="guide-title">先把想法说出来</view>
+        <view class="guide-kicker">不用一上来就求最后结果</view>
+      </view>
+      <view class="guide-steps soft">
+        <view class="guide-step">
+          <view class="guide-num">1</view>
+          <text>题目</text>
+        </view>
+        <view class="guide-step">
+          <view class="guide-num">2</view>
+          <text>第一步想法</text>
+        </view>
+        <view class="guide-step">
+          <view class="guide-num">3</view>
+          <text>卡住点</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="weak-verdict-card result-state home-secondary-panel" wx:if="{{showWeakVerdict}}">
+      <view class="weak-verdict-head">
+        <view>
+          <view class="weak-verdict-kicker">今晚先修</view>
+          <view class="weak-verdict-title">{{weaknessVerdict.name}}</view>
+        </view>
+        <view class="weak-verdict-score">{{weaknessVerdict.confidence}}%</view>
+      </view>
+      <view class="weak-verdict-row">
+        <view class="weak-verdict-label">为什么是它</view>
+        <view class="weak-verdict-text">{{weaknessVerdict.why}}</view>
+      </view>
+      <view class="weak-verdict-row">
+        <view class="weak-verdict-label">今晚怎么修</view>
+        <view class="weak-verdict-text">{{weaknessVerdict.tonight}}</view>
+      </view>
+      <view class="weak-verdict-row">
+        <view class="weak-verdict-label">谁来点拨</view>
+        <view class="weak-verdict-text">{{weaknessVerdict.helper}}</view>
+      </view>
+      <view class="weak-verdict-actions">
+        <button class="weak-verdict-primary" data-action="{{weaknessVerdict.primaryAction}}" bindtap="runTodayAction">{{weaknessVerdict.primaryLabel}}</button>
+        <button class="weak-verdict-secondary" data-action="{{weaknessVerdict.secondaryAction}}" bindtap="runTodayAction">{{weaknessVerdict.secondaryLabel}}</button>
+      </view>
+    </view>
+
+    <view class="share-card" wx:if="{{incomingShare}}">
+      <view class="share-copy">
+        <view class="share-kicker">学习复盘卡</view>
+        <view class="share-title">朋友分享了一张复盘卡</view>
+        <view class="share-body">邀请码 #{{incomingShare.code}}。用自己的材料生成一组轻练习，再完成今天 5 分钟回访。</view>
+        <view class="share-body" wx:if="{{incomingShare.action_label}}">下一步：{{incomingShare.action_label}}</view>
+        <view class="share-body" wx:if="{{incomingShare.action_detail}}">怎么做：{{incomingShare.action_detail}}</view>
+      </view>
+      <button class="share-button" bindtap="goTools">去轻回访</button>
+    </view>
+
+    <view class="home-spacer"></view>
+  </scroll-view>
+</view>

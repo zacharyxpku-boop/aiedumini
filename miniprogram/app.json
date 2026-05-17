@@ -1,0 +1,58 @@
+{
+  "pages": [
+    "pages/home/home",
+    "pages/daily-math/daily-math",
+    "pages/dictation/dictation",
+    "pages/light-diagnosis/light-diagnosis",
+    "pages/focus/focus",
+    "pages/tools/tools",
+    "pages/module/module",
+    "pages/review/review",
+    "pages/arcade/arcade",
+    "pages/tutor/tutor",
+    "pages/radar/radar",
+    "pages/profile/profile",
+    "pages/diagnosis/diagnosis",
+    "pages/upload/upload",
+    "pages/legal/legal"
+  ],
+  "__usePrivacyCheck__": true,
+  "window": {
+    "navigationBarTitleText": "原点智学",
+    "navigationBarBackgroundColor": "#FAF7F0",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#FAF7F0",
+    "backgroundTextStyle": "dark"
+  },
+  "tabBar": {
+    "custom": true,
+    "color": "#7B756B",
+    "selectedColor": "#0F4F3D",
+    "backgroundColor": "#FFFDF8",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/home/home",
+        "text": "作业点拨"
+      },
+      {
+        "pagePath": "pages/review/review",
+        "text": "修卡点"
+      },
+      {
+        "pagePath": "pages/focus/focus",
+        "text": "专注舱"
+      },
+      {
+        "pagePath": "pages/tools/tools",
+        "text": "轻回访"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

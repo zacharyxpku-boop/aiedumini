@@ -1,0 +1,187 @@
+<view class="tutor-page safe-bottom">
+  <view class="tutor-shell">
+    <view class="page-positioning socratic-positioning">
+      <view class="positioning-kicker">作业点拨</view>
+      <view class="positioning-title">咕点用追问陪你说第一步，不直接讲答案</view>
+      <view class="positioning-flow">先说你准备怎么开始，咕点再给下一句提示；说清以后去专注舱坐一段。</view>
+      <view class="positioning-actions">
+        <button bindtap="goFocus">带着这一小步去专注</button>
+        <button bindtap="goReview">把卡点整理成错题卡</button>
+      </view>
+    </view>
+    <view class="top-nav">
+      <button class="home-back" bindtap="goHome">首页</button>
+      <view class="nav-brand">
+        <view class="brand-title">原点智学</view>
+        <view class="brand-subtitle">作业点拨只说一步</view>
+      </view>
+      <button class="nav-pill" bindtap="goRadar"><text class="nav-dot"></text>只问一步</button>
+    </view>
+
+    <scroll-view class="tutor-main" scroll-y enhanced show-scrollbar="{{false}}">
+      <view class="main-inner">
+        <view class="chat-card">
+          <view class="chat-head">
+            <view class="chat-avatar">
+              <view class="chat-avatar-eye"></view>
+              <view class="chat-avatar-eye"></view>
+            </view>
+            <view class="chat-head-copy">
+              <view class="chat-kicker">和原小点对话</view>
+              <view class="chat-title">把题目或第一步发过来</view>
+              <view class="chat-subtitle">简单题直接核对，卡住时只点拨下一步。</view>
+            </view>
+            <view class="chat-live-dot"></view>
+          </view>
+          <scroll-view class="chat" scroll-y>
+            <view class="message {{item.role}}" wx:for="{{messages}}" wx:key="index">
+              <view class="bubble">
+                <view class="hint-label" wx:if="{{item.hint_label}}">{{item.hint_label}}</view>
+                <text>{{item.text}}</text>
+              </view>
+            </view>
+            <view class="message assistant" wx:if="{{loading}}">
+              <view class="bubble">我先看一步。</view>
+            </view>
+          </scroll-view>
+          <view class="chat-suggestion-row">
+            <button class="suggestion-pill {{activeStep === item.id ? 'active' : ''}}" wx:for="{{quickActions}}" wx:key="id" wx:if="{{index < 4}}" data-step="{{item.id}}" bindtap="sendQuick">
+              {{item.label}}
+            </button>
+          </view>
+        </view>
+
+        <view class="selected-card" wx:if="{{selected}}">
+          <view class="selected-label">今晚必须做</view>
+          <view class="selected-text">{{selected.text}}</view>
+          <view class="selected-reason" wx:if="{{selected.reason}}">{{selected.reason}}</view>
+        </view>
+
+        <view class="mode-strip">
+          <scroll-view class="mode-scroll" scroll-x enable-flex show-scrollbar="{{false}}">
+            <view class="chips-grid">
+              <button class="chip {{activeStep === item.id ? 'active' : ''}}" wx:for="{{quickActions}}" wx:key="id" wx:if="{{index >= 4 && index < 8}}" data-step="{{item.id}}" bindtap="sendQuick">
+                {{item.label}}
+              </button>
+            </view>
+          </scroll-view>
+          <button class="must-do-mini" bindtap="quickStart">锁定今晚</button>
+        </view>
+
+        <view class="receipt-card" wx:if="{{thinkingReceipt}}">
+          <view class="receipt-head">
+            <view>
+              <view class="receipt-title">这轮卡点 · 思路记录</view>
+              <view class="receipt-subtitle">{{thinkingReceipt.status}}</view>
+            </view>
+            <view class="receipt-score">{{thinkingReceipt.score}}</view>
+          </view>
+          <view class="receipt-focus">{{thinkingReceipt.focus}}</view>
+          <view class="receipt-diagnostic" wx:if="{{thinkingReceipt.diagnostic_probe}}">
+            <view class="receipt-diagnostic-title">这轮怎么追问</view>
+            <view class="receipt-diagnostic-line">{{thinkingReceipt.diagnostic_probe.prompt}}</view>
+            <view class="receipt-diagnostic-sub">{{thinkingReceipt.diagnostic_probe.goal}}</view>
+          </view>
+          <view class="receipt-first-step-board" wx:if="{{thinkingReceipt.firstStepBoard}}">
+            <view class="receipt-diagnostic-title">{{thinkingReceipt.firstStepBoard.title}}</view>
+            <view class="receipt-board-body">{{thinkingReceipt.firstStepBoard.body}}</view>
+            <view class="receipt-board-structure">{{thinkingReceipt.firstStepBoard.structure}}</view>
+            <view class="receipt-board-line">第一步：{{thinkingReceipt.firstStepBoard.firstMove}}</view>
+            <view class="receipt-board-line">孩子说：{{thinkingReceipt.firstStepBoard.childPrompt}}</view>
+            <view class="receipt-board-parent">家长只问：{{thinkingReceipt.firstStepBoard.parentPrompt}}</view>
+            <view class="receipt-board-avoid">{{thinkingReceipt.firstStepBoard.avoid}}</view>
+          </view>
+          <view class="receipt-contract" wx:if="{{thinkingReceipt.socratic_contract}}">
+            <view class="receipt-diagnostic-title">{{thinkingReceipt.socratic_contract.title}}</view>
+            <view class="receipt-diagnostic-line">为什么这样问：{{thinkingReceipt.socratic_contract.whyThisQuestion}}</view>
+            <view class="receipt-diagnostic-line">下一句：{{thinkingReceipt.socratic_contract.nextQuestion}}</view>
+            <view class="receipt-diagnostic-sub">停止规则：{{thinkingReceipt.socratic_contract.stopRule}}</view>
+            <view class="receipt-diagnostic-sub">沉淀证据：{{thinkingReceipt.socratic_contract.evidenceToSave}}</view>
+          </view>
+          <view class="receipt-move-row" wx:if="{{thinkingReceipt.allowed_moves.length}}">
+            <text wx:for="{{thinkingReceipt.allowed_moves}}" wx:key="*this">{{item}}</text>
+          </view>
+          <view class="receipt-transfer" wx:if="{{thinkingReceipt.transfer_prompt}}">{{thinkingReceipt.transfer_prompt}}</view>
+        </view>
+
+        <view class="surface-depth-card tutor-surface-depth" wx:if="{{surfaceDepthPack}}">
+          <view class="surface-depth-title">{{surfaceDepthPack.title}}</view>
+          <view class="surface-depth-subtitle">{{surfaceDepthPack.summary}}</view>
+          <view class="surface-depth-next" data-route="{{surfaceDepthPack.primaryRoute}}" bindtap="runSurfaceDepthAction">{{surfaceDepthPack.nextAction}}</view>
+          <view class="surface-depth-grid">
+            <view class="surface-depth-chip {{item.ready ? 'ready' : ''}}" wx:for="{{surfaceDepthPack.cards}}" wx:key="id" data-route="{{item.route}}" data-dimension-id="{{item.id}}" data-label="{{item.displayLabel}}" bindtap="runSurfaceDepthAction">
+              <text class="surface-depth-chip-title">{{item.displayLabel}}</text>
+              <text class="surface-depth-chip-line">{{item.ready ? item.evidenceLine : item.gapLine}}</text>
+            </view>
+          </view>
+          <view class="surface-depth-note">{{surfaceDepthPack.familyLine}}</view>
+        </view>
+
+        <view class="tutor-detail-toggle">
+          <view>
+            <view class="detail-toggle-title">为什么只提示一步</view>
+            <view class="detail-toggle-subtitle">为什么不直接整题代做</view>
+          </view>
+          <button class="detail-toggle-button" bindtap="toggleTutorDetails">{{showTutorDetails ? '收起' : '展开'}}</button>
+        </view>
+
+        <block wx:if="{{showTutorDetails}}">
+          <view class="process-section">
+            <view class="section-label">今晚怎么一起往下走</view>
+            <view class="process-list">
+              <view class="process-item">
+                <view class="process-num">1</view>
+                <view class="process-content">先说一步<text>你提供已知或困惑</text></view>
+              </view>
+              <view class="process-item">
+                <view class="process-num">2</view>
+                <view class="process-content">只给最小提示<text>克制启发，保留思考空间</text></view>
+              </view>
+              <view class="process-item">
+                <view class="process-num">3</view>
+                <view class="process-content">说出错因<text>定位思维盲区</text></view>
+              </view>
+              <view class="process-item">
+                <view class="process-num">4</view>
+                <view class="process-content">用自己的话说回去<text>说清下次先查什么</text></view>
+              </view>
+            </view>
+          </view>
+
+          <view class="coach-strip" wx:if="{{coachConsole}}">
+            <view class="coach-item">
+              <view class="coach-label">带学原则</view>
+              <view class="coach-value">{{coachConsole.currentAction}}</view>
+            </view>
+            <view class="coach-item">
+              <view class="coach-label">今晚先看</view>
+              <view class="coach-value">{{coachConsole.wrongCause}}</view>
+            </view>
+            <view class="coach-item">
+              <view class="coach-label">别急着要答案</view>
+              <view class="coach-value">{{pasteRisk.level}}</view>
+            </view>
+          </view>
+        </block>
+
+        <view hidden>{{pedagogy.title}}{{pasteRisk.title}}{{coachConsole.title}}</view>
+      </view>
+    </scroll-view>
+
+    <view class="composer-area">
+      <view class="composer-inner">
+        <textarea
+          class="composer-input"
+          value="{{input}}"
+          bindinput="onInput"
+          auto-height
+          maxlength="900"
+          placeholder="说第一步，或把题目贴过来。"
+        />
+        <button class="composer-btn" bindtap="send" loading="{{loading}}" aria-label="发送">
+          <text class="send-arrow">➤</text>
+        </button>
+      </view>
+    </view>
+  </view>
+</view>

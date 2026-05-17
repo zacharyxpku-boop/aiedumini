@@ -1,0 +1,840 @@
+function count(list) {
+  return Array.isArray(list) ? list.length : 0;
+}
+
+function hasText(value) {
+  return String(value || '').trim().length > 0;
+}
+
+function evidenceItem(id, label, ready, evidence = [], gap = '') {
+  return {
+    id,
+    label,
+    ready: !!ready,
+    evidence: (Array.isArray(evidence) ? evidence : [evidence]).filter(Boolean),
+    gap: ready ? '' : gap
+  };
+}
+
+function scoreFromItems(items = []) {
+  if (!items.length) return 0;
+  return Math.round((items.filter((item) => item.ready).length / items.length) * 100);
+}
+
+const BENCHMARK_CAPABILITIES = [
+  {
+    id: 'guided_tutor',
+    label: 'guided tutor does not leak final answers',
+    dimensionIds: ['guided_tutor']
+  },
+  {
+    id: 'material_to_active_recall',
+    label: 'uploaded or entered material becomes reviewable practice',
+    dimensionIds: ['material_to_review', 'spaced_recall']
+  },
+  {
+    id: 'light_entry_to_core_loop',
+    label: 'light entries create reusable first-step evidence',
+    dimensionIds: ['light_entry_evidence']
+  },
+  {
+    id: 'report_to_next_action',
+    label: 'assessment output routes into a concrete learning plan',
+    dimensionIds: ['report_to_solution']
+  },
+  {
+    id: 'motivation_loop',
+    label: 'light game play writes back learning evidence',
+    dimensionIds: ['game_retention']
+  },
+  {
+    id: 'parent_evidence_loop',
+    label: 'parent side sees evidence instead of a static report wall',
+    dimensionIds: ['parent_evidence']
+  },
+  {
+    id: 'share_return_loop',
+    label: 'share cards carry the next action back into the learning loop',
+    dimensionIds: ['share_return']
+  },
+  {
+    id: 'local_recovery',
+    label: 'weak-network and local recovery path is diagnosable',
+    dimensionIds: ['local_resilience']
+  },
+  {
+    id: 'depth_compounding',
+    label: 'learning evidence compounds across tutor, recall, practice, parent, and return visits',
+    dimensionIds: ['depth_compounding']
+  },
+  {
+    id: 'pattern_to_decision',
+    label: 'weekly learning pattern turns into a concrete next action',
+    dimensionIds: ['weekly_pattern', 'decision_path']
+  },
+  {
+    id: 'mastery_to_intervention',
+    label: 'mastery rubric drives intervention and outcome review',
+    dimensionIds: ['mastery_rubric', 'intervention_playbook', 'outcome_review']
+  }
+];
+
+const MODULE_FLOW_CONTRACTS = [
+  {
+    id: 'home_to_tutor',
+    module: 'home',
+    entry: 'home_or_upload',
+    output: 'guided_tutor_first_step',
+    requiredDimensionIds: ['guided_tutor']
+  },
+  {
+    id: 'tutor_to_focus',
+    module: 'tutor',
+    entry: 'guided_tutor_first_step',
+    output: 'focus_cabin',
+    requiredDimensionIds: ['guided_tutor']
+  },
+  {
+    id: 'focus_to_review_evidence',
+    module: 'focus',
+    entry: 'focus_cabin',
+    output: 'review_or_parent_evidence',
+    requiredDimensionIds: ['guided_tutor', 'parent_evidence', 'spaced_recall']
+  },
+  {
+    id: 'material_to_review',
+    module: 'upload_or_tools',
+    entry: 'home_or_upload',
+    output: 'review_card',
+    requiredDimensionIds: ['material_to_review']
+  },
+  {
+    id: 'upload_to_report_material',
+    module: 'upload',
+    entry: 'manual_material_or_photo_note',
+    output: 'report_or_review_material',
+    requiredDimensionIds: ['material_to_review', 'report_to_solution', 'local_resilience']
+  },
+  {
+    id: 'tools_to_practice_asset',
+    module: 'tools',
+    entry: 'tool_entry',
+    output: 'review_or_practice_asset',
+    requiredDimensionIds: ['light_entry_evidence', 'material_to_review', 'game_retention']
+  },
+  {
+    id: 'light_entry_to_profile',
+    module: 'daily_math_dictation_light_diagnosis',
+    entry: 'light_entry',
+    output: 'parent_visible_light_evidence',
+    requiredDimensionIds: ['light_entry_evidence', 'parent_evidence']
+  },
+  {
+    id: 'module_to_recall_card',
+    module: 'module',
+    entry: 'mini_learning_loop',
+    output: 'recall_card_or_tutor_step',
+    requiredDimensionIds: ['guided_tutor', 'material_to_review', 'spaced_recall']
+  },
+  {
+    id: 'report_to_plan',
+    module: 'learning_report',
+    entry: 'learning_report_solution',
+    output: 'review_card_and_seven_day_plan',
+    requiredDimensionIds: ['report_to_solution', 'material_to_review']
+  },
+  {
+    id: 'review_to_recall',
+    module: 'review',
+    entry: 'review_card',
+    output: 'next_day_revisit',
+    requiredDimensionIds: ['spaced_recall']
+  },
+  {
+    id: 'practice_to_record',
+    module: 'arcade',
+    entry: 'light_practice_game',
+    output: 'parent_recap',
+    requiredDimensionIds: ['game_retention', 'parent_evidence']
+  },
+  {
+    id: 'parent_recap_to_revisit',
+    module: 'profile',
+    entry: 'parent_recap',
+    output: 'next_day_revisit',
+    requiredDimensionIds: ['parent_evidence', 'local_resilience']
+  },
+  {
+    id: 'share_to_landing_next_action',
+    module: 'share',
+    entry: 'family_action_card',
+    output: 'incoming_share_next_action',
+    requiredDimensionIds: ['share_return', 'decision_path']
+  },
+  {
+    id: 'radar_to_family_action',
+    module: 'radar',
+    entry: 'parent_decision_radar',
+    output: 'family_action_or_intervention',
+    requiredDimensionIds: ['decision_path', 'weekly_pattern', 'intervention_playbook']
+  },
+  {
+    id: 'weekly_pattern_to_next_action',
+    module: 'profile',
+    entry: 'weekly_pattern',
+    output: 'next_best_action',
+    requiredDimensionIds: ['weekly_pattern', 'decision_path']
+  },
+  {
+    id: 'mastery_to_intervention',
+    module: 'profile',
+    entry: 'mastery_rubric',
+    output: 'intervention_playbook_and_outcome_review',
+    requiredDimensionIds: ['mastery_rubric', 'intervention_playbook', 'outcome_review']
+  }
+];
+
+const USER_TRIAL_SCENARIOS = [
+  {
+    id: 'first_homework_help',
+    persona: 'student_with_homework_stuck_point',
+    entry: 'home',
+    targetOutcome: 'child states the first step, then enters focus and review',
+    requiredDimensionIds: ['guided_tutor', 'material_to_review', 'parent_evidence']
+  },
+  {
+    id: 'parent_report_to_solution',
+    persona: 'parent_with_score_or_assessment_material',
+    entry: 'profile_or_upload',
+    targetOutcome: 'report becomes a 7-day plan and routes to review/focus',
+    requiredDimensionIds: ['report_to_solution', 'material_to_review', 'spaced_recall']
+  },
+  {
+    id: 'child_low_motivation_revisit',
+    persona: 'child_wants_light_practice',
+    entry: 'tools_or_arcade',
+    targetOutcome: 'light game writes learning evidence and missed cards return to review',
+    requiredDimensionIds: ['game_retention', 'spaced_recall', 'parent_evidence']
+  },
+  {
+    id: 'child_light_entry_to_core',
+    persona: 'child_starts_from_small_light_tool',
+    entry: 'daily_math_or_dictation',
+    targetOutcome: 'light entry creates first-step evidence and parent sees where to continue',
+    requiredDimensionIds: ['light_entry_evidence', 'parent_evidence', 'decision_path']
+  },
+  {
+    id: 'weak_network_return_visit',
+    persona: 'family_returns_after_exit_or_weak_network',
+    entry: 'profile',
+    targetOutcome: 'local record, sync diagnostics, and next-day revisit remain available',
+    requiredDimensionIds: ['local_resilience', 'parent_evidence', 'spaced_recall']
+  },
+  {
+    id: 'parent_weekly_decision',
+    persona: 'parent_after_several_nights',
+    entry: 'profile',
+    targetOutcome: 'parent sees the repeated pattern and a concrete next action',
+    requiredDimensionIds: ['weekly_pattern', 'decision_path', 'parent_evidence']
+  },
+  {
+    id: 'parent_mastery_intervention',
+    persona: 'parent_needs_to_know_if_it_worked',
+    entry: 'profile',
+    targetOutcome: 'parent sees mastery level, intervention plan, and outcome review',
+    requiredDimensionIds: ['mastery_rubric', 'intervention_playbook', 'outcome_review']
+  },
+  {
+    id: 'shared_family_card_return',
+    persona: 'second_parent_opens_shared_card',
+    entry: 'share_landing',
+    targetOutcome: 'shared family card lands with the same next action and routeable detail',
+    requiredDimensionIds: ['share_return', 'parent_evidence', 'decision_path']
+  }
+];
+
+const MATURITY_AREAS = [
+  {
+    id: 'product_completeness',
+    label: 'product completeness',
+    requiredDimensionIds: ['guided_tutor', 'report_to_solution', 'material_to_review', 'light_entry_evidence', 'parent_evidence']
+  },
+  {
+    id: 'workflow_closure',
+    label: 'end-to-end workflow closure',
+    requiredDimensionIds: ['guided_tutor', 'report_to_solution', 'material_to_review', 'light_entry_evidence', 'spaced_recall', 'game_retention', 'parent_evidence', 'share_return']
+  },
+  {
+    id: 'technical_stability',
+    label: 'local technical stability and recovery',
+    requiredDimensionIds: ['local_resilience', 'spaced_recall']
+  },
+  {
+    id: 'user_experience_maturity',
+    label: 'zero-help user experience maturity',
+    requiredDimensionIds: ['guided_tutor', 'light_entry_evidence', 'game_retention', 'parent_evidence', 'share_return', 'local_resilience', 'depth_compounding', 'weekly_pattern', 'decision_path', 'mastery_rubric', 'intervention_playbook', 'outcome_review']
+  }
+];
+
+function mapById(items = []) {
+  return items.reduce((acc, item) => {
+    if (item && item.id) acc[item.id] = item;
+    return acc;
+  }, {});
+}
+
+function readinessStatus(ready) {
+  return ready ? 'ready' : 'gap';
+}
+
+function riskLevelFromReadiness(item) {
+  if (item.ready) return 'low';
+  if (item.id === 'report_to_solution' || item.id === 'guided_tutor' || item.id === 'share_return') return 'high';
+  return 'medium';
+}
+
+function buildContractStatus(contract, dimensionMap) {
+  const evidence = contract.requiredDimensionIds
+    .map((id) => dimensionMap[id])
+    .filter(Boolean);
+  const ready = evidence.length === contract.requiredDimensionIds.length && evidence.every((item) => item.ready);
+  return {
+    id: contract.id,
+    module: contract.module,
+    entry: contract.entry,
+    output: contract.output,
+    status: ready ? 'closed' : 'broken',
+    evidence: evidence.flatMap((item) => item.evidence || []),
+    missingDimensionIds: contract.requiredDimensionIds.filter((id) => !dimensionMap[id] || !dimensionMap[id].ready)
+  };
+}
+
+function buildUserTrialScenario(scenario, dimensionMap) {
+  const evidence = scenario.requiredDimensionIds
+    .map((id) => dimensionMap[id])
+    .filter(Boolean);
+  const ready = evidence.length === scenario.requiredDimensionIds.length && evidence.every((item) => item.ready);
+  return {
+    id: scenario.id,
+    persona: scenario.persona,
+    entry: scenario.entry,
+    targetOutcome: scenario.targetOutcome,
+    status: ready ? 'pass' : 'blocked',
+    zeroHelpReady: ready,
+    evidence: evidence.flatMap((item) => item.evidence || []),
+    blockingIssues: scenario.requiredDimensionIds
+      .filter((id) => !dimensionMap[id] || !dimensionMap[id].ready)
+      .map((id) => ({
+        id,
+        fix: dimensionMap[id] ? dimensionMap[id].gap : 'missing readiness dimension'
+      }))
+  };
+}
+
+function buildPseudoFunctionScan(functionalityChecklist, externalBlockers) {
+  const localPseudoFunctions = functionalityChecklist
+    .filter((item) => item.status !== 'implemented' || !count(item.evidence))
+    .map((item) => ({
+      id: item.id,
+      name: item.name,
+      reason: item.fix || 'missing traceable local evidence'
+    }));
+  return {
+    localPseudoFunctions,
+    externalConfigOnly: externalBlockers.map((item) => ({
+      id: item.id,
+      label: item.label,
+      blockingLaunch: !!item.blockingLaunch
+    })),
+    allDisplayedLocalFunctionsBackedByEvidence: localPseudoFunctions.length === 0
+  };
+}
+
+function buildMaturityDelta(area, dimensionMap, externalBlockers) {
+  const missingDimensionIds = area.requiredDimensionIds.filter((id) => !dimensionMap[id] || !dimensionMap[id].ready);
+  const hasBlockingExternal = externalBlockers.some((item) => item.blockingLaunch);
+  const gapLevel = missingDimensionIds.length
+    ? (missingDimensionIds.length >= 2 ? 'severe' : 'medium')
+    : (hasBlockingExternal ? 'external_only' : 'none');
+  return {
+    id: area.id,
+    label: area.label,
+    gapLevel,
+    localStatus: missingDimensionIds.length ? 'local_gap' : 'local_ready',
+    missingDimensionIds,
+    evidence: area.requiredDimensionIds
+      .map((id) => dimensionMap[id])
+      .filter(Boolean)
+      .flatMap((item) => item.evidence || []),
+    externalBlockers: externalBlockers
+      .filter((item) => item.blockingLaunch)
+      .map((item) => item.id)
+  };
+}
+
+function buildReadinessGateChecklist(localReady, moduleFlowMap, userTrialSimulation, pseudoFunctionScan, dimensions, externalBlockers) {
+  const dimensionMap = mapById(dimensions);
+  return [
+    {
+      id: 'core_chain_100_percent',
+      label: 'core learning loop can run end to end',
+      passed: localReady && moduleFlowMap.every((item) => item.status === 'closed')
+    },
+    {
+      id: 'no_local_pseudo_function',
+      label: 'all displayed local functions are backed by evidence',
+      passed: !!(pseudoFunctionScan && pseudoFunctionScan.allDisplayedLocalFunctionsBackedByEvidence)
+    },
+    {
+      id: 'exception_fallback',
+      label: 'exit, weak network, and local recovery have fallback state',
+      passed: !!(dimensionMap.local_resilience && dimensionMap.local_resilience.ready)
+    },
+    {
+      id: 'zero_help_trial',
+      label: 'non-technical users can complete the simulated core scenarios without help',
+      passed: userTrialSimulation.length > 0 && userTrialSimulation.every((item) => item.zeroHelpReady)
+    },
+    {
+      id: 'no_local_p0',
+      label: 'no known high-priority local code blocker remains',
+      passed: localReady && moduleFlowMap.every((item) => item.status === 'closed')
+    },
+    {
+      id: 'external_launch_config_clear',
+      label: 'real launch configuration is complete',
+      passed: !externalBlockers.some((item) => item.blockingLaunch)
+    }
+  ];
+}
+
+function buildIterationBoundary(gateChecklist, moduleFlowMap, pseudoFunctionScan, externalBlockers) {
+  const localGateFailures = gateChecklist.filter((item) => !item.passed && item.id !== 'external_launch_config_clear');
+  const brokenFlows = moduleFlowMap.filter((item) => item.status !== 'closed');
+  const pseudoFunctions = pseudoFunctionScan.localPseudoFunctions || [];
+  const externalLaunchBlockers = externalBlockers.filter((item) => item.blockingLaunch);
+  const localActions = localGateFailures.map((item) => item.id)
+    .concat(brokenFlows.map((item) => item.id))
+    .concat(pseudoFunctions.map((item) => item.id));
+  return {
+    canContinueLocally: localActions.length > 0,
+    localActions,
+    stopReason: localActions.length
+      ? 'local_acceptance_gaps_remain'
+      : (externalLaunchBlockers.length ? 'local_acceptance_exhausted_external_config_required' : 'all_acceptance_gates_passed'),
+    externalBlockerIds: externalLaunchBlockers.map((item) => item.id)
+  };
+}
+
+function buildAcceptanceReport(readiness = {}) {
+  const dimensions = Array.isArray(readiness.dimensions) ? readiness.dimensions : [];
+  const dimensionMap = mapById(dimensions);
+  const localGaps = Array.isArray(readiness.gaps) ? readiness.gaps : [];
+  const externalBlockers = Array.isArray(readiness.externalBlockers) ? readiness.externalBlockers : [];
+  const localReady = dimensions.length > 0 && localGaps.length === 0;
+  const launchBlockedByExternalConfig = !!readiness.launchBlockedByExternalConfig;
+  const verdict = localReady
+    ? (launchBlockedByExternalConfig ? 'conditional_pass' : 'pass')
+    : 'fail';
+
+  const competitorBenchmark = BENCHMARK_CAPABILITIES.map((capability) => {
+    const evidence = capability.dimensionIds
+      .map((id) => dimensionMap[id])
+      .filter(Boolean);
+    const ready = evidence.length === capability.dimensionIds.length && evidence.every((item) => item.ready);
+    return {
+      id: capability.id,
+      label: capability.label,
+      status: readinessStatus(ready),
+      evidence: evidence.flatMap((item) => item.evidence || []),
+      gap: ready ? '' : 'missing local evidence for one or more required capability dimensions'
+    };
+  });
+
+  const functionalityChecklist = dimensions.map((item) => ({
+    id: item.id,
+    name: item.label,
+    status: item.ready ? 'implemented' : 'partial',
+    evidence: item.evidence || [],
+    fix: item.gap || ''
+  }));
+  const moduleFlowMap = MODULE_FLOW_CONTRACTS.map((contract) => buildContractStatus(contract, dimensionMap));
+  const userTrialSimulation = USER_TRIAL_SCENARIOS.map((scenario) => buildUserTrialScenario(scenario, dimensionMap));
+  const pseudoFunctionScan = buildPseudoFunctionScan(functionalityChecklist, externalBlockers);
+  const competitiveMaturityDelta = MATURITY_AREAS.map((area) => buildMaturityDelta(area, dimensionMap, externalBlockers));
+  const readinessGateChecklist = buildReadinessGateChecklist(
+    localReady,
+    moduleFlowMap,
+    userTrialSimulation,
+    pseudoFunctionScan,
+    dimensions,
+    externalBlockers
+  );
+  const iterationBoundary = buildIterationBoundary(
+    readinessGateChecklist,
+    moduleFlowMap,
+    pseudoFunctionScan,
+    externalBlockers
+  );
+
+  const workflowBreakpoints = dimensions.map((item) => ({
+    id: item.id,
+    status: item.ready ? 'normal' : 'breakpoint',
+    position: item.label,
+    evidence: item.evidence || [],
+    fix: item.ready ? '' : item.gap
+  }));
+
+  const technicalBreakpoints = dimensions.map((item) => ({
+    id: item.id,
+    risk: riskLevelFromReadiness(item),
+    status: item.ready ? 'normal' : 'local_gap',
+    description: item.ready
+      ? `${item.id} has traceable local evidence`
+      : `${item.id} lacks enough traceable local evidence`,
+    fix: item.ready ? '' : item.gap
+  })).concat(externalBlockers.map((item) => ({
+    id: item.id,
+    risk: item.blockingLaunch ? 'high_external' : 'medium_external',
+    status: 'external_config_required',
+    description: item.label,
+    fix: 'configure outside this local code pass'
+  })));
+
+  const friendTrialRisk = localReady
+    ? [{
+      risk: launchBlockedByExternalConfig ? 'medium_external' : 'low',
+      scenario: 'non-technical friend completes the local learning loop',
+      description: 'local tutor, report, review, light practice, parent recap, and revisit loop have traceable evidence',
+      mitigation: launchBlockedByExternalConfig ? 'use local/dev trial until external launch config is completed' : ''
+    }]
+    : localGaps.map((gap) => ({
+      risk: gap.id === 'report_to_solution' || gap.id === 'guided_tutor' ? 'high' : 'medium',
+      scenario: gap.label,
+      description: 'friend may see a broken or shallow learning loop',
+      mitigation: gap.fix
+    }));
+
+  const fixPriorityQueue = localGaps.map((gap) => ({
+    priority: 'P0',
+    owner: 'code',
+    id: gap.id,
+    action: gap.fix
+  })).concat(externalBlockers.map((item) => ({
+    priority: item.blockingLaunch ? 'P0_EXTERNAL' : 'P1_EXTERNAL',
+    owner: item.owner || 'external_config',
+    id: item.id,
+    action: 'complete real service configuration before public launch'
+  })));
+
+  return {
+    version: 1,
+    generatedAt: new Date().toISOString(),
+    overallConclusion: verdict,
+    localReadinessScore: Number(readiness.score || 0),
+    friendTrialReady: !!readiness.friendTrialReady && localReady,
+    commercialCodeReady: !!readiness.commercialCodeReady && localReady,
+    launchBlockedByExternalConfig,
+    competitiveGapSummary: competitorBenchmark,
+    competitiveMaturityDelta,
+    functionalityChecklist,
+    storyLoop: Array.isArray(readiness.workflow) ? readiness.workflow : [],
+    moduleFlowMap,
+    userTrialSimulation,
+    pseudoFunctionScan,
+    readinessGateChecklist,
+    iterationBoundary,
+    workflowBreakpoints,
+    technicalBreakpoints,
+    friendTrialRisk,
+    fixPriorityQueue,
+    finalRecommendation: localReady
+      ? 'keep_and_trial_after_external_config_boundary_is_clear'
+      : 'fix_local_p0_before_friend_trial'
+  };
+}
+
+function buildProductReadiness(storage, options = {}) {
+  const todaySession = storage.getTodaySession ? storage.getTodaySession(options) : {};
+  const todayFocus = storage.loadTodayFocus ? storage.loadTodayFocus() : null;
+  const reportState = storage.loadLearningReportState ? storage.loadLearningReportState() : {};
+  const tonightPlan = storage.loadTonightPlan ? storage.loadTonightPlan() : null;
+  const reviewCards = storage.loadReviewCards ? storage.loadReviewCards() : [];
+  const reviewEvents = storage.loadReviewEvents ? storage.loadReviewEvents() : [];
+  const tutorEvents = storage.loadTutorEvents ? storage.loadTutorEvents() : [];
+  const receipts = storage.loadThinkingReceipts ? storage.loadThinkingReceipts() : [];
+  const gameProfile = storage.loadGameProfile ? storage.loadGameProfile() : {};
+  const shareRuns = storage.loadShareRuns ? storage.loadShareRuns() : [];
+  const incomingShare = storage.loadIncomingShare ? storage.loadIncomingShare() : null;
+  const lightEvidence = storage.buildLightFeatureEvidenceSummary ? storage.buildLightFeatureEvidenceSummary(options) : null;
+  const globalEvidence = storage.buildGlobalEvidenceBrief ? storage.buildGlobalEvidenceBrief(options) : null;
+  const reviewLoop = storage.loadReviewLoop ? storage.loadReviewLoop() : {};
+  const recent = storage.buildRecentLearningSummary ? storage.buildRecentLearningSummary(options.now || new Date()) : {};
+  const sync = storage.syncDiagnostics ? storage.syncDiagnostics() : {};
+  const analytics = storage.localAnalyticsDashboard ? storage.localAnalyticsDashboard() : {};
+  const currentSession = storage.getTodaySession ? storage.getTodaySession({ now: options.now || new Date() }) : {};
+  const depthMap = storage.buildLearningDepthMap ? storage.buildLearningDepthMap(options) : null;
+  const weeklyPattern = storage.buildWeeklyPatternSynthesis ? storage.buildWeeklyPatternSynthesis(options) : null;
+  const decisionPath = storage.buildLearningDecisionPath ? storage.buildLearningDecisionPath(options) : null;
+  const masteryRubric = storage.buildMasteryRubric ? storage.buildMasteryRubric(options) : null;
+  const interventionPlaybook = storage.buildInterventionPlaybook ? storage.buildInterventionPlaybook(options) : null;
+  const outcomeReview = storage.buildOutcomeReviewSummary ? storage.buildOutcomeReviewSummary(options) : null;
+
+  const tutorBlocked = tutorEvents.some((event) => /blocked|safety|answer/.test(`${event.type || ''}${event.name || ''}${event.mastery_status || ''}`))
+    || receipts.some((receipt) => /answer shortcut blocked|blocked/i.test(`${receipt.status || ''}${receipt.title || ''}`));
+  const diagnosticTutorEvidence = receipts.some((receipt) => receipt && (receipt.diagnostic_probe || receipt.transfer_prompt))
+    || tutorEvents.some((event) => event && event.event === 'tutor_diagnostic_probe');
+  const guidedEvidence = !!(
+    todayFocus && (todayFocus.systemSuggestedStep || todayFocus.childArticulatedStep)
+  ) || !!(
+    currentSession && (currentSession.childArticulatedStep || currentSession.tutorCompleted || currentSession.taskTypeConfirmed)
+  ) || tutorBlocked || diagnosticTutorEvidence;
+  const reportConnected = !!(reportState.localLoopConnection && reportState.localLoopConnection.reportId);
+  const cardsWithDue = reviewCards.filter((card) => card && (card.due || card.dueDate));
+  const wrongCauseCards = reviewCards.filter((card) => card && (card.wrongCauseBucket || card.nextPracticePlan || card.repairPlan));
+  const quizEvents = reviewEvents.filter((event) => /quiz|grade|revisit|review/.test(`${event.type || ''}`));
+  const hasSevenDayPlan = !!(
+    (tonightPlan && tonightPlan.reportSolution && count(tonightPlan.reportSolution.sevenDayPlan) >= 7)
+    || (reportState.recommendationPlan && count(reportState.recommendationPlan.sevenDayPlan) >= 7)
+  );
+  const hasSyncDiagnostics = !!(
+    sync
+    && (
+      Object.prototype.hasOwnProperty.call(sync, 'queueLength')
+      || Object.prototype.hasOwnProperty.call(sync, 'pending')
+      || Object.prototype.hasOwnProperty.call(sync, 'localSeq')
+      || hasText(sync.label)
+    )
+  );
+
+  const dimensions = [
+    evidenceItem(
+      'guided_tutor',
+      '引导式作业点拨',
+      guidedEvidence && (tutorBlocked || hasText(currentSession.childArticulatedStep) || hasText(todayFocus && todayFocus.systemSuggestedStep)),
+      [
+        todayFocus && todayFocus.systemSuggestedStep ? 'todayFocus.systemSuggestedStep' : '',
+        currentSession.childArticulatedStep ? 'todaySession.childArticulatedStep' : '',
+        diagnosticTutorEvidence ? 'tutor diagnostic probe or transfer prompt' : '',
+        tutorBlocked ? 'tutor blocked direct-answer or safety shortcut' : ''
+      ],
+      '需要至少一次可追踪的第一步记录，并保留拒绝直接答案或安全转向证据。'
+    ),
+    evidenceItem(
+      'report_to_solution',
+      '测评/成绩单到方案承接',
+      reportConnected && hasSevenDayPlan && !!(tonightPlan && tonightPlan.reportSolution),
+      [
+        reportConnected ? 'learningReport.localLoopConnection' : '',
+        hasSevenDayPlan ? 'sevenDayPlan >= 7' : '',
+        tonightPlan && tonightPlan.reportSolution ? 'tonightPlan.reportSolution' : ''
+      ],
+      '学习画像必须写入今晚路线、今日卡点、复习卡和 7 天游走方案。'
+    ),
+    evidenceItem(
+      'material_to_review',
+      '资料/错题变成复习资产',
+      reviewCards.length > 0 && wrongCauseCards.length > 0,
+      [
+        `${reviewCards.length} reviewCards`,
+        `${wrongCauseCards.length} wrong-cause cards`
+      ],
+      '需要真实生成可回访卡片，并保留错因/下一次检查点。'
+    ),
+    evidenceItem(
+      'light_entry_evidence',
+      '轻入口第一步证据',
+      !!(lightEvidence && lightEvidence.ready && Number(lightEvidence.total || 0) > 0),
+      [
+        lightEvidence ? `light entries ${lightEvidence.total}` : '',
+        lightEvidence ? `actionable ${lightEvidence.actionable}` : '',
+        lightEvidence && lightEvidence.parentLine ? lightEvidence.parentLine : ''
+      ],
+      '口算、听写或手动选题必须留下可回到核心学习链路的第一步记录，并能在家长页汇总。'
+    ),
+    evidenceItem(
+      'spaced_recall',
+      '间隔复习和测验回流',
+      cardsWithDue.length > 0 && (quizEvents.length > 0 || Number(reviewLoop.current_streak || 0) >= 0),
+      [
+        `${cardsWithDue.length} due cards`,
+        quizEvents.length ? `${quizEvents.length} review events` : 'reviewLoop available'
+      ],
+      '复习卡必须有 due/dueDate，并能通过测验或评分事件回写。'
+    ),
+    evidenceItem(
+      'game_retention',
+      '轻练习留存证据',
+      !!(todaySession.gamePlayed || Number(gameProfile.review_count || gameProfile.xp || 0) > 0),
+      [
+        todaySession.gamePlayed ? 'todaySession.gamePlayed' : '',
+        Number(gameProfile.review_count || 0) ? `review_count ${gameProfile.review_count}` : '',
+        Number(gameProfile.xp || 0) ? `xp ${gameProfile.xp}` : ''
+      ],
+      '小游戏必须写回学习记录，而不是只做装饰入口。'
+    ),
+    evidenceItem(
+      'parent_evidence',
+      '家长证据与 3/7 晚复盘',
+      !!(todaySession.parentRecapViewed || count(recent.latest3) >= 1 || count(recent.latest7) >= 1),
+      [
+        todaySession.parentRecapViewed ? 'parentRecapViewed' : '',
+        count(recent.latest3) ? `latest3 ${count(recent.latest3)}` : '',
+        count(recent.latest7) ? `latest7 ${count(recent.latest7)}` : ''
+      ],
+      '家长侧必须能看到孩子第一步、专注、回访或轻练习的证据。'
+    ),
+    evidenceItem(
+      'share_return',
+      '家庭行动卡分享回流',
+      !!(
+        (shareRuns.length > 0 || incomingShare)
+        && globalEvidence
+        && (globalEvidence.latestRoute || globalEvidence.shareLine)
+      ),
+      [
+        shareRuns.length ? `${shareRuns.length} share runs` : '',
+        incomingShare ? 'incoming share stored' : '',
+        globalEvidence && globalEvidence.shareLine ? globalEvidence.shareLine : '',
+        globalEvidence && globalEvidence.latestRoute ? `route ${globalEvidence.latestRoute}` : ''
+      ],
+      '分享卡必须携带家长下一步、行动说明和回流入口，不能只是静态海报。'
+    ),
+    evidenceItem(
+      'local_resilience',
+      '本地恢复与服务边界',
+      hasSyncDiagnostics && !!(analytics && Array.isArray(analytics.nodes)),
+      [
+        hasSyncDiagnostics ? 'syncDiagnostics.localQueue' : '',
+        analytics && Array.isArray(analytics.nodes) ? 'localAnalyticsDashboard.nodes' : ''
+      ],
+      '弱网/未登录下必须有本地队列、备份或可诊断状态。'
+    ),
+    evidenceItem(
+      'depth_compounding',
+      '多层学习证据复利',
+      !!(depthMap && Number(depthMap.depthScore || 0) >= 80 && Number(depthMap.readyCount || 0) >= 5),
+      [
+        depthMap ? `depthScore ${depthMap.depthScore}` : '',
+        depthMap ? `readyDimensions ${depthMap.readyCount}/${depthMap.totalCount}` : '',
+        depthMap && depthMap.nextBestAction ? `next: ${depthMap.nextBestAction}` : ''
+      ],
+      '需要追问、方案、回访、轻练、家长陪伴和回流至少 5 个维度有本地证据。'
+    ),
+    evidenceItem(
+      'weekly_pattern',
+      '一周模式归因',
+      !!(weeklyPattern && weeklyPattern.ready),
+      [
+        weeklyPattern && weeklyPattern.summary ? weeklyPattern.summary : '',
+        weeklyPattern && weeklyPattern.intervention ? weeklyPattern.intervention : ''
+      ],
+      '需要至少 3 晚或 3 张卡的真实记录，才能给出周模式判断。'
+    ),
+    evidenceItem(
+      'decision_path',
+      '下一步决策路径',
+      !!(decisionPath && decisionPath.action && decisionPath.route),
+      [
+        decisionPath && decisionPath.action ? decisionPath.action : '',
+        decisionPath && decisionPath.reason ? decisionPath.reason : ''
+      ],
+      '需要把当前证据转成一个明确的下一步入口和理由。'
+    ),
+    evidenceItem(
+      'mastery_rubric',
+      '掌握度分层',
+      !!(masteryRubric && Number(masteryRubric.readyCount || 0) >= 3),
+      [
+        masteryRubric ? `stage ${masteryRubric.stage}` : '',
+        masteryRubric ? `score ${masteryRubric.score}` : '',
+        masteryRubric && masteryRubric.line ? masteryRubric.line : ''
+      ],
+      '需要第一步、错因、迁移、教家长或次日回访中至少 3 层证据。'
+    ),
+    evidenceItem(
+      'intervention_playbook',
+      '干预作战单',
+      !!(interventionPlaybook && interventionPlaybook.ready && Array.isArray(interventionPlaybook.actions)),
+      [
+        interventionPlaybook && interventionPlaybook.summary ? interventionPlaybook.summary : '',
+        interventionPlaybook && interventionPlaybook.masteryStage ? `mastery ${interventionPlaybook.masteryStage}` : ''
+      ],
+      '需要把周模式和掌握度转成今晚、回访、迁移、家长复述的动作单。'
+    ),
+    evidenceItem(
+      'outcome_review',
+      '结果复核',
+      !!(outcomeReview && outcomeReview.ready),
+      [
+        outcomeReview && outcomeReview.line ? outcomeReview.line : ''
+      ],
+      '需要至少一次会解释、能迁移、隔天记得的结果复核记录。'
+    )
+  ];
+
+  const externalBlockers = [
+    {
+      id: 'real_appid',
+      label: '真实 AppID / 微信登录 / 合法域名',
+      owner: 'external_config',
+      blockingLaunch: true
+    },
+    {
+      id: 'cloud_persistence',
+      label: '跨设备云端持久化',
+      owner: 'external_config',
+      blockingLaunch: true
+    },
+    {
+      id: 'production_ai_provider',
+      label: '生产模型、API Key 与内容安全服务',
+      owner: 'external_config',
+      blockingLaunch: true
+    },
+    {
+      id: 'payment',
+      label: '支付与订阅',
+      owner: 'external_config',
+      blockingLaunch: false
+    }
+  ];
+
+  const score = scoreFromItems(dimensions);
+  const failed = dimensions.filter((item) => !item.ready);
+  return {
+    version: 1,
+    generatedAt: new Date().toISOString(),
+    score,
+    verdict: failed.length ? 'conditional' : 'local_ready',
+    friendTrialReady: failed.length === 0,
+    commercialCodeReady: failed.length === 0,
+    launchBlockedByExternalConfig: externalBlockers.some((item) => item.blockingLaunch),
+    dimensions,
+    workflow: [
+      'home_or_upload',
+      'guided_tutor_first_step',
+      'focus_cabin',
+      'light_entry_evidence',
+      'review_card',
+      'light_practice_game',
+      'parent_recap',
+      'share_return',
+      'next_day_revisit',
+      'learning_report_solution',
+      'learning_depth_map',
+      'weekly_pattern',
+      'next_best_action',
+      'mastery_rubric',
+      'intervention_playbook',
+      'outcome_review'
+    ],
+    gaps: failed.map((item) => ({ id: item.id, label: item.label, fix: item.gap })),
+    externalBlockers
+  };
+}
+
+module.exports = {
+  buildProductReadiness,
+  buildAcceptanceReport
+};
