@@ -357,7 +357,7 @@ function buildShareCode(profile, reviewSummary, gameProfileCard) {
   return hash.toString(36).slice(0, 6).toUpperCase();
 }
 
-function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCauseSummary, todayFocus, globalEvidenceBrief, reportDailyActionQueue, unifiedNextAction) {
+function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCauseSummary, todayFocus, globalEvidenceBrief, reportDailyActionQueue, unifiedNextAction, capabilityEvidenceLedger) {
   const review = reviewSummary || {};
   const game = gameProfileCard || {};
   const progress = review.progress || {};
@@ -391,15 +391,20 @@ function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCause
   const unifiedActionLabel = unifiedAction && unifiedAction.actionLabel ? unifiedAction.actionLabel : '';
   const unifiedActionDetail = unifiedAction && unifiedAction.reasonLine ? unifiedAction.reasonLine : '';
   const unifiedQuery = `&action_label=${encodeURIComponent(unifiedActionLabel)}&action_detail=${encodeURIComponent(unifiedActionDetail)}`;
-  const path = `/pages/home/home?share=${code}&from=daily_card&challenge=arcade&mode=same_identity&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}`;
-  const parentPath = `/pages/home/home?share=${code}&from=parent_card&mode=parent_recap&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}`;
-  const peerPath = `/pages/home/home?share=${code}&from=peer_challenge&challenge=arcade&mode=same_identity&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}`;
+  const evidenceBrief = globalEvidenceBrief || (storage.buildGlobalEvidenceBrief ? storage.buildGlobalEvidenceBrief() : null);
+  const capabilityLedger = capabilityEvidenceLedger || (storage.buildCapabilityEvidenceLedger ? storage.buildCapabilityEvidenceLedger({ globalEvidenceBrief: evidenceBrief }) : null);
+  const nextCapability = capabilityLedger && capabilityLedger.nextCapability ? capabilityLedger.nextCapability : null;
+  const capabilityQuery = nextCapability
+    ? `&capability_gap=${encodeURIComponent(nextCapability.id || '')}&capability_label=${encodeURIComponent(nextCapability.label || '')}&capability_next_action=${encodeURIComponent(nextCapability.nextAction || '')}&capability_route=${encodeURIComponent(nextCapability.route || '')}`
+    : '';
+  const path = `/pages/home/home?share=${code}&from=daily_card&challenge=arcade&mode=same_identity&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}`;
+  const parentPath = `/pages/home/home?share=${code}&from=parent_card&mode=parent_recap&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}`;
+  const peerPath = `/pages/home/home?share=${code}&from=peer_challenge&challenge=arcade&mode=same_identity&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}`;
   const parentShareTitle = todayFocus && todayFocus.title
     ? `今晚先看这一处：${storage.formatIssueType(todayFocus.issueType || '卡点')} · ${todayFocus.title}`
     : '给家里看的今日学习复盘';
   const peerShareTitle = `今天轻回访 5 分钟：${identityTag}`;
   const shareCount = storage.loadShareRuns ? storage.loadShareRuns().length : 0;
-  const evidenceBrief = globalEvidenceBrief || (storage.buildGlobalEvidenceBrief ? storage.buildGlobalEvidenceBrief() : null);
   const reportAction = reportDailyActionQueue && reportDailyActionQueue.ready
     ? reportDailyActionQueue
     : (storage.buildReportDailyActionQueue ? storage.buildReportDailyActionQueue() : null);
@@ -427,6 +432,7 @@ function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCause
     reportAction && reportAction.ready ? reportAction.actionLine : '',
     evidenceBrief && evidenceBrief.reportLine ? evidenceBrief.reportLine : ''
   ].filter(Boolean).join(' · ') || '先从今晚第一步开始沉淀记录';
+  const capabilityLine = nextCapability ? `能力账本下一条：${nextCapability.label} · ${nextCapability.nextAction}` : '';
   return {
     code,
     title,
@@ -469,10 +475,20 @@ function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCause
       parentQuestion: oneQuestion,
       tomorrowCheck,
       evidenceLine,
+      capabilityLine,
       boundary: '家长只追问，不接管答案；孩子说不出第一步，就回到提示卡。'
     },
+    capabilityGap: nextCapability ? {
+      id: nextCapability.id,
+      label: nextCapability.label,
+      route: nextCapability.route,
+      evidenceLine: nextCapability.evidenceLine,
+      nextAction: nextCapability.nextAction,
+      ledgerLine: capabilityLedger.parentLine || capabilityLedger.summary || ''
+    } : null,
     reportDailyAction: reportAction,
     globalEvidenceBrief: evidenceBrief,
+    capabilityEvidenceLedger: capabilityLedger,
     unifiedNextAction: unifiedAction,
     path,
     parentPath,
@@ -513,6 +529,10 @@ function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCause
       parent_card: true,
       peer_challenge: true,
       evidence_brief: evidenceBrief && evidenceBrief.reportLine,
+      capability_gap_id: nextCapability && nextCapability.id,
+      capability_gap_label: nextCapability && nextCapability.label,
+      capability_gap_route: nextCapability && nextCapability.route,
+      capability_gap_next_action: nextCapability && nextCapability.nextAction,
       mode: 'same_identity',
       challenge: 'arcade'
     }
@@ -584,8 +604,10 @@ function buildProfileSafeSummary(todayFocus, focusHistory = [], profileEmptyGuid
   };
 }
 
-function buildLearningReportSummary(reportState = {}) {
+function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger) {
   const globalEvidenceBrief = storage.buildGlobalEvidenceBrief ? storage.buildGlobalEvidenceBrief() : null;
+  const capabilityLedger = capabilityEvidenceLedger || (storage.buildCapabilityEvidenceLedger ? storage.buildCapabilityEvidenceLedger({ globalEvidenceBrief }) : null);
+  const nextCapability = capabilityLedger && capabilityLedger.nextCapability ? capabilityLedger.nextCapability : null;
   const reportDailyActionQueue = storage.buildReportDailyActionQueue ? storage.buildReportDailyActionQueue({ reportState }) : null;
   const draft = reportState.reportDraft || {};
   const overview = draft.overview || {};
@@ -609,7 +631,7 @@ function buildLearningReportSummary(reportState = {}) {
     review: daySeven.task || solutionMap.reviewTrigger || '第 7 天用新错题或小测更新一次画像。',
     parentScript: solutionMap.parentScript || plan.parentLine || '家长先问一句：这一步你准备先看哪里？',
     childScript: solutionMap.childScript || plan.childLine || '我先说出第一步。',
-    evidenceLine: [nextEvidence.join(' / '), globalEvidenceBrief && globalEvidenceBrief.reportLine].filter(Boolean).join(' / '),
+    evidenceLine: [nextEvidence.join(' / '), globalEvidenceBrief && globalEvidenceBrief.reportLine, nextCapability && nextCapability.evidenceLine].filter(Boolean).join(' / '),
     routeLabel: plan.cta && plan.cta.label ? plan.cta.label : '进入第一步练习',
     routePath: plan.cta && plan.cta.path ? plan.cta.path : '/pages/tutor/tutor?from=learning_report',
     days: sevenDayPlan.map((item) => ({
@@ -643,6 +665,13 @@ function buildLearningReportSummary(reportState = {}) {
     liveEvidenceLine: globalEvidenceBrief ? globalEvidenceBrief.reportLine : '',
     liveEvidenceSummary: globalEvidenceBrief ? globalEvidenceBrief.summary : '',
     liveEvidenceCards: globalEvidenceBrief ? globalEvidenceBrief.cards : [],
+    capabilityLedger,
+    capabilityNextLine: nextCapability ? `${nextCapability.label} · ${nextCapability.nextAction}` : '',
+    capabilityEvidenceLine: nextCapability && nextCapability.evidenceLine
+      ? nextCapability.evidenceLine
+      : (capabilityLedger && (capabilityLedger.parentLine || capabilityLedger.summary)) || '',
+    capabilityRoute: nextCapability && nextCapability.route ? nextCapability.route : '',
+    capabilityProgressLine: capabilityLedger ? `${capabilityLedger.readyCount} / ${capabilityLedger.totalCount} · ${capabilityLedger.summary}` : '',
     parentScript: solutionMap.parentScript || plan.parentLine || '家长先问一句：这一步你准备先看哪里？',
     childScript: solutionMap.childScript || plan.childLine || '我先说出第一步。',
     nextEvidenceLine: Array.isArray(solutionMap.nextEvidenceRequired) && solutionMap.nextEvidenceRequired.length
@@ -896,7 +925,7 @@ Page({
     const reviewSummary = reviewCards.reviewSummary();
     const profile = storage.loadProfile();
     const learningReportState = storage.loadLearningReportState ? storage.loadLearningReportState() : null;
-    const learningReportSummary = buildLearningReportSummary(learningReportState || {});
+    let learningReportSummary = null;
     const moduleSummary = storage.moduleEventSummary();
     const tutorSummary = storage.tutorEventSummary();
     const thinkingSummary = storage.thinkingReceiptSummary ? storage.thinkingReceiptSummary() : null;
@@ -926,7 +955,23 @@ Page({
     const globalEvidenceBrief = storage.buildGlobalEvidenceBrief ? storage.buildGlobalEvidenceBrief() : null;
     const reportDailyActionQueue = storage.buildReportDailyActionQueue ? storage.buildReportDailyActionQueue({ reportState: learningReportState || {} }) : null;
     const unifiedNextAction = storage.buildUnifiedNextActionController ? storage.buildUnifiedNextActionController({ surface: 'profile' }) : null;
-    const dailyShareCard = buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCauseSummary, todayFocus, globalEvidenceBrief, reportDailyActionQueue, unifiedNextAction);
+    const learningDepthMap = storage.buildLearningDepthMap ? storage.buildLearningDepthMap() : null;
+    const learningQuestArc = storage.buildLearningQuestArc ? storage.buildLearningQuestArc() : null;
+    const moduleFlowCompass = storage.buildModuleFlowCompass ? storage.buildModuleFlowCompass() : null;
+    const surfaceDepthPack = storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('profile') : null;
+    const surfaceDepthActionSummary = storage.buildSurfaceDepthActionSummary ? storage.buildSurfaceDepthActionSummary() : null;
+    const lightFeatureEvidence = storage.buildLightFeatureEvidenceSummary ? storage.buildLightFeatureEvidenceSummary() : null;
+    const capabilityEvidenceLedger = storage.buildCapabilityEvidenceLedger ? storage.buildCapabilityEvidenceLedger({
+      globalEvidenceBrief,
+      learningDepthMap,
+      learningQuestArc,
+      moduleFlowCompass,
+      surfaceDepthActionSummary,
+      lightFeatureEvidence,
+      thinkingSummary
+    }) : null;
+    learningReportSummary = buildLearningReportSummary(learningReportState || {}, capabilityEvidenceLedger);
+    const dailyShareCard = buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCauseSummary, todayFocus, globalEvidenceBrief, reportDailyActionQueue, unifiedNextAction, capabilityEvidenceLedger);
     if (dailyShareCard && dailyShareCard.code && dailyShareCard.code !== lastGeneratedShareCode) {
       lastGeneratedShareCode = dailyShareCard.code;
       sendMiniEvent({
@@ -962,21 +1007,6 @@ Page({
     });
     const parentActionGuide = storage.buildParentActionGuide ? storage.buildParentActionGuide({
       tonightRecap: profileViewModel.parentRecap && profileViewModel.parentRecap.tonightRecap
-    }) : null;
-    const learningDepthMap = storage.buildLearningDepthMap ? storage.buildLearningDepthMap() : null;
-    const learningQuestArc = storage.buildLearningQuestArc ? storage.buildLearningQuestArc() : null;
-    const moduleFlowCompass = storage.buildModuleFlowCompass ? storage.buildModuleFlowCompass() : null;
-    const surfaceDepthPack = storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('profile') : null;
-    const surfaceDepthActionSummary = storage.buildSurfaceDepthActionSummary ? storage.buildSurfaceDepthActionSummary() : null;
-    const lightFeatureEvidence = storage.buildLightFeatureEvidenceSummary ? storage.buildLightFeatureEvidenceSummary() : null;
-    const capabilityEvidenceLedger = storage.buildCapabilityEvidenceLedger ? storage.buildCapabilityEvidenceLedger({
-      globalEvidenceBrief,
-      learningDepthMap,
-      learningQuestArc,
-      moduleFlowCompass,
-      surfaceDepthActionSummary,
-      lightFeatureEvidence,
-      thinkingSummary
     }) : null;
     const acceptanceReport = storage.buildAcceptanceReport ? storage.buildAcceptanceReport({ surface: 'profile' }) : null;
     const profileReadinessSnapshot = buildProfileReadinessSnapshot({
@@ -1493,9 +1523,21 @@ Page({
   },
 
   goLearningReportCta() {
-    const path = this.data.learningReportSummary && this.data.learningReportSummary.ctaPath
-      ? this.data.learningReportSummary.ctaPath
+    const summary = this.data.learningReportSummary || {};
+    const path = summary.ctaPath
+      ? summary.ctaPath
       : '/pages/tutor/tutor?from=learning_report';
+    if (storage.recordSurfaceDepthAction) {
+      storage.recordSurfaceDepthAction({
+        surface: 'profile',
+        dimensionId: summary.capabilityLedger && summary.capabilityLedger.nextCapability
+          ? summary.capabilityLedger.nextCapability.id
+          : 'report_to_solution',
+        label: summary.capabilityNextLine || summary.ctaLabel || '',
+        route: summary.capabilityRoute || path,
+        readiness: 'learning_report_cta'
+      });
+    }
     const cleanPath = path.split('?')[0];
     if (['/pages/home/home', '/pages/review/review', '/pages/focus/focus', '/pages/tools/tools', '/pages/profile/profile'].indexOf(cleanPath) >= 0) {
       wx.switchTab({ url: cleanPath });

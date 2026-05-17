@@ -156,7 +156,11 @@ Page({
         identity_tag: query.identity || '',
         parent_next_action: query.action || '',
         action_label: safeDecodeShareParam(query.action_label),
-        action_detail: safeDecodeShareParam(query.action_detail)
+        action_detail: safeDecodeShareParam(query.action_detail),
+        capability_gap: safeDecodeShareParam(query.capability_gap),
+        capability_label: safeDecodeShareParam(query.capability_label),
+        capability_next_action: safeDecodeShareParam(query.capability_next_action),
+        capability_route: safeDecodeShareParam(query.capability_route)
       }) : {
         code: query.share,
         share_code: query.share,
@@ -165,6 +169,10 @@ Page({
         mode: query.mode || '',
         identity_tag: query.identity || '',
         parent_next_action: query.action || '',
+        capability_gap: safeDecodeShareParam(query.capability_gap),
+        capability_label: safeDecodeShareParam(query.capability_label),
+        capability_next_action: safeDecodeShareParam(query.capability_next_action),
+        capability_route: safeDecodeShareParam(query.capability_route),
         action_label: query.action === 'wrong_cause_revisit'
           ? '明天先回看这张错因卡'
           : query.action === 'due_card_revisit'
@@ -192,7 +200,9 @@ Page({
             challenge: query.challenge || '',
             mode: query.mode || '',
             identity_tag: query.identity || '',
-            parent_next_action: query.action || ''
+            parent_next_action: query.action || '',
+            capability_gap: safeDecodeShareParam(query.capability_gap),
+            capability_label: safeDecodeShareParam(query.capability_label)
           }
         });
       }
@@ -207,7 +217,9 @@ Page({
           challenge: query.challenge || '',
           mode: query.mode || '',
           identity_tag: query.identity || '',
-          parent_next_action: query.action || ''
+          parent_next_action: query.action || '',
+          capability_gap: safeDecodeShareParam(query.capability_gap),
+          capability_label: safeDecodeShareParam(query.capability_label)
         }
       }).catch(() => {});
       this.setData({
@@ -1382,7 +1394,7 @@ Page({
     });
     const incoming = this.data.incomingShare || (storage.loadIncomingShare && storage.loadIncomingShare()) || {};
     const query = incoming.share_code
-      ? `?from=share&share=${incoming.share_code}&mode=${incoming.mode || ''}&identity=${encodeURIComponent(incoming.identity_tag || '')}&action=${incoming.parent_next_action || ''}`
+      ? `?from=share&share=${incoming.share_code}&mode=${incoming.mode || ''}&identity=${encodeURIComponent(incoming.identity_tag || '')}&action=${incoming.parent_next_action || ''}&capability_gap=${encodeURIComponent(incoming.capability_gap || '')}&capability_label=${encodeURIComponent(incoming.capability_label || '')}`
       : '';
     wx.navigateTo({ url: `/pages/arcade/arcade${query}` });
   },
@@ -1416,7 +1428,11 @@ Page({
         challenge: incoming.challenge || '',
         mode: incoming.mode || '',
         identity_tag: incoming.identity_tag || '',
-        parent_next_action: incoming.parent_next_action || ''
+        parent_next_action: incoming.parent_next_action || '',
+        capability_gap: incoming.capability_gap || '',
+        capability_label: incoming.capability_label || '',
+        capability_next_action: incoming.capability_next_action || '',
+        capability_route: incoming.capability_route || ''
       }, payload || {})
     }).catch(() => {});
   },

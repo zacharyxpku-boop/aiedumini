@@ -337,6 +337,8 @@
         <view class="share-body">邀请码 #{{incomingShare.code}}。用自己的材料生成一组轻练习，再完成今天 5 分钟回访。</view>
         <view class="share-body" wx:if="{{incomingShare.action_label}}">下一步：{{incomingShare.action_label}}</view>
         <view class="share-body" wx:if="{{incomingShare.action_detail}}">怎么做：{{incomingShare.action_detail}}</view>
+        <view class="share-body" wx:if="{{incomingShare.capability_label}}">{{incomingShare.capability_label}}</view>
+        <view class="share-body" wx:if="{{incomingShare.capability_next_action}}">{{incomingShare.capability_next_action}}</view>
       </view>
       <button class="share-button" bindtap="goTools">去轻回访</button>
     </view>

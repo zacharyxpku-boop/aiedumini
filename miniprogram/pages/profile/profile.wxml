@@ -591,6 +591,7 @@
           <text wx:if="{{learningReportSummary.evidenceLine}}">依据：{{learningReportSummary.evidenceLine}}</text>
           <text wx:if="{{learningReportSummary.liveEvidenceLine}}">{{learningReportSummary.liveEvidenceLine}}</text>
           <text wx:if="{{learningReportSummary.liveEvidenceSummary}}">{{learningReportSummary.liveEvidenceSummary}}</text>
+          <text wx:if="{{learningReportSummary.capabilityProgressLine}}">{{learningReportSummary.capabilityProgressLine}}</text>
         </view>
         <view class="parent-brief-block">
           <text class="parent-brief-label">学业矩阵</text>
@@ -616,6 +617,8 @@
           <text>家长：{{learningReportSummary.parentScript}}</text>
           <text>孩子：{{learningReportSummary.childScript}}</text>
           <text>下次看：{{learningReportSummary.nextEvidenceLine}}</text>
+          <text wx:if="{{learningReportSummary.capabilityNextLine}}">{{learningReportSummary.capabilityNextLine}}</text>
+          <text wx:if="{{learningReportSummary.capabilityEvidenceLine}}">{{learningReportSummary.capabilityEvidenceLine}}</text>
           <text>{{learningReportSummary.reviewTrigger}}</text>
         </view>
         <view class="report-action-board" wx:if="{{learningReportSummary.sevenDayActionBoard}}">
@@ -801,7 +804,14 @@
           <view class="share-family-action-line">家长只问：{{dailyShareCard.familyActionCard.parentQuestion}}</view>
           <view class="share-family-action-line">明天复核：{{dailyShareCard.familyActionCard.tomorrowCheck}}</view>
           <view class="share-family-action-evidence">{{dailyShareCard.familyActionCard.evidenceLine}}</view>
+          <view class="share-family-action-evidence" wx:if="{{dailyShareCard.familyActionCard.capabilityLine}}">{{dailyShareCard.familyActionCard.capabilityLine}}</view>
           <view class="share-family-action-boundary">{{dailyShareCard.familyActionCard.boundary}}</view>
+        </view>
+        <view class="share-conversation-card" wx:if="{{dailyShareCard.capabilityGap}}">
+          <view class="share-conversation-title">{{dailyShareCard.capabilityGap.label}}</view>
+          <view>{{dailyShareCard.capabilityGap.nextAction}}</view>
+          <view wx:if="{{dailyShareCard.capabilityGap.evidenceLine}}">{{dailyShareCard.capabilityGap.evidenceLine}}</view>
+          <view wx:if="{{dailyShareCard.capabilityGap.ledgerLine}}">{{dailyShareCard.capabilityGap.ledgerLine}}</view>
         </view>
         <view class="share-stat-grid">
           <view class="share-stat" wx:for="{{dailyShareCard.stats}}" wx:key="id">

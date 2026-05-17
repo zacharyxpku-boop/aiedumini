@@ -1686,6 +1686,13 @@ function buildEvidenceRouteBias(options = {}) {
     nextRoute = incomingShare.parent_next_action.indexOf('revisit') >= 0 ? knownRoutes.review : knownRoutes.tutor;
     reasonLine = incomingShare.action_detail || incomingShare.action_label || reasonLine;
     evidenceLine = incomingShare.action_label || evidenceLine;
+    if (incomingShare.capability_gap) {
+      weakKey = incomingShare.capability_gap;
+      questBias = incomingShare.capability_gap;
+      nextRoute = incomingShare.capability_route || nextRoute;
+      reasonLine = incomingShare.capability_next_action || reasonLine;
+      evidenceLine = incomingShare.capability_label || evidenceLine;
+    }
   } else if (dueCount > 0) {
     source = 'due_review';
     nextRoute = knownRoutes.review;
@@ -3772,6 +3779,10 @@ function saveIncomingShare(share = {}) {
     parent_next_action: parentNextAction,
     action_label: share.action_label || parentNextActionLabel(parentNextAction),
     action_detail: share.action_detail || parentNextActionDetail(parentNextAction),
+    capability_gap: share.capability_gap || '',
+    capability_label: share.capability_label || '',
+    capability_next_action: share.capability_next_action || '',
+    capability_route: share.capability_route || '',
     created_at: share.created_at || new Date().toISOString()
   };
   set(KEYS.incomingShare, record);
