@@ -181,6 +181,8 @@
           <view class="surface-depth-chip {{item.ready ? 'ready' : ''}}" wx:for="{{capabilityMaturityQueue.items}}" wx:key="id" data-id="{{item.id}}" data-route="{{item.route}}" bindtap="runCapabilityMaturityAction">
             <text class="surface-depth-chip-title">{{item.displayLabel}} · {{item.score}}%</text>
             <text class="surface-depth-chip-line">{{item.nextAction}}</text>
+            <text class="surface-depth-chip-line">{{item.evidenceContractLine}}</text>
+            <text class="surface-depth-chip-line">{{item.fallbackLine}}</text>
           </view>
         </view>
         <view class="surface-depth-note">{{capabilityMaturityQueue.positioningLine}}</view>

@@ -1734,6 +1734,48 @@ function buildCapabilityMaturityQueue(options = {}) {
       nextAction: '确认边界后回到家长复盘或补一条真实材料。'
     }
   ];
+  const maturityContracts = {
+    socratic_depth: {
+      acceptanceCriteria: ['孩子先说出自己的第一步', '系统只追问误区和证据', '点拨回执能转成修卡点或轻练'],
+      fallbackPlan: ['沉默时给 A/B 微选择', '直接要答案时退回第一步小黑板', '连续卡住时交给家长只问一句'],
+      evidenceRequired: ['child_first_step', 'diagnostic_probe', 'handoff_to_review']
+    },
+    game_retention: {
+      acceptanceCriteria: ['每局先主动回忆再核对', '错误回到错因修复', 'XP 只奖励可复述的第一步'],
+      fallbackPlan: ['连续错两次降级到小黑板', '疲劳时减少题量不清空成就', '隔天从同一错因再回访'],
+      evidenceRequired: ['active_recall_cards', 'wrong_cause_return', 'memory_feedback_controller']
+    },
+    report_decision: {
+      acceptanceCriteria: ['报告给出长期画像', '报告给出课堂级观察', '报告落到今晚动作和 7 天复核'],
+      fallbackPlan: ['证据不足时只给观察假设', '不输出学习结果承诺', '先补一条真实材料再更新判断'],
+      evidenceRequired: ['long_term_portrait', 'classroom_observation', 'seven_day_action']
+    },
+    repair_to_recall: {
+      acceptanceCriteria: ['卡点有明确错因', '修复后生成同类变式', '结果进入轻练或家长复盘'],
+      fallbackPlan: ['错因不清先回点拨', '同类题失败时降级到第一步', '次日未记住则重新排入回忆'],
+      evidenceRequired: ['wrong_cause_label', 'near_transfer_attempt', 'next_day_recall']
+    },
+    light_entry_scale: {
+      acceptanceCriteria: ['每个轻入口至少 5 个可复用种子', '种子有第一步和错因', '轻入口能回到核心链路'],
+      fallbackPlan: ['无法识别时手动选择科目和卡点', '不生成完整答案', '只保存第一步证据'],
+      evidenceRequired: ['light_seed_model', 'first_step_blackboard', 'light_to_core_transition']
+    },
+    share_return_loop: {
+      acceptanceCriteria: ['分享卡带能力缺口', '回流页保留下一步', '分享不做排行和虚假社交'],
+      fallbackPlan: ['缺证据时只分享家庭行动', '回流失败时落到首页下一步', '不展示同学比较'],
+      evidenceRequired: ['capability_gap_share', 'share_landing_next_action', 'no_ranking_boundary']
+    },
+    material_factory: {
+      acceptanceCriteria: ['材料变成复习卡', '卡片能进入轻练', '材料来源可追溯'],
+      fallbackPlan: ['材料太薄时要求补一句卡点', '外部识别不可用时本地手动录入', '不把输入框伪装成自动导入'],
+      evidenceRequired: ['material_to_card', 'source_trace', 'practice_asset']
+    },
+    trust_boundary: {
+      acceptanceCriteria: ['未成年人和隐私边界清楚', 'AI 只做学习建议', '家长能看到可控范围'],
+      fallbackPlan: ['涉及隐私时提示边界', '配置缺失时保留本地可用链路', '无法确认时回到人工/家长判断'],
+      evidenceRequired: ['privacy_boundary', 'ai_suggestion_boundary', 'parent_control']
+    }
+  };
   const items = surfaceSpecs.map((spec) => {
     const pack = buildSurfaceDepthPack(spec.surface, Object.assign({}, options, {
       globalEvidenceBrief,
@@ -1747,6 +1789,11 @@ function buildCapabilityMaturityQueue(options = {}) {
     const readyRows = rows.filter((row) => row.ready);
     const score = rows.length ? Math.round((readyRows.length / rows.length) * 100) : 0;
     const missing = rows.find((row) => !row.ready) || rows[0] || {};
+    const contract = maturityContracts[spec.id] || {
+      acceptanceCriteria: ['完成真实学习动作', '留下证据', '能进入下一步'],
+      fallbackPlan: ['证据不足时先收窄动作', '无法自动判断时给家长可执行问题'],
+      evidenceRequired: ['real_action', 'evidence_saved', 'next_action']
+    };
     return {
       id: spec.id,
       label: spec.label,
@@ -1760,6 +1807,13 @@ function buildCapabilityMaturityQueue(options = {}) {
       nextAction: missing.ready ? spec.nextAction : (missing.nextAction || spec.nextAction),
       nextCapability: missing.label || spec.label,
       competitorLine: spec.competitorLine,
+      acceptanceCriteria: contract.acceptanceCriteria,
+      fallbackPlan: contract.fallbackPlan,
+      evidenceRequired: contract.evidenceRequired,
+      acceptanceLine: `验收：${contract.acceptanceCriteria[0]}；${contract.acceptanceCriteria[1]}；${contract.acceptanceCriteria[2]}。`,
+      fallbackLine: `兜底：${contract.fallbackPlan[0]}；${contract.fallbackPlan[1]}。`,
+      evidenceContractLine: `证据：${contract.evidenceRequired.join(' / ')}`,
+      parentCheckLine: `家长只看：${contract.acceptanceCriteria[0]}，不看完整答案或分数刺激。`,
       moatLine: `${spec.label} 的护城河不是功能名，而是：动作 -> 证据 -> 回访 -> 家长决策持续复利。`,
       visibleProof: rows.map((row) => ({
         id: row.id,

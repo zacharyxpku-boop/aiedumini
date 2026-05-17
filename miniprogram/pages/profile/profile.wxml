@@ -106,6 +106,9 @@
             <view class="parent-brief-block" wx:if="{{capabilityMaturityQueue.next}}">
               <text class="parent-brief-label">先补这里</text>
               <text>{{capabilityMaturityQueue.next.label}} · {{capabilityMaturityQueue.next.nextAction}}</text>
+              <text>{{capabilityMaturityQueue.next.acceptanceLine}}</text>
+              <text>{{capabilityMaturityQueue.next.fallbackLine}}</text>
+              <text>{{capabilityMaturityQueue.next.parentCheckLine}}</text>
               <button class="profile-small-primary" data-id="{{capabilityMaturityQueue.next.id}}" data-route="{{capabilityMaturityQueue.next.route}}" bindtap="runCapabilityMaturityAction">去推进</button>
             </view>
             <view class="module-flow-mini-grid">
