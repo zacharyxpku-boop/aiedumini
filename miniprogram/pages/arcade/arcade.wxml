@@ -74,6 +74,8 @@
         <view class="story-mission-rule" wx:for="{{challengeBrief.courseUnitQuestionTypes}}" wx:key="*this">本局题型：{{item}}</view>
         <view class="story-mission-rule">{{challengeBrief.courseUnitReportContract}}</view>
         <view class="story-mission-rule">{{challengeBrief.courseUnitShareContract}}</view>
+        <view class="story-mission-rule" wx:if="{{challengeBrief.courseUnitPracticeDeckTitle}}">{{challengeBrief.courseUnitPracticeDeckTitle}}：{{challengeBrief.courseUnitPracticeDeckLine}}</view>
+        <view class="story-mission-rule" wx:for="{{challengeBrief.courseUnitPracticeDeck}}" wx:key="id">{{item.label}} · 掌握度 {{item.masteryScore}} · 风险 {{item.risk}} · {{item.action}} · {{item.nextEvidence}}</view>
       </view>
       <view class="challenge-brief-sub" wx:if="{{challengeBrief.evidenceBiasLine}}">为什么开这局：{{challengeBrief.evidenceBiasLine}}</view>
     </view>

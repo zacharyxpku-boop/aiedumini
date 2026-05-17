@@ -80,6 +80,9 @@ Page({
     const courseUnitMap = storage.buildCourseUnitMap
       ? storage.buildCourseUnitMap(Object.assign({}, loopFocus || {}, { subjectSeedLibrary: null }))
       : null;
+    const courseUnitMasteryTrajectory = storage.buildCourseUnitMasteryTrajectory
+      ? storage.buildCourseUnitMasteryTrajectory({ courseUnitMap })
+      : null;
     const taskBoundCards = this.cardsForRecentTaskType(recentTaskType, loopFocus);
     const loopBoundCards = this.loopBoundCards(dueCards.concat(fallbackCards), taskBoundCards, loopFocus);
     const cards = loopBoundCards.length ? loopBoundCards : (dueCards.length ? dueCards : (fallbackCards.length ? fallbackCards : taskBoundCards));
@@ -127,11 +130,12 @@ Page({
       dailyQuestSet,
       adaptiveChallenge,
       questArcMission,
-      challengeBrief: this.buildChallengeBrief(dailyQuestSet, adaptiveChallenge, questArcMission, evidenceBias, subjectSkillDepth, curriculumSpine, courseUnitMap),
+      challengeBrief: this.buildChallengeBrief(dailyQuestSet, adaptiveChallenge, questArcMission, evidenceBias, subjectSkillDepth, curriculumSpine, courseUnitMap, courseUnitMasteryTrajectory),
       surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('arcade') : null,
       subjectSkillDepth,
       curriculumSpine,
       courseUnitMap,
+      courseUnitMasteryTrajectory,
       result: null,
       resultAdvice: null,
       gameRetentionLoop: null,
@@ -259,7 +263,7 @@ Page({
     return arcade.buildWhackRound(cards, { limit: size });
   },
 
-  buildChallengeBrief(dailyQuestSet = {}, adaptiveChallenge = {}, questArcMission = null, evidenceBias = null, subjectSkillDepth = null, curriculumSpine = null, courseUnitMap = null) {
+  buildChallengeBrief(dailyQuestSet = {}, adaptiveChallenge = {}, questArcMission = null, evidenceBias = null, subjectSkillDepth = null, curriculumSpine = null, courseUnitMap = null, courseUnitMasteryTrajectory = null) {
     const quests = Array.isArray(dailyQuestSet.quests) ? dailyQuestSet.quests : [];
     const activeQuest = quests.find((item) => item && item.progress < item.target) || quests[0] || {};
     const mode = adaptiveChallenge.mode || 'balanced';
@@ -271,6 +275,9 @@ Page({
     const activeCourseUnit = courseUnitMap && courseUnitMap.active && Array.isArray(courseUnitMap.active.units)
       ? courseUnitMap.active.units[0]
       : null;
+    const trajectoryRows = courseUnitMasteryTrajectory && Array.isArray(courseUnitMasteryTrajectory.trajectories)
+      ? courseUnitMasteryTrajectory.trajectories.slice(0, 3)
+      : [];
     return {
       mode,
       modeLabel: labels[mode] || labels.balanced,
@@ -322,7 +329,17 @@ Page({
         ? activeCourseUnit.reusableQuestionTypes
         : [],
       courseUnitReportContract: activeCourseUnit ? activeCourseUnit.reportContract : '',
-      courseUnitShareContract: activeCourseUnit ? activeCourseUnit.shareContract : ''
+      courseUnitShareContract: activeCourseUnit ? activeCourseUnit.shareContract : '',
+      courseUnitPracticeDeckTitle: courseUnitMasteryTrajectory ? courseUnitMasteryTrajectory.title : '',
+      courseUnitPracticeDeckLine: courseUnitMasteryTrajectory ? courseUnitMasteryTrajectory.summary : '',
+      courseUnitPracticeDeck: trajectoryRows.map((item) => ({
+        id: item.id,
+        label: item.unitLabel,
+        masteryScore: item.masteryScore,
+        risk: item.regressionRisk,
+        nextEvidence: item.nextEvidence,
+        action: item.parentInterventionLevel
+      }))
     };
   },
 
@@ -796,6 +813,9 @@ Page({
       course_unit_subject: this.data.courseUnitMap && this.data.courseUnitMap.active ? this.data.courseUnitMap.active.label : '',
       course_unit_count: this.data.courseUnitMap ? this.data.courseUnitMap.unitCount : 0,
       course_unit_question_types: this.data.courseUnitMap ? this.data.courseUnitMap.reusableQuestionTypeCount : 0,
+      course_unit_trajectory_rows: this.data.courseUnitMasteryTrajectory && Array.isArray(this.data.courseUnitMasteryTrajectory.trajectories)
+        ? this.data.courseUnitMasteryTrajectory.trajectories.length
+        : 0,
       retention_mode: gameRetentionLoop && gameRetentionLoop.mode,
       retention_next_route: gameRetentionLoop && gameRetentionLoop.nextRoute,
       retention_weak_key: gameRetentionLoop && gameRetentionLoop.weakKey,
@@ -878,6 +898,9 @@ Page({
         course_unit_subject: this.data.courseUnitMap && this.data.courseUnitMap.active ? this.data.courseUnitMap.active.label : '',
         course_unit_count: this.data.courseUnitMap ? this.data.courseUnitMap.unitCount : 0,
         course_unit_question_types: this.data.courseUnitMap ? this.data.courseUnitMap.reusableQuestionTypeCount : 0,
+        course_unit_trajectory_rows: this.data.courseUnitMasteryTrajectory && Array.isArray(this.data.courseUnitMasteryTrajectory.trajectories)
+          ? this.data.courseUnitMasteryTrajectory.trajectories.length
+          : 0,
         quest_arc_stage: this.data.questArcMission && this.data.questArcMission.currentStage,
         quest_arc_mission: this.data.questArcMission && this.data.questArcMission.title,
         retention_mode: gameRetentionLoop && gameRetentionLoop.mode,
