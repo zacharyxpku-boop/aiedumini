@@ -4239,6 +4239,50 @@ function parentNextActionDetail(action = '') {
   return '用自己的作业或错题生成一张卡，再完成一次 5 分钟轻回访。';
 }
 
+function buildShareChallengePlan(input = {}) {
+  const focus = input.focus || loadTodayFocus() || {};
+  const capability = input.capability || {};
+  const subjectDepth = input.subjectSkillDepth || null;
+  const actionLabel = input.actionLabel || capability.nextAction || parentNextActionLabel(input.parentNextAction || '');
+  const subjectLabel = subjectDepth && subjectDepth.label ? subjectDepth.label : (focus.title ? '当前卡点' : '第一步');
+  const firstStep = subjectDepth && subjectDepth.firstStep
+    ? subjectDepth.firstStep
+    : (focus.childArticulatedStep || focus.systemSuggestedStep || '先说清第一步');
+  const route = capability.route || input.route || '/pages/arcade/arcade';
+  const goal = `用自己的材料完成一次「${subjectLabel}」轻挑战`;
+  const steps = [
+    { id: 'recall', label: '主动回忆', text: `先不看答案，说出：${firstStep}` },
+    { id: 'repair', label: '错因修复', text: actionLabel || '错了也只退回第一步提示卡。' },
+    { id: 'revisit', label: '次日回访', text: '明天只回看 1 张卡，确认还能开口。' }
+  ];
+  const reviewCadence = [
+    { id: 'tonight', label: '今晚', text: '完成 3 张主动回忆卡，只奖励说清第一步。' },
+    { id: 'tomorrow', label: '明天', text: '只回访最不稳的 1 张卡，不扩题量。' },
+    { id: 'day_7', label: '第 7 天', text: '用 1 道小变式确认能不能迁移。' }
+  ];
+  return {
+    id: 'share_challenge_plan',
+    title: '同伴轻挑战',
+    goal,
+    route,
+    noRankingLine: '不排行、不晒分，只看有没有说清第一步。',
+    modeLine: input.mode === 'parent_recap'
+      ? '家庭模式：另一位家长只照着一句话追问。'
+      : '同伴模式：对方用自己的材料做同一类第一步。',
+    steps,
+    reviewCadence,
+    parentEvidenceLine: '家长只看三件事：孩子是否自己说第一步、错因是否回到卡片、明天是否还能复述。',
+    successRule: '完成 3 张主动回忆卡，并留下孩子自己的第一步。',
+    failureFallback: '如果说不出来，退回第一步小黑板，不继续讲完整答案。',
+    evidenceRequired: ['active_recall_cards', 'child_first_step', 'wrong_cause_return', 'next_day_revisit'],
+    query: {
+      challenge_goal: goal,
+      challenge_rule: '三张主动回忆卡，不排行，只留第一步证据',
+      challenge_route: route
+    }
+  };
+}
+
 function saveIncomingShare(share = {}) {
   const code = share.share_code || share.code || '';
   if (!code) return null;
@@ -4257,6 +4301,9 @@ function saveIncomingShare(share = {}) {
     capability_label: share.capability_label || '',
     capability_next_action: share.capability_next_action || '',
     capability_route: share.capability_route || '',
+    challenge_goal: share.challenge_goal || '',
+    challenge_rule: share.challenge_rule || '',
+    challenge_route: share.challenge_route || '',
     created_at: share.created_at || new Date().toISOString()
   };
   set(KEYS.incomingShare, record);
@@ -7014,6 +7061,7 @@ module.exports = {
   saveGamePurchase,
   loadShareRuns,
   loadIncomingShare,
+  buildShareChallengePlan,
   saveIncomingShare,
   appendShareRun,
   loadClientIdentity,

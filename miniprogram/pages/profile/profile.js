@@ -397,9 +397,20 @@ function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCause
   const capabilityQuery = nextCapability
     ? `&capability_gap=${encodeURIComponent(nextCapability.id || '')}&capability_label=${encodeURIComponent(nextCapability.label || '')}&capability_next_action=${encodeURIComponent(nextCapability.nextAction || '')}&capability_route=${encodeURIComponent(nextCapability.route || '')}`
     : '';
-  const path = `/pages/home/home?share=${code}&from=daily_card&challenge=arcade&mode=same_identity&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}`;
-  const parentPath = `/pages/home/home?share=${code}&from=parent_card&mode=parent_recap&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}`;
-  const peerPath = `/pages/home/home?share=${code}&from=peer_challenge&challenge=arcade&mode=same_identity&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}`;
+  const shareChallengePlan = storage.buildShareChallengePlan ? storage.buildShareChallengePlan({
+    focus: todayFocus,
+    capability: nextCapability || {},
+    subjectSkillDepth,
+    parentNextAction,
+    actionLabel: unifiedActionLabel,
+    route: nextCapability && nextCapability.route ? nextCapability.route : '/pages/arcade/arcade'
+  }) : null;
+  const challengeQuery = shareChallengePlan && shareChallengePlan.query
+    ? `&challenge_goal=${encodeURIComponent(shareChallengePlan.query.challenge_goal || '')}&challenge_rule=${encodeURIComponent(shareChallengePlan.query.challenge_rule || '')}&challenge_route=${encodeURIComponent(shareChallengePlan.query.challenge_route || '')}`
+    : '';
+  const path = `/pages/home/home?share=${code}&from=daily_card&challenge=arcade&mode=same_identity&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}`;
+  const parentPath = `/pages/home/home?share=${code}&from=parent_card&mode=parent_recap&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}`;
+  const peerPath = `/pages/home/home?share=${code}&from=peer_challenge&challenge=arcade&mode=same_identity&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}`;
   const parentShareTitle = todayFocus && todayFocus.title
     ? `今晚先看这一处：${storage.formatIssueType(todayFocus.issueType || '卡点')} · ${todayFocus.title}`
     : '给家里看的今日学习复盘';
@@ -469,6 +480,7 @@ function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCause
       nextAction: repaired > 0 ? '明天先回看这张错因卡' : due > 0 ? '明天先清一张待回访卡' : '明天继续说出第一步',
       evidenceRequired: ['parent_question_used', 'child_first_step', 'next_day_revisit']
     },
+    shareChallengePlan,
     familyActionCard: {
       title: '家庭行动卡',
       judgement: todayFocus && todayFocus.repairStatus === 'completed'
@@ -558,6 +570,9 @@ function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCause
       next_challenge: 'arcade',
       parent_card: true,
       peer_challenge: true,
+      share_challenge_goal: shareChallengePlan && shareChallengePlan.goal,
+      share_challenge_rule: shareChallengePlan && shareChallengePlan.successRule,
+      share_challenge_route: shareChallengePlan && shareChallengePlan.route,
       evidence_brief: evidenceBrief && evidenceBrief.reportLine,
       capability_gap_id: nextCapability && nextCapability.id,
       capability_gap_label: nextCapability && nextCapability.label,

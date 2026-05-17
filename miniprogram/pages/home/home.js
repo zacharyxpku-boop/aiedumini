@@ -160,7 +160,10 @@ Page({
         capability_gap: safeDecodeShareParam(query.capability_gap),
         capability_label: safeDecodeShareParam(query.capability_label),
         capability_next_action: safeDecodeShareParam(query.capability_next_action),
-        capability_route: safeDecodeShareParam(query.capability_route)
+        capability_route: safeDecodeShareParam(query.capability_route),
+        challenge_goal: safeDecodeShareParam(query.challenge_goal),
+        challenge_rule: safeDecodeShareParam(query.challenge_rule),
+        challenge_route: safeDecodeShareParam(query.challenge_route)
       }) : {
         code: query.share,
         share_code: query.share,
@@ -173,6 +176,9 @@ Page({
         capability_label: safeDecodeShareParam(query.capability_label),
         capability_next_action: safeDecodeShareParam(query.capability_next_action),
         capability_route: safeDecodeShareParam(query.capability_route),
+        challenge_goal: safeDecodeShareParam(query.challenge_goal),
+        challenge_rule: safeDecodeShareParam(query.challenge_rule),
+        challenge_route: safeDecodeShareParam(query.challenge_route),
         action_label: query.action === 'wrong_cause_revisit'
           ? '明天先回看这张错因卡'
           : query.action === 'due_card_revisit'
@@ -202,7 +208,10 @@ Page({
             identity_tag: query.identity || '',
             parent_next_action: query.action || '',
             capability_gap: safeDecodeShareParam(query.capability_gap),
-            capability_label: safeDecodeShareParam(query.capability_label)
+            capability_label: safeDecodeShareParam(query.capability_label),
+            challenge_goal: safeDecodeShareParam(query.challenge_goal),
+            challenge_rule: safeDecodeShareParam(query.challenge_rule),
+            challenge_route: safeDecodeShareParam(query.challenge_route)
           }
         });
       }
@@ -219,7 +228,10 @@ Page({
           identity_tag: query.identity || '',
           parent_next_action: query.action || '',
           capability_gap: safeDecodeShareParam(query.capability_gap),
-          capability_label: safeDecodeShareParam(query.capability_label)
+          capability_label: safeDecodeShareParam(query.capability_label),
+          challenge_goal: safeDecodeShareParam(query.challenge_goal),
+          challenge_rule: safeDecodeShareParam(query.challenge_rule),
+          challenge_route: safeDecodeShareParam(query.challenge_route)
         }
       }).catch(() => {});
       this.setData({
@@ -1394,9 +1406,28 @@ Page({
     });
     const incoming = this.data.incomingShare || (storage.loadIncomingShare && storage.loadIncomingShare()) || {};
     const query = incoming.share_code
-      ? `?from=share&share=${incoming.share_code}&mode=${incoming.mode || ''}&identity=${encodeURIComponent(incoming.identity_tag || '')}&action=${incoming.parent_next_action || ''}&capability_gap=${encodeURIComponent(incoming.capability_gap || '')}&capability_label=${encodeURIComponent(incoming.capability_label || '')}`
+      ? `?from=share&share=${incoming.share_code}&mode=${incoming.mode || ''}&identity=${encodeURIComponent(incoming.identity_tag || '')}&action=${incoming.parent_next_action || ''}&capability_gap=${encodeURIComponent(incoming.capability_gap || '')}&capability_label=${encodeURIComponent(incoming.capability_label || '')}&challenge_goal=${encodeURIComponent(incoming.challenge_goal || '')}&challenge_rule=${encodeURIComponent(incoming.challenge_rule || '')}`
       : '';
     wx.navigateTo({ url: `/pages/arcade/arcade${query}` });
+  },
+
+  goSharedChallenge() {
+    const incoming = this.data.incomingShare || (storage.loadIncomingShare && storage.loadIncomingShare()) || {};
+    const route = navigation.normalizeRoute(incoming.challenge_route || incoming.capability_route || '/pages/arcade/arcade');
+    const query = incoming.share_code
+      ? `from=share&share=${incoming.share_code}&mode=${incoming.mode || ''}&identity=${encodeURIComponent(incoming.identity_tag || '')}&action=${incoming.parent_next_action || ''}&capability_gap=${encodeURIComponent(incoming.capability_gap || '')}&capability_label=${encodeURIComponent(incoming.capability_label || '')}&challenge_goal=${encodeURIComponent(incoming.challenge_goal || '')}&challenge_rule=${encodeURIComponent(incoming.challenge_rule || '')}`
+      : '';
+    const target = query && route.indexOf('?') < 0 ? `${route}?${query}` : route;
+    this.trackShareActivation('challenge_started', {
+      next: 'shared_challenge',
+      route: target,
+      challenge_goal: incoming.challenge_goal || '',
+      challenge_rule: incoming.challenge_rule || '',
+      challenge_route: incoming.challenge_route || ''
+    });
+    if (!navigation.navigateLearningRoute(target)) {
+      wx.navigateTo({ url: '/pages/arcade/arcade' });
+    }
   },
 
   startTopMust() {
@@ -1432,7 +1463,10 @@ Page({
         capability_gap: incoming.capability_gap || '',
         capability_label: incoming.capability_label || '',
         capability_next_action: incoming.capability_next_action || '',
-        capability_route: incoming.capability_route || ''
+        capability_route: incoming.capability_route || '',
+        challenge_goal: incoming.challenge_goal || '',
+        challenge_rule: incoming.challenge_rule || '',
+        challenge_route: incoming.challenge_route || ''
       }, payload || {})
     }).catch(() => {});
   },

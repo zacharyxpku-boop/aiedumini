@@ -873,6 +873,17 @@
           <view>边界：{{dailyShareCard.parentConversationPlan.avoid}}</view>
           <view wx:if="{{dailyShareCard.shareOutcome}}">明天：{{dailyShareCard.shareOutcome.nextAction}}</view>
         </view>
+        <view class="share-conversation-card" wx:if="{{dailyShareCard.shareChallengePlan}}">
+          <view class="share-conversation-title">{{dailyShareCard.shareChallengePlan.title}}</view>
+          <view>{{dailyShareCard.shareChallengePlan.goal}}</view>
+          <view>{{dailyShareCard.shareChallengePlan.noRankingLine}}</view>
+          <view>{{dailyShareCard.shareChallengePlan.modeLine}}</view>
+          <view wx:for="{{dailyShareCard.shareChallengePlan.steps}}" wx:key="id">{{item.label}}：{{item.text}}</view>
+          <view wx:for="{{dailyShareCard.shareChallengePlan.reviewCadence}}" wx:key="id">{{item.label}}回访：{{item.text}}</view>
+          <view>{{dailyShareCard.shareChallengePlan.parentEvidenceLine}}</view>
+          <view>{{dailyShareCard.shareChallengePlan.successRule}}</view>
+          <view>{{dailyShareCard.shareChallengePlan.failureFallback}}</view>
+        </view>
         <view class="share-invite">{{dailyShareCard.inviteLine}}</view>
         <view class="wechat-share-row">
           <button

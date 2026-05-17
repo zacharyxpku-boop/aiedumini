@@ -339,8 +339,10 @@
         <view class="share-body" wx:if="{{incomingShare.action_detail}}">怎么做：{{incomingShare.action_detail}}</view>
         <view class="share-body" wx:if="{{incomingShare.capability_label}}">{{incomingShare.capability_label}}</view>
         <view class="share-body" wx:if="{{incomingShare.capability_next_action}}">{{incomingShare.capability_next_action}}</view>
+        <view class="share-body" wx:if="{{incomingShare.challenge_goal}}">轻挑战：{{incomingShare.challenge_goal}}</view>
+        <view class="share-body" wx:if="{{incomingShare.challenge_rule}}">规则：{{incomingShare.challenge_rule}}</view>
       </view>
-      <button class="share-button" bindtap="goTools">去轻回访</button>
+      <button class="share-button" bindtap="goSharedChallenge">去轻挑战</button>
     </view>
 
     <view class="home-spacer"></view>
