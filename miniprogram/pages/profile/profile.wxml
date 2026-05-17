@@ -643,6 +643,30 @@
           <text wx:if="{{learningReportSummary.familyDecisionSevenDayGate}}">7天降级：{{learningReportSummary.familyDecisionSevenDayGate.reduceRule}}</text>
           <text wx:if="{{learningReportSummary.familyDecisionShareLine}}">{{learningReportSummary.familyDecisionShareLine}}</text>
         </view>
+        <view class="family-decision-bridge" wx:if="{{learningReportSummary.familyDecisionActionBridge}}">
+          <view class="family-decision-bridge-title">{{learningReportSummary.familyDecisionActionBridge.title}}</view>
+          <view class="family-decision-bridge-summary">{{learningReportSummary.familyDecisionActionBridge.summary}}</view>
+          <view class="family-decision-bridge-line">{{learningReportSummary.familyDecisionActionBridge.subjectLine}}</view>
+          <view class="family-decision-bridge-grid">
+            <button
+              class="family-decision-bridge-action"
+              wx:for="{{learningReportSummary.familyDecisionActionBridge.actions}}"
+              wx:key="id"
+              data-id="{{item.id}}"
+              data-label="{{item.label}}"
+              data-route="{{item.route}}"
+              data-reason="{{item.reason}}"
+              data-evidence="{{item.evidence}}"
+              data-share-intent="{{item.shareIntent}}"
+              bindtap="runFamilyDecisionBridgeAction"
+            >
+              <text class="family-decision-bridge-action-label">{{item.label}}</text>
+              <text class="family-decision-bridge-action-reason">{{item.reason}}</text>
+            </button>
+          </view>
+          <view class="family-decision-bridge-evidence">证据：{{learningReportSummary.familyDecisionActionBridge.evidenceLine}}</view>
+          <view class="family-decision-bridge-stop">停止规则：{{learningReportSummary.familyDecisionActionBridge.stopRule}}</view>
+        </view>
         <view class="parent-brief-block">
           <text class="parent-brief-label">下一步方案</text>
           <text>{{learningReportSummary.planLine}}</text>

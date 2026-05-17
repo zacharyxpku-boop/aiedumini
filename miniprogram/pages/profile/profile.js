@@ -697,6 +697,16 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
       checkpoint: item.checkpoint || item.parentPrompt || ''
     }))
   };
+  const familyDecisionActionBridge = buildFamilyDecisionActionBridge({
+    familyDecisionMemo,
+    reportDailyActionQueue,
+    sevenDayActionBoard,
+    nextCapability,
+    subjectSkillDepth,
+    visualSocraticMatrix,
+    solutionMap,
+    plan
+  });
   const subjectDepthEvidenceLine = subjectSkillDepth && Array.isArray(subjectSkillDepth.evidenceRequired)
     ? subjectSkillDepth.evidenceRequired.join(' / ')
     : '';
@@ -766,6 +776,7 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     familyDecisionParentMeetingScript: Array.isArray(familyDecisionMemo.parentMeetingScript) ? familyDecisionMemo.parentMeetingScript : [],
     familyDecisionSevenDayGate: familyDecisionMemo.sevenDayDecisionGate || null,
     familyDecisionShareLine: familyDecisionMemo.shareLine || '',
+    familyDecisionActionBridge,
     parentScript: solutionMap.parentScript || plan.parentLine || '家长先问一句：这一步你准备先看哪里？',
     childScript: solutionMap.childScript || plan.childLine || '我先说出第一步。',
     nextEvidenceLine: Array.isArray(solutionMap.nextEvidenceRequired) && solutionMap.nextEvidenceRequired.length
@@ -780,6 +791,60 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     missingLine: (draft.missingItems || []).slice(0, 3).join(' · '),
     tendencyLines: tendencies.slice(0, 3).map((item) => `${item.label}：${item.description}`),
     questionnaire: learningReport.buildQuickAssessmentQuestions ? learningReport.buildQuickAssessmentQuestions() : []
+  };
+}
+
+function buildFamilyDecisionActionBridge(input = {}) {
+  const memo = input.familyDecisionMemo || {};
+  const reportQueue = input.reportDailyActionQueue || {};
+  const active = reportQueue.active || {};
+  const sevenDay = input.sevenDayActionBoard || {};
+  const nextCapability = input.nextCapability || {};
+  const subjectDepth = input.subjectSkillDepth || {};
+  const visual = input.visualSocraticMatrix || {};
+  const solutionMap = input.solutionMap || {};
+  const plan = input.plan || {};
+  const evidence = Array.isArray(memo.evidenceChecklist) && memo.evidenceChecklist.length
+    ? memo.evidenceChecklist.slice(0, 3)
+    : ['孩子说出第一步', '留下错因卡', '明天能回访同一小步'];
+  const tutorRoute = memo.route || (plan.cta && plan.cta.path) || '/pages/tutor/tutor?from=family_decision_bridge';
+  const practiceRoute = nextCapability.route || active.route || '/pages/arcade/arcade?from=family_decision_bridge';
+  const subjectLine = subjectDepth && subjectDepth.label
+    ? `${subjectDepth.label}：${subjectDepth.firstStep}`
+    : (visual && visual.parentLine) || '第一步小黑板只看一笔，不讲完整答案。';
+  const sharePath = `/pages/home/home?from=family_decision_bridge&challenge=arcade&mode=family_action&action=first_step_revisit&action_label=${encodeURIComponent('家庭决策行动桥')}&action_detail=${encodeURIComponent(memo.shareLine || sevenDay.today || '今晚只做一小步')}`;
+  return {
+    title: '家庭决策行动桥',
+    summary: memo.tonightDecision || sevenDay.today || '报告结论要落到今晚一个动作。',
+    subjectLine,
+    evidenceLine: evidence.join(' / '),
+    stopRule: memo.sevenDayDecisionGate && memo.sevenDayDecisionGate.reduceRule
+      ? memo.sevenDayDecisionGate.reduceRule
+      : '连续两次说不出第一步，就退回小黑板，不加题量。',
+    actions: [
+      {
+        id: 'tutor',
+        label: '今晚点拨',
+        route: tutorRoute,
+        reason: solutionMap.parentScript || sevenDay.parentScript || '先用一句追问确认孩子自己的第一步。',
+        evidence: evidence[0] || '孩子说出第一步'
+      },
+      {
+        id: 'practice',
+        label: '5分钟轻练',
+        route: practiceRoute,
+        reason: active.task || nextCapability.nextAction || '用一局轻回访确认不是当场会、转身忘。',
+        evidence: evidence[1] || '留下错因卡'
+      },
+      {
+        id: 'share',
+        label: '发家庭挑战卡',
+        route: sharePath,
+        shareIntent: 'family_decision',
+        reason: memo.shareLine || '把今晚动作发给家里，只看证据，不排行。',
+        evidence: evidence[2] || '明天能回访同一小步'
+      }
+    ]
   };
 }
 
@@ -2048,6 +2113,48 @@ Page({
       });
     }
     navigation.navigateLearningRoute(next.route || '/pages/tutor/tutor');
+  },
+
+  runFamilyDecisionBridgeAction(event) {
+    const dataset = event.currentTarget.dataset || {};
+    const route = dataset.route || '/pages/tutor/tutor?from=family_decision_bridge';
+    const action = {
+      source: 'family_decision_bridge',
+      sourceLabel: '家庭决策行动桥',
+      actionId: dataset.id || 'tutor',
+      actionLabel: dataset.label || '今晚点拨',
+      route,
+      reasonLine: dataset.reason || '',
+      evidenceLine: dataset.evidence || '',
+      shareIntent: dataset.shareIntent || ''
+    };
+    if (storage.recordUnifiedNextAction) {
+      storage.recordUnifiedNextAction(Object.assign({}, action, { surface: 'profile' }));
+    }
+    if (storage.recordSurfaceDepthAction) {
+      storage.recordSurfaceDepthAction({
+        surface: 'profile',
+        dimensionId: action.actionId,
+        label: action.actionLabel,
+        route,
+        readiness: 'family_decision_bridge',
+        capabilityId: action.actionId === 'practice' ? 'game' : action.actionId === 'share' ? 'share' : 'socratic'
+      });
+    }
+    sendMiniEvent({
+      event: 'family_decision_bridge_action',
+      source: 'profile_learning_report',
+      entity_id: action.actionId,
+      page: 'profile',
+      payload: {
+        route,
+        action_label: action.actionLabel,
+        reason: action.reasonLine,
+        evidence: action.evidenceLine,
+        share_intent: action.shareIntent
+      }
+    });
+    navigation.navigateLearningRoute(route);
   },
 
 });
