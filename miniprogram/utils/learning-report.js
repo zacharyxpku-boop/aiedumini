@@ -655,6 +655,45 @@ function buildClassroomDecisionBoard(parts = {}, matrix = [], recommendationPlan
   };
 }
 
+function buildFamilyDecisionMemo(parts = {}, matrix = [], recommendationPlan = {}, solutionMap = {}, portrait = {}, classroom = {}) {
+  const diagnosis = Array.isArray(matrix) ? matrix : [];
+  const primary = diagnosis.find((item) => item.status === '需要支持') || diagnosis[0] || {};
+  const plan = recommendationPlan || {};
+  const solution = solutionMap || {};
+  const subject = primary.subject || solution.targetSubject || '当前学科';
+  const cause = primary.mainCause || solution.rootCause || '第一步不清';
+  const evidence = Array.isArray(solution.nextEvidenceRequired) && solution.nextEvidenceRequired.length
+    ? solution.nextEvidenceRequired
+    : ['child_first_step', 'wrong_cause_card', 'next_day_revisit'];
+  const portraitEvidence = Array.isArray(portrait.evidenceToCollect) ? portrait.evidenceToCollect.slice(0, 3) : [];
+  return {
+    title: '家庭决策书',
+    tonightDecision: `${subject} 今晚不加题量，先处理「${cause}」。`,
+    doNotDo: [
+      '不按一次分数给孩子定性',
+      '不直接讲完整答案',
+      '不把薄弱学科一次性铺开'
+    ],
+    evidenceChecklist: [
+      `孩子能否说出 ${subject} 的第一步`,
+      `错因是否写成一张可回访卡`,
+      `明天是否还能复述同一小步`
+    ].concat(portraitEvidence).slice(0, 6),
+    parentMeetingScript: [
+      solution.parentScript || plan.parentLine || '家长只问：这一步你准备先看哪里？',
+      classroom.nextConferenceQuestion || `下次复盘只问：${subject} 这类题，孩子能否自己说出第一步？`,
+      portrait.parentDecisionRule || '连续两次能说清第一步才加题量。'
+    ],
+    sevenDayDecisionGate: {
+      continueRule: '连续 2 天能独立说出第一步，才进入变式练习。',
+      reduceRule: '连续 2 次沉默或同错因重复，减少题量，退回第一步小黑板。',
+      evidenceRule: evidence.join(' / ')
+    },
+    shareLine: `${subject} 家庭决策：先看 ${cause}，7 天后用证据复核。`,
+    route: plan.cta && plan.cta.path ? plan.cta.path : '/pages/tutor/tutor?from=family_decision_memo'
+  };
+}
+
 function buildLearningReportDraft(input = {}) {
   const sources = normalizeReportSources(input);
   const allText = [input.sourceText || '', input.scoreText || ''].concat(sources.map((source) => source.text || '')).join('\n');
@@ -687,6 +726,7 @@ function buildLearningReportDraft(input = {}) {
   const solutionMap = buildSolutionMap(parts, diagnosisMatrix, recommendationPlan);
   const longTermPortrait = buildLongTermLearningPortrait(parts, diagnosisMatrix, capabilityTendencies);
   const classroomDecisionBoard = buildClassroomDecisionBoard(parts, diagnosisMatrix, recommendationPlan, solutionMap);
+  const familyDecisionMemo = buildFamilyDecisionMemo(parts, diagnosisMatrix, recommendationPlan, solutionMap, longTermPortrait, classroomDecisionBoard);
   const missing = missingItems(parts);
   const reportDraft = {
     id: input.id || `learning_report_${String(nowIso(input.now)).slice(0, 10).replace(/-/g, '')}`,
@@ -715,6 +755,7 @@ function buildLearningReportDraft(input = {}) {
     solutionMap,
     longTermPortrait,
     classroomDecisionBoard,
+    familyDecisionMemo,
     generatedAt: nowIso(input.now),
     missingItems: missing,
     sourceIntegrity: {
@@ -745,6 +786,7 @@ function buildLearningReportDraft(input = {}) {
     solutionMap,
     longTermPortrait,
     classroomDecisionBoard,
+    familyDecisionMemo,
     reportCompleteness: completeness,
     reportStatus: {
       state: completeness >= 30 ? 'ready' : 'draft',

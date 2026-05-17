@@ -666,6 +666,7 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
   const solutionMap = reportState.solutionMap || draft.solutionMap || {};
   const longTermPortrait = reportState.longTermPortrait || draft.longTermPortrait || {};
   const classroomDecisionBoard = reportState.classroomDecisionBoard || draft.classroomDecisionBoard || {};
+  const familyDecisionMemo = reportState.familyDecisionMemo || draft.familyDecisionMemo || {};
   const matrix = Array.isArray(draft.diagnosisMatrix) ? draft.diagnosisMatrix : [];
   const tendencies = Array.isArray(draft.capabilityTendencies) ? draft.capabilityTendencies : [];
   const mainDiagnosis = matrix.find((item) => item.status === '需要支持') || matrix[0] || null;
@@ -757,6 +758,14 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     classroomObservation: Array.isArray(classroomDecisionBoard.classLikeObservation) ? classroomDecisionBoard.classLikeObservation : [],
     classroomEscalationRule: classroomDecisionBoard.escalationRule || '',
     classroomSuccessRule: classroomDecisionBoard.successRule || '',
+    familyDecisionMemo,
+    familyDecisionTitle: familyDecisionMemo.title || '',
+    familyDecisionTonight: familyDecisionMemo.tonightDecision || '',
+    familyDecisionDoNotDo: Array.isArray(familyDecisionMemo.doNotDo) ? familyDecisionMemo.doNotDo : [],
+    familyDecisionEvidenceChecklist: Array.isArray(familyDecisionMemo.evidenceChecklist) ? familyDecisionMemo.evidenceChecklist : [],
+    familyDecisionParentMeetingScript: Array.isArray(familyDecisionMemo.parentMeetingScript) ? familyDecisionMemo.parentMeetingScript : [],
+    familyDecisionSevenDayGate: familyDecisionMemo.sevenDayDecisionGate || null,
+    familyDecisionShareLine: familyDecisionMemo.shareLine || '',
     parentScript: solutionMap.parentScript || plan.parentLine || '家长先问一句：这一步你准备先看哪里？',
     childScript: solutionMap.childScript || plan.childLine || '我先说出第一步。',
     nextEvidenceLine: Array.isArray(solutionMap.nextEvidenceRequired) && solutionMap.nextEvidenceRequired.length

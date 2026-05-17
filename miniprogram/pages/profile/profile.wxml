@@ -633,6 +633,16 @@
           <text wx:if="{{learningReportSummary.classroomEscalationRule}}">升级规则：{{learningReportSummary.classroomEscalationRule}}</text>
           <text wx:if="{{learningReportSummary.classroomSuccessRule}}">成功规则：{{learningReportSummary.classroomSuccessRule}}</text>
         </view>
+        <view class="parent-brief-block" wx:if="{{learningReportSummary.familyDecisionTitle}}">
+          <text class="parent-brief-label">{{learningReportSummary.familyDecisionTitle}}</text>
+          <text>{{learningReportSummary.familyDecisionTonight}}</text>
+          <text wx:for="{{learningReportSummary.familyDecisionDoNotDo}}" wx:key="*this">今晚不做：{{item}}</text>
+          <text wx:for="{{learningReportSummary.familyDecisionEvidenceChecklist}}" wx:key="*this">证据清单：{{item}}</text>
+          <text wx:for="{{learningReportSummary.familyDecisionParentMeetingScript}}" wx:key="*this">复盘问题：{{item}}</text>
+          <text wx:if="{{learningReportSummary.familyDecisionSevenDayGate}}">7天继续：{{learningReportSummary.familyDecisionSevenDayGate.continueRule}}</text>
+          <text wx:if="{{learningReportSummary.familyDecisionSevenDayGate}}">7天降级：{{learningReportSummary.familyDecisionSevenDayGate.reduceRule}}</text>
+          <text wx:if="{{learningReportSummary.familyDecisionShareLine}}">{{learningReportSummary.familyDecisionShareLine}}</text>
+        </view>
         <view class="parent-brief-block">
           <text class="parent-brief-label">下一步方案</text>
           <text>{{learningReportSummary.planLine}}</text>
