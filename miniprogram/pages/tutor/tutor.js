@@ -176,6 +176,38 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
     + (!blockedAnswer ? 14 : 0)
     + (proofSentence ? 14 : 0)
   );
+  const handoffPlan = {
+    title: proofSentence ? '点拨后继续走一小步' : blockedAnswer ? '先退回安全点拨' : '点拨还差一句证据',
+    summary: proofSentence
+      ? '孩子已经能说回去，下一步不要加讲解，转成修卡点、轻回访或给家长看。'
+      : blockedAnswer
+        ? '先拦住直接答案，把动作收窄到第一步和错因。'
+        : '先补一句自己的第一步，再进入修卡点或轻练。',
+    evidenceLine: `当前 ${score}/100 · ${studentFirst ? '有第一步' : '缺第一步'} · ${namedWrongCause ? '有错因' : '缺错因'}`,
+    actions: [
+      {
+        id: 'repair',
+        label: '修卡点',
+        route: '/pages/review/review?from=tutor_handoff&focus=wrong_cause',
+        reason: namedWrongCause ? '错因已经出现，适合沉淀成一张可回访卡。' : '先把卡住点写成一句话，避免点拨后断掉。',
+        evidence: namedWrongCause ? '错因卡' : '卡点句'
+      },
+      {
+        id: 'recall',
+        label: '5分钟轻练',
+        route: '/pages/arcade/arcade?from=tutor_handoff&mode=recall',
+        reason: proofSentence ? '已经会说方法，马上用一局轻回访问是否转身还记得。' : '还没完全说清，先用低负担练习保留手感。',
+        evidence: '轻回访结果'
+      },
+      {
+        id: 'parent',
+        label: '给家长看',
+        route: '/pages/profile/profile?from=tutor_handoff',
+        reason: '家长只看第一步、错因和下次检查点，不看完整对话。',
+        evidence: '家长复盘'
+      }
+    ]
+  };
   return {
     title: '思路记录',
     label: '看的不是“做完没”，而是有没有先想、有没有说清卡点、有没有知道下次先查什么。',
@@ -186,6 +218,7 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
     subjectSkillDepth,
     curriculumSpine,
     visualSocraticMatrix,
+    handoffPlan,
     checks: [
       { id: 'first', label: '先有自己的想法', done: studentFirst, detail: studentFirst ? '已经说出一步或一个问题' : '还需要先交出自己的第一步' },
       { id: 'cause', label: '已经说出错因', done: namedWrongCause, detail: namedWrongCause ? '对话里出现了明确错因' : '还要把错因说具体' },
@@ -689,6 +722,46 @@ Page({
 
   goReview() {
     wx.switchTab({ url: '/pages/review/review' });
+  },
+
+  runTutorHandoffAction(event) {
+    const dataset = event.currentTarget.dataset || {};
+    const route = dataset.route || '/pages/review/review?from=tutor_handoff';
+    const action = {
+      source: 'tutor_handoff',
+      sourceLabel: '点拨后承接',
+      actionId: dataset.id || 'repair',
+      actionLabel: dataset.label || '修卡点',
+      route,
+      reasonLine: dataset.reason || '',
+      evidenceLine: dataset.evidence || ''
+    };
+    if (storage.recordUnifiedNextAction) {
+      storage.recordUnifiedNextAction(Object.assign({}, action, { surface: 'tutor' }));
+    }
+    if (storage.recordSurfaceDepthAction) {
+      storage.recordSurfaceDepthAction({
+        surface: 'tutor',
+        dimensionId: action.actionId,
+        label: action.actionLabel,
+        route,
+        readiness: 'tutor_handoff',
+        capabilityId: action.actionId === 'recall' ? 'game' : action.actionId === 'parent' ? 'parent_action' : 'socratic'
+      });
+    }
+    api.submitEvent({
+      event: 'tutor_handoff_action',
+      source: 'tutor_receipt',
+      page: 'tutor',
+      entity_id: action.actionId,
+      payload: {
+        route,
+        action_label: action.actionLabel,
+        reason: action.reasonLine,
+        evidence: action.evidenceLine
+      }
+    }).catch(() => {});
+    navigation.navigateLearningRoute(route);
   },
 
   syncTutorSignal(masterySignal, coachStep) {

@@ -706,6 +706,58 @@ page {
   background: #FFFFFF;
 }
 
+.tutor-handoff-plan {
+  display: grid;
+  gap: 12rpx;
+  margin-top: 14rpx;
+  padding: 18rpx;
+  border-radius: 20rpx;
+  background: #ECFDF5;
+  border: 1rpx solid rgba(22, 101, 52, 0.14);
+}
+
+.tutor-handoff-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10rpx;
+}
+
+.tutor-handoff-action {
+  display: grid;
+  gap: 6rpx;
+  min-width: 0;
+  min-height: 122rpx;
+  margin: 0;
+  padding: 12rpx;
+  text-align: left;
+  background: #FFFFFF;
+  border: 1rpx solid rgba(22, 101, 52, 0.10);
+  border-radius: 16rpx;
+  box-shadow: none;
+}
+
+.tutor-handoff-action::after {
+  border: 0;
+}
+
+.tutor-handoff-label {
+  color: #14532D;
+  font-size: 21rpx;
+  font-weight: 1000;
+  line-height: 1.2;
+}
+
+.tutor-handoff-reason {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #667A6C;
+  font-size: 18rpx;
+  font-weight: 720;
+  line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
 .chat-card {
   position: relative;
   display: flex;

@@ -137,6 +137,27 @@
             <text wx:for="{{thinkingReceipt.allowed_moves}}" wx:key="*this">{{item}}</text>
           </view>
           <view class="receipt-transfer" wx:if="{{thinkingReceipt.transfer_prompt}}">{{thinkingReceipt.transfer_prompt}}</view>
+          <view class="tutor-handoff-plan" wx:if="{{thinkingReceipt.handoffPlan}}">
+            <view class="receipt-diagnostic-title">{{thinkingReceipt.handoffPlan.title}}</view>
+            <view class="receipt-diagnostic-line">{{thinkingReceipt.handoffPlan.summary}}</view>
+            <view class="tutor-handoff-grid">
+              <button
+                class="tutor-handoff-action"
+                wx:for="{{thinkingReceipt.handoffPlan.actions}}"
+                wx:key="id"
+                data-id="{{item.id}}"
+                data-label="{{item.label}}"
+                data-route="{{item.route}}"
+                data-reason="{{item.reason}}"
+                data-evidence="{{item.evidence}}"
+                bindtap="runTutorHandoffAction"
+              >
+                <text class="tutor-handoff-label">{{item.label}}</text>
+                <text class="tutor-handoff-reason">{{item.reason}}</text>
+              </button>
+            </view>
+            <view class="receipt-diagnostic-sub">证据：{{thinkingReceipt.handoffPlan.evidenceLine}}</view>
+          </view>
         </view>
 
         <view class="surface-depth-card tutor-surface-depth" wx:if="{{surfaceDepthPack}}">
