@@ -658,7 +658,35 @@ function buildProfileSafeSummary(todayFocus, focusHistory = [], profileEmptyGuid
   };
 }
 
-function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, subjectSkillDepth, curriculumSpine, visualSocraticMatrix) {
+function buildCourseUnitDecisionBoard(courseUnitMap = null) {
+  const active = courseUnitMap && courseUnitMap.active ? courseUnitMap.active : null;
+  const units = active && Array.isArray(active.units) ? active.units : [];
+  const unit = units[0] || null;
+  if (!courseUnitMap || !active || !unit) return null;
+  return {
+    title: `${active.label}单元级家庭决策板`,
+    summary: `当前先看「${unit.unitLabel}」这一单元，不按分数下结论，按第一步、错因和隔天回访下结论。`,
+    unitLabel: unit.unitLabel,
+    subjectLabel: unit.subjectLabel,
+    tier: unit.tier,
+    gradeBand: unit.gradeBand,
+    questionTypes: unit.reusableQuestionTypes || [],
+    wrongCauseAtlas: unit.wrongCauseAtlas || [],
+    diagnosticProbes: unit.diagnosticProbes || [],
+    blackboardLine: unit.blackboardBlueprint ? `${unit.blackboardBlueprint.title}：${unit.blackboardBlueprint.firstStroke}` : '',
+    parentTonightDecision: `今晚只判断一件事：孩子能不能自己说出「${unit.unitLabel}」的第一步和一个错因。`,
+    classroomObservationLine: `课堂级观察：同类题是否还卡在「${unit.wrongCauseAtlas && unit.wrongCauseAtlas[0] ? unit.wrongCauseAtlas[0] : '第一步'}」。`,
+    sevenDayReviewLine: unit.practiceLoop && unit.practiceLoop.nextDay ? unit.practiceLoop.nextDay : '第 7 天用一道同类小变式复核。',
+    reportContract: unit.reportContract,
+    shareContract: unit.shareContract,
+    actionRoute: unit.route || '/pages/tutor/tutor',
+    recallRoute: unit.recallRoute || '/pages/review/review',
+    gameRoute: unit.gameRoute || '/pages/arcade/arcade',
+    evidenceRequired: unit.evidenceRequired || []
+  };
+}
+
+function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, subjectSkillDepth, curriculumSpine, visualSocraticMatrix, courseUnitMap) {
   const globalEvidenceBrief = storage.buildGlobalEvidenceBrief ? storage.buildGlobalEvidenceBrief() : null;
   const capabilityLedger = capabilityEvidenceLedger || (storage.buildCapabilityEvidenceLedger ? storage.buildCapabilityEvidenceLedger({ globalEvidenceBrief }) : null);
   const nextCapability = capabilityLedger && capabilityLedger.nextCapability ? capabilityLedger.nextCapability : null;
@@ -672,6 +700,7 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
   const familyDecisionMemo = reportState.familyDecisionMemo || draft.familyDecisionMemo || {};
   const matrix = Array.isArray(draft.diagnosisMatrix) ? draft.diagnosisMatrix : [];
   const tendencies = Array.isArray(draft.capabilityTendencies) ? draft.capabilityTendencies : [];
+  const effectiveCourseUnitMap = courseUnitMap || (storage.buildCourseUnitMap ? storage.buildCourseUnitMap({}) : null);
   const mainDiagnosis = matrix.find((item) => item.status === '需要支持') || matrix[0] || null;
   const sevenDayPlan = Array.isArray(plan.sevenDayPlan) ? plan.sevenDayPlan.slice(0, 7) : [];
   const dayOne = sevenDayPlan[0] || {};
@@ -700,6 +729,10 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
       checkpoint: item.checkpoint || item.parentPrompt || ''
     }))
   };
+  const subjectDepthEvidenceLine = subjectSkillDepth && Array.isArray(subjectSkillDepth.evidenceRequired)
+    ? subjectSkillDepth.evidenceRequired.join(' / ')
+    : '';
+  const courseUnitDecisionBoard = buildCourseUnitDecisionBoard(effectiveCourseUnitMap);
   const familyDecisionActionBridge = buildFamilyDecisionActionBridge({
     familyDecisionMemo,
     reportDailyActionQueue,
@@ -707,12 +740,10 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     nextCapability,
     subjectSkillDepth,
     visualSocraticMatrix,
+    courseUnitDecisionBoard,
     solutionMap,
     plan
   });
-  const subjectDepthEvidenceLine = subjectSkillDepth && Array.isArray(subjectSkillDepth.evidenceRequired)
-    ? subjectSkillDepth.evidenceRequired.join(' / ')
-    : '';
   return {
     title: draft.title || '学习画像',
     modeLabel: reportState.reportProgress && reportState.reportProgress.label ? reportState.reportProgress.label : '0% · 快速版',
@@ -755,6 +786,12 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     visualSocraticMatrix,
     visualSocraticReportLine: visualSocraticMatrix && visualSocraticMatrix.reportLine ? visualSocraticMatrix.reportLine : '',
     visualSocraticBoundary: visualSocraticMatrix && visualSocraticMatrix.visualBoundary ? visualSocraticMatrix.visualBoundary : '',
+    courseUnitMap: effectiveCourseUnitMap,
+    courseUnitDecisionBoard,
+    courseUnitReportLine: courseUnitDecisionBoard ? courseUnitDecisionBoard.reportContract : '',
+    courseUnitParentDecisionLine: courseUnitDecisionBoard ? courseUnitDecisionBoard.parentTonightDecision : '',
+    courseUnitClassroomLine: courseUnitDecisionBoard ? courseUnitDecisionBoard.classroomObservationLine : '',
+    courseUnitSevenDayLine: courseUnitDecisionBoard ? courseUnitDecisionBoard.sevenDayReviewLine : '',
     longTermPortrait,
     longTermPortraitLine: longTermPortrait.learnerPattern || '',
     longTermPortraitStabilityLine: longTermPortrait.stabilityLine || '',
@@ -816,6 +853,7 @@ function buildFamilyDecisionActionBridge(input = {}) {
   const nextCapability = input.nextCapability || {};
   const subjectDepth = input.subjectSkillDepth || {};
   const visual = input.visualSocraticMatrix || {};
+  const courseUnit = input.courseUnitDecisionBoard || null;
   const solutionMap = input.solutionMap || {};
   const plan = input.plan || {};
   const evidence = Array.isArray(memo.evidenceChecklist) && memo.evidenceChecklist.length
@@ -823,6 +861,7 @@ function buildFamilyDecisionActionBridge(input = {}) {
     : ['孩子说出第一步', '留下错因卡', '明天能回访同一小步'];
   const tutorRoute = memo.route || (plan.cta && plan.cta.path) || '/pages/tutor/tutor?from=family_decision_bridge';
   const practiceRoute = nextCapability.route || active.route || '/pages/arcade/arcade?from=family_decision_bridge';
+  const courseUnitRoute = courseUnit && courseUnit.gameRoute ? courseUnit.gameRoute : practiceRoute;
   const subjectLine = subjectDepth && subjectDepth.label
     ? `${subjectDepth.label}：${subjectDepth.firstStep}`
     : (visual && visual.parentLine) || '第一步小黑板只看一笔，不讲完整答案。';
@@ -846,9 +885,9 @@ function buildFamilyDecisionActionBridge(input = {}) {
       {
         id: 'practice',
         label: '5分钟轻练',
-        route: practiceRoute,
-        reason: active.task || nextCapability.nextAction || '用一局轻回访确认不是当场会、转身忘。',
-        evidence: evidence[1] || '留下错因卡'
+        route: courseUnitRoute,
+        reason: courseUnit ? courseUnit.sevenDayReviewLine : (active.task || nextCapability.nextAction || '用一局轻回访确认不是当场会、转身忘。'),
+        evidence: courseUnit ? courseUnit.classroomObservationLine : (evidence[1] || '留下错因卡')
       },
       {
         id: 'share',
@@ -1143,6 +1182,9 @@ Page({
     const visualSocraticMatrix = storage.buildVisualSocraticMatrix
       ? storage.buildVisualSocraticMatrix(Object.assign({}, todayFocus || {}, { subjectSkillDepth, curriculumSpine }))
       : null;
+    const courseUnitMap = storage.buildCourseUnitMap
+      ? storage.buildCourseUnitMap(Object.assign({}, todayFocus || {}, { subjectSeedLibrary: null }))
+      : null;
     const learningDepthMap = storage.buildLearningDepthMap ? storage.buildLearningDepthMap() : null;
     const learningQuestArc = storage.buildLearningQuestArc ? storage.buildLearningQuestArc() : null;
     const moduleFlowCompass = storage.buildModuleFlowCompass ? storage.buildModuleFlowCompass() : null;
@@ -1164,7 +1206,7 @@ Page({
       moduleFlowCompass,
       capabilityEvidenceLedger
     }) : null;
-    learningReportSummary = buildLearningReportSummary(learningReportState || {}, capabilityEvidenceLedger, subjectSkillDepth, curriculumSpine, visualSocraticMatrix);
+    learningReportSummary = buildLearningReportSummary(learningReportState || {}, capabilityEvidenceLedger, subjectSkillDepth, curriculumSpine, visualSocraticMatrix, courseUnitMap);
     const dailyShareCard = buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCauseSummary, todayFocus, globalEvidenceBrief, reportDailyActionQueue, unifiedNextAction, capabilityEvidenceLedger, subjectSkillDepth, curriculumSpine, visualSocraticMatrix);
     if (dailyShareCard && dailyShareCard.code && dailyShareCard.code !== lastGeneratedShareCode) {
       lastGeneratedShareCode = dailyShareCard.code;
@@ -1255,6 +1297,7 @@ Page({
       subjectSkillDepth,
       curriculumSpine,
       visualSocraticMatrix,
+      courseUnitMap,
       reportDailyActionQueue,
       learningReportInput: Object.assign({}, this.data.learningReportInput, {
         mode: (learningReportState && learningReportState.reportProgress && learningReportState.reportProgress.mode) || this.data.learningReportInput.mode || 'fast',

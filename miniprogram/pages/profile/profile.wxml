@@ -620,6 +620,19 @@
           <text wx:if="{{learningReportSummary.curriculumVisualBoardLine}}">{{learningReportSummary.curriculumVisualBoardLine}}</text>
           <text wx:if="{{learningReportSummary.visualSocraticReportLine}}">图解追问：{{learningReportSummary.visualSocraticReportLine}}</text>
           <text wx:if="{{learningReportSummary.visualSocraticBoundary}}">{{learningReportSummary.visualSocraticBoundary}}</text>
+          <text wx:if="{{learningReportSummary.courseUnitReportLine}}">单元判断：{{learningReportSummary.courseUnitReportLine}}</text>
+          <text wx:if="{{learningReportSummary.courseUnitParentDecisionLine}}">{{learningReportSummary.courseUnitParentDecisionLine}}</text>
+          <text wx:if="{{learningReportSummary.courseUnitClassroomLine}}">{{learningReportSummary.courseUnitClassroomLine}}</text>
+        </view>
+        <view class="parent-brief-block" wx:if="{{learningReportSummary.courseUnitDecisionBoard}}">
+          <text class="parent-brief-label">{{learningReportSummary.courseUnitDecisionBoard.title}}</text>
+          <text>{{learningReportSummary.courseUnitDecisionBoard.summary}}</text>
+          <text>{{learningReportSummary.courseUnitDecisionBoard.blackboardLine}}</text>
+          <text wx:for="{{learningReportSummary.courseUnitDecisionBoard.questionTypes}}" wx:key="*this">题型动作：{{item}}</text>
+          <text wx:for="{{learningReportSummary.courseUnitDecisionBoard.wrongCauseAtlas}}" wx:key="*this">错因谱：{{item}}</text>
+          <text wx:for="{{learningReportSummary.courseUnitDecisionBoard.diagnosticProbes}}" wx:key="*this">诊断追问：{{item}}</text>
+          <text>{{learningReportSummary.courseUnitDecisionBoard.sevenDayReviewLine}}</text>
+          <text>{{learningReportSummary.courseUnitDecisionBoard.shareContract}}</text>
         </view>
         <view class="parent-brief-block">
           <text class="parent-brief-label">学业矩阵</text>
