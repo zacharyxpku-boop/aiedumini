@@ -165,7 +165,10 @@ Page({
         capability_route: safeDecodeShareParam(query.capability_route),
         challenge_goal: safeDecodeShareParam(query.challenge_goal),
         challenge_rule: safeDecodeShareParam(query.challenge_rule),
-        challenge_route: safeDecodeShareParam(query.challenge_route)
+        challenge_route: safeDecodeShareParam(query.challenge_route),
+        relay_privacy: safeDecodeShareParam(query.relay_privacy),
+        relay_review: safeDecodeShareParam(query.relay_review),
+        relay_first_step: safeDecodeShareParam(query.relay_first_step)
       }) : {
         code: query.share,
         share_code: query.share,
@@ -181,6 +184,9 @@ Page({
         challenge_goal: safeDecodeShareParam(query.challenge_goal),
         challenge_rule: safeDecodeShareParam(query.challenge_rule),
         challenge_route: safeDecodeShareParam(query.challenge_route),
+        relay_privacy: safeDecodeShareParam(query.relay_privacy),
+        relay_review: safeDecodeShareParam(query.relay_review),
+        relay_first_step: safeDecodeShareParam(query.relay_first_step),
         action_label: query.action === 'wrong_cause_revisit'
           ? '明天先回看这张错因卡'
           : query.action === 'due_card_revisit'
@@ -213,7 +219,10 @@ Page({
             capability_label: safeDecodeShareParam(query.capability_label),
             challenge_goal: safeDecodeShareParam(query.challenge_goal),
             challenge_rule: safeDecodeShareParam(query.challenge_rule),
-            challenge_route: safeDecodeShareParam(query.challenge_route)
+            challenge_route: safeDecodeShareParam(query.challenge_route),
+            relay_privacy: safeDecodeShareParam(query.relay_privacy),
+            relay_review: safeDecodeShareParam(query.relay_review),
+            relay_first_step: safeDecodeShareParam(query.relay_first_step)
           }
         });
       }
@@ -233,7 +242,10 @@ Page({
           capability_label: safeDecodeShareParam(query.capability_label),
           challenge_goal: safeDecodeShareParam(query.challenge_goal),
           challenge_rule: safeDecodeShareParam(query.challenge_rule),
-          challenge_route: safeDecodeShareParam(query.challenge_route)
+          challenge_route: safeDecodeShareParam(query.challenge_route),
+          relay_privacy: safeDecodeShareParam(query.relay_privacy),
+          relay_review: safeDecodeShareParam(query.relay_review),
+          relay_first_step: safeDecodeShareParam(query.relay_first_step)
         }
       }).catch(() => {});
       this.setData({
@@ -748,10 +760,17 @@ Page({
     const actionLabel = incoming.action_label || '先接住这张学习复盘卡';
     const actionDetail = incoming.action_detail || incoming.capability_next_action || '用自己的材料走一遍：第一步、轻练、回访。';
     const challengeRoute = navigation.normalizeRoute(incoming.challenge_route || incoming.capability_route || '/pages/arcade/arcade');
+    const firstStep = incoming.relay_first_step || incoming.challenge_goal || actionLabel;
+    const privacyLine = incoming.relay_privacy || '分享只带学习动作和回访证据，不带孩子完整对话、分数、原题照片。';
+    const reviewLine = incoming.relay_review || '第 7 天用 1 道小变式确认能不能迁移。';
     return {
       title: '回流接力板',
-      summary: '朋友分享的不是排名，是一个可复用的小动作。先选一条路，咕点会留下接力证据。',
+      summary: '朋友分享的不是排名，是一个可复用的小动作。先选一条路，按点会留下接力证据。',
       evidenceLine: incoming.capability_label || incoming.challenge_goal || actionLabel,
+      firstStepLine: `先做第一步：${firstStep}`,
+      privacyLine,
+      reviewLine,
+      returnContractLine: '接力成立条件：主动回忆、错因回退、明天回访三件事至少完成一件并留下记录。',
       actions: [
         {
           id: 'repair',
@@ -1487,7 +1506,7 @@ Page({
     const incoming = this.data.incomingShare || (storage.loadIncomingShare && storage.loadIncomingShare()) || {};
     const route = navigation.normalizeRoute(incoming.challenge_route || incoming.capability_route || '/pages/arcade/arcade');
     const query = incoming.share_code
-      ? `from=share&share=${incoming.share_code}&mode=${incoming.mode || ''}&identity=${encodeURIComponent(incoming.identity_tag || '')}&action=${incoming.parent_next_action || ''}&capability_gap=${encodeURIComponent(incoming.capability_gap || '')}&capability_label=${encodeURIComponent(incoming.capability_label || '')}&challenge_goal=${encodeURIComponent(incoming.challenge_goal || '')}&challenge_rule=${encodeURIComponent(incoming.challenge_rule || '')}`
+      ? `from=share&share=${incoming.share_code}&mode=${incoming.mode || ''}&identity=${encodeURIComponent(incoming.identity_tag || '')}&action=${incoming.parent_next_action || ''}&capability_gap=${encodeURIComponent(incoming.capability_gap || '')}&capability_label=${encodeURIComponent(incoming.capability_label || '')}&challenge_goal=${encodeURIComponent(incoming.challenge_goal || '')}&challenge_rule=${encodeURIComponent(incoming.challenge_rule || '')}&relay_privacy=${encodeURIComponent(incoming.relay_privacy || '')}&relay_review=${encodeURIComponent(incoming.relay_review || '')}&relay_first_step=${encodeURIComponent(incoming.relay_first_step || '')}`
       : '';
     const target = query && route.indexOf('?') < 0 ? `${route}?${query}` : route;
     this.trackShareActivation('challenge_started', {
@@ -1495,7 +1514,10 @@ Page({
       route: target,
       challenge_goal: incoming.challenge_goal || '',
       challenge_rule: incoming.challenge_rule || '',
-      challenge_route: incoming.challenge_route || ''
+      challenge_route: incoming.challenge_route || '',
+      relay_privacy: incoming.relay_privacy || '',
+      relay_review: incoming.relay_review || '',
+      relay_first_step: incoming.relay_first_step || ''
     });
     if (!navigation.navigateLearningRoute(target)) {
       wx.navigateTo({ url: '/pages/arcade/arcade' });
@@ -1507,7 +1529,7 @@ Page({
     const incoming = this.data.incomingShare || (storage.loadIncomingShare && storage.loadIncomingShare()) || {};
     const route = navigation.normalizeRoute(dataset.route || '/pages/arcade/arcade', '/pages/arcade/arcade');
     const query = incoming.share_code && route.indexOf('?') < 0
-      ? `?from=share_relay&share=${incoming.share_code}&mode=${incoming.mode || ''}&identity=${encodeURIComponent(incoming.identity_tag || '')}&action=${incoming.parent_next_action || ''}&capability_gap=${encodeURIComponent(incoming.capability_gap || '')}&capability_label=${encodeURIComponent(incoming.capability_label || '')}&challenge_goal=${encodeURIComponent(incoming.challenge_goal || '')}&challenge_rule=${encodeURIComponent(incoming.challenge_rule || '')}`
+      ? `?from=share_relay&share=${incoming.share_code}&mode=${incoming.mode || ''}&identity=${encodeURIComponent(incoming.identity_tag || '')}&action=${incoming.parent_next_action || ''}&capability_gap=${encodeURIComponent(incoming.capability_gap || '')}&capability_label=${encodeURIComponent(incoming.capability_label || '')}&challenge_goal=${encodeURIComponent(incoming.challenge_goal || '')}&challenge_rule=${encodeURIComponent(incoming.challenge_rule || '')}&relay_privacy=${encodeURIComponent(incoming.relay_privacy || '')}&relay_review=${encodeURIComponent(incoming.relay_review || '')}&relay_first_step=${encodeURIComponent(incoming.relay_first_step || '')}`
       : '';
     const target = `${route}${query}`;
     const action = {

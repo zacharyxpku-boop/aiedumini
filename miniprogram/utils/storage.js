@@ -4544,6 +4544,45 @@ function buildShareChallengePlan(input = {}) {
     { id: 'tomorrow', label: '明天', text: '只回访最不稳的 1 张卡，不扩题量。' },
     { id: 'day_7', label: '第 7 天', text: '用 1 道小变式确认能不能迁移。' }
   ];
+  const privacyBoundary = '分享只带轻挑战、第一步、能力缺口和回访动作，不带孩子完整对话、分数、原题照片。';
+  const peerSafeLine = '同伴只接同类动作，不比较速度、不比较正确率。';
+  const returnPathContract = [
+    { id: 'land', label: '落地页', text: '先解释这不是排行榜，而是一张可复用的学习动作卡。' },
+    { id: 'choose', label: '选动作', text: '从修卡点、轻挑战、给家长看三条路里选一条。' },
+    { id: 'persist', label: '留证据', text: '完成后写入分享接力、统一下一步和页面能力账本。' }
+  ];
+  const relayChain = [
+    { id: 'sender', label: '发起者', text: `留下「${subjectLabel}」的第一步证据。` },
+    { id: 'receiver', label: '接收者', text: '用自己的材料复刻同一类第一步，不复制作业答案。' },
+    { id: 'parent', label: '家长', text: '只检查今晚动作和明天回访，不追排名。' }
+  ];
+  const communityChallengeCard = {
+    title: '家庭轻接力卡',
+    promise: '把一次分享变成一次可复用的学习动作，而不是邀请链接。',
+    firstStep,
+    noRankingLine: '不排行、不晒分、不暴露原题，只留行动证据。',
+    doneSignal: '接收者完成 1 次主动回忆、1 次错因回退、1 次明天回访预约。'
+  };
+  const parentDecisionPayload = {
+    tonightQuestion: `今晚只问一句：${firstStep}`,
+    evidenceToCheck: ['孩子自己的第一步', '错因是否回到卡片', '明天是否能复述'],
+    stopRule: '孩子说不出来就停在小黑板提示，不继续补完整答案。'
+  };
+  const wrongCauseReplayPayload = {
+    entry: '/pages/review/review?from=share_relay&mode=wrong_cause',
+    replayRule: '先复述错因，再做 1 道同类小变式。',
+    fallback: '错因说不清时回到第一步卡，不进入刷题。'
+  };
+  const sevenDayReviewPayload = {
+    day1: '今晚完成主动回忆。',
+    day2: '明天只回访最不稳的 1 张卡。',
+    day7: '第 7 天用小变式确认迁移。'
+  };
+  const shareRelayActions = [
+    { id: 'repair', label: '修卡点', route: wrongCauseReplayPayload.entry, evidence: 'wrong_cause_relay' },
+    { id: 'challenge', label: '做轻挑战', route, evidence: 'active_recall_relay' },
+    { id: 'parent', label: '给家长看', route: '/pages/profile/profile?from=share_relay', evidence: 'parent_decision_relay' }
+  ];
   return {
     id: 'share_challenge_plan',
     title: '同伴轻挑战',
@@ -4555,6 +4594,16 @@ function buildShareChallengePlan(input = {}) {
       : '同伴模式：对方用自己的材料做同一类第一步。',
     steps,
     reviewCadence,
+    relayChain,
+    communityChallengeCard,
+    returnPathContract,
+    privacyBoundary,
+    peerSafeLine,
+    parentDecisionPayload,
+    wrongCauseReplayPayload,
+    sevenDayReviewPayload,
+    evidenceContractLine: '接力成立必须同时有：第一步、错因回退、明天回访；缺一项就只算邀请，不算学习闭环。',
+    shareRelayActions,
     parentEvidenceLine: '家长只看三件事：孩子是否自己说第一步、错因是否回到卡片、明天是否还能复述。',
     successRule: '完成 3 张主动回忆卡，并留下孩子自己的第一步。',
     failureFallback: '如果说不出来，退回第一步小黑板，不继续讲完整答案。',
@@ -4562,7 +4611,10 @@ function buildShareChallengePlan(input = {}) {
     query: {
       challenge_goal: goal,
       challenge_rule: '三张主动回忆卡，不排行，只留第一步证据',
-      challenge_route: route
+      challenge_route: route,
+      relay_privacy: privacyBoundary,
+      relay_review: sevenDayReviewPayload.day7,
+      relay_first_step: firstStep
     }
   };
 }
@@ -4588,6 +4640,9 @@ function saveIncomingShare(share = {}) {
     challenge_goal: share.challenge_goal || '',
     challenge_rule: share.challenge_rule || '',
     challenge_route: share.challenge_route || '',
+    relay_privacy: share.relay_privacy || '',
+    relay_review: share.relay_review || '',
+    relay_first_step: share.relay_first_step || '',
     created_at: share.created_at || new Date().toISOString()
   };
   set(KEYS.incomingShare, record);

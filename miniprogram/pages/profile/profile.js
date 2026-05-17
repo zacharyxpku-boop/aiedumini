@@ -406,7 +406,7 @@ function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCause
     route: nextCapability && nextCapability.route ? nextCapability.route : '/pages/arcade/arcade'
   }) : null;
   const challengeQuery = shareChallengePlan && shareChallengePlan.query
-    ? `&challenge_goal=${encodeURIComponent(shareChallengePlan.query.challenge_goal || '')}&challenge_rule=${encodeURIComponent(shareChallengePlan.query.challenge_rule || '')}&challenge_route=${encodeURIComponent(shareChallengePlan.query.challenge_route || '')}`
+    ? `&challenge_goal=${encodeURIComponent(shareChallengePlan.query.challenge_goal || '')}&challenge_rule=${encodeURIComponent(shareChallengePlan.query.challenge_rule || '')}&challenge_route=${encodeURIComponent(shareChallengePlan.query.challenge_route || '')}&relay_privacy=${encodeURIComponent(shareChallengePlan.query.relay_privacy || '')}&relay_review=${encodeURIComponent(shareChallengePlan.query.relay_review || '')}&relay_first_step=${encodeURIComponent(shareChallengePlan.query.relay_first_step || '')}`
     : '';
   const path = `/pages/home/home?share=${code}&from=daily_card&challenge=arcade&mode=same_identity&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}`;
   const parentPath = `/pages/home/home?share=${code}&from=parent_card&mode=parent_recap&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}`;
@@ -573,6 +573,9 @@ function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCause
       share_challenge_goal: shareChallengePlan && shareChallengePlan.goal,
       share_challenge_rule: shareChallengePlan && shareChallengePlan.successRule,
       share_challenge_route: shareChallengePlan && shareChallengePlan.route,
+      share_privacy_boundary: shareChallengePlan && shareChallengePlan.privacyBoundary,
+      share_return_contract: shareChallengePlan && shareChallengePlan.evidenceContractLine,
+      share_relay_actions: shareChallengePlan && shareChallengePlan.shareRelayActions,
       evidence_brief: evidenceBrief && evidenceBrief.reportLine,
       capability_gap_id: nextCapability && nextCapability.id,
       capability_gap_label: nextCapability && nextCapability.label,

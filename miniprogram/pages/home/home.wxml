@@ -360,11 +360,18 @@
         <view class="share-body" wx:if="{{incomingShare.capability_next_action}}">{{incomingShare.capability_next_action}}</view>
         <view class="share-body" wx:if="{{incomingShare.challenge_goal}}">轻挑战：{{incomingShare.challenge_goal}}</view>
         <view class="share-body" wx:if="{{incomingShare.challenge_rule}}">规则：{{incomingShare.challenge_rule}}</view>
+        <view class="share-body" wx:if="{{incomingShare.relay_first_step}}">第一步：{{incomingShare.relay_first_step}}</view>
+        <view class="share-body" wx:if="{{incomingShare.relay_review}}">7 天复核：{{incomingShare.relay_review}}</view>
+        <view class="share-body" wx:if="{{incomingShare.relay_privacy}}">{{incomingShare.relay_privacy}}</view>
       </view>
       <button class="share-button" bindtap="goSharedChallenge">去轻挑战</button>
       <view class="share-relay-board" wx:if="{{incomingShareRelay}}">
         <view class="share-relay-title">{{incomingShareRelay.title}}</view>
         <view class="share-relay-summary">{{incomingShareRelay.summary}}</view>
+        <view class="share-relay-evidence">{{incomingShareRelay.firstStepLine}}</view>
+        <view class="share-relay-evidence">{{incomingShareRelay.privacyLine}}</view>
+        <view class="share-relay-evidence">{{incomingShareRelay.reviewLine}}</view>
+        <view class="share-relay-evidence">{{incomingShareRelay.returnContractLine}}</view>
         <view class="share-relay-grid">
           <button
             class="share-relay-action"
