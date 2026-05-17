@@ -5855,6 +5855,36 @@ function buildSurfaceDepthPack(surface = 'home', options = {}) {
     light_entry_evidence: '/pages/daily-math/daily-math',
     share_return: '/pages/profile/profile'
   };
+  const surfaceCapabilityMap = {
+    home: ['socratic', 'light_entry', 'game', 'parent_action', 'next_action'],
+    tutor: ['socratic', 'module_flow', 'parent_action', 'next_action'],
+    review: ['socratic', 'game', 'report', 'module_flow', 'next_action'],
+    arcade: ['game', 'socratic', 'parent_action', 'next_action'],
+    profile: ['report', 'share', 'parent_action', 'surface_action', 'next_action'],
+    legal: ['parent_action', 'report', 'share', 'next_action'],
+    tools: ['light_entry', 'module_flow', 'game', 'next_action'],
+    upload: ['report', 'socratic', 'module_flow', 'next_action'],
+    diagnosis: ['socratic', 'report', 'module_flow', 'next_action'],
+    focus: ['socratic', 'parent_action', 'surface_action', 'next_action'],
+    module: ['module_flow', 'socratic', 'game', 'next_action'],
+    radar: ['report', 'parent_action', 'module_flow', 'next_action'],
+    daily_math: ['light_entry', 'game', 'socratic', 'next_action'],
+    dictation: ['light_entry', 'socratic', 'parent_action', 'next_action'],
+    light_diagnosis: ['light_entry', 'socratic', 'module_flow', 'next_action']
+  };
+  const ledgerRows = capabilityLedger && Array.isArray(capabilityLedger.rows) ? capabilityLedger.rows : [];
+  const capabilityCards = (surfaceCapabilityMap[surface] || surfaceCapabilityMap.home)
+    .map((id) => ledgerRows.find((item) => item && item.id === id))
+    .filter(Boolean)
+    .map((item) => ({
+      id: item.id,
+      label: item.label,
+      displayLabel: item.label,
+      ready: !!item.ready,
+      evidenceLine: item.evidenceLine,
+      nextAction: item.nextAction,
+      route: item.route
+    }));
   const cards = current.focusIds.map((id) => {
     const item = map[id] || {};
     const flow = (moduleFlowCompass.modules || []).find((entry) => entry.id === id) || {};
@@ -5913,6 +5943,7 @@ function buildSurfaceDepthPack(surface = 'home', options = {}) {
       nextCapability: capabilityLedger.nextCapability,
       moatLine: capabilityLedger.moatLine
     } : null,
+    capabilityCards,
     cards,
     surfaceReadiness: readyCount >= cards.length ? 'closed' : readyCount >= Math.max(2, Math.ceil(cards.length / 2)) ? 'building' : 'thin',
     acceptanceSignal: readiness && readiness.score ? Number(readiness.score || 0) : 0
