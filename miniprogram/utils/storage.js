@@ -5720,6 +5720,11 @@ function buildSurfaceDepthPack(surface = 'home', options = {}) {
   const moduleFlowCompass = buildModuleFlowCompass(options);
   const globalEvidenceBrief = options.globalEvidenceBrief || buildGlobalEvidenceBrief(options);
   const learningQuestArc = options.learningQuestArc || buildLearningQuestArc(options);
+  const capabilityLedger = options.capabilityEvidenceLedger || buildCapabilityEvidenceLedger(Object.assign({}, options, {
+    globalEvidenceBrief,
+    learningQuestArc,
+    moduleFlowCompass
+  }));
   const checklist = Array.isArray(acceptance.functionalityChecklist) ? acceptance.functionalityChecklist : [];
   const map = checklist.reduce((acc, item) => {
     if (item && item.id) acc[item.id] = item;
@@ -5876,7 +5881,13 @@ function buildSurfaceDepthPack(surface = 'home', options = {}) {
   const routeLine = globalEvidenceBrief && globalEvidenceBrief.shareLine
     ? `流转线：${globalEvidenceBrief.shareLine}`
     : `流转线：下一步进入 ${currentModule && currentModule.displayLabel ? currentModule.displayLabel : current.nextAction}`;
-  const familyLine = `${current.benchmark} ${storyLine} ${evidenceLine}`;
+  const capabilityLine = capabilityLedger && capabilityLedger.nextCapability
+    ? `能力账本：${capabilityLedger.readyCount}/${capabilityLedger.totalCount}，先补 ${capabilityLedger.nextCapability.label}。${capabilityLedger.nextCapability.evidenceLine || capabilityLedger.nextCapability.nextAction}`
+    : '能力账本：继续沉淀孩子思路、练习、家长动作和下一步证据。';
+  const capabilityRoute = capabilityLedger && capabilityLedger.nextCapability && capabilityLedger.nextCapability.route
+    ? capabilityLedger.nextCapability.route
+    : (currentModule && currentModule.route ? currentModule.route : '/pages/home/home');
+  const familyLine = `${current.benchmark} ${storyLine} ${evidenceLine} ${capabilityLine}`;
   return {
     surface,
     title: current.title,
@@ -5886,12 +5897,22 @@ function buildSurfaceDepthPack(surface = 'home', options = {}) {
     storyLine,
     evidenceLine,
     routeLine,
+    capabilityLine,
+    capabilityRoute,
     familyLine,
     readyCount,
     totalCount: cards.length,
     progress: cards.length ? Math.round((readyCount / cards.length) * 100) : 0,
     currentModule,
     primaryRoute: currentModule && currentModule.route ? currentModule.route : '/pages/home/home',
+    ledgerPrimaryRoute: capabilityRoute,
+    capabilityLedgerSummary: capabilityLedger ? {
+      readyCount: capabilityLedger.readyCount,
+      totalCount: capabilityLedger.totalCount,
+      progress: capabilityLedger.progress,
+      nextCapability: capabilityLedger.nextCapability,
+      moatLine: capabilityLedger.moatLine
+    } : null,
     cards,
     surfaceReadiness: readyCount >= cards.length ? 'closed' : readyCount >= Math.max(2, Math.ceil(cards.length / 2)) ? 'building' : 'thin',
     acceptanceSignal: readiness && readiness.score ? Number(readiness.score || 0) : 0
