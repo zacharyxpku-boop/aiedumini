@@ -5942,8 +5942,21 @@ function buildSurfaceDepthPack(surface = 'home', options = {}) {
       moduleLabel: flow.label || ''
     };
   });
-  const readyCount = cards.filter((item) => item.ready).length;
-  const currentModule = cards.find((item) => !item.ready) || cards[0] || null;
+  const functionCards = cards;
+  const visibleCards = functionCards.concat(capabilityCards.map((item) => ({
+    id: item.id,
+    label: item.label,
+    displayLabel: `能力·${item.label}`,
+    ready: !!item.ready,
+    statusLine: item.ready ? '已有能力证据' : '能力证据待补',
+    evidenceLine: item.evidenceLine,
+    gapLine: item.nextAction,
+    route: item.route,
+    moduleLabel: '能力账本',
+    cardType: 'capability'
+  })));
+  const readyCount = visibleCards.filter((item) => item.ready).length;
+  const currentModule = visibleCards.find((item) => !item.ready) || visibleCards[0] || null;
   const storyLine = learningQuestArc && learningQuestArc.currentLabel
     ? `当前剧情：${learningQuestArc.currentLabel} - ${learningQuestArc.currentTitle || learningQuestArc.currentBody || ''}`
     : '当前剧情：先留下第一步，再把练习、家长复盘和隔天回看接起来。';
@@ -5973,8 +5986,8 @@ function buildSurfaceDepthPack(surface = 'home', options = {}) {
     capabilityRoute,
     familyLine,
     readyCount,
-    totalCount: cards.length,
-    progress: cards.length ? Math.round((readyCount / cards.length) * 100) : 0,
+    totalCount: visibleCards.length,
+    progress: visibleCards.length ? Math.round((readyCount / visibleCards.length) * 100) : 0,
     currentModule,
     primaryRoute: currentModule && currentModule.route ? currentModule.route : '/pages/home/home',
     ledgerPrimaryRoute: capabilityRoute,
@@ -5986,8 +5999,9 @@ function buildSurfaceDepthPack(surface = 'home', options = {}) {
       moatLine: capabilityLedger.moatLine
     } : null,
     capabilityCards,
-    cards,
-    surfaceReadiness: readyCount >= cards.length ? 'closed' : readyCount >= Math.max(2, Math.ceil(cards.length / 2)) ? 'building' : 'thin',
+    functionCards,
+    cards: visibleCards,
+    surfaceReadiness: readyCount >= visibleCards.length ? 'closed' : readyCount >= Math.max(2, Math.ceil(visibleCards.length / 2)) ? 'building' : 'thin',
     acceptanceSignal: readiness && readiness.score ? Number(readiness.score || 0) : 0
   };
 }
