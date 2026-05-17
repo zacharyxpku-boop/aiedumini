@@ -5076,7 +5076,9 @@ const LIGHT_ENTRY_SEED_BANK = {
     taskSeeds: [
       { id: 'symbol_scan', label: '符号先看清', taskType: 'daily_math', wrongCause: '漏看符号', firstStep: '先圈加减乘除符号。' },
       { id: 'carry_check', label: '进退位检查', taskType: 'daily_math', wrongCause: '进退位漏掉', firstStep: '先标出需要进位或退位的位置。' },
-      { id: 'estimate_guard', label: '估算护栏', taskType: 'daily_math', wrongCause: '答案量级不对', firstStep: '先估一个大概范围。' }
+      { id: 'estimate_guard', label: '估算护栏', taskType: 'daily_math', wrongCause: '结果量级不对', firstStep: '先估一个大概范围。' },
+      { id: 'unit_place', label: '位值对齐', taskType: 'daily_math', wrongCause: '数位没对齐', firstStep: '先把个位、十位、小数点对齐。' },
+      { id: 'reverse_check', label: '反向验算', taskType: 'daily_math', wrongCause: '算完不检查', firstStep: '先用反向运算验一遍。' }
     ]
   },
   dictation: {
@@ -5085,7 +5087,9 @@ const LIGHT_ENTRY_SEED_BANK = {
     taskSeeds: [
       { id: 'sound_shape', label: '音形对应', taskType: 'dictation', wrongCause: '听到音但字形不稳', firstStep: '先说这个词最容易错的那一笔。' },
       { id: 'meaning_anchor', label: '意思锚点', taskType: 'dictation', wrongCause: '词义不清', firstStep: '先用这个词说一句短句。' },
-      { id: 'repeat_rhythm', label: '复听节奏', taskType: 'dictation', wrongCause: '听一次就下笔', firstStep: '先听两遍，再写第一个字。' }
+      { id: 'repeat_rhythm', label: '复听节奏', taskType: 'dictation', wrongCause: '听一次就下笔', firstStep: '先听两遍，再写第一个字。' },
+      { id: 'shape_part', label: '部件拆字', taskType: 'dictation', wrongCause: '偏旁部件混淆', firstStep: '先把这个字拆成偏旁和剩下部分。' },
+      { id: 'sentence_memory', label: '句中记忆', taskType: 'dictation', wrongCause: '孤立背词不稳', firstStep: '先把词放进一句自己能说的话。' }
     ]
   },
   light_diagnosis: {
@@ -5094,7 +5098,9 @@ const LIGHT_ENTRY_SEED_BANK = {
     taskSeeds: [
       { id: 'type_confirm', label: '先判题型', taskType: 'unknown', wrongCause: '题型没确认', firstStep: '先说这题像哪一类。' },
       { id: 'ask_sentence', label: '问题句定位', taskType: 'math_word_problem', wrongCause: '没看清问什么', firstStep: '先圈题目真正问的句子。' },
-      { id: 'start_position', label: '下手位置', taskType: 'unknown', wrongCause: '第一步太大', firstStep: '先写一个能马上做的小动作。' }
+      { id: 'start_position', label: '下手位置', taskType: 'unknown', wrongCause: '第一步太大', firstStep: '先写一个能马上做的小动作。' },
+      { id: 'known_unknown', label: '已知未知', taskType: 'equation_setup', wrongCause: '未知量没设清', firstStep: '先写清谁是未知数。' },
+      { id: 'evidence_sentence', label: '证据句', taskType: 'reading_question', wrongCause: '回答没有依据', firstStep: '先找一句能支撑回答的原文。' }
     ]
   }
 };
@@ -5118,6 +5124,10 @@ function buildLightEntrySeedBank(feature = 'daily_math', options = {}) {
       firstStep: seed.firstStep,
       parentQuestion: depth.parentQuestion,
       evidenceRequired: depth.evidenceRequired,
+      modelLine: `${taskTypeLabel(seed.taskType)} · ${seed.wrongCause}`,
+      blackboardLine: `${bank.label}小黑板：${seed.label} -> ${seed.firstStep}`,
+      evidenceLine: `留下 ${depth.evidenceRequired.slice(0, 2).join(' / ')} 证据`,
+      loopLine: `完成后回到${feature === 'dictation' ? '听写回访' : feature === 'daily_math' ? '口算轻练' : '修卡点'}，再给家长看一句第一步。`,
       route: bank.route
     };
   });
@@ -5128,9 +5138,12 @@ function buildLightEntrySeedBank(feature = 'daily_math', options = {}) {
     title: `${bank.label}题型种子`,
     summary: latest
       ? `最近记录会优先回到「${latest.childArticulatedStep || latest.systemSuggestedStep || latest.stuckPointText || bank.label}」。`
-      : '先从 3 个可复用小题型里选一个，留下第一步证据。',
+      : `先从 ${seeds.length} 个可复用小题型里选一个，留下第一步证据。`,
     seeds,
     reusableCount: seeds.length,
+    modelLine: `${bank.label}已沉淀 ${seeds.length} 条题型 / 错因 / 第一动作模型。`,
+    evidenceLine: '每条种子都会进入题型评测、错因卡、轻练习和家长复盘。',
+    routeLine: `回流路线：${bank.label} -> 第一手证据 -> 修卡点 / 轻练习 -> 家长行动板。`,
     latestEvidence: latest,
     route: bank.route,
     nextAction: latest ? '带着最近第一步回到修卡点' : '先完成一条轻入口第一步'
