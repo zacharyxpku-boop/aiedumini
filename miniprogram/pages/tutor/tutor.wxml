@@ -91,6 +91,13 @@
             <view class="receipt-board-parent">家长只问：{{thinkingReceipt.firstStepBoard.parentPrompt}}</view>
             <view class="receipt-board-avoid">{{thinkingReceipt.firstStepBoard.avoid}}</view>
           </view>
+          <view class="receipt-first-step-board" wx:if="{{thinkingReceipt.subjectSkillDepth}}">
+            <view class="receipt-diagnostic-title">{{thinkingReceipt.subjectSkillDepth.label}}</view>
+            <view class="receipt-board-line">第一步：{{thinkingReceipt.subjectSkillDepth.firstStep}}</view>
+            <view class="receipt-board-line" wx:for="{{thinkingReceipt.subjectSkillDepth.blackboard}}" wx:key="order">{{item.order}}. {{item.text}}</view>
+            <view class="receipt-board-parent">家长只问：{{thinkingReceipt.subjectSkillDepth.parentQuestion}}</view>
+            <view class="receipt-board-avoid">{{thinkingReceipt.subjectSkillDepth.reportSignal}}</view>
+          </view>
           <view class="receipt-contract" wx:if="{{thinkingReceipt.socratic_contract}}">
             <view class="receipt-diagnostic-title">{{thinkingReceipt.socratic_contract.title}}</view>
             <view class="receipt-diagnostic-line">为什么这样问：{{thinkingReceipt.socratic_contract.whyThisQuestion}}</view>

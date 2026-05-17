@@ -592,6 +592,8 @@
           <text wx:if="{{learningReportSummary.liveEvidenceLine}}">{{learningReportSummary.liveEvidenceLine}}</text>
           <text wx:if="{{learningReportSummary.liveEvidenceSummary}}">{{learningReportSummary.liveEvidenceSummary}}</text>
           <text wx:if="{{learningReportSummary.capabilityProgressLine}}">{{learningReportSummary.capabilityProgressLine}}</text>
+          <text wx:if="{{learningReportSummary.subjectSkillDepthLine}}">题型：{{learningReportSummary.subjectSkillDepthLine}}</text>
+          <text wx:if="{{learningReportSummary.subjectSkillDepthEvidence}}">题型证据：{{learningReportSummary.subjectSkillDepthEvidence}}</text>
         </view>
         <view class="parent-brief-block">
           <text class="parent-brief-label">学业矩阵</text>
@@ -619,6 +621,7 @@
           <text>下次看：{{learningReportSummary.nextEvidenceLine}}</text>
           <text wx:if="{{learningReportSummary.capabilityNextLine}}">{{learningReportSummary.capabilityNextLine}}</text>
           <text wx:if="{{learningReportSummary.capabilityEvidenceLine}}">{{learningReportSummary.capabilityEvidenceLine}}</text>
+          <text wx:if="{{learningReportSummary.subjectSkillDepthParentQuestion}}">家长题型追问：{{learningReportSummary.subjectSkillDepthParentQuestion}}</text>
           <text>{{learningReportSummary.reviewTrigger}}</text>
         </view>
         <view class="report-action-board" wx:if="{{learningReportSummary.sevenDayActionBoard}}">
@@ -805,7 +808,14 @@
           <view class="share-family-action-line">明天复核：{{dailyShareCard.familyActionCard.tomorrowCheck}}</view>
           <view class="share-family-action-evidence">{{dailyShareCard.familyActionCard.evidenceLine}}</view>
           <view class="share-family-action-evidence" wx:if="{{dailyShareCard.familyActionCard.capabilityLine}}">{{dailyShareCard.familyActionCard.capabilityLine}}</view>
+          <view class="share-family-action-evidence" wx:if="{{dailyShareCard.familyActionCard.subjectDepthLine}}">题型：{{dailyShareCard.familyActionCard.subjectDepthLine}}</view>
           <view class="share-family-action-boundary">{{dailyShareCard.familyActionCard.boundary}}</view>
+        </view>
+        <view class="share-conversation-card" wx:if="{{dailyShareCard.subjectSkillDepth}}">
+          <view class="share-conversation-title">{{dailyShareCard.subjectSkillDepth.label}}</view>
+          <view>第一步：{{dailyShareCard.subjectSkillDepth.firstStep}}</view>
+          <view>家长只问：{{dailyShareCard.subjectSkillDepth.parentQuestion}}</view>
+          <view wx:if="{{dailyShareCard.subjectSkillDepth.reportSignal}}">{{dailyShareCard.subjectSkillDepth.reportSignal}}</view>
         </view>
         <view class="share-conversation-card" wx:if="{{dailyShareCard.capabilityGap}}">
           <view class="share-conversation-title">{{dailyShareCard.capabilityGap.label}}</view>

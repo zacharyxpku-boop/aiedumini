@@ -64,6 +64,13 @@ Page({
     const todayFocus = storage.loadTodayFocus ? storage.loadTodayFocus() : null;
     const loopFocus = todaySession && todaySession.childArticulatedStep ? todaySession : todayFocus;
     const recentTaskType = (loopFocus && loopFocus.taskType) || 'unknown';
+    const subjectSkillDepth = storage.buildSubjectSkillDepth
+      ? storage.buildSubjectSkillDepth(Object.assign({}, loopFocus || {}, {
+        taskType: recentTaskType,
+        sourceText: loopFocus && (loopFocus.stuckPointText || loopFocus.sourceText || loopFocus.thought || loopFocus.title),
+        firstStep: loopFocus && (loopFocus.childArticulatedStep || loopFocus.systemSuggestedStep)
+      }))
+      : null;
     const taskBoundCards = this.cardsForRecentTaskType(recentTaskType, loopFocus);
     const loopBoundCards = this.loopBoundCards(dueCards.concat(fallbackCards), taskBoundCards, loopFocus);
     const cards = loopBoundCards.length ? loopBoundCards : (dueCards.length ? dueCards : (fallbackCards.length ? fallbackCards : taskBoundCards));
@@ -111,8 +118,9 @@ Page({
       dailyQuestSet,
       adaptiveChallenge,
       questArcMission,
-      challengeBrief: this.buildChallengeBrief(dailyQuestSet, adaptiveChallenge, questArcMission, evidenceBias),
+      challengeBrief: this.buildChallengeBrief(dailyQuestSet, adaptiveChallenge, questArcMission, evidenceBias, subjectSkillDepth),
       surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('arcade') : null,
+      subjectSkillDepth,
       result: null,
       resultAdvice: null,
       emptyGuide: this.emptyGuide(selectedGame, round),
@@ -239,7 +247,7 @@ Page({
     return arcade.buildWhackRound(cards, { limit: size });
   },
 
-  buildChallengeBrief(dailyQuestSet = {}, adaptiveChallenge = {}, questArcMission = null, evidenceBias = null) {
+  buildChallengeBrief(dailyQuestSet = {}, adaptiveChallenge = {}, questArcMission = null, evidenceBias = null, subjectSkillDepth = null) {
     const quests = Array.isArray(dailyQuestSet.quests) ? dailyQuestSet.quests : [];
     const activeQuest = quests.find((item) => item && item.progress < item.target) || quests[0] || {};
     const mode = adaptiveChallenge.mode || 'balanced';
@@ -270,7 +278,20 @@ Page({
         ? questArcMission.evidenceRequired.join(' / ')
         : '',
       evidenceBiasSource: evidenceBias && evidenceBias.source ? evidenceBias.source : '',
-      evidenceBiasLine: evidenceBias && evidenceBias.reasonLine ? evidenceBias.reasonLine : ''
+      evidenceBiasLine: evidenceBias && evidenceBias.reasonLine ? evidenceBias.reasonLine : '',
+      subjectDepthLabel: subjectSkillDepth && subjectSkillDepth.label ? subjectSkillDepth.label : '',
+      subjectDepthLine: subjectSkillDepth && subjectSkillDepth.firstStep
+        ? `${subjectSkillDepth.label} · ${subjectSkillDepth.firstStep}`
+        : '',
+      subjectDepthGameDrills: subjectSkillDepth && Array.isArray(subjectSkillDepth.gameDrills)
+        ? subjectSkillDepth.gameDrills.slice(0, 3)
+        : [],
+      subjectDepthGameLine: subjectSkillDepth && Array.isArray(subjectSkillDepth.gameDrills)
+        ? subjectSkillDepth.gameDrills.slice(0, 3).join(' / ')
+        : '',
+      subjectDepthEvidenceLine: subjectSkillDepth && Array.isArray(subjectSkillDepth.evidenceRequired)
+        ? subjectSkillDepth.evidenceRequired.join(' / ')
+        : ''
     };
   },
 
@@ -717,6 +738,8 @@ Page({
       accuracy: savedResult.accuracy,
       xp: savedResult.xp,
       best_combo: savedResult.bestCombo,
+      subject_depth_task_type: this.data.subjectSkillDepth && this.data.subjectSkillDepth.taskType,
+      subject_depth_label: this.data.subjectSkillDepth && this.data.subjectSkillDepth.label,
       share_code: incomingShare && incomingShare.share_code ? incomingShare.share_code : ''
     });
     if (storage.saveTodaySession) {
@@ -732,6 +755,9 @@ Page({
           firstStep: session.childArticulatedStep || '',
           wrongCauseBucket: cause.wrongCauseBucket,
           wrongCauseLabel: cause.wrongCauseLabel,
+          subjectSkillDepth: this.data.subjectSkillDepth,
+          subjectDepthTaskType: this.data.subjectSkillDepth && this.data.subjectSkillDepth.taskType,
+          subjectDepthLabel: this.data.subjectSkillDepth && this.data.subjectSkillDepth.label,
           nextPracticePlan: cause,
           score: Number(savedResult.accuracy || 0),
           adaptiveMode: this.data.adaptiveChallenge && this.data.adaptiveChallenge.mode,
@@ -762,6 +788,8 @@ Page({
         xp: savedResult.xp,
         best_combo: savedResult.bestCombo,
         adaptive_mode: this.data.adaptiveChallenge && this.data.adaptiveChallenge.mode,
+        subject_depth_task_type: this.data.subjectSkillDepth && this.data.subjectSkillDepth.taskType,
+        subject_depth_label: this.data.subjectSkillDepth && this.data.subjectSkillDepth.label,
         quest_arc_stage: this.data.questArcMission && this.data.questArcMission.currentStage,
         quest_arc_mission: this.data.questArcMission && this.data.questArcMission.title,
         boss_gap: this.data.adaptiveChallenge && this.data.adaptiveChallenge.bossCard

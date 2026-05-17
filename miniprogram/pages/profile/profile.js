@@ -357,7 +357,7 @@ function buildShareCode(profile, reviewSummary, gameProfileCard) {
   return hash.toString(36).slice(0, 6).toUpperCase();
 }
 
-function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCauseSummary, todayFocus, globalEvidenceBrief, reportDailyActionQueue, unifiedNextAction, capabilityEvidenceLedger) {
+function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCauseSummary, todayFocus, globalEvidenceBrief, reportDailyActionQueue, unifiedNextAction, capabilityEvidenceLedger, subjectSkillDepth) {
   const review = reviewSummary || {};
   const game = gameProfileCard || {};
   const progress = review.progress || {};
@@ -433,6 +433,9 @@ function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCause
     evidenceBrief && evidenceBrief.reportLine ? evidenceBrief.reportLine : ''
   ].filter(Boolean).join(' · ') || '先从今晚第一步开始沉淀记录';
   const capabilityLine = nextCapability ? `能力账本下一条：${nextCapability.label} · ${nextCapability.nextAction}` : '';
+  const subjectDepthLine = subjectSkillDepth && subjectSkillDepth.label
+    ? `${subjectSkillDepth.label}：${subjectSkillDepth.firstStep}`
+    : '';
   return {
     code,
     title,
@@ -476,8 +479,18 @@ function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCause
       tomorrowCheck,
       evidenceLine,
       capabilityLine,
+      subjectDepthLine,
       boundary: '家长只追问，不接管答案；孩子说不出第一步，就回到提示卡。'
     },
+    subjectSkillDepth: subjectSkillDepth ? {
+      taskType: subjectSkillDepth.taskType,
+      label: subjectSkillDepth.label,
+      firstStep: subjectSkillDepth.firstStep,
+      parentQuestion: subjectSkillDepth.parentQuestion,
+      reportSignal: subjectSkillDepth.reportSignal,
+      shareLine: subjectSkillDepth.shareLine,
+      evidenceRequired: subjectSkillDepth.evidenceRequired || []
+    } : null,
     capabilityGap: nextCapability ? {
       id: nextCapability.id,
       label: nextCapability.label,
@@ -533,6 +546,9 @@ function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCause
       capability_gap_label: nextCapability && nextCapability.label,
       capability_gap_route: nextCapability && nextCapability.route,
       capability_gap_next_action: nextCapability && nextCapability.nextAction,
+      subject_depth_task_type: subjectSkillDepth && subjectSkillDepth.taskType,
+      subject_depth_label: subjectSkillDepth && subjectSkillDepth.label,
+      subject_depth_first_step: subjectSkillDepth && subjectSkillDepth.firstStep,
       mode: 'same_identity',
       challenge: 'arcade'
     }
@@ -604,7 +620,7 @@ function buildProfileSafeSummary(todayFocus, focusHistory = [], profileEmptyGuid
   };
 }
 
-function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger) {
+function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, subjectSkillDepth) {
   const globalEvidenceBrief = storage.buildGlobalEvidenceBrief ? storage.buildGlobalEvidenceBrief() : null;
   const capabilityLedger = capabilityEvidenceLedger || (storage.buildCapabilityEvidenceLedger ? storage.buildCapabilityEvidenceLedger({ globalEvidenceBrief }) : null);
   const nextCapability = capabilityLedger && capabilityLedger.nextCapability ? capabilityLedger.nextCapability : null;
@@ -643,6 +659,9 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger) 
       checkpoint: item.checkpoint || item.parentPrompt || ''
     }))
   };
+  const subjectDepthEvidenceLine = subjectSkillDepth && Array.isArray(subjectSkillDepth.evidenceRequired)
+    ? subjectSkillDepth.evidenceRequired.join(' / ')
+    : '';
   return {
     title: draft.title || '学习画像',
     modeLabel: reportState.reportProgress && reportState.reportProgress.label ? reportState.reportProgress.label : '0% · 快速版',
@@ -672,6 +691,12 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger) 
       : (capabilityLedger && (capabilityLedger.parentLine || capabilityLedger.summary)) || '',
     capabilityRoute: nextCapability && nextCapability.route ? nextCapability.route : '',
     capabilityProgressLine: capabilityLedger ? `${capabilityLedger.readyCount} / ${capabilityLedger.totalCount} · ${capabilityLedger.summary}` : '',
+    subjectSkillDepth,
+    subjectSkillDepthLine: subjectSkillDepth && subjectSkillDepth.label
+      ? `${subjectSkillDepth.label} · ${subjectSkillDepth.firstStep}`
+      : '',
+    subjectSkillDepthEvidence: subjectDepthEvidenceLine,
+    subjectSkillDepthParentQuestion: subjectSkillDepth && subjectSkillDepth.parentQuestion ? subjectSkillDepth.parentQuestion : '',
     parentScript: solutionMap.parentScript || plan.parentLine || '家长先问一句：这一步你准备先看哪里？',
     childScript: solutionMap.childScript || plan.childLine || '我先说出第一步。',
     nextEvidenceLine: Array.isArray(solutionMap.nextEvidenceRequired) && solutionMap.nextEvidenceRequired.length
@@ -955,6 +980,15 @@ Page({
     const globalEvidenceBrief = storage.buildGlobalEvidenceBrief ? storage.buildGlobalEvidenceBrief() : null;
     const reportDailyActionQueue = storage.buildReportDailyActionQueue ? storage.buildReportDailyActionQueue({ reportState: learningReportState || {} }) : null;
     const unifiedNextAction = storage.buildUnifiedNextActionController ? storage.buildUnifiedNextActionController({ surface: 'profile' }) : null;
+    const latestThinkingReceipt = Array.isArray(thinkingReceipts) ? thinkingReceipts[0] : null;
+    const subjectSkillDepth = storage.buildSubjectSkillDepth
+      ? storage.buildSubjectSkillDepth(Object.assign({}, todayFocus || {}, {
+        sourceText: (todayFocus && (todayFocus.stuckPointText || todayFocus.sourceText || todayFocus.thought || todayFocus.title))
+          || (latestThinkingReceipt && (latestThinkingReceipt.selected_text || latestThinkingReceipt.focus))
+          || '',
+        firstStep: todayFocus && (todayFocus.childArticulatedStep || todayFocus.systemSuggestedStep)
+      }))
+      : null;
     const learningDepthMap = storage.buildLearningDepthMap ? storage.buildLearningDepthMap() : null;
     const learningQuestArc = storage.buildLearningQuestArc ? storage.buildLearningQuestArc() : null;
     const moduleFlowCompass = storage.buildModuleFlowCompass ? storage.buildModuleFlowCompass() : null;
@@ -970,8 +1004,8 @@ Page({
       lightFeatureEvidence,
       thinkingSummary
     }) : null;
-    learningReportSummary = buildLearningReportSummary(learningReportState || {}, capabilityEvidenceLedger);
-    const dailyShareCard = buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCauseSummary, todayFocus, globalEvidenceBrief, reportDailyActionQueue, unifiedNextAction, capabilityEvidenceLedger);
+    learningReportSummary = buildLearningReportSummary(learningReportState || {}, capabilityEvidenceLedger, subjectSkillDepth);
+    const dailyShareCard = buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCauseSummary, todayFocus, globalEvidenceBrief, reportDailyActionQueue, unifiedNextAction, capabilityEvidenceLedger, subjectSkillDepth);
     if (dailyShareCard && dailyShareCard.code && dailyShareCard.code !== lastGeneratedShareCode) {
       lastGeneratedShareCode = dailyShareCard.code;
       sendMiniEvent({
@@ -1058,6 +1092,7 @@ Page({
       wrongCauseSummary,
       learningReportState,
       learningReportSummary,
+      subjectSkillDepth,
       reportDailyActionQueue,
       learningReportInput: Object.assign({}, this.data.learningReportInput, {
         mode: (learningReportState && learningReportState.reportProgress && learningReportState.reportProgress.mode) || this.data.learningReportInput.mode || 'fast',

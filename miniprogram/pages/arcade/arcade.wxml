@@ -55,6 +55,12 @@
         <view class="story-mission-line">{{challengeBrief.storyLine}}</view>
         <view class="story-mission-rule">{{challengeBrief.storyRule}}</view>
       </view>
+      <view class="story-mission" wx:if="{{challengeBrief.subjectDepthLine}}">
+        <view class="story-mission-title">{{challengeBrief.subjectDepthLabel}}</view>
+        <view class="story-mission-line">题型第一步：{{challengeBrief.subjectDepthLine}}</view>
+        <view class="story-mission-rule" wx:if="{{challengeBrief.subjectDepthGameLine}}">本局练：{{challengeBrief.subjectDepthGameLine}}</view>
+        <view class="story-mission-rule" wx:if="{{challengeBrief.subjectDepthEvidenceLine}}">留下证据：{{challengeBrief.subjectDepthEvidenceLine}}</view>
+      </view>
       <view class="challenge-brief-sub" wx:if="{{challengeBrief.evidenceBiasLine}}">为什么开这局：{{challengeBrief.evidenceBiasLine}}</view>
     </view>
 

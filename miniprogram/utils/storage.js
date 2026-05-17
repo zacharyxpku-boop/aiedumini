@@ -2311,6 +2311,85 @@ function suggestedStepForTaskType(taskType = 'unknown') {
   return firstStepTemplatesForTaskType(taskType)[0] || FIRST_STEP_TEMPLATES.unknown[0];
 }
 
+const SUBJECT_SKILL_DEPTH = {
+  math_word_problem: {
+    label: '数学应用题',
+    blackboard: ['圈已知条件', '标问题句', '说数量关系'],
+    socratic: ['题目问的到底是什么？', '哪两个量之间有关系？', '换一个数字时第一步还一样吗？'],
+    game: ['找关键词', '配数量关系', '说第一步'],
+    report: '应用题先看读题、关系、单位三处证据。',
+    parent: '你先圈了哪一句？为什么先看这句？',
+    evidenceRequired: ['known_conditions', 'question_sentence', 'relation_sentence']
+  },
+  equation_setup: {
+    label: '方程建模',
+    blackboard: ['写未知数', '找等量关系', '再列式'],
+    socratic: ['你准备用什么表示未知量？', '左右两边什么相等？', '如果单位变了要先检查什么？'],
+    game: ['未知数卡', '等量关系卡', '变式检查卡'],
+    report: '方程题重点看未知量、等量关系和变式迁移。',
+    parent: '这题你设的 x 表示什么？两边为什么相等？',
+    evidenceRequired: ['unknown_defined', 'equation_relation', 'transfer_check']
+  },
+  reading_question: {
+    label: '阅读理解',
+    blackboard: ['判断题型', '回文定位', '证据句复述'],
+    socratic: ['这题问细节、主旨还是原因？', '原文哪一句能做证据？', '答案有没有超出原文？'],
+    game: ['题型分类', '关键词定位', '证据句匹配'],
+    report: '阅读题重点看题型判断、回文定位和答案边界。',
+    parent: '你凭原文哪一句判断？这句能不能直接支持答案？',
+    evidenceRequired: ['question_type', 'text_evidence', 'answer_boundary']
+  },
+  english_sentence: {
+    label: '英语句法',
+    blackboard: ['找主语', '找谓语', '看时态/修饰'],
+    socratic: ['谁在做动作？', '真正的谓语在哪里？', '时态线索是哪一个词？'],
+    game: ['主谓配对', '时态判断', '句子骨架'],
+    report: '英语句子重点看主谓骨架、时态线索和修饰边界。',
+    parent: '这句话谁做动作？动作词是哪一个？',
+    evidenceRequired: ['subject_found', 'verb_found', 'tense_signal']
+  },
+  writing_process: {
+    label: '写作表达',
+    blackboard: ['一句话立意', '列两个要点', '补例子'],
+    socratic: ['你最想说明哪一句？', '第一个理由是什么？', '有没有一个具体例子？'],
+    game: ['开头句', '要点排序', '例子补全'],
+    report: '写作重点看开头句、要点结构和例子支撑。',
+    parent: '你先说一句最简单的中心句，后面只补两个理由。',
+    evidenceRequired: ['topic_sentence', 'two_points', 'example_support']
+  },
+  unknown: {
+    label: '通用卡点',
+    blackboard: ['说题目问什么', '说第一步', '说检查点'],
+    socratic: ['这题第一步先看哪里？', '你现在卡在哪一句？', '下一次先检查什么？'],
+    game: ['第一步卡', '检查点卡', '复述卡'],
+    report: '通用卡点先看第一步是否能说清楚。',
+    parent: '你先说第一步，不急着说答案。',
+    evidenceRequired: ['child_first_step', 'stuck_sentence', 'next_check']
+  }
+};
+
+function buildSubjectSkillDepth(input = {}) {
+  const sourceText = input.sourceText || input.stuckPointText || input.thought || input.title || input.text || '';
+  const taskType = input.taskType || detectTaskType(sourceText, input.subject || input.issueType || '');
+  const spec = SUBJECT_SKILL_DEPTH[taskType] || SUBJECT_SKILL_DEPTH.unknown;
+  const firstStep = sanitizeMiniActionText(input.childArticulatedStep || input.systemSuggestedStep || input.firstStep || suggestedStepForTaskType(taskType));
+  return {
+    id: `subject_depth_${taskType}`,
+    taskType,
+    label: spec.label,
+    firstStep,
+    blackboard: spec.blackboard.map((text, index) => ({ order: index + 1, text })),
+    socraticQuestions: spec.socratic.slice(),
+    gameDrills: spec.game.slice(),
+    reportSignal: spec.report,
+    parentQuestion: spec.parent,
+    evidenceRequired: spec.evidenceRequired.slice(),
+    gameBias: taskType === 'unknown' ? 'balanced' : 'repair',
+    route: taskType === 'writing_process' ? '/pages/focus/focus' : taskType === 'unknown' ? '/pages/tutor/tutor' : '/pages/arcade/arcade',
+    shareLine: `${spec.label}：先做「${firstStep}」，再留下 ${spec.evidenceRequired[0]} 证据。`
+  };
+}
+
 function childStepQuality(text = '') {
   const value = String(text || '').trim();
   const compact = value.replace(/\s+/g, '');
@@ -6317,6 +6396,7 @@ module.exports = {
   detectTaskType,
   firstStepTemplatesForTaskType,
   suggestedStepForTaskType,
+  buildSubjectSkillDepth,
   childStepQuality,
   normalizeFirstStepEvidence,
   saveChildArticulatedStep,
