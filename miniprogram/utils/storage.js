@@ -5500,6 +5500,87 @@ function buildSubjectSeedLibrary(options = {}) {
   };
 }
 
+function buildCourseUnitMap(options = {}) {
+  const subjectLibrary = options.subjectSeedLibrary || buildSubjectSeedLibrary(options);
+  const activeSubject = options.subject ? String(options.subject) : '';
+  const subjects = (subjectLibrary.subjects || []).map((subject) => {
+    const units = (subject.seeds || []).map((seed, index) => ({
+      id: `${subject.id}_unit_${seed.id}`,
+      order: index + 1,
+      subjectId: subject.id,
+      subjectLabel: subject.label,
+      unitLabel: seed.label,
+      tier: seed.tier,
+      gradeBand: seed.gradeBand,
+      taskType: seed.taskType,
+      reusableQuestionTypes: [
+        `${seed.label}第一步判断`,
+        `${seed.label}错因复述`,
+        `${seed.label}同类小变式`
+      ],
+      wrongCauseAtlas: [
+        seed.wrongCause,
+        `${seed.label}证据不足`,
+        '会做一次但隔天不能复述'
+      ],
+      diagnosticProbes: [
+        seed.parentQuestion,
+        `这题先看「${seed.label}」还是先算答案？`,
+        `换一道题时，第一步还会是「${seed.firstStep}」吗？`
+      ],
+      blackboardBlueprint: {
+        title: `${subject.label} · ${seed.label}小黑板`,
+        firstStroke: seed.boardMove,
+        visualPrompt: seed.visualPrompt,
+        stopRule: '只画第一笔和证据点，孩子能说出第一步就停。'
+      },
+      practiceLoop: {
+        recall: seed.recallPrompt,
+        repair: seed.wrongCauseModel,
+        transfer: seed.transferPrompt,
+        nextDay: '明天只回访 1 道同类小变式。'
+      },
+      reportContract: `${subject.label}/${seed.label}进入报告时，只写第一步证据、错因和下一次回访，不写分数排名。`,
+      parentAction: seed.parentCheckLine,
+      shareContract: `分享只带「${seed.label}」第一步和回访动作，不带完整答案。`,
+      evidenceRequired: seed.evidenceRequired || [],
+      route: seed.route,
+      recallRoute: seed.recallRoute,
+      gameRoute: seed.gameRoute
+    }));
+    return {
+      id: subject.id,
+      label: subject.label,
+      route: subject.route,
+      visualBoundary: subject.visualBoundary,
+      unitCount: units.length,
+      modelLine: `${subject.label}已沉淀 ${units.length} 个课程单元，每个单元都有题型、错因、小黑板、游戏回流和报告口径。`,
+      units
+    };
+  });
+  const active = subjects.find((item) => item.id === activeSubject || item.label === activeSubject)
+    || (subjectLibrary.active && subjects.find((item) => item.id === subjectLibrary.active.id))
+    || subjects[0];
+  const totalUnits = subjects.reduce((sum, subject) => sum + subject.unitCount, 0);
+  const totalQuestionTypes = subjects.reduce((sum, subject) => sum + subject.units.reduce((unitSum, unit) => unitSum + unit.reusableQuestionTypes.length, 0), 0);
+  return {
+    id: 'course_unit_map',
+    title: '七科课程单元地图',
+    summary: '把每科第一步种子升级为课程单元：题型、错因、小黑板、练习回流、报告和家长动作都能复用。',
+    boundary: '这是课程能力地图，不承诺拍题自动板书讲完整答案。',
+    subjects,
+    active,
+    subjectCount: subjects.length,
+    unitCount: totalUnits,
+    reusableQuestionTypeCount: totalQuestionTypes,
+    wrongCauseModelCount: totalUnits * 3,
+    reportLine: `当前课程地图覆盖 ${subjects.length} 科、${totalUnits} 个单元、${totalQuestionTypes} 条可复用题型动作。`,
+    parentLine: active ? `今晚家长只看 ${active.label} 的一个单元：孩子能不能说第一步、错因和明天回访。` : '',
+    gameLine: '游戏只奖励主动回忆和错因回退，不奖励刷题数量。',
+    generatedAt: options.now ? new Date(options.now).toISOString() : rcNowIso()
+  };
+}
+
 function detectAvoidancePattern(patternInput = loadTaskTypePattern()) {
   const byTaskType = (patternInput && patternInput.byTaskType) || {};
   const candidates = Object.keys(byTaskType).map((type) => {
@@ -7345,6 +7426,7 @@ module.exports = {
   buildFirstStepBlackboardBlueprint,
   buildLightEntrySeedBank,
   buildSubjectSeedLibrary,
+  buildCourseUnitMap,
   childStepQuality,
   normalizeFirstStepEvidence,
   saveChildArticulatedStep,

@@ -59,6 +59,27 @@
     </view>
   </view>
 
+  <view class="global-depth-card" wx:if="{{courseUnitMap}}">
+    <view class="global-depth-title">{{courseUnitMap.title}}</view>
+    <view class="global-depth-summary">{{courseUnitMap.summary}}</view>
+    <view class="global-depth-note">{{courseUnitMap.boundary}}</view>
+    <view class="global-depth-note">{{courseUnitMap.reportLine}}</view>
+    <view class="global-depth-note">{{courseUnitMap.parentLine}}</view>
+    <view class="global-depth-note">{{courseUnitMap.gameLine}}</view>
+    <view class="global-depth-grid">
+      <view class="global-depth-chip ready" wx:for="{{courseUnitMap.active.units}}" wx:key="id" data-unit-id="{{item.id}}" bindtap="runCourseUnitAction">
+        <text>{{item.subjectLabel}} · {{item.unitLabel}} · {{item.tier}}</text>
+        <text>{{item.blackboardBlueprint.title}}</text>
+        <text>{{item.blackboardBlueprint.firstStroke}}</text>
+        <text>{{item.reusableQuestionTypes[0]}}</text>
+        <text>{{item.wrongCauseAtlas[0]}}</text>
+        <text>{{item.practiceLoop.recall}}</text>
+        <text>{{item.reportContract}}</text>
+        <text>{{item.shareContract}}</text>
+      </view>
+    </view>
+  </view>
+
   <view class="section-title">这道题是什么科目？</view>
   <view class="choice-row">
     <view class="choice-chip {{subject === item.id ? 'active' : ''}}" wx:for="{{subjectOptions}}" wx:key="id" data-id="{{item.id}}" bindtap="chooseSubject">{{item.label}}</view>

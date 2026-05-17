@@ -31,14 +31,16 @@ Page({
     result: null,
     surfaceDepthPack: null,
     lightSeedBank: null,
-    subjectSeedLibrary: null
+    subjectSeedLibrary: null,
+    courseUnitMap: null
   },
 
   onLoad() {
     this.setData({
       surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('light_diagnosis') : null,
       lightSeedBank: storage.buildLightEntrySeedBank ? storage.buildLightEntrySeedBank('light_diagnosis') : null,
-      subjectSeedLibrary: storage.buildSubjectSeedLibrary ? storage.buildSubjectSeedLibrary({ subject: this.data.subject }) : null
+      subjectSeedLibrary: storage.buildSubjectSeedLibrary ? storage.buildSubjectSeedLibrary({ subject: this.data.subject }) : null,
+      courseUnitMap: storage.buildCourseUnitMap ? storage.buildCourseUnitMap({ subject: this.data.subject }) : null
     });
   },
 
@@ -68,7 +70,8 @@ Page({
       subject,
       diagnosis: null,
       result: null,
-      subjectSeedLibrary: storage.buildSubjectSeedLibrary ? storage.buildSubjectSeedLibrary({ subject }) : this.data.subjectSeedLibrary
+      subjectSeedLibrary: storage.buildSubjectSeedLibrary ? storage.buildSubjectSeedLibrary({ subject }) : this.data.subjectSeedLibrary,
+      courseUnitMap: storage.buildCourseUnitMap ? storage.buildCourseUnitMap({ subject }) : this.data.courseUnitMap
     });
   },
 
@@ -209,6 +212,47 @@ Page({
     }
     wx.showToast({
       title: '已记录这张第一步种子',
+      icon: 'none'
+    });
+    navigation.navigateLearningRoute(route);
+  },
+
+  runCourseUnitAction(event) {
+    const dataset = event.currentTarget.dataset || {};
+    const map = this.data.courseUnitMap || {};
+    const active = map.active || {};
+    const units = active.units || [];
+    const unit = units.find((item) => item.id === dataset.unitId) || units[0] || {};
+    const route = unit.route || active.route || '/pages/tutor/tutor';
+    if (storage.recordUnifiedNextAction) {
+      storage.recordUnifiedNextAction({
+        source: 'course_unit_map',
+        sourceLabel: `${unit.subjectLabel || active.label || '七科'}课程单元`,
+        actionLabel: unit.blackboardBlueprint && unit.blackboardBlueprint.title ? unit.blackboardBlueprint.title : unit.unitLabel,
+        route,
+        reasonLine: unit.reportContract || '',
+        evidenceLine: unit.practiceLoop && unit.practiceLoop.nextDay ? unit.practiceLoop.nextDay : '',
+        surface: 'light_diagnosis',
+        candidateCount: map.unitCount || units.length
+      });
+    }
+    if (storage.recordSurfaceDepthAction) {
+      storage.recordSurfaceDepthAction({
+        surface: 'light_diagnosis',
+        dimensionId: 'course_unit_map',
+        label: unit.unitLabel || active.label || '课程单元',
+        route,
+        readiness: unit.reportContract || '',
+        source: 'course_unit_card',
+        capabilityId: unit.id || '',
+        capabilityLabel: unit.tier || '',
+        capabilityRoute: unit.gameRoute || route,
+        capabilityEvidenceLine: unit.shareContract || '',
+        capabilityNextAction: unit.parentAction || ''
+      });
+    }
+    wx.showToast({
+      title: '已记录课程单元',
       icon: 'none'
     });
     navigation.navigateLearningRoute(route);
