@@ -5353,6 +5353,8 @@ function buildLightEntrySeedBank(feature = 'daily_math', options = {}) {
 
 function buildSubjectSeedLibrary(options = {}) {
   const subjectIds = ['math', 'chinese', 'english', 'physics', 'chemistry', 'biology', 'geography'];
+  const tiers = ['入门', '核心', '迁移'];
+  const gradeBands = ['小学高段', '小初衔接', '初中'];
   const subjects = subjectIds.map((subjectId) => {
     const curriculum = CURRICULUM_SPINE[subjectId] || CURRICULUM_SPINE.math;
     const taskType = taskTypeForSubject(subjectId) || 'unknown';
@@ -5362,20 +5364,39 @@ function buildSubjectSeedLibrary(options = {}) {
       firstStep: suggestedStepForTaskType(taskType),
       sourceText: `${curriculum.label} 七科第一步种子`
     });
-    const seeds = curriculum.nodes.map((node, index) => ({
-      id: `${subjectId}_${node.id}`,
-      order: index + 1,
-      subjectId,
-      subjectLabel: curriculum.label,
-      label: node.label,
-      taskType,
-      firstStep: index === 0 ? depth.firstStep : `先处理「${node.label}」：${node.evidence}`,
-      wrongCause: index === 0 ? '不知道从哪里下手' : `${node.label}证据不足`,
-      parentQuestion: index === 0 ? depth.parentQuestion : `你能先说清「${node.label}」这一小步吗？`,
-      evidenceRequired: index === 0 ? depth.evidenceRequired : [node.id, 'child_first_step', 'next_day_revisit'],
-      blackboardLine: `${curriculum.label}小黑板：${node.label} -> ${node.evidence}`,
-      route: curriculum.route
-    }));
+    const seeds = curriculum.nodes.map((node, index) => {
+      const firstStep = index === 0 ? depth.firstStep : `先处理「${node.label}」：${node.evidence}`;
+      const wrongCause = index === 0 ? '不知道从哪里下手' : `${node.label}证据不足`;
+      const evidenceRequired = index === 0 ? depth.evidenceRequired : [node.id, 'child_first_step', 'next_day_revisit'];
+      const tier = tiers[index] || '迁移';
+      const gradeBand = gradeBands[index] || '初中';
+      return {
+        id: `${subjectId}_${node.id}`,
+        order: index + 1,
+        tier,
+        gradeBand,
+        subjectId,
+        subjectLabel: curriculum.label,
+        label: node.label,
+        taskType,
+        firstStep,
+        wrongCause,
+        wrongCauseModel: `${curriculum.label}/${node.label}：先判是不是「${wrongCause}」，再只补一个可观察动作。`,
+        parentQuestion: index === 0 ? depth.parentQuestion : `你能先说清「${node.label}」这一小步吗？`,
+        parentCheckLine: `家长只检查：孩子是否能说出「${firstStep}」，不替孩子讲完整答案。`,
+        evidenceRequired,
+        evidenceContractLine: `证据契约：留下 ${evidenceRequired.slice(0, 2).join(' + ')}，明天回访同类一题。`,
+        visualPrompt: `${curriculum.label}可视化：画出「${node.label}」和「${node.evidence}」的关系，不画最终答案。`,
+        boardMove: `小黑板动作：先写「${node.label}」，旁边标一条证据「${node.evidence}」。`,
+        blackboardLine: `${curriculum.label}小黑板：${node.label} -> ${node.evidence}`,
+        transferPrompt: `迁移题：换一道同类题，仍然先做「${firstStep}」。`,
+        recallPrompt: `主动回忆：合上题目，说出这张卡的错因和第一步。`,
+        loopLine: `流转闭环：轻诊断 -> ${curriculum.route} -> 复习回访 -> 家长复盘。`,
+        recallRoute: '/pages/review/review',
+        gameRoute: '/pages/arcade/arcade',
+        route: curriculum.route
+      };
+    });
     return {
       id: subjectId,
       label: curriculum.label,
@@ -5383,6 +5404,7 @@ function buildSubjectSeedLibrary(options = {}) {
       route: curriculum.route,
       depthLine: depth.reportSignal,
       visualBoundary: '只做第一步小黑板，不做全科自动板书讲题。',
+      progressionLine: `${curriculum.label}按「入门-核心-迁移」三层沉淀，不追求大而全。`,
       seeds
     };
   });
@@ -5391,7 +5413,7 @@ function buildSubjectSeedLibrary(options = {}) {
   return {
     id: 'subject_seed_library',
     title: '七科第一步种子库',
-    summary: '每科都只沉淀题型、错因、第一步、家长追问和证据，不承诺自动给完整答案。',
+    summary: '每科沉淀题型、错因模型、第一步小黑板、迁移题、回忆路线、家长检查和证据契约，不承诺自动给完整答案。',
     subjects,
     active,
     subjectCount: subjects.length,

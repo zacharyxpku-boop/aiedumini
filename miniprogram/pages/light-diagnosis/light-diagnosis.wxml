@@ -44,11 +44,17 @@
     <view class="global-depth-summary">{{subjectSeedLibrary.summary}}</view>
     <view class="global-depth-note">覆盖数学、语文、英语、物理、化学、生物、地理。</view>
     <view class="global-depth-note">{{subjectSeedLibrary.active.label}}：{{subjectSeedLibrary.active.depthLine}}</view>
+    <view class="global-depth-note">{{subjectSeedLibrary.active.progressionLine}}</view>
     <view class="global-depth-grid">
-      <view class="global-depth-chip ready" wx:for="{{subjectSeedLibrary.active.seeds}}" wx:key="id">
-        <text>{{item.subjectLabel}} · {{item.label}}</text>
-        <text>{{item.firstStep}}</text>
-        <text>{{item.parentQuestion}}</text>
+      <view class="global-depth-chip ready" wx:for="{{subjectSeedLibrary.active.seeds}}" wx:key="id" data-seed-id="{{item.id}}" bindtap="runSubjectSeedAction">
+        <text>{{item.subjectLabel}} · {{item.label}} · {{item.tier}}</text>
+        <text>{{item.gradeBand}}｜{{item.firstStep}}</text>
+        <text>{{item.wrongCauseModel}}</text>
+        <text>{{item.boardMove}}</text>
+        <text>{{item.parentCheckLine}}</text>
+        <text>{{item.evidenceContractLine}}</text>
+        <text>{{item.loopLine}}</text>
+        <text>点这里进入这一类题的下一步</text>
       </view>
     </view>
   </view>

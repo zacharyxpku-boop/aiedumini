@@ -173,4 +173,45 @@ Page({
     navigation.navigateLearningRoute(route);
   },
 
+  runSubjectSeedAction(event) {
+    const dataset = event.currentTarget.dataset || {};
+    const library = this.data.subjectSeedLibrary || {};
+    const active = library.active || {};
+    const seeds = active.seeds || [];
+    const seed = seeds.find((item) => item.id === dataset.seedId) || seeds[0] || {};
+    const route = seed.route || active.route || '/pages/tutor/tutor';
+    if (storage.recordUnifiedNextAction) {
+      storage.recordUnifiedNextAction({
+        source: 'subject_seed_library',
+        sourceLabel: `${seed.subjectLabel || active.label || '七科'}第一步种子`,
+        actionLabel: seed.firstStep || seed.label || '先做第一步',
+        route,
+        reasonLine: seed.wrongCauseModel || seed.wrongCause || '',
+        evidenceLine: seed.evidenceContractLine || '',
+        surface: 'light_diagnosis',
+        candidateCount: library.seedCount || seeds.length
+      });
+    }
+    if (storage.recordSurfaceDepthAction) {
+      storage.recordSurfaceDepthAction({
+        surface: 'light_diagnosis',
+        dimensionId: 'subject_seed_library',
+        label: seed.label || active.label || '七科第一步种子',
+        route,
+        readiness: seed.loopLine || active.progressionLine || '',
+        source: 'subject_seed_card',
+        capabilityId: seed.id || '',
+        capabilityLabel: seed.tier || '',
+        capabilityRoute: seed.recallRoute || route,
+        capabilityEvidenceLine: seed.evidenceContractLine || '',
+        capabilityNextAction: seed.transferPrompt || seed.firstStep || ''
+      });
+    }
+    wx.showToast({
+      title: '已记录这张第一步种子',
+      icon: 'none'
+    });
+    navigation.navigateLearningRoute(route);
+  },
+
 });
