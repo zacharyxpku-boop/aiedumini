@@ -164,6 +164,18 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
       curriculumSpine
     })
     : null;
+  const courseUnitMap = storage.buildCourseUnitMap
+    ? storage.buildCourseUnitMap({
+      sourceText: latestUserText,
+      thought: latestUserText,
+      subject: selected && selected.subject ? selected.subject : '',
+      title: selected && selected.text ? selected.text : '',
+      subjectSeedLibrary: null
+    })
+    : null;
+  const activeCourseUnit = courseUnitMap && courseUnitMap.active && Array.isArray(courseUnitMap.active.units)
+    ? courseUnitMap.active.units[0]
+    : null;
   const studentFirst = userMessages.some((item) => String(item.text || '').length >= 8 && !/答案|直接|代写|帮我写/.test(String(item.text || '')));
   const blockedAnswer = (masterySignal && masterySignal.status === 'blocked_answer_request')
     || (pasteRisk && pasteRisk.level === 'high');
@@ -218,6 +230,8 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
     subjectSkillDepth,
     curriculumSpine,
     visualSocraticMatrix,
+    courseUnitMap,
+    activeCourseUnit,
     handoffPlan,
     checks: [
       { id: 'first', label: '先有自己的想法', done: studentFirst, detail: studentFirst ? '已经说出一步或一个问题' : '还需要先交出自己的第一步' },
@@ -667,6 +681,13 @@ Page({
         question_type_axis: result.question_type_socratic_path && result.question_type_socratic_path.activeAxis,
         question_type_probe_count: result.question_type_socratic_path && Array.isArray(result.question_type_socratic_path.probeBank)
           ? result.question_type_socratic_path.probeBank.length
+          : 0,
+        course_unit_subject: diagnosticReceipt.courseUnitMap && diagnosticReceipt.courseUnitMap.active
+          ? diagnosticReceipt.courseUnitMap.active.label
+          : '',
+        course_unit_label: diagnosticReceipt.activeCourseUnit ? diagnosticReceipt.activeCourseUnit.unitLabel : '',
+        course_unit_wrong_cause_count: diagnosticReceipt.activeCourseUnit && Array.isArray(diagnosticReceipt.activeCourseUnit.wrongCauseAtlas)
+          ? diagnosticReceipt.activeCourseUnit.wrongCauseAtlas.length
           : 0,
         socratic_contract: result.socratic_contract || null,
         socratic_fallback_mode: result.socratic_fallback_plan && result.socratic_fallback_plan.mode,

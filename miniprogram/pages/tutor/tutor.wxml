@@ -128,6 +128,17 @@
             <view class="receipt-board-line">{{thinkingReceipt.visualSocraticMatrix.fallback.whenSilent}}</view>
             <view class="receipt-board-avoid">{{thinkingReceipt.visualSocraticMatrix.fallback.whenAsksAnswer}}</view>
           </view>
+          <view class="receipt-first-step-board" wx:if="{{thinkingReceipt.activeCourseUnit}}">
+            <view class="receipt-diagnostic-title">{{thinkingReceipt.activeCourseUnit.subjectLabel}} · {{thinkingReceipt.activeCourseUnit.unitLabel}}</view>
+            <view class="receipt-board-avoid">{{thinkingReceipt.courseUnitMap.boundary}}</view>
+            <view class="receipt-board-line">{{thinkingReceipt.activeCourseUnit.blackboardBlueprint.title}}</view>
+            <view class="receipt-board-line">{{thinkingReceipt.activeCourseUnit.blackboardBlueprint.firstStroke}}</view>
+            <view class="receipt-board-parent">{{thinkingReceipt.activeCourseUnit.blackboardBlueprint.stopRule}}</view>
+            <view class="receipt-board-line" wx:for="{{thinkingReceipt.activeCourseUnit.diagnosticProbes}}" wx:key="*this">单元追问：{{item}}</view>
+            <view class="receipt-board-line" wx:for="{{thinkingReceipt.activeCourseUnit.wrongCauseAtlas}}" wx:key="*this">错因谱：{{item}}</view>
+            <view class="receipt-board-avoid">{{thinkingReceipt.activeCourseUnit.practiceLoop.repair}}</view>
+            <view class="receipt-board-avoid">{{thinkingReceipt.activeCourseUnit.reportContract}}</view>
+          </view>
           <view class="receipt-contract" wx:if="{{thinkingReceipt.socratic_contract}}">
             <view class="receipt-diagnostic-title">{{thinkingReceipt.socratic_contract.title}}</view>
             <view class="receipt-diagnostic-line">为什么这样问：{{thinkingReceipt.socratic_contract.whyThisQuestion}}</view>

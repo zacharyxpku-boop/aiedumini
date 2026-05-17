@@ -67,6 +67,14 @@
         <view class="story-mission-rule" wx:for="{{challengeBrief.curriculumProgression}}" wx:key="id">{{item.order}}. {{item.label}}：{{item.evidence}}</view>
         <view class="story-mission-rule">{{challengeBrief.curriculumScaleLine}}</view>
       </view>
+      <view class="story-mission" wx:if="{{challengeBrief.courseUnitTitle}}">
+        <view class="story-mission-title">{{challengeBrief.courseUnitTitle}}</view>
+        <view class="story-mission-line">{{challengeBrief.courseUnitLine}}</view>
+        <view class="story-mission-rule">错因谱：{{challengeBrief.courseUnitWrongCauseLine}}</view>
+        <view class="story-mission-rule" wx:for="{{challengeBrief.courseUnitQuestionTypes}}" wx:key="*this">本局题型：{{item}}</view>
+        <view class="story-mission-rule">{{challengeBrief.courseUnitReportContract}}</view>
+        <view class="story-mission-rule">{{challengeBrief.courseUnitShareContract}}</view>
+      </view>
       <view class="challenge-brief-sub" wx:if="{{challengeBrief.evidenceBiasLine}}">为什么开这局：{{challengeBrief.evidenceBiasLine}}</view>
     </view>
 
