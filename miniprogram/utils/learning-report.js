@@ -612,6 +612,46 @@ function buildLongTermLearningPortrait(parts = {}, matrix = [], tendencies = [])
     riskWatch: weakest.secondaryCause
       ? `连续两次出现 ${weakest.secondaryCause} 时，需要降低题量，改成一步追问。`
       : '如果孩子开始沉默或只要答案，立刻退回第一步小黑板。',
+    portraitDimensions: [
+      {
+        id: 'first_step_agency',
+        label: '第一步自主性',
+        signal: `${subjectName} 是否能先说出可执行小动作`,
+        evidence: 'child_first_step',
+        nextIntervention: '说不出时只给二选一，不讲完整答案'
+      },
+      {
+        id: 'wrong_cause_stability',
+        label: '错因稳定性',
+        signal: `${causeName} 是否跨两次同类题重复`,
+        evidence: 'wrong_cause_card',
+        nextIntervention: '重复两次就降题量，先修错因'
+      },
+      {
+        id: 'transfer_resilience',
+        label: '迁移韧性',
+        signal: '换一题后是否还能复述同一第一步',
+        evidence: 'next_day_revisit',
+        nextIntervention: '能迁移再加变式，不能迁移回小黑板'
+      },
+      {
+        id: 'parent_scaffold_load',
+        label: '家长脚手架负荷',
+        signal: '家长是否需要反复解释才能启动',
+        evidence: 'parent_prompt_count',
+        nextIntervention: '家长只保留一句追问，减少讲解'
+      }
+    ],
+    trajectoryFlags: [
+      stability === 'high' ? '画像稳定：可以看 7 天趋势，不按单题波动调整。' : '画像未稳：先收集连续证据，不急着定性。',
+      weakest.mainCause ? `主风险：${weakest.mainCause} 如果连续出现，需要先降题量。` : '主风险待确认：先观察第一步质量。',
+      stable.subject ? `可利用强项：从 ${stable.subject} 建立信心入口。` : '强项待确认：先记录孩子完成感。'
+    ],
+    evidenceConfidenceRubric: [
+      '1 条证据：只能做今晚建议',
+      '3 条同类证据：可以判断短期卡点',
+      '7 天证据：才进入长期画像调整'
+    ],
     evidenceToCollect: nextEvidence.slice(0, 5),
     trendLines: trendItems.slice(0, 3).map((item) => `${item.label}: ${item.description}`),
     observationLoop: [
@@ -620,7 +660,8 @@ function buildLongTermLearningPortrait(parts = {}, matrix = [], tendencies = [])
       '第 7 天：用新错题确认是否迁移'
     ],
     parentDecisionRule: '连续两次能说清第一步才加题量；连续两次沉默就降到小黑板。',
-    nextReviewCadence: '每 7 天更新一次，不按单次分数下结论。'
+    nextReviewCadence: '每 7 天更新一次，不按单次分数下结论。',
+    nextTeacherConference: `如果要和老师沟通，只带三样：${subjectName} 第一脚证据、${causeName} 重复次数、7 天回访结果。`
   };
 }
 
@@ -641,6 +682,41 @@ function buildClassroomDecisionBoard(parts = {}, matrix = [], recommendationPlan
       `干预点：${cause} 出现时立刻退回小黑板`,
       '复核点：第二天同类题能否迁移'
     ],
+    observationRubric: [
+      {
+        id: 'observe',
+        label: '观察',
+        metric: '启动时间',
+        rule: `孩子看到 ${subject} 同类题，30 秒内能否说出第一步`,
+        evidence: 'child_first_step'
+      },
+      {
+        id: 'intervene',
+        label: '干预',
+        metric: '提示强度',
+        rule: `${cause} 出现时，只给第一步小黑板或二选一`,
+        evidence: 'hint_level'
+      },
+      {
+        id: 'review',
+        label: '复核',
+        metric: '迁移结果',
+        rule: '第二天换题，仍看能否复述同一小动作',
+        evidence: 'next_day_revisit'
+      }
+    ],
+    interventionLadder: [
+      { level: 1, label: '独立说第一步', action: '不讲答案，只让孩子说出下一笔' },
+      { level: 2, label: '二选一启动', action: '给两个可能入口，让孩子选一个并说明理由' },
+      { level: 3, label: '小黑板降阶', action: '只画关系或条件，不推完整解法' },
+      { level: 4, label: '减少题量', action: '同错因重复时停刷题，改成 3 分钟轻练习' }
+    ],
+    classroomEvidencePacket: [
+      `${subject} 第一脚记录`,
+      `${cause} 重复次数`,
+      '同类题次日回访',
+      '家长是否只问一句'
+    ],
     intervention: plan.cta && plan.cta.label
       ? `${plan.cta.label}: ${plan.cta.reason || '把报告落到一个小动作'}`
       : '先用点拨页让孩子说出第一步。',
@@ -650,6 +726,7 @@ function buildClassroomDecisionBoard(parts = {}, matrix = [], recommendationPlan
     stopRule: '如果连续两次答不上来，不继续讲答案，改用小黑板画第一步。',
     escalationRule: '如果 7 天内同一错因出现 3 次，先减少题量，改成 3 分钟轻练习和一次家长复盘。',
     successRule: '如果连续 2 天能独立说出第一步，再进入变式练习，不提前加难题。',
+    classroomCadence: '当天观察启动，次日复核迁移，第 7 天决定加题量还是降阶。',
     nextConferenceQuestion: `下次复盘只问：${subject} 这类题，孩子能否自己说出第一步？`,
     shareableSummary: `${subject} 的下一次干预重点是 ${cause}，用 7 天证据复核，不按一次表现定性。`
   };
@@ -683,6 +760,25 @@ function buildFamilyDecisionMemo(parts = {}, matrix = [], recommendationPlan = {
       solution.parentScript || plan.parentLine || '家长只问：这一步你准备先看哪里？',
       classroom.nextConferenceQuestion || `下次复盘只问：${subject} 这类题，孩子能否自己说出第一步？`,
       portrait.parentDecisionRule || '连续两次能说清第一步才加题量。'
+    ],
+    decisionCard: {
+      subject,
+      cause,
+      tonight: `今晚只处理 ${cause} 的第一步，不扩题量。`,
+      tomorrow: '明天换一题回访，看是否能迁移。',
+      shareTitle: `${subject} 7 天家庭学习决策`,
+      shareSummary: `${cause} 先用第一步证据复核，不用一次分数定性。`
+    },
+    weeklyReviewAgenda: [
+      '本周哪两次孩子能自己启动？',
+      `哪一次 ${cause} 重复出现？`,
+      '家长有没有忍住不讲完整答案？',
+      '下周是加一点变式，还是继续降阶？'
+    ],
+    parentActionLadder: [
+      { level: 1, label: '只问一句', action: solution.parentScript || plan.parentLine || '这一步你准备先看哪里？' },
+      { level: 2, label: '给二选一', action: '让孩子在两个入口里选一个' },
+      { level: 3, label: '停讲答案', action: '退回小黑板，保留孩子自己的第一笔' }
     ],
     sevenDayDecisionGate: {
       continueRule: '连续 2 天能独立说出第一步，才进入变式练习。',

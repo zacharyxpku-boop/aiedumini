@@ -640,9 +640,13 @@
           <text>{{learningReportSummary.longTermPortraitLine}}</text>
           <text wx:if="{{learningReportSummary.longTermPortraitStabilityLine}}">{{learningReportSummary.longTermPortraitStabilityLine}}</text>
           <text wx:if="{{learningReportSummary.longTermPortraitRiskLine}}">{{learningReportSummary.longTermPortraitRiskLine}}</text>
+          <text wx:for="{{learningReportSummary.longTermPortraitDimensions}}" wx:key="id">画像维度：{{item.label}}｜{{item.signal}}｜证据 {{item.evidence}}</text>
+          <text wx:for="{{learningReportSummary.longTermPortraitTrajectoryFlags}}" wx:key="*this">趋势旗标：{{item}}</text>
+          <text wx:for="{{learningReportSummary.longTermPortraitConfidenceRubric}}" wx:key="*this">置信规则：{{item}}</text>
           <text wx:for="{{learningReportSummary.longTermPortraitEvidence}}" wx:key="*this">下次证据：{{item}}</text>
           <text wx:for="{{learningReportSummary.longTermPortraitObservationLoop}}" wx:key="*this">观察闭环：{{item}}</text>
           <text wx:if="{{learningReportSummary.longTermPortraitParentRule}}">家长判断：{{learningReportSummary.longTermPortraitParentRule}}</text>
+          <text wx:if="{{learningReportSummary.longTermPortraitTeacherConference}}">沟通老师：{{learningReportSummary.longTermPortraitTeacherConference}}</text>
         </view>
         <view class="parent-brief-block" wx:if="{{learningReportSummary.classroomDecisionLine}}">
           <text class="parent-brief-label">课堂级决策板</text>
@@ -650,6 +654,10 @@
           <text wx:if="{{learningReportSummary.classroomTeacherLens}}">{{learningReportSummary.classroomTeacherLens}}</text>
           <text wx:if="{{learningReportSummary.classroomParentLens}}">家长：{{learningReportSummary.classroomParentLens}}</text>
           <text wx:for="{{learningReportSummary.classroomObservation}}" wx:key="*this">{{item}}</text>
+          <text wx:for="{{learningReportSummary.classroomObservationRubric}}" wx:key="id">课堂量表：{{item.label}}｜{{item.metric}}｜{{item.rule}}</text>
+          <text wx:for="{{learningReportSummary.classroomInterventionLadder}}" wx:key="level">干预梯度 {{item.level}}：{{item.label}}｜{{item.action}}</text>
+          <text wx:for="{{learningReportSummary.classroomEvidencePacket}}" wx:key="*this">课堂证据包：{{item}}</text>
+          <text wx:if="{{learningReportSummary.classroomCadence}}">节奏：{{learningReportSummary.classroomCadence}}</text>
           <text wx:if="{{learningReportSummary.classroomEvidenceRule}}">证据：{{learningReportSummary.classroomEvidenceRule}}</text>
           <text wx:if="{{learningReportSummary.classroomStopRule}}">停止规则：{{learningReportSummary.classroomStopRule}}</text>
           <text wx:if="{{learningReportSummary.classroomEscalationRule}}">升级规则：{{learningReportSummary.classroomEscalationRule}}</text>
@@ -658,9 +666,12 @@
         <view class="parent-brief-block" wx:if="{{learningReportSummary.familyDecisionTitle}}">
           <text class="parent-brief-label">{{learningReportSummary.familyDecisionTitle}}</text>
           <text>{{learningReportSummary.familyDecisionTonight}}</text>
+          <text wx:if="{{learningReportSummary.familyDecisionCard}}">决策卡：{{learningReportSummary.familyDecisionCard.shareTitle}}｜{{learningReportSummary.familyDecisionCard.shareSummary}}</text>
           <text wx:for="{{learningReportSummary.familyDecisionDoNotDo}}" wx:key="*this">今晚不做：{{item}}</text>
           <text wx:for="{{learningReportSummary.familyDecisionEvidenceChecklist}}" wx:key="*this">证据清单：{{item}}</text>
           <text wx:for="{{learningReportSummary.familyDecisionParentMeetingScript}}" wx:key="*this">复盘问题：{{item}}</text>
+          <text wx:for="{{learningReportSummary.familyDecisionWeeklyReviewAgenda}}" wx:key="*this">周复盘：{{item}}</text>
+          <text wx:for="{{learningReportSummary.familyDecisionParentActionLadder}}" wx:key="level">家长动作 {{item.level}}：{{item.label}}｜{{item.action}}</text>
           <text wx:if="{{learningReportSummary.familyDecisionSevenDayGate}}">7天继续：{{learningReportSummary.familyDecisionSevenDayGate.continueRule}}</text>
           <text wx:if="{{learningReportSummary.familyDecisionSevenDayGate}}">7天降级：{{learningReportSummary.familyDecisionSevenDayGate.reduceRule}}</text>
           <text wx:if="{{learningReportSummary.familyDecisionShareLine}}">{{learningReportSummary.familyDecisionShareLine}}</text>
