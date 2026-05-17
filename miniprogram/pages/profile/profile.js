@@ -969,6 +969,15 @@ Page({
     const surfaceDepthPack = storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('profile') : null;
     const surfaceDepthActionSummary = storage.buildSurfaceDepthActionSummary ? storage.buildSurfaceDepthActionSummary() : null;
     const lightFeatureEvidence = storage.buildLightFeatureEvidenceSummary ? storage.buildLightFeatureEvidenceSummary() : null;
+    const capabilityEvidenceLedger = storage.buildCapabilityEvidenceLedger ? storage.buildCapabilityEvidenceLedger({
+      globalEvidenceBrief,
+      learningDepthMap,
+      learningQuestArc,
+      moduleFlowCompass,
+      surfaceDepthActionSummary,
+      lightFeatureEvidence,
+      thinkingSummary
+    }) : null;
     const acceptanceReport = storage.buildAcceptanceReport ? storage.buildAcceptanceReport({ surface: 'profile' }) : null;
     const profileReadinessSnapshot = buildProfileReadinessSnapshot({
       acceptance: acceptanceReport,
@@ -1047,6 +1056,7 @@ Page({
       dailyShareCard,
       commercialUnlockCard: buildCommercialUnlockCard(reviewSummary, tutorSummary, thinkingSummary, wrongCauseSummary),
       profileReadinessSnapshot,
+      capabilityEvidenceLedger,
       lightFeatureEvidence,
       parentActionGuide,
       learningDepthMap,
@@ -1847,6 +1857,23 @@ Page({
         label: dataset.label || '',
         route,
         readiness: pack.surfaceReadiness || ''
+      });
+    }
+    navigation.navigateLearningRoute(route);
+  },
+
+  goCapabilityLedgerRoute(event) {
+    const dataset = event.currentTarget.dataset || {};
+    const ledger = this.data.capabilityEvidenceLedger || {};
+    const next = ledger.nextCapability || {};
+    const route = dataset.route || next.route || '/pages/tutor/tutor';
+    if (storage.recordSurfaceDepthAction) {
+      storage.recordSurfaceDepthAction({
+        surface: 'profile',
+        dimensionId: next.id || 'capability_ledger',
+        label: next.label || '能力证据账本',
+        route,
+        readiness: 'capability_evidence_ledger'
       });
     }
     navigation.navigateLearningRoute(route);

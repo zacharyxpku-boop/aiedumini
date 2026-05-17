@@ -1485,6 +1485,140 @@ function buildGlobalEvidenceBrief(options = {}) {
   };
 }
 
+function buildCapabilityEvidenceLedger(options = {}) {
+  const globalEvidenceBrief = options.globalEvidenceBrief || buildGlobalEvidenceBrief(options);
+  const learningDepthMap = options.learningDepthMap || buildLearningDepthMap(options);
+  const learningQuestArc = options.learningQuestArc || buildLearningQuestArc(options);
+  const moduleFlowCompass = options.moduleFlowCompass || buildModuleFlowCompass(options);
+  const surfaceDepthActionSummary = options.surfaceDepthActionSummary || buildSurfaceDepthActionSummary();
+  const unifiedSummary = options.unifiedSummary || buildUnifiedNextActionSummary();
+  const lightFeatureEvidence = options.lightFeatureEvidence || buildLightFeatureEvidenceSummary(options);
+  const thinking = options.thinkingSummary || thinkingReceiptSummary();
+  const gameProfile = loadGameProfile();
+  const shareRuns = loadShareRuns();
+  const reportState = loadLearningReportState();
+  const reviewEvents = loadReviewEvents();
+  const parentDimension = learningDepthMap && Array.isArray(learningDepthMap.dimensions)
+    ? learningDepthMap.dimensions.find((item) => item && (item.id === 'parent_coaching' || item.id === 'parent_reflection'))
+    : null;
+  const reportConnected = !!(
+    reportState.localLoopConnection
+    || reportState.solutionMap
+    || reportState.reportDraft
+    || (reportState.reportProgress && Number(reportState.reportProgress.completeness || 0) > 0)
+  );
+  const gameCount = Number(gameProfile.reviewed_today || gameProfile.reviewedToday || gameProfile.review_count || 0);
+  const questSignals = reviewEvents.filter((item) => item && item.event === 'quest_arc_game_signal');
+  const moduleReady = moduleFlowCompass && Number(moduleFlowCompass.readyCount || 0);
+  const moduleTotal = moduleFlowCompass && Number(moduleFlowCompass.totalCount || 0);
+  const rows = [
+    {
+      id: 'socratic',
+      label: '点拨证据',
+      ready: Number(thinking.total || 0) > 0 || Number(thinking.diagnosticProbes || 0) > 0,
+      evidenceLine: thinking.latest && thinking.latest.shareLine ? thinking.latest.shareLine : (thinking.label || '还缺一次孩子自己说第一步的点拨回执'),
+      nextAction: '让孩子先说出第一步，再判断卡点',
+      route: '/pages/tutor/tutor'
+    },
+    {
+      id: 'game',
+      label: '游戏回流',
+      ready: gameCount > 0 || questSignals.length > 0,
+      evidenceLine: questSignals.length
+        ? `已有 ${questSignals.length} 条剧情闯关证据`
+        : gameCount
+          ? `今日轻练 ${gameCount} 次`
+          : '还缺一局能写回学习记录的轻练',
+      nextAction: '打一小局，把错因或迁移结果写回复习队列',
+      route: '/pages/arcade/arcade'
+    },
+    {
+      id: 'report',
+      label: '报告落地',
+      ready: reportConnected,
+      evidenceLine: reportConnected
+        ? (globalEvidenceBrief.reportLine || '学习画像已经接到今晚路线')
+        : '还缺把报告结论接到今晚第一步或 7 天行动',
+      nextAction: '把报告从描述变成今日可执行动作',
+      route: '/pages/profile/profile'
+    },
+    {
+      id: 'share',
+      label: '分享回流',
+      ready: shareRuns.length > 0,
+      evidenceLine: shareRuns.length ? `已有 ${shareRuns.length} 条分享或回流记录` : '还缺一张可转发的家庭行动卡',
+      nextAction: '整理今日复盘卡，带上下一个动作',
+      route: '/pages/profile/profile'
+    },
+    {
+      id: 'light_entry',
+      label: '轻入口证据',
+      ready: !!(lightFeatureEvidence && lightFeatureEvidence.ready),
+      evidenceLine: lightFeatureEvidence && (lightFeatureEvidence.parentLine || lightFeatureEvidence.summary)
+        ? (lightFeatureEvidence.parentLine || lightFeatureEvidence.summary)
+        : '口算、听写、手动诊断还缺回到核心链路的证据',
+      nextAction: lightFeatureEvidence && lightFeatureEvidence.nextAction ? lightFeatureEvidence.nextAction : '从一个轻入口补一条第一步记录',
+      route: lightFeatureEvidence && lightFeatureEvidence.route ? lightFeatureEvidence.route : '/pages/daily-math/daily-math'
+    },
+    {
+      id: 'module_flow',
+      label: '模块流转',
+      ready: moduleReady >= Math.max(4, Math.ceil(moduleTotal * 0.6)),
+      evidenceLine: moduleFlowCompass ? moduleFlowCompass.summary : '还缺跨模块流转罗盘',
+      nextAction: moduleFlowCompass ? moduleFlowCompass.currentNextAction : '先补齐一个模块到下一模块的真实动作',
+      route: moduleFlowCompass && moduleFlowCompass.currentRoute ? moduleFlowCompass.currentRoute : '/pages/home/home'
+    },
+    {
+      id: 'parent_action',
+      label: '家长动作',
+      ready: !!(parentDimension && parentDimension.ready),
+      evidenceLine: parentDimension ? parentDimension.evidence : (learningQuestArc && learningQuestArc.parentHook) || '还缺家长一问一答的回执',
+      nextAction: '家长只问一句，确认孩子能复述第一步',
+      route: '/pages/profile/profile'
+    },
+    {
+      id: 'surface_action',
+      label: '页面行动',
+      ready: Number(surfaceDepthActionSummary.total || 0) > 0,
+      evidenceLine: surfaceDepthActionSummary.parentLine || '还缺一次从页面深度卡触发的真实跳转',
+      nextAction: '从当前页面深度卡执行一个下一步',
+      route: surfaceDepthActionSummary.latest && surfaceDepthActionSummary.latest.route ? surfaceDepthActionSummary.latest.route : '/pages/home/home'
+    },
+    {
+      id: 'next_action',
+      label: '统一下一步',
+      ready: Number(unifiedSummary.total || 0) > 0,
+      evidenceLine: unifiedSummary.parentLine || (globalEvidenceBrief.shareLine || '还缺一次统一下一步执行记录'),
+      nextAction: unifiedSummary.latest && unifiedSummary.latest.label ? unifiedSummary.latest.label : '执行系统推荐的下一步',
+      route: unifiedSummary.latest && unifiedSummary.latest.route ? unifiedSummary.latest.route : (globalEvidenceBrief.latestRoute || '/pages/home/home')
+    }
+  ];
+  const readyCount = rows.filter((item) => item.ready).length;
+  const next = rows.find((item) => !item.ready) || rows[0] || null;
+  const grouped = {
+    child: rows.filter((item) => ['socratic', 'game', 'light_entry'].includes(item.id)),
+    family: rows.filter((item) => ['report', 'share', 'parent_action'].includes(item.id)),
+    system: rows.filter((item) => ['module_flow', 'surface_action', 'next_action'].includes(item.id))
+  };
+  return {
+    title: '能力证据账本',
+    summary: readyCount >= rows.length
+      ? '孩子思考、游戏练习、家长动作、报告和分享已经能互相交账。'
+      : `已闭合 ${readyCount}/${rows.length} 条能力证据，下一条先补：${next ? next.label : '继续积累真实记录'}`,
+    readyCount,
+    totalCount: rows.length,
+    progress: rows.length ? Math.round((readyCount / rows.length) * 100) : 0,
+    rows,
+    grouped,
+    nextCapability: next,
+    parentLine: next
+      ? `${next.label}：${next.nextAction}`
+      : '继续沉淀真实学习材料，保持次日回看。',
+    moatLine: '护城河不靠功能堆叠，而靠每次学习都留下可复用证据：思路、练习、复盘、分享和下一步互相回流。',
+    generatedAt: options.now ? new Date(options.now).toISOString() : new Date().toISOString()
+  };
+}
+
 function buildEvidenceRouteBias(options = {}) {
   const brief = options.globalEvidenceBrief || buildGlobalEvidenceBrief(options);
   const incomingShare = options.incomingShare || loadIncomingShare() || null;
@@ -6199,6 +6333,7 @@ module.exports = {
   buildParentActionGuide,
   buildLearningDepthMap,
   buildGlobalEvidenceBrief,
+  buildCapabilityEvidenceLedger,
   buildUnifiedNextActionController,
   buildLearningQuestArc,
   buildQuestArcGameBridge,
