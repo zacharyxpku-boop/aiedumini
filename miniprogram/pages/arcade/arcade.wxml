@@ -61,6 +61,12 @@
         <view class="story-mission-rule" wx:if="{{challengeBrief.subjectDepthGameLine}}">本局练：{{challengeBrief.subjectDepthGameLine}}</view>
         <view class="story-mission-rule" wx:if="{{challengeBrief.subjectDepthEvidenceLine}}">留下证据：{{challengeBrief.subjectDepthEvidenceLine}}</view>
       </view>
+      <view class="story-mission" wx:if="{{challengeBrief.curriculumLine}}">
+        <view class="story-mission-title">{{challengeBrief.curriculumTitle}}</view>
+        <view class="story-mission-line">{{challengeBrief.curriculumLine}}</view>
+        <view class="story-mission-rule" wx:for="{{challengeBrief.curriculumProgression}}" wx:key="id">{{item.order}}. {{item.label}}：{{item.evidence}}</view>
+        <view class="story-mission-rule">{{challengeBrief.curriculumScaleLine}}</view>
+      </view>
       <view class="challenge-brief-sub" wx:if="{{challengeBrief.evidenceBiasLine}}">为什么开这局：{{challengeBrief.evidenceBiasLine}}</view>
     </view>
 

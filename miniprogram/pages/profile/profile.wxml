@@ -594,6 +594,8 @@
           <text wx:if="{{learningReportSummary.capabilityProgressLine}}">{{learningReportSummary.capabilityProgressLine}}</text>
           <text wx:if="{{learningReportSummary.subjectSkillDepthLine}}">题型：{{learningReportSummary.subjectSkillDepthLine}}</text>
           <text wx:if="{{learningReportSummary.subjectSkillDepthEvidence}}">题型证据：{{learningReportSummary.subjectSkillDepthEvidence}}</text>
+          <text wx:if="{{learningReportSummary.curriculumReportLine}}">课程骨架：{{learningReportSummary.curriculumReportLine}}</text>
+          <text wx:if="{{learningReportSummary.curriculumVisualBoardLine}}">{{learningReportSummary.curriculumVisualBoardLine}}</text>
         </view>
         <view class="parent-brief-block">
           <text class="parent-brief-label">学业矩阵</text>
@@ -622,6 +624,7 @@
           <text wx:if="{{learningReportSummary.capabilityNextLine}}">{{learningReportSummary.capabilityNextLine}}</text>
           <text wx:if="{{learningReportSummary.capabilityEvidenceLine}}">{{learningReportSummary.capabilityEvidenceLine}}</text>
           <text wx:if="{{learningReportSummary.subjectSkillDepthParentQuestion}}">家长题型追问：{{learningReportSummary.subjectSkillDepthParentQuestion}}</text>
+          <text wx:if="{{learningReportSummary.curriculumParentDecisionLine}}">{{learningReportSummary.curriculumParentDecisionLine}}</text>
           <text>{{learningReportSummary.reviewTrigger}}</text>
         </view>
         <view class="report-action-board" wx:if="{{learningReportSummary.sevenDayActionBoard}}">
@@ -816,6 +819,12 @@
           <view>第一步：{{dailyShareCard.subjectSkillDepth.firstStep}}</view>
           <view>家长只问：{{dailyShareCard.subjectSkillDepth.parentQuestion}}</view>
           <view wx:if="{{dailyShareCard.subjectSkillDepth.reportSignal}}">{{dailyShareCard.subjectSkillDepth.reportSignal}}</view>
+        </view>
+        <view class="share-conversation-card" wx:if="{{dailyShareCard.curriculumSpine}}">
+          <view class="share-conversation-title">{{dailyShareCard.curriculumSpine.title}}</view>
+          <view>{{dailyShareCard.curriculumSpine.shareLine}}</view>
+          <view>{{dailyShareCard.curriculumSpine.parentDecisionLine}}</view>
+          <view wx:for="{{dailyShareCard.curriculumSpine.progression}}" wx:key="id">{{item.order}}. {{item.label}}：{{item.evidence}}</view>
         </view>
         <view class="share-conversation-card" wx:if="{{dailyShareCard.capabilityGap}}">
           <view class="share-conversation-title">{{dailyShareCard.capabilityGap.label}}</view>

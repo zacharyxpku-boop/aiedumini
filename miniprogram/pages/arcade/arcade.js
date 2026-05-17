@@ -71,6 +71,9 @@ Page({
         firstStep: loopFocus && (loopFocus.childArticulatedStep || loopFocus.systemSuggestedStep)
       }))
       : null;
+    const curriculumSpine = storage.buildCurriculumSpine
+      ? storage.buildCurriculumSpine(Object.assign({}, loopFocus || {}, { subjectSkillDepth }))
+      : null;
     const taskBoundCards = this.cardsForRecentTaskType(recentTaskType, loopFocus);
     const loopBoundCards = this.loopBoundCards(dueCards.concat(fallbackCards), taskBoundCards, loopFocus);
     const cards = loopBoundCards.length ? loopBoundCards : (dueCards.length ? dueCards : (fallbackCards.length ? fallbackCards : taskBoundCards));
@@ -118,9 +121,10 @@ Page({
       dailyQuestSet,
       adaptiveChallenge,
       questArcMission,
-      challengeBrief: this.buildChallengeBrief(dailyQuestSet, adaptiveChallenge, questArcMission, evidenceBias, subjectSkillDepth),
+      challengeBrief: this.buildChallengeBrief(dailyQuestSet, adaptiveChallenge, questArcMission, evidenceBias, subjectSkillDepth, curriculumSpine),
       surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('arcade') : null,
       subjectSkillDepth,
+      curriculumSpine,
       result: null,
       resultAdvice: null,
       emptyGuide: this.emptyGuide(selectedGame, round),
@@ -247,7 +251,7 @@ Page({
     return arcade.buildWhackRound(cards, { limit: size });
   },
 
-  buildChallengeBrief(dailyQuestSet = {}, adaptiveChallenge = {}, questArcMission = null, evidenceBias = null, subjectSkillDepth = null) {
+  buildChallengeBrief(dailyQuestSet = {}, adaptiveChallenge = {}, questArcMission = null, evidenceBias = null, subjectSkillDepth = null, curriculumSpine = null) {
     const quests = Array.isArray(dailyQuestSet.quests) ? dailyQuestSet.quests : [];
     const activeQuest = quests.find((item) => item && item.progress < item.target) || quests[0] || {};
     const mode = adaptiveChallenge.mode || 'balanced';
@@ -291,7 +295,13 @@ Page({
         : '',
       subjectDepthEvidenceLine: subjectSkillDepth && Array.isArray(subjectSkillDepth.evidenceRequired)
         ? subjectSkillDepth.evidenceRequired.join(' / ')
-        : ''
+        : '',
+      curriculumTitle: curriculumSpine && curriculumSpine.title ? curriculumSpine.title : '',
+      curriculumLine: curriculumSpine && curriculumSpine.gameLine ? curriculumSpine.gameLine : '',
+      curriculumProgression: curriculumSpine && Array.isArray(curriculumSpine.progression)
+        ? curriculumSpine.progression
+        : [],
+      curriculumScaleLine: curriculumSpine && curriculumSpine.scaleLine ? curriculumSpine.scaleLine : ''
     };
   },
 
@@ -740,6 +750,8 @@ Page({
       best_combo: savedResult.bestCombo,
       subject_depth_task_type: this.data.subjectSkillDepth && this.data.subjectSkillDepth.taskType,
       subject_depth_label: this.data.subjectSkillDepth && this.data.subjectSkillDepth.label,
+      curriculum_subject: this.data.curriculumSpine && this.data.curriculumSpine.subjectLabel,
+      curriculum_node: this.data.curriculumSpine && this.data.curriculumSpine.currentNode && this.data.curriculumSpine.currentNode.label,
       share_code: incomingShare && incomingShare.share_code ? incomingShare.share_code : ''
     });
     if (storage.saveTodaySession) {
@@ -758,6 +770,7 @@ Page({
           subjectSkillDepth: this.data.subjectSkillDepth,
           subjectDepthTaskType: this.data.subjectSkillDepth && this.data.subjectSkillDepth.taskType,
           subjectDepthLabel: this.data.subjectSkillDepth && this.data.subjectSkillDepth.label,
+          curriculumSpine: this.data.curriculumSpine,
           nextPracticePlan: cause,
           score: Number(savedResult.accuracy || 0),
           adaptiveMode: this.data.adaptiveChallenge && this.data.adaptiveChallenge.mode,
@@ -790,6 +803,8 @@ Page({
         adaptive_mode: this.data.adaptiveChallenge && this.data.adaptiveChallenge.mode,
         subject_depth_task_type: this.data.subjectSkillDepth && this.data.subjectSkillDepth.taskType,
         subject_depth_label: this.data.subjectSkillDepth && this.data.subjectSkillDepth.label,
+        curriculum_subject: this.data.curriculumSpine && this.data.curriculumSpine.subjectLabel,
+        curriculum_node: this.data.curriculumSpine && this.data.curriculumSpine.currentNode && this.data.curriculumSpine.currentNode.label,
         quest_arc_stage: this.data.questArcMission && this.data.questArcMission.currentStage,
         quest_arc_mission: this.data.questArcMission && this.data.questArcMission.title,
         boss_gap: this.data.adaptiveChallenge && this.data.adaptiveChallenge.bossCard

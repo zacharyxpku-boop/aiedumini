@@ -2390,6 +2390,129 @@ function buildSubjectSkillDepth(input = {}) {
   };
 }
 
+const CURRICULUM_SPINE = {
+  math: {
+    label: '数学',
+    route: '/pages/daily-math/daily-math',
+    nodes: [
+      { id: 'read_problem', label: '读题', evidence: '圈已知、问题句、单位' },
+      { id: 'model_relation', label: '建模', evidence: '写数量关系或等量关系' },
+      { id: 'solve_check', label: '求解复核', evidence: '检查单位、答句和变式' }
+    ]
+  },
+  chinese: {
+    label: '语文',
+    route: '/pages/tutor/tutor',
+    nodes: [
+      { id: 'question_type', label: '判断问法', evidence: '细节、主旨、原因、推断' },
+      { id: 'text_evidence', label: '回文找证据', evidence: '原文证据句' },
+      { id: 'answer_boundary', label: '组织答案', evidence: '答案不越界' }
+    ]
+  },
+  english: {
+    label: '英语',
+    route: '/pages/dictation/dictation',
+    nodes: [
+      { id: 'sentence_frame', label: '句子骨架', evidence: '主语、谓语、时态线索' },
+      { id: 'word_use', label: '词汇用法', evidence: '词义、搭配、语境' },
+      { id: 'output_check', label: '表达复核', evidence: '一句话复述或造句' }
+    ]
+  },
+  physics: {
+    label: '物理',
+    route: '/pages/tutor/tutor',
+    nodes: [
+      { id: 'object_state', label: '对象和状态', evidence: '研究对象、初末状态' },
+      { id: 'diagram_first', label: '图示第一步', evidence: '受力/电路/光路的第一笔' },
+      { id: 'law_match', label: '规律匹配', evidence: '用哪条规律解释现象' }
+    ]
+  },
+  chemistry: {
+    label: '化学',
+    route: '/pages/tutor/tutor',
+    nodes: [
+      { id: 'substance_state', label: '物质和状态', evidence: '反应物、生成物、状态变化' },
+      { id: 'phenomenon_reason', label: '现象到原因', evidence: '颜色、气体、沉淀背后的原因' },
+      { id: 'equation_check', label: '方程式复核', evidence: '守恒和条件' }
+    ]
+  },
+  biology: {
+    label: '生物',
+    route: '/pages/tutor/tutor',
+    nodes: [
+      { id: 'structure_function', label: '结构和功能', evidence: '结构对应的功能' },
+      { id: 'process_order', label: '过程顺序', evidence: '步骤、变量、对照组' },
+      { id: 'evidence_reason', label: '证据解释', evidence: '用现象说明结论' }
+    ]
+  },
+  geography: {
+    label: '地理',
+    route: '/pages/tutor/tutor',
+    nodes: [
+      { id: 'map_reading', label: '读图定位', evidence: '方向、位置、图例' },
+      { id: 'cause_chain', label: '因果链', evidence: '地形、气候、人类活动关系' },
+      { id: 'space_transfer', label: '空间迁移', evidence: '换地区仍能解释' }
+    ]
+  }
+};
+
+function inferCurriculumSubject(input = {}, subjectSkillDepth = null) {
+  const text = `${input.subject || ''} ${input.sourceText || ''} ${input.stuckPointText || ''} ${input.thought || ''} ${input.title || ''} ${(subjectSkillDepth && subjectSkillDepth.label) || ''}`;
+  if (/物理|受力|电路|光路|速度|压强|浮力|physics/i.test(text)) return 'physics';
+  if (/化学|方程式|反应|溶液|气体|沉淀|chemistry/i.test(text)) return 'chemistry';
+  if (/生物|细胞|植物|人体|对照组|biology/i.test(text)) return 'biology';
+  if (/地理|地图|经纬|气候|公转|自转|geography/i.test(text)) return 'geography';
+  if (/英语|英文|单词|语法|句子|english|sentence|verb/i.test(text)) return 'english';
+  if (/语文|阅读|作文|文章|段落|主旨|chinese/i.test(text)) return 'chinese';
+  return 'math';
+}
+
+function buildCurriculumSpine(input = {}) {
+  const subjectDepth = input.subjectSkillDepth || buildSubjectSkillDepth(input);
+  const subjectId = inferCurriculumSubject(input, subjectDepth);
+  const subject = CURRICULUM_SPINE[subjectId] || CURRICULUM_SPINE.math;
+  const evidenceKey = subjectDepth && Array.isArray(subjectDepth.evidenceRequired)
+    ? subjectDepth.evidenceRequired[0]
+    : subject.nodes[0].id;
+  const matchedIndex = subject.nodes.findIndex((node) => node.id === evidenceKey);
+  const currentIndex = matchedIndex >= 0 ? matchedIndex : 0;
+  const currentNode = subject.nodes[currentIndex] || subject.nodes[0];
+  const nextNode = subject.nodes[Math.min(subject.nodes.length - 1, currentIndex + 1)] || currentNode;
+  const firstStep = subjectDepth.firstStep || suggestedStepForTaskType(subjectDepth.taskType);
+  const progression = subject.nodes.map((node, index) => ({
+    id: node.id,
+    order: index + 1,
+    label: node.label,
+    evidence: node.evidence,
+    active: node.id === currentNode.id,
+    done: index < currentIndex
+  }));
+  return {
+    id: `curriculum_${subjectId}_${subjectDepth.taskType || 'unknown'}`,
+    subjectId,
+    subjectLabel: subject.label,
+    taskType: subjectDepth.taskType,
+    title: `${subject.label}学习骨架`,
+    currentNode,
+    nextNode,
+    progression,
+    firstStep,
+    route: subjectDepth.route || subject.route,
+    visualBoardLine: `${subject.label}小黑板：先做「${firstStep}」，只画第一步，不直接给完整答案。`,
+    reportLine: `${subject.label}不是只看做对没有，先看「${currentNode.label}」是否留下证据：${currentNode.evidence}。`,
+    parentDecisionLine: `今晚家长只判断一件事：孩子能否说清「${currentNode.label}」这一小步。`,
+    gameLine: `轻练习优先练「${currentNode.label}」，下一关再看「${nextNode.label}」。`,
+    shareLine: `${subject.label}闭环：${currentNode.label} -> ${nextNode.label}，保留证据再进入下一步。`,
+    scaleLine: `七科课程骨架已覆盖：${Object.keys(CURRICULUM_SPINE).map((key) => CURRICULUM_SPINE[key].label).join(' / ')}；当前只落到第一步图解和证据闭环。`,
+    lightEntrySeeds: subject.nodes.map((node) => ({
+      id: `${subjectId}_${node.id}`,
+      label: node.label,
+      prompt: `先说${node.label}：${node.evidence}`,
+      route: subject.route
+    }))
+  };
+}
+
 function childStepQuality(text = '') {
   const value = String(text || '').trim();
   const compact = value.replace(/\s+/g, '');
@@ -6397,6 +6520,7 @@ module.exports = {
   firstStepTemplatesForTaskType,
   suggestedStepForTaskType,
   buildSubjectSkillDepth,
+  buildCurriculumSpine,
   childStepQuality,
   normalizeFirstStepEvidence,
   saveChildArticulatedStep,
