@@ -91,6 +91,7 @@ Page({
     showWeakVerdict: false,
     planSummaryText: '',
     incomingShare: null,
+    incomingShareRelay: null,
     updatedText: '',
     legacyStuckAnchor: { title: '卡住了，先说想法' },
     showFirstRunOverlay: false,
@@ -235,7 +236,8 @@ Page({
         }
       }).catch(() => {});
       this.setData({
-        incomingShare: incoming
+        incomingShare: incoming,
+        incomingShareRelay: this.buildIncomingShareRelay(incoming)
       });
     }
   },
@@ -361,6 +363,7 @@ Page({
       parentHandoff: this.buildParentHandoff(topMust, reviewSummary, state),
       quickDock: this.buildQuickDock(topMust, reviewSummary, modulePath),
       incomingShare,
+      incomingShareRelay: this.buildIncomingShareRelay(incomingShare),
       todaySession,
       focusEntryReady,
       yesterdayReviewCard: yesterdayReviewCard ? Object.assign({}, yesterdayReviewCard, {
@@ -733,6 +736,41 @@ Page({
     const cards = reviewCards.sessionCards('smart', 8);
     const fallback = cards.length ? cards : reviewCards.cardBrowser({ status: 'all', limit: 8 });
     return arcadeEngine.buildHomeArcadeEntry(reviewSummary || {}, fallback);
+  },
+
+  buildIncomingShareRelay(incoming = null) {
+    if (!incoming || !incoming.share_code) return null;
+    const actionLabel = incoming.action_label || '先接住这张学习复盘卡';
+    const actionDetail = incoming.action_detail || incoming.capability_next_action || '用自己的材料走一遍：第一步、轻练、回访。';
+    const challengeRoute = navigation.normalizeRoute(incoming.challenge_route || incoming.capability_route || '/pages/arcade/arcade');
+    return {
+      title: '回流接力板',
+      summary: '朋友分享的不是排名，是一个可复用的小动作。先选一条路，咕点会留下接力证据。',
+      evidenceLine: incoming.capability_label || incoming.challenge_goal || actionLabel,
+      actions: [
+        {
+          id: 'repair',
+          label: '先修卡点',
+          route: '/pages/review/review?from=share_relay&mode=wrong_cause',
+          reason: incoming.capability_gap ? `先补 ${incoming.capability_gap} 这条能力缺口。` : actionDetail,
+          evidence: '错因接力'
+        },
+        {
+          id: 'challenge',
+          label: '轻挑战',
+          route: challengeRoute,
+          reason: incoming.challenge_goal || actionLabel,
+          evidence: incoming.challenge_rule || '5分钟轻回访'
+        },
+        {
+          id: 'parent',
+          label: '给家长看',
+          route: '/pages/profile/profile?from=share_relay',
+          reason: '只看今晚动作、证据和明天复核，不做排行。',
+          evidence: '家庭复盘'
+        }
+      ]
+    };
   },
 
   buildWrongbookEntry(reviewSummary) {
@@ -1424,6 +1462,60 @@ Page({
       challenge_goal: incoming.challenge_goal || '',
       challenge_rule: incoming.challenge_rule || '',
       challenge_route: incoming.challenge_route || ''
+    });
+    if (!navigation.navigateLearningRoute(target)) {
+      wx.navigateTo({ url: '/pages/arcade/arcade' });
+    }
+  },
+
+  runIncomingShareRelayAction(event) {
+    const dataset = event.currentTarget.dataset || {};
+    const incoming = this.data.incomingShare || (storage.loadIncomingShare && storage.loadIncomingShare()) || {};
+    const route = navigation.normalizeRoute(dataset.route || '/pages/arcade/arcade', '/pages/arcade/arcade');
+    const query = incoming.share_code && route.indexOf('?') < 0
+      ? `?from=share_relay&share=${incoming.share_code}&mode=${incoming.mode || ''}&identity=${encodeURIComponent(incoming.identity_tag || '')}&action=${incoming.parent_next_action || ''}&capability_gap=${encodeURIComponent(incoming.capability_gap || '')}&capability_label=${encodeURIComponent(incoming.capability_label || '')}&challenge_goal=${encodeURIComponent(incoming.challenge_goal || '')}&challenge_rule=${encodeURIComponent(incoming.challenge_rule || '')}`
+      : '';
+    const target = `${route}${query}`;
+    const action = {
+      source: 'incoming_share_relay',
+      sourceLabel: '分享回流接力',
+      actionId: dataset.id || 'challenge',
+      actionLabel: dataset.label || '轻挑战',
+      route: target,
+      reasonLine: dataset.reason || '',
+      evidenceLine: dataset.evidence || ''
+    };
+    if (storage.recordUnifiedNextAction) {
+      storage.recordUnifiedNextAction(Object.assign({}, action, { surface: 'home' }));
+    }
+    if (storage.recordSurfaceDepthAction) {
+      storage.recordSurfaceDepthAction({
+        surface: 'home',
+        dimensionId: action.actionId,
+        label: action.actionLabel,
+        route: target,
+        readiness: 'incoming_share_relay',
+        capabilityId: action.actionId === 'parent' ? 'parent_action' : action.actionId === 'repair' ? 'socratic' : 'game'
+      });
+    }
+    if (storage.appendShareRun) {
+      storage.appendShareRun({
+        share_code: incoming.share_code || '',
+        type: 'share_relay_action',
+        path: target,
+        title: action.actionLabel,
+        payload: {
+          action_id: action.actionId,
+          reason: action.reasonLine,
+          evidence: action.evidenceLine
+        }
+      });
+    }
+    this.trackShareActivation('share_relay_action', {
+      action_id: action.actionId,
+      route: target,
+      reason: action.reasonLine,
+      evidence: action.evidenceLine
     });
     if (!navigation.navigateLearningRoute(target)) {
       wx.navigateTo({ url: '/pages/arcade/arcade' });

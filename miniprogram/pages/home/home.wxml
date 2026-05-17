@@ -343,6 +343,27 @@
         <view class="share-body" wx:if="{{incomingShare.challenge_rule}}">规则：{{incomingShare.challenge_rule}}</view>
       </view>
       <button class="share-button" bindtap="goSharedChallenge">去轻挑战</button>
+      <view class="share-relay-board" wx:if="{{incomingShareRelay}}">
+        <view class="share-relay-title">{{incomingShareRelay.title}}</view>
+        <view class="share-relay-summary">{{incomingShareRelay.summary}}</view>
+        <view class="share-relay-grid">
+          <button
+            class="share-relay-action"
+            wx:for="{{incomingShareRelay.actions}}"
+            wx:key="id"
+            data-id="{{item.id}}"
+            data-label="{{item.label}}"
+            data-route="{{item.route}}"
+            data-reason="{{item.reason}}"
+            data-evidence="{{item.evidence}}"
+            bindtap="runIncomingShareRelayAction"
+          >
+            <text class="share-relay-label">{{item.label}}</text>
+            <text class="share-relay-reason">{{item.reason}}</text>
+          </button>
+        </view>
+        <view class="share-relay-evidence">接力证据：{{incomingShareRelay.evidenceLine}}</view>
+      </view>
     </view>
 
     <view class="home-spacer"></view>
