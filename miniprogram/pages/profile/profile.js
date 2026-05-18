@@ -796,6 +796,11 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     solutionMap,
     plan
   });
+  const todaySession = storage.getTodaySession ? storage.getTodaySession() : {};
+  const gameEvidence = todaySession && todaySession.gameEvidence ? todaySession.gameEvidence : {};
+  const socraticMemoryReportBridge = learningReport.buildSocraticMemoryReportBridge
+    ? learningReport.buildSocraticMemoryReportBridge({ gameEvidence }, parentDecisionTrustSystem, portraitConfidenceSystem)
+    : (draft.socraticMemoryReportBridge || null);
   return {
     title: draft.title || '学习画像',
     modeLabel: reportState.reportProgress && reportState.reportProgress.label ? reportState.reportProgress.label : '0% · 快速版',
@@ -911,6 +916,21 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     parentDecisionTrustGaps: Array.isArray(parentDecisionTrustSystem.evidenceGaps) ? parentDecisionTrustSystem.evidenceGaps : [],
     parentDecisionTrustWeeklyReview: Array.isArray(parentDecisionTrustSystem.weeklyDecisionReview) ? parentDecisionTrustSystem.weeklyDecisionReview : [],
     parentDecisionTrustShareBoundary: parentDecisionTrustSystem.shareBoundary || '',
+    socraticMemoryReportBridge,
+    socraticMemoryReportTitle: socraticMemoryReportBridge ? socraticMemoryReportBridge.title : '',
+    socraticMemoryReportStatus: socraticMemoryReportBridge ? socraticMemoryReportBridge.status : '',
+    socraticMemoryReportSummary: socraticMemoryReportBridge ? socraticMemoryReportBridge.summary : '',
+    socraticMemoryReportPrimaryAction: socraticMemoryReportBridge ? socraticMemoryReportBridge.primaryActionLine : '',
+    socraticMemoryReportDecisionLine: socraticMemoryReportBridge ? socraticMemoryReportBridge.reportDecisionLine : '',
+    socraticMemoryReportNoIncreaseRule: socraticMemoryReportBridge ? socraticMemoryReportBridge.noIncreaseRule : '',
+    socraticMemoryReportParentProofLine: socraticMemoryReportBridge ? socraticMemoryReportBridge.parentProofLine : '',
+    socraticMemoryReportShareBoundary: socraticMemoryReportBridge ? socraticMemoryReportBridge.shareBoundary : '',
+    socraticMemoryReportActions: socraticMemoryReportBridge && Array.isArray(socraticMemoryReportBridge.reportActions)
+      ? socraticMemoryReportBridge.reportActions
+      : [],
+    socraticMemoryReportEvidence: socraticMemoryReportBridge && Array.isArray(socraticMemoryReportBridge.evidenceRequired)
+      ? socraticMemoryReportBridge.evidenceRequired
+      : [],
     familyDecisionTitle: familyDecisionMemo.title || '',
     familyDecisionTonight: familyDecisionMemo.tonightDecision || '',
     familyDecisionDoNotDo: Array.isArray(familyDecisionMemo.doNotDo) ? familyDecisionMemo.doNotDo : [],

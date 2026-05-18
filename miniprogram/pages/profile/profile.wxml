@@ -727,6 +727,17 @@
           <text wx:for="{{learningReportSummary.parentDecisionTrustWeeklyReview}}" wx:key="day">复核：{{item.day}}｜{{item.check}}｜{{item.action}}</text>
           <text wx:if="{{learningReportSummary.parentDecisionTrustShareBoundary}}">分享边界：{{learningReportSummary.parentDecisionTrustShareBoundary}}</text>
         </view>
+        <view class="parent-brief-block" wx:if="{{learningReportSummary.socraticMemoryReportBridge}}">
+          <text class="parent-brief-label">点拨质量到长期画像</text>
+          <text>{{learningReportSummary.socraticMemoryReportSummary}}</text>
+          <text>{{learningReportSummary.socraticMemoryReportPrimaryAction}}</text>
+          <text>{{learningReportSummary.socraticMemoryReportDecisionLine}}</text>
+          <text>不加题规则：{{learningReportSummary.socraticMemoryReportNoIncreaseRule}}</text>
+          <text>家长证据：{{learningReportSummary.socraticMemoryReportParentProofLine}}</text>
+          <text>分享边界：{{learningReportSummary.socraticMemoryReportShareBoundary}}</text>
+          <text wx:for="{{learningReportSummary.socraticMemoryReportActions}}" wx:key="id">报告动作：{{item.label}}｜{{item.action}}｜证据 {{item.evidence}}</text>
+          <text wx:for="{{learningReportSummary.socraticMemoryReportEvidence}}" wx:key="*this">可信证据：{{item}}</text>
+        </view>
         <view class="parent-brief-block" wx:if="{{learningReportSummary.classroomDecisionLine}}">
           <text class="parent-brief-label">课堂级决策板</text>
           <text>{{learningReportSummary.classroomDecisionLine}}</text>

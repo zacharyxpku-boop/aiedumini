@@ -917,6 +917,48 @@ function buildParentDecisionTrustSystem(parts = {}, matrix = [], portraitConfide
   };
 }
 
+function buildSocraticMemoryReportBridge(input = {}, parentDecisionTrust = {}, portraitConfidence = {}) {
+  const gameEvidence = input.gameEvidence || {};
+  const highFrequencyLoop = input.highFrequencyPracticeLoop || gameEvidence.highFrequencyPracticeLoop || {};
+  const bridge = input.socraticQualityMemoryBridge || highFrequencyLoop.socraticQualityMemoryBridge || {};
+  const actions = Array.isArray(bridge.memoryActions) ? bridge.memoryActions : [];
+  const scenarioCount = Number(bridge.scenarioCount || 0);
+  const evidenceRequired = Array.isArray(bridge.evidenceRequired) ? bridge.evidenceRequired : [];
+  const trustDeck = Array.isArray(parentDecisionTrust.decisionDeck) ? parentDecisionTrust.decisionDeck : [];
+  const confidenceLedger = Array.isArray(portraitConfidence.evidenceLedger) ? portraitConfidence.evidenceLedger : [];
+  const hasLiveBridge = scenarioCount > 0 && actions.length > 0;
+  const readyEvidence = confidenceLedger.filter((item) => item.status === 'ready').length;
+  const canUpdatePortrait = hasLiveBridge && readyEvidence >= 2 && trustDeck.some((item) => item.id === 'portrait' && String(item.verdict || '').indexOf('先不要') < 0);
+  const primaryAction = actions.find((item) => item.id === 'wrong_axis') || actions[0] || {};
+  return {
+    id: 'socratic_memory_report_bridge',
+    title: '点拨质量到长期画像',
+    status: hasLiveBridge ? 'ready' : 'waiting_game_evidence',
+    scenarioCount,
+    actionCount: actions.length,
+    summary: hasLiveBridge
+      ? `已有 ${scenarioCount} 个点拨质量场景接入游戏复习，家长报告可以用它判断是否继续观察、降级或进入长期画像。`
+      : '还缺一次带点拨质量证据的游戏复习，暂不把单次表现写入长期画像。',
+    primaryActionLine: primaryAction.title
+      ? `${primaryAction.title}：${primaryAction.memoryAction}`
+      : '先完成一次点拨后的高频回忆，再进入家长报告判断。',
+    reportDecisionLine: canUpdatePortrait
+      ? '可临时更新长期画像，但仍需明天和第 7 天复核。'
+      : '暂不更新长期画像，只把今晚动作写入观察记录。',
+    noIncreaseRule: bridge.xpGate || '没有第一步、错因回放或次日回访证据，不增加题量。',
+    parentProofLine: bridge.parentLine || '家长只看孩子是否说出第一步、是否完成回访。',
+    shareBoundary: bridge.privacyBoundary || '不带原题照片、完整对话、分数、排名、私密评价或原始答案。',
+    reportActions: actions.slice(0, 4).map((item) => ({
+      id: item.id,
+      label: item.title,
+      action: item.memoryAction,
+      evidence: item.evidence,
+      route: item.route || '/pages/review/review'
+    })),
+    evidenceRequired: ['socratic_quality_memory_bridge', 'parent_decision_trust', 'portrait_confidence_ledger'].concat(evidenceRequired).slice(0, 8)
+  };
+}
+
 function buildLearningReportDraft(input = {}) {
   const sources = normalizeReportSources(input);
   const allText = [input.sourceText || '', input.scoreText || ''].concat(sources.map((source) => source.text || '')).join('\n');
@@ -952,6 +994,7 @@ function buildLearningReportDraft(input = {}) {
   const familyDecisionMemo = buildFamilyDecisionMemo(parts, diagnosisMatrix, recommendationPlan, solutionMap, longTermPortrait, classroomDecisionBoard);
   const portraitConfidenceSystem = buildPortraitConfidenceSystem(parts, diagnosisMatrix, longTermPortrait, classroomDecisionBoard, familyDecisionMemo);
   const parentDecisionTrustSystem = buildParentDecisionTrustSystem(parts, diagnosisMatrix, portraitConfidenceSystem, familyDecisionMemo, classroomDecisionBoard);
+  const socraticMemoryReportBridge = buildSocraticMemoryReportBridge(input, parentDecisionTrustSystem, portraitConfidenceSystem);
   const missing = missingItems(parts);
   const reportDraft = {
     id: input.id || `learning_report_${String(nowIso(input.now)).slice(0, 10).replace(/-/g, '')}`,
@@ -983,6 +1026,7 @@ function buildLearningReportDraft(input = {}) {
     familyDecisionMemo,
     portraitConfidenceSystem,
     parentDecisionTrustSystem,
+    socraticMemoryReportBridge,
     generatedAt: nowIso(input.now),
     missingItems: missing,
     sourceIntegrity: {
@@ -1016,6 +1060,7 @@ function buildLearningReportDraft(input = {}) {
     familyDecisionMemo,
     portraitConfidenceSystem,
     parentDecisionTrustSystem,
+    socraticMemoryReportBridge,
     reportCompleteness: completeness,
     reportStatus: {
       state: completeness >= 30 ? 'ready' : 'draft',
@@ -1041,6 +1086,7 @@ module.exports = {
   buildClassroomDecisionBoard,
   buildPortraitConfidenceSystem,
   buildParentDecisionTrustSystem,
+  buildSocraticMemoryReportBridge,
   normalizeReportSources,
   confidenceLabel
 };
