@@ -1307,6 +1307,58 @@ function buildDailyMemoryPrescription(memoryFeedbackController = {}, gizmoLikeMe
   };
 }
 
+function buildQuestionTypeClusterMemoryProtocol(questionTypeClusters = [], result = {}, options = {}) {
+  const clusters = Array.isArray(questionTypeClusters) ? questionTypeClusters : [];
+  const accuracy = Number.isFinite(Number(result.accuracy)) ? Number(result.accuracy) : 0;
+  const wrong = Math.max(0, Number(result.wrong || 0));
+  const rescue = wrong >= 2 || accuracy < 60;
+  const activeTaskType = String(options.taskType || '').trim();
+  const rows = clusters.map((cluster, index) => {
+    const wrongCause = Array.isArray(cluster.wrongCauseSignals) && cluster.wrongCauseSignals.length
+      ? cluster.wrongCauseSignals[0]
+      : '第一步不稳';
+    return {
+      id: cluster.id || `question_type_cluster_${index + 1}`,
+      taskType: cluster.taskType || '',
+      subject: cluster.subject || '',
+      pressureFamily: cluster.pressureFamily || '',
+      mode: rescue ? 'rescue_recall' : 'spaced_mastery',
+      recallCard: cluster.firstStepRule || '先说第一步。',
+      wrongCauseReplay: wrongCause,
+      boardAction: cluster.boardMove || '只画第一步，不写答案。',
+      socraticProbe: cluster.socraticProbe || '你先说第一步是什么？',
+      reportSignal: cluster.reportSignal || '报告只记录证据，不记录答案。',
+      revisitWindows: [
+        { id: 'now', label: '现在', action: '遮住答案，说第一步。' },
+        { id: 'tomorrow', label: '明天', action: cluster.memoryCadence || '换一个材料回访第一步。' },
+        { id: 'day3', label: '第3天', action: '做一张近迁移卡。' },
+        { id: 'day7', label: '第7天', action: '判断是否写入长期画像。' }
+      ],
+      xpGate: '只奖励主动回忆、错因复述和次日回访，不奖励直接看答案。',
+      unlockRule: rescue ? '同一错因稳定前不开放新题型。' : '连续两次说清第一步后开放小变式。',
+      shareHook: cluster.shareHook || '分享只带题型动作和回访窗口。',
+      localGates: Array.isArray(cluster.localGates) ? cluster.localGates : [],
+      localDeterministic: true
+    };
+  });
+  const activeRow = rows.find((row) => activeTaskType && row.taskType === activeTaskType) || rows[0] || null;
+  return {
+    id: 'question_type_cluster_memory_protocol',
+    title: rescue ? '题型簇记忆急救协议' : '题型簇间隔记忆协议',
+    mode: rescue ? 'rescue' : 'mastery',
+    rows,
+    activeRow,
+    dailyCap: rescue
+      ? { newClusters: 0, recallCards: 3, transferCards: 0 }
+      : { newClusters: 1, recallCards: 4, transferCards: 1 },
+    parentLine: activeRow
+      ? `今晚只看「${activeRow.subject}」题型簇：第一步、错因、明天回访。`
+      : '先补题型簇，再开放记忆协议。',
+    shareBoundary: '题型簇分享只带第一步、错因和回访窗口，不带原题、答案、分数、排名或完整对话。',
+    evidenceRequired: ['question_type_cluster', 'active_recall', 'wrong_cause_replay', 'spaced_revisit', 'xp_gate', 'safe_share_boundary']
+  };
+}
+
 function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], result = {}, challenge = {}, questSet = {}, options = {}) {
   const safeCards = Array.isArray(cards) ? cards : [];
   const safeEvents = Array.isArray(events) ? events : [];
@@ -1423,6 +1475,11 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
     result,
     { weakKey }
   );
+  const questionTypeClusterMemoryProtocol = buildQuestionTypeClusterMemoryProtocol(
+    options.questionTypeClusterRunway || options.questionTypeClusters || [],
+    result,
+    { taskType: options.taskType }
+  );
   return {
     title: needsRepair ? '高频修复循环' : '高频巩固循环',
     mode: needsRepair ? 'repair_recall' : 'mastery_recall',
@@ -1446,13 +1503,14 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
     memoryRiskReleaseModel,
     memoryComebackLoop,
     dailyMemoryPrescription,
+    questionTypeClusterMemoryProtocol,
     xpRule: 'XP 只奖励主动回忆、错因修复和次日回访，不奖励盲刷题量。',
     leechRule: needsRepair
       ? `同一错因连续 2 次错，会降到第一步小黑板。`
       : '连续 2 次说清第一步，才进入变式练习。',
     parentShareLine: `家长复盘只看：孩子能否自己说出「${weakKey}」的第一步。`,
     nextRoute: needsRepair ? '/pages/review/review' : '/pages/tutor/tutor',
-    evidenceRequired: ['active_recall_cards', 'spaced_review_plan', 'wrong_cause_return', 'quest_cadence', 'memory_feedback_controller', 'recall_intensity_plan', 'wrong_cause_replay_deck', 'xp_feedback_policy', 'quest_arc_runway', 'gizmo_like_memory_protocol', 'socratic_quality_memory_bridge', 'question_bank_memory_bridge', 'question_bank_recall_workout', 'daily_memory_sprint_deck', 'adaptive_recall_scheduler', 'memory_risk_release_model', 'memory_comeback_loop', 'daily_memory_prescription', 'parent_share_line'],
+    evidenceRequired: ['active_recall_cards', 'spaced_review_plan', 'wrong_cause_return', 'quest_cadence', 'memory_feedback_controller', 'recall_intensity_plan', 'wrong_cause_replay_deck', 'xp_feedback_policy', 'quest_arc_runway', 'gizmo_like_memory_protocol', 'socratic_quality_memory_bridge', 'question_bank_memory_bridge', 'question_bank_recall_workout', 'daily_memory_sprint_deck', 'adaptive_recall_scheduler', 'memory_risk_release_model', 'memory_comeback_loop', 'daily_memory_prescription', 'question_type_cluster_memory_protocol', 'parent_share_line'],
     weakKey
   };
 }
@@ -1469,6 +1527,7 @@ module.exports = {
   buildGizmoLikeMemoryProtocol,
   buildHighFrequencyPracticeLoop,
   buildDailyMemoryPrescription,
+  buildQuestionTypeClusterMemoryProtocol,
   buildMemoryFeedbackController,
   buildMemoryComebackLoop,
   buildAdaptiveRecallScheduler,
