@@ -793,11 +793,15 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
   const courseUnitQuestionBank = storage.buildCourseUnitQuestionBank
     ? storage.buildCourseUnitQuestionBank({ courseUnitMap: effectiveCourseUnitMap })
     : null;
+  const courseUnitDepthExpansionAtlas = storage.buildCourseUnitDepthExpansionAtlas
+    ? storage.buildCourseUnitDepthExpansionAtlas({ courseUnitMap: effectiveCourseUnitMap, courseUnitQuestionBank })
+    : null;
   const commercialDepthRunway = storage.buildCommercialDepthRunway
     ? storage.buildCommercialDepthRunway({
       courseUnitMap: effectiveCourseUnitMap,
       courseUnitMasteryTrajectory,
       courseUnitQuestionBank,
+      courseUnitDepthExpansionAtlas,
       subjectSkillDepth
     })
     : null;
@@ -944,6 +948,11 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     courseUnitQuestionBank,
     courseUnitQuestionBankLine: courseUnitQuestionBank ? courseUnitQuestionBank.reportLine : '',
     courseUnitQuestionBankCards: courseUnitQuestionBank ? courseUnitQuestionBank.activeCards : [],
+    courseUnitDepthExpansionAtlas,
+    courseUnitDepthExpansionLine: courseUnitDepthExpansionAtlas ? courseUnitDepthExpansionAtlas.reportLine : '',
+    courseUnitDepthExpansionArchetypes: courseUnitDepthExpansionAtlas && Array.isArray(courseUnitDepthExpansionAtlas.activeArchetypes)
+      ? courseUnitDepthExpansionAtlas.activeArchetypes
+      : [],
     courseUnitTransferLadders: courseUnitQuestionBank && Array.isArray(courseUnitQuestionBank.activeTransferLadders)
       ? courseUnitQuestionBank.activeTransferLadders
       : [],

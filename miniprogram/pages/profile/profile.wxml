@@ -652,6 +652,9 @@
           <text wx:for="{{learningReportSummary.courseUnitQuestionBankCards}}" wx:key="id">样例证据：{{item.sampleStem}}｜第一步：{{item.firstStepHint}}｜家长：{{item.parentCheck}}</text>
           <text wx:for="{{learningReportSummary.courseUnitQuestionBankCards}}" wx:key="id">进阶证据：{{item.progression.parentEvidence}}｜掌握门槛：{{item.progression.masteryGate}}</text>
           <text wx:for="{{learningReportSummary.courseUnitQuestionBankCards}}" wx:key="id">回访安排：{{item.progression.nextDayRevisit}}</text>
+          <text wx:if="{{learningReportSummary.courseUnitDepthExpansionAtlas}}">题型深度：{{learningReportSummary.courseUnitDepthExpansionLine}}</text>
+          <text wx:for="{{learningReportSummary.courseUnitDepthExpansionArchetypes}}" wx:key="id">原型题：{{item.label}}｜小黑板：{{item.visualBoardTemplate.opening}}｜家长话术：{{item.parentCheckScript}}</text>
+          <text wx:for="{{learningReportSummary.courseUnitDepthExpansionArchetypes}}" wx:key="id">安全复习：{{item.gameHook}}｜{{item.shareSafeLine}}</text>
           <text wx:if="{{learningReportSummary.courseUnitTransferLadderLine}}">{{learningReportSummary.courseUnitTransferLadderLine}}</text>
           <text wx:for="{{learningReportSummary.courseUnitTransferLadders}}" wx:key="id">迁移路径：{{item.title}}｜{{item.summary}}</text>
           <text wx:for="{{learningReportSummary.courseUnitTransferLadders}}" wx:key="id">路径家长判断：{{item.parentDecisionRule}}</text>
@@ -741,7 +744,7 @@
           <text>成熟等级：{{learningReportSummary.portraitEvidenceMaturityLevel}}｜成熟分：{{learningReportSummary.portraitEvidenceMaturityScore}}</text>
           <text>{{learningReportSummary.portraitEvidenceMaturitySummary}}</text>
           <text wx:for="{{learningReportSummary.portraitEvidenceMaturityLanes}}" wx:key="id">证据层：{{item.label}}｜可做：{{item.allowedDecision}}｜不可做：{{item.blockedDecision}}</text>
-          <text wx:for="{{learningReportSummary.portraitEvidenceDecisionLocks}}" wx:key="id">决策锁：{{item.lock}}｜解锁：{{item.release}}</text>
+          <text wx:for="{{learningReportSummary.portraitEvidenceDecisionLocks}}" wx:key="id">决策锁：{{item.lock}}｜放行条件：{{item.release}}</text>
           <text wx:for="{{learningReportSummary.portraitEvidenceUpdateGates}}" wx:key="id">画像更新镜像：{{item.label}}｜{{item.rule}}</text>
           <text wx:if="{{learningReportSummary.portraitEvidenceMaturityParentAction}}">家长动作：{{learningReportSummary.portraitEvidenceMaturityParentAction}}</text>
           <text wx:if="{{learningReportSummary.portraitEvidenceMaturityShareBoundary}}">分享边界：{{learningReportSummary.portraitEvidenceMaturityShareBoundary}}</text>

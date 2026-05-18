@@ -6204,9 +6204,118 @@ function buildCourseUnitQuestionBank(options = {}) {
   };
 }
 
+function buildCourseUnitDepthExpansionAtlas(options = {}) {
+  const courseUnitMap = options.courseUnitMap || buildCourseUnitMap(options);
+  const courseUnitQuestionBank = options.courseUnitQuestionBank || buildCourseUnitQuestionBank({ courseUnitMap });
+  const active = courseUnitMap && courseUnitMap.active ? courseUnitMap.active : null;
+  const subjects = courseUnitMap && Array.isArray(courseUnitMap.subjects) ? courseUnitMap.subjects : [];
+  const units = subjects.reduce((list, subject) => list.concat(Array.isArray(subject.units) ? subject.units : []), []);
+  const cards = courseUnitQuestionBank && Array.isArray(courseUnitQuestionBank.cards) ? courseUnitQuestionBank.cards : [];
+  const cardsByUnit = cards.reduce((acc, card) => {
+    if (!acc[card.unitId]) acc[card.unitId] = [];
+    acc[card.unitId].push(card);
+    return acc;
+  }, {});
+  const unitAtlases = units.map((unit) => {
+    const unitCards = cardsByUnit[unit.id] || [];
+    const archetypes = (unit.reusableQuestionTypes || []).map((questionType, index) => {
+      const card = unitCards[index] || unitCards[0] || {};
+      const wrongCause = (unit.wrongCauseAtlas || [])[index] || card.wrongCause || `${unit.unitLabel}错因未命名`;
+      const probe = (unit.diagnosticProbes || [])[index] || card.firstStepHint || `先说 ${unit.unitLabel} 的第一步`;
+      const boardMove = index === 0
+        ? (unit.blackboardBlueprint && unit.blackboardBlueprint.firstStroke)
+        : index === 1
+          ? (unit.blackboardBlueprint && unit.blackboardBlueprint.visualPrompt)
+          : (unit.blackboardBlueprint && unit.blackboardBlueprint.stopRule);
+      const sampleStem = card.sampleStem || `${unit.subjectLabel}：围绕 ${unit.unitLabel} 做一题小练习。`;
+      return {
+        id: `${unit.id}_depth_archetype_${index + 1}`,
+        unitId: unit.id,
+        subjectId: unit.subjectId,
+        subjectLabel: unit.subjectLabel,
+        unitLabel: unit.unitLabel,
+        label: questionType,
+        sampleStem,
+        diagnosticProbe: probe,
+        misconceptionVariants: [
+          wrongCause,
+          `${unit.unitLabel}只记住题面词，没说出第一步依据。`,
+          `${unit.unitLabel}换一个条件后，仍然沿用原题动作。`
+        ],
+        visualBoardTemplate: {
+          title: `${unit.subjectLabel}/${unit.unitLabel} 第一笔小黑板`,
+          opening: boardMove || `只画 ${unit.unitLabel} 的第一步关系。`,
+          drawSteps: [
+            `圈出目标：${unit.unitLabel}`,
+            `标一条证据：${probe}`,
+            '停在第一步，让孩子自己说下一句'
+          ],
+          stopRule: '孩子能说出第一步和错因名就停，不补完整答案。'
+        },
+        parentCheckScript: `家长只问：这题属于「${questionType}」吗？你第一步先看哪里？`,
+        recallRoute: unit.recallRoute || '/pages/review/review',
+        gameHook: card.progression && card.progression.nextDayRevisit
+          ? card.progression.nextDayRevisit
+          : '明天用 1 道同类小题遮答案回访。',
+        reportEvidence: card.progression && card.progression.parentEvidence
+          ? card.progression.parentEvidence
+          : unit.reportContract,
+        shareSafeLine: `分享只带「${unit.unitLabel}」的题型名、第一步和回访动作，不带原题、完整答案、分数或排名。`,
+        noFullAnswerBoundary: '只做第一步图解、错因命名和近迁移，不做拍题完整解答。'
+      };
+    });
+    return {
+      id: `${unit.id}_depth_atlas`,
+      unitId: unit.id,
+      subjectId: unit.subjectId,
+      subjectLabel: unit.subjectLabel,
+      unitLabel: unit.unitLabel,
+      title: `${unit.subjectLabel}/${unit.unitLabel} 题型深度图谱`,
+      archetypeCount: archetypes.length,
+      misconceptionCount: archetypes.reduce((sum, item) => sum + item.misconceptionVariants.length, 0),
+      boardMoveCount: archetypes.reduce((sum, item) => sum + item.visualBoardTemplate.drawSteps.length, 0),
+      parentCheckCount: archetypes.length,
+      archetypes,
+      reportLine: `${unit.subjectLabel}/${unit.unitLabel} 已拆成 ${archetypes.length} 类原型题、${archetypes.length * 3} 条误区变体和第一步小黑板。`,
+      parentLine: `家长今晚只检查 ${unit.unitLabel} 的一类原型题，不扩成整科刷题。`,
+      gameLine: `游戏只抽 ${unit.unitLabel} 的主动回忆、错因修复和近迁移，不按刷题数量奖励。`,
+      shareBoundary: `分享只带 ${unit.unitLabel} 的题型动作、回访计划和安全接力口径。`
+    };
+  });
+  const activeUnitIds = active && Array.isArray(active.units)
+    ? active.units.reduce((acc, unit) => {
+      acc[unit.id] = true;
+      return acc;
+    }, {})
+    : {};
+  const activeAtlases = unitAtlases.filter((item) => activeUnitIds[item.unitId]).slice(0, 3);
+  const activeArchetypes = activeAtlases.reduce((list, atlas) => list.concat(atlas.archetypes || []), []).slice(0, 9);
+  return {
+    id: 'course_unit_depth_expansion_atlas',
+    title: '题型深度扩展图谱',
+    subjectLabel: active ? active.label : '',
+    summary: `已把 ${unitAtlases.length} 个单元扩展为原型题、误区变体、第一步小黑板、家长检查、游戏回访和安全分享。`,
+    boundary: '这是题型级内容厚度，不是全科拍题讲完整答案。',
+    unitCount: unitAtlases.length,
+    archetypeCount: unitAtlases.reduce((sum, item) => sum + item.archetypeCount, 0),
+    misconceptionVariantCount: unitAtlases.reduce((sum, item) => sum + item.misconceptionCount, 0),
+    visualBoardMoveCount: unitAtlases.reduce((sum, item) => sum + item.boardMoveCount, 0),
+    parentCheckScriptCount: unitAtlases.reduce((sum, item) => sum + item.parentCheckCount, 0),
+    shareBoundaryCount: unitAtlases.filter((item) => item.shareBoundary).length,
+    atlases: unitAtlases,
+    activeAtlases,
+    activeArchetypes,
+    reportLine: `报告可引用 ${unitAtlases.length} 个单元、${unitAtlases.reduce((sum, item) => sum + item.archetypeCount, 0)} 类原型题和 ${unitAtlases.reduce((sum, item) => sum + item.misconceptionCount, 0)} 条误区变体。`,
+    tutorLine: '点拨先选原型题，再用 A/B 微选择定位错因，最后只画第一步小黑板。',
+    gameLine: '游戏按“认题型-说错因-近迁移-隔日回访”抽卡，不做刷题瀑布流。',
+    parentLine: '家长看到的是可执行检查话术和下一次证据，不是题库清单。'
+  };
+}
+
 function buildCommercialDepthRunway(options = {}) {
   const courseUnitMap = options.courseUnitMap || buildCourseUnitMap(options);
   const courseUnitQuestionBank = options.courseUnitQuestionBank || buildCourseUnitQuestionBank({ courseUnitMap });
+  const courseUnitDepthExpansionAtlas = options.courseUnitDepthExpansionAtlas || buildCourseUnitDepthExpansionAtlas({ courseUnitMap, courseUnitQuestionBank });
   const courseUnitMasteryTrajectory = options.courseUnitMasteryTrajectory || buildCourseUnitMasteryTrajectory({ courseUnitMap });
   const subjectSkillDepth = options.subjectSkillDepth || buildSubjectSkillDepth(options);
   const activeUnit = courseUnitMap && courseUnitMap.active && Array.isArray(courseUnitMap.active.units)
@@ -6221,9 +6330,9 @@ function buildCommercialDepthRunway(options = {}) {
       id: 'question_type_depth',
       label: '题型级内容深度',
       route: '/pages/light-diagnosis/light-diagnosis',
-      evidenceLine: `已有 ${activeCards.length} 张单元题库卡，覆盖主动回忆、错因诊断、近迁移。`,
+      evidenceLine: `已有 ${activeCards.length} 张单元题库卡，外加 ${courseUnitDepthExpansionAtlas.archetypeCount || 0} 类原型题和 ${courseUnitDepthExpansionAtlas.misconceptionVariantCount || 0} 条误区变体。`,
       nextAction: activeCards[0] ? activeCards[0].prompt : '先补一张主动回忆卡',
-      proof: activeCards.slice(0, 3).map((card) => `${card.label}：${card.evidenceRequired}`)
+      proof: (courseUnitDepthExpansionAtlas.activeArchetypes || []).slice(0, 3).map((item) => `${item.label}：${item.parentCheckScript}`)
     },
     {
       id: 'memory_feedback',
@@ -8305,6 +8414,7 @@ module.exports = {
   buildCourseUnitMap,
   buildCourseUnitMasteryTrajectory,
   buildCourseUnitQuestionBank,
+  buildCourseUnitDepthExpansionAtlas,
   buildCommercialDepthRunway,
   buildWeeklyEvidenceFlywheel,
   buildSevenSubjectMasterySprint,

@@ -34,6 +34,7 @@ Page({
     subjectSeedLibrary: null,
     courseUnitMap: null,
     courseUnitQuestionBank: null,
+    courseUnitDepthExpansionAtlas: null,
     commercialDepthRunway: null,
     sevenSubjectMasterySprint: null
   },
@@ -42,13 +43,15 @@ Page({
     const subjectSeedLibrary = storage.buildSubjectSeedLibrary ? storage.buildSubjectSeedLibrary({ subject: this.data.subject }) : null;
     const courseUnitMap = storage.buildCourseUnitMap ? storage.buildCourseUnitMap({ subject: this.data.subject }) : null;
     const courseUnitQuestionBank = storage.buildCourseUnitQuestionBank ? storage.buildCourseUnitQuestionBank({ courseUnitMap }) : null;
-    const commercialDepthRunway = storage.buildCommercialDepthRunway ? storage.buildCommercialDepthRunway({ courseUnitMap, courseUnitQuestionBank }) : null;
+    const courseUnitDepthExpansionAtlas = storage.buildCourseUnitDepthExpansionAtlas ? storage.buildCourseUnitDepthExpansionAtlas({ courseUnitMap, courseUnitQuestionBank }) : null;
+    const commercialDepthRunway = storage.buildCommercialDepthRunway ? storage.buildCommercialDepthRunway({ courseUnitMap, courseUnitQuestionBank, courseUnitDepthExpansionAtlas }) : null;
     this.setData({
       surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('light_diagnosis') : null,
       lightSeedBank: storage.buildLightEntrySeedBank ? storage.buildLightEntrySeedBank('light_diagnosis') : null,
       subjectSeedLibrary,
       courseUnitMap,
       courseUnitQuestionBank,
+      courseUnitDepthExpansionAtlas,
       commercialDepthRunway,
       sevenSubjectMasterySprint: storage.buildSevenSubjectMasterySprint ? storage.buildSevenSubjectMasterySprint({ courseUnitMap, courseUnitQuestionBank, commercialDepthRunway }) : null
     });
@@ -79,7 +82,8 @@ Page({
     const subjectSeedLibrary = storage.buildSubjectSeedLibrary ? storage.buildSubjectSeedLibrary({ subject }) : this.data.subjectSeedLibrary;
     const courseUnitMap = storage.buildCourseUnitMap ? storage.buildCourseUnitMap({ subject }) : this.data.courseUnitMap;
     const courseUnitQuestionBank = storage.buildCourseUnitQuestionBank ? storage.buildCourseUnitQuestionBank({ courseUnitMap }) : this.data.courseUnitQuestionBank;
-    const commercialDepthRunway = storage.buildCommercialDepthRunway ? storage.buildCommercialDepthRunway({ courseUnitMap, courseUnitQuestionBank }) : this.data.commercialDepthRunway;
+    const courseUnitDepthExpansionAtlas = storage.buildCourseUnitDepthExpansionAtlas ? storage.buildCourseUnitDepthExpansionAtlas({ courseUnitMap, courseUnitQuestionBank }) : this.data.courseUnitDepthExpansionAtlas;
+    const commercialDepthRunway = storage.buildCommercialDepthRunway ? storage.buildCommercialDepthRunway({ courseUnitMap, courseUnitQuestionBank, courseUnitDepthExpansionAtlas }) : this.data.commercialDepthRunway;
     this.setData({
       subject,
       diagnosis: null,
@@ -87,6 +91,7 @@ Page({
       subjectSeedLibrary,
       courseUnitMap,
       courseUnitQuestionBank,
+      courseUnitDepthExpansionAtlas,
       commercialDepthRunway,
       sevenSubjectMasterySprint: storage.buildSevenSubjectMasterySprint ? storage.buildSevenSubjectMasterySprint({ courseUnitMap, courseUnitQuestionBank, commercialDepthRunway }) : this.data.sevenSubjectMasterySprint
     });

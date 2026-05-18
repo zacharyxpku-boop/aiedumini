@@ -166,6 +166,16 @@
             <view class="receipt-board-line" wx:for="{{thinkingReceipt.courseUnitTransferLadders}}" wx:key="id">小黑板路径：{{item.visualBoardPath}}</view>
             <view class="receipt-board-avoid">{{thinkingReceipt.courseUnitQuestionBank.boundary}}</view>
           </view>
+          <view class="receipt-first-step-board" wx:if="{{thinkingReceipt.courseUnitDepthExpansionAtlas}}">
+            <view class="receipt-diagnostic-title">{{thinkingReceipt.courseUnitDepthExpansionAtlas.title}}</view>
+            <view class="receipt-board-avoid">{{thinkingReceipt.courseUnitDepthExpansionAtlas.boundary}}</view>
+            <view class="receipt-board-line">{{thinkingReceipt.courseUnitDepthExpansionAtlas.reportLine}}</view>
+            <view class="receipt-board-parent">{{thinkingReceipt.courseUnitDepthExpansionAtlas.tutorLine}}</view>
+            <view class="receipt-board-line" wx:for="{{thinkingReceipt.courseUnitDepthArchetypes}}" wx:key="id">原型题：{{item.label}}｜追问：{{item.diagnosticProbe}}</view>
+            <view class="receipt-board-parent" wx:for="{{thinkingReceipt.courseUnitDepthArchetypes}}" wx:key="id">小黑板：{{item.visualBoardTemplate.opening}}｜家长：{{item.parentCheckScript}}</view>
+            <view class="receipt-board-line" wx:for="{{thinkingReceipt.courseUnitDepthArchetypes}}" wx:key="id">误区变体：{{item.misconceptionVariants}}</view>
+            <view class="receipt-board-avoid" wx:for="{{thinkingReceipt.courseUnitDepthArchetypes}}" wx:key="id">{{item.shareSafeLine}}</view>
+          </view>
           <view class="receipt-first-step-board" wx:if="{{thinkingReceipt.sevenSubjectMasterySprint}}">
             <view class="receipt-diagnostic-title">{{thinkingReceipt.sevenSubjectMasterySprint.title}}</view>
             <view class="receipt-board-avoid">{{thinkingReceipt.sevenSubjectMasterySprint.tutorBoundaryLine}}</view>

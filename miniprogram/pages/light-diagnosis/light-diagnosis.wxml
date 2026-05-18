@@ -110,6 +110,25 @@
     </view>
   </view>
 
+  <view class="global-depth-card" wx:if="{{courseUnitDepthExpansionAtlas}}">
+    <view class="global-depth-title">{{courseUnitDepthExpansionAtlas.title}}</view>
+    <view class="global-depth-summary">{{courseUnitDepthExpansionAtlas.summary}}</view>
+    <view class="global-depth-note">{{courseUnitDepthExpansionAtlas.boundary}}</view>
+    <view class="global-depth-note">{{courseUnitDepthExpansionAtlas.tutorLine}}</view>
+    <view class="global-depth-note">{{courseUnitDepthExpansionAtlas.parentLine}}</view>
+    <view class="global-depth-grid">
+      <view class="global-depth-chip ready" wx:for="{{courseUnitDepthExpansionAtlas.activeArchetypes}}" wx:key="id">
+        <text>{{item.subjectLabel}} · {{item.unitLabel}}</text>
+        <text>原型题：{{item.label}}</text>
+        <text>追问：{{item.diagnosticProbe}}</text>
+        <text>小黑板：{{item.visualBoardTemplate.opening}}</text>
+        <text>家长话术：{{item.parentCheckScript}}</text>
+        <text>复习变式：{{item.gameHook}}</text>
+        <text>{{item.shareSafeLine}}</text>
+      </view>
+    </view>
+  </view>
+
   <view class="global-depth-card" wx:if="{{commercialDepthRunway}}">
     <view class="global-depth-title">{{commercialDepthRunway.title}}</view>
     <view class="global-depth-summary">{{commercialDepthRunway.summary}}</view>
