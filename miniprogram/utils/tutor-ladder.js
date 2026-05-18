@@ -1,4 +1,4 @@
-const ANSWER_REQUEST_RE = /直接告诉我答案|求答案|不想写过程|不用讲第一步|直接给最终数字|最终数字|马上填空|拍照出答案|直接给结果|告诉我答案|给答案|答案是什么|直接说结果|帮我写答案|直接帮孩子写|帮孩子写.*字|成文|代写|替他.*写|直接替|完整解题板书|从第一步到最后答案|照着写|完整板书.*结论|最后结论|直接给拍题|假装已经识别|tell me the answer/i;
+const ANSWER_REQUEST_RE = /直接告诉我答案|求答案|不想写过程|不用讲第一步|直接给最终数字|最终数字|最终答案|马上填空|拍照出答案|直接给结果|告诉我答案|给答案|答案是什么|直接说结果|帮我写答案|直接帮孩子写|帮孩子写.*字|成文|代写|替他.*写|直接替|完整解题板书|完整动态板书|完整错题答案|从第一步到最后答案|照着写|完整板书.*结论|最后结论|直接给拍题|假装已经识别|已经看过孩子的照片|带孩子分数|排名.*转发|tell me the answer/i;
 const STUCK_RE = /不会下一步|不知道下一步|不会列式|还是不会|又不会|我不会|卡住|卡住了|不会写|没思路|读不懂|看不懂|不知道怎么写|不会做|不懂/;
 
 const HINT_LADDER = [
@@ -66,6 +66,12 @@ const TASK_TYPE_PROMPTS = {
 
 function detectTaskType(text = '', selected = {}) {
   const source = `${text || ''} ${selected.text || ''}`;
+  if (/数学统计图|平均每天|平均数|概率题|摸到红球|有利结果|总结果/.test(source)) {
+    return 'math_word_problem';
+  }
+  if (/古诗理解|诗句|明月|故乡|意象|表达的情感/.test(source)) {
+    return 'reading_question';
+  }
   if (/英语.*完形|完形.*英语/i.test(source)) {
     return /不看上下文/.test(source) ? 'english_sentence' : 'reading_question';
   }
@@ -229,6 +235,146 @@ function inferHomeworkPressureSignal(text = '', taskType = 'unknown') {
     .filter((entry) => entry.matched)
     .sort((a, b) => b.score - a.score || b.index - a.index)[0];
   const cases = [
+    {
+      id: 'average_chart_total_parts',
+      taskType: 'math_word_problem',
+      patterns: [/条形图给出 4 天阅读页数|平均每天读多少页|最高的一天|总量除以天数/],
+      firstStep: '先把 4 天页数合成总量，再判断平均数要用总量除以天数。',
+      wrongCause: '把最高值当平均值，没有先合计总量和份数。',
+      boardMove: '小黑板只写“总页数 / 4 天 = 平均每天”。',
+      parentCheck: '先问：平均数看最高的一天，还是看总量分成几份？',
+      reviewMove: '换成 5 次跳绳成绩，仍先求总量和份数。'
+    },
+    {
+      id: 'probability_favorable_total',
+      taskType: 'math_word_problem',
+      patterns: [/红球、白球、蓝球|摸到红球|颜色种类|每种球的数量|有利结果/],
+      firstStep: '先数红球个数和球的总个数，再写可能性对应的比。',
+      wrongCause: '只看颜色种类，没有把有利结果和总结果分开。',
+      boardMove: '小黑板只画“红球个数 / 总球数”两个格子。',
+      parentCheck: '先问：有利结果有几个？所有可能结果一共有几个？',
+      reviewMove: '换成转盘颜色，仍先数目标区域和全部区域。'
+    },
+    {
+      id: 'poem_image_emotion',
+      taskType: 'reading_question',
+      patterns: [/明月、故乡|表达的情感|字面意思|意象|思乡/],
+      firstStep: '先圈出明月、故乡这两个意象，再判断它们常指向思乡情感。',
+      wrongCause: '只逐字翻译，没有把意象和情感联系起来。',
+      boardMove: '小黑板只写“意象 -> 常见情感 -> 诗句证据”。',
+      parentCheck: '先问：诗里哪个物象最能提示情感？',
+      reviewMove: '换成柳、送别诗句，仍先圈意象再说情感。'
+    },
+    {
+      id: 'expository_order_paragraphs',
+      taskType: 'reading_question',
+      patterns: [/说明文阅读|桥的结构|说明顺序|段落之间|先后关系/],
+      firstStep: '先看每段介绍对象从整体到局部，还是从原因到结果。',
+      wrongCause: '只抓一个细节，没有看段落推进顺序。',
+      boardMove: '小黑板只画“第1段 -> 第2段 -> 第3段”的说明对象变化。',
+      parentCheck: '先问：每段说的对象是在变大、变小，还是按时间推进？',
+      reviewMove: '换成介绍植物生长的说明文，仍先看段落顺序。'
+    },
+    {
+      id: 'passive_classroom_be_done',
+      taskType: 'english_sentence',
+      patterns: [/The classroom is cleaned|cleaned|前面要有 is|classroom|be done/],
+      firstStep: '先判断主语 classroom 是动作承受者，再看 be done 结构。',
+      wrongCause: '只记过去分词，没有检查被动语态需要 be 动词。',
+      boardMove: '小黑板只写“承受者 + be + done”。',
+      parentCheck: '先问：教室是自己打扫，还是被打扫？be 动词在哪里？',
+      reviewMove: '换成 The window is broken，仍先判断承受者和 be done。'
+    },
+    {
+      id: 'english_inference_behavior_emotion',
+      taskType: 'reading_question',
+      patterns: [/没有直接写人物生气|关上门不说话|找不到原句|行为证据|推情绪/],
+      firstStep: '先找行为证据，再判断这些行为暗示的情绪。',
+      wrongCause: '把推断题当成原文原句题，没有用行为证据推情绪。',
+      boardMove: '小黑板只写“行为证据 -> 可能情绪”。',
+      parentCheck: '先问：哪一个动作能支持你的推断？',
+      reviewMove: '换成角色低头沉默，仍先找行为证据再推情绪。'
+    },
+    {
+      id: 'pressure_book_area',
+      taskType: 'physics_diagram',
+      patterns: [/平放和竖放|压强变化|重量一样|受力面积/],
+      firstStep: '先判断压力不变，再比较受力面积变大还是变小。',
+      wrongCause: '只看压力大小，忽略受力面积对压强的影响。',
+      boardMove: '小黑板只画“压力相同 / 接触面积不同”。',
+      parentCheck: '先问：压力有没有变？接触面积变大还是变小？',
+      reviewMove: '换成砖块不同放法，仍先比较压力和面积。'
+    },
+    {
+      id: 'circuit_fault_meter_segment',
+      taskType: 'physics_diagram',
+      patterns: [/电路故障|灯泡不亮|电压表有示数|接在哪一段|电表位置/],
+      firstStep: '先看电压表测的是哪一段电路，再判断这一段是否断路。',
+      wrongCause: '直接猜元件损坏，没有先把电表位置和故障段对应起来。',
+      boardMove: '小黑板只圈电压表两端连接的那一段。',
+      parentCheck: '先问：电压表跨在哪两个点之间？这一段可能通还是断？',
+      reviewMove: '换成电流表示数为零，仍先定位电表所在路径。'
+    },
+    {
+      id: 'solubility_curve_temperature_point',
+      taskType: 'chemistry_experiment',
+      patterns: [/溶解度曲线|温度升高|温度点|物质曲线|曲线高低/],
+      firstStep: '先在横轴找到温度，再对到对应物质的溶解度曲线。',
+      wrongCause: '只看曲线整体高低，没有先定位温度和物质。',
+      boardMove: '小黑板只画“温度点 -> 曲线 -> 纵轴溶解度”。',
+      parentCheck: '先问：你先定位的是哪个温度、哪条物质曲线？',
+      reviewMove: '换成降温析晶题，仍先定位温度点和曲线。'
+    },
+    {
+      id: 'ion_identification_reagent_evidence',
+      taskType: 'chemistry_experiment',
+      patterns: [/硝酸银|白色沉淀|氯离子|离子检验|证据链/],
+      firstStep: '先把试剂、现象和对应离子连成一条证据链。',
+      wrongCause: '只背现象，没有把沉淀和被检验离子对应。',
+      boardMove: '小黑板只画“试剂 -> 白色沉淀 -> 氯离子可能”。',
+      parentCheck: '先问：这个白色沉淀是哪种试剂帮你证明的？',
+      reviewMove: '换成硫酸根检验，仍先连试剂、现象和离子。'
+    },
+    {
+      id: 'respiration_night_vs_photosynthesis',
+      taskType: 'biology_process',
+      patterns: [/夜间为什么也消耗氧气|呼吸作用和光合作用|夜间没有光合作用|一直进行/],
+      firstStep: '先判断夜间没有光合作用，但呼吸作用一直进行。',
+      wrongCause: '把光合作用和呼吸作用的条件、产物混淆。',
+      boardMove: '小黑板只写“夜间无光合作用 / 呼吸作用仍进行”。',
+      parentCheck: '先问：这个过程需要光吗？夜间还会不会呼吸？',
+      reviewMove: '换成动物细胞，仍先判断是否进行呼吸作用。'
+    },
+    {
+      id: 'blood_route_body_cycle',
+      taskType: 'biology_process',
+      patterns: [/体循环路径|左心室|右心房|肺循环路线|起点/],
+      firstStep: '先判断体循环从左心室出发，最后回到右心房。',
+      wrongCause: '把肺循环和体循环的起点终点混淆。',
+      boardMove: '小黑板只画“左心室 -> 全身 -> 右心房”。',
+      parentCheck: '先问：这题问体循环还是肺循环？起点是哪一个心腔？',
+      reviewMove: '换成肺循环，仍先说起点和终点。'
+    },
+    {
+      id: 'lat_lon_hemisphere_exact',
+      taskType: 'geography_map',
+      patterns: [/经纬网题|经纬度|哪个半球|经度和纬度作用|南北半球/],
+      firstStep: '先分清纬度判断南北半球，经度判断东西半球。',
+      wrongCause: '把经线纬线的作用混在一起。',
+      boardMove: '小黑板只写“纬度看南北，经度看东西”。',
+      parentCheck: '先问：南北半球先看经度还是纬度？东西半球呢？',
+      reviewMove: '换一个经纬度点，仍先分南北再分东西。'
+    },
+    {
+      id: 'monsoon_water_vapor_exact',
+      taskType: 'geography_map',
+      patterns: [/夏季风从海洋吹向陆地|为什么带来降水|只背风向|水汽来源/],
+      firstStep: '先判断夏季风从海洋来，带来水汽。',
+      wrongCause: '只背风向，没有连接水汽来源和降水。',
+      boardMove: '小黑板只画“海洋 -> 陆地 -> 水汽 -> 降水”。',
+      parentCheck: '先问：这股风从哪里来？有没有带来水汽？',
+      reviewMove: '换成冬季风，仍先判断来自海洋还是陆地。'
+    },
     {
       id: 'percent_consecutive_base_shift',
       taskType: 'math_word_problem',

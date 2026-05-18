@@ -1,22 +1,22 @@
 const SUBJECT_COUNTS = [
-  { id: 'math', label: '数学', count: 21, nextGap: '比例、百分数、几何角、函数图像继续补变式压力样本。' },
-  { id: 'physics', label: '物理', count: 13, nextGap: '受力、光路、电路、浮力、图像题继续补真实卡点。' },
-  { id: 'chemistry', label: '化学', count: 14, nextGap: '实验现象、气体验证、溶液、守恒、酸碱图像继续拆错因。' },
-  { id: 'english', label: '英语', count: 15, nextGap: '语法信号、比较级、完形上下文、阅读证据句继续扩样。' },
-  { id: 'biology', label: '生物', count: 13, nextGap: '显微镜、遗传、生态、人体循环继续验证小黑板边界。' },
-  { id: 'geography', label: '地理', count: 15, nextGap: '经纬网、等高线、气候图、地球运动继续验证空间误判。' },
-  { id: 'chinese', label: '语文', count: 15, nextGap: '阅读概括、文言词语、句式转换、写作起步继续压测。' }
+  { id: 'math', label: '数学', count: 23, nextGap: '比例、百分数、几何角、函数图像、统计平均数、概率继续补变式压力样本。' },
+  { id: 'physics', label: '物理', count: 15, nextGap: '受力、光路、电路、浮力、压强、电路故障、图像题继续补真实卡点。' },
+  { id: 'chemistry', label: '化学', count: 16, nextGap: '实验现象、气体验证、溶液、守恒、酸碱图像、溶解度曲线、离子检验继续拆错因。' },
+  { id: 'english', label: '英语', count: 17, nextGap: '语法信号、比较级、被动语态、完形上下文、阅读推断继续扩样。' },
+  { id: 'biology', label: '生物', count: 15, nextGap: '显微镜、遗传、生态、呼吸作用、人体循环继续验证小黑板边界。' },
+  { id: 'geography', label: '地理', count: 17, nextGap: '经纬网、等高线、气候图、地球运动、季风成因继续验证空间误判。' },
+  { id: 'chinese', label: '语文', count: 17, nextGap: '阅读概括、古诗意象、说明顺序、文言词语、句式转换、写作起步继续压测。' }
 ];
 
 const TYPE_COUNTS = [
-  { id: 'math_word_problem', label: '数学应用/建模', count: 17, firstStep: '先翻译数量关系、图形关系或变化基准。' },
+  { id: 'math_word_problem', label: '数学应用/建模', count: 19, firstStep: '先翻译数量关系、图形关系、变化基准、统计总量或概率分母。' },
   { id: 'equation_setup', label: '方程/不等式建模', count: 4, firstStep: '先设未知数或标出变形规则。' },
-  { id: 'physics_diagram', label: '物理图解', count: 13, firstStep: '先定对象、方向、单位、路径或决定量。' },
-  { id: 'chemistry_experiment', label: '化学实验/变化', count: 14, firstStep: '先列反应物、现象、体系边界和守恒关系。' },
-  { id: 'english_sentence', label: '英语句法/上下文', count: 11, firstStep: '先找时态、主语、比较、被动或上下文信号。' },
-  { id: 'reading_question', label: '阅读证据', count: 16, firstStep: '先判断题目类型，再回文定位证据或语境。' },
-  { id: 'biology_process', label: '生物过程', count: 13, firstStep: '先分结构、功能、方向、变量或能量流动。' },
-  { id: 'geography_map', label: '地理图示', count: 15, firstStep: '先看图例、方向、经纬、海拔、峰值或成因链。' },
+  { id: 'physics_diagram', label: '物理图解', count: 15, firstStep: '先定对象、方向、单位、路径、受力面积、电表位置或决定量。' },
+  { id: 'chemistry_experiment', label: '化学实验/变化', count: 16, firstStep: '先列反应物、现象、体系边界、守恒关系、曲线定位和检验试剂。' },
+  { id: 'english_sentence', label: '英语句法/上下文', count: 12, firstStep: '先找时态、主语、比较、被动或上下文信号。' },
+  { id: 'reading_question', label: '阅读证据', count: 19, firstStep: '先判断题目类型，再回文定位证据、意象、说明顺序或推断行为。' },
+  { id: 'biology_process', label: '生物过程', count: 15, firstStep: '先分结构、功能、方向、变量、能量流动、过程条件或循环路径。' },
+  { id: 'geography_map', label: '地理图示', count: 17, firstStep: '先看图例、方向、经纬、海拔、峰值、水汽来源或成因链。' },
   { id: 'writing_process', label: '写作起步', count: 3, firstStep: '先写一句朴素事实，不追求完整成文。' }
 ];
 
