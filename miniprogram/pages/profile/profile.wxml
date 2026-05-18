@@ -770,6 +770,26 @@
           <text wx:for="{{learningReportSummary.socraticMemoryReportActions}}" wx:key="id">报告动作：{{item.label}}｜{{item.action}}｜证据 {{item.evidence}}</text>
           <text wx:for="{{learningReportSummary.socraticMemoryReportEvidence}}" wx:key="*this">可信证据：{{item}}</text>
         </view>
+        <view class="parent-brief-block" wx:if="{{learningReportSummary.crossWeekTrendBoard}}">
+          <text class="parent-brief-label">{{learningReportSummary.crossWeekTrendTitle}}</text>
+          <text>{{learningReportSummary.crossWeekTrendSummary}}</text>
+          <text>{{learningReportSummary.crossWeekTrendParentLine}}</text>
+          <text wx:for="{{learningReportSummary.crossWeekTrendRows}}" wx:key="id">跨周观察：{{item.label}}｜{{item.signal}}｜{{item.decision}}</text>
+          <text wx:if="{{learningReportSummary.crossWeekTrendUpdateRule}}">更新规则：{{learningReportSummary.crossWeekTrendUpdateRule}}</text>
+          <text wx:if="{{learningReportSummary.crossWeekTrendRegressionRule}}">退回规则：{{learningReportSummary.crossWeekTrendRegressionRule}}</text>
+          <text wx:if="{{learningReportSummary.crossWeekTrendShareBoundary}}">分享边界：{{learningReportSummary.crossWeekTrendShareBoundary}}</text>
+        </view>
+        <view class="parent-brief-block" wx:if="{{learningReportSummary.homeSchoolCollaborationDigest}}">
+          <text class="parent-brief-label">{{learningReportSummary.homeSchoolDigestTitle}}</text>
+          <text>{{learningReportSummary.homeSchoolDigestTeacherQuestion}}</text>
+          <text>{{learningReportSummary.homeSchoolDigestParentQuestion}}</text>
+          <text wx:for="{{learningReportSummary.homeSchoolEvidencePacket}}" wx:key="*this">证据包：{{item}}</text>
+          <text wx:for="{{learningReportSummary.homeSchoolTeacherDo}}" wx:key="*this">老师侧：{{item}}</text>
+          <text wx:for="{{learningReportSummary.homeSchoolParentDo}}" wx:key="*this">家长侧：{{item}}</text>
+          <text wx:for="{{learningReportSummary.homeSchoolDoNotShare}}" wx:key="*this">不分享：{{item}}</text>
+          <text wx:for="{{learningReportSummary.homeSchoolHandoffCadence}}" wx:key="id">交接节奏：{{item.label}}｜{{item.action}}</text>
+          <text wx:if="{{learningReportSummary.homeSchoolShareBoundary}}">分享边界：{{learningReportSummary.homeSchoolShareBoundary}}</text>
+        </view>
         <view class="parent-brief-block" wx:if="{{learningReportSummary.socraticPromptQualityJudge}}">
           <text class="parent-brief-label">{{learningReportSummary.socraticPromptJudgeTitle}}</text>
           <text>{{learningReportSummary.socraticPromptJudgeSummary}}</text>

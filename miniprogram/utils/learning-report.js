@@ -1151,6 +1151,98 @@ function buildPortraitEvidenceMaturitySystem(parts = {}, portraitConfidence = {}
   };
 }
 
+function buildCrossWeekTrendBoard(parts = {}, matrix = [], longitudinalTimeline = {}, portraitEvidenceMaturity = {}, questionBankRecallReportBridge = {}) {
+  const diagnosis = Array.isArray(matrix) ? matrix : [];
+  const primary = diagnosis.find((item) => String(item.status || '').indexOf('支持') >= 0) || diagnosis[0] || {};
+  const subject = primary.subject || '当前学科';
+  const cause = primary.mainCause || '第一步不清';
+  const timeline = Array.isArray(longitudinalTimeline.timeline) ? longitudinalTimeline.timeline : [];
+  const maturityLevel = portraitEvidenceMaturity.maturityLevel || '先补证据';
+  const workoutReady = questionBankRecallReportBridge && questionBankRecallReportBridge.status === 'ready';
+  const trendRows = [
+    {
+      id: 'week_0',
+      label: '本周',
+      signal: `${subject} 是否能说出第一步`,
+      evidence: 'child_first_step',
+      decision: `只处理「${cause}」，不加题量。`,
+      confidence: timeline.length >= 2 ? '可观察' : '待补证据'
+    },
+    {
+      id: 'week_1',
+      label: '下周',
+      signal: '同错因是否复现',
+      evidence: 'wrong_cause_replay + next_day_revisit',
+      decision: workoutReady ? '用题库回忆卡做 1 次近迁移。' : '先补 1 张错因卡和 1 次明天回访。',
+      confidence: workoutReady ? '可执行' : '待补题库证据'
+    },
+    {
+      id: 'week_2',
+      label: '两周后',
+      signal: '方法是否跨周稳定',
+      evidence: 'two_week_stability_check',
+      decision: maturityLevel === '可进入周画像' ? '可更新长期画像候选。' : '继续观察，不贴长期标签。',
+      confidence: maturityLevel
+    }
+  ];
+  return {
+    id: 'cross_week_trend_board',
+    title: '跨周趋势板',
+    subject,
+    cause,
+    summary: `把 ${subject} 的「${cause}」从今晚、下周到两周后连成趋势，不按单次分数下结论。`,
+    trendRows,
+    updateRule: '只有第一步、错因复述、明天回访、第 7 天小变式同时出现，才更新长期画像候选。',
+    regressionRule: '同错因连续 2 次失败或隔天忘记，立即从趋势判断退回第一步小黑板。',
+    parentLine: '家长只看趋势是否稳定，不看排名、不比较同学。',
+    shareBoundary: '趋势板只分享趋势问题、下一步动作和证据缺口；不分享原题、答案、分数、排名或完整对话。',
+    evidenceRequired: ['child_first_step', 'wrong_cause_replay', 'next_day_revisit', 'day7_variant', 'two_week_stability_check']
+  };
+}
+
+function buildHomeSchoolCollaborationDigest(parts = {}, matrix = [], classroomDecisionBoard = {}, familyDecisionMemo = {}, crossWeekTrendBoard = {}) {
+  const diagnosis = Array.isArray(matrix) ? matrix : [];
+  const primary = diagnosis.find((item) => String(item.status || '').indexOf('支持') >= 0) || diagnosis[0] || {};
+  const subject = primary.subject || (crossWeekTrendBoard && crossWeekTrendBoard.subject) || '当前学科';
+  const cause = primary.mainCause || (crossWeekTrendBoard && crossWeekTrendBoard.cause) || '第一步不清';
+  const classroomPacket = Array.isArray(classroomDecisionBoard.classroomEvidencePacket)
+    ? classroomDecisionBoard.classroomEvidencePacket
+    : [`${subject} 第一脚记录`, `${cause} 重复次数`, '同类题次日回访'];
+  const familyEvidence = Array.isArray(familyDecisionMemo.evidenceChecklist)
+    ? familyDecisionMemo.evidenceChecklist.slice(0, 4)
+    : ['孩子自己的第一步', '错因卡', '明天回访'];
+  return {
+    id: 'home_school_collaboration_digest',
+    title: '家校协同摘要',
+    subject,
+    cause,
+    teacherQuestion: `老师侧只问：${subject} 这类题，孩子是在审题、第一步、错因复现还是迁移上卡住？`,
+    parentQuestion: familyDecisionMemo.parentMeetingScript && familyDecisionMemo.parentMeetingScript[0]
+      ? familyDecisionMemo.parentMeetingScript[0]
+      : '家长侧只问：这一步你准备先看哪里？',
+    evidencePacket: classroomPacket.concat(familyEvidence).slice(0, 6),
+    suggestedMessage: `老师您好，我们这周只观察 ${subject} 的「${cause}」。孩子能说出第一步时状态更稳；如果需要沟通，我们只带第一步记录、错因重复次数和第 7 天回访结果。`,
+    teacherDo: [
+      '只看同类题启动动作，不按一次错题定性。',
+      '优先确认孩子卡在题意、第一步、错因还是迁移。',
+      '建议给 1 个同类小变式，不额外加题海。'
+    ],
+    parentDo: [
+      '只问一句第一步，不讲完整答案。',
+      '记录孩子原话和错因，不做情绪评价。',
+      '明天回访同一张卡，第 7 天再看迁移。'
+    ],
+    doNotShare: ['原题照片', '完整答案', '完整对话', '分数', '排名', '孩子隐私评价'],
+    handoffCadence: [
+      { id: 'tonight', label: '今晚', action: '家庭记录第一步和错因。' },
+      { id: 'tomorrow', label: '明天', action: '家庭回访同一错因。' },
+      { id: 'day7', label: '第 7 天', action: '如仍反复，再把证据包带给老师沟通。' }
+    ],
+    shareBoundary: '家校协同只传证据包和问题清单，不传原题、答案、分数、排名或完整对话。',
+    evidenceRequired: ['classroom_evidence_packet', 'family_evidence_checklist', 'teacher_question', 'handoff_cadence', 'safe_share_boundary']
+  };
+}
+
 function buildSocraticMemoryReportBridge(input = {}, parentDecisionTrust = {}, portraitConfidence = {}) {
   const gameEvidence = input.gameEvidence || {};
   const highFrequencyLoop = input.highFrequencyPracticeLoop || gameEvidence.highFrequencyPracticeLoop || {};
@@ -1411,6 +1503,8 @@ function buildLearningReportDraft(input = {}) {
   const questionBankDecisionBridge = buildQuestionBankDecisionBridge(input, parentDecisionTrustSystem, portraitConfidenceSystem);
   const questionBankRecallReportBridge = buildQuestionBankRecallReportBridge(input, parentDecisionTrustSystem, portraitConfidenceSystem);
   const portraitDecisionReleaseSystem = buildPortraitDecisionReleaseSystem(input, parentDecisionTrustSystem, portraitConfidenceSystem, portraitEvidenceMaturitySystem, questionBankRecallReportBridge);
+  const crossWeekTrendBoard = buildCrossWeekTrendBoard(parts, diagnosisMatrix, longitudinalPortraitTimeline, portraitEvidenceMaturitySystem, questionBankRecallReportBridge);
+  const homeSchoolCollaborationDigest = buildHomeSchoolCollaborationDigest(parts, diagnosisMatrix, classroomDecisionBoard, familyDecisionMemo, crossWeekTrendBoard);
   const tonightDecisionBrief = buildTonightDecisionBrief(parts, diagnosisMatrix, familyDecisionMemo, parentDecisionTrustSystem, questionBankRecallReportBridge, input.socraticPromptQualityJudge || null);
   const missing = missingItems(parts);
   const reportDraft = {
@@ -1449,6 +1543,8 @@ function buildLearningReportDraft(input = {}) {
     questionBankDecisionBridge,
     questionBankRecallReportBridge,
     portraitDecisionReleaseSystem,
+    crossWeekTrendBoard,
+    homeSchoolCollaborationDigest,
     tonightDecisionBrief,
     generatedAt: nowIso(input.now),
     missingItems: missing,
@@ -1489,6 +1585,8 @@ function buildLearningReportDraft(input = {}) {
     questionBankDecisionBridge,
     questionBankRecallReportBridge,
     portraitDecisionReleaseSystem,
+    crossWeekTrendBoard,
+    homeSchoolCollaborationDigest,
     tonightDecisionBrief,
     reportCompleteness: completeness,
     reportStatus: {
@@ -1523,6 +1621,8 @@ module.exports = {
   buildQuestionBankDecisionBridge,
   buildQuestionBankRecallReportBridge,
   buildPortraitDecisionReleaseSystem,
+  buildCrossWeekTrendBoard,
+  buildHomeSchoolCollaborationDigest,
   normalizeReportSources,
   confidenceLabel
 };

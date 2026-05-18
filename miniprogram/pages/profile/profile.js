@@ -808,6 +808,8 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
   const parentDecisionTrustSystem = reportState.parentDecisionTrustSystem || draft.parentDecisionTrustSystem || {};
   const longitudinalPortraitTimeline = reportState.longitudinalPortraitTimeline || draft.longitudinalPortraitTimeline || {};
   const portraitEvidenceMaturitySystem = reportState.portraitEvidenceMaturitySystem || draft.portraitEvidenceMaturitySystem || {};
+  const crossWeekTrendBoard = reportState.crossWeekTrendBoard || draft.crossWeekTrendBoard || {};
+  const homeSchoolCollaborationDigest = reportState.homeSchoolCollaborationDigest || draft.homeSchoolCollaborationDigest || {};
   const matrix = Array.isArray(draft.diagnosisMatrix) ? draft.diagnosisMatrix : [];
   const tendencies = Array.isArray(draft.capabilityTendencies) ? draft.capabilityTendencies : [];
   const effectiveCourseUnitMap = courseUnitMap || (storage.buildCourseUnitMap ? storage.buildCourseUnitMap({}) : null);
@@ -1054,6 +1056,8 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     parentDecisionTrustSystem,
     longitudinalPortraitTimeline,
     portraitEvidenceMaturitySystem,
+    crossWeekTrendBoard,
+    homeSchoolCollaborationDigest,
     longitudinalPortraitTimelineTitle: longitudinalPortraitTimeline.title || '',
     longitudinalPortraitTimelineStatus: longitudinalPortraitTimeline.status || '',
     longitudinalPortraitTimelineSummary: longitudinalPortraitTimeline.summary || '',
@@ -1072,6 +1076,24 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     portraitEvidenceUpdateGates: Array.isArray(portraitEvidenceMaturitySystem.updateGateMirror) ? portraitEvidenceMaturitySystem.updateGateMirror : [],
     portraitEvidenceMaturityParentAction: portraitEvidenceMaturitySystem.parentAction || '',
     portraitEvidenceMaturityShareBoundary: portraitEvidenceMaturitySystem.shareBoundary || '',
+    crossWeekTrendTitle: crossWeekTrendBoard.title || '',
+    crossWeekTrendSummary: crossWeekTrendBoard.summary || '',
+    crossWeekTrendRows: Array.isArray(crossWeekTrendBoard.trendRows) ? crossWeekTrendBoard.trendRows : [],
+    crossWeekTrendUpdateRule: crossWeekTrendBoard.updateRule || '',
+    crossWeekTrendRegressionRule: crossWeekTrendBoard.regressionRule || '',
+    crossWeekTrendParentLine: crossWeekTrendBoard.parentLine || '',
+    crossWeekTrendShareBoundary: crossWeekTrendBoard.shareBoundary || '',
+    crossWeekTrendEvidence: Array.isArray(crossWeekTrendBoard.evidenceRequired) ? crossWeekTrendBoard.evidenceRequired : [],
+    homeSchoolDigestTitle: homeSchoolCollaborationDigest.title || '',
+    homeSchoolDigestTeacherQuestion: homeSchoolCollaborationDigest.teacherQuestion || '',
+    homeSchoolDigestParentQuestion: homeSchoolCollaborationDigest.parentQuestion || '',
+    homeSchoolDigestSuggestedMessage: homeSchoolCollaborationDigest.suggestedMessage || '',
+    homeSchoolEvidencePacket: Array.isArray(homeSchoolCollaborationDigest.evidencePacket) ? homeSchoolCollaborationDigest.evidencePacket : [],
+    homeSchoolTeacherDo: Array.isArray(homeSchoolCollaborationDigest.teacherDo) ? homeSchoolCollaborationDigest.teacherDo : [],
+    homeSchoolParentDo: Array.isArray(homeSchoolCollaborationDigest.parentDo) ? homeSchoolCollaborationDigest.parentDo : [],
+    homeSchoolDoNotShare: Array.isArray(homeSchoolCollaborationDigest.doNotShare) ? homeSchoolCollaborationDigest.doNotShare : [],
+    homeSchoolHandoffCadence: Array.isArray(homeSchoolCollaborationDigest.handoffCadence) ? homeSchoolCollaborationDigest.handoffCadence : [],
+    homeSchoolShareBoundary: homeSchoolCollaborationDigest.shareBoundary || '',
     portraitConfidenceTitle: portraitConfidenceSystem.title || '',
     portraitConfidenceLevel: portraitConfidenceSystem.confidenceLevel || '',
     portraitConfidenceScore: Number(portraitConfidenceSystem.evidenceScore || 0),
