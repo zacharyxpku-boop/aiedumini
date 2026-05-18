@@ -5660,7 +5660,9 @@ function buildCourseUnitMasteryTrajectory(options = {}) {
       return text.indexOf(active.id) >= 0 || text.indexOf(active.label) >= 0;
     }).length
     : 0;
-  const units = active && Array.isArray(active.units) ? active.units : [];
+  const subjects = courseUnitMap && Array.isArray(courseUnitMap.subjects) ? courseUnitMap.subjects : [];
+  const units = subjects.reduce((list, subject) => list.concat(Array.isArray(subject.units) ? subject.units : []), []);
+  const activeUnits = active && Array.isArray(active.units) ? active.units : [];
   const trajectories = units.map((unit, index) => {
     const evidenceCount = subjectEvidence + Math.max(0, totalEvidence - index);
     const masteryScore = Math.max(12, Math.min(96, 28 + evidenceCount * 7 + reviewedToday * 3 - index * 4));
@@ -5705,16 +5707,62 @@ function buildCourseUnitMasteryTrajectory(options = {}) {
   };
 }
 
+function buildQuestionSampleCard(unit = {}, type = 'active_recall', index = 0) {
+  const subject = unit.subjectLabel || '学科';
+  const label = unit.unitLabel || '当前单元';
+  const samples = {
+    active_recall: {
+      sampleStem: `${subject}小题：看到“${label}”相关题目时，先判断题目要你找什么，再说出第一步。`,
+      firstStepHint: unit.practiceLoop && unit.practiceLoop.recall ? unit.practiceLoop.recall : `先说出${label}的第一步。`,
+      blackboardMove: unit.blackboardBlueprint && unit.blackboardBlueprint.firstStroke ? unit.blackboardBlueprint.firstStroke : `小黑板只写：${label} -> 第一条已知条件。`,
+      wrongCauseProbe: unit.wrongCauseAtlas && unit.wrongCauseAtlas[0] ? unit.wrongCauseAtlas[0] : '没有先说第一步，直接想答案。',
+      nearTransferStem: `把数字、材料或语境换一下，仍然先复述${label}的第一步。`,
+      parentCheck: '家长只问：这题第一步你先看哪里？不追完整答案。'
+    },
+    wrong_cause: {
+      sampleStem: `${subject}错题：孩子说“我会一点但卡住”，先定位卡在${label}的哪一环。`,
+      firstStepHint: unit.diagnosticProbes && unit.diagnosticProbes[0] ? unit.diagnosticProbes[0] : `先命名${label}的卡点。`,
+      blackboardMove: unit.blackboardBlueprint && unit.blackboardBlueprint.visualPrompt ? unit.blackboardBlueprint.visualPrompt : `画出${label}和卡点之间的关系线。`,
+      wrongCauseProbe: unit.wrongCauseAtlas && unit.wrongCauseAtlas[1] ? unit.wrongCauseAtlas[1] : `${label}证据不足。`,
+      nearTransferStem: '换一道同类错题，只要求说出同一个错因是否还出现。',
+      parentCheck: '家长只听错因名称，不用当场讲解完整过程。'
+    },
+    near_transfer: {
+      sampleStem: `${subject}小变式：保留${label}的方法，换一个条件，检查孩子能不能迁移。`,
+      firstStepHint: unit.practiceLoop && unit.practiceLoop.transfer ? unit.practiceLoop.transfer : `做一题${label}的小变式。`,
+      blackboardMove: unit.blackboardBlueprint && unit.blackboardBlueprint.stopRule ? unit.blackboardBlueprint.stopRule : '小黑板画到方法迁移点就停。',
+      wrongCauseProbe: unit.wrongCauseAtlas && unit.wrongCauseAtlas[2] ? unit.wrongCauseAtlas[2] : '会做一次，但换题不能复述。',
+      nearTransferStem: '同类题只换一个条件，让孩子先说“哪里没变，哪里变了”。',
+      parentCheck: '家长只判断方法能不能搬家，不用看刷题数量。'
+    }
+  };
+  const sample = samples[type] || samples.active_recall;
+  return Object.assign({}, sample, {
+    sampleId: `${unit.id || 'unit'}_${type}_sample_${index + 1}`,
+    classroomUse: '适合晚间作业 3 分钟低压练习，不作为考试押题。',
+    evidenceRubric: [
+      '孩子能说出第一步',
+      '孩子能命名错因',
+      '孩子能做一次近迁移或隔天回看'
+    ],
+    safetyBoundary: '不展示完整答案、不替孩子写过程、不用分数或排名证明能力。'
+  });
+}
+
 function buildCourseUnitQuestionBank(options = {}) {
   const courseUnitMap = options.courseUnitMap || buildCourseUnitMap(options);
   const active = courseUnitMap && courseUnitMap.active ? courseUnitMap.active : null;
-  const units = active && Array.isArray(active.units) ? active.units : [];
+  const subjects = courseUnitMap && Array.isArray(courseUnitMap.subjects) ? courseUnitMap.subjects : [];
+  const units = subjects.reduce((list, subject) => list.concat(Array.isArray(subject.units) ? subject.units : []), []);
+  const activeUnits = active && Array.isArray(active.units) ? active.units : [];
   const questionCards = units.reduce((list, unit) => {
     const base = `${unit.subjectLabel}/${unit.unitLabel}`;
-    return list.concat([
+    const cards = [
       {
         id: `${unit.id}_recall`,
         unitId: unit.id,
+        subjectId: unit.subjectId,
+        subjectLabel: unit.subjectLabel,
         type: 'active_recall',
         label: `${base}主动回忆`,
         prompt: unit.practiceLoop.recall,
@@ -5726,6 +5774,8 @@ function buildCourseUnitQuestionBank(options = {}) {
       {
         id: `${unit.id}_diagnose`,
         unitId: unit.id,
+        subjectId: unit.subjectId,
+        subjectLabel: unit.subjectLabel,
         type: 'wrong_cause',
         label: `${base}错因诊断`,
         prompt: unit.diagnosticProbes[0],
@@ -5737,6 +5787,8 @@ function buildCourseUnitQuestionBank(options = {}) {
       {
         id: `${unit.id}_transfer`,
         unitId: unit.id,
+        subjectId: unit.subjectId,
+        subjectLabel: unit.subjectLabel,
         type: 'near_transfer',
         label: `${base}同类小变式`,
         prompt: unit.practiceLoop.transfer,
@@ -5745,8 +5797,14 @@ function buildCourseUnitQuestionBank(options = {}) {
         visualMove: unit.blackboardBlueprint.stopRule,
         evidenceRequired: 'near_transfer_attempted'
       }
-    ]);
+    ];
+    return list.concat(cards.map((card, cardIndex) => Object.assign({}, card, buildQuestionSampleCard(unit, card.type, cardIndex))));
   }, []);
+  const activeUnitIds = activeUnits.reduce((acc, unit) => {
+    acc[unit.id] = true;
+    return acc;
+  }, {});
+  const activeCards = questionCards.filter((card) => activeUnitIds[card.unitId]).slice(0, 9);
   const byType = questionCards.reduce((acc, card) => {
     acc[card.type] = Number(acc[card.type] || 0) + 1;
     return acc;
@@ -5758,10 +5816,12 @@ function buildCourseUnitQuestionBank(options = {}) {
     summary: `当前单元题库含 ${questionCards.length} 张可复用练习卡，覆盖主动回忆、错因诊断和同类迁移。`,
     boundary: '题库只沉淀第一步、错因和迁移证据，不提供拍题出完整答案。',
     unitCount: units.length,
+    subjectCount: subjects.length,
     questionCount: questionCards.length,
+    sampleCount: questionCards.filter((card) => card.sampleStem && card.firstStepHint && card.nearTransferStem).length,
     byType,
     cards: questionCards,
-    activeCards: questionCards.slice(0, 9),
+    activeCards,
     reportLine: `报告可追踪 ${units.length} 个单元、${questionCards.length} 张题库卡的下一证据。`,
     gameLine: '游戏优先抽主动回忆和错因诊断卡，迁移卡只做小变式。',
     shareLine: '分享只带题库动作和证据合同，不带原题答案。'

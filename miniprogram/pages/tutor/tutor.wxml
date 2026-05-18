@@ -125,6 +125,14 @@
             <view class="receipt-board-parent" wx:for="{{thinkingReceipt.questionTypeCoverageAtlas.paths}}" wx:key="id">{{item.taskType}}：{{item.probeCount}} 追问 / {{item.visualMoveCount}} 小黑板 / {{item.fallbackCount}} 兜底</view>
             <view class="receipt-board-avoid">{{thinkingReceipt.questionTypeCoverageAtlas.boundary}}</view>
           </view>
+          <view class="receipt-first-step-board" wx:if="{{thinkingReceipt.courseUnitQuestionBank}}">
+            <view class="receipt-diagnostic-title">{{thinkingReceipt.courseUnitQuestionBank.title}}</view>
+            <view class="receipt-board-avoid">{{thinkingReceipt.courseUnitQuestionBank.summary}}</view>
+            <view class="receipt-board-line" wx:for="{{thinkingReceipt.courseUnitQuestionBankCards}}" wx:key="id">{{item.sampleStem}}</view>
+            <view class="receipt-board-parent" wx:for="{{thinkingReceipt.courseUnitQuestionBankCards}}" wx:key="id">第一步：{{item.firstStepHint}} / 小黑板：{{item.blackboardMove}}</view>
+            <view class="receipt-board-line" wx:for="{{thinkingReceipt.courseUnitQuestionBankCards}}" wx:key="id">近迁移：{{item.nearTransferStem}} / 家长：{{item.parentCheck}}</view>
+            <view class="receipt-board-avoid">{{thinkingReceipt.courseUnitQuestionBank.boundary}}</view>
+          </view>
           <view class="receipt-first-step-board" wx:if="{{thinkingReceipt.sevenSubjectMasterySprint}}">
             <view class="receipt-diagnostic-title">{{thinkingReceipt.sevenSubjectMasterySprint.title}}</view>
             <view class="receipt-board-avoid">{{thinkingReceipt.sevenSubjectMasterySprint.tutorBoundaryLine}}</view>

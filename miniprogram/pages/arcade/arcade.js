@@ -366,7 +366,7 @@ Page({
       courseUnitQuestionBankTitle: courseUnitQuestionBank ? courseUnitQuestionBank.title : '',
       courseUnitQuestionBankLine: courseUnitQuestionBank ? courseUnitQuestionBank.summary : '',
       courseUnitQuestionBankCards: courseUnitQuestionBank && Array.isArray(courseUnitQuestionBank.activeCards)
-        ? courseUnitQuestionBank.activeCards.slice(0, 3)
+        ? courseUnitQuestionBank.activeCards.slice(0, 6)
         : [],
       commercialDepthRunwayTitle: commercialDepthRunway ? commercialDepthRunway.title : '',
       commercialDepthRunwayLine: commercialDepthRunway ? commercialDepthRunway.gameLine : '',

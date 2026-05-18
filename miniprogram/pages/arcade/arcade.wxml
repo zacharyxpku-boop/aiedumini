@@ -79,6 +79,7 @@
         <view class="story-mission-rule" wx:if="{{challengeBrief.courseUnitQuestionBankTitle}}">{{challengeBrief.courseUnitQuestionBankTitle}}：{{challengeBrief.courseUnitQuestionBankLine}}</view>
         <view class="story-mission-rule" wx:for="{{challengeBrief.courseUnitQuestionBankCards}}" wx:key="id">题库卡：{{item.label}}｜{{item.prompt}}｜{{item.evidenceRequired}}</view>
       </view>
+        <view class="story-mission-rule" wx:for="{{challengeBrief.courseUnitQuestionBankCards}}" wx:key="id">样例：{{item.sampleStem}}｜第一步：{{item.firstStepHint}}｜近迁移：{{item.nearTransferStem}}</view>
       <view class="story-mission" wx:if="{{challengeBrief.commercialDepthRunwayTitle}}">
         <view class="story-mission-title">{{challengeBrief.commercialDepthRunwayTitle}}</view>
         <view class="story-mission-line">{{challengeBrief.commercialDepthRunwayLine}}</view>

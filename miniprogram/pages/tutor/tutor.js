@@ -176,9 +176,13 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
   const activeCourseUnit = courseUnitMap && courseUnitMap.active && Array.isArray(courseUnitMap.active.units)
     ? courseUnitMap.active.units[0]
     : null;
+  const courseUnitQuestionBank = storage.buildCourseUnitQuestionBank
+    ? storage.buildCourseUnitQuestionBank({ courseUnitMap })
+    : null;
   const commercialDepthRunway = storage.buildCommercialDepthRunway
     ? storage.buildCommercialDepthRunway({
       courseUnitMap,
+      courseUnitQuestionBank,
       subjectSkillDepth,
       sourceText: latestUserText,
       thought: latestUserText
@@ -190,6 +194,7 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
   const sevenSubjectMasterySprint = storage.buildSevenSubjectMasterySprint
     ? storage.buildSevenSubjectMasterySprint({
       courseUnitMap,
+      courseUnitQuestionBank,
       commercialDepthRunway,
       subjectSkillDepth,
       sourceText: latestUserText,
@@ -252,6 +257,10 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
     visualSocraticMatrix,
     courseUnitMap,
     activeCourseUnit,
+    courseUnitQuestionBank,
+    courseUnitQuestionBankCards: courseUnitQuestionBank && Array.isArray(courseUnitQuestionBank.activeCards)
+      ? courseUnitQuestionBank.activeCards.slice(0, 3)
+      : [],
     commercialDepthRunway,
     questionTypeCoverageAtlas,
     sevenSubjectMasterySprint,

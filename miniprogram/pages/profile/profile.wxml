@@ -647,6 +647,7 @@
           <text>{{learningReportSummary.courseUnitQuestionBankLine}}</text>
           <text wx:for="{{learningReportSummary.courseUnitQuestionBankCards}}" wx:key="id">题库卡：{{item.label}} · {{item.prompt}} · {{item.answerBoundary}}</text>
         </view>
+          <text wx:for="{{learningReportSummary.courseUnitQuestionBankCards}}" wx:key="id">样例证据：{{item.sampleStem}}｜第一步：{{item.firstStepHint}}｜家长：{{item.parentCheck}}</text>
         <view class="parent-brief-block" wx:if="{{learningReportSummary.commercialDepthRunway}}">
           <text class="parent-brief-label">{{learningReportSummary.commercialDepthRunway.title}}</text>
           <text>{{learningReportSummary.commercialDepthRunway.summary}}</text>
