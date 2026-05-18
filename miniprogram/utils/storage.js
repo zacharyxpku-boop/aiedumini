@@ -4641,6 +4641,34 @@ function buildShareChallengePlan(input = {}) {
     { id: 'peer_copyable', trigger: '同学也卡同类题', hook: '对方用自己的材料复刻第一步，不复制原题。' },
     { id: 'weekly_return', trigger: '一周后还想确认', hook: '第 7 天自动回到同一错因的小变式。' }
   ];
+  const naturalSpreadLoop = {
+    id: 'privacy_safe_growth_loop',
+    title: '安全接力裂变',
+    inviteLine: `我只发一个可复用的第一步：${firstStep}`,
+    receiverPrompt: '你不用看我的题，用自己的作业复刻同类第一步。',
+    parentReassuranceLine: '这张卡不带原题、照片、答案、分数、排名或完整对话，家长只看行动证据。',
+    day7ReturnLine: '第 7 天回到同一错因，用一道小变式确认是否真的会迁移。',
+    proofOfLifeSignal: '接收者留下自己的第一步、错因回退和明日回访预约，才算接力完成。',
+    oneTapAction: {
+      label: '接力这一小步',
+      route,
+      evidence: 'privacy_safe_growth_relay'
+    },
+    viralGuardrails: [
+      '不传播原题照片',
+      '不传播完整答案',
+      '不传播孩子完整对话',
+      '不晒分数排名',
+      '不比较速度',
+      '不暴露孩子隐私'
+    ],
+    spreadScore: {
+      copyable: true,
+      safe: true,
+      returnable: true,
+      reason: '能被朋友复刻的是学习动作，不是题目、答案或成绩。'
+    }
+  };
   const communityRipplePlan = {
     id: 'safe_learning_ripple',
     title: '安全学习涟漪',
@@ -4693,6 +4721,7 @@ function buildShareChallengePlan(input = {}) {
     communityChallengeCard,
     shareHookDeck,
     naturalSpreadTriggers,
+    naturalSpreadLoop,
     communityRipplePlan,
     returnPathContract,
     privacyBoundary,
@@ -4716,6 +4745,12 @@ function buildShareChallengePlan(input = {}) {
       relay_first_step: firstStep,
       relay_hook: shareHookDeck[0].title,
       relay_spread_trigger: naturalSpreadTriggers[0].id,
+      relay_invite_line: naturalSpreadLoop.inviteLine,
+      relay_receiver_prompt: naturalSpreadLoop.receiverPrompt,
+      relay_parent_reassurance: naturalSpreadLoop.parentReassuranceLine,
+      relay_day7_return: naturalSpreadLoop.day7ReturnLine,
+      relay_proof_signal: naturalSpreadLoop.proofOfLifeSignal,
+      relay_guardrail: naturalSpreadLoop.viralGuardrails.join(','),
       relay_id: safeRelayChallengePacket.query.relay_id,
       relay_receiver_action: safeRelayChallengePacket.query.relay_receiver_action,
       relay_parent_check: safeRelayChallengePacket.query.relay_parent_check,
@@ -4806,6 +4841,7 @@ function buildCommunityShareRelayBoard(input = {}) {
     safeRelayChallengePacket: plan.safeRelayChallengePacket,
     shareHookDeck: plan.shareHookDeck || [],
     naturalSpreadTriggers: plan.naturalSpreadTriggers || [],
+    naturalSpreadLoop: plan.naturalSpreadLoop || {},
     communityRipplePlan: plan.communityRipplePlan || {},
     visualRelayProtocol,
     visualRelayProofChecklist,
@@ -4974,6 +5010,12 @@ function saveIncomingShare(share = {}) {
     relay_privacy: share.relay_privacy || '',
     relay_review: share.relay_review || '',
     relay_first_step: share.relay_first_step || '',
+    relay_invite_line: share.relay_invite_line || '',
+    relay_receiver_prompt: share.relay_receiver_prompt || '',
+    relay_parent_reassurance: share.relay_parent_reassurance || '',
+    relay_day7_return: share.relay_day7_return || '',
+    relay_proof_signal: share.relay_proof_signal || '',
+    relay_guardrail: share.relay_guardrail || '',
     relay_id: share.relay_id || '',
     relay_receiver_action: share.relay_receiver_action || '',
     relay_parent_check: share.relay_parent_check || '',

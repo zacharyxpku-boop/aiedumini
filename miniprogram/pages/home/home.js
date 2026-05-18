@@ -868,6 +868,14 @@ Page({
     const firstStep = incoming.relay_first_step || incoming.challenge_goal || actionLabel;
     const privacyLine = incoming.relay_privacy || '分享只带学习动作和回访证据，不带孩子完整对话、分数、原题照片。';
     const reviewLine = incoming.relay_review || '第 7 天用 1 道小变式确认能不能迁移。';
+    const naturalSpread = {
+      inviteLine: incoming.relay_invite_line || '',
+      receiverPrompt: incoming.relay_receiver_prompt || '',
+      parentReassuranceLine: incoming.relay_parent_reassurance || '',
+      day7ReturnLine: incoming.relay_day7_return || '',
+      proofOfLifeSignal: incoming.relay_proof_signal || '',
+      guardrailLine: incoming.relay_guardrail || ''
+    };
     const safeRelayPacket = incoming.relay_id ? {
       relayId: incoming.relay_id,
       receiverAction: incoming.relay_receiver_action || actionDetail,
@@ -918,6 +926,12 @@ Page({
       firstStepLine: `先做第一步：${firstStep}`,
       privacyLine,
       reviewLine,
+      naturalSpreadInviteLine: naturalSpread.inviteLine ? `朋友发来的是动作：${naturalSpread.inviteLine}` : '',
+      naturalSpreadReceiverLine: naturalSpread.receiverPrompt ? `你要做的：${naturalSpread.receiverPrompt}` : '',
+      naturalSpreadParentLine: naturalSpread.parentReassuranceLine ? `家长放心：${naturalSpread.parentReassuranceLine}` : '',
+      naturalSpreadDay7Line: naturalSpread.day7ReturnLine ? `第 7 天：${naturalSpread.day7ReturnLine}` : '',
+      naturalSpreadProofLine: naturalSpread.proofOfLifeSignal ? `完成信号：${naturalSpread.proofOfLifeSignal}` : '',
+      naturalSpreadGuardrailLine: naturalSpread.guardrailLine ? `裂变护栏：${naturalSpread.guardrailLine}` : '',
       safeRelayPacket,
       receiverActionLine: safeRelayPacket && safeRelayPacket.receiverAction,
       parentCheckLine: safeRelayPacket && safeRelayPacket.parentCheck,
@@ -965,7 +979,7 @@ Page({
           id: 'challenge',
           label: incoming.course_unit_label ? '练这个单元' : '轻挑战',
           route: questionBankRelayRoute,
-          reason: incoming.question_bank_relay_parent_check || incoming.course_unit_parent_decision || incoming.challenge_goal || actionLabel,
+          reason: naturalSpread.receiverPrompt || incoming.question_bank_relay_parent_check || incoming.course_unit_parent_decision || incoming.challenge_goal || actionLabel,
           evidence: incoming.challenge_rule || '5分钟轻回访'
         },
         {

@@ -1191,6 +1191,18 @@
           <view>{{dailyShareCard.shareChallengePlan.parentEvidenceLine}}</view>
           <view>{{dailyShareCard.shareChallengePlan.successRule}}</view>
           <view>{{dailyShareCard.shareChallengePlan.failureFallback}}</view>
+          <view wx:if="{{dailyShareCard.shareChallengePlan.naturalSpreadLoop}}">
+            自然接力：{{dailyShareCard.shareChallengePlan.naturalSpreadLoop.inviteLine}}
+          </view>
+          <view wx:if="{{dailyShareCard.shareChallengePlan.naturalSpreadLoop}}">
+            接收者：{{dailyShareCard.shareChallengePlan.naturalSpreadLoop.receiverPrompt}}
+          </view>
+          <view wx:if="{{dailyShareCard.shareChallengePlan.naturalSpreadLoop}}">
+            家长放心：{{dailyShareCard.shareChallengePlan.naturalSpreadLoop.parentReassuranceLine}}
+          </view>
+          <view wx:if="{{dailyShareCard.shareChallengePlan.naturalSpreadLoop}}">
+            裂变护栏：{{dailyShareCard.shareChallengePlan.naturalSpreadLoop.viralGuardrails}}
+          </view>
           <view wx:if="{{dailyShareCard.shareChallengePlan.safeRelayChallengePacket}}">
             {{dailyShareCard.shareChallengePlan.safeRelayChallengePacket.title}}：{{dailyShareCard.shareChallengePlan.safeRelayChallengePacket.evidenceContract}}
           </view>
@@ -1238,6 +1250,9 @@
           <view>{{communityShareRelayBoard.noRankingLine}}</view>
           <view>{{communityShareRelayBoard.privacyBoundary}}</view>
           <view>{{communityShareRelayBoard.peerSafeLine}}</view>
+          <view wx:if="{{communityShareRelayBoard.naturalSpreadLoop}}">
+            自然裂变：{{communityShareRelayBoard.naturalSpreadLoop.inviteLine}}｜{{communityShareRelayBoard.naturalSpreadLoop.proofOfLifeSignal}}
+          </view>
           <view wx:for="{{communityShareRelayBoard.lanes}}" wx:key="id">{{item.label}}：{{item.action}}｜{{item.evidence}}</view>
           <view wx:for="{{communityShareRelayBoard.visualRelayProtocol}}" wx:key="id">小黑板接力协议：{{item.label}}｜{{item.action}}｜证据 {{item.evidence}}｜禁止 {{item.blocked}}</view>
           <view wx:for="{{communityShareRelayBoard.visualRelayProofChecklist}}" wx:key="*this">小黑板证据清单：{{item}}</view>
