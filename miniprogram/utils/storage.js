@@ -1858,6 +1858,72 @@ function buildCapabilityMaturityQueue(options = {}) {
   };
 }
 
+function buildCapabilityStructuralReadinessLedger(options = {}) {
+  const runtimeLedger = options.capabilityEvidenceLedger || buildCapabilityEvidenceLedger(options);
+  const maturityQueue = options.capabilityMaturityQueue || buildCapabilityMaturityQueue(Object.assign({}, options, {
+    capabilityEvidenceLedger: runtimeLedger
+  }));
+  const routeRe = /^\/pages\/[a-z0-9-]+\/[a-z0-9-]+$/i;
+  const runtimeRows = Array.isArray(runtimeLedger.rows) ? runtimeLedger.rows : [];
+  const maturityItems = Array.isArray(maturityQueue.items) ? maturityQueue.items : [];
+  const capabilityRows = runtimeRows.map((row) => {
+    const checks = {
+      route: routeRe.test(String(row.route || '')),
+      emptyStateCta: !!row.nextAction,
+      localFallback: !!row.evidenceLine,
+      evidenceContract: !!row.id && !!row.label,
+      parentSafeLine: !!(row.nextAction || row.evidenceLine),
+      nextModuleHandoff: routeRe.test(String(row.route || ''))
+    };
+    return Object.assign({}, row, {
+      structuralReady: Object.keys(checks).every((key) => checks[key]),
+      structuralChecks: checks,
+      emptyStateLine: row.nextAction || '先完成一条真实学习动作',
+      structuralEvidenceLine: `${row.label} 有入口、空状态动作、证据说明和下一模块承接。`
+    });
+  });
+  const maturityRows = maturityItems.map((item) => {
+    const checks = {
+      route: routeRe.test(String(item.route || '')),
+      emptyStateCta: !!item.nextAction,
+      localFallback: Array.isArray(item.fallbackPlan) && item.fallbackPlan.length >= 2,
+      evidenceContract: Array.isArray(item.evidenceRequired) && item.evidenceRequired.length >= 3,
+      parentSafeLine: !!item.parentCheckLine,
+      nextModuleHandoff: !!(item.actionPayload && routeRe.test(String(item.actionPayload.route || item.route || '')))
+    };
+    return {
+      id: item.id,
+      label: item.label,
+      surface: item.surface,
+      route: item.route,
+      structuralReady: Object.keys(checks).every((key) => checks[key]),
+      structuralChecks: checks,
+      emptyStateLine: item.nextAction,
+      localFallbackLine: Array.isArray(item.fallbackPlan) ? item.fallbackPlan.join(' / ') : '',
+      evidenceContractLine: item.evidenceContractLine || (Array.isArray(item.evidenceRequired) ? item.evidenceRequired.join(' / ') : ''),
+      parentSafeLine: item.parentCheckLine || '',
+      nextModuleHandoff: item.actionPayload || { route: item.route, actionLabel: item.nextAction }
+    };
+  });
+  const capabilityStructuralReady = capabilityRows.filter((item) => item.structuralReady).length;
+  const maturityStructuralReady = maturityRows.filter((item) => item.structuralReady).length;
+  return {
+    id: 'capability_structural_readiness_ledger',
+    title: '空状态结构就绪账本',
+    summary: `结构就绪 ${capabilityStructuralReady}/${capabilityRows.length} 条能力、${maturityStructuralReady}/${maturityRows.length} 个成熟面；运行时证据仍按真实记录计算。`,
+    boundary: '结构就绪只证明新用户无历史时也有入口、空状态动作、兜底、证据契约和下一步，不伪造已发生的学习证据。',
+    capabilityStructuralReady,
+    capabilityStructuralTotal: capabilityRows.length,
+    maturityStructuralReady,
+    maturityStructuralTotal: maturityRows.length,
+    capabilityRows,
+    maturityRows,
+    requiredChecks: ['route', 'emptyStateCta', 'localFallback', 'evidenceContract', 'parentSafeLine', 'nextModuleHandoff'],
+    runtimeEvidenceLine: `运行时账本仍为 ${runtimeLedger.readyCount}/${runtimeLedger.totalCount}，成熟度仍为 ${maturityQueue.readyCount}/${maturityQueue.totalCount}。`,
+    generatedAt: options.now ? new Date(options.now).toISOString() : new Date().toISOString()
+  };
+}
+
 function buildEvidenceRouteBias(options = {}) {
   const brief = options.globalEvidenceBrief || buildGlobalEvidenceBrief(options);
   const incomingShare = options.incomingShare || loadIncomingShare() || null;
@@ -8967,6 +9033,7 @@ module.exports = {
   buildGlobalEvidenceBrief,
   buildCapabilityEvidenceLedger,
   buildCapabilityMaturityQueue,
+  buildCapabilityStructuralReadinessLedger,
   buildUnifiedNextActionController,
   buildLearningQuestArc,
   buildQuestArcGameBridge,
