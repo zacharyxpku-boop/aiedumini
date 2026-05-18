@@ -276,6 +276,125 @@ const MATURITY_AREAS = [
   }
 ];
 
+const AI_USAGE_DECISION_MATRIX = [
+  {
+    id: 'socratic_hint_generation',
+    module: 'tutor',
+    decision: 'ai_required_with_local_guardrail',
+    label: '作业点拨追问生成',
+    reason: '用户输入高熵，AI 负责把题干、卡点和孩子原话改写成合适追问。',
+    localFallback: 'tutor-ladder 题型规则、答案拦截、第一步提示、错因模板必须本地可用。',
+    guardrail: 'AI 不得直接给最终答案；本地规则先拦截代写、拍题出答案、完整板书。'
+  },
+  {
+    id: 'report_draft_interpretation',
+    module: 'profile',
+    decision: 'ai_enhanced_not_required',
+    label: '学习报告文字解读',
+    reason: 'AI 可把成绩单、错因和家长描述整理成更自然的报告语言。',
+    localFallback: '长期画像、7 天行动、家长今晚决策、家校协同必须由本地证据账本生成。',
+    guardrail: '没有足够证据时只给观察建议，不下长期定性结论。'
+  },
+  {
+    id: 'question_variant_generation',
+    module: 'review',
+    decision: 'ai_enhanced_not_required',
+    label: '变式题和复述提示',
+    reason: 'AI 可以快速生成同错因小变式，提高内容规模。',
+    localFallback: '错因卡、近迁移、间隔复习、掌握度 gate 必须由本地规则维持。',
+    guardrail: '变式只练第一步和错因，不生成可抄的完整答案。'
+  },
+  {
+    id: 'visual_blackboard_explanation',
+    module: 'tutor_review',
+    decision: 'ai_enhanced_not_required',
+    label: '第一步小黑板说明',
+    reason: 'AI 可把抽象题干转成更自然的图解语言。',
+    localFallback: '七科小黑板 blueprint、boardMove、parentCheck 必须本地可用。',
+    guardrail: '只画第一步、对象、方向、证据或关系，不承诺全科自动动态板书。'
+  },
+  {
+    id: 'homework_intake_routing',
+    module: 'home_upload',
+    decision: 'local_rule_required',
+    label: '作业入口路由和题型初判',
+    reason: '入口路由必须稳定、可解释、弱网可用。',
+    localFallback: '关键词、页面入口、任务类型、下一步 route 全部本地计算。',
+    guardrail: 'AI 只能在路由后补充解释，不能决定隐私字段、支付、分享和核心导航。'
+  },
+  {
+    id: 'spaced_recall_scheduler',
+    module: 'review_arcade',
+    decision: 'local_rule_required',
+    label: '间隔复习和记忆调度',
+    reason: '复习时间、错因回访和 leech card 必须确定可复现。',
+    localFallback: 'SM-2、dueDate、错因复现、每日上限、streak rescue 全部本地规则。',
+    guardrail: 'AI 不得改变到期队列、删除复习证据或夸大学会程度。'
+  },
+  {
+    id: 'game_reward_xp',
+    module: 'arcade',
+    decision: 'local_rule_required',
+    label: 'XP、任务、成就和游戏反馈',
+    reason: '奖励系统需要一致、公平、无模型漂移。',
+    localFallback: 'XP、等级、streak、成就、每日任务全部本地规则。',
+    guardrail: '不做排名刺激，不用 AI 生成比较同学、分数或班级地位。'
+  },
+  {
+    id: 'share_privacy_and_return',
+    module: 'share',
+    decision: 'local_rule_required',
+    label: '分享字段、隐私边界和回流参数',
+    reason: '分享天然涉及隐私和传播，必须确定性过滤。',
+    localFallback: 'allowedFields、blockedFields、query、回流 route 和能力缺口全部本地生成。',
+    guardrail: '禁止原题照片、完整对话、分数、排名、完整答案出现在分享 payload。'
+  },
+  {
+    id: 'parent_gate_and_release',
+    module: 'profile',
+    decision: 'local_rule_required',
+    label: '家长决策 gate 和画像放行',
+    reason: '家长侧结论影响家庭行为，必须由证据门槛驱动。',
+    localFallback: '画像可信度、观察周期、决策阈值、今晚做/不做全部本地规则。',
+    guardrail: 'AI 只能润色表达，不能绕过两周稳定性和证据锁。'
+  },
+  {
+    id: 'safety_content_boundary',
+    module: 'global',
+    decision: 'local_rule_required',
+    label: '代写、直给答案、假能力和隐私拦截',
+    reason: '安全边界不能依赖模型心情。',
+    localFallback: 'ANSWER_REQUEST_RE、负例样本、隐私字段阻断、假拍题/假板书拦截必须本地通过。',
+    guardrail: '任何 AI 输出都要受本地边界二次检查。'
+  }
+];
+
+function buildAiUsageDecisionMatrix() {
+  const rows = AI_USAGE_DECISION_MATRIX.map((item) => Object.assign({}, item, {
+    needsAI: item.decision === 'ai_required_with_local_guardrail',
+    mayUseAI: item.decision === 'ai_required_with_local_guardrail' || item.decision === 'ai_enhanced_not_required',
+    mustWorkOffline: item.decision === 'local_rule_required' || item.decision === 'ai_enhanced_not_required'
+  }));
+  const counts = rows.reduce((acc, item) => {
+    acc[item.decision] = (acc[item.decision] || 0) + 1;
+    return acc;
+  }, {});
+  const localRuleRows = rows.filter((item) => item.decision === 'local_rule_required');
+  const aiRows = rows.filter((item) => item.mayUseAI);
+  return {
+    id: 'ai_usage_decision_matrix',
+    title: 'AI 使用分级矩阵',
+    principle: '高熵解释用 AI，确定性闭环用规则；AI 增强不等于 AI 依赖。',
+    rows,
+    counts,
+    aiRows,
+    localRuleRows,
+    releaseRule: '没有生产模型时，小程序仍必须完成入口、点拨兜底、错因卡、复习、家长复盘、分享安全回流。',
+    blockedAiAreas: localRuleRows.map((item) => item.id),
+    providerDependencyLine: `${aiRows.length} 个模块可用 AI 增强；${localRuleRows.length} 个模块必须本地规则可跑。`
+  };
+}
+
 function mapById(items = []) {
   return items.reduce((acc, item) => {
     if (item && item.id) acc[item.id] = item;
@@ -431,6 +550,7 @@ function buildAcceptanceReport(readiness = {}) {
   const dimensionMap = mapById(dimensions);
   const localGaps = Array.isArray(readiness.gaps) ? readiness.gaps : [];
   const externalBlockers = Array.isArray(readiness.externalBlockers) ? readiness.externalBlockers : [];
+  const aiUsageDecisionMatrix = readiness.aiUsageDecisionMatrix || buildAiUsageDecisionMatrix();
   const localReady = dimensions.length > 0 && localGaps.length === 0;
   const launchBlockedByExternalConfig = !!readiness.launchBlockedByExternalConfig;
   const verdict = localReady
@@ -544,6 +664,7 @@ function buildAcceptanceReport(readiness = {}) {
     pseudoFunctionScan,
     readinessGateChecklist,
     iterationBoundary,
+    aiUsageDecisionMatrix,
     workflowBreakpoints,
     technicalBreakpoints,
     friendTrialRisk,
@@ -802,6 +923,7 @@ function buildProductReadiness(storage, options = {}) {
 
   const score = scoreFromItems(dimensions);
   const failed = dimensions.filter((item) => !item.ready);
+  const aiUsageDecisionMatrix = buildAiUsageDecisionMatrix();
   return {
     version: 1,
     generatedAt: new Date().toISOString(),
@@ -829,6 +951,7 @@ function buildProductReadiness(storage, options = {}) {
       'intervention_playbook',
       'outcome_review'
     ],
+    aiUsageDecisionMatrix,
     gaps: failed.map((item) => ({ id: item.id, label: item.label, fix: item.gap })),
     externalBlockers
   };
@@ -836,5 +959,6 @@ function buildProductReadiness(storage, options = {}) {
 
 module.exports = {
   buildProductReadiness,
-  buildAcceptanceReport
+  buildAcceptanceReport,
+  buildAiUsageDecisionMatrix
 };
