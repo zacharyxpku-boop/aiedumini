@@ -458,6 +458,23 @@
           <view class="retention-loop-step">{{highFrequencyPracticeLoop.questionBankRecallWorkout.noCramRule}}</view>
           <view class="retention-loop-step">{{highFrequencyPracticeLoop.questionBankRecallWorkout.shareBoundary}}</view>
         </view>
+        <view class="high-frequency-section" wx:if="{{highFrequencyPracticeLoop.dailyMemoryPrescription}}">
+          <view class="high-frequency-label">{{highFrequencyPracticeLoop.dailyMemoryPrescription.title}}</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.dailyMemoryPrescription.reasonLine}}</view>
+          <view class="retention-loop-step">今日上限：新卡 {{highFrequencyPracticeLoop.dailyMemoryPrescription.dailyCap.newCards}} 张，总量 {{highFrequencyPracticeLoop.dailyMemoryPrescription.dailyCap.totalCards}} 张，{{highFrequencyPracticeLoop.dailyMemoryPrescription.dailyCap.maxMinutes}} 分钟内收口。</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.dailyMemoryPrescription.dailyCap.reason}}</view>
+          <view class="high-frequency-item" wx:for="{{highFrequencyPracticeLoop.dailyMemoryPrescription.mustDo}}" wx:key="id">
+            <text>{{item.label}}</text>
+            <text>{{item.action}}</text>
+          </view>
+          <view class="high-frequency-item" wx:for="{{highFrequencyPracticeLoop.dailyMemoryPrescription.releaseQueue}}" wx:key="id">
+            <text>{{item.label}}：{{item.status}}</text>
+            <text>{{item.rule}}</text>
+          </view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.dailyMemoryPrescription.antiCramRule}}</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.dailyMemoryPrescription.parentLine}}</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.dailyMemoryPrescription.shareLine}}</view>
+        </view>
         <view class="high-frequency-section" wx:if="{{highFrequencyPracticeLoop.dailyMemorySprintDeck}}">
           <view class="high-frequency-label">{{highFrequencyPracticeLoop.dailyMemorySprintDeck.title}}</view>
           <view class="retention-loop-step">{{highFrequencyPracticeLoop.dailyMemorySprintDeck.summary}}</view>
