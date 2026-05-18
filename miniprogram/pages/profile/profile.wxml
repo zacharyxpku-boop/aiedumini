@@ -649,10 +649,14 @@
           <text>{{learningReportSummary.courseUnitQuestionBank.summary}}</text>
           <text>{{learningReportSummary.courseUnitQuestionBankLine}}</text>
           <text wx:for="{{learningReportSummary.courseUnitQuestionBankCards}}" wx:key="id">题库卡：{{item.label}} · {{item.prompt}} · {{item.answerBoundary}}</text>
-        </view>
           <text wx:for="{{learningReportSummary.courseUnitQuestionBankCards}}" wx:key="id">样例证据：{{item.sampleStem}}｜第一步：{{item.firstStepHint}}｜家长：{{item.parentCheck}}</text>
           <text wx:for="{{learningReportSummary.courseUnitQuestionBankCards}}" wx:key="id">进阶证据：{{item.progression.parentEvidence}}｜掌握门槛：{{item.progression.masteryGate}}</text>
           <text wx:for="{{learningReportSummary.courseUnitQuestionBankCards}}" wx:key="id">回访安排：{{item.progression.nextDayRevisit}}</text>
+          <text wx:if="{{learningReportSummary.courseUnitTransferLadderLine}}">{{learningReportSummary.courseUnitTransferLadderLine}}</text>
+          <text wx:for="{{learningReportSummary.courseUnitTransferLadders}}" wx:key="id">迁移路径：{{item.title}}｜{{item.summary}}</text>
+          <text wx:for="{{learningReportSummary.courseUnitTransferLadders}}" wx:key="id">路径家长判断：{{item.parentDecisionRule}}</text>
+          <text wx:for="{{learningReportSummary.courseUnitTransferLadders}}" wx:key="id">路径分享边界：{{item.shareBoundary}}</text>
+        </view>
         <view class="parent-brief-block" wx:if="{{learningReportSummary.commercialDepthRunway}}">
           <text class="parent-brief-label">{{learningReportSummary.commercialDepthRunway.title}}</text>
           <text>{{learningReportSummary.commercialDepthRunway.summary}}</text>

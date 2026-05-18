@@ -940,6 +940,12 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     courseUnitQuestionBank,
     courseUnitQuestionBankLine: courseUnitQuestionBank ? courseUnitQuestionBank.reportLine : '',
     courseUnitQuestionBankCards: courseUnitQuestionBank ? courseUnitQuestionBank.activeCards : [],
+    courseUnitTransferLadders: courseUnitQuestionBank && Array.isArray(courseUnitQuestionBank.activeTransferLadders)
+      ? courseUnitQuestionBank.activeTransferLadders
+      : [],
+    courseUnitTransferLadderLine: courseUnitQuestionBank
+      ? `题型迁移路径 ${courseUnitQuestionBank.transferLadderCount || 0} 条，覆盖 ${courseUnitQuestionBank.transferLadderRungCount || 0} 个可观察台阶。`
+      : '',
     commercialDepthRunway,
     commercialDepthRunwayLine: commercialDepthRunway ? commercialDepthRunway.reportLine : '',
     commercialDepthRunwayLanes: commercialDepthRunway ? commercialDepthRunway.lanes : [],

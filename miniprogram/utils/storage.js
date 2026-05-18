@@ -5996,6 +5996,78 @@ function buildQuestionProgressionCard(unit = {}, card = {}, index = 0) {
   };
 }
 
+function buildQuestionTypeTransferLadder(unit = {}, cards = []) {
+  const subject = unit.subjectLabel || '学科';
+  const label = unit.unitLabel || '当前单元';
+  const recallCard = cards.find((card) => card.type === 'active_recall') || cards[0] || {};
+  const wrongCauseCard = cards.find((card) => card.type === 'wrong_cause') || cards[1] || recallCard;
+  const transferCard = cards.find((card) => card.type === 'near_transfer') || cards[2] || recallCard;
+  const visualMove = transferCard.visualMove
+    || wrongCauseCard.visualMove
+    || recallCard.visualMove
+    || (unit.blackboardBlueprint && unit.blackboardBlueprint.firstStroke)
+    || `小黑板只画 ${label} 的第一步`;
+  const wrongCause = wrongCauseCard.wrongCause
+    || (unit.wrongCauseAtlas && unit.wrongCauseAtlas[0])
+    || `${label} 错因未命名`;
+  const rungs = [
+    {
+      id: 'recognize',
+      label: '认出题型',
+      task: recallCard.sampleStem || `${subject}：先判断这题是不是 ${label}。`,
+      evidence: 'question_type_recognized',
+      exit: `孩子能用一句话说“这是 ${label} 的哪一类”。`
+    },
+    {
+      id: 'name_wrong_cause',
+      label: '命名错因',
+      task: wrongCauseCard.firstStepHint || `先说卡在 ${label} 的哪一步。`,
+      evidence: 'wrong_cause_named',
+      exit: `孩子能说出错因：${wrongCause}。`
+    },
+    {
+      id: 'near_transfer',
+      label: '近迁移',
+      task: transferCard.nearTransferStem || `换一个条件，仍然先说 ${label} 的第一步。`,
+      evidence: 'near_transfer_attempted',
+      exit: '孩子能说出“哪里没变，哪里变了”。'
+    },
+    {
+      id: 'next_day_revisit',
+      label: '隔日回访',
+      task: transferCard.progression && transferCard.progression.nextDayRevisit
+        ? transferCard.progression.nextDayRevisit
+        : `明天只回访一次 ${label} 的第一步和错因名。`,
+      evidence: 'next_day_revisit_scheduled',
+      exit: '隔天遮住答案仍能先开口。'
+    }
+  ];
+  return {
+    id: `${unit.id || 'unit'}_transfer_ladder`,
+    unitId: unit.id || '',
+    subjectId: unit.subjectId || '',
+    subjectLabel: subject,
+    unitLabel: label,
+    title: `${subject}/${label} 题型迁移路径`,
+    summary: `从认出题型到隔日回访，共 ${rungs.length} 步，只沉淀第一步、错因和迁移证据。`,
+    rungs,
+    blockerRules: [
+      '不能说出题型时，不进入讲解，只退回读题和圈目标。',
+      '不能命名错因时，不加新题，只用小黑板画卡点。',
+      '近迁移失败时，不刷题量，只保留一个变化条件重来。'
+    ],
+    visualBoardPath: [
+      visualMove,
+      wrongCauseCard.blackboardMove || wrongCauseCard.visualMove || `标出 ${label} 的卡点。`,
+      transferCard.blackboardMove || transferCard.visualMove || '只画变化条件，不画完整答案。',
+      '回访时只遮答案复述第一步。'
+    ],
+    parentDecisionRule: `家长只看 ${label} 是否走完“认题型、说错因、近迁移、隔日回访”，不看分数或排名。`,
+    shareBoundary: '分享只带题型路径、第一步、小黑板动作和回访计划；不带原题、答案、分数、排名或完整对话。',
+    evidenceRequired: ['question_type_recognized', 'wrong_cause_named', 'near_transfer_attempted', 'next_day_revisit_scheduled', 'parent_decision_rule', 'safe_share_boundary']
+  };
+}
+
 function buildCourseUnitQuestionBank(options = {}) {
   const courseUnitMap = options.courseUnitMap || buildCourseUnitMap(options);
   const active = courseUnitMap && courseUnitMap.active ? courseUnitMap.active : null;
@@ -6061,6 +6133,11 @@ function buildCourseUnitQuestionBank(options = {}) {
     acc[card.type] = Number(acc[card.type] || 0) + 1;
     return acc;
   }, {});
+  const transferLadders = units.map((unit) => buildQuestionTypeTransferLadder(
+    unit,
+    questionCards.filter((card) => card.unitId === unit.id)
+  ));
+  const activeTransferLadders = transferLadders.filter((ladder) => activeUnitIds[ladder.unitId]).slice(0, 3);
   return {
     id: 'course_unit_question_bank',
     title: '课程单元题库包',
@@ -6074,9 +6151,14 @@ function buildCourseUnitQuestionBank(options = {}) {
     progressionCount: questionCards.filter((card) => card.progression && card.progression.entryTask && card.progression.masteryGate).length,
     progressionStageCount: questionCards.reduce((sum, card) => sum + Number(card.progression && card.progression.stageCount || 0), 0),
     masteryGateCount: questionCards.filter((card) => card.progression && card.progression.masteryGate).length,
+    transferLadderCount: transferLadders.length,
+    transferLadderRungCount: transferLadders.reduce((sum, ladder) => sum + (Array.isArray(ladder.rungs) ? ladder.rungs.length : 0), 0),
+    transferLadderBlockerCount: transferLadders.reduce((sum, ladder) => sum + (Array.isArray(ladder.blockerRules) ? ladder.blockerRules.length : 0), 0),
     byType,
     cards: questionCards,
     activeCards,
+    transferLadders,
+    activeTransferLadders,
     reportLine: `报告可追踪 ${units.length} 个单元、${questionCards.length} 张题库卡的下一证据。`,
     gameLine: '游戏优先抽主动回忆和错因诊断卡，迁移卡只做小变式。',
     shareLine: '分享只带题库动作和证据合同，不带原题答案。'

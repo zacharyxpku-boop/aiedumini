@@ -264,6 +264,9 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
     courseUnitQuestionBankCards: courseUnitQuestionBank && Array.isArray(courseUnitQuestionBank.activeCards)
       ? courseUnitQuestionBank.activeCards.slice(0, 3)
       : [],
+    courseUnitTransferLadders: courseUnitQuestionBank && Array.isArray(courseUnitQuestionBank.activeTransferLadders)
+      ? courseUnitQuestionBank.activeTransferLadders.slice(0, 3)
+      : [],
     commercialDepthRunway,
     questionTypeCoverageAtlas,
     socraticQualityEvaluationSuite,
@@ -732,6 +735,12 @@ Page({
         course_unit_label: diagnosticReceipt.activeCourseUnit ? diagnosticReceipt.activeCourseUnit.unitLabel : '',
         course_unit_wrong_cause_count: diagnosticReceipt.activeCourseUnit && Array.isArray(diagnosticReceipt.activeCourseUnit.wrongCauseAtlas)
           ? diagnosticReceipt.activeCourseUnit.wrongCauseAtlas.length
+          : 0,
+        course_unit_transfer_ladders: diagnosticReceipt.courseUnitQuestionBank && Array.isArray(diagnosticReceipt.courseUnitQuestionBank.activeTransferLadders)
+          ? diagnosticReceipt.courseUnitQuestionBank.activeTransferLadders.length
+          : 0,
+        course_unit_transfer_rungs: diagnosticReceipt.courseUnitQuestionBank
+          ? diagnosticReceipt.courseUnitQuestionBank.transferLadderRungCount
           : 0,
         socratic_contract: result.socratic_contract || null,
         socratic_fallback_mode: result.socratic_fallback_plan && result.socratic_fallback_plan.mode,
