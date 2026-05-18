@@ -722,7 +722,9 @@ function buildSocraticQualityMemoryBridge(qualitySuite = {}, result = {}, retent
     expectedMove: actionMap[id].memoryAction,
     passEvidence: actionMap[id].evidence
   }));
-  const sourceScenarios = activeScenarios.length ? activeScenarios : fallbackScenarios;
+  const sourceScenarios = activeScenarios.length >= 4
+    ? activeScenarios
+    : fallbackScenarios;
   const memoryActions = sourceScenarios.map((scenario, index) => {
     const mapped = actionMap[scenario.id] || {
       title: `质量场景 ${index + 1}`,

@@ -224,7 +224,9 @@
             <view class="receipt-board-avoid">{{thinkingReceipt.realHomeworkCoverageMatrix.summary}}</view>
             <view class="receipt-board-line">当前科目：{{thinkingReceipt.realHomeworkCoverageMatrix.activeSubject.label}} · {{thinkingReceipt.realHomeworkCoverageMatrix.activeSubject.count}} 个压力样本</view>
             <view class="receipt-board-line">{{thinkingReceipt.realHomeworkCoverageMatrix.publicSourceLine}}</view>
+            <view class="receipt-board-line">{{thinkingReceipt.realHomeworkCoverageMatrix.publicWorkbenchLine}}</view>
             <view class="receipt-board-line">{{thinkingReceipt.realHomeworkCoverageMatrix.clusterRunwayLine}}</view>
+            <view class="receipt-board-parent" wx:for="{{thinkingReceipt.realHomeworkUseWorkbench}}" wx:key="id">{{item.label}}：可直接用{{item.directUse[0]}}，本地代码管{{item.localizeAsCode[0]}}，AI 管{{item.aiBetterFor[0]}}，禁用{{item.mustNotUse[0]}}</view>
             <view class="receipt-board-parent" wx:for="{{thinkingReceipt.realHomeworkQuestionTypeClusters}}" wx:key="id">{{item.subject}} · {{item.pressureFamily}}：{{item.firstStepRule}}</view>
             <view class="receipt-board-parent" wx:for="{{thinkingReceipt.realHomeworkPublicSources}}" wx:key="id">{{item.label}}：本地规则管{{item.localRuleUse[0]}}，AI 只管{{item.aiUse[0]}}</view>
             <view class="receipt-board-parent" wx:for="{{thinkingReceipt.realHomeworkImplementationDecisions}}" wx:key="id">实现判断：{{item.productQuestion}}｜{{item.decision}}</view>

@@ -185,6 +185,75 @@ const PUBLIC_K12_USE_POLICY = {
   ]
 };
 
+const PUBLIC_K12_USE_WORKBENCH = [
+  {
+    id: 'curriculum_standard_spine',
+    label: '课程标准',
+    directUse: ['学科能力框架', '年级段目标', '核心素养方向'],
+    localizeAsCode: ['学科路由', '能力标签', '报告维度', '掌握门槛'],
+    aiBetterFor: ['把能力标签改写成孩子听得懂的一句话', '把家长行动建议说得更柔和'],
+    mustNotUse: ['复制课程标准正文当内容库', '宣称覆盖全教材原题', '让 AI 决定掌握等级'],
+    productSurface: ['/pages/tutor/tutor', '/pages/profile/profile'],
+    evidenceGate: ['subject_route_exists', 'capability_tag_exists', 'local_mastery_gate'],
+    productDecision: '直接用框架，不直接用原文；本地代码管结构，AI 只管表达。'
+  },
+  {
+    id: 'smartedu_basic_homework_pattern',
+    label: '基础性作业',
+    directUse: ['题型方向', '作业压力场景', '减负边界'],
+    localizeAsCode: ['压力样本', '错因模型', '回访窗口', '家长检查句'],
+    aiBetterFor: ['同一错因的不同追问语气', '孩子卡住时的降阶提示'],
+    mustNotUse: ['批量搬运原题', '输出完整题解', '伪装成拍照搜题'],
+    productSurface: ['/pages/home/home', '/pages/tutor/tutor', '/pages/review/review'],
+    evidenceGate: ['sample_rewritten', 'wrong_cause_specific', 'no_answer_bank'],
+    productDecision: '抽象成题型和错因，不做原题答案库。'
+  },
+  {
+    id: 'public_exam_archetype',
+    label: '公开考试题型',
+    directUse: ['题型簇', '变式方向', '压力测试口径'],
+    localizeAsCode: ['题型路由', '变式解锁', '小黑板第一笔', '跨周趋势'],
+    aiBetterFor: ['解释同一错因在不同题面里的表现'],
+    mustNotUse: ['押题承诺', '原题答案索引', '考试分数预测'],
+    productSurface: ['/pages/tutor/tutor', '/pages/radar/radar', '/pages/profile/profile'],
+    evidenceGate: ['question_type_cluster', 'variant_gate', 'exam_boundary_visible'],
+    productDecision: '用来压测迁移能力，不用来做押题或答案搜索。'
+  },
+  {
+    id: 'family_first_party_homework',
+    label: '家庭真实输入',
+    directUse: ['孩子原话', '今晚卡点', '家长观察', '回访结果'],
+    localizeAsCode: ['隐私裁剪', '分享字段白名单', '画像置信度', '奖励发放门槛'],
+    aiBetterFor: ['把证据翻译成家长可执行的一句话', '把复盘语气改得不责备'],
+    mustNotUse: ['公开完整对话', '公开原题照片', '公开排名分数', '无证据贴诊断标签'],
+    productSurface: ['/pages/profile/profile', '/pages/home/home'],
+    evidenceGate: ['guardian_safe_field', 'confidence_gate', 'share_blocklist'],
+    productDecision: '这是最有价值的一方数据，但必须先过隐私和置信度门槛。'
+  },
+  {
+    id: 'socratic_ai_layer',
+    label: '苏格拉底 AI 表达层',
+    directUse: ['追问语气', '同义改写', '鼓励与降阶表达'],
+    localizeAsCode: ['追问轴选择', '禁止直接答案', '失败兜底', '停止条件'],
+    aiBetterFor: ['根据孩子原话换一种问法', '把硬规则变成自然对话'],
+    mustNotUse: ['让 AI 决定是否给答案', '让 AI 决定奖励', '让 AI 判断隐私字段', '让 AI 生成标准答案'],
+    productSurface: ['/pages/tutor/tutor'],
+    evidenceGate: ['axis_local', 'three_round_no_answer', 'fallback_micro_choice'],
+    productDecision: 'AI 适合“怎么说”，不适合“问什么、能不能放行”。'
+  },
+  {
+    id: 'visual_blackboard_layer',
+    label: '小黑板图解层',
+    directUse: ['第一笔图解动作', '图示边界', '退出条件'],
+    localizeAsCode: ['板书层级', '禁止写最终答案', '按题型选图示动作'],
+    aiBetterFor: ['解释为什么先画这一笔', '把板书动作翻译成儿童语言'],
+    mustNotUse: ['承诺全科动态板书', '冒充拍照识别', '自动生成完整解题过程'],
+    productSurface: ['/pages/tutor/tutor', '/pages/profile/profile'],
+    evidenceGate: ['board_move_present', 'answer_boundary_visible', 'exit_criteria_present'],
+    productDecision: '先做可信第一步小黑板，不做四不像全科板书。'
+  }
+];
+
 const K12_PUBLIC_IMPLEMENTATION_DECISION_MATRIX = [
   {
     id: 'homework_archetype_pressure',
@@ -417,7 +486,9 @@ function buildRealHomeworkCoverageMatrix(options = {}) {
     questionTypeClusterRunway: QUESTION_TYPE_CLUSTER_RUNWAY,
     publicSourceLedger: PUBLIC_K12_SOURCE_LEDGER,
     publicSourcePolicy: PUBLIC_K12_USE_POLICY,
+    publicK12UseWorkbench: PUBLIC_K12_USE_WORKBENCH,
     implementationDecisionMatrix: K12_PUBLIC_IMPLEMENTATION_DECISION_MATRIX,
+    publicWorkbenchLine: `已把 ${PUBLIC_K12_USE_WORKBENCH.length} 类可用资料拆成“可直接用 / 本地代码更好 / AI 更好 / 禁用”四格决策。`,
     publicSourceLine: `已把 ${PUBLIC_K12_SOURCE_LEDGER.length} 类公开/一方资料沉淀为本地规则资产：题型、错因、第一步、小黑板、回访、报告和分享边界。`,
     publicSourceBlockedLine: '禁止把公开资料变成原题答案库、拍照搜题承诺、排名晒分或全科动态板书承诺。',
     clusterRunwayLine: `已把 ${QUESTION_TYPE_CLUSTER_RUNWAY.length} 个高频题型簇接成“第一步-错因-小黑板-回访-分享”本地闭环。`,
@@ -447,6 +518,7 @@ module.exports = {
   QUESTION_TYPE_CLUSTER_RUNWAY,
   PUBLIC_K12_SOURCE_LEDGER,
   PUBLIC_K12_USE_POLICY,
+  PUBLIC_K12_USE_WORKBENCH,
   K12_PUBLIC_IMPLEMENTATION_DECISION_MATRIX,
   buildRealHomeworkCoverageMatrix
 };

@@ -1035,6 +1035,9 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     realHomeworkPublicSources: realHomeworkCoverageMatrix && Array.isArray(realHomeworkCoverageMatrix.publicSourceLedger)
       ? realHomeworkCoverageMatrix.publicSourceLedger
       : [],
+    realHomeworkUseWorkbench: realHomeworkCoverageMatrix && Array.isArray(realHomeworkCoverageMatrix.publicK12UseWorkbench)
+      ? realHomeworkCoverageMatrix.publicK12UseWorkbench
+      : [],
     realHomeworkImplementationDecisions: realHomeworkCoverageMatrix && Array.isArray(realHomeworkCoverageMatrix.implementationDecisionMatrix)
       ? realHomeworkCoverageMatrix.implementationDecisionMatrix
       : [],

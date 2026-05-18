@@ -685,7 +685,9 @@
           <text>{{learningReportSummary.realHomeworkCoverageMatrix.summary}}</text>
           <text>{{learningReportSummary.realHomeworkCoverageLine}}</text>
           <text>{{learningReportSummary.realHomeworkCoverageMatrix.publicSourceLine}}</text>
+          <text>{{learningReportSummary.realHomeworkCoverageMatrix.publicWorkbenchLine}}</text>
           <text>{{learningReportSummary.realHomeworkCoverageMatrix.clusterRunwayLine}}</text>
+          <text wx:for="{{learningReportSummary.realHomeworkUseWorkbench}}" wx:key="id">资料工作台：{{item.label}}｜可直接用：{{item.directUse[0]}}｜本地代码：{{item.localizeAsCode[0]}}｜AI：{{item.aiBetterFor[0]}}｜禁用：{{item.mustNotUse[0]}}</text>
           <text>{{learningReportSummary.realHomeworkCoverageMatrix.parentLine}}</text>
           <text wx:for="{{learningReportSummary.realHomeworkPublicSources}}" wx:key="id">资料账本：{{item.label}}｜本地规则：{{item.localRuleUse[0]}}｜AI：{{item.aiUse[0]}}｜禁用：{{item.blockedUse[0]}}</text>
           <text wx:for="{{learningReportSummary.realHomeworkImplementationDecisions}}" wx:key="id">实现判断：{{item.productQuestion}}｜{{item.decision}}</text>

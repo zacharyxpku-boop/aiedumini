@@ -304,6 +304,9 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
     realHomeworkPublicSources: realHomeworkCoverageMatrix && Array.isArray(realHomeworkCoverageMatrix.publicSourceLedger)
       ? realHomeworkCoverageMatrix.publicSourceLedger.slice(0, 3)
       : [],
+    realHomeworkUseWorkbench: realHomeworkCoverageMatrix && Array.isArray(realHomeworkCoverageMatrix.publicK12UseWorkbench)
+      ? realHomeworkCoverageMatrix.publicK12UseWorkbench.slice(0, 4)
+      : [],
     realHomeworkImplementationDecisions: realHomeworkCoverageMatrix && Array.isArray(realHomeworkCoverageMatrix.implementationDecisionMatrix)
       ? realHomeworkCoverageMatrix.implementationDecisionMatrix.slice(0, 5)
       : [],
