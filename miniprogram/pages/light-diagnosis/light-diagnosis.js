@@ -32,7 +32,8 @@ Page({
     surfaceDepthPack: null,
     lightSeedBank: null,
     subjectSeedLibrary: null,
-    courseUnitMap: null
+    courseUnitMap: null,
+    courseUnitQuestionBank: null
   },
 
   onLoad() {
@@ -40,7 +41,8 @@ Page({
       surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('light_diagnosis') : null,
       lightSeedBank: storage.buildLightEntrySeedBank ? storage.buildLightEntrySeedBank('light_diagnosis') : null,
       subjectSeedLibrary: storage.buildSubjectSeedLibrary ? storage.buildSubjectSeedLibrary({ subject: this.data.subject }) : null,
-      courseUnitMap: storage.buildCourseUnitMap ? storage.buildCourseUnitMap({ subject: this.data.subject }) : null
+      courseUnitMap: storage.buildCourseUnitMap ? storage.buildCourseUnitMap({ subject: this.data.subject }) : null,
+      courseUnitQuestionBank: storage.buildCourseUnitQuestionBank ? storage.buildCourseUnitQuestionBank({ subject: this.data.subject }) : null
     });
   },
 
@@ -71,7 +73,8 @@ Page({
       diagnosis: null,
       result: null,
       subjectSeedLibrary: storage.buildSubjectSeedLibrary ? storage.buildSubjectSeedLibrary({ subject }) : this.data.subjectSeedLibrary,
-      courseUnitMap: storage.buildCourseUnitMap ? storage.buildCourseUnitMap({ subject }) : this.data.courseUnitMap
+      courseUnitMap: storage.buildCourseUnitMap ? storage.buildCourseUnitMap({ subject }) : this.data.courseUnitMap,
+      courseUnitQuestionBank: storage.buildCourseUnitQuestionBank ? storage.buildCourseUnitQuestionBank({ subject }) : this.data.courseUnitQuestionBank
     });
   },
 

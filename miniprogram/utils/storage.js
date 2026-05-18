@@ -5705,6 +5705,69 @@ function buildCourseUnitMasteryTrajectory(options = {}) {
   };
 }
 
+function buildCourseUnitQuestionBank(options = {}) {
+  const courseUnitMap = options.courseUnitMap || buildCourseUnitMap(options);
+  const active = courseUnitMap && courseUnitMap.active ? courseUnitMap.active : null;
+  const units = active && Array.isArray(active.units) ? active.units : [];
+  const questionCards = units.reduce((list, unit) => {
+    const base = `${unit.subjectLabel}/${unit.unitLabel}`;
+    return list.concat([
+      {
+        id: `${unit.id}_recall`,
+        unitId: unit.id,
+        type: 'active_recall',
+        label: `${base}主动回忆`,
+        prompt: unit.practiceLoop.recall,
+        answerBoundary: '只要求说出第一步，不要求完整答案。',
+        wrongCause: unit.wrongCauseAtlas[0],
+        visualMove: unit.blackboardBlueprint.firstStroke,
+        evidenceRequired: 'child_first_step'
+      },
+      {
+        id: `${unit.id}_diagnose`,
+        unitId: unit.id,
+        type: 'wrong_cause',
+        label: `${base}错因诊断`,
+        prompt: unit.diagnosticProbes[0],
+        answerBoundary: '只定位卡点，不讲完整解法。',
+        wrongCause: unit.wrongCauseAtlas[1],
+        visualMove: unit.blackboardBlueprint.visualPrompt,
+        evidenceRequired: 'wrong_cause_named'
+      },
+      {
+        id: `${unit.id}_transfer`,
+        unitId: unit.id,
+        type: 'near_transfer',
+        label: `${base}同类小变式`,
+        prompt: unit.practiceLoop.transfer,
+        answerBoundary: '只检查方法能不能迁移，不追求刷题数量。',
+        wrongCause: unit.wrongCauseAtlas[2],
+        visualMove: unit.blackboardBlueprint.stopRule,
+        evidenceRequired: 'near_transfer_attempted'
+      }
+    ]);
+  }, []);
+  const byType = questionCards.reduce((acc, card) => {
+    acc[card.type] = Number(acc[card.type] || 0) + 1;
+    return acc;
+  }, {});
+  return {
+    id: 'course_unit_question_bank',
+    title: '课程单元题库包',
+    subjectLabel: active ? active.label : '',
+    summary: `当前单元题库含 ${questionCards.length} 张可复用练习卡，覆盖主动回忆、错因诊断和同类迁移。`,
+    boundary: '题库只沉淀第一步、错因和迁移证据，不提供拍题出完整答案。',
+    unitCount: units.length,
+    questionCount: questionCards.length,
+    byType,
+    cards: questionCards,
+    activeCards: questionCards.slice(0, 9),
+    reportLine: `报告可追踪 ${units.length} 个单元、${questionCards.length} 张题库卡的下一证据。`,
+    gameLine: '游戏优先抽主动回忆和错因诊断卡，迁移卡只做小变式。',
+    shareLine: '分享只带题库动作和证据合同，不带原题答案。'
+  };
+}
+
 function detectAvoidancePattern(patternInput = loadTaskTypePattern()) {
   const byTaskType = (patternInput && patternInput.byTaskType) || {};
   const candidates = Object.keys(byTaskType).map((type) => {
@@ -7552,6 +7615,7 @@ module.exports = {
   buildSubjectSeedLibrary,
   buildCourseUnitMap,
   buildCourseUnitMasteryTrajectory,
+  buildCourseUnitQuestionBank,
   childStepQuality,
   normalizeFirstStepEvidence,
   saveChildArticulatedStep,

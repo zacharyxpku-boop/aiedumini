@@ -83,6 +83,9 @@ Page({
     const courseUnitMasteryTrajectory = storage.buildCourseUnitMasteryTrajectory
       ? storage.buildCourseUnitMasteryTrajectory({ courseUnitMap })
       : null;
+    const courseUnitQuestionBank = storage.buildCourseUnitQuestionBank
+      ? storage.buildCourseUnitQuestionBank({ courseUnitMap })
+      : null;
     const taskBoundCards = this.cardsForRecentTaskType(recentTaskType, loopFocus);
     const loopBoundCards = this.loopBoundCards(dueCards.concat(fallbackCards), taskBoundCards, loopFocus);
     const cards = loopBoundCards.length ? loopBoundCards : (dueCards.length ? dueCards : (fallbackCards.length ? fallbackCards : taskBoundCards));
@@ -130,12 +133,13 @@ Page({
       dailyQuestSet,
       adaptiveChallenge,
       questArcMission,
-      challengeBrief: this.buildChallengeBrief(dailyQuestSet, adaptiveChallenge, questArcMission, evidenceBias, subjectSkillDepth, curriculumSpine, courseUnitMap, courseUnitMasteryTrajectory),
+      challengeBrief: this.buildChallengeBrief(dailyQuestSet, adaptiveChallenge, questArcMission, evidenceBias, subjectSkillDepth, curriculumSpine, courseUnitMap, courseUnitMasteryTrajectory, courseUnitQuestionBank),
       surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('arcade') : null,
       subjectSkillDepth,
       curriculumSpine,
       courseUnitMap,
       courseUnitMasteryTrajectory,
+      courseUnitQuestionBank,
       result: null,
       resultAdvice: null,
       gameRetentionLoop: null,
@@ -263,7 +267,7 @@ Page({
     return arcade.buildWhackRound(cards, { limit: size });
   },
 
-  buildChallengeBrief(dailyQuestSet = {}, adaptiveChallenge = {}, questArcMission = null, evidenceBias = null, subjectSkillDepth = null, curriculumSpine = null, courseUnitMap = null, courseUnitMasteryTrajectory = null) {
+  buildChallengeBrief(dailyQuestSet = {}, adaptiveChallenge = {}, questArcMission = null, evidenceBias = null, subjectSkillDepth = null, curriculumSpine = null, courseUnitMap = null, courseUnitMasteryTrajectory = null, courseUnitQuestionBank = null) {
     const quests = Array.isArray(dailyQuestSet.quests) ? dailyQuestSet.quests : [];
     const activeQuest = quests.find((item) => item && item.progress < item.target) || quests[0] || {};
     const mode = adaptiveChallenge.mode || 'balanced';
@@ -339,7 +343,12 @@ Page({
         risk: item.regressionRisk,
         nextEvidence: item.nextEvidence,
         action: item.parentInterventionLevel
-      }))
+      })),
+      courseUnitQuestionBankTitle: courseUnitQuestionBank ? courseUnitQuestionBank.title : '',
+      courseUnitQuestionBankLine: courseUnitQuestionBank ? courseUnitQuestionBank.summary : '',
+      courseUnitQuestionBankCards: courseUnitQuestionBank && Array.isArray(courseUnitQuestionBank.activeCards)
+        ? courseUnitQuestionBank.activeCards.slice(0, 3)
+        : []
     };
   },
 

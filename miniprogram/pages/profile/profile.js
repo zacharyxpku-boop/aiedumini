@@ -718,6 +718,9 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
   const courseUnitMasteryTrajectory = storage.buildCourseUnitMasteryTrajectory
     ? storage.buildCourseUnitMasteryTrajectory({ courseUnitMap: effectiveCourseUnitMap })
     : null;
+  const courseUnitQuestionBank = storage.buildCourseUnitQuestionBank
+    ? storage.buildCourseUnitQuestionBank({ courseUnitMap: effectiveCourseUnitMap })
+    : null;
   const mainDiagnosis = matrix.find((item) => item.status === '需要支持') || matrix[0] || null;
   const sevenDayPlan = Array.isArray(plan.sevenDayPlan) ? plan.sevenDayPlan.slice(0, 7) : [];
   const dayOne = sevenDayPlan[0] || {};
@@ -814,6 +817,9 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     courseUnitTrajectoryParentLine: courseUnitMasteryTrajectory ? courseUnitMasteryTrajectory.parentLine : '',
     courseUnitTrajectoryWeakest: courseUnitMasteryTrajectory ? courseUnitMasteryTrajectory.weakest : null,
     courseUnitTrajectoryRows: courseUnitMasteryTrajectory ? courseUnitMasteryTrajectory.trajectories : [],
+    courseUnitQuestionBank,
+    courseUnitQuestionBankLine: courseUnitQuestionBank ? courseUnitQuestionBank.reportLine : '',
+    courseUnitQuestionBankCards: courseUnitQuestionBank ? courseUnitQuestionBank.activeCards : [],
     longTermPortrait,
     longTermPortraitLine: longTermPortrait.learnerPattern || '',
     longTermPortraitStabilityLine: longTermPortrait.stabilityLine || '',

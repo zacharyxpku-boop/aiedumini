@@ -641,6 +641,12 @@
           <text wx:if="{{learningReportSummary.courseUnitTrajectoryParentLine}}">{{learningReportSummary.courseUnitTrajectoryParentLine}}</text>
           <text wx:for="{{learningReportSummary.courseUnitTrajectoryRows}}" wx:key="id">{{item.masteryLine}} · 下一证据：{{item.nextEvidence}} · 家长：{{item.parentInterventionLevel}}</text>
         </view>
+        <view class="parent-brief-block" wx:if="{{learningReportSummary.courseUnitQuestionBank}}">
+          <text class="parent-brief-label">{{learningReportSummary.courseUnitQuestionBank.title}}</text>
+          <text>{{learningReportSummary.courseUnitQuestionBank.summary}}</text>
+          <text>{{learningReportSummary.courseUnitQuestionBankLine}}</text>
+          <text wx:for="{{learningReportSummary.courseUnitQuestionBankCards}}" wx:key="id">题库卡：{{item.label}} · {{item.prompt}} · {{item.answerBoundary}}</text>
+        </view>
         <view class="parent-brief-block">
           <text class="parent-brief-label">学业矩阵</text>
           <text>{{learningReportSummary.diagnosisLine}}</text>

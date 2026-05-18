@@ -80,6 +80,23 @@
     </view>
   </view>
 
+  <view class="global-depth-card" wx:if="{{courseUnitQuestionBank}}">
+    <view class="global-depth-title">{{courseUnitQuestionBank.title}}</view>
+    <view class="global-depth-summary">{{courseUnitQuestionBank.summary}}</view>
+    <view class="global-depth-note">{{courseUnitQuestionBank.boundary}}</view>
+    <view class="global-depth-note">{{courseUnitQuestionBank.reportLine}}</view>
+    <view class="global-depth-note">{{courseUnitQuestionBank.gameLine}}</view>
+    <view class="global-depth-grid">
+      <view class="global-depth-chip ready" wx:for="{{courseUnitQuestionBank.activeCards}}" wx:key="id">
+        <text>{{item.label}}</text>
+        <text>{{item.prompt}}</text>
+        <text>{{item.visualMove}}</text>
+        <text>{{item.wrongCause}}</text>
+        <text>{{item.answerBoundary}}</text>
+      </view>
+    </view>
+  </view>
+
   <view class="section-title">这道题是什么科目？</view>
   <view class="choice-row">
     <view class="choice-chip {{subject === item.id ? 'active' : ''}}" wx:for="{{subjectOptions}}" wx:key="id" data-id="{{item.id}}" bindtap="chooseSubject">{{item.label}}</view>
