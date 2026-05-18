@@ -1468,6 +1468,103 @@ function buildQuestionTypeClusterMemoryProtocol(questionTypeClusters = [], resul
   };
 }
 
+function buildRealHomeworkPressureMemoryPrescription(samples = [], result = {}, options = {}) {
+  const safeSamples = Array.isArray(samples) ? samples.filter((sample) => sample && sample.id && sample.taskType) : [];
+  const taskType = options.taskType || '';
+  const subject = options.subject || '';
+  const wrongCause = options.wrongCause || options.weakKey || '';
+  const activeSampleId = options.activeSampleId || '';
+  const directActiveSample = options.activeSample && options.activeSample.id ? options.activeSample : null;
+  const wrong = Math.max(0, Number(result.wrong || 0));
+  const accuracy = Number.isFinite(Number(result.accuracy)) ? Number(result.accuracy) : 0;
+  const rescue = wrong >= 2 || accuracy < Number(options.targetAccuracy || 70);
+  const matched = safeSamples.filter((sample) => {
+    const text = [sample.subject, sample.taskType, sample.expectedWrongCause, sample.expectedFirstStep, sample.stem].filter(Boolean).join(' ');
+    return (!taskType || sample.taskType === taskType)
+      || (!subject || sample.subject === subject)
+      || (wrongCause && text.includes(wrongCause));
+  });
+  const activeSample = directActiveSample || (activeSampleId ? safeSamples.find((sample) => sample.id === activeSampleId) : null);
+  const exactWrongCause = wrongCause
+    ? safeSamples.filter((sample) => sample.expectedWrongCause && sample.expectedWrongCause.includes(wrongCause))
+    : [];
+  const pool = []
+    .concat(activeSample ? [activeSample] : [])
+    .concat(exactWrongCause)
+    .concat(matched.length ? matched : safeSamples);
+  const seen = new Set();
+  const source = pool.filter((sample) => {
+    const key = `${sample.id || ''}::${sample.stem || ''}`;
+    if (!sample || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  }).slice(0, rescue ? 5 : 4);
+  const subjectCounts = safeSamples.reduce((acc, sample) => {
+    acc[sample.subject || 'unknown'] = (acc[sample.subject || 'unknown'] || 0) + 1;
+    return acc;
+  }, {});
+  const taskTypeCounts = safeSamples.reduce((acc, sample) => {
+    acc[sample.taskType || 'unknown'] = (acc[sample.taskType || 'unknown'] || 0) + 1;
+    return acc;
+  }, {});
+  const reviewQueue = source.map((sample, index) => ({
+    id: `${sample.id}_memory_${index + 1}`,
+    sampleId: sample.id,
+    subject: sample.subject,
+    taskType: sample.taskType,
+    order: index + 1,
+    stemSignal: sample.stem,
+    firstStep: sample.expectedFirstStep,
+    wrongCause: sample.expectedWrongCause,
+    boardMove: sample.expectedBoardMove,
+    parentCheck: sample.parentCheck,
+    nearTransfer: sample.nearTransfer,
+    dueWindow: index === 0 ? 'tonight' : index === 1 ? 'tomorrow' : index === 2 ? 'day3' : 'day7',
+    route: index <= 1 ? '/pages/review/review' : index === 2 ? '/pages/tutor/tutor' : '/pages/profile/profile'
+  }));
+  const sampleSpecificReady = reviewQueue.every((item) => item.firstStep && item.wrongCause && item.boardMove && item.parentCheck && item.nearTransfer);
+  return {
+    id: 'real_homework_pressure_memory_prescription',
+    title: rescue ? '真实作业错因急救处方' : '真实作业错因巩固处方',
+    mode: rescue ? 'rescue' : 'growth',
+    localDeterministic: true,
+    totalSamples: safeSamples.length,
+    matchedSamples: matched.length,
+    selectedSamples: source.length,
+    subjectCounts,
+    taskTypeCounts,
+    reviewQueue,
+    dailyDose: {
+      firstStepRecall: rescue ? 3 : 2,
+      wrongCauseReplay: rescue ? 2 : 1,
+      nearTransfer: rescue ? 0 : 1,
+      newSamples: rescue ? 0 : 1
+    },
+    scheduleWindows: [
+      { id: 'tonight', label: '今晚', releaseGate: '能说出第一步和错因，才记行为证据。' },
+      { id: 'tomorrow', label: '明天', releaseGate: '隔天仍能复述第一步，才进入回访通过。' },
+      { id: 'day3', label: '第3天', releaseGate: '同错因不复发，才开放近迁移。' },
+      { id: 'day7', label: '第7天', releaseGate: '第7天变式通过，才写入长期画像。' }
+    ],
+    xpReleaseGate: rescue
+      ? '同一错因未稳定前，XP 只记录主动回忆，不释放掌握奖励。'
+      : '第一步、错因、明天回访都出现后，才释放小额 XP。' ,
+    unlockGates: [
+      { id: 'new_sample_unlock', open: !rescue, rule: '急救模式不加新样本。' },
+      { id: 'near_transfer_unlock', open: !rescue && accuracy >= 80, rule: '近迁移必须等明天回访通过。' },
+      { id: 'peer_share_unlock', open: !rescue && accuracy >= 90, rule: '分享只开放安全动作，不开放原题答案。' }
+    ],
+    sharePayload: {
+      allowedFields: ['subject', 'task_type', 'first_step_action', 'wrong_cause_label', 'return_window'],
+      blockedFields: ['original_stem_photo', 'full_answer', 'full_dialogue', 'score', 'ranking', 'private_teacher_comment']
+    },
+    aiBoundary: 'AI can rewrite prompts and parent wording; local code decides queue, XP, unlocks, report release, and share fields.',
+    parentLine: '家长只看第一步、错因、明天回访和第7天是否迁移，不看完整答案、分数或排名。',
+    evidenceRequired: ['real_homework_pressure_samples', 'sample_specific_queue', 'local_rule_decision', 'xp_release_gate', 'safe_share_payload', 'day7_portrait_gate'],
+    sampleSpecificReady
+  };
+}
+
 function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], result = {}, challenge = {}, questSet = {}, options = {}) {
   const safeCards = Array.isArray(cards) ? cards : [];
   const safeEvents = Array.isArray(events) ? events : [];
@@ -1603,6 +1700,18 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
     result,
     { weakKey }
   );
+  const realHomeworkPressureMemoryPrescription = buildRealHomeworkPressureMemoryPrescription(
+    options.realHomeworkPressureSamples || [],
+    result,
+    {
+      taskType: options.taskType || challenge.taskType || '',
+      subject: options.subject || '',
+      wrongCause: weakKey,
+      activeSampleId: options.activeSampleId || '',
+      activeSample: options.activeSample || null,
+      targetAccuracy: challenge.targetAccuracy || 80
+    }
+  );
   return {
     title: needsRepair ? '高频修复循环' : '高频巩固循环',
     mode: needsRepair ? 'repair_recall' : 'mastery_recall',
@@ -1629,13 +1738,14 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
     questionTypeClusterMemoryProtocol,
     peerMemoryRelayLeague,
     microRecallPrescriptionEngine,
+    realHomeworkPressureMemoryPrescription,
     xpRule: 'XP 只奖励主动回忆、错因修复和次日回访，不奖励盲刷题量。',
     leechRule: needsRepair
       ? `同一错因连续 2 次错，会降到第一步小黑板。`
       : '连续 2 次说清第一步，才进入变式练习。',
     parentShareLine: `家长复盘只看：孩子能否自己说出「${weakKey}」的第一步。`,
     nextRoute: needsRepair ? '/pages/review/review' : '/pages/tutor/tutor',
-    evidenceRequired: ['active_recall_cards', 'spaced_review_plan', 'wrong_cause_return', 'quest_cadence', 'memory_feedback_controller', 'recall_intensity_plan', 'wrong_cause_replay_deck', 'xp_feedback_policy', 'quest_arc_runway', 'gizmo_like_memory_protocol', 'socratic_quality_memory_bridge', 'question_bank_memory_bridge', 'question_bank_recall_workout', 'daily_memory_sprint_deck', 'adaptive_recall_scheduler', 'memory_risk_release_model', 'memory_comeback_loop', 'daily_memory_prescription', 'question_type_cluster_memory_protocol', 'peer_memory_relay_league', 'micro_recall_prescription_engine', 'parent_share_line'],
+    evidenceRequired: ['active_recall_cards', 'spaced_review_plan', 'wrong_cause_return', 'quest_cadence', 'memory_feedback_controller', 'recall_intensity_plan', 'wrong_cause_replay_deck', 'xp_feedback_policy', 'quest_arc_runway', 'gizmo_like_memory_protocol', 'socratic_quality_memory_bridge', 'question_bank_memory_bridge', 'question_bank_recall_workout', 'daily_memory_sprint_deck', 'adaptive_recall_scheduler', 'memory_risk_release_model', 'memory_comeback_loop', 'daily_memory_prescription', 'question_type_cluster_memory_protocol', 'peer_memory_relay_league', 'micro_recall_prescription_engine', 'real_homework_pressure_memory_prescription', 'parent_share_line'],
     weakKey
   };
 }
@@ -1655,6 +1765,7 @@ module.exports = {
   buildPeerMemoryRelayLeague,
   buildMicroRecallPrescriptionEngine,
   buildQuestionTypeClusterMemoryProtocol,
+  buildRealHomeworkPressureMemoryPrescription,
   buildMemoryFeedbackController,
   buildMemoryComebackLoop,
   buildAdaptiveRecallScheduler,
