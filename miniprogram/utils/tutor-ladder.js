@@ -40,12 +40,12 @@ const HINT_LADDER = [
 ];
 
 const TASK_TYPE_RULES = [
+  { id: 'chemistry_experiment', patterns: /化学|反应|方程式|溶液|气体|沉淀|颜色|酸碱|守恒|配平/i },
   { id: 'equation_setup', patterns: /方程|等量关系|设x|未知数|列方程|解方程/i },
-  { id: 'math_word_problem', patterns: /应用题|题目问什么|数量关系|单位1|已知条件|列式|行程|工程|分数应用题/i },
-  { id: 'reading_question', patterns: /阅读|主旨|细节|原因|段意|中心句|概括/i },
+  { id: 'math_word_problem', patterns: /应用题|题目问什么|数量关系|单位1|已知条件|列式|行程|工程|分数应用题|几何|邻补角|对顶角|函数|图像|增减性|平均每小时/i },
+  { id: 'reading_question', patterns: /阅读|主旨|细节|原因|段意|中心句|概括|反问句|陈述句|文言文|句子改写|心情变化/i },
   { id: 'english_sentence', patterns: /英语|单词|语法|句型|主语|谓语|时态|词性/i },
   { id: 'physics_diagram', patterns: /物理|受力|电路|光路|运动|速度|压强|浮力|透镜/i },
-  { id: 'chemistry_experiment', patterns: /化学|反应|方程式|溶液|气体|沉淀|颜色|酸碱/i },
   { id: 'biology_process', patterns: /生物|细胞|植物|人体|遗传|生态|光合|对照组/i },
   { id: 'geography_map', patterns: /地理|地图|经纬|气候|公转|自转|昼夜|地形|图例/i },
   { id: 'writing_process', patterns: /作文|写作|开头|结尾|提纲|续写|作文题/i }
@@ -207,34 +207,84 @@ function inferHomeworkPressureSignal(text = '', taskType = 'unknown') {
   const source = String(text || '');
   const cases = [
     {
+      id: 'ratio_speed_each_hour',
+      taskType: 'math_word_problem',
+      patterns: [/平均每小时|3 小时|12 千米|总路程|总时间|每 1 小时/],
+      firstStep: '先判断题目问每小时多少，再圈出总路程和总时间。',
+      wrongCause: '没有先分清总量和每份量，直接拿数字相除。',
+      boardMove: '小黑板只画“总路程 12 千米 -> 分成 3 小时”的线段。',
+      parentCheck: '先问：这题问的是总共走多少，还是每 1 小时走多少？',
+      reviewMove: '把 12 千米换成 15 千米，仍先说总量和份数。'
+    },
+    {
+      id: 'geometry_adjacent_angle',
+      taskType: 'math_word_problem',
+      patterns: [/邻补角|对顶角|65 度|直线相交|共一条边/],
+      firstStep: '先判断题目问邻补角，再标出和 65 度共一条边的角。',
+      wrongCause: '把对顶角相等和邻补角互补混淆。',
+      boardMove: '小黑板只画交叉线和 65 度，圈出相邻的那个角。',
+      parentCheck: '先问：这个角是对面那个，还是挨着 65 度那个？',
+      reviewMove: '把 65 度换成 110 度，仍先判断是对顶角还是邻补角。'
+    },
+    {
+      id: 'function_graph_trend',
+      taskType: 'math_word_problem',
+      patterns: [/函数图像|一次函数|增减性|从左到右|趋势|代公式/],
+      firstStep: '先看图像从左到右是上升还是下降。',
+      wrongCause: '只想套公式，没有先读图像趋势。',
+      boardMove: '小黑板只画坐标轴和一条从左到右的趋势箭头。',
+      parentCheck: '先问：从左往右看，这条线是往上还是往下？',
+      reviewMove: '换一条下降直线，仍先判断趋势再说增减性。'
+    },
+    {
       id: 'fraction_part_whole',
       taskType: 'math_word_problem',
       patterns: [/三分之|分之|剩.*页|全书|单位1|对应/],
-      firstStep: '先判断题目问整体，再圈出已知量对应整体的哪一份。',
+      firstStep: '先判断题目问全书总页数，再圈出还剩 24 页对应的是全书的三分之一。',
       wrongCause: '把已知分率和剩余页数的对应关系混在一起。',
-      boardMove: '小黑板只画整体线段和已知那一份，不直接算总量。',
-      parentCheck: '先问：这个数对应整体的哪一份？',
-      reviewMove: '明天换一个剩余页数，只复述“哪一份对应几”。'
+      boardMove: '小黑板只画一条整体线段，分成三份，只标剩下的一份是 24 页。',
+      parentCheck: '先问：24 页对应的是哪一份，不需要直接算总页数。',
+      reviewMove: '把剩余页数换成 18 页，仍然先说“哪一份对应几页”。'
     },
     {
       id: 'total_difference_equation',
       taskType: 'equation_setup',
       patterns: [/一共|总共|比.*多|比.*少|设x|未知数|方程/],
-      firstStep: '先设较小或未知的一方为 x，再把另一方写成 x 加减差量。',
+      firstStep: '先设乙有 x 本，再把甲写成 x+6。',
       wrongCause: '没有先设清未知数代表谁，直接心算结果。',
       boardMove: '小黑板只写“乙=x、甲=x+差量、总数=已知”。',
-      parentCheck: '先问：x 代表谁？另一方怎么用 x 表示？',
-      reviewMove: '把总数和差量换掉，仍先写同一个等量关系。'
+      parentCheck: '先问：你设的 x 代表谁？另一人的数量怎么表示？',
+      reviewMove: '把 48 和 6 换成别的数，先保留同一个等量关系。'
+    },
+    {
+      id: 'circuit_path',
+      taskType: 'physics_diagram',
+      patterns: [/电路|串联|并联|电流路径|灯泡|开关|分叉/],
+      firstStep: '先从电源正极出发，沿电流路径画一圈。',
+      wrongCause: '没有先追电流路径，只看元件位置猜连接方式。',
+      boardMove: '小黑板只画电源和第一条电流路径箭头，不直接判定串并联。',
+      parentCheck: '先问：电流有没有分叉？先用手指沿路径走一遍。',
+      reviewMove: '换一个有分叉的图，仍先追电流路径。'
+    },
+    {
+      id: 'buoyancy_direction',
+      taskType: 'physics_diagram',
+      patterns: [/浮力|水中|竖直向上|重力|下沉|托物体/],
+      firstStep: '先标浮力方向竖直向上，再和重力方向区分。',
+      wrongCause: '把浮力方向和重力方向混淆。',
+      boardMove: '小黑板只画物体、向下重力箭头和向上浮力箭头。',
+      parentCheck: '先问：浮力是水托物体，方向先往哪边？',
+      reviewMove: '换成物体下沉情境，仍先标浮力方向。'
     },
     {
       id: 'force_friction_diagram',
       taskType: 'physics_diagram',
       patterns: [/受力|摩擦|水平|拉动|木块|研究对象/],
-      firstStep: '先定研究对象，再标第一根外力方向。',
+      firstStep: '先定研究对象是木块，再标重力、支持力、拉力和摩擦力方向。',
       wrongCause: '没有先确定研究对象和运动趋势。',
-      boardMove: '小黑板只画物体方框和第一根力箭头，让孩子补摩擦方向。',
-      parentCheck: '先问：这题研究谁？摩擦力阻碍什么趋势？',
-      reviewMove: '换一个拉力方向，只判断摩擦方向会不会变。'
+      boardMove: '小黑板只画木块方框和第一根水平拉力箭头，再让孩子补摩擦方向。',
+      parentCheck: '先问：这题先研究谁？摩擦力总是阻碍什么？',
+      reviewMove: '把拉力方向反过来，先判断摩擦方向会不会变。'
     },
     {
       id: 'convex_lens_ray',
@@ -243,8 +293,28 @@ function inferHomeworkPressureSignal(text = '', taskType = 'unknown') {
       firstStep: '先标 F 和 2F，再画一条平行主光轴的光线。',
       wrongCause: '只背成像规律，没有把位置和光路连起来。',
       boardMove: '小黑板只画主光轴、焦点和第一条入射光线，不直接给像的结论。',
-      parentCheck: '先问：物体在哪个区间？第一条光线怎么走？',
-      reviewMove: '换一个物距区间，仍先标点和画第一条线。'
+      parentCheck: '先问：你先标出 F 和 2F，再说物体在哪个区间。',
+      reviewMove: '把物体移到一倍到两倍焦距之间，只重复标点和画第一条线。'
+    },
+    {
+      id: 'mass_conservation',
+      taskType: 'chemistry_experiment',
+      patterns: [/质量守恒|反应前后质量|硫化亚铁|凭空增加|原子/],
+      firstStep: '先判断化学反应遵守质量守恒。',
+      wrongCause: '把生成新物质理解成凭空增加质量。',
+      boardMove: '小黑板只画“反应前总质量 = 反应后总质量”的天平。',
+      parentCheck: '先问：反应前后原子有没有凭空多出来或少掉？',
+      reviewMove: '换成碳燃烧，仍先判断是否守恒。'
+    },
+    {
+      id: 'equation_balance_atoms',
+      taskType: 'chemistry_experiment',
+      patterns: [/配平|氢气|氧气|生成水|H2O|原子个数/],
+      firstStep: '先数反应前后氢原子和氧原子个数。',
+      wrongCause: '只记生成物，没有检查左右原子个数守恒。',
+      boardMove: '小黑板只画左右两栏，分别数 H 和 O 的个数。',
+      parentCheck: '先问：左右两边 H 和 O 的个数分别是多少？',
+      reviewMove: '换成镁燃烧，仍先数左右原子个数。'
     },
     {
       id: 'carbonate_gas_test',
@@ -253,28 +323,48 @@ function inferHomeworkPressureSignal(text = '', taskType = 'unknown') {
       firstStep: '先列反应前物质，再判断气泡可能对应二氧化碳。',
       wrongCause: '只记现象，没有把现象和物质变化对应。',
       boardMove: '小黑板只画“反应物 -> 气体 -> 检验现象”三格。',
-      parentCheck: '先问：气泡说明产生了什么？用什么现象证明？',
+      parentCheck: '先问：气泡说明产生了什么？你用什么现象证明它？',
       reviewMove: '换一种碳酸盐，仍先说气体和检验。'
     },
     {
       id: 'indicator_acid_base',
       taskType: 'chemistry_experiment',
       patterns: [/酚酞|变红|褪去|酸|碱|中和|溶液/],
-      firstStep: '先判断指示剂颜色对应酸碱性，再看加入物质如何改变酸碱性。',
+      firstStep: '先判断酚酞变红说明溶液显碱性。',
       wrongCause: '把指示剂颜色当成要背的现象，没有连接酸碱性。',
       boardMove: '小黑板只画“碱性 -> 变红 -> 加酸 -> 褪色”的原因链。',
       parentCheck: '先问：颜色变化对应酸碱性变了，还是物质名字变了？',
       reviewMove: '换一种指示剂，仍先判断颜色对应酸性还是碱性。'
     },
     {
+      id: 'pronoun_case_subject',
+      taskType: 'english_sentence',
+      patterns: [/we 和 us|代词|主格|宾格|Tom and I|作主语/],
+      firstStep: '先判断代词在句子里作主语。',
+      wrongCause: '没有先看代词成分，混淆主格和宾格。',
+      boardMove: '小黑板只圈主语位置，写“主格”。',
+      parentCheck: '先问：这个代词在动词前作主语，还是在动词后作宾语？',
+      reviewMove: '换成 Mary and him，仍先判断代词位置。'
+    },
+    {
+      id: 'subject_verb_real_subject',
+      taskType: 'english_sentence',
+      patterns: [/The number|students|真正主语|主谓一致|复数名词/],
+      firstStep: '先找真正主语是 the number。',
+      wrongCause: '被靠近动词的复数名词干扰，没有找真正主语。',
+      boardMove: '小黑板只圈 The number，划掉干扰词 students。',
+      parentCheck: '先问：动词跟谁一致，是 students 还是 the number？',
+      reviewMove: '换成 A group of boys，仍先找真正主语。'
+    },
+    {
       id: 'english_past_tense_signal',
       taskType: 'english_sentence',
       patterns: [/yesterday|过去时|时态|go|动词|时间信号/i],
-      firstStep: '先圈时间信号，再判断时态。',
+      firstStep: '先找时间信号 yesterday，再判断一般过去时。',
       wrongCause: '没有先看时间词，直接凭语感选动词形式。',
-      boardMove: '小黑板只圈时间词并写时态判断，不直接改完整句。',
-      parentCheck: '先问：这句话的时间词是什么？提示什么时态？',
-      reviewMove: '把时间词换掉，先判断时态是否改变。'
+      boardMove: '小黑板只圈出 yesterday，只写“过去时”这个判断，不直接改完整句。',
+      parentCheck: '先问：这句话的时间词是什么？它提示什么时态？',
+      reviewMove: '把 yesterday 换成 every day，先判断时态会不会变。'
     },
     {
       id: 'reading_mood_change',
@@ -294,7 +384,27 @@ function inferHomeworkPressureSignal(text = '', taskType = 'unknown') {
       wrongCause: '离开原文凭感觉答，没有锚定证据句。',
       boardMove: '小黑板只画“题目类型 -> 回文定位 -> 证据句”。',
       parentCheck: '先问：你选项旁边能标出原文哪一句吗？',
-      reviewMove: '换一段短文，仍先找题目类型和证据句。'
+      reviewMove: '换一篇更短的段落，仍然先找原因词。'
+    },
+    {
+      id: 'food_chain_arrow',
+      taskType: 'biology_process',
+      patterns: [/食物链|草|兔|鹰|能量流动|箭头方向/],
+      firstStep: '先从被吃的生物指向吃它的生物。',
+      wrongCause: '把捕食关系和能量流动箭头方向混淆。',
+      boardMove: '小黑板只画“草 -> 兔 -> 鹰”的一条箭头链。',
+      parentCheck: '先问：箭头表示能量流向谁，不是表示谁去抓谁。',
+      reviewMove: '换成草、昆虫、青蛙，仍先从生产者画起。'
+    },
+    {
+      id: 'genetics_hidden_recessive',
+      taskType: 'biology_process',
+      patterns: [/隐性性状|表现型正常|隐性基因|杂合子|携带/],
+      firstStep: '先判断父母可能是携带隐性基因的杂合子。',
+      wrongCause: '把表现型正常误认为没有隐性基因。',
+      boardMove: '小黑板只画父母各带一个显性和一个隐性的基因格子。',
+      parentCheck: '先问：表现出来正常，是否一定没有隐性基因？',
+      reviewMove: '换成另一种隐性性状，仍先判断是否可能携带。'
     },
     {
       id: 'photosynthesis_columns',
@@ -302,7 +412,7 @@ function inferHomeworkPressureSignal(text = '', taskType = 'unknown') {
       patterns: [/光合作用|叶绿体|二氧化碳|氧气|原料|产物/],
       firstStep: '先把条件、场所、原料、产物分成四栏。',
       wrongCause: '把过程口诀背散了，结构和功能没有连起来。',
-      boardMove: '小黑板只画四栏空格，不直接替孩子填完整答案。',
+      boardMove: '小黑板只画“光、叶绿体、二氧化碳和水 -> 有机物和氧气”的空格图。',
       parentCheck: '先问：这是条件、原料、场所还是产物？',
       reviewMove: '换成呼吸作用，仍先分四栏。'
     },
@@ -310,19 +420,39 @@ function inferHomeworkPressureSignal(text = '', taskType = 'unknown') {
       id: 'control_variable',
       taskType: 'biology_process',
       patterns: [/对照|变量|有光|无光|遮光|唯一不同|实验/],
-      firstStep: '先找两组唯一不同的条件。',
+      firstStep: '先说唯一不同的条件是光照。',
       wrongCause: '没有分清自变量、因变量和控制变量。',
       boardMove: '小黑板只画两列并标一个不同点。',
-      parentCheck: '先问：两组除了这个条件，还有什么要保持一样？',
+      parentCheck: '先问：两组除了光照，还有什么应该保持一样？',
       reviewMove: '把光照换成水分，仍先找唯一不同条件。'
+    },
+    {
+      id: 'climate_graph_trend',
+      taskType: 'geography_map',
+      patterns: [/气候图|气温曲线|降水柱状图|全年趋势|季节分配|单月数据/],
+      firstStep: '先看全年气温变化，再看降水季节分配。',
+      wrongCause: '只看单月数据，没有读全年趋势。',
+      boardMove: '小黑板只画“气温全年趋势”和“降水集中季节”两条提示。',
+      parentCheck: '先问：你看的是全年趋势，还是只看了一个月？',
+      reviewMove: '换一张气候图，仍先看全年再看季节。'
+    },
+    {
+      id: 'contour_shape',
+      taskType: 'geography_map',
+      patterns: [/等高线|山脊|山谷|弯曲方向|海拔数值|往高处/],
+      firstStep: '先看等高线弯曲方向，再判断山脊或山谷。',
+      wrongCause: '只看海拔数值，没有看等高线形态。',
+      boardMove: '小黑板只画一组弯曲等高线和水流/高低方向箭头。',
+      parentCheck: '先问：等高线往高处凸还是往低处凸？',
+      reviewMove: '换一张等高线图，仍先判断弯曲方向。'
     },
     {
       id: 'earth_rotation',
       taskType: 'geography_map',
       patterns: [/昼夜|自转|公转|太阳|地球|四季/],
-      firstStep: '先判断现象发生在一天内还是一年内。',
+      firstStep: '先判断昼夜更替对应地球自转，不是公转。',
       wrongCause: '把自转、公转对应的现象混淆。',
-      boardMove: '小黑板只画太阳、地球和自转箭头，标昼半球和夜半球。',
+      boardMove: '小黑板只画地球、太阳和自转箭头，只标昼半球和夜半球。',
       parentCheck: '先问：一天内变化看自转，还是一年内变化？',
       reviewMove: '换成四季变化，先判断是否属于公转。'
     },
@@ -337,13 +467,33 @@ function inferHomeworkPressureSignal(text = '', taskType = 'unknown') {
       reviewMove: '换一个比例尺，仍先说 1 厘米代表什么。'
     },
     {
+      id: 'rhetorical_to_statement',
+      taskType: 'reading_question',
+      patterns: [/反问句|陈述句|删问号|反问词|否定词|语气/],
+      firstStep: '先找反问词和否定词，再把语气改成肯定陈述。',
+      wrongCause: '只改标点，没有处理反问语气。',
+      boardMove: '小黑板只圈反问词、否定词和句末标点三处。',
+      parentCheck: '先问：这句话改完后意思有没有变？语气是不是陈述？',
+      reviewMove: '换一个反问句，仍先圈反问词和否定词。'
+    },
+    {
+      id: 'classical_zhi_context',
+      taskType: 'reading_question',
+      patterns: [/文言文|所有之|前后词|翻成“的”|用法/],
+      firstStep: '先看“之”在句子里的位置和前后词。',
+      wrongCause: '把常见义套到所有语境，没有看词在句中的作用。',
+      boardMove: '小黑板只圈“之”的前后两个词，先判断结构。',
+      parentCheck: '先问：这个“之”前后分别是什么词？能不能都翻成“的”？',
+      reviewMove: '换一句文言句子，仍先看前后词。'
+    },
+    {
       id: 'writing_first_sentence',
       taskType: 'writing_process',
       patterns: [/作文|开头|难忘|小事|完整篇|第一句/],
       firstStep: '先写一句最朴素的开头：那天发生了什么。',
       wrongCause: '想一次写完全文，导致第一句迟迟落不下来。',
       boardMove: '小黑板只画“时间、地点、人物、事件”四格，不评价文采。',
-      parentCheck: '先问：一句话说发生了什么，不用一开始写漂亮。',
+      parentCheck: '先问：先写一句发生了什么，不用一开始就写得漂亮。',
       reviewMove: '换一个作文题，仍先写一件事的第一句。'
     }
   ];
