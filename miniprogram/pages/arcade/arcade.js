@@ -890,6 +890,9 @@ Page({
     const questionBankMemoryBridge = highFrequencyPracticeLoop && highFrequencyPracticeLoop.questionBankMemoryBridge
       ? highFrequencyPracticeLoop.questionBankMemoryBridge
       : null;
+    const questionBankRecallWorkout = highFrequencyPracticeLoop && highFrequencyPracticeLoop.questionBankRecallWorkout
+      ? highFrequencyPracticeLoop.questionBankRecallWorkout
+      : null;
     const questArcSignal = storage.recordQuestArcGameSignal
       ? storage.recordQuestArcGameSignal({
         mission: this.data.questArcMission,
@@ -970,6 +973,18 @@ Page({
         : 0,
       question_bank_memory_gate: questionBankMemoryBridge
         ? questionBankMemoryBridge.xpGate
+        : '',
+      question_bank_recall_workout_mode: questionBankRecallWorkout
+        ? questionBankRecallWorkout.mode
+        : '',
+      question_bank_recall_workout_cards: questionBankRecallWorkout && Array.isArray(questionBankRecallWorkout.workoutCards)
+        ? questionBankRecallWorkout.workoutCards.length
+        : 0,
+      question_bank_recall_workout_phases: questionBankRecallWorkout && Array.isArray(questionBankRecallWorkout.phases)
+        ? questionBankRecallWorkout.phases.length
+        : 0,
+      question_bank_recall_workout_boundary: questionBankRecallWorkout
+        ? questionBankRecallWorkout.shareBoundary
         : '',
       share_code: incomingShare && incomingShare.share_code ? incomingShare.share_code : ''
     });
@@ -1095,6 +1110,18 @@ Page({
           : 0,
         question_bank_memory_gate: questionBankMemoryBridge
           ? questionBankMemoryBridge.xpGate
+          : '',
+        question_bank_recall_workout_mode: questionBankRecallWorkout
+          ? questionBankRecallWorkout.mode
+          : '',
+        question_bank_recall_workout_cards: questionBankRecallWorkout && Array.isArray(questionBankRecallWorkout.workoutCards)
+          ? questionBankRecallWorkout.workoutCards.length
+          : 0,
+        question_bank_recall_workout_phases: questionBankRecallWorkout && Array.isArray(questionBankRecallWorkout.phases)
+          ? questionBankRecallWorkout.phases.length
+          : 0,
+        question_bank_recall_workout_boundary: questionBankRecallWorkout
+          ? questionBankRecallWorkout.shareBoundary
           : '',
         boss_gap: this.data.adaptiveChallenge && this.data.adaptiveChallenge.bossCard
           ? this.data.adaptiveChallenge.bossCard.key

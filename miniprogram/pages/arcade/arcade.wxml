@@ -440,6 +440,24 @@
           <view class="retention-loop-step">{{highFrequencyPracticeLoop.questionBankMemoryBridge.parentDecisionLine}}</view>
           <view class="retention-loop-step">{{highFrequencyPracticeLoop.questionBankMemoryBridge.privacyBoundary}}</view>
         </view>
+        <view class="high-frequency-section" wx:if="{{highFrequencyPracticeLoop.questionBankRecallWorkout}}">
+          <view class="high-frequency-label">{{highFrequencyPracticeLoop.questionBankRecallWorkout.title}}</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.questionBankRecallWorkout.reportLine}}</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.questionBankRecallWorkout.intensityLine}}</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.questionBankRecallWorkout.returnWindowLine}}</view>
+          <view class="high-frequency-item" wx:for="{{highFrequencyPracticeLoop.questionBankRecallWorkout.workoutCards}}" wx:key="id">
+            <text>{{item.label}}</text>
+            <text>{{item.action}}</text>
+            <text>{{item.proof}}</text>
+          </view>
+          <view class="high-frequency-item" wx:for="{{highFrequencyPracticeLoop.questionBankRecallWorkout.phases}}" wx:key="id">
+            <text>{{item.label}}</text>
+            <text>{{item.rule}}</text>
+          </view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.questionBankRecallWorkout.parentDecisionLine}}</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.questionBankRecallWorkout.noCramRule}}</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.questionBankRecallWorkout.shareBoundary}}</view>
+        </view>
         <view class="retention-loop-foot">{{highFrequencyPracticeLoop.parentShareLine}}</view>
       </view>
       <view class="next-action-card" wx:if="{{challengeBrief.resultLine}}">
