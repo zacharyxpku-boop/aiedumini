@@ -204,7 +204,12 @@ Page({
         socratic_report_decision: safeDecodeShareParam(query.socratic_report_decision),
         socratic_report_no_increase: safeDecodeShareParam(query.socratic_report_no_increase),
         socratic_report_parent_proof: safeDecodeShareParam(query.socratic_report_parent_proof),
-        socratic_report_boundary: safeDecodeShareParam(query.socratic_report_boundary)
+        socratic_report_boundary: safeDecodeShareParam(query.socratic_report_boundary),
+        tonight_decision: safeDecodeShareParam(query.tonight_decision),
+        tonight_parent_question: safeDecodeShareParam(query.tonight_parent_question),
+        tonight_tomorrow: safeDecodeShareParam(query.tonight_tomorrow),
+        tonight_release_gate: safeDecodeShareParam(query.tonight_release_gate),
+        tonight_share_boundary: safeDecodeShareParam(query.tonight_share_boundary)
       }) : {
         code: query.share,
         share_code: query.share,
@@ -258,6 +263,11 @@ Page({
         socratic_report_no_increase: safeDecodeShareParam(query.socratic_report_no_increase),
         socratic_report_parent_proof: safeDecodeShareParam(query.socratic_report_parent_proof),
         socratic_report_boundary: safeDecodeShareParam(query.socratic_report_boundary),
+        tonight_decision: safeDecodeShareParam(query.tonight_decision),
+        tonight_parent_question: safeDecodeShareParam(query.tonight_parent_question),
+        tonight_tomorrow: safeDecodeShareParam(query.tonight_tomorrow),
+        tonight_release_gate: safeDecodeShareParam(query.tonight_release_gate),
+        tonight_share_boundary: safeDecodeShareParam(query.tonight_share_boundary),
         action_label: query.action === 'wrong_cause_revisit'
           ? '明天先回看这张错因卡'
           : query.action === 'due_card_revisit'
@@ -890,10 +900,20 @@ Page({
     const socraticReportSummary = hasSocraticReport
       ? `这张卡带回点拨质量证据：${incoming.socratic_report_status || '待复核'}。先执行报告里的最小动作，不加题、不看排名。`
       : '';
-    const socraticReportEvidence = incoming.socratic_report_decision || incoming.socratic_report_action || '';
+    const hasTonightDecision = !!(
+      incoming.tonight_decision ||
+      incoming.tonight_parent_question ||
+      incoming.tonight_tomorrow ||
+      incoming.tonight_release_gate ||
+      incoming.tonight_share_boundary
+    );
+    const tonightDecisionSummary = hasTonightDecision
+      ? `这张卡带回一份今晚决策书：${incoming.tonight_decision || '先做一个最小动作'}`
+      : '';
+    const socraticReportEvidence = incoming.tonight_decision || incoming.socratic_report_decision || incoming.socratic_report_action || '';
     return {
       title: '回流接力板',
-      summary: socraticReportSummary || (unitLine ? `这张卡带回一个单元动作：${unitLine}。先复用第一步，不看排名。` : '朋友分享的不是排名，是一个可复用的小动作。先选一条路，按点会留下接力证据。'),
+      summary: tonightDecisionSummary || socraticReportSummary || (unitLine ? `这张卡带回一个单元动作：${unitLine}。先复用第一步，不看排名。` : '朋友分享的不是排名，是一个可复用的小动作。先选一条路，按点会留下接力证据。'),
       evidenceLine: socraticReportEvidence || incoming.course_unit_share_contract || incoming.capability_label || incoming.challenge_goal || actionLabel,
       firstStepLine: `先做第一步：${firstStep}`,
       privacyLine,
@@ -925,6 +945,11 @@ Page({
       socraticReportNoIncreaseLine: incoming.socratic_report_no_increase ? `不加题规则：${incoming.socratic_report_no_increase}` : '',
       socraticReportParentProofLine: incoming.socratic_report_parent_proof ? `家长证据：${incoming.socratic_report_parent_proof}` : '',
       socraticReportBoundaryLine: incoming.socratic_report_boundary ? `分享边界：${incoming.socratic_report_boundary}` : '',
+      tonightDecisionLine: hasTonightDecision && incoming.tonight_decision ? `今晚决策：${incoming.tonight_decision}` : '',
+      tonightParentQuestionLine: hasTonightDecision && incoming.tonight_parent_question ? `家长只问：${incoming.tonight_parent_question}` : '',
+      tonightTomorrowLine: hasTonightDecision && incoming.tonight_tomorrow ? `明天回访：${incoming.tonight_tomorrow}` : '',
+      tonightReleaseGateLine: hasTonightDecision && incoming.tonight_release_gate ? `放行门槛：${incoming.tonight_release_gate}` : '',
+      tonightShareBoundaryLine: hasTonightDecision && incoming.tonight_share_boundary ? `分享边界：${incoming.tonight_share_boundary}` : '',
       returnContractLine: safeRelayPacket
         ? '接力成立条件：自己的第一步、错因回退、明天回访预约都要留下证据。'
         : '接力成立条件：主动回忆、错因回退、明天回访三件事至少完成一件并留下记录。',

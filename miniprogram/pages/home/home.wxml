@@ -418,6 +418,11 @@
         <view class="share-relay-evidence" wx:if="{{incomingShareRelay.socraticReportNoIncreaseLine}}">{{incomingShareRelay.socraticReportNoIncreaseLine}}</view>
         <view class="share-relay-evidence" wx:if="{{incomingShareRelay.socraticReportParentProofLine}}">{{incomingShareRelay.socraticReportParentProofLine}}</view>
         <view class="share-relay-evidence" wx:if="{{incomingShareRelay.socraticReportBoundaryLine}}">{{incomingShareRelay.socraticReportBoundaryLine}}</view>
+        <view class="share-relay-evidence" wx:if="{{incomingShareRelay.tonightDecisionLine}}">{{incomingShareRelay.tonightDecisionLine}}</view>
+        <view class="share-relay-evidence" wx:if="{{incomingShareRelay.tonightParentQuestionLine}}">{{incomingShareRelay.tonightParentQuestionLine}}</view>
+        <view class="share-relay-evidence" wx:if="{{incomingShareRelay.tonightTomorrowLine}}">{{incomingShareRelay.tonightTomorrowLine}}</view>
+        <view class="share-relay-evidence" wx:if="{{incomingShareRelay.tonightReleaseGateLine}}">{{incomingShareRelay.tonightReleaseGateLine}}</view>
+        <view class="share-relay-evidence" wx:if="{{incomingShareRelay.tonightShareBoundaryLine}}">{{incomingShareRelay.tonightShareBoundaryLine}}</view>
         <view class="share-relay-evidence">{{incomingShareRelay.returnContractLine}}</view>
         <view class="share-relay-grid">
           <button

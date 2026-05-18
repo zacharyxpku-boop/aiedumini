@@ -40,8 +40,8 @@ const HINT_LADDER = [
 ];
 
 const TASK_TYPE_RULES = [
-  { id: 'math_word_problem', patterns: /应用题|题目问什么|数量关系|单位1|已知条件|列式|方程|行程|工程|分数应用题/i },
   { id: 'equation_setup', patterns: /方程|等量关系|设x|未知数|列方程|解方程/i },
+  { id: 'math_word_problem', patterns: /应用题|题目问什么|数量关系|单位1|已知条件|列式|行程|工程|分数应用题/i },
   { id: 'reading_question', patterns: /阅读|主旨|细节|原因|段意|中心句|概括/i },
   { id: 'english_sentence', patterns: /英语|单词|语法|句型|主语|谓语|时态|词性/i },
   { id: 'physics_diagram', patterns: /物理|受力|电路|光路|运动|速度|压强|浮力|透镜/i },
@@ -201,6 +201,167 @@ function diagnosticProbe(taskType, level) {
       : ['ask_student_first_step', 'reflect_stuck_point', 'minimal_hint'],
     transferPrompt: normalized >= 5 ? 'make_one_similar_problem_or_review_card' : 'wait_for_student_first_step'
   };
+}
+
+function inferHomeworkPressureSignal(text = '', taskType = 'unknown') {
+  const source = String(text || '');
+  const cases = [
+    {
+      id: 'fraction_part_whole',
+      taskType: 'math_word_problem',
+      patterns: [/三分之|分之|剩.*页|全书|单位1|对应/],
+      firstStep: '先判断题目问整体，再圈出已知量对应整体的哪一份。',
+      wrongCause: '把已知分率和剩余页数的对应关系混在一起。',
+      boardMove: '小黑板只画整体线段和已知那一份，不直接算总量。',
+      parentCheck: '先问：这个数对应整体的哪一份？',
+      reviewMove: '明天换一个剩余页数，只复述“哪一份对应几”。'
+    },
+    {
+      id: 'total_difference_equation',
+      taskType: 'equation_setup',
+      patterns: [/一共|总共|比.*多|比.*少|设x|未知数|方程/],
+      firstStep: '先设较小或未知的一方为 x，再把另一方写成 x 加减差量。',
+      wrongCause: '没有先设清未知数代表谁，直接心算结果。',
+      boardMove: '小黑板只写“乙=x、甲=x+差量、总数=已知”。',
+      parentCheck: '先问：x 代表谁？另一方怎么用 x 表示？',
+      reviewMove: '把总数和差量换掉，仍先写同一个等量关系。'
+    },
+    {
+      id: 'force_friction_diagram',
+      taskType: 'physics_diagram',
+      patterns: [/受力|摩擦|水平|拉动|木块|研究对象/],
+      firstStep: '先定研究对象，再标第一根外力方向。',
+      wrongCause: '没有先确定研究对象和运动趋势。',
+      boardMove: '小黑板只画物体方框和第一根力箭头，让孩子补摩擦方向。',
+      parentCheck: '先问：这题研究谁？摩擦力阻碍什么趋势？',
+      reviewMove: '换一个拉力方向，只判断摩擦方向会不会变。'
+    },
+    {
+      id: 'convex_lens_ray',
+      taskType: 'physics_diagram',
+      patterns: [/凸透镜|焦距|光路|成像|主光轴|两倍焦距/],
+      firstStep: '先标 F 和 2F，再画一条平行主光轴的光线。',
+      wrongCause: '只背成像规律，没有把位置和光路连起来。',
+      boardMove: '小黑板只画主光轴、焦点和第一条入射光线，不直接给像的结论。',
+      parentCheck: '先问：物体在哪个区间？第一条光线怎么走？',
+      reviewMove: '换一个物距区间，仍先标点和画第一条线。'
+    },
+    {
+      id: 'carbonate_gas_test',
+      taskType: 'chemistry_experiment',
+      patterns: [/盐酸|碳酸|气泡|二氧化碳|石灰水|检验/],
+      firstStep: '先列反应前物质，再判断气泡可能对应二氧化碳。',
+      wrongCause: '只记现象，没有把现象和物质变化对应。',
+      boardMove: '小黑板只画“反应物 -> 气体 -> 检验现象”三格。',
+      parentCheck: '先问：气泡说明产生了什么？用什么现象证明？',
+      reviewMove: '换一种碳酸盐，仍先说气体和检验。'
+    },
+    {
+      id: 'indicator_acid_base',
+      taskType: 'chemistry_experiment',
+      patterns: [/酚酞|变红|褪去|酸|碱|中和|溶液/],
+      firstStep: '先判断指示剂颜色对应酸碱性，再看加入物质如何改变酸碱性。',
+      wrongCause: '把指示剂颜色当成要背的现象，没有连接酸碱性。',
+      boardMove: '小黑板只画“碱性 -> 变红 -> 加酸 -> 褪色”的原因链。',
+      parentCheck: '先问：颜色变化对应酸碱性变了，还是物质名字变了？',
+      reviewMove: '换一种指示剂，仍先判断颜色对应酸性还是碱性。'
+    },
+    {
+      id: 'english_past_tense_signal',
+      taskType: 'english_sentence',
+      patterns: [/yesterday|过去时|时态|go|动词|时间信号/i],
+      firstStep: '先圈时间信号，再判断时态。',
+      wrongCause: '没有先看时间词，直接凭语感选动词形式。',
+      boardMove: '小黑板只圈时间词并写时态判断，不直接改完整句。',
+      parentCheck: '先问：这句话的时间词是什么？提示什么时态？',
+      reviewMove: '把时间词换掉，先判断时态是否改变。'
+    },
+    {
+      id: 'reading_mood_change',
+      taskType: 'reading_question',
+      patterns: [/心情|变化|情节复述|人物心情|雨天帮助|故事/],
+      firstStep: '先找表示心情的词，再按前后顺序排变化。',
+      wrongCause: '把情节复述当成答案，没有抓住题目问心情变化。',
+      boardMove: '小黑板只画“开始心情 -> 事件 -> 后来心情”三格。',
+      parentCheck: '先问：题目问情节，还是问心情怎么变？',
+      reviewMove: '换一篇短文，仍先圈心情词。'
+    },
+    {
+      id: 'reading_reason_evidence',
+      taskType: 'reading_question',
+      patterns: [/阅读|原因|because|so|证据句|原文|短文/i],
+      firstStep: '先判断题目问细节、原因还是变化，再回原文找证据句。',
+      wrongCause: '离开原文凭感觉答，没有锚定证据句。',
+      boardMove: '小黑板只画“题目类型 -> 回文定位 -> 证据句”。',
+      parentCheck: '先问：你选项旁边能标出原文哪一句吗？',
+      reviewMove: '换一段短文，仍先找题目类型和证据句。'
+    },
+    {
+      id: 'photosynthesis_columns',
+      taskType: 'biology_process',
+      patterns: [/光合作用|叶绿体|二氧化碳|氧气|原料|产物/],
+      firstStep: '先把条件、场所、原料、产物分成四栏。',
+      wrongCause: '把过程口诀背散了，结构和功能没有连起来。',
+      boardMove: '小黑板只画四栏空格，不直接替孩子填完整答案。',
+      parentCheck: '先问：这是条件、原料、场所还是产物？',
+      reviewMove: '换成呼吸作用，仍先分四栏。'
+    },
+    {
+      id: 'control_variable',
+      taskType: 'biology_process',
+      patterns: [/对照|变量|有光|无光|遮光|唯一不同|实验/],
+      firstStep: '先找两组唯一不同的条件。',
+      wrongCause: '没有分清自变量、因变量和控制变量。',
+      boardMove: '小黑板只画两列并标一个不同点。',
+      parentCheck: '先问：两组除了这个条件，还有什么要保持一样？',
+      reviewMove: '把光照换成水分，仍先找唯一不同条件。'
+    },
+    {
+      id: 'earth_rotation',
+      taskType: 'geography_map',
+      patterns: [/昼夜|自转|公转|太阳|地球|四季/],
+      firstStep: '先判断现象发生在一天内还是一年内。',
+      wrongCause: '把自转、公转对应的现象混淆。',
+      boardMove: '小黑板只画太阳、地球和自转箭头，标昼半球和夜半球。',
+      parentCheck: '先问：一天内变化看自转，还是一年内变化？',
+      reviewMove: '换成四季变化，先判断是否属于公转。'
+    },
+    {
+      id: 'map_scale_unit',
+      taskType: 'geography_map',
+      patterns: [/比例尺|图上距离|实际距离|地图|单位|厘米/],
+      firstStep: '先读比例尺含义，再统一单位。',
+      wrongCause: '没有先看比例尺和单位，直接代数计算。',
+      boardMove: '小黑板只写“图上距离 -> 比例尺 -> 实际距离”，先不算到底。',
+      parentCheck: '先问：图上 1 厘米代表实际多少？单位统一了吗？',
+      reviewMove: '换一个比例尺，仍先说 1 厘米代表什么。'
+    },
+    {
+      id: 'writing_first_sentence',
+      taskType: 'writing_process',
+      patterns: [/作文|开头|难忘|小事|完整篇|第一句/],
+      firstStep: '先写一句最朴素的开头：那天发生了什么。',
+      wrongCause: '想一次写完全文，导致第一句迟迟落不下来。',
+      boardMove: '小黑板只画“时间、地点、人物、事件”四格，不评价文采。',
+      parentCheck: '先问：一句话说发生了什么，不用一开始写漂亮。',
+      reviewMove: '换一个作文题，仍先写一件事的第一句。'
+    }
+  ];
+  const matched = cases.find((item) => item.taskType === taskType && item.patterns.some((pattern) => pattern.test(source)))
+    || cases.find((item) => item.patterns.some((pattern) => pattern.test(source)));
+  if (!matched) {
+    return {
+      id: `generic_${taskType || 'unknown'}`,
+      taskType: taskType || 'unknown',
+      firstStep: TASK_TYPE_PROMPTS[taskType] || TASK_TYPE_PROMPTS.unknown,
+      wrongCause: (MISCONCEPTION_MAP[taskType] && Object.values(MISCONCEPTION_MAP[taskType])[0]) || MISCONCEPTION_MAP.unknown.first_step,
+      boardMove: '小黑板只画第一步入口，不写完整答案。',
+      parentCheck: '家长只问孩子第一步先看哪里。',
+      reviewMove: '明天换一题小变式，只回访同一个第一步。',
+      source: 'generic_task_type'
+    };
+  }
+  return Object.assign({}, matched, { source: 'real_homework_pressure_pattern' });
 }
 
 function buildQuestionTypeSocraticPath(taskType = 'unknown', item = {}, probe = {}) {
@@ -760,6 +921,7 @@ function buildTutorReply(text, options = {}) {
   const currentHintLevel = options.currentHintLevel || 1;
   const selected = options.selected || {};
   const taskType = detectTaskType(text, selected);
+  const homeworkPressureSignal = inferHomeworkPressureSignal(`${text || ''} ${selected.text || ''}`, taskType);
   const target = selected && selected.text ? `「${selected.text}」` : '这道题';
   const taskPrompt = TASK_TYPE_PROMPTS[taskType] || TASK_TYPE_PROMPTS.unknown;
 
@@ -783,6 +945,7 @@ function buildTutorReply(text, options = {}) {
       coach_step_label: stepIntro(item),
       diagnostic_probe: probe,
       question_type_socratic_path: questionTypePath,
+      real_homework_pressure_signal: homeworkPressureSignal,
       question_bank_visual_board_bridge: questionBankVisualBoardBridge,
       socratic_quality_evaluation_suite: socraticQualityEvaluationSuite,
       socratic_prompt_quality_judge: socraticPromptQualityJudge,
@@ -793,7 +956,7 @@ function buildTutorReply(text, options = {}) {
       three_round_socratic_protocol: threeRoundSocraticProtocol,
       allowed_moves: probe.allowedMoves,
       transfer_prompt: probe.transferPrompt,
-      next_action: '先说题目问什么，或者圈出一个已知条件。',
+      next_action: homeworkPressureSignal.firstStep || '先说题目问什么，或者圈出一个已知条件。',
       task_type: taskType,
       first_prompt: taskPrompt,
       mastery_signal: {
@@ -828,9 +991,10 @@ function buildTutorReply(text, options = {}) {
     hint_label: item.label,
     coach_step: item.step,
     coach_step_label: stepIntro(item),
-    diagnostic_probe: probe,
-    question_type_socratic_path: questionTypePath,
-    question_bank_visual_board_bridge: questionBankVisualBoardBridge,
+      diagnostic_probe: probe,
+      question_type_socratic_path: questionTypePath,
+      real_homework_pressure_signal: homeworkPressureSignal,
+      question_bank_visual_board_bridge: questionBankVisualBoardBridge,
     socratic_quality_evaluation_suite: socraticQualityEvaluationSuite,
     socratic_prompt_quality_judge: socraticPromptQualityJudge,
     socratic_contract: socraticContract,
@@ -840,7 +1004,7 @@ function buildTutorReply(text, options = {}) {
     three_round_socratic_protocol: threeRoundSocraticProtocol,
     allowed_moves: probe.allowedMoves,
     transfer_prompt: probe.transferPrompt,
-    next_action: item.level >= 5 ? '把方法做成复习卡或生成一道小变式。' : '先回一句你的第一步。',
+      next_action: item.level >= 5 ? (homeworkPressureSignal.reviewMove || '把方法做成复习卡或生成一道小变式。') : (homeworkPressureSignal.firstStep || '先回一句你的第一步。'),
     task_type: taskType,
     first_prompt: taskPrompt,
     mastery_signal: {
@@ -887,6 +1051,7 @@ module.exports = {
   buildFallbackRecoveryBridge,
   buildThreeRoundSocraticProtocol,
   buildQuestionTypeSocraticPath,
+  inferHomeworkPressureSignal,
   buildQuestionBankVisualBoardBridge,
   buildQuestionTypeCoverageAtlas,
   buildSocraticQualityEvaluationSuite,

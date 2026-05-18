@@ -790,6 +790,73 @@ function buildFamilyDecisionMemo(parts = {}, matrix = [], recommendationPlan = {
   };
 }
 
+function buildTonightDecisionBrief(parts = {}, matrix = [], familyDecision = {}, parentDecisionTrust = {}, questionBankRecallReportBridge = {}, socraticPromptQualityJudge = null) {
+  const diagnosis = Array.isArray(matrix) ? matrix : [];
+  const primary = diagnosis.find((item) => String(item.status || '').indexOf('支持') >= 0) || diagnosis[0] || {};
+  const subject = primary.subject || (familyDecision.decisionCard && familyDecision.decisionCard.subject) || '当前学科';
+  const cause = primary.mainCause || (familyDecision.decisionCard && familyDecision.decisionCard.cause) || '第一步不清';
+  const trustScore = Number(parentDecisionTrust.score || 0);
+  const recallReady = questionBankRecallReportBridge && questionBankRecallReportBridge.status === 'ready';
+  const promptStop = socraticPromptQualityJudge && Array.isArray(socraticPromptQualityJudge.stopConditions)
+    ? socraticPromptQualityJudge.stopConditions.slice(0, 3)
+    : [
+      { id: 'answer_request', label: '孩子继续要答案', action: '停讲完整答案，回到第一步。' },
+      { id: 'repeated_silence', label: '连续沉默', action: '降到 A/B 微选择。' },
+      { id: 'transfer_fail', label: '变式失败', action: '停止加题，明天回访。' }
+    ];
+  const parentRules = socraticPromptQualityJudge && Array.isArray(socraticPromptQualityJudge.parentDecisionRules)
+    ? socraticPromptQualityJudge.parentDecisionRules.slice(0, 4)
+    : [];
+  const actionLevel = trustScore >= 65 && recallReady ? 'can_try_variant' : trustScore >= 40 ? 'action_only' : 'collect_evidence';
+  return {
+    id: 'tonight_decision_brief',
+    title: '今晚决策书',
+    actionLevel,
+    subject,
+    cause,
+    headline: actionLevel === 'can_try_variant'
+      ? `${subject} 可以做 1 张小变式，但必须先复述第一步。`
+      : actionLevel === 'action_only'
+        ? `${subject} 今晚只做一个动作：把「${cause}」退回第一步。`
+        : `${subject} 今晚先收证据，不评价能力，不加题量。`,
+    tonightDo: [
+      `先问：这类题第一步先看哪里？`,
+      `只处理「${cause}」这一处，不扩到整章。`,
+      recallReady ? '完成 1 轮主动回忆，再停。' : '说不出第一步就用 A/B 微选择。'
+    ],
+    tonightDoNot: [
+      '不直接讲完整答案',
+      '不按一次表现贴标签',
+      '不把分享变成排名或晒分'
+    ],
+    parentScript: familyDecision.parentMeetingScript && familyDecision.parentMeetingScript[0]
+      ? familyDecision.parentMeetingScript[0]
+      : '家长只问一句：这一步你准备先看哪里？',
+    childScript: '孩子只需要说出自己的第一步，不需要一次讲完整过程。',
+    stopConditions: promptStop,
+    tomorrowRevisit: questionBankRecallReportBridge && questionBankRecallReportBridge.returnWindowLine
+      ? questionBankRecallReportBridge.returnWindowLine
+      : '明天换一题，只回访同一个第一步。',
+    releaseGate: actionLevel === 'can_try_variant'
+      ? '能复述第一步 + 明天回访通过，才进入小变式。'
+      : '第一步、错因卡、明天回访三项缺一项，就不更新长期画像。',
+    evidenceChecklist: [
+      'child_first_step',
+      'wrong_cause_card',
+      'next_day_revisit',
+      'parent_question_used',
+      'safe_share_boundary'
+    ],
+    parentDecisionRules: parentRules,
+    sharePayload: {
+      allowed_fields: ['subject', 'cause', 'tonight_action', 'parent_question', 'tomorrow_revisit', 'evidence_gap'],
+      blocked_fields: ['original_question', 'full_answer', 'raw_dialogue', 'score', 'ranking', 'child_private_note']
+    },
+    shareLine: '安全接力只带今晚动作、家长问题、明日回访和证据缺口，不带原题、答案、完整对话、分数或排名。',
+    route: '/pages/profile/profile?from=tonight_decision_brief'
+  };
+}
+
 function buildPortraitConfidenceSystem(parts = {}, matrix = [], portrait = {}, classroom = {}, familyDecision = {}) {
   const diagnosis = Array.isArray(matrix) ? matrix : [];
   const subjects = Object.keys(parts.parsedScores || {});
@@ -1344,6 +1411,7 @@ function buildLearningReportDraft(input = {}) {
   const questionBankDecisionBridge = buildQuestionBankDecisionBridge(input, parentDecisionTrustSystem, portraitConfidenceSystem);
   const questionBankRecallReportBridge = buildQuestionBankRecallReportBridge(input, parentDecisionTrustSystem, portraitConfidenceSystem);
   const portraitDecisionReleaseSystem = buildPortraitDecisionReleaseSystem(input, parentDecisionTrustSystem, portraitConfidenceSystem, portraitEvidenceMaturitySystem, questionBankRecallReportBridge);
+  const tonightDecisionBrief = buildTonightDecisionBrief(parts, diagnosisMatrix, familyDecisionMemo, parentDecisionTrustSystem, questionBankRecallReportBridge, input.socraticPromptQualityJudge || null);
   const missing = missingItems(parts);
   const reportDraft = {
     id: input.id || `learning_report_${String(nowIso(input.now)).slice(0, 10).replace(/-/g, '')}`,
@@ -1381,6 +1449,7 @@ function buildLearningReportDraft(input = {}) {
     questionBankDecisionBridge,
     questionBankRecallReportBridge,
     portraitDecisionReleaseSystem,
+    tonightDecisionBrief,
     generatedAt: nowIso(input.now),
     missingItems: missing,
     sourceIntegrity: {
@@ -1420,6 +1489,7 @@ function buildLearningReportDraft(input = {}) {
     questionBankDecisionBridge,
     questionBankRecallReportBridge,
     portraitDecisionReleaseSystem,
+    tonightDecisionBrief,
     reportCompleteness: completeness,
     reportStatus: {
       state: completeness >= 30 ? 'ready' : 'draft',
@@ -1443,6 +1513,8 @@ module.exports = {
   buildLearningReportDraft,
   buildLongTermLearningPortrait,
   buildClassroomDecisionBoard,
+  buildFamilyDecisionMemo,
+  buildTonightDecisionBrief,
   buildPortraitConfidenceSystem,
   buildParentDecisionTrustSystem,
   buildLongitudinalPortraitTimeline,

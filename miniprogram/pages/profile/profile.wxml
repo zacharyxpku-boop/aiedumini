@@ -878,6 +878,20 @@
           <text wx:if="{{learningReportSummary.familyDecisionSevenDayGate}}">7天降级：{{learningReportSummary.familyDecisionSevenDayGate.reduceRule}}</text>
           <text wx:if="{{learningReportSummary.familyDecisionShareLine}}">{{learningReportSummary.familyDecisionShareLine}}</text>
         </view>
+        <view class="parent-brief-block" wx:if="{{learningReportSummary.tonightDecisionBrief}}">
+          <text class="parent-brief-label">{{learningReportSummary.tonightDecisionTitle}}</text>
+          <text>{{learningReportSummary.tonightDecisionHeadline}}</text>
+          <text>家长话术：{{learningReportSummary.tonightDecisionParentScript}}</text>
+          <text>孩子只做：{{learningReportSummary.tonightDecisionChildScript}}</text>
+          <text wx:for="{{learningReportSummary.tonightDecisionDo}}" wx:key="*this">今晚做：{{item}}</text>
+          <text wx:for="{{learningReportSummary.tonightDecisionDoNot}}" wx:key="*this">今晚不做：{{item}}</text>
+          <text wx:for="{{learningReportSummary.tonightDecisionStopConditions}}" wx:key="id">停止条件：{{item.label}}｜{{item.action}}</text>
+          <text wx:for="{{learningReportSummary.tonightDecisionParentRules}}" wx:key="id">家长规则：{{item.label}}｜{{item.rule}}</text>
+          <text>明天回访：{{learningReportSummary.tonightDecisionTomorrowRevisit}}</text>
+          <text>放行门槛：{{learningReportSummary.tonightDecisionReleaseGate}}</text>
+          <text wx:for="{{learningReportSummary.tonightDecisionEvidenceChecklist}}" wx:key="*this">证据：{{item}}</text>
+          <text>{{learningReportSummary.tonightDecisionShareLine}}</text>
+        </view>
         <view class="family-decision-bridge" wx:if="{{learningReportSummary.familyDecisionActionBridge}}">
           <view class="family-decision-bridge-title">{{learningReportSummary.familyDecisionActionBridge.title}}</view>
           <view class="family-decision-bridge-summary">{{learningReportSummary.familyDecisionActionBridge.summary}}</view>
@@ -1173,6 +1187,13 @@
           <view>家长判断：{{dailyShareCard.socraticMemoryRelay.decision}}</view>
           <view>不加题规则：{{dailyShareCard.socraticMemoryRelay.noIncreaseRule}}</view>
           <view>分享边界：{{dailyShareCard.socraticMemoryRelay.shareBoundary}}</view>
+        </view>
+        <view class="share-conversation-card" wx:if="{{dailyShareCard.tonightDecisionRelay}}">
+          <view class="share-conversation-title">{{dailyShareCard.tonightDecisionRelay.title}}</view>
+          <view>{{dailyShareCard.tonightDecisionRelay.headline}}</view>
+          <view>家长只问：{{dailyShareCard.tonightDecisionRelay.parentQuestion}}</view>
+          <view>明天回访：{{dailyShareCard.tonightDecisionRelay.tomorrow}}</view>
+          <view>分享边界：{{dailyShareCard.tonightDecisionRelay.shareLine}}</view>
         </view>
         <view class="share-conversation-card" wx:if="{{dailyShareCard.questionBankShareRelayDeck}}">
           <view class="share-conversation-title">{{dailyShareCard.questionBankShareRelayDeck.title}}</view>

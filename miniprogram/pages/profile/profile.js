@@ -449,13 +449,28 @@ function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCause
   const socraticReportQuery = socraticMemoryRelay
     ? `&socratic_report_status=${encodeURIComponent(socraticMemoryRelay.status)}&socratic_report_action=${encodeURIComponent(socraticMemoryRelay.action)}&socratic_report_decision=${encodeURIComponent(socraticMemoryRelay.decision)}&socratic_report_no_increase=${encodeURIComponent(socraticMemoryRelay.noIncreaseRule)}&socratic_report_parent_proof=${encodeURIComponent(socraticMemoryRelay.parentProof)}&socratic_report_boundary=${encodeURIComponent(socraticMemoryRelay.shareBoundary)}`
     : '';
+  const tonightDecisionRelay = learningReportSummary && learningReportSummary.tonightDecisionBrief
+    ? {
+      title: learningReportSummary.tonightDecisionTitle || '今晚决策书',
+      headline: learningReportSummary.tonightDecisionHeadline || '',
+      parentQuestion: learningReportSummary.tonightDecisionParentScript || '',
+      tomorrow: learningReportSummary.tonightDecisionTomorrowRevisit || '',
+      releaseGate: learningReportSummary.tonightDecisionReleaseGate || '',
+      shareLine: learningReportSummary.tonightDecisionShareLine || '',
+      allowedFields: learningReportSummary.tonightDecisionSharePayload && learningReportSummary.tonightDecisionSharePayload.allowed_fields,
+      blockedFields: learningReportSummary.tonightDecisionSharePayload && learningReportSummary.tonightDecisionSharePayload.blocked_fields
+    }
+    : null;
+  const tonightDecisionQuery = tonightDecisionRelay
+    ? `&tonight_decision=${encodeURIComponent(tonightDecisionRelay.headline)}&tonight_parent_question=${encodeURIComponent(tonightDecisionRelay.parentQuestion)}&tonight_tomorrow=${encodeURIComponent(tonightDecisionRelay.tomorrow)}&tonight_release_gate=${encodeURIComponent(tonightDecisionRelay.releaseGate)}&tonight_share_boundary=${encodeURIComponent(tonightDecisionRelay.shareLine)}`
+    : '';
   const courseUnitDecision = buildCourseUnitDecisionBoard(courseUnitMap);
   const courseUnitQuery = courseUnitDecision
     ? `&course_unit_label=${encodeURIComponent(courseUnitDecision.unitLabel || '')}&course_unit_subject=${encodeURIComponent(courseUnitDecision.subjectLabel || '')}&course_unit_tier=${encodeURIComponent(courseUnitDecision.tier || '')}&course_unit_parent_decision=${encodeURIComponent(courseUnitDecision.parentTonightDecision || '')}&course_unit_report_contract=${encodeURIComponent(courseUnitDecision.reportContract || '')}&course_unit_share_contract=${encodeURIComponent(courseUnitDecision.shareContract || '')}&course_unit_blackboard=${encodeURIComponent(courseUnitDecision.blackboardLine || '')}&course_unit_recall_route=${encodeURIComponent(courseUnitDecision.recallRoute || '')}&course_unit_game_route=${encodeURIComponent(courseUnitDecision.gameRoute || '')}`
     : '';
-  const path = `/pages/home/home?share=${code}&from=daily_card&challenge=arcade&mode=same_identity&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}${courseUnitQuery}${socraticReportQuery}${questionBankRelayQuery}${visualRelayQuery}`;
-  const parentPath = `/pages/home/home?share=${code}&from=parent_card&mode=parent_recap&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}${courseUnitQuery}${socraticReportQuery}${questionBankRelayQuery}${visualRelayQuery}`;
-  const peerPath = `/pages/home/home?share=${code}&from=peer_challenge&challenge=arcade&mode=same_identity&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}${courseUnitQuery}${socraticReportQuery}${questionBankRelayQuery}${visualRelayQuery}`;
+  const path = `/pages/home/home?share=${code}&from=daily_card&challenge=arcade&mode=same_identity&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}${courseUnitQuery}${socraticReportQuery}${tonightDecisionQuery}${questionBankRelayQuery}${visualRelayQuery}`;
+  const parentPath = `/pages/home/home?share=${code}&from=parent_card&mode=parent_recap&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}${courseUnitQuery}${socraticReportQuery}${tonightDecisionQuery}${questionBankRelayQuery}${visualRelayQuery}`;
+  const peerPath = `/pages/home/home?share=${code}&from=peer_challenge&challenge=arcade&mode=same_identity&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}${courseUnitQuery}${socraticReportQuery}${tonightDecisionQuery}${questionBankRelayQuery}${visualRelayQuery}`;
   const parentShareTitle = todayFocus && todayFocus.title
     ? `今晚先看这一处：${storage.formatIssueType(todayFocus.issueType || '卡点')} · ${todayFocus.title}`
     : '给家里看的今日学习复盘';
@@ -527,6 +542,7 @@ function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCause
     },
     shareChallengePlan,
     socraticMemoryRelay,
+    tonightDecisionRelay,
     questionBankShareRelayDeck,
     questionBankVisualShareRelayDeck,
     familyActionCard: {
@@ -633,6 +649,14 @@ function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCause
       socratic_report_decision: socraticMemoryRelay && socraticMemoryRelay.decision,
       socratic_report_no_increase: socraticMemoryRelay && socraticMemoryRelay.noIncreaseRule,
       socratic_report_boundary: socraticMemoryRelay && socraticMemoryRelay.shareBoundary,
+      tonight_decision_title: tonightDecisionRelay && tonightDecisionRelay.title,
+      tonight_decision_headline: tonightDecisionRelay && tonightDecisionRelay.headline,
+      tonight_parent_question: tonightDecisionRelay && tonightDecisionRelay.parentQuestion,
+      tonight_tomorrow_revisit: tonightDecisionRelay && tonightDecisionRelay.tomorrow,
+      tonight_release_gate: tonightDecisionRelay && tonightDecisionRelay.releaseGate,
+      tonight_share_boundary: tonightDecisionRelay && tonightDecisionRelay.shareLine,
+      tonight_allowed_fields: tonightDecisionRelay && tonightDecisionRelay.allowedFields,
+      tonight_blocked_fields: tonightDecisionRelay && tonightDecisionRelay.blockedFields,
       question_bank_relay_label: activeRelayCard && activeRelayCard.label,
       question_bank_relay_first_step: activeRelayCard && activeRelayCard.firstStep,
       question_bank_relay_parent_check: activeRelayCard && activeRelayCard.parentCheck,
@@ -898,6 +922,16 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
   const socraticPromptQualityJudge = latestThinkingReceipt && (latestThinkingReceipt.socratic_prompt_quality_judge || latestThinkingReceipt.socraticPromptQualityJudge)
     ? (latestThinkingReceipt.socratic_prompt_quality_judge || latestThinkingReceipt.socraticPromptQualityJudge)
     : null;
+  const tonightDecisionBrief = draft.tonightDecisionBrief || (learningReport.buildTonightDecisionBrief
+    ? learningReport.buildTonightDecisionBrief(
+      reportState || {},
+      reportState.diagnosisMatrix || draft.diagnosisMatrix || [],
+      familyDecisionMemo,
+      parentDecisionTrustSystem,
+      questionBankRecallReportBridge,
+      socraticPromptQualityJudge
+    )
+    : null);
   return {
     title: draft.title || '学习画像',
     modeLabel: reportState.reportProgress && reportState.reportProgress.label ? reportState.reportProgress.label : '0% · 快速版',
@@ -1189,6 +1223,23 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     familyDecisionParentActionLadder: Array.isArray(familyDecisionMemo.parentActionLadder) ? familyDecisionMemo.parentActionLadder : [],
     familyDecisionSevenDayGate: familyDecisionMemo.sevenDayDecisionGate || null,
     familyDecisionShareLine: familyDecisionMemo.shareLine || '',
+    tonightDecisionBrief,
+    tonightDecisionTitle: tonightDecisionBrief ? tonightDecisionBrief.title : '',
+    tonightDecisionHeadline: tonightDecisionBrief ? tonightDecisionBrief.headline : '',
+    tonightDecisionActionLevel: tonightDecisionBrief ? tonightDecisionBrief.actionLevel : '',
+    tonightDecisionSubject: tonightDecisionBrief ? tonightDecisionBrief.subject : '',
+    tonightDecisionCause: tonightDecisionBrief ? tonightDecisionBrief.cause : '',
+    tonightDecisionDo: tonightDecisionBrief && Array.isArray(tonightDecisionBrief.tonightDo) ? tonightDecisionBrief.tonightDo : [],
+    tonightDecisionDoNot: tonightDecisionBrief && Array.isArray(tonightDecisionBrief.tonightDoNot) ? tonightDecisionBrief.tonightDoNot : [],
+    tonightDecisionStopConditions: tonightDecisionBrief && Array.isArray(tonightDecisionBrief.stopConditions) ? tonightDecisionBrief.stopConditions : [],
+    tonightDecisionEvidenceChecklist: tonightDecisionBrief && Array.isArray(tonightDecisionBrief.evidenceChecklist) ? tonightDecisionBrief.evidenceChecklist : [],
+    tonightDecisionParentRules: tonightDecisionBrief && Array.isArray(tonightDecisionBrief.parentDecisionRules) ? tonightDecisionBrief.parentDecisionRules : [],
+    tonightDecisionParentScript: tonightDecisionBrief ? tonightDecisionBrief.parentScript : '',
+    tonightDecisionChildScript: tonightDecisionBrief ? tonightDecisionBrief.childScript : '',
+    tonightDecisionTomorrowRevisit: tonightDecisionBrief ? tonightDecisionBrief.tomorrowRevisit : '',
+    tonightDecisionReleaseGate: tonightDecisionBrief ? tonightDecisionBrief.releaseGate : '',
+    tonightDecisionShareLine: tonightDecisionBrief ? tonightDecisionBrief.shareLine : '',
+    tonightDecisionSharePayload: tonightDecisionBrief ? tonightDecisionBrief.sharePayload : null,
     familyDecisionActionBridge,
     parentScript: solutionMap.parentScript || plan.parentLine || '家长先问一句：这一步你准备先看哪里？',
     childScript: solutionMap.childScript || plan.childLine || '我先说出第一步。',
