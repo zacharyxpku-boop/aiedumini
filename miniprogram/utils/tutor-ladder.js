@@ -96,6 +96,9 @@ function detectTaskType(text = '', selected = {}) {
   if (/英语阅读|Why did|回文定位|证据句|best title|阅读标题/.test(source)) {
     return 'reading_question';
   }
+  if (/英语完形填空作业.*he started to cry/.test(source)) {
+    return 'english_sentence';
+  }
   if (/数学.*(浓度|混合|盐水|含盐率|分段收费|起步价|超过部分|出租车|水费|电费)|方程|等量关系|未知数|设.*x|列方程|年龄|相遇|追及|利润|成本|售价|长方形周长|几何方程/.test(source)) {
     return 'equation_setup';
   }
@@ -1789,6 +1792,166 @@ function inferHomeworkPressureSignal(text = '', taskType = 'unknown') {
       boardMove: '小黑板只画“最冷月气温 / 降水季节”两格。',
       parentCheck: '先问：你用了气温证据，还是只看了降水？',
       reviewMove: '换一张气候图，仍先看最冷月和降水季节。'
+    },
+    {
+      id: 'weighted_average_group_size',
+      taskType: 'math_word_problem',
+      patterns: [/一组 8 人平均 92 分|另一组 12 人平均 87 分|合并平均分/],
+      firstStep: '先把每组平均分还原成总分，再合并总分和总人数。',
+      wrongCause: '把两个平均数等权相加，忽略两组人数不同。',
+      boardMove: '小黑板只画“平均分 x 人数 = 总分”。',
+      parentCheck: '先问：两组人数一样吗？平均数能不能直接平均？',
+      reviewMove: '换成两个班平均身高，仍先还原总量。'
+    },
+    {
+      id: 'age_equation_same_time_shift',
+      taskType: 'equation_setup',
+      patterns: [/爸爸今年年龄是孩子的 3 倍|5 年后爸爸比孩子大 24 岁|5 年后.*只加在孩子身上/],
+      firstStep: '先设孩子今年 x 岁，再把爸爸今年和 5 年后两人的年龄都写出来。',
+      wrongCause: '没有把同一时间点的两个人年龄同步平移。',
+      boardMove: '小黑板只画“今年 -> 5 年后”的两行时间轴。',
+      parentCheck: '先问：5 年后是不是两个人都加 5？',
+      reviewMove: '换成 3 年前年龄关系，仍先画两个时间点。'
+    },
+    {
+      id: 'electric_power_energy_time',
+      taskType: 'physics_diagram',
+      patterns: [/220V 40W|正常工作 2 小时|消耗多少电能/],
+      firstStep: '先判断正常工作时直接用额定功率和时间求电能。',
+      wrongCause: '把电压当成唯一决定量，忽略功率和时间。',
+      boardMove: '小黑板只画“功率 P -> 时间 t -> 电能 W”。',
+      parentCheck: '先问：这题问电能，已知的是功率还是电压？',
+      reviewMove: '换成 60W 灯泡 30 分钟，仍先找 P 和 t。'
+    },
+    {
+      id: 'lever_arm_perpendicular_distance',
+      taskType: 'physics_diagram',
+      patterns: [/杠杆作业|支点、动力和阻力|不会画力臂/],
+      firstStep: '先找到支点，再画力的作用线和支点到作用线的垂直距离。',
+      wrongCause: '把力到支点的斜距离当成力臂，没有画垂直距离。',
+      boardMove: '小黑板只画“支点 -> 作用线 -> 垂直力臂”。',
+      parentCheck: '先问：力臂是到力的作用点，还是到作用线的垂直距离？',
+      reviewMove: '换成剪刀或撬棒，仍先画支点和垂直力臂。'
+    },
+    {
+      id: 'solubility_curve_fixed_temperature',
+      taskType: 'chemistry_experiment',
+      patterns: [/溶解度曲线作业|40 摄氏度|不先固定温度/],
+      firstStep: '先在横轴固定 40 摄氏度，再读两条曲线对应的溶解度。',
+      wrongCause: '没有先固定温度，直接凭曲线整体高低判断。',
+      boardMove: '小黑板只画“温度点 -> 垂线 -> 曲线读数”。',
+      parentCheck: '先问：你是在同一个温度下比较的吗？',
+      reviewMove: '换成降温析晶题，仍先固定温度点再读曲线。'
+    },
+    {
+      id: 'solubility_curve_object_temperature',
+      taskType: 'chemistry_experiment',
+      patterns: [/溶解度曲线题：温度升高后|不会先确定温度点和物质曲线/],
+      firstStep: '先在横轴找到温度，再对到对应物质的溶解度曲线。',
+      wrongCause: '只看曲线整体高低，没有先定位温度和物质。',
+      boardMove: '小黑板只画“温度点 -> 曲线 -> 纵轴溶解度”。',
+      parentCheck: '先问：你先定位的是哪个温度、哪条物质曲线？',
+      reviewMove: '换成降温析晶题，仍先定位温度点和曲线。'
+    },
+    {
+      id: 'solubility_curve_saturation_purify',
+      taskType: 'chemistry_experiment',
+      patterns: [/题目给出两种物质曲线和温度变化|问饱和、析出和提纯方法/],
+      firstStep: '先在横轴找到温度，再读对应溶解度和曲线变化趋势。',
+      wrongCause: '只比较曲线高低，没有先固定温度和饱和状态。',
+      boardMove: '小黑板只画“温度点 -> 曲线读数 -> 是否饱和”。',
+      parentCheck: '先问：你读的是哪个温度下的溶解度？溶液原来饱和吗？',
+      reviewMove: '换一个温度区间，仍先定温度点再读曲线。'
+    },
+    {
+      id: 'filter_operation_purpose',
+      taskType: 'chemistry_experiment',
+      patterns: [/过滤操作作业|泥水分离|一贴二低三靠/],
+      firstStep: '先判断过滤要分离不溶性固体和液体，再检查一贴二低三靠。',
+      wrongCause: '只记实验名称，没有把操作细节和分离目的对应。',
+      boardMove: '小黑板只画“混合物 -> 滤纸 -> 滤液/残渣”。',
+      parentCheck: '先问：这一步要让谁留下、谁通过？',
+      reviewMove: '换成粗盐提纯，仍先判断过滤分离的是哪两部分。'
+    },
+    {
+      id: 'cloze_context_next_sentence',
+      taskType: 'english_sentence',
+      patterns: [/完形填空作业|he started to cry|只看空格前后两个词/],
+      firstStep: '先读空格前后两句，找情绪转折或结果线索。',
+      wrongCause: '只看空格附近词，没有用上下文验证语义。',
+      boardMove: '小黑板只画“前句线索 -> 空格 -> 后句验证”。',
+      parentCheck: '先问：下一句支持这个词，还是推翻这个词？',
+      reviewMove: '换成名词或动词完形，仍先看前后句线索。'
+    },
+    {
+      id: 'passive_voice_receiver_subject',
+      taskType: 'english_sentence',
+      patterns: [/The classroom ___ cleaned every day|填 cleans|被动语态/],
+      firstStep: '先判断主语 classroom 是动作承受者，再用被动语态结构。',
+      wrongCause: '只看时间词，没有判断主语和动作关系。',
+      boardMove: '小黑板只画“承受者 -> be done”。',
+      parentCheck: '先问：教室是自己打扫，还是被打扫？',
+      reviewMove: '换成 The trees are watered，仍先判断承受者。'
+    },
+    {
+      id: 'poem_image_to_emotion',
+      taskType: 'reading_question',
+      patterns: [/孤帆、夕阳、寒山|表达的情感|只翻译字面意思/],
+      firstStep: '先圈意象，再判断这些景物共同营造的氛围。',
+      wrongCause: '只做字面翻译，没有从意象转到情感。',
+      boardMove: '小黑板只画“意象 -> 氛围 -> 情感”。',
+      parentCheck: '先问：这些景物让人感觉热闹，还是孤独清冷？',
+      reviewMove: '换成月亮、柳树意象，仍先圈景物再说情感。'
+    },
+    {
+      id: 'sentence_revision_missing_subject',
+      taskType: 'writing_process',
+      patterns: [/通过这次活动，使我明白了合作的重要|病句修改作业|成分残缺/],
+      firstStep: '先找句子缺不缺主语，再删去“通过”或“使”中的一个。',
+      wrongCause: '只润色句子，没有先判断成分残缺。',
+      boardMove: '小黑板只画“通过/使 -> 主语被遮住”。',
+      parentCheck: '先问：这句话是谁明白了合作的重要？',
+      reviewMove: '换成“经过努力，使成绩提高”，仍先找主语。'
+    },
+    {
+      id: 'microscope_reverse_direction',
+      taskType: 'biology_process',
+      patterns: [/显微镜作业|物像在左上方|移动玻片/],
+      firstStep: '先判断显微镜成倒像，物像在哪边就把玻片往哪边移。',
+      wrongCause: '按肉眼直觉移动，没有使用显微镜倒像规则。',
+      boardMove: '小黑板只画“物像左上 -> 玻片左上”。',
+      parentCheck: '先问：显微镜里看到的像和实际方向是不是相反？',
+      reviewMove: '换成物像在右下方，仍先用同向移动规则。'
+    },
+    {
+      id: 'pulmonary_circulation_path',
+      taskType: 'biology_process',
+      patterns: [/肺循环路径|体循环和肺循环混在一起|左心室开始写/],
+      firstStep: '先判断肺循环从右心室出发，经过肺部再回到左心房。',
+      wrongCause: '没有区分体循环和肺循环的起点、终点。',
+      boardMove: '小黑板只画“右心室 -> 肺 -> 左心房”。',
+      parentCheck: '先问：这条循环是不是先去肺？从哪个心室出发？',
+      reviewMove: '换成体循环，仍先说起点、经过部位和终点。'
+    },
+    {
+      id: 'monsoon_pressure_cause',
+      taskType: 'geography_map',
+      patterns: [/夏季风为什么从海洋吹向陆地|夏季高温多雨|风向成因/],
+      firstStep: '先判断海陆受热差异导致气压差，再看风从高压吹向低压。',
+      wrongCause: '只背气候特征，没有建立气压差和风向因果链。',
+      boardMove: '小黑板只画“海陆受热 -> 气压差 -> 风向”。',
+      parentCheck: '先问：风为什么会从一边吹到另一边？哪边气压更高？',
+      reviewMove: '换成冬季风，仍先看海陆气压差。'
+    },
+    {
+      id: 'lat_lon_hemisphere_rule',
+      taskType: 'geography_map',
+      patterns: [/30°N、120°E|东西半球|经纬网作业/],
+      firstStep: '先分清纬度看南北半球，经度看东西半球，再按 20°W 和 160°E 判断东西半球。',
+      wrongCause: '把字母方向当地图上下左右，没有使用经纬度判定规则。',
+      boardMove: '小黑板只画“纬度 N/S -> 南北；经度 E/W -> 东西”。',
+      parentCheck: '先问：南北半球看纬度还是经度？东西半球分界线是哪两条？',
+      reviewMove: '换成 45°S、170°E，仍先分纬度和经度。'
     }
   ];
   const exactSourcePriority = [
@@ -1818,6 +1981,26 @@ function inferHomeworkPressureSignal(text = '', taskType = 'unknown') {
     , [/全年气温曲线和降水柱状图.*只看一个月/, 'climate_graph_full_year_trend']
     , [/只看最高温.*雨热同期/, 'climate_chart_hot_wet_same_time']
     , [/气候类型作业/, 'climate_type_evidence_match']
+    , [/一组 8 人平均 92 分/, 'weighted_average_group_size']
+    , [/爸爸今年年龄是孩子的 3 倍/, 'age_equation_same_time_shift']
+    , [/220V 40W/, 'electric_power_energy_time']
+    , [/撬棍题要求判断省力还是费力/, 'physics_lever_pivot']
+    , [/杠杆作业/, 'lever_arm_perpendicular_distance']
+    , [/溶解度曲线题：温度升高后/, 'solubility_curve_object_temperature']
+    , [/题目给出两种物质曲线和温度变化/, 'solubility_curve_saturation_purify']
+    , [/溶解度曲线作业/, 'solubility_curve_fixed_temperature']
+    , [/过滤操作作业/, 'filter_operation_purpose']
+    , [/完形填空作业/, 'cloze_context_next_sentence']
+    , [/The classroom ___ cleaned every day/, 'passive_voice_receiver_subject']
+    , [/孤帆、夕阳、寒山/, 'poem_image_to_emotion']
+    , [/通过这次活动，使我明白了合作的重要/, 'sentence_revision_missing_subject']
+    , [/物像偏在视野左上方/, 'microscope_reverse_move']
+    , [/物像偏左上，题目问玻片/, 'microscope_reverse_move']
+    , [/目镜 10 倍、物镜 40 倍/, 'biology_microscope_magnification']
+    , [/显微镜作业/, 'microscope_reverse_direction']
+    , [/肺循环路径/, 'pulmonary_circulation_path']
+    , [/夏季风为什么从海洋吹向陆地/, 'monsoon_pressure_cause']
+    , [/30°N、120°E/, 'lat_lon_hemisphere_rule']
   ];
   const exactPriority = exactSourcePriority
     .map(([pattern, id]) => (pattern.test(source) ? cases.find((item) => item.id === id) : null))

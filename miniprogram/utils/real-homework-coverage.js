@@ -1,23 +1,23 @@
 const SUBJECT_COUNTS = [
-  { id: 'math', label: '数学', count: 35, nextGap: '比例、百分数、几何角、函数图像、统计平均数、概率、浓度/分段收费/年龄/行程/利润/几何方程继续补跨学科词面误判样本。' },
-  { id: 'physics', label: '物理', count: 23, nextGap: '受力、光路、电路、浮力、压强、电路故障、杠杆、电功率、热传递、状态变化和图像题继续补真实卡点。' },
-  { id: 'chemistry', label: '化学', count: 25, nextGap: '实验现象、气体验证、溶液、守恒、微粒观、酸碱指示剂、变量控制、开放体系、反应速率、溶解度曲线、离子检验继续拆错因。' },
-  { id: 'english', label: '英语', count: 26, nextGap: '语法信号、比较级、被动语态、定语从句、非谓语、状语从句、完形上下文、阅读推断、标题题和逻辑连词继续扩样。' },
-  { id: 'biology', label: '生物', count: 23, nextGap: '显微镜、遗传、生态系统成分、呼吸作用、人体循环、血糖调节、反射弧和能量流动继续验证小黑板边界。' },
-  { id: 'geography', label: '地理', count: 25, nextGap: '经纬网、等高线、气候图、气候类型、交通/农业/工业区位、地球运动、季风成因继续验证空间误判。' },
-  { id: 'chinese', label: '语文', count: 33, nextGap: '阅读概括、古诗意象、说明方法、说明顺序、文言虚词、句式转换、写作起步、段落中心、选材、结尾照应、细节描写和单句修改继续压测。' }
+  { id: 'math', label: '数学', count: 37, nextGap: '比例、百分数、几何角、函数图像、统计平均数、概率、浓度/分段收费/年龄/行程/利润/几何方程继续补跨学科词面误判样本。' },
+  { id: 'physics', label: '物理', count: 25, nextGap: '受力、光路、电路、浮力、压强、电路故障、杠杆、电功率、热传递、状态变化和图像题继续补真实卡点。' },
+  { id: 'chemistry', label: '化学', count: 27, nextGap: '实验现象、气体验证、溶液、守恒、微粒观、酸碱指示剂、变量控制、开放体系、反应速率、溶解度曲线、过滤操作、离子检验继续拆错因。' },
+  { id: 'english', label: '英语', count: 28, nextGap: '语法信号、比较级、被动语态、定语从句、非谓语、状语从句、完形上下文、阅读推断、标题题和逻辑连词继续扩样。' },
+  { id: 'biology', label: '生物', count: 25, nextGap: '显微镜、遗传、生态系统成分、呼吸作用、人体循环、血糖调节、反射弧和能量流动继续验证小黑板边界。' },
+  { id: 'geography', label: '地理', count: 27, nextGap: '经纬网、等高线、气候图、气候类型、交通/农业/工业区位、地球运动、季风成因继续验证空间误判。' },
+  { id: 'chinese', label: '语文', count: 35, nextGap: '阅读概括、古诗意象、说明方法、说明顺序、文言虚词、句式转换、写作起步、段落中心、选材、结尾照应、细节描写、病句修改继续压测。' }
 ];
 
 const TYPE_COUNTS = [
-  { id: 'math_word_problem', label: '数学应用/建模', count: 24, firstStep: '先翻译数量关系、图形关系、变化基准、统计总量、概率分母、比例份数或函数坐标。' },
-  { id: 'equation_setup', label: '方程/不等式建模', count: 11, firstStep: '先设未知数、写等量关系，或拆浓度、分段收费、不等式变形规则。' },
-  { id: 'physics_diagram', label: '物理图解', count: 23, firstStep: '先定对象、方向、单位、路径、力臂、受力面积、电表位置、热量方向、状态变化或决定量。' },
-  { id: 'chemistry_experiment', label: '化学实验/变化', count: 25, firstStep: '先列反应物、现象、体系边界、微粒解释、守恒关系、唯一变量、酸碱性质、过滤条件、曲线定位和检验试剂。' },
-  { id: 'english_sentence', label: '英语句法/上下文', count: 18, firstStep: '先找时态、主语、比较、被动、先行词、目的关系、逻辑连词或上下文信号。' },
-  { id: 'reading_question', label: '阅读证据', count: 29, firstStep: '先判断题目类型，再回文定位证据、意象、说明方法、文言功能、说明顺序、标题中心或推断行为。' },
-  { id: 'biology_process', label: '生物过程', count: 23, firstStep: '先分结构、功能、方向、变量、能量流动、生态角色、调节路径、过程条件或循环路径。' },
-  { id: 'geography_map', label: '地理图示', count: 25, firstStep: '先看图例、方向、经纬、海拔、等高线形态、气候证据、区位条件、水汽来源或成因链。' },
-  { id: 'writing_process', label: '写作过程', count: 12, firstStep: '先写一句朴素事实、段落中心、一个可见细节、结尾照应或选一个核心材料，不追求完整成文。' }
+  { id: 'math_word_problem', label: '数学应用/建模', count: 25, firstStep: '先翻译数量关系、图形关系、变化基准、统计总量、概率分母、比例份数或函数坐标。' },
+  { id: 'equation_setup', label: '方程/不等式建模', count: 12, firstStep: '先设未知数、写等量关系，或拆浓度、分段收费、不等式变形规则、同步时间点。' },
+  { id: 'physics_diagram', label: '物理图解', count: 25, firstStep: '先定对象、方向、单位、路径、力臂、受力面积、电表位置、热量方向、状态变化或决定量。' },
+  { id: 'chemistry_experiment', label: '化学实验/变化', count: 27, firstStep: '先列反应物、现象、体系边界、微粒解释、守恒关系、唯一变量、酸碱性质、过滤条件、曲线定位和检验试剂。' },
+  { id: 'english_sentence', label: '英语句法/上下文', count: 20, firstStep: '先找时态、主语、比较、被动、先行词、目的关系、逻辑连词或上下文信号。' },
+  { id: 'reading_question', label: '阅读证据', count: 30, firstStep: '先判断题目类型，再回文定位证据、意象、说明方法、文言功能、说明顺序、标题中心或推断行为。' },
+  { id: 'biology_process', label: '生物过程', count: 25, firstStep: '先分结构、功能、方向、变量、能量流动、生态角色、调节路径、过程条件或循环路径。' },
+  { id: 'geography_map', label: '地理图示', count: 27, firstStep: '先看图例、方向、经纬、海拔、等高线形态、气候证据、区位条件、水汽来源或成因链。' },
+  { id: 'writing_process', label: '写作过程', count: 13, firstStep: '先写一句朴素事实、段落中心、一个可见细节、结尾照应、修改成分残缺或选一个核心材料，不追求完整成文。' }
 ];
 
 const SAMPLE_CLUSTERS = [
