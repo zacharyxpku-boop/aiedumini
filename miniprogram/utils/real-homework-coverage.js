@@ -260,6 +260,93 @@ const PUBLIC_K12_ASSET_PIPELINE = [
   }
 ];
 
+const PUBLIC_K12_CANDIDATE_POOL = [
+  {
+    id: 'moe_2022_math_quantity_relation',
+    sourceFamily: '课程标准/教学目标',
+    qualityTier: 'A',
+    usableAs: ['能力轴', '题型簇', '报告维度'],
+    localCodeFit: ['math_word_problem', 'equation_setup', 'mastery_gate'],
+    aiFit: ['把数量关系入口改写成追问'],
+    rejectIf: ['出现教材整段原文', '出现标准答案', '只有知识点没有任务动作'],
+    sampleSeed: '分数、百分数、比例、方程先找“谁和谁的关系”。',
+    miniappLanding: ['/pages/tutor/tutor', '/pages/profile/profile'],
+    nextAction: '继续拆成数量关系、方程建模、函数图像三组压力样本。'
+  },
+  {
+    id: 'smartedu_daily_homework_pressure',
+    sourceFamily: '基础性作业/课堂练习风格',
+    qualityTier: 'A',
+    usableAs: ['真实作业压力样本', '家长检查句', '回访卡'],
+    localCodeFit: ['wrong_cause_signal', 'first_step_rule', 'revisit_window'],
+    aiFit: ['换一种不责备的提示语气'],
+    rejectIf: ['需要搬运原题全文', '需要输出完整题解', '题干含学生隐私'],
+    sampleSeed: '把日常作业题转写成“孩子卡在哪个第一步”。',
+    miniappLanding: ['/pages/home/home', '/pages/review/review', '/pages/arcade/arcade'],
+    nextAction: '优先补语数英物化生地每天作业最常见卡点。'
+  },
+  {
+    id: 'public_exam_archetype_transfer',
+    sourceFamily: '公开考试题型/学业水平题型',
+    qualityTier: 'B',
+    usableAs: ['变式迁移', '干扰项压力测试', '小黑板第一笔'],
+    localCodeFit: ['variant_unlock_gate', 'transfer_ladder', 'board_move'],
+    aiFit: ['解释为什么新题面还是同一错因'],
+    rejectIf: ['押题承诺', '分数预测', '原题答案索引'],
+    sampleSeed: '只抽题型结构和干扰项，不抽原题答案。',
+    miniappLanding: ['/pages/tutor/tutor', '/pages/arcade/arcade', '/pages/radar/radar'],
+    nextAction: '补“同错因换题面”的迁移压测，而不是补标准答案。'
+  },
+  {
+    id: 'family_first_party_recurrence',
+    sourceFamily: '家庭一方输入',
+    qualityTier: 'A+',
+    usableAs: ['长期证据账本', '跨周趋势', '家校摘要'],
+    localCodeFit: ['confidence_threshold', 'privacy_trim', 'overdiagnosis_lock'],
+    aiFit: ['把证据翻译成家长能执行的一句话'],
+    rejectIf: ['完整对话公开', '原题照片公开', '分数排名公开'],
+    sampleSeed: '孩子连续两天卡在同一错因，才进入跨周趋势候选。',
+    miniappLanding: ['/pages/profile/profile', '/pages/home/home'],
+    nextAction: '优先积累第一步原话、错因复述、明天回访、第 7 天迁移。'
+  },
+  {
+    id: 'qwen_visual_blackboard_observation',
+    sourceFamily: '竞品机制观察',
+    qualityTier: 'B',
+    usableAs: ['视觉解释模式', '小黑板边界', '用户期待校准'],
+    localCodeFit: ['first_step_blackboard', 'visual_boundary', 'exit_criteria'],
+    aiFit: ['解释为什么先画这一笔'],
+    rejectIf: ['承诺全科动态板书', '假装拍题识别', '输出完整板书答案'],
+    sampleSeed: '借鉴“画着讲”的期待，但只落成第一步小黑板。',
+    miniappLanding: ['/pages/tutor/tutor', '/pages/profile/profile'],
+    nextAction: '每个题型只补第一笔图解和退出条件。'
+  },
+  {
+    id: 'gizmo_recall_mechanic_observation',
+    sourceFamily: '竞品机制观察',
+    qualityTier: 'B',
+    usableAs: ['高频记忆循环', '主动回忆', '复习召回'],
+    localCodeFit: ['spaced_recall_policy', 'xp_hold_rule', 'leech_rule'],
+    aiFit: ['把复习提醒写得不枯燥'],
+    rejectIf: ['排行榜刺激', '分数攀比', 'AI 直接发奖励'],
+    sampleSeed: '借鉴高频回忆机制，但 XP 和解锁必须本地规则决定。',
+    miniappLanding: ['/pages/arcade/arcade', '/pages/review/review'],
+    nextAction: '继续压每日 90 秒微回忆和错因复现。'
+  },
+  {
+    id: 'teacher_wrong_cause_language',
+    sourceFamily: '课堂/作业错因观察',
+    qualityTier: 'A',
+    usableAs: ['家校沟通包', '老师可观察问题', '过度诊断拦截'],
+    localCodeFit: ['teacher_safe_fields', 'recurrence_count', 'day7_transfer_check'],
+    aiFit: ['把沟通摘要改写成不指责孩子'],
+    rejectIf: ['人格判断', '长期能力标签', '老师重点盯防', '同学比较'],
+    sampleSeed: '把“孩子不认真”改写成“卡在审题、第一步、错因复现还是迁移”。',
+    miniappLanding: ['/pages/profile/profile', '/pages/review/review'],
+    nextAction: '把家校摘要固定成问题清单，不做诊断结论。'
+  }
+];
+
 const PUBLIC_K12_USE_WORKBENCH = [
   {
     id: 'curriculum_standard_spine',
@@ -642,11 +729,13 @@ function buildRealHomeworkCoverageMatrix(options = {}) {
     publicSourceLedger: PUBLIC_K12_SOURCE_LEDGER,
     publicSourcePolicy: PUBLIC_K12_USE_POLICY,
     publicK12AssetPipeline: PUBLIC_K12_ASSET_PIPELINE,
+    publicK12CandidatePool: PUBLIC_K12_CANDIDATE_POOL,
     publicK12UseWorkbench: PUBLIC_K12_USE_WORKBENCH,
     implementationDecisionMatrix: K12_PUBLIC_IMPLEMENTATION_DECISION_MATRIX,
     longitudinalPressureScenarioLedger: LONGITUDINAL_PRESSURE_SCENARIO_LEDGER,
     publicWorkbenchLine: `已把 ${PUBLIC_K12_USE_WORKBENCH.length} 类可用资料拆成“可直接用 / 本地代码更好 / AI 更好 / 禁用”四格决策。`,
     publicAssetPipelineLine: `已把 ${PUBLIC_K12_ASSET_PIPELINE.length} 类公开/一方/竞品资料转成采集-本地化-禁用-落地页面流水线。`,
+    publicCandidatePoolLine: `已把 ${PUBLIC_K12_CANDIDATE_POOL.length} 条可扩内容候选按 A+/A/B 分级，先过本地化和禁用字段检查再进入样本库。`,
     publicSourceLine: `已把 ${PUBLIC_K12_SOURCE_LEDGER.length} 类公开/一方资料沉淀为本地规则资产：题型、错因、第一步、小黑板、回访、报告和分享边界。`,
     publicSourceBlockedLine: '禁止把公开资料变成原题答案库、拍照搜题承诺、排名晒分或全科动态板书承诺。',
     clusterRunwayLine: `已把 ${QUESTION_TYPE_CLUSTER_RUNWAY.length} 个高频题型簇接成“第一步-错因-小黑板-回访-分享”本地闭环。`,
@@ -656,6 +745,7 @@ function buildRealHomeworkCoverageMatrix(options = {}) {
     totalTypes,
     totalPublicSources: PUBLIC_K12_SOURCE_LEDGER.length,
     totalPublicAssetPipelines: PUBLIC_K12_ASSET_PIPELINE.length,
+    totalPublicCandidateAssets: PUBLIC_K12_CANDIDATE_POOL.length,
     totalQuestionTypeClusters: QUESTION_TYPE_CLUSTER_RUNWAY.length,
     totalLongitudinalPressureScenarios: LONGITUDINAL_PRESSURE_SCENARIO_LEDGER.length,
     reportLine: `报告可引用 ${totalSamples} 个压力样本的第一步、错因、小黑板和回访动作。`,
@@ -680,6 +770,7 @@ module.exports = {
   PUBLIC_K12_SOURCE_LEDGER,
   PUBLIC_K12_USE_POLICY,
   PUBLIC_K12_ASSET_PIPELINE,
+  PUBLIC_K12_CANDIDATE_POOL,
   PUBLIC_K12_USE_WORKBENCH,
   K12_PUBLIC_IMPLEMENTATION_DECISION_MATRIX,
   LONGITUDINAL_PRESSURE_SCENARIO_LEDGER,
