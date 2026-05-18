@@ -821,6 +821,9 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
   const socraticMemoryReportBridge = learningReport.buildSocraticMemoryReportBridge
     ? learningReport.buildSocraticMemoryReportBridge({ gameEvidence }, parentDecisionTrustSystem, portraitConfidenceSystem)
     : (draft.socraticMemoryReportBridge || null);
+  const questionBankDecisionBridge = learningReport.buildQuestionBankDecisionBridge
+    ? learningReport.buildQuestionBankDecisionBridge({ gameEvidence }, parentDecisionTrustSystem, portraitConfidenceSystem)
+    : (draft.questionBankDecisionBridge || null);
   return {
     title: draft.title || '学习画像',
     modeLabel: reportState.reportProgress && reportState.reportProgress.label ? reportState.reportProgress.label : '0% · 快速版',
@@ -950,6 +953,23 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
       : [],
     socraticMemoryReportEvidence: socraticMemoryReportBridge && Array.isArray(socraticMemoryReportBridge.evidenceRequired)
       ? socraticMemoryReportBridge.evidenceRequired
+      : [],
+    questionBankDecisionBridge,
+    questionBankDecisionTitle: questionBankDecisionBridge ? questionBankDecisionBridge.title : '',
+    questionBankDecisionStatus: questionBankDecisionBridge ? questionBankDecisionBridge.status : '',
+    questionBankDecisionSummary: questionBankDecisionBridge ? questionBankDecisionBridge.summary : '',
+    questionBankDecisionLine: questionBankDecisionBridge ? questionBankDecisionBridge.decisionLine : '',
+    questionBankDecisionParentAction: questionBankDecisionBridge ? questionBankDecisionBridge.parentActionLine : '',
+    questionBankDecisionXpGate: questionBankDecisionBridge ? questionBankDecisionBridge.xpGate : '',
+    questionBankDecisionConfidenceLine: questionBankDecisionBridge ? questionBankDecisionBridge.confidenceLine : '',
+    questionBankDecisionDeck: questionBankDecisionBridge && Array.isArray(questionBankDecisionBridge.activeDeck)
+      ? questionBankDecisionBridge.activeDeck
+      : [],
+    questionBankDecisionReviewWindows: questionBankDecisionBridge && Array.isArray(questionBankDecisionBridge.reviewWindows)
+      ? questionBankDecisionBridge.reviewWindows
+      : [],
+    questionBankDecisionEvidence: questionBankDecisionBridge && Array.isArray(questionBankDecisionBridge.evidenceRequired)
+      ? questionBankDecisionBridge.evidenceRequired
       : [],
     familyDecisionTitle: familyDecisionMemo.title || '',
     familyDecisionTonight: familyDecisionMemo.tonightDecision || '',

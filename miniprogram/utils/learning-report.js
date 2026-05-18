@@ -959,6 +959,48 @@ function buildSocraticMemoryReportBridge(input = {}, parentDecisionTrust = {}, p
   };
 }
 
+function buildQuestionBankDecisionBridge(input = {}, parentDecisionTrust = {}, portraitConfidence = {}) {
+  const gameEvidence = input.gameEvidence || {};
+  const highFrequencyLoop = input.highFrequencyPracticeLoop || gameEvidence.highFrequencyPracticeLoop || {};
+  const bridge = input.questionBankMemoryBridge || highFrequencyLoop.questionBankMemoryBridge || {};
+  const activeDeck = Array.isArray(bridge.activeDeck) ? bridge.activeDeck : [];
+  const reviewWindows = Array.isArray(bridge.reviewWindows) ? bridge.reviewWindows : [];
+  const questionCardCount = Number(bridge.questionCardCount || 0);
+  const trustScore = Number(parentDecisionTrust.score || 0);
+  const confidenceScore = Number(portraitConfidence.evidenceScore || 0);
+  const canUseForDecision = bridge.status === 'ready' && activeDeck.length >= 3 && trustScore >= 45;
+  return {
+    id: 'question_bank_decision_bridge',
+    title: '题型题库到家长决策',
+    status: bridge.status || 'waiting_question_bank',
+    questionCardCount,
+    activeCardCount: Number(bridge.activeCardCount || activeDeck.length || 0),
+    masteryGateCount: Number(bridge.masteryGateCount || 0),
+    progressionStageCount: Number(bridge.progressionStageCount || 0),
+    summary: canUseForDecision
+      ? `题库已有 ${questionCardCount} 张题型卡，当前 ${activeDeck.length} 张进入高频记忆训练；家长可以按掌握门槛安排明天回访。`
+      : '题型题库证据还不足，报告只能给今晚观察建议，不升级长期画像。',
+    decisionLine: canUseForDecision
+      ? '今晚只追一个题型掌握门槛；明天回访通过后，再决定是否进入长期画像。'
+      : '先补足第一步、错因复述和次日回访证据，再做长期判断。',
+    parentActionLine: bridge.parentDecisionLine || '家长只看题型掌握门槛、错因是否复现和明天回访，不看分数排行。',
+    xpGate: bridge.xpGate || '只刷数量不加分，必须留下第一步和回访证据。',
+    reportLine: bridge.reportLine || '',
+    privacyBoundary: bridge.privacyBoundary || '不分享原题照片、完整答案、分数、排名和孩子私密评价。',
+    activeDeck: activeDeck.slice(0, 4).map((item) => ({
+      id: item.id,
+      label: item.label,
+      firstStep: item.firstStep,
+      masteryGate: item.masteryGate,
+      parentCheck: item.parentCheck,
+      nextDayRevisit: item.nextDayRevisit
+    })),
+    reviewWindows,
+    evidenceRequired: ['question_bank_memory_bridge', 'mastery_gate', 'parent_decision_trust', 'portrait_confidence'].concat(Array.isArray(bridge.evidenceRequired) ? bridge.evidenceRequired : []).slice(0, 9),
+    confidenceLine: `家长决策可信分 ${trustScore}，画像证据分 ${confidenceScore}；不足时只做观察，不做结论。`
+  };
+}
+
 function buildLearningReportDraft(input = {}) {
   const sources = normalizeReportSources(input);
   const allText = [input.sourceText || '', input.scoreText || ''].concat(sources.map((source) => source.text || '')).join('\n');
@@ -995,6 +1037,7 @@ function buildLearningReportDraft(input = {}) {
   const portraitConfidenceSystem = buildPortraitConfidenceSystem(parts, diagnosisMatrix, longTermPortrait, classroomDecisionBoard, familyDecisionMemo);
   const parentDecisionTrustSystem = buildParentDecisionTrustSystem(parts, diagnosisMatrix, portraitConfidenceSystem, familyDecisionMemo, classroomDecisionBoard);
   const socraticMemoryReportBridge = buildSocraticMemoryReportBridge(input, parentDecisionTrustSystem, portraitConfidenceSystem);
+  const questionBankDecisionBridge = buildQuestionBankDecisionBridge(input, parentDecisionTrustSystem, portraitConfidenceSystem);
   const missing = missingItems(parts);
   const reportDraft = {
     id: input.id || `learning_report_${String(nowIso(input.now)).slice(0, 10).replace(/-/g, '')}`,
@@ -1027,6 +1070,7 @@ function buildLearningReportDraft(input = {}) {
     portraitConfidenceSystem,
     parentDecisionTrustSystem,
     socraticMemoryReportBridge,
+    questionBankDecisionBridge,
     generatedAt: nowIso(input.now),
     missingItems: missing,
     sourceIntegrity: {
@@ -1061,6 +1105,7 @@ function buildLearningReportDraft(input = {}) {
     portraitConfidenceSystem,
     parentDecisionTrustSystem,
     socraticMemoryReportBridge,
+    questionBankDecisionBridge,
     reportCompleteness: completeness,
     reportStatus: {
       state: completeness >= 30 ? 'ready' : 'draft',
@@ -1087,6 +1132,7 @@ module.exports = {
   buildPortraitConfidenceSystem,
   buildParentDecisionTrustSystem,
   buildSocraticMemoryReportBridge,
+  buildQuestionBankDecisionBridge,
   normalizeReportSources,
   confidenceLabel
 };

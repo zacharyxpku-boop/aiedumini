@@ -738,6 +738,17 @@
           <text wx:for="{{learningReportSummary.socraticMemoryReportActions}}" wx:key="id">报告动作：{{item.label}}｜{{item.action}}｜证据 {{item.evidence}}</text>
           <text wx:for="{{learningReportSummary.socraticMemoryReportEvidence}}" wx:key="*this">可信证据：{{item}}</text>
         </view>
+        <view class="parent-brief-block" wx:if="{{learningReportSummary.questionBankDecisionBridge}}">
+          <text class="parent-brief-label">{{learningReportSummary.questionBankDecisionTitle}}</text>
+          <text>{{learningReportSummary.questionBankDecisionSummary}}</text>
+          <text>{{learningReportSummary.questionBankDecisionLine}}</text>
+          <text>{{learningReportSummary.questionBankDecisionParentAction}}</text>
+          <text>不加题规则：{{learningReportSummary.questionBankDecisionXpGate}}</text>
+          <text>{{learningReportSummary.questionBankDecisionConfidenceLine}}</text>
+          <text wx:for="{{learningReportSummary.questionBankDecisionDeck}}" wx:key="id">题型卡：{{item.label}}｜第一步：{{item.firstStep}}｜掌握门槛：{{item.masteryGate}}</text>
+          <text wx:for="{{learningReportSummary.questionBankDecisionReviewWindows}}" wx:key="id">{{item.label}}回访：{{item.action}}</text>
+          <text wx:for="{{learningReportSummary.questionBankDecisionEvidence}}" wx:key="*this">决策证据：{{item}}</text>
+        </view>
         <view class="parent-brief-block" wx:if="{{learningReportSummary.classroomDecisionLine}}">
           <text class="parent-brief-label">课堂级决策板</text>
           <text>{{learningReportSummary.classroomDecisionLine}}</text>

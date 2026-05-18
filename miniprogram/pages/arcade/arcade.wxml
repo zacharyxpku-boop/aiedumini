@@ -416,6 +416,23 @@
           <view class="retention-loop-step">{{highFrequencyPracticeLoop.socraticQualityMemoryBridge.parentLine}}</view>
           <view class="retention-loop-step">{{highFrequencyPracticeLoop.socraticQualityMemoryBridge.privacyBoundary}}</view>
         </view>
+        <view class="high-frequency-section" wx:if="{{highFrequencyPracticeLoop.questionBankMemoryBridge}}">
+          <view class="high-frequency-label">{{highFrequencyPracticeLoop.questionBankMemoryBridge.title}}</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.questionBankMemoryBridge.reportLine}}</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.questionBankMemoryBridge.entryRule}}</view>
+          <view class="high-frequency-item" wx:for="{{highFrequencyPracticeLoop.questionBankMemoryBridge.activeDeck}}" wx:key="id">
+            <text>{{item.label}}</text>
+            <text>{{item.firstStep}}</text>
+            <text>{{item.masteryGate}}</text>
+          </view>
+          <view class="high-frequency-item" wx:for="{{highFrequencyPracticeLoop.questionBankMemoryBridge.reviewWindows}}" wx:key="id">
+            <text>{{item.label}}</text>
+            <text>{{item.action}}</text>
+          </view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.questionBankMemoryBridge.xpGate}}</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.questionBankMemoryBridge.parentDecisionLine}}</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.questionBankMemoryBridge.privacyBoundary}}</view>
+        </view>
         <view class="retention-loop-foot">{{highFrequencyPracticeLoop.parentShareLine}}</view>
       </view>
       <view class="next-action-card" wx:if="{{challengeBrief.resultLine}}">

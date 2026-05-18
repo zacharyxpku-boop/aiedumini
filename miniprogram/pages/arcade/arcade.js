@@ -863,12 +863,16 @@ Page({
           retentionLoop: gameRetentionLoop,
           weakKey: repairFocus && repairFocus.title ? repairFocus.title : '',
           taskType: this.data.recentTaskType || 'unknown',
-          socraticQualityEvaluationSuite
+          socraticQualityEvaluationSuite,
+          courseUnitQuestionBank: this.data.courseUnitQuestionBank
         }
       )
       : null;
     const socraticQualityMemoryBridge = highFrequencyPracticeLoop && highFrequencyPracticeLoop.socraticQualityMemoryBridge
       ? highFrequencyPracticeLoop.socraticQualityMemoryBridge
+      : null;
+    const questionBankMemoryBridge = highFrequencyPracticeLoop && highFrequencyPracticeLoop.questionBankMemoryBridge
+      ? highFrequencyPracticeLoop.questionBankMemoryBridge
       : null;
     const questArcSignal = storage.recordQuestArcGameSignal
       ? storage.recordQuestArcGameSignal({
@@ -941,6 +945,15 @@ Page({
         : 0,
       socratic_quality_memory_xp_gate: socraticQualityMemoryBridge
         ? socraticQualityMemoryBridge.xpGate
+        : '',
+      question_bank_memory_cards: questionBankMemoryBridge
+        ? questionBankMemoryBridge.questionCardCount
+        : 0,
+      question_bank_memory_active: questionBankMemoryBridge
+        ? questionBankMemoryBridge.activeDeck.length
+        : 0,
+      question_bank_memory_gate: questionBankMemoryBridge
+        ? questionBankMemoryBridge.xpGate
         : '',
       share_code: incomingShare && incomingShare.share_code ? incomingShare.share_code : ''
     });
@@ -1057,6 +1070,15 @@ Page({
           : 0,
         socratic_quality_memory_xp_gate: socraticQualityMemoryBridge
           ? socraticQualityMemoryBridge.xpGate
+          : '',
+        question_bank_memory_cards: questionBankMemoryBridge
+          ? questionBankMemoryBridge.questionCardCount
+          : 0,
+        question_bank_memory_active: questionBankMemoryBridge
+          ? questionBankMemoryBridge.activeDeck.length
+          : 0,
+        question_bank_memory_gate: questionBankMemoryBridge
+          ? questionBankMemoryBridge.xpGate
           : '',
         boss_gap: this.data.adaptiveChallenge && this.data.adaptiveChallenge.bossCard
           ? this.data.adaptiveChallenge.bossCard.key

@@ -733,6 +733,54 @@ function buildSocraticQualityMemoryBridge(qualitySuite = {}, result = {}, retent
   };
 }
 
+function buildQuestionBankMemoryBridge(courseUnitQuestionBank = {}, result = {}, retention = {}, options = {}) {
+  const activeCards = Array.isArray(courseUnitQuestionBank.activeCards) ? courseUnitQuestionBank.activeCards : [];
+  const allCards = Array.isArray(courseUnitQuestionBank.cards) ? courseUnitQuestionBank.cards : [];
+  const sourceCards = (activeCards.length ? activeCards : allCards).slice(0, 6);
+  const weakKey = options.weakKey || retention.weakKey || '第一步';
+  const accuracy = Number(result.accuracy || 0);
+  const needsRepair = retention.mode === 'repair' || accuracy < Number(options.targetAccuracy || 80) || Number(result.wrong || 0) > 0;
+  const masteryActions = sourceCards.slice(0, 4).map((card, index) => ({
+    id: card.id || `question_bank_memory_${index + 1}`,
+    label: card.label || card.prompt || `题型卡 ${index + 1}`,
+    prompt: card.sampleStem || card.prompt || `用自己的题复述 ${weakKey} 的第一步`,
+    firstStep: card.firstStepHint || card.progression && card.progression.entryTask || `先说出 ${weakKey} 的第一步`,
+    wrongCause: card.wrongCause || card.wrongCauseLabel || weakKey,
+    visualMove: card.blackboardMove || card.visualMove || '画出已知条件和第一步关系',
+    masteryGate: card.progression && card.progression.masteryGate ? card.progression.masteryGate : '能说出第一步、错因和一个小变式',
+    nextDayRevisit: card.progression && card.progression.nextDayRevisit ? card.progression.nextDayRevisit : '明天换一题确认能不能迁移',
+    parentCheck: card.parentCheck || card.progression && card.progression.parentEvidence || '家长只问第一步和错因，不看完整答案',
+    route: '/pages/tutor/tutor'
+  }));
+  return {
+    id: 'question_bank_memory_bridge',
+    title: needsRepair ? '题型卡进入错因回忆' : '题型卡进入掌握巩固',
+    status: sourceCards.length ? 'ready' : 'waiting_question_bank',
+    questionCardCount: Number(courseUnitQuestionBank.questionCount || allCards.length || activeCards.length || 0),
+    activeCardCount: activeCards.length,
+    masteryGateCount: Number(courseUnitQuestionBank.masteryGateCount || 0),
+    progressionStageCount: Number(courseUnitQuestionBank.progressionStageCount || 0),
+    activeDeck: masteryActions,
+    reviewWindows: [
+      { id: 'tonight', label: '今晚', action: '只做 3 张题型卡的主动回忆，不加新题量。' },
+      { id: 'tomorrow', label: '明天', action: '回访最不稳的一张卡，先说第一步再看提示。' },
+      { id: 'day_7', label: '第 7 天', action: '换一个小变式，确认不是记住答案。' }
+    ],
+    entryRule: sourceCards.length
+      ? `本轮从 ${sourceCards.length} 张题型卡里选最相关的主动回忆。`
+      : '还没有可用题型卡，先回到第一步点拨生成题型证据。',
+    xpGate: '题型卡只有通过第一步、错因复述和次日回访，才进入 XP；只刷数量不加分。',
+    parentDecisionLine: sourceCards.length
+      ? '家长报告只看题型掌握门槛、错因是否复现和明天回访，不看分数排行。'
+      : '题型证据不足时，报告只能给观察建议，不能升级长期画像。',
+    reportLine: sourceCards.length
+      ? `题库已把 ${sourceCards.length} 张题型卡接入高频记忆训练。`
+      : '题库还没有进入高频记忆训练。',
+    privacyBoundary: '不分享原题照片、完整答案、分数、排名和孩子私密评价。',
+    evidenceRequired: ['course_unit_question_bank', 'mastery_gate', 'active_recall', 'wrong_cause_replay', 'next_day_revisit', 'parent_decision_line']
+  };
+}
+
 function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], result = {}, challenge = {}, questSet = {}, options = {}) {
   const safeCards = Array.isArray(cards) ? cards : [];
   const safeEvents = Array.isArray(events) ? events : [];
@@ -796,6 +844,15 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
       targetAccuracy: challenge.targetAccuracy || 80
     }
   );
+  const questionBankMemoryBridge = buildQuestionBankMemoryBridge(
+    options.courseUnitQuestionBank || {},
+    result,
+    retention,
+    {
+      weakKey,
+      targetAccuracy: challenge.targetAccuracy || 80
+    }
+  );
   return {
     title: needsRepair ? '高频修复循环' : '高频巩固循环',
     mode: needsRepair ? 'repair_recall' : 'mastery_recall',
@@ -812,13 +869,14 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
     questArcRunway,
     gizmoLikeMemoryProtocol,
     socraticQualityMemoryBridge,
+    questionBankMemoryBridge,
     xpRule: 'XP 只奖励主动回忆、错因修复和次日回访，不奖励盲刷题量。',
     leechRule: needsRepair
       ? `同一错因连续 2 次错，会降到第一步小黑板。`
       : '连续 2 次说清第一步，才进入变式练习。',
     parentShareLine: `家长复盘只看：孩子能否自己说出「${weakKey}」的第一步。`,
     nextRoute: needsRepair ? '/pages/review/review' : '/pages/tutor/tutor',
-    evidenceRequired: ['active_recall_cards', 'spaced_review_plan', 'wrong_cause_return', 'quest_cadence', 'memory_feedback_controller', 'recall_intensity_plan', 'wrong_cause_replay_deck', 'xp_feedback_policy', 'quest_arc_runway', 'gizmo_like_memory_protocol', 'socratic_quality_memory_bridge', 'parent_share_line'],
+    evidenceRequired: ['active_recall_cards', 'spaced_review_plan', 'wrong_cause_return', 'quest_cadence', 'memory_feedback_controller', 'recall_intensity_plan', 'wrong_cause_replay_deck', 'xp_feedback_policy', 'quest_arc_runway', 'gizmo_like_memory_protocol', 'socratic_quality_memory_bridge', 'question_bank_memory_bridge', 'parent_share_line'],
     weakKey
   };
 }
@@ -835,6 +893,7 @@ module.exports = {
   buildGizmoLikeMemoryProtocol,
   buildHighFrequencyPracticeLoop,
   buildMemoryFeedbackController,
+  buildQuestionBankMemoryBridge,
   buildQuestArcRunway,
   buildRecallIntensityPlan,
   buildSocraticQualityMemoryBridge,
