@@ -1001,6 +1001,50 @@ function buildQuestionBankDecisionBridge(input = {}, parentDecisionTrust = {}, p
   };
 }
 
+function buildQuestionBankRecallReportBridge(input = {}, parentDecisionTrust = {}, portraitConfidence = {}) {
+  const gameEvidence = input.gameEvidence || {};
+  const highFrequencyLoop = input.highFrequencyPracticeLoop || gameEvidence.highFrequencyPracticeLoop || {};
+  const workout = input.questionBankRecallWorkout || highFrequencyLoop.questionBankRecallWorkout || {};
+  const workoutCards = Array.isArray(workout.workoutCards) ? workout.workoutCards : [];
+  const phases = Array.isArray(workout.phases) ? workout.phases : [];
+  const trustScore = Number(parentDecisionTrust.score || 0);
+  const confidenceScore = Number(portraitConfidence.evidenceScore || 0);
+  const hasWorkout = workoutCards.length >= 3 && phases.length >= 4;
+  const canFeedPortrait = hasWorkout && trustScore >= 45 && confidenceScore >= 70;
+  return {
+    id: 'question_bank_recall_report_bridge',
+    title: '题库回忆训练到长期画像',
+    status: hasWorkout ? 'ready' : 'waiting_recall_workout',
+    mode: workout.mode || '',
+    workoutCardCount: workoutCards.length,
+    phaseCount: phases.length,
+    summary: hasWorkout
+      ? `题库回忆训练已形成 ${workoutCards.length} 张训练卡和 ${phases.length} 个训练阶段，报告可用它判断明天回访、错因重放和第 7 天小变式。`
+      : '还缺一轮完整题库回忆训练，报告暂不把单次游戏结果写入长期画像。',
+    portraitDecisionLine: canFeedPortrait
+      ? '可以作为长期画像的候选证据，但仍必须经过明天回访和第 7 天复核。'
+      : '暂不更新长期画像，只进入家长行动记录和下次回访清单。',
+    parentActionLine: workout.parentDecisionLine || '家长只看训练阶段、回访窗口和掌握门槛，不看分数排名。',
+    noCramRule: workout.noCramRule || '单次正确不升级长期画像；必须有明天回访和第 7 天小变式。',
+    shareBoundary: workout.shareBoundary || '分享只带训练主题、第一步和回访时间，不带原题、答案、分数、排名或完整对话。',
+    intensityLine: workout.intensityLine || '',
+    returnWindowLine: workout.returnWindowLine || '',
+    workoutCards: workoutCards.slice(0, 4).map((item) => ({
+      id: item.id,
+      label: item.label,
+      action: item.action,
+      proof: item.proof,
+      route: item.route || '/pages/arcade/arcade'
+    })),
+    phases: phases.slice(0, 5).map((item) => ({
+      id: item.id,
+      label: item.label,
+      rule: item.rule
+    })),
+    evidenceRequired: ['question_bank_recall_workout', 'workout_cards', 'recall_phases', 'parent_decision_trust', 'portrait_confidence'].concat(Array.isArray(workout.evidenceRequired) ? workout.evidenceRequired : []).slice(0, 10)
+  };
+}
+
 function buildLearningReportDraft(input = {}) {
   const sources = normalizeReportSources(input);
   const allText = [input.sourceText || '', input.scoreText || ''].concat(sources.map((source) => source.text || '')).join('\n');
@@ -1038,6 +1082,7 @@ function buildLearningReportDraft(input = {}) {
   const parentDecisionTrustSystem = buildParentDecisionTrustSystem(parts, diagnosisMatrix, portraitConfidenceSystem, familyDecisionMemo, classroomDecisionBoard);
   const socraticMemoryReportBridge = buildSocraticMemoryReportBridge(input, parentDecisionTrustSystem, portraitConfidenceSystem);
   const questionBankDecisionBridge = buildQuestionBankDecisionBridge(input, parentDecisionTrustSystem, portraitConfidenceSystem);
+  const questionBankRecallReportBridge = buildQuestionBankRecallReportBridge(input, parentDecisionTrustSystem, portraitConfidenceSystem);
   const missing = missingItems(parts);
   const reportDraft = {
     id: input.id || `learning_report_${String(nowIso(input.now)).slice(0, 10).replace(/-/g, '')}`,
@@ -1071,6 +1116,7 @@ function buildLearningReportDraft(input = {}) {
     parentDecisionTrustSystem,
     socraticMemoryReportBridge,
     questionBankDecisionBridge,
+    questionBankRecallReportBridge,
     generatedAt: nowIso(input.now),
     missingItems: missing,
     sourceIntegrity: {
@@ -1106,6 +1152,7 @@ function buildLearningReportDraft(input = {}) {
     parentDecisionTrustSystem,
     socraticMemoryReportBridge,
     questionBankDecisionBridge,
+    questionBankRecallReportBridge,
     reportCompleteness: completeness,
     reportStatus: {
       state: completeness >= 30 ? 'ready' : 'draft',
@@ -1133,6 +1180,7 @@ module.exports = {
   buildParentDecisionTrustSystem,
   buildSocraticMemoryReportBridge,
   buildQuestionBankDecisionBridge,
+  buildQuestionBankRecallReportBridge,
   normalizeReportSources,
   confidenceLabel
 };

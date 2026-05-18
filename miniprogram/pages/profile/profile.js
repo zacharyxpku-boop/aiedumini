@@ -858,6 +858,9 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
   const questionBankDecisionBridge = learningReport.buildQuestionBankDecisionBridge
     ? learningReport.buildQuestionBankDecisionBridge({ gameEvidence }, parentDecisionTrustSystem, portraitConfidenceSystem)
     : (draft.questionBankDecisionBridge || null);
+  const questionBankRecallReportBridge = learningReport.buildQuestionBankRecallReportBridge
+    ? learningReport.buildQuestionBankRecallReportBridge({ gameEvidence }, parentDecisionTrustSystem, portraitConfidenceSystem)
+    : (draft.questionBankRecallReportBridge || null);
   const fallbackRecoveryReportBridge = latestThinkingReceipt && latestThinkingReceipt.fallback_recovery_bridge
     ? latestThinkingReceipt.fallback_recovery_bridge
     : null;
@@ -1020,6 +1023,25 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
       : [],
     questionBankDecisionEvidence: questionBankDecisionBridge && Array.isArray(questionBankDecisionBridge.evidenceRequired)
       ? questionBankDecisionBridge.evidenceRequired
+      : [],
+    questionBankRecallReportBridge,
+    questionBankRecallReportTitle: questionBankRecallReportBridge ? questionBankRecallReportBridge.title : '',
+    questionBankRecallReportStatus: questionBankRecallReportBridge ? questionBankRecallReportBridge.status : '',
+    questionBankRecallReportSummary: questionBankRecallReportBridge ? questionBankRecallReportBridge.summary : '',
+    questionBankRecallReportPortraitDecision: questionBankRecallReportBridge ? questionBankRecallReportBridge.portraitDecisionLine : '',
+    questionBankRecallReportParentAction: questionBankRecallReportBridge ? questionBankRecallReportBridge.parentActionLine : '',
+    questionBankRecallReportNoCramRule: questionBankRecallReportBridge ? questionBankRecallReportBridge.noCramRule : '',
+    questionBankRecallReportShareBoundary: questionBankRecallReportBridge ? questionBankRecallReportBridge.shareBoundary : '',
+    questionBankRecallReportIntensityLine: questionBankRecallReportBridge ? questionBankRecallReportBridge.intensityLine : '',
+    questionBankRecallReportReturnWindowLine: questionBankRecallReportBridge ? questionBankRecallReportBridge.returnWindowLine : '',
+    questionBankRecallReportCards: questionBankRecallReportBridge && Array.isArray(questionBankRecallReportBridge.workoutCards)
+      ? questionBankRecallReportBridge.workoutCards
+      : [],
+    questionBankRecallReportPhases: questionBankRecallReportBridge && Array.isArray(questionBankRecallReportBridge.phases)
+      ? questionBankRecallReportBridge.phases
+      : [],
+    questionBankRecallReportEvidence: questionBankRecallReportBridge && Array.isArray(questionBankRecallReportBridge.evidenceRequired)
+      ? questionBankRecallReportBridge.evidenceRequired
       : [],
     fallbackRecoveryReportBridge,
     fallbackRecoveryTitle: fallbackRecoveryReportBridge ? fallbackRecoveryReportBridge.title : '',

@@ -752,6 +752,19 @@
           <text wx:for="{{learningReportSummary.questionBankDecisionReviewWindows}}" wx:key="id">{{item.label}}回访：{{item.action}}</text>
           <text wx:for="{{learningReportSummary.questionBankDecisionEvidence}}" wx:key="*this">决策证据：{{item}}</text>
         </view>
+        <view class="parent-brief-block" wx:if="{{learningReportSummary.questionBankRecallReportBridge}}">
+          <text class="parent-brief-label">{{learningReportSummary.questionBankRecallReportTitle}}</text>
+          <text>{{learningReportSummary.questionBankRecallReportSummary}}</text>
+          <text>{{learningReportSummary.questionBankRecallReportPortraitDecision}}</text>
+          <text>{{learningReportSummary.questionBankRecallReportParentAction}}</text>
+          <text wx:if="{{learningReportSummary.questionBankRecallReportIntensityLine}}">{{learningReportSummary.questionBankRecallReportIntensityLine}}</text>
+          <text wx:if="{{learningReportSummary.questionBankRecallReportReturnWindowLine}}">{{learningReportSummary.questionBankRecallReportReturnWindowLine}}</text>
+          <text>不刷量规则：{{learningReportSummary.questionBankRecallReportNoCramRule}}</text>
+          <text>分享边界：{{learningReportSummary.questionBankRecallReportShareBoundary}}</text>
+          <text wx:for="{{learningReportSummary.questionBankRecallReportCards}}" wx:key="id">训练卡：{{item.label}}｜{{item.action}}｜证据 {{item.proof}}</text>
+          <text wx:for="{{learningReportSummary.questionBankRecallReportPhases}}" wx:key="id">训练阶段：{{item.label}}｜{{item.rule}}</text>
+          <text wx:for="{{learningReportSummary.questionBankRecallReportEvidence}}" wx:key="*this">画像证据：{{item}}</text>
+        </view>
         <view class="parent-brief-block" wx:if="{{learningReportSummary.questionBankShareRelayDeck}}">
           <text class="parent-brief-label">{{learningReportSummary.questionBankShareRelayTitle}}</text>
           <text>{{learningReportSummary.questionBankShareRelayLine}}</text>
