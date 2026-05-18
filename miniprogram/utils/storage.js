@@ -4801,6 +4801,66 @@ function buildQuestionBankShareRelayDeck(options = {}) {
   };
 }
 
+function buildQuestionBankVisualShareRelayDeck(options = {}) {
+  const questionBankShareRelayDeck = options.questionBankShareRelayDeck || buildQuestionBankShareRelayDeck(options);
+  const relayCards = questionBankShareRelayDeck && Array.isArray(questionBankShareRelayDeck.relayCards)
+    ? questionBankShareRelayDeck.relayCards
+    : [];
+  const activeCard = relayCards[0] || {};
+  const boardLayers = [
+    {
+      id: 'locate',
+      label: '定位',
+      drawAction: activeCard.visualMove || '小黑板只画题目问什么，不抄原题答案。',
+      studentLine: activeCard.firstStep || '我先说出第一步。'
+    },
+    {
+      id: 'wrong_cause',
+      label: '错因',
+      drawAction: '只标出卡住点：看错条件、不会建模、步骤跳过。',
+      studentLine: activeCard.challengePrompt || '我说出自己卡在哪里。'
+    },
+    {
+      id: 'revisit',
+      label: '回访',
+      drawAction: '明天只换一个同类小变式，确认方法能不能迁移。',
+      studentLine: '我用自己的材料再说一次第一步。'
+    }
+  ];
+  const exitCriteria = [
+    activeCard.parentCheck || '孩子能自己说出第一步。',
+    '不看完整答案也能指出卡住点。',
+    '明天能用同类小变式复述一次。'
+  ];
+  const blockedFields = ['original_photo', 'full_dialogue', 'score', 'ranking', 'private_comment', 'original_answer'];
+  return {
+    id: 'question_bank_visual_share_relay_deck',
+    title: '题型小黑板接力卡',
+    status: boardLayers.length >= 3 && exitCriteria.length >= 3 ? 'ready' : 'needs_visual_layers',
+    relayTitle: activeCard.label || '同类题型第一步',
+    route: activeCard.route || '/pages/arcade/arcade?from=visual_board_relay',
+    boardLayers,
+    relayLayer: boardLayers[0].label,
+    studentLine: boardLayers[0].studentLine,
+    parentLine: activeCard.parentCheck || '家长只看孩子能不能复述第一步，不追问完整答案。',
+    exitCriteria,
+    exitLine: exitCriteria[0],
+    shareBoundary: '小黑板分享只带题型、第一步、卡住点、家长检查句和回访窗口；不带原题、答案、分数、排名或完整对话。',
+    allowedFields: ['relayTitle', 'relayLayer', 'studentLine', 'parentLine', 'exitLine', 'route'],
+    blockedFields,
+    safeQuery: {
+      visual_board_relay_title: activeCard.label || '同类题型第一步',
+      visual_board_relay_layer: boardLayers[0].drawAction,
+      visual_board_relay_student_line: boardLayers[0].studentLine,
+      visual_board_relay_parent_line: activeCard.parentCheck || '家长只看孩子能不能复述第一步，不追问完整答案。',
+      visual_board_relay_exit: exitCriteria[0],
+      visual_board_relay_route: activeCard.route || '/pages/arcade/arcade?from=visual_board_relay',
+      visual_board_relay_boundary: '不带原题、答案、分数、排名或完整对话'
+    },
+    evidenceRequired: ['question_type_visual_board', 'child_first_step', 'parent_check_line', 'safe_share_payload', 'next_day_revisit']
+  };
+}
+
 function saveIncomingShare(share = {}) {
   const code = share.share_code || share.code || '';
   if (!code) return null;
@@ -4847,6 +4907,13 @@ function saveIncomingShare(share = {}) {
     question_bank_relay_parent_check: share.question_bank_relay_parent_check || '',
     question_bank_relay_route: share.question_bank_relay_route || '',
     question_bank_relay_boundary: share.question_bank_relay_boundary || '',
+    visual_board_relay_title: share.visual_board_relay_title || '',
+    visual_board_relay_layer: share.visual_board_relay_layer || '',
+    visual_board_relay_student_line: share.visual_board_relay_student_line || '',
+    visual_board_relay_parent_line: share.visual_board_relay_parent_line || '',
+    visual_board_relay_exit: share.visual_board_relay_exit || '',
+    visual_board_relay_route: share.visual_board_relay_route || '',
+    visual_board_relay_boundary: share.visual_board_relay_boundary || '',
     created_at: share.created_at || new Date().toISOString()
   };
   set(KEYS.incomingShare, record);
@@ -8215,6 +8282,7 @@ module.exports = {
   buildShareChallengePlan,
   buildCommunityShareRelayBoard,
   buildQuestionBankShareRelayDeck,
+  buildQuestionBankVisualShareRelayDeck,
   saveIncomingShare,
   appendShareRun,
   loadClientIdentity,

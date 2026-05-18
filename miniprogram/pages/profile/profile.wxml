@@ -1117,6 +1117,15 @@
           <view wx:for="{{dailyShareCard.questionBankShareRelayDeck.relayCards}}" wx:key="id">题型接力：{{item.label}}｜第一步：{{item.firstStep}}</view>
           <view wx:for="{{dailyShareCard.questionBankShareRelayDeck.reviewWindows}}" wx:key="id">{{item.label}}：{{item.action}}</view>
         </view>
+        <view class="share-conversation-card" wx:if="{{dailyShareCard.questionBankVisualShareRelayDeck}}">
+          <view class="share-conversation-title">{{dailyShareCard.questionBankVisualShareRelayDeck.title}}</view>
+          <view>接力题型：{{dailyShareCard.questionBankVisualShareRelayDeck.relayTitle}}</view>
+          <view wx:for="{{dailyShareCard.questionBankVisualShareRelayDeck.boardLayers}}" wx:key="id">小黑板：{{item.label}}｜{{item.drawAction}}｜孩子说：{{item.studentLine}}</view>
+          <view wx:for="{{dailyShareCard.questionBankVisualShareRelayDeck.exitCriteria}}" wx:key="*this">退出标准：{{item}}</view>
+          <view>家长检查：{{dailyShareCard.questionBankVisualShareRelayDeck.parentLine}}</view>
+          <view>分享边界：{{dailyShareCard.questionBankVisualShareRelayDeck.shareBoundary}}</view>
+          <view>不带字段：{{dailyShareCard.questionBankVisualShareRelayDeck.blockedFields}}</view>
+        </view>
         <view class="share-conversation-card" wx:if="{{communityShareRelayBoard}}">
           <view class="share-conversation-title">{{communityShareRelayBoard.title}}</view>
           <view>{{communityShareRelayBoard.summary}}</view>

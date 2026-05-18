@@ -420,11 +420,20 @@ function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCause
   const activeRelayCard = questionBankShareRelayDeck && Array.isArray(questionBankShareRelayDeck.relayCards)
     ? questionBankShareRelayDeck.relayCards[0]
     : null;
+  const questionBankVisualShareRelayDeck = storage.buildQuestionBankVisualShareRelayDeck ? storage.buildQuestionBankVisualShareRelayDeck({
+    questionBankShareRelayDeck,
+    courseUnitMap,
+    shareChallengePlan,
+    subjectSkillDepth
+  }) : null;
   const challengeQuery = shareChallengePlan && shareChallengePlan.query
     ? `&challenge_goal=${encodeURIComponent(shareChallengePlan.query.challenge_goal || '')}&challenge_rule=${encodeURIComponent(shareChallengePlan.query.challenge_rule || '')}&challenge_route=${encodeURIComponent(shareChallengePlan.query.challenge_route || '')}&relay_privacy=${encodeURIComponent(shareChallengePlan.query.relay_privacy || '')}&relay_review=${encodeURIComponent(shareChallengePlan.query.relay_review || '')}&relay_first_step=${encodeURIComponent(shareChallengePlan.query.relay_first_step || '')}&relay_id=${encodeURIComponent(shareChallengePlan.query.relay_id || '')}&relay_receiver_action=${encodeURIComponent(shareChallengePlan.query.relay_receiver_action || '')}&relay_parent_check=${encodeURIComponent(shareChallengePlan.query.relay_parent_check || '')}&relay_next_revisit=${encodeURIComponent(shareChallengePlan.query.relay_next_revisit || '')}&relay_allowed_fields=${encodeURIComponent(shareChallengePlan.query.relay_allowed_fields || '')}&relay_blocked_fields=${encodeURIComponent(shareChallengePlan.query.relay_blocked_fields || '')}&relay_completion_signal=${encodeURIComponent(shareChallengePlan.query.relay_completion_signal || '')}&relay_return_path=${encodeURIComponent(shareChallengePlan.query.relay_return_path || '')}`
     : '';
   const questionBankRelayQuery = activeRelayCard
     ? `&question_bank_relay_label=${encodeURIComponent(activeRelayCard.label || '')}&question_bank_relay_first_step=${encodeURIComponent(activeRelayCard.firstStep || '')}&question_bank_relay_parent_check=${encodeURIComponent(activeRelayCard.parentCheck || '')}&question_bank_relay_route=${encodeURIComponent(activeRelayCard.route || '')}&question_bank_relay_boundary=${encodeURIComponent(questionBankShareRelayDeck.shareLine || '')}`
+    : '';
+  const visualRelayQuery = questionBankVisualShareRelayDeck && questionBankVisualShareRelayDeck.safeQuery
+    ? `&visual_board_relay_title=${encodeURIComponent(questionBankVisualShareRelayDeck.safeQuery.visual_board_relay_title || '')}&visual_board_relay_layer=${encodeURIComponent(questionBankVisualShareRelayDeck.safeQuery.visual_board_relay_layer || '')}&visual_board_relay_student_line=${encodeURIComponent(questionBankVisualShareRelayDeck.safeQuery.visual_board_relay_student_line || '')}&visual_board_relay_parent_line=${encodeURIComponent(questionBankVisualShareRelayDeck.safeQuery.visual_board_relay_parent_line || '')}&visual_board_relay_exit=${encodeURIComponent(questionBankVisualShareRelayDeck.safeQuery.visual_board_relay_exit || '')}&visual_board_relay_route=${encodeURIComponent(questionBankVisualShareRelayDeck.safeQuery.visual_board_relay_route || '')}&visual_board_relay_boundary=${encodeURIComponent(questionBankVisualShareRelayDeck.safeQuery.visual_board_relay_boundary || '')}`
     : '';
   const socraticMemoryRelay = learningReportSummary && learningReportSummary.socraticMemoryReportBridge
     ? {
@@ -444,9 +453,9 @@ function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCause
   const courseUnitQuery = courseUnitDecision
     ? `&course_unit_label=${encodeURIComponent(courseUnitDecision.unitLabel || '')}&course_unit_subject=${encodeURIComponent(courseUnitDecision.subjectLabel || '')}&course_unit_tier=${encodeURIComponent(courseUnitDecision.tier || '')}&course_unit_parent_decision=${encodeURIComponent(courseUnitDecision.parentTonightDecision || '')}&course_unit_report_contract=${encodeURIComponent(courseUnitDecision.reportContract || '')}&course_unit_share_contract=${encodeURIComponent(courseUnitDecision.shareContract || '')}&course_unit_blackboard=${encodeURIComponent(courseUnitDecision.blackboardLine || '')}&course_unit_recall_route=${encodeURIComponent(courseUnitDecision.recallRoute || '')}&course_unit_game_route=${encodeURIComponent(courseUnitDecision.gameRoute || '')}`
     : '';
-  const path = `/pages/home/home?share=${code}&from=daily_card&challenge=arcade&mode=same_identity&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}${courseUnitQuery}${socraticReportQuery}${questionBankRelayQuery}`;
-  const parentPath = `/pages/home/home?share=${code}&from=parent_card&mode=parent_recap&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}${courseUnitQuery}${socraticReportQuery}${questionBankRelayQuery}`;
-  const peerPath = `/pages/home/home?share=${code}&from=peer_challenge&challenge=arcade&mode=same_identity&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}${courseUnitQuery}${socraticReportQuery}${questionBankRelayQuery}`;
+  const path = `/pages/home/home?share=${code}&from=daily_card&challenge=arcade&mode=same_identity&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}${courseUnitQuery}${socraticReportQuery}${questionBankRelayQuery}${visualRelayQuery}`;
+  const parentPath = `/pages/home/home?share=${code}&from=parent_card&mode=parent_recap&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}${courseUnitQuery}${socraticReportQuery}${questionBankRelayQuery}${visualRelayQuery}`;
+  const peerPath = `/pages/home/home?share=${code}&from=peer_challenge&challenge=arcade&mode=same_identity&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}${courseUnitQuery}${socraticReportQuery}${questionBankRelayQuery}${visualRelayQuery}`;
   const parentShareTitle = todayFocus && todayFocus.title
     ? `今晚先看这一处：${storage.formatIssueType(todayFocus.issueType || '卡点')} · ${todayFocus.title}`
     : '给家里看的今日学习复盘';
@@ -519,6 +528,7 @@ function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCause
     shareChallengePlan,
     socraticMemoryRelay,
     questionBankShareRelayDeck,
+    questionBankVisualShareRelayDeck,
     familyActionCard: {
       title: '家庭行动卡',
       judgement: todayFocus && todayFocus.repairStatus === 'completed'
@@ -630,6 +640,15 @@ function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCause
       question_bank_relay_boundary: questionBankShareRelayDeck && questionBankShareRelayDeck.shareLine,
       question_bank_relay_allowed_fields: questionBankShareRelayDeck && questionBankShareRelayDeck.safeSharePayload && questionBankShareRelayDeck.safeSharePayload.allowed_fields,
       question_bank_relay_blocked_fields: questionBankShareRelayDeck && questionBankShareRelayDeck.safeSharePayload && questionBankShareRelayDeck.safeSharePayload.blocked_fields,
+      visual_board_relay_title: questionBankVisualShareRelayDeck && questionBankVisualShareRelayDeck.safeQuery && questionBankVisualShareRelayDeck.safeQuery.visual_board_relay_title,
+      visual_board_relay_layer: questionBankVisualShareRelayDeck && questionBankVisualShareRelayDeck.safeQuery && questionBankVisualShareRelayDeck.safeQuery.visual_board_relay_layer,
+      visual_board_relay_student_line: questionBankVisualShareRelayDeck && questionBankVisualShareRelayDeck.safeQuery && questionBankVisualShareRelayDeck.safeQuery.visual_board_relay_student_line,
+      visual_board_relay_parent_line: questionBankVisualShareRelayDeck && questionBankVisualShareRelayDeck.safeQuery && questionBankVisualShareRelayDeck.safeQuery.visual_board_relay_parent_line,
+      visual_board_relay_exit: questionBankVisualShareRelayDeck && questionBankVisualShareRelayDeck.safeQuery && questionBankVisualShareRelayDeck.safeQuery.visual_board_relay_exit,
+      visual_board_relay_route: questionBankVisualShareRelayDeck && questionBankVisualShareRelayDeck.safeQuery && questionBankVisualShareRelayDeck.safeQuery.visual_board_relay_route,
+      visual_board_relay_boundary: questionBankVisualShareRelayDeck && questionBankVisualShareRelayDeck.safeQuery && questionBankVisualShareRelayDeck.safeQuery.visual_board_relay_boundary,
+      visual_board_relay_allowed_fields: questionBankVisualShareRelayDeck && questionBankVisualShareRelayDeck.allowedFields,
+      visual_board_relay_blocked_fields: questionBankVisualShareRelayDeck && questionBankVisualShareRelayDeck.blockedFields,
       evidence_brief: evidenceBrief && evidenceBrief.reportLine,
       capability_gap_id: nextCapability && nextCapability.id,
       capability_gap_label: nextCapability && nextCapability.label,
