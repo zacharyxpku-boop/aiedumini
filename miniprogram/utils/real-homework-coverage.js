@@ -185,6 +185,81 @@ const PUBLIC_K12_USE_POLICY = {
   ]
 };
 
+const PUBLIC_K12_ASSET_PIPELINE = [
+  {
+    id: 'curriculum_standard_to_capability_spine',
+    sourceFamily: '课程标准/教学目标',
+    intakeFields: ['学段', '学科能力词', '核心概念', '过程要求'],
+    directUse: ['学科导航骨架', '能力账本维度', '课程单元命名'],
+    normalizeAsLocalCode: ['subject_lane', 'capability_axis', 'mastery_gate', 'report_dimension'],
+    aiExpressionUse: ['把能力词解释成孩子听得懂的一句追问'],
+    discardFields: ['标准正文大段复制', '教材版本专属原文', '标准答案表述'],
+    miniappLanding: ['/pages/tutor/tutor', '/pages/profile/profile'],
+    acceptanceGate: ['has_subject_lane', 'has_capability_axis', 'no_copied_standard_text'],
+    owner: 'local_rule'
+  },
+  {
+    id: 'smartedu_homework_to_pressure_sample',
+    sourceFamily: '基础性作业/课堂练习风格',
+    intakeFields: ['任务类型', '常见卡点', '第一步入口', '家长检查句'],
+    directUse: ['真实作业压力样本', '错因候选', '回访窗口'],
+    normalizeAsLocalCode: ['task_type', 'wrong_cause_signal', 'first_step_rule', 'revisit_window'],
+    aiExpressionUse: ['把同一错因换成不责备的苏格拉底追问'],
+    discardFields: ['原题全文搬运', '完整答案', '题目图片'],
+    miniappLanding: ['/pages/home/home', '/pages/tutor/tutor', '/pages/review/review'],
+    acceptanceGate: ['sample_rewritten', 'answer_blocked', 'parent_check_present'],
+    owner: 'local_rule_plus_ai_wording'
+  },
+  {
+    id: 'public_exam_to_variant_ladder',
+    sourceFamily: '公开考试题型/学业水平题型',
+    intakeFields: ['题型簇', '干扰项结构', '迁移变量', '图示动作'],
+    directUse: ['变式阶梯', '迁移压测', '小黑板第一笔'],
+    normalizeAsLocalCode: ['question_type_cluster', 'variant_unlock_gate', 'board_move', 'transfer_ladder'],
+    aiExpressionUse: ['解释同一错因为什么会在新题面复发'],
+    discardFields: ['押题话术', '分数预测', '原题答案索引'],
+    miniappLanding: ['/pages/arcade/arcade', '/pages/radar/radar', '/pages/profile/profile'],
+    acceptanceGate: ['variant_gate_local', 'no_exam_score_claim', 'board_move_first_step_only'],
+    owner: 'local_rule'
+  },
+  {
+    id: 'family_input_to_evidence_ledger',
+    sourceFamily: '家庭一方输入',
+    intakeFields: ['孩子第一步原话', '家长观察', '卡住点摘要', '回访结果'],
+    directUse: ['今晚决策', '长期证据账本', '家校协同摘要', '分享回流'],
+    normalizeAsLocalCode: ['privacy_trim', 'confidence_threshold', 'safe_share_fields', 'home_school_digest'],
+    aiExpressionUse: ['把证据翻译成家长今晚能做的一句话'],
+    discardFields: ['完整对话公开', '原题照片公开', '学校班级', '分数排名'],
+    miniappLanding: ['/pages/home/home', '/pages/profile/profile'],
+    acceptanceGate: ['guardian_safe_field', 'confidence_gate', 'blocked_private_fields'],
+    owner: 'local_rule_plus_ai_wording'
+  },
+  {
+    id: 'competitor_mechanic_to_local_loop',
+    sourceFamily: 'Gizmo/Khanmigo/千问等公开机制观察',
+    intakeFields: ['记忆循环', '教师/家长工具', '视觉解释模式', '分享动机'],
+    directUse: ['产品机制假设', '本地 release gate', '能力成熟度队列'],
+    normalizeAsLocalCode: ['spaced_recall_policy', 'parent_decision_gate', 'visual_boundary', 'share_return_contract'],
+    aiExpressionUse: ['把机制包装成中文家庭场景下的轻提示'],
+    discardFields: ['竞品品牌承诺', '全科动态板书承诺', '排行榜刺激传播'],
+    miniappLanding: ['/pages/arcade/arcade', '/pages/tutor/tutor', '/pages/profile/profile'],
+    acceptanceGate: ['local_gate_before_ai', 'no_fake_competitor_claim', 'family_scenario_fit'],
+    owner: 'local_rule'
+  },
+  {
+    id: 'classroom_wrong_cause_to_home_school_packet',
+    sourceFamily: '课堂/作业错因观察',
+    intakeFields: ['重复错因', '第一次卡住位置', '迁移失败点', '老师可观察问题'],
+    directUse: ['家校沟通包', '跨周趋势', '过度诊断拦截'],
+    normalizeAsLocalCode: ['recurrence_count', 'teacher_question', 'overdiagnosis_lock', 'day7_transfer_check'],
+    aiExpressionUse: ['把沟通摘要写成不指责孩子的短句'],
+    discardFields: ['人格判断', '长期能力标签', '同学比较', '老师重点盯防话术'],
+    miniappLanding: ['/pages/profile/profile', '/pages/review/review'],
+    acceptanceGate: ['three_evidence_points', 'no_personality_label', 'teacher_safe_fields_only'],
+    owner: 'local_rule_plus_ai_wording'
+  }
+];
+
 const PUBLIC_K12_USE_WORKBENCH = [
   {
     id: 'curriculum_standard_spine',
@@ -566,10 +641,12 @@ function buildRealHomeworkCoverageMatrix(options = {}) {
     questionTypeClusterRunway: QUESTION_TYPE_CLUSTER_RUNWAY,
     publicSourceLedger: PUBLIC_K12_SOURCE_LEDGER,
     publicSourcePolicy: PUBLIC_K12_USE_POLICY,
+    publicK12AssetPipeline: PUBLIC_K12_ASSET_PIPELINE,
     publicK12UseWorkbench: PUBLIC_K12_USE_WORKBENCH,
     implementationDecisionMatrix: K12_PUBLIC_IMPLEMENTATION_DECISION_MATRIX,
     longitudinalPressureScenarioLedger: LONGITUDINAL_PRESSURE_SCENARIO_LEDGER,
     publicWorkbenchLine: `已把 ${PUBLIC_K12_USE_WORKBENCH.length} 类可用资料拆成“可直接用 / 本地代码更好 / AI 更好 / 禁用”四格决策。`,
+    publicAssetPipelineLine: `已把 ${PUBLIC_K12_ASSET_PIPELINE.length} 类公开/一方/竞品资料转成采集-本地化-禁用-落地页面流水线。`,
     publicSourceLine: `已把 ${PUBLIC_K12_SOURCE_LEDGER.length} 类公开/一方资料沉淀为本地规则资产：题型、错因、第一步、小黑板、回访、报告和分享边界。`,
     publicSourceBlockedLine: '禁止把公开资料变成原题答案库、拍照搜题承诺、排名晒分或全科动态板书承诺。',
     clusterRunwayLine: `已把 ${QUESTION_TYPE_CLUSTER_RUNWAY.length} 个高频题型簇接成“第一步-错因-小黑板-回访-分享”本地闭环。`,
@@ -578,6 +655,7 @@ function buildRealHomeworkCoverageMatrix(options = {}) {
     totalSubjects: SUBJECT_COUNTS.length,
     totalTypes,
     totalPublicSources: PUBLIC_K12_SOURCE_LEDGER.length,
+    totalPublicAssetPipelines: PUBLIC_K12_ASSET_PIPELINE.length,
     totalQuestionTypeClusters: QUESTION_TYPE_CLUSTER_RUNWAY.length,
     totalLongitudinalPressureScenarios: LONGITUDINAL_PRESSURE_SCENARIO_LEDGER.length,
     reportLine: `报告可引用 ${totalSamples} 个压力样本的第一步、错因、小黑板和回访动作。`,
@@ -601,6 +679,7 @@ module.exports = {
   QUESTION_TYPE_CLUSTER_RUNWAY,
   PUBLIC_K12_SOURCE_LEDGER,
   PUBLIC_K12_USE_POLICY,
+  PUBLIC_K12_ASSET_PIPELINE,
   PUBLIC_K12_USE_WORKBENCH,
   K12_PUBLIC_IMPLEMENTATION_DECISION_MATRIX,
   LONGITUDINAL_PRESSURE_SCENARIO_LEDGER,
