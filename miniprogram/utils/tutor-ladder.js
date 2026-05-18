@@ -66,6 +66,9 @@ const TASK_TYPE_PROMPTS = {
 
 function detectTaskType(text = '', selected = {}) {
   const source = `${text || ''} ${selected.text || ''}`;
+  if (/地理|地图|经纬|经线|纬线|气候|季风|河流|等高线|比例尺|公转|自转|昼夜|地形|图例/i.test(source)) {
+    return 'geography_map';
+  }
   const hit = TASK_TYPE_RULES.find((item) => item.patterns.test(source));
   return hit ? hit.id : 'unknown';
 }
