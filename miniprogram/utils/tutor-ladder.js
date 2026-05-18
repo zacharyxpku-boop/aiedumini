@@ -66,6 +66,30 @@ const TASK_TYPE_PROMPTS = {
 
 function detectTaskType(text = '', selected = {}) {
   const source = `${text || ''} ${selected.text || ''}`;
+  if (/几何作业|邻补角|对顶角|平行线同位角|角的位置关系/.test(source)) {
+    return 'math_word_problem';
+  }
+  if (/行程作业|追上|先走|追及|提前.*分钟|路程相等/.test(source)) {
+    return 'equation_setup';
+  }
+  if (/完形作业|完形填空.*代词|Tom and his sister|Lily and I/.test(source)) {
+    return 'english_sentence';
+  }
+  if (/百分数作业|八折|七五折|折扣/.test(source)) {
+    return 'math_word_problem';
+  }
+  if (/宾语从句|陈述语序|疑问词 where|疑问词 when/.test(source)) {
+    return 'english_sentence';
+  }
+  if (/阅读指代|it 指代|they 指代/.test(source)) {
+    return 'reading_question';
+  }
+  if (/病句作业|通过这次活动|主语缺失|由于.*让/.test(source)) {
+    return 'writing_process';
+  }
+  if (/材料作文|坚持与转弯|规则与创新|立意/.test(source)) {
+    return 'writing_process';
+  }
   if (/调酸奶饮品|原味酸奶和水按 3:2|酸奶占几份/.test(source)) {
     return 'math_word_problem';
   }
@@ -265,6 +289,42 @@ function diagnosticProbe(taskType, level) {
 
 function inferHomeworkPressureSignal(text = '', taskType = 'unknown') {
   const source = String(text || '');
+  const exactHomeworkCases = [
+    ['percent_discount', /又减 6 元|再减 6 元/, 'math_word_problem', '先把八折改成原价的百分之八十，再写出现价和原价的关系。', '把折扣当成固定金额，没有把百分数对应到原价。', '小黑板只写“原价 -> 80%原价 -> 再减 6 元”。', '先问：八折是减 8 元，还是变成原价的百分之八十？', '换成七五折后加运费，仍先把折扣写成原价的百分比。'],
+    ['geometry_angle_relation', /另一个角互补|未知角.*邻补角/, 'math_word_problem', '先在图上标出已知角和未知角的位置，再判断它们是对顶角还是邻补角。', '没有先看角的位置关系，直接套角度公式。', '小黑板只画交叉线，圈出“对顶相等、邻补和为 180°”两个位置。', '先问：这两个角是面对面，还是挨在一起成一条直线？', '换成平行线同位角题，仍先说两个角的位置关系。'],
+    ['travel_catchup_time', /甲先走|乙再追|追上|x\+20|先走 20 分钟/, 'equation_setup', '先设乙追上用 x 分钟，再写甲一共走 x+20 分钟。', '没有区分先走时间和追及时间，把两人的时间量混同。', '小黑板只列“乙时间=x，甲时间=x+20，路程相等”。', '先问：谁先走？追上时谁走的时间更长？', '换成甲提前 15 分钟出发，仍先写两人的时间表达式。'],
+    ['series_circuit_branch_path', /题目给两个灯泡和一个开关/, 'physics_diagram', '先从电源正极出发描一条电流路径，看有没有分支。', '只数元件，没有判断电流是否分路。', '小黑板只画电源和一条电流路径，用分叉点判断串并联。', '先问：电流走到这里有没有分成两条路？', '换成开关闭合后一个灯不亮，仍先描电流路径。'],
+    ['liquid_pressure_depth', /液体.*压强|同种液体|不同深度|容器形状/, 'physics_diagram', '先确认同种液体，再比较两个点到液面的深度。', '把容器形状当成决定因素，没有抓住液体深度。', '小黑板只画液面到两个点的竖直深度线。', '先问：同种液体时，压强主要看深度还是容器宽窄？', '换成不同液体同一深度，仍先说要比较密度还是深度。'],
+    ['speed_graph_slope', /哪一段速度大|只看线段长短/, 'physics_diagram', '先确认横轴是时间、纵轴是路程，再比较图线斜率。', '把图线长度当速度，没有用斜率表示快慢。', '小黑板只标横轴、纵轴和两段斜率。', '先问：速度看这段线有多长，还是看它有多陡？', '换成速度-时间图像，仍先分清横纵轴表示什么。'],
+    ['chloride_ion_reagent', /氯离子的检验方法/, 'chemistry_experiment', '先判断要检验氯离子，再想到加入硝酸银溶液观察白色沉淀。', '只背现象，没有把待检离子和试剂对应。', '小黑板只画“Cl- -> AgNO3 -> 白色沉淀”。', '先问：你要检验的是哪种离子？对应的试剂是什么？', '换成硫酸根离子，仍先说待检离子和检验试剂。'],
+    ['mass_conservation_closed', /看到有气体生成就以为质量变少|质量变少/, 'chemistry_experiment', '先判断系统是否密闭，再说密闭体系总质量不变。', '把气体生成等同于质量消失，没有区分开放和密闭体系。', '小黑板只画“密闭容器 -> 反应前总质量 = 反应后总质量”。', '先问：气体有没有跑出容器？如果没有，总质量会怎样？', '换成开放烧杯反应，仍先判断气体是否逸出。'],
+    ['gas_collection_property', /氧气收集|收集方法|气体性质|溶于水|密度比空气/, 'chemistry_experiment', '先判断氧气不易溶于水、密度比空气略大，再选收集方法。', '没有先看气体性质，直接凭装置外观选择。', '小黑板只画“气体性质 -> 收集方法”的两格。', '先问：这种气体能不能溶于水？比空气轻还是重？', '换成二氧化碳收集，仍先看溶解性和密度。'],
+    ['english_cloze_pronoun', /完形.*代词|Tom and his sister|凭中文感觉选 he/, 'english_sentence', '先找空格指代的是一个人还是两个人，再判断主格、宾格或物主代词。', '没有回看前文指代对象和句子成分。', '小黑板只写“指代谁 -> 单复数 -> 句子成分”。', '先问：这个词代替前文哪个人或哪些人？在句子里做什么成分？', '换成 Lily and I，仍先判断指代对象和成分。'],
+    ['object_clause_order', /where 就保留疑问句语序|宾语从句语序/, 'english_sentence', '先判断这是宾语从句，再把从句改成陈述语序。', '把疑问词当成疑问句，没有识别宾语从句要用陈述语序。', '小黑板只写“主句 + where/when + 主语 + 谓语”。', '先问：这个 where 后面是不是放在宾语从句里？从句语序要怎样？', '换成 when 引导的宾语从句，仍先改陈述语序。'],
+    ['english_reference_it', /it 指代|they 指代|只看所在句|回看上一句/, 'reading_question', '先回到 it 前一句，找最近且语义能对应的名词或事情；如果是单数名词或整件事，再代回本句验证。', '只看指代词所在句，没有用前文名词和语义验证；也可能只看本句，没有用上下文寻找指代对象。', '小黑板只画“上一句候选词/前文名词事件 -> it -> 代入本句是否通顺”。', '先问：把哪个词代回 it 的位置，句子最通顺？', '换成 they 指代题或 this，仍先找前文复数候选和指代对象。'],
+    ['argument_method_claim', /论证方法及作用|没有结合论点/, 'reading_question', '先找这一段服务的中心论点，再判断是举例、道理、对比还是比喻论证。', '没有先找论点，作用分析停留在空话。', '小黑板只写“论证方法 -> 证明了哪个论点”。', '先问：这一段是为了证明哪一句观点？', '换成举例论证段，仍先找被证明的观点。'],
+    ['sentence_error_subject_missing', /通过这次活动，使我明白/, 'writing_process', '先找句子主干，判断缺不缺主语，再删去“通过”或“使”中的一个。', '没有抓句子主干，只凭读起来顺不顺判断；只润色句子，没有先判断成分残缺和主语缺失。', '小黑板只写“通过...，使...”会让主语消失，并画“通过/使 -> 主语被遮住”。', '先问：这句话的主语是谁？删掉“通过”或“使”后主语还在吗？', '换成“由于...，让...”结构或“经过努力，使成绩提高”，仍先找主语。'],
+    ['material_composition_relation', /材料作文|坚持与转弯|万能主题|立意/, 'writing_process', '先圈出材料里的两个关键词“坚持”和“转弯”，再确定二者关系。', '没有分析材料关系，直接套万能主题。', '小黑板只画“关键词 -> 关系 -> 立意句”。', '先问：材料是在只夸坚持，还是说坚持也要会调整？', '换成“规则与创新”材料，仍先圈关键词并说关系。'],
+    ['genetics_same_trait', /相对性状|高茎|绿色种子|同一性状/, 'biology_process', '先确认是不是同一种生物同一性状的不同表现。', '没有抓住“同一性状”，把不同性状混在一起。', '小黑板只写“同种生物 + 同一性状 + 不同表现”。', '先问：这两个特征是不是在比较同一个方面？', '换成有耳垂和无耳垂，仍先判断是不是同一性状。'],
+    ['foodweb_arrow_energy', /某动物减少|箭头方向理解反了/, 'biology_process', '先确认箭头表示物质和能量从被吃者流向捕食者。', '把食物网箭头当成捕食方向，没有理解能量流向。', '小黑板只画“草 -> 兔 -> 狐”的能量流向。', '先问：箭头从谁指向谁？表示谁被谁吃后能量流过去？', '换成另一条食物链，仍先说箭头表示能量流向。'],
+    ['digestive_absorption_structure', /小肠适于吸收|绒毛|毛细血管|面积大/, 'biology_process', '先把问题分成“面积大”和“物质容易进入血液”两个方向。', '只背单个特点，没有把结构和功能对应。', '小黑板只画“小肠长/绒毛多 -> 面积大；毛细血管多 -> 易吸收”。', '先问：这个结构特点是让面积变大，还是让营养物质更容易进入血液？', '换成肺泡适于气体交换，仍先把结构特点和功能对应。'],
+    ['contour_ridge_valley', /海拔递变方向/, 'geography_map', '先沿等高线数值判断海拔向哪边升高，再看弯曲方向。', '只看形状，没有结合等高线数值变化。', '小黑板只画等高线弯曲和海拔升高箭头。', '先问：这些数字往哪边越来越高？弯曲方向和高低有什么关系？', '换成陡坡缓坡判断，仍先看等高线疏密和数值。'],
+    ['river_flood_climate', /汛期长短|河流长度，不看气候/, 'geography_map', '先看流域气候和降水季节分配，再判断汛期长短。', '把河流长度当成汛期依据，没有连接气候降水。', '小黑板只画“气候降水 -> 径流变化 -> 汛期”。', '先问：这条河的水主要来自哪里？雨季集中在什么时候？', '换成内流河，仍先判断补给来源和季节变化。'],
+    ['climate_chart_type', /气候类型。孩子只看最高温|只看最高温，不看雨热同期/, 'geography_map', '先判断最冷月/最热月气温，再看降水集中在哪个季节；也要读最冷月和最热月气温，再看降水是否集中在夏季。', '只抓一个温度点，只看温度，没有同时看气温和降水组合。', '小黑板只画“温度范围/气温范围 + 降水季节 -> 气候类型”。', '先问：冬天冷不冷？雨主要下在夏天还是全年均匀？', '换成地中海气候图或换一张气候图，仍先读气温和降水两个证据。']
+  ];
+  const exactHomeworkCase = exactHomeworkCases.find((item) => item[1].test(source));
+  if (exactHomeworkCase) {
+    return {
+      id: exactHomeworkCase[0],
+      taskType: exactHomeworkCase[2],
+      firstStep: exactHomeworkCase[3],
+      wrongCause: exactHomeworkCase[4],
+      boardMove: exactHomeworkCase[5],
+      parentCheck: exactHomeworkCase[6],
+      reviewMove: exactHomeworkCase[7],
+      source: 'real_homework_pressure_exact'
+    };
+  }
   const scorePattern = (pattern) => {
     const rawParts = String(pattern && pattern.source ? pattern.source : '')
       .split('|')

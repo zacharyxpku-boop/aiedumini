@@ -100,6 +100,91 @@ const SAMPLE_CLUSTERS = [
   }
 ];
 
+const PUBLIC_K12_SOURCE_LEDGER = [
+  {
+    id: 'moe_curriculum_standard',
+    label: '义务教育课程方案与课程标准',
+    sourceType: 'official_public_standard',
+    useLevel: 'high_confidence',
+    productUse: ['课程骨架', '能力标签', '题型方向', '错因模型'],
+    localRuleUse: ['学科分流', '任务类型识别', '第一步入口', '报告能力维度'],
+    aiUse: ['把本地规则生成的第一步改写成孩子听得懂的追问'],
+    blockedUse: ['直接复制教材正文', '宣称覆盖全教材原题', '生成标准答案库'],
+    miniappSurface: ['/pages/tutor/tutor', '/pages/profile/profile'],
+    evidenceRequired: ['subject_lane', 'capability_tag', 'first_step_rule', 'no_answer_bank_boundary']
+  },
+  {
+    id: 'smartedu_basic_homework',
+    label: '国家中小学智慧教育平台基础性作业方向',
+    sourceType: 'official_public_homework_direction',
+    useLevel: 'high_confidence',
+    productUse: ['作业压力样本', '回访题型', '家长检查话术', '减负边界'],
+    localRuleUse: ['真实作业压测样本', '负样本拦截', '回访间隔', '家长侧只看行动建议'],
+    aiUse: ['根据错因生成不同语气的苏格拉底追问'],
+    blockedUse: ['批量搬运原题', '输出完整题解', '伪装成拍照搜题'],
+    miniappSurface: ['/pages/home/home', '/pages/review/review', '/pages/arcade/arcade'],
+    evidenceRequired: ['sample_rewrite', 'parent_check', 'revisit_plan', 'shortcut_block']
+  },
+  {
+    id: 'public_exam_archetype',
+    label: '公开中考/学业水平考试常见题型',
+    sourceType: 'public_exam_archetype',
+    useLevel: 'medium_confidence',
+    productUse: ['题型簇', '变式迁移', '小黑板图解动作', '跨周趋势'],
+    localRuleUse: ['题型路由', '小黑板第一笔', '变式解锁门槛', '错因复现'],
+    aiUse: ['解释同一错因在不同题面里的表现'],
+    blockedUse: ['原题答案索引', '押题承诺', '考试分数预测'],
+    miniappSurface: ['/pages/tutor/tutor', '/pages/radar/radar', '/pages/profile/profile'],
+    evidenceRequired: ['question_type_cluster', 'visual_board_move', 'variant_gate', 'exam_score_boundary']
+  },
+  {
+    id: 'family_homework_observation',
+    label: '家庭晚间作业真实观察',
+    sourceType: 'first_party_observation',
+    useLevel: 'highest_confidence_after_consent',
+    productUse: ['今晚决策', '长期画像', '家校协同摘要', '分享回流'],
+    localRuleUse: ['隐私字段裁剪', '分享可见字段', '家校摘要字段', '奖励发放门槛'],
+    aiUse: ['把证据解释成家长能执行的一句话'],
+    blockedUse: ['展示完整对话', '展示原题照片', '展示排名分数', '未确认就给诊断标签'],
+    miniappSurface: ['/pages/profile/profile', '/pages/home/home'],
+    evidenceRequired: ['guardian_safe_field', 'visible_share_field', 'home_school_digest', 'confidence_gate']
+  }
+];
+
+const PUBLIC_K12_USE_POLICY = {
+  id: 'public_k12_use_policy',
+  title: '公开 K12 资料使用边界',
+  principle: '公开资料只沉淀为题型、能力、错因、第一步、小黑板动作和回访规则；不做答案库，不搬运原题，不承诺全科自动板书。',
+  localCodeOwns: [
+    '学科与题型路由',
+    '错因分类',
+    '第一步小黑板动作',
+    '回访间隔',
+    'XP 和变式解锁',
+    '报告释放门槛',
+    '分享隐私边界'
+  ],
+  aiOwns: [
+    '苏格拉底追问语气',
+    '同一第一步的多种讲法',
+    '家长报告解释',
+    '孩子卡住后的鼓励与降阶提示'
+  ],
+  aiBlocked: [
+    '直接给最终答案',
+    '决定是否分享隐私字段',
+    '决定奖励和解锁',
+    '宣称拍照识别或全科动态板书',
+    '替代老师或家长判断'
+  ],
+  releaseGate: [
+    '每个资料来源必须有 productUse',
+    '每个资料来源必须有 blockedUse',
+    '每个资料来源必须落到至少一个小程序页面',
+    '每个资料来源必须说明哪些归本地规则、哪些归 AI 表达'
+  ]
+};
+
 function buildRealHomeworkCoverageMatrix(options = {}) {
   const activeSubject = String(options.subject || '').trim();
   const active = SUBJECT_COUNTS.find((item) => item.id === activeSubject || item.label === activeSubject) || SUBJECT_COUNTS[0];
@@ -115,9 +200,14 @@ function buildRealHomeworkCoverageMatrix(options = {}) {
     subjectRows: SUBJECT_COUNTS,
     typeRows: TYPE_COUNTS,
     sampleClusters: SAMPLE_CLUSTERS,
+    publicSourceLedger: PUBLIC_K12_SOURCE_LEDGER,
+    publicSourcePolicy: PUBLIC_K12_USE_POLICY,
+    publicSourceLine: `已把 ${PUBLIC_K12_SOURCE_LEDGER.length} 类公开/一方资料沉淀为本地规则资产：题型、错因、第一步、小黑板、回访、报告和分享边界。`,
+    publicSourceBlockedLine: '禁止把公开资料变成原题答案库、拍照搜题承诺、排名晒分或全科动态板书承诺。',
     totalSamples,
     totalSubjects: SUBJECT_COUNTS.length,
     totalTypes,
+    totalPublicSources: PUBLIC_K12_SOURCE_LEDGER.length,
     reportLine: `报告可引用 ${totalSamples} 个压力样本的第一步、错因、小黑板和回访动作。`,
     parentLine: `家长侧只看 ${active.label} 当前错因和下一次回访，不看孩子完整对话、分数或排名。`,
     nextExpansionLine: active.nextGap,
@@ -126,7 +216,8 @@ function buildRealHomeworkCoverageMatrix(options = {}) {
       'sample_specific_wrong_cause',
       'visual_board_move',
       'parent_check_line',
-      'next_day_revisit'
+      'next_day_revisit',
+      'public_source_boundary'
     ]
   };
 }
@@ -135,5 +226,7 @@ module.exports = {
   SUBJECT_COUNTS,
   TYPE_COUNTS,
   SAMPLE_CLUSTERS,
+  PUBLIC_K12_SOURCE_LEDGER,
+  PUBLIC_K12_USE_POLICY,
   buildRealHomeworkCoverageMatrix
 };

@@ -298,6 +298,9 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
     realHomeworkCoverageClusters: realHomeworkCoverageMatrix && Array.isArray(realHomeworkCoverageMatrix.sampleClusters)
       ? realHomeworkCoverageMatrix.sampleClusters.slice(0, 3)
       : [],
+    realHomeworkPublicSources: realHomeworkCoverageMatrix && Array.isArray(realHomeworkCoverageMatrix.publicSourceLedger)
+      ? realHomeworkCoverageMatrix.publicSourceLedger.slice(0, 3)
+      : [],
     questionTypeCoverageAtlas,
     socraticQualityEvaluationSuite,
     socraticPromptQualityJudge,
