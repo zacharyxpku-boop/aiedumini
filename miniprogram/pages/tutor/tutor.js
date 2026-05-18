@@ -198,6 +198,13 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
   const socraticQualityEvaluationSuite = tutorLadder.buildSocraticQualityEvaluationSuite
     ? tutorLadder.buildSocraticQualityEvaluationSuite(subjectSkillDepth && subjectSkillDepth.taskType ? subjectSkillDepth.taskType : 'unknown')
     : null;
+  const socraticPromptQualityJudge = tutorLadder.buildSocraticPromptQualityJudge
+    ? tutorLadder.buildSocraticPromptQualityJudge(
+      subjectSkillDepth && subjectSkillDepth.taskType ? subjectSkillDepth.taskType : 'unknown',
+      socraticQualityEvaluationSuite,
+      null
+    )
+    : null;
   const sevenSubjectMasterySprint = storage.buildSevenSubjectMasterySprint
     ? storage.buildSevenSubjectMasterySprint({
       courseUnitMap,
@@ -278,6 +285,16 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
     commercialDepthRunway,
     questionTypeCoverageAtlas,
     socraticQualityEvaluationSuite,
+    socraticPromptQualityJudge,
+    socraticPromptEffectivePrompts: socraticPromptQualityJudge && Array.isArray(socraticPromptQualityJudge.effectivePrompts)
+      ? socraticPromptQualityJudge.effectivePrompts.slice(0, 4)
+      : [],
+    socraticPromptMisleadingPrompts: socraticPromptQualityJudge && Array.isArray(socraticPromptQualityJudge.misleadingPrompts)
+      ? socraticPromptQualityJudge.misleadingPrompts.slice(0, 4)
+      : [],
+    socraticPromptStopConditions: socraticPromptQualityJudge && Array.isArray(socraticPromptQualityJudge.stopConditions)
+      ? socraticPromptQualityJudge.stopConditions.slice(0, 4)
+      : [],
     sevenSubjectMasterySprint,
     handoffPlan,
     checks: [
@@ -709,6 +726,7 @@ Page({
       visual_socratic_recovery: result && result.visual_socratic_recovery ? result.visual_socratic_recovery : null,
       fallback_recovery_bridge: result && result.fallback_recovery_bridge ? result.fallback_recovery_bridge : null,
       three_round_socratic_protocol: result && result.three_round_socratic_protocol ? result.three_round_socratic_protocol : null,
+      socratic_prompt_quality_judge: result && result.socratic_prompt_quality_judge ? result.socratic_prompt_quality_judge : receipt.socraticPromptQualityJudge || null,
       allowed_moves: result && result.allowed_moves ? result.allowed_moves : [],
       transfer_prompt: result && result.transfer_prompt ? result.transfer_prompt : ''
     });
@@ -776,6 +794,16 @@ Page({
           : 0,
         three_round_socratic_evidence: result.three_round_socratic_protocol && Array.isArray(result.three_round_socratic_protocol.evidenceRequired)
           ? result.three_round_socratic_protocol.evidenceRequired.length
+          : 0,
+        socratic_prompt_quality_judge: result.socratic_prompt_quality_judge || null,
+        prompt_quality_effective_count: result.socratic_prompt_quality_judge && Array.isArray(result.socratic_prompt_quality_judge.effectivePrompts)
+          ? result.socratic_prompt_quality_judge.effectivePrompts.length
+          : 0,
+        prompt_quality_misleading_count: result.socratic_prompt_quality_judge && Array.isArray(result.socratic_prompt_quality_judge.misleadingPrompts)
+          ? result.socratic_prompt_quality_judge.misleadingPrompts.length
+          : 0,
+        prompt_quality_stop_count: result.socratic_prompt_quality_judge && Array.isArray(result.socratic_prompt_quality_judge.stopConditions)
+          ? result.socratic_prompt_quality_judge.stopConditions.length
           : 0,
         allowed_moves: result.allowed_moves || [],
         transfer_prompt: result.transfer_prompt || ''

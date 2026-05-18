@@ -144,6 +144,15 @@
             <view class="receipt-board-avoid">{{thinkingReceipt.socraticQualityEvaluationSuite.activeCase.passLine}}</view>
             <view class="receipt-board-avoid">{{thinkingReceipt.socraticQualityEvaluationSuite.shareBoundary}}</view>
           </view>
+          <view class="receipt-first-step-board" wx:if="{{thinkingReceipt.socraticPromptQualityJudge}}">
+            <view class="receipt-diagnostic-title">{{thinkingReceipt.socraticPromptQualityJudge.title}}</view>
+            <view class="receipt-board-avoid">{{thinkingReceipt.socraticPromptQualityJudge.summary}}</view>
+            <view class="receipt-board-line" wx:for="{{thinkingReceipt.socraticPromptEffectivePrompts}}" wx:key="id">有效追问：{{item.label}}｜{{item.prompt}}</view>
+            <view class="receipt-board-parent" wx:for="{{thinkingReceipt.socraticPromptMisleadingPrompts}}" wx:key="id">误导追问：{{item.label}}｜{{item.risk}}</view>
+            <view class="receipt-board-line" wx:for="{{thinkingReceipt.socraticPromptStopConditions}}" wx:key="id">停止条件：{{item.label}}｜{{item.action}}</view>
+            <view class="receipt-board-avoid">{{thinkingReceipt.socraticPromptQualityJudge.parentDecisionLine}}</view>
+            <view class="receipt-board-avoid">{{thinkingReceipt.socraticPromptQualityJudge.shareBoundary}}</view>
+          </view>
           <view class="receipt-first-step-board" wx:if="{{thinkingReceipt.three_round_socratic_protocol}}">
             <view class="receipt-diagnostic-title">{{thinkingReceipt.three_round_socratic_protocol.title}}</view>
             <view class="receipt-board-avoid">{{thinkingReceipt.three_round_socratic_protocol.parentLine}}</view>

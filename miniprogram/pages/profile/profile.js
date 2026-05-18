@@ -895,6 +895,9 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
   const fallbackRecoveryReportBridge = latestThinkingReceipt && latestThinkingReceipt.fallback_recovery_bridge
     ? latestThinkingReceipt.fallback_recovery_bridge
     : null;
+  const socraticPromptQualityJudge = latestThinkingReceipt && (latestThinkingReceipt.socratic_prompt_quality_judge || latestThinkingReceipt.socraticPromptQualityJudge)
+    ? (latestThinkingReceipt.socratic_prompt_quality_judge || latestThinkingReceipt.socraticPromptQualityJudge)
+    : null;
   return {
     title: draft.title || '学习画像',
     modeLabel: reportState.reportProgress && reportState.reportProgress.label ? reportState.reportProgress.label : '0% · 快速版',
@@ -1068,6 +1071,26 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
       : [],
     socraticMemoryReportEvidence: socraticMemoryReportBridge && Array.isArray(socraticMemoryReportBridge.evidenceRequired)
       ? socraticMemoryReportBridge.evidenceRequired
+      : [],
+    socraticPromptQualityJudge,
+    socraticPromptJudgeTitle: socraticPromptQualityJudge ? socraticPromptQualityJudge.title : '',
+    socraticPromptJudgeSummary: socraticPromptQualityJudge ? socraticPromptQualityJudge.summary : '',
+    socraticPromptEffectivePrompts: socraticPromptQualityJudge && Array.isArray(socraticPromptQualityJudge.effectivePrompts)
+      ? socraticPromptQualityJudge.effectivePrompts
+      : [],
+    socraticPromptMisleadingPrompts: socraticPromptQualityJudge && Array.isArray(socraticPromptQualityJudge.misleadingPrompts)
+      ? socraticPromptQualityJudge.misleadingPrompts
+      : [],
+    socraticPromptStopConditions: socraticPromptQualityJudge && Array.isArray(socraticPromptQualityJudge.stopConditions)
+      ? socraticPromptQualityJudge.stopConditions
+      : [],
+    socraticPromptParentRules: socraticPromptQualityJudge && Array.isArray(socraticPromptQualityJudge.parentDecisionRules)
+      ? socraticPromptQualityJudge.parentDecisionRules
+      : [],
+    socraticPromptParentDecisionLine: socraticPromptQualityJudge ? socraticPromptQualityJudge.parentDecisionLine : '',
+    socraticPromptShareBoundary: socraticPromptQualityJudge ? socraticPromptQualityJudge.shareBoundary : '',
+    socraticPromptJudgeEvidence: socraticPromptQualityJudge && Array.isArray(socraticPromptQualityJudge.evidenceRequired)
+      ? socraticPromptQualityJudge.evidenceRequired
       : [],
     questionBankDecisionBridge,
     questionBankDecisionTitle: questionBankDecisionBridge ? questionBankDecisionBridge.title : '',

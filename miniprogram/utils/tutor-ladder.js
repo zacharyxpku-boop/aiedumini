@@ -419,6 +419,75 @@ function buildSocraticQualityEvaluationSuite(activeTaskType = 'unknown') {
   };
 }
 
+function buildSocraticPromptQualityJudge(activeTaskType = 'unknown', qualitySuite = null, questionTypePath = null) {
+  const suite = qualitySuite || buildSocraticQualityEvaluationSuite(activeTaskType);
+  const activeCase = suite && suite.activeCase ? suite.activeCase : {};
+  const taskType = activeCase.taskType || activeTaskType || 'unknown';
+  const activeScenarios = Array.isArray(activeCase.scenarios) ? activeCase.scenarios : [];
+  const probeBank = questionTypePath && Array.isArray(questionTypePath.probeBank) ? questionTypePath.probeBank : [];
+  const firstProbe = probeBank[0] || {};
+  return {
+    id: `socratic_prompt_quality_judge_${taskType}`,
+    title: '追问质量判断器',
+    taskType,
+    status: activeScenarios.length >= 4 ? 'ready' : 'needs_more_cases',
+    summary: '每次点拨都先判断追问是否推动孩子说出第一步，而不是多讲概念、替孩子写答案。',
+    effectivePrompts: [
+      {
+        id: 'first_step_probe',
+        label: '第一步定位追问',
+        prompt: firstProbe.question || '先说题目问什么，再说你准备先看哪一个条件。',
+        why: '只要求一个可观察动作，能把卡住点从空泛变成可回访证据。'
+      },
+      {
+        id: 'micro_choice',
+        label: 'A/B 微选择',
+        prompt: '如果说不出，就在 A 先找已知条件、B 先看题目问题里选一个。',
+        why: '沉默时降低门槛，不把孩子推向抄答案。'
+      },
+      {
+        id: 'evidence_anchor',
+        label: '证据锚点',
+        prompt: '用一句话说你刚才根据哪个词、图、单位或条件判断的。',
+        why: '把“会不会”转成“证据是否出现”，方便家长判断今晚是否停。'
+      },
+      {
+        id: 'next_day_revisit',
+        label: '明日回访',
+        prompt: '同类小变式还卡住时，不加题，明天只回访同一个第一步。',
+        why: '迁移失败时避免刷量，保护记忆循环和情绪。'
+      }
+    ],
+    misleadingPrompts: [
+      { id: 'full_answer', label: '直接给完整答案', risk: '会绕过孩子第一步，破坏证据链。', blockedBy: 'no_full_answer_boundary' },
+      { id: 'concept_stack', label: '一次堆多个概念', risk: '孩子只会点头，无法留下可复测动作。', blockedBy: 'one_prompt_one_action' },
+      { id: 'compound_question', label: '连续问多步复合问题', risk: '沉默会增加，家长也不知道该检查哪一步。', blockedBy: 'micro_choice_fallback' },
+      { id: 'ability_label', label: '过早评价能力', risk: '把当前错因误判成长期画像，影响家长决策。', blockedBy: 'evidence_before_label' }
+    ],
+    stopConditions: [
+      { id: 'child_first_step', label: '孩子说出第一步', action: '停止继续讲解，转修卡点或轻回访。' },
+      { id: 'answer_request', label: '孩子继续要答案', action: '拦住完整答案，只回到题目问什么和已知条件。' },
+      { id: 'repeated_silence', label: '连续沉默或只说不会', action: '降到 A/B 微选择，仍无回应就交给家长低压话术。' },
+      { id: 'transfer_fail', label: '同类小变式失败', action: '停止加题，记录错因，安排明日同一步回访。' }
+    ],
+    parentDecisionRules: [
+      { id: 'continue', label: '继续', rule: '孩子能说出第一步且情绪稳定，继续做一张近似小变式。' },
+      { id: 'downgrade', label: '降级', rule: '孩子沉默或答偏，降到 A/B 微选择，不讲新概念。' },
+      { id: 'stop', label: '停止', rule: '出现要答案、焦躁或迁移失败，今晚停止讲解，只留明日回访。' },
+      { id: 'report', label: '进报告', rule: '只有第一步、错因、回访结果三类证据齐了，才进入长期画像。' }
+    ],
+    parentDecisionLine: '家长只看：这次追问有没有让孩子说出第一步；没有就降级或停止，不用继续讲题。',
+    shareBoundary: '安全接力只分享能力缺口、下一步动作和回访窗口，不分享原题、完整答案、孩子原始表现或完整对话。',
+    evidenceRequired: [
+      'effective_prompt',
+      'misleading_prompt_blocked',
+      'stop_condition',
+      'parent_decision_rule',
+      'safe_share_boundary'
+    ]
+  };
+}
+
 function buildThreeRoundSocraticProtocol(taskType, item, probe, fallbackPlan = {}, visualRecovery = {}, qualitySuite = {}) {
   const normalizedType = taskType || 'unknown';
   const boardLayers = Array.isArray(visualRecovery.boardLayers) ? visualRecovery.boardLayers : [];
@@ -699,6 +768,7 @@ function buildTutorReply(text, options = {}) {
     const probe = diagnosticProbe(taskType, item.level);
     const questionTypePath = buildQuestionTypeSocraticPath(taskType, item, probe);
     const socraticQualityEvaluationSuite = buildSocraticQualityEvaluationSuite(taskType);
+    const socraticPromptQualityJudge = buildSocraticPromptQualityJudge(taskType, socraticQualityEvaluationSuite, questionTypePath);
     const socraticContract = buildSocraticContract(taskType, item, probe);
     const socraticFallbackPlan = buildSocraticFallbackPlan(taskType, item, probe, { answerBlocked: true });
     const visualSocraticRecovery = buildVisualSocraticRecoveryProtocol(taskType, item, probe, socraticFallbackPlan, { answerBlocked: true });
@@ -715,6 +785,7 @@ function buildTutorReply(text, options = {}) {
       question_type_socratic_path: questionTypePath,
       question_bank_visual_board_bridge: questionBankVisualBoardBridge,
       socratic_quality_evaluation_suite: socraticQualityEvaluationSuite,
+      socratic_prompt_quality_judge: socraticPromptQualityJudge,
       socratic_contract: socraticContract,
       socratic_fallback_plan: socraticFallbackPlan,
       visual_socratic_recovery: visualSocraticRecovery,
@@ -739,6 +810,7 @@ function buildTutorReply(text, options = {}) {
   const probe = diagnosticProbe(taskType, item.level);
   const questionTypePath = buildQuestionTypeSocraticPath(taskType, item, probe);
   const socraticQualityEvaluationSuite = buildSocraticQualityEvaluationSuite(taskType);
+  const socraticPromptQualityJudge = buildSocraticPromptQualityJudge(taskType, socraticQualityEvaluationSuite, questionTypePath);
   const socraticContract = buildSocraticContract(taskType, item, probe);
   const stuckCount = countRecentStuck(messages, text);
   const socraticFallbackPlan = buildSocraticFallbackPlan(taskType, item, probe, { stuckCount });
@@ -760,6 +832,7 @@ function buildTutorReply(text, options = {}) {
     question_type_socratic_path: questionTypePath,
     question_bank_visual_board_bridge: questionBankVisualBoardBridge,
     socratic_quality_evaluation_suite: socraticQualityEvaluationSuite,
+    socratic_prompt_quality_judge: socraticPromptQualityJudge,
     socratic_contract: socraticContract,
     socratic_fallback_plan: socraticFallbackPlan,
     visual_socratic_recovery: visualSocraticRecovery,
@@ -817,6 +890,7 @@ module.exports = {
   buildQuestionBankVisualBoardBridge,
   buildQuestionTypeCoverageAtlas,
   buildSocraticQualityEvaluationSuite,
+  buildSocraticPromptQualityJudge,
   MISCONCEPTION_MAP,
   detectTaskType,
   buildTutorReply,

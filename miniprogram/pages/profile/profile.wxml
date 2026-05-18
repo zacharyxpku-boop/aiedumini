@@ -770,6 +770,17 @@
           <text wx:for="{{learningReportSummary.socraticMemoryReportActions}}" wx:key="id">报告动作：{{item.label}}｜{{item.action}}｜证据 {{item.evidence}}</text>
           <text wx:for="{{learningReportSummary.socraticMemoryReportEvidence}}" wx:key="*this">可信证据：{{item}}</text>
         </view>
+        <view class="parent-brief-block" wx:if="{{learningReportSummary.socraticPromptQualityJudge}}">
+          <text class="parent-brief-label">{{learningReportSummary.socraticPromptJudgeTitle}}</text>
+          <text>{{learningReportSummary.socraticPromptJudgeSummary}}</text>
+          <text>{{learningReportSummary.socraticPromptParentDecisionLine}}</text>
+          <text wx:for="{{learningReportSummary.socraticPromptEffectivePrompts}}" wx:key="id">有效追问：{{item.label}}｜{{item.why}}</text>
+          <text wx:for="{{learningReportSummary.socraticPromptMisleadingPrompts}}" wx:key="id">误导追问：{{item.label}}｜{{item.risk}}</text>
+          <text wx:for="{{learningReportSummary.socraticPromptStopConditions}}" wx:key="id">停止条件：{{item.label}}｜{{item.action}}</text>
+          <text wx:for="{{learningReportSummary.socraticPromptParentRules}}" wx:key="id">家长判断：{{item.label}}｜{{item.rule}}</text>
+          <text>分享边界：{{learningReportSummary.socraticPromptShareBoundary}}</text>
+          <text wx:for="{{learningReportSummary.socraticPromptJudgeEvidence}}" wx:key="*this">质量证据：{{item}}</text>
+        </view>
         <view class="parent-brief-block" wx:if="{{learningReportSummary.questionBankDecisionBridge}}">
           <text class="parent-brief-label">{{learningReportSummary.questionBankDecisionTitle}}</text>
           <text>{{learningReportSummary.questionBankDecisionSummary}}</text>
@@ -807,7 +818,7 @@
           <text wx:for="{{learningReportSummary.memoryRiskEvidence}}" wx:key="*this">记忆证据：{{item}}</text>
         </view>
         <view class="parent-brief-block" wx:if="{{learningReportSummary.portraitDecisionReleaseSystem}}">
-          <text class="parent-brief-label">长期画像放行系统</text>
+          <text class="parent-brief-label">长期画像放行建议</text>
           <text wx:if="{{learningReportSummary.portraitDecisionReleaseTitle}}">{{learningReportSummary.portraitDecisionReleaseTitle}}</text>
           <text>放行等级：{{learningReportSummary.portraitDecisionReleaseLevel}}｜放行分：{{learningReportSummary.portraitDecisionReleaseScore}}</text>
           <text>{{learningReportSummary.portraitDecisionReleaseSummary}}</text>
