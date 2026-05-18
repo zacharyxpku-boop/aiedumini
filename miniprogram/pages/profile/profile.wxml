@@ -1034,6 +1034,15 @@
           <view>{{dailyShareCard.shareChallengePlan.parentEvidenceLine}}</view>
           <view>{{dailyShareCard.shareChallengePlan.successRule}}</view>
           <view>{{dailyShareCard.shareChallengePlan.failureFallback}}</view>
+          <view wx:if="{{dailyShareCard.shareChallengePlan.safeRelayChallengePacket}}">
+            {{dailyShareCard.shareChallengePlan.safeRelayChallengePacket.title}}：{{dailyShareCard.shareChallengePlan.safeRelayChallengePacket.evidenceContract}}
+          </view>
+          <view wx:if="{{dailyShareCard.shareChallengePlan.safeRelayChallengePacket}}">
+            接收动作：{{dailyShareCard.shareChallengePlan.safeRelayChallengePacket.receiverAction}}
+          </view>
+          <view wx:if="{{dailyShareCard.shareChallengePlan.safeRelayChallengePacket}}">
+            {{dailyShareCard.shareChallengePlan.safeRelayChallengePacket.noRankingRule}}
+          </view>
         </view>
         <view class="share-conversation-card" wx:if="{{communityShareRelayBoard}}">
           <view class="share-conversation-title">{{communityShareRelayBoard.title}}</view>
@@ -1045,6 +1054,12 @@
           <view wx:for="{{communityShareRelayBoard.recentRuns}}" wx:key="id">接力记录：{{item.code}} · {{item.evidence}}</view>
           <view>{{communityShareRelayBoard.contractLine}}</view>
           <view>{{communityShareRelayBoard.returnPathLine}}</view>
+          <view wx:if="{{communityShareRelayBoard.safeRelayChallengePacket}}">
+            安全字段：{{communityShareRelayBoard.safeRelayChallengePacket.allowedFields}}
+          </view>
+          <view wx:if="{{communityShareRelayBoard.safeRelayChallengePacket}}">
+            不带字段：{{communityShareRelayBoard.safeRelayChallengePacket.blockedFields}}
+          </view>
         </view>
         <view class="share-conversation-card" wx:if="{{learningReportSummary.weeklyEvidenceFlywheel}}">
           <view class="share-conversation-title">{{learningReportSummary.weeklyEvidenceFlywheel.title}}</view>

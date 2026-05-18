@@ -170,6 +170,14 @@ Page({
         relay_privacy: safeDecodeShareParam(query.relay_privacy),
         relay_review: safeDecodeShareParam(query.relay_review),
         relay_first_step: safeDecodeShareParam(query.relay_first_step),
+        relay_id: safeDecodeShareParam(query.relay_id),
+        relay_receiver_action: safeDecodeShareParam(query.relay_receiver_action),
+        relay_parent_check: safeDecodeShareParam(query.relay_parent_check),
+        relay_next_revisit: safeDecodeShareParam(query.relay_next_revisit),
+        relay_allowed_fields: safeDecodeShareParam(query.relay_allowed_fields),
+        relay_blocked_fields: safeDecodeShareParam(query.relay_blocked_fields),
+        relay_completion_signal: safeDecodeShareParam(query.relay_completion_signal),
+        relay_return_path: safeDecodeShareParam(query.relay_return_path),
         course_unit_label: safeDecodeShareParam(query.course_unit_label),
         course_unit_subject: safeDecodeShareParam(query.course_unit_subject),
         course_unit_tier: safeDecodeShareParam(query.course_unit_tier),
@@ -197,6 +205,14 @@ Page({
         relay_privacy: safeDecodeShareParam(query.relay_privacy),
         relay_review: safeDecodeShareParam(query.relay_review),
         relay_first_step: safeDecodeShareParam(query.relay_first_step),
+        relay_id: safeDecodeShareParam(query.relay_id),
+        relay_receiver_action: safeDecodeShareParam(query.relay_receiver_action),
+        relay_parent_check: safeDecodeShareParam(query.relay_parent_check),
+        relay_next_revisit: safeDecodeShareParam(query.relay_next_revisit),
+        relay_allowed_fields: safeDecodeShareParam(query.relay_allowed_fields),
+        relay_blocked_fields: safeDecodeShareParam(query.relay_blocked_fields),
+        relay_completion_signal: safeDecodeShareParam(query.relay_completion_signal),
+        relay_return_path: safeDecodeShareParam(query.relay_return_path),
         course_unit_label: safeDecodeShareParam(query.course_unit_label),
         course_unit_subject: safeDecodeShareParam(query.course_unit_subject),
         course_unit_tier: safeDecodeShareParam(query.course_unit_tier),
@@ -794,6 +810,16 @@ Page({
     const firstStep = incoming.relay_first_step || incoming.challenge_goal || actionLabel;
     const privacyLine = incoming.relay_privacy || '分享只带学习动作和回访证据，不带孩子完整对话、分数、原题照片。';
     const reviewLine = incoming.relay_review || '第 7 天用 1 道小变式确认能不能迁移。';
+    const safeRelayPacket = incoming.relay_id ? {
+      relayId: incoming.relay_id,
+      receiverAction: incoming.relay_receiver_action || actionDetail,
+      parentCheck: incoming.relay_parent_check || '家长只看行动证据，不看完整对话。',
+      nextDayRevisit: incoming.relay_next_revisit || reviewLine,
+      allowedFields: incoming.relay_allowed_fields || 'relay_id,first_step,receiver_action,parent_check,next_day_revisit',
+      blockedFields: incoming.relay_blocked_fields || 'original_photo,full_dialogue,score,ranking,private_comment,original_answer',
+      completionSignal: incoming.relay_completion_signal || 'active_recall_next_revisit',
+      returnPath: incoming.relay_return_path || challengeRoute
+    } : null;
     const unitLine = incoming.course_unit_label
       ? `${incoming.course_unit_subject || '当前学科'} · ${incoming.course_unit_label}`
       : '';
@@ -804,11 +830,20 @@ Page({
       firstStepLine: `先做第一步：${firstStep}`,
       privacyLine,
       reviewLine,
+      safeRelayPacket,
+      receiverActionLine: safeRelayPacket && safeRelayPacket.receiverAction,
+      parentCheckLine: safeRelayPacket && safeRelayPacket.parentCheck,
+      nextDayRevisitLine: safeRelayPacket && safeRelayPacket.nextDayRevisit,
+      safeFieldLine: safeRelayPacket ? `只带：${safeRelayPacket.allowedFields}` : '',
+      blockedFieldLine: safeRelayPacket ? `不带：${safeRelayPacket.blockedFields}` : '',
+      completionSignalLine: safeRelayPacket ? `完成信号：${safeRelayPacket.completionSignal}` : '',
       unitLine,
       unitDecisionLine: incoming.course_unit_parent_decision || '',
       unitReportLine: incoming.course_unit_report_contract || '',
       unitBlackboardLine: incoming.course_unit_blackboard || '',
-      returnContractLine: '接力成立条件：主动回忆、错因回退、明天回访三件事至少完成一件并留下记录。',
+      returnContractLine: safeRelayPacket
+        ? '接力成立条件：自己的第一步、错因回退、明天回访预约都要留下证据。'
+        : '接力成立条件：主动回忆、错因回退、明天回访三件事至少完成一件并留下记录。',
       actions: [
         {
           id: 'repair',
@@ -1544,7 +1579,7 @@ Page({
     const incoming = this.data.incomingShare || (storage.loadIncomingShare && storage.loadIncomingShare()) || {};
     const route = navigation.normalizeRoute(incoming.challenge_route || incoming.capability_route || '/pages/arcade/arcade');
     const query = incoming.share_code
-      ? `from=share&share=${incoming.share_code}&mode=${incoming.mode || ''}&identity=${encodeURIComponent(incoming.identity_tag || '')}&action=${incoming.parent_next_action || ''}&capability_gap=${encodeURIComponent(incoming.capability_gap || '')}&capability_label=${encodeURIComponent(incoming.capability_label || '')}&challenge_goal=${encodeURIComponent(incoming.challenge_goal || '')}&challenge_rule=${encodeURIComponent(incoming.challenge_rule || '')}&relay_privacy=${encodeURIComponent(incoming.relay_privacy || '')}&relay_review=${encodeURIComponent(incoming.relay_review || '')}&relay_first_step=${encodeURIComponent(incoming.relay_first_step || '')}`
+      ? `from=share&share=${incoming.share_code}&mode=${incoming.mode || ''}&identity=${encodeURIComponent(incoming.identity_tag || '')}&action=${incoming.parent_next_action || ''}&capability_gap=${encodeURIComponent(incoming.capability_gap || '')}&capability_label=${encodeURIComponent(incoming.capability_label || '')}&challenge_goal=${encodeURIComponent(incoming.challenge_goal || '')}&challenge_rule=${encodeURIComponent(incoming.challenge_rule || '')}&relay_privacy=${encodeURIComponent(incoming.relay_privacy || '')}&relay_review=${encodeURIComponent(incoming.relay_review || '')}&relay_first_step=${encodeURIComponent(incoming.relay_first_step || '')}&relay_id=${encodeURIComponent(incoming.relay_id || '')}&relay_receiver_action=${encodeURIComponent(incoming.relay_receiver_action || '')}&relay_parent_check=${encodeURIComponent(incoming.relay_parent_check || '')}&relay_next_revisit=${encodeURIComponent(incoming.relay_next_revisit || '')}&relay_allowed_fields=${encodeURIComponent(incoming.relay_allowed_fields || '')}&relay_blocked_fields=${encodeURIComponent(incoming.relay_blocked_fields || '')}&relay_completion_signal=${encodeURIComponent(incoming.relay_completion_signal || '')}&relay_return_path=${encodeURIComponent(incoming.relay_return_path || '')}`
       : '';
     const target = query && route.indexOf('?') < 0 ? `${route}?${query}` : route;
     this.trackShareActivation('challenge_started', {
@@ -1567,7 +1602,7 @@ Page({
     const incoming = this.data.incomingShare || (storage.loadIncomingShare && storage.loadIncomingShare()) || {};
     const route = navigation.normalizeRoute(dataset.route || '/pages/arcade/arcade', '/pages/arcade/arcade');
     const query = incoming.share_code && route.indexOf('?') < 0
-      ? `?from=share_relay&share=${incoming.share_code}&mode=${incoming.mode || ''}&identity=${encodeURIComponent(incoming.identity_tag || '')}&action=${incoming.parent_next_action || ''}&capability_gap=${encodeURIComponent(incoming.capability_gap || '')}&capability_label=${encodeURIComponent(incoming.capability_label || '')}&challenge_goal=${encodeURIComponent(incoming.challenge_goal || '')}&challenge_rule=${encodeURIComponent(incoming.challenge_rule || '')}&relay_privacy=${encodeURIComponent(incoming.relay_privacy || '')}&relay_review=${encodeURIComponent(incoming.relay_review || '')}&relay_first_step=${encodeURIComponent(incoming.relay_first_step || '')}`
+      ? `?from=share_relay&share=${incoming.share_code}&mode=${incoming.mode || ''}&identity=${encodeURIComponent(incoming.identity_tag || '')}&action=${incoming.parent_next_action || ''}&capability_gap=${encodeURIComponent(incoming.capability_gap || '')}&capability_label=${encodeURIComponent(incoming.capability_label || '')}&challenge_goal=${encodeURIComponent(incoming.challenge_goal || '')}&challenge_rule=${encodeURIComponent(incoming.challenge_rule || '')}&relay_privacy=${encodeURIComponent(incoming.relay_privacy || '')}&relay_review=${encodeURIComponent(incoming.relay_review || '')}&relay_first_step=${encodeURIComponent(incoming.relay_first_step || '')}&relay_id=${encodeURIComponent(incoming.relay_id || '')}&relay_receiver_action=${encodeURIComponent(incoming.relay_receiver_action || '')}&relay_parent_check=${encodeURIComponent(incoming.relay_parent_check || '')}&relay_next_revisit=${encodeURIComponent(incoming.relay_next_revisit || '')}&relay_allowed_fields=${encodeURIComponent(incoming.relay_allowed_fields || '')}&relay_blocked_fields=${encodeURIComponent(incoming.relay_blocked_fields || '')}&relay_completion_signal=${encodeURIComponent(incoming.relay_completion_signal || '')}&relay_return_path=${encodeURIComponent(incoming.relay_return_path || '')}`
       : '';
     const target = `${route}${query}`;
     const action = {

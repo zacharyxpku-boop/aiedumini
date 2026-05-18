@@ -406,7 +406,7 @@ function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCause
     route: nextCapability && nextCapability.route ? nextCapability.route : '/pages/arcade/arcade'
   }) : null;
   const challengeQuery = shareChallengePlan && shareChallengePlan.query
-    ? `&challenge_goal=${encodeURIComponent(shareChallengePlan.query.challenge_goal || '')}&challenge_rule=${encodeURIComponent(shareChallengePlan.query.challenge_rule || '')}&challenge_route=${encodeURIComponent(shareChallengePlan.query.challenge_route || '')}&relay_privacy=${encodeURIComponent(shareChallengePlan.query.relay_privacy || '')}&relay_review=${encodeURIComponent(shareChallengePlan.query.relay_review || '')}&relay_first_step=${encodeURIComponent(shareChallengePlan.query.relay_first_step || '')}`
+    ? `&challenge_goal=${encodeURIComponent(shareChallengePlan.query.challenge_goal || '')}&challenge_rule=${encodeURIComponent(shareChallengePlan.query.challenge_rule || '')}&challenge_route=${encodeURIComponent(shareChallengePlan.query.challenge_route || '')}&relay_privacy=${encodeURIComponent(shareChallengePlan.query.relay_privacy || '')}&relay_review=${encodeURIComponent(shareChallengePlan.query.relay_review || '')}&relay_first_step=${encodeURIComponent(shareChallengePlan.query.relay_first_step || '')}&relay_id=${encodeURIComponent(shareChallengePlan.query.relay_id || '')}&relay_receiver_action=${encodeURIComponent(shareChallengePlan.query.relay_receiver_action || '')}&relay_parent_check=${encodeURIComponent(shareChallengePlan.query.relay_parent_check || '')}&relay_next_revisit=${encodeURIComponent(shareChallengePlan.query.relay_next_revisit || '')}&relay_allowed_fields=${encodeURIComponent(shareChallengePlan.query.relay_allowed_fields || '')}&relay_blocked_fields=${encodeURIComponent(shareChallengePlan.query.relay_blocked_fields || '')}&relay_completion_signal=${encodeURIComponent(shareChallengePlan.query.relay_completion_signal || '')}&relay_return_path=${encodeURIComponent(shareChallengePlan.query.relay_return_path || '')}`
     : '';
   const courseUnitDecision = buildCourseUnitDecisionBoard(courseUnitMap);
   const courseUnitQuery = courseUnitDecision
@@ -581,6 +581,9 @@ function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCause
       share_privacy_boundary: shareChallengePlan && shareChallengePlan.privacyBoundary,
       share_return_contract: shareChallengePlan && shareChallengePlan.evidenceContractLine,
       share_relay_actions: shareChallengePlan && shareChallengePlan.shareRelayActions,
+      safe_relay_packet: shareChallengePlan && shareChallengePlan.safeRelayChallengePacket,
+      safe_relay_allowed_fields: shareChallengePlan && shareChallengePlan.safeRelayChallengePacket && shareChallengePlan.safeRelayChallengePacket.allowedFields,
+      safe_relay_blocked_fields: shareChallengePlan && shareChallengePlan.safeRelayChallengePacket && shareChallengePlan.safeRelayChallengePacket.blockedFields,
       evidence_brief: evidenceBrief && evidenceBrief.reportLine,
       capability_gap_id: nextCapability && nextCapability.id,
       capability_gap_label: nextCapability && nextCapability.label,

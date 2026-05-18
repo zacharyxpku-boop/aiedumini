@@ -392,6 +392,12 @@
         <view class="share-relay-evidence">{{incomingShareRelay.firstStepLine}}</view>
         <view class="share-relay-evidence">{{incomingShareRelay.privacyLine}}</view>
         <view class="share-relay-evidence">{{incomingShareRelay.reviewLine}}</view>
+        <view class="share-relay-evidence" wx:if="{{incomingShareRelay.receiverActionLine}}">接收动作：{{incomingShareRelay.receiverActionLine}}</view>
+        <view class="share-relay-evidence" wx:if="{{incomingShareRelay.parentCheckLine}}">{{incomingShareRelay.parentCheckLine}}</view>
+        <view class="share-relay-evidence" wx:if="{{incomingShareRelay.nextDayRevisitLine}}">{{incomingShareRelay.nextDayRevisitLine}}</view>
+        <view class="share-relay-evidence" wx:if="{{incomingShareRelay.safeFieldLine}}">{{incomingShareRelay.safeFieldLine}}</view>
+        <view class="share-relay-evidence" wx:if="{{incomingShareRelay.blockedFieldLine}}">{{incomingShareRelay.blockedFieldLine}}</view>
+        <view class="share-relay-evidence" wx:if="{{incomingShareRelay.completionSignalLine}}">{{incomingShareRelay.completionSignalLine}}</view>
         <view class="share-relay-evidence" wx:if="{{incomingShareRelay.unitLine}}">单元接力：{{incomingShareRelay.unitLine}}</view>
         <view class="share-relay-evidence" wx:if="{{incomingShareRelay.unitDecisionLine}}">{{incomingShareRelay.unitDecisionLine}}</view>
         <view class="share-relay-evidence" wx:if="{{incomingShareRelay.unitReportLine}}">{{incomingShareRelay.unitReportLine}}</view>

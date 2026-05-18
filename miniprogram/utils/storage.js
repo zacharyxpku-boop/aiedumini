@@ -4523,6 +4523,49 @@ function parentNextActionDetail(action = '') {
   return '用自己的作业或错题生成一张卡，再完成一次 5 分钟轻回访。';
 }
 
+function buildSafeRelayChallengePacket(input = {}) {
+  const focus = input.focus || loadTodayFocus() || {};
+  const capability = input.capability || {};
+  const subjectDepth = input.subjectSkillDepth || null;
+  const route = input.route || capability.route || '/pages/arcade/arcade';
+  const firstStep = input.firstStep
+    || (subjectDepth && subjectDepth.firstStep)
+    || focus.childArticulatedStep
+    || focus.systemSuggestedStep
+    || '先说清第一步';
+  const relayId = input.relayId || `relay_${Date.now()}`;
+  const receiverAction = input.receiverAction || `用自己的材料复刻这一步：${firstStep}`;
+  const parentCheck = input.parentCheck || '家长只看第一步、错因回退和明天回访，不看完整对话。';
+  const nextDayRevisit = input.nextDayRevisit || '明天只回看 1 张最不稳的卡，再做 1 个小变式。';
+  const allowedFields = ['relay_id', 'first_step', 'receiver_action', 'parent_check', 'next_day_revisit', 'capability_gap'];
+  const blockedFields = ['original_photo', 'full_dialogue', 'score', 'ranking', 'private_comment', 'original_answer'];
+  return {
+    id: 'safe_relay_challenge_packet',
+    relayId,
+    title: '安全接力包',
+    starterAction: `发起者只留下第一步：${firstStep}`,
+    receiverAction,
+    parentCheck,
+    nextDayRevisit,
+    evidenceContract: '接力成立要留下：自己的第一步、一次错因回退、一次明日回访预约。',
+    allowedFields,
+    blockedFields,
+    returnPath: route,
+    completionSignal: '接收者完成 1 次主动回忆，并写下明天要回看的那张卡。',
+    noRankingRule: '不排行、不晒分、不比较速度，只看有没有把第一步说清楚。',
+    query: {
+      relay_id: relayId,
+      relay_receiver_action: receiverAction,
+      relay_parent_check: parentCheck,
+      relay_next_revisit: nextDayRevisit,
+      relay_allowed_fields: allowedFields.join(','),
+      relay_blocked_fields: blockedFields.join(','),
+      relay_completion_signal: 'active_recall_next_revisit',
+      relay_return_path: route
+    }
+  };
+}
+
 function buildShareChallengePlan(input = {}) {
   const focus = input.focus || loadTodayFocus() || {};
   const capability = input.capability || {};
@@ -4583,6 +4626,16 @@ function buildShareChallengePlan(input = {}) {
     { id: 'challenge', label: '做轻挑战', route, evidence: 'active_recall_relay' },
     { id: 'parent', label: '给家长看', route: '/pages/profile/profile?from=share_relay', evidence: 'parent_decision_relay' }
   ];
+  const safeRelayChallengePacket = buildSafeRelayChallengePacket({
+    focus,
+    capability,
+    subjectSkillDepth: subjectDepth,
+    route,
+    firstStep,
+    receiverAction: `用自己的材料做同类第一步：${firstStep}`,
+    parentCheck: parentDecisionPayload.tonightQuestion,
+    nextDayRevisit: sevenDayReviewPayload.day7
+  });
   return {
     id: 'share_challenge_plan',
     title: '同伴轻挑战',
@@ -4602,6 +4655,7 @@ function buildShareChallengePlan(input = {}) {
     parentDecisionPayload,
     wrongCauseReplayPayload,
     sevenDayReviewPayload,
+    safeRelayChallengePacket,
     evidenceContractLine: '接力成立必须同时有：第一步、错因回退、明天回访；缺一项就只算邀请，不算学习闭环。',
     shareRelayActions,
     parentEvidenceLine: '家长只看三件事：孩子是否自己说第一步、错因是否回到卡片、明天是否还能复述。',
@@ -4614,7 +4668,15 @@ function buildShareChallengePlan(input = {}) {
       challenge_route: route,
       relay_privacy: privacyBoundary,
       relay_review: sevenDayReviewPayload.day7,
-      relay_first_step: firstStep
+      relay_first_step: firstStep,
+      relay_id: safeRelayChallengePacket.query.relay_id,
+      relay_receiver_action: safeRelayChallengePacket.query.relay_receiver_action,
+      relay_parent_check: safeRelayChallengePacket.query.relay_parent_check,
+      relay_next_revisit: safeRelayChallengePacket.query.relay_next_revisit,
+      relay_allowed_fields: safeRelayChallengePacket.query.relay_allowed_fields,
+      relay_blocked_fields: safeRelayChallengePacket.query.relay_blocked_fields,
+      relay_completion_signal: safeRelayChallengePacket.query.relay_completion_signal,
+      relay_return_path: safeRelayChallengePacket.query.relay_return_path
     }
   };
 }
@@ -4658,6 +4720,7 @@ function buildCommunityShareRelayBoard(input = {}) {
     noRankingLine: plan.noRankingLine || '不排行、不晒分，只看有没有说清第一步。',
     privacyBoundary: plan.privacyBoundary,
     peerSafeLine: plan.peerSafeLine,
+    safeRelayChallengePacket: plan.safeRelayChallengePacket,
     relayEvidenceCount,
     lanes,
     recentRuns: recentRuns.map((item) => ({
@@ -4698,6 +4761,14 @@ function saveIncomingShare(share = {}) {
     relay_privacy: share.relay_privacy || '',
     relay_review: share.relay_review || '',
     relay_first_step: share.relay_first_step || '',
+    relay_id: share.relay_id || '',
+    relay_receiver_action: share.relay_receiver_action || '',
+    relay_parent_check: share.relay_parent_check || '',
+    relay_next_revisit: share.relay_next_revisit || '',
+    relay_allowed_fields: share.relay_allowed_fields || '',
+    relay_blocked_fields: share.relay_blocked_fields || '',
+    relay_completion_signal: share.relay_completion_signal || '',
+    relay_return_path: share.relay_return_path || '',
     course_unit_label: share.course_unit_label || '',
     course_unit_subject: share.course_unit_subject || '',
     course_unit_tier: share.course_unit_tier || '',
@@ -8071,6 +8142,7 @@ module.exports = {
   saveGamePurchase,
   loadShareRuns,
   loadIncomingShare,
+  buildSafeRelayChallengePacket,
   buildShareChallengePlan,
   buildCommunityShareRelayBoard,
   saveIncomingShare,
