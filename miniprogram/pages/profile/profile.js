@@ -412,8 +412,19 @@ function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCause
     actionLabel: unifiedActionLabel,
     route: nextCapability && nextCapability.route ? nextCapability.route : '/pages/arcade/arcade'
   }) : null;
+  const questionBankShareRelayDeck = storage.buildQuestionBankShareRelayDeck ? storage.buildQuestionBankShareRelayDeck({
+    courseUnitMap,
+    shareChallengePlan,
+    subjectSkillDepth
+  }) : null;
+  const activeRelayCard = questionBankShareRelayDeck && Array.isArray(questionBankShareRelayDeck.relayCards)
+    ? questionBankShareRelayDeck.relayCards[0]
+    : null;
   const challengeQuery = shareChallengePlan && shareChallengePlan.query
     ? `&challenge_goal=${encodeURIComponent(shareChallengePlan.query.challenge_goal || '')}&challenge_rule=${encodeURIComponent(shareChallengePlan.query.challenge_rule || '')}&challenge_route=${encodeURIComponent(shareChallengePlan.query.challenge_route || '')}&relay_privacy=${encodeURIComponent(shareChallengePlan.query.relay_privacy || '')}&relay_review=${encodeURIComponent(shareChallengePlan.query.relay_review || '')}&relay_first_step=${encodeURIComponent(shareChallengePlan.query.relay_first_step || '')}&relay_id=${encodeURIComponent(shareChallengePlan.query.relay_id || '')}&relay_receiver_action=${encodeURIComponent(shareChallengePlan.query.relay_receiver_action || '')}&relay_parent_check=${encodeURIComponent(shareChallengePlan.query.relay_parent_check || '')}&relay_next_revisit=${encodeURIComponent(shareChallengePlan.query.relay_next_revisit || '')}&relay_allowed_fields=${encodeURIComponent(shareChallengePlan.query.relay_allowed_fields || '')}&relay_blocked_fields=${encodeURIComponent(shareChallengePlan.query.relay_blocked_fields || '')}&relay_completion_signal=${encodeURIComponent(shareChallengePlan.query.relay_completion_signal || '')}&relay_return_path=${encodeURIComponent(shareChallengePlan.query.relay_return_path || '')}`
+    : '';
+  const questionBankRelayQuery = activeRelayCard
+    ? `&question_bank_relay_label=${encodeURIComponent(activeRelayCard.label || '')}&question_bank_relay_first_step=${encodeURIComponent(activeRelayCard.firstStep || '')}&question_bank_relay_parent_check=${encodeURIComponent(activeRelayCard.parentCheck || '')}&question_bank_relay_route=${encodeURIComponent(activeRelayCard.route || '')}&question_bank_relay_boundary=${encodeURIComponent(questionBankShareRelayDeck.shareLine || '')}`
     : '';
   const socraticMemoryRelay = learningReportSummary && learningReportSummary.socraticMemoryReportBridge
     ? {
@@ -433,9 +444,9 @@ function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCause
   const courseUnitQuery = courseUnitDecision
     ? `&course_unit_label=${encodeURIComponent(courseUnitDecision.unitLabel || '')}&course_unit_subject=${encodeURIComponent(courseUnitDecision.subjectLabel || '')}&course_unit_tier=${encodeURIComponent(courseUnitDecision.tier || '')}&course_unit_parent_decision=${encodeURIComponent(courseUnitDecision.parentTonightDecision || '')}&course_unit_report_contract=${encodeURIComponent(courseUnitDecision.reportContract || '')}&course_unit_share_contract=${encodeURIComponent(courseUnitDecision.shareContract || '')}&course_unit_blackboard=${encodeURIComponent(courseUnitDecision.blackboardLine || '')}&course_unit_recall_route=${encodeURIComponent(courseUnitDecision.recallRoute || '')}&course_unit_game_route=${encodeURIComponent(courseUnitDecision.gameRoute || '')}`
     : '';
-  const path = `/pages/home/home?share=${code}&from=daily_card&challenge=arcade&mode=same_identity&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}${courseUnitQuery}${socraticReportQuery}`;
-  const parentPath = `/pages/home/home?share=${code}&from=parent_card&mode=parent_recap&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}${courseUnitQuery}${socraticReportQuery}`;
-  const peerPath = `/pages/home/home?share=${code}&from=peer_challenge&challenge=arcade&mode=same_identity&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}${courseUnitQuery}${socraticReportQuery}`;
+  const path = `/pages/home/home?share=${code}&from=daily_card&challenge=arcade&mode=same_identity&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}${courseUnitQuery}${socraticReportQuery}${questionBankRelayQuery}`;
+  const parentPath = `/pages/home/home?share=${code}&from=parent_card&mode=parent_recap&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}${courseUnitQuery}${socraticReportQuery}${questionBankRelayQuery}`;
+  const peerPath = `/pages/home/home?share=${code}&from=peer_challenge&challenge=arcade&mode=same_identity&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}${courseUnitQuery}${socraticReportQuery}${questionBankRelayQuery}`;
   const parentShareTitle = todayFocus && todayFocus.title
     ? `今晚先看这一处：${storage.formatIssueType(todayFocus.issueType || '卡点')} · ${todayFocus.title}`
     : '给家里看的今日学习复盘';
@@ -507,6 +518,7 @@ function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCause
     },
     shareChallengePlan,
     socraticMemoryRelay,
+    questionBankShareRelayDeck,
     familyActionCard: {
       title: '家庭行动卡',
       judgement: todayFocus && todayFocus.repairStatus === 'completed'
@@ -611,6 +623,13 @@ function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCause
       socratic_report_decision: socraticMemoryRelay && socraticMemoryRelay.decision,
       socratic_report_no_increase: socraticMemoryRelay && socraticMemoryRelay.noIncreaseRule,
       socratic_report_boundary: socraticMemoryRelay && socraticMemoryRelay.shareBoundary,
+      question_bank_relay_label: activeRelayCard && activeRelayCard.label,
+      question_bank_relay_first_step: activeRelayCard && activeRelayCard.firstStep,
+      question_bank_relay_parent_check: activeRelayCard && activeRelayCard.parentCheck,
+      question_bank_relay_route: activeRelayCard && activeRelayCard.route,
+      question_bank_relay_boundary: questionBankShareRelayDeck && questionBankShareRelayDeck.shareLine,
+      question_bank_relay_allowed_fields: questionBankShareRelayDeck && questionBankShareRelayDeck.safeSharePayload && questionBankShareRelayDeck.safeSharePayload.allowed_fields,
+      question_bank_relay_blocked_fields: questionBankShareRelayDeck && questionBankShareRelayDeck.safeSharePayload && questionBankShareRelayDeck.safeSharePayload.blocked_fields,
       evidence_brief: evidenceBrief && evidenceBrief.reportLine,
       capability_gap_id: nextCapability && nextCapability.id,
       capability_gap_label: nextCapability && nextCapability.label,
@@ -770,6 +789,14 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
       subjectSkillDepth
     })
     : null;
+  const questionBankShareRelayDeck = storage.buildQuestionBankShareRelayDeck
+    ? storage.buildQuestionBankShareRelayDeck({
+      courseUnitMap: effectiveCourseUnitMap,
+      courseUnitQuestionBank,
+      weeklyEvidenceFlywheel,
+      subjectSkillDepth
+    })
+    : null;
   const sevenSubjectMasterySprint = storage.buildSevenSubjectMasterySprint
     ? storage.buildSevenSubjectMasterySprint({
       courseUnitMap: effectiveCourseUnitMap,
@@ -899,6 +926,19 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     weeklyEvidenceFlywheelLine: weeklyEvidenceFlywheel ? weeklyEvidenceFlywheel.parentTrustLine : '',
     weeklyEvidenceFlywheelDays: weeklyEvidenceFlywheel ? weeklyEvidenceFlywheel.days : [],
     weeklyEvidenceFlywheelSharePayload: weeklyEvidenceFlywheel ? weeklyEvidenceFlywheel.sharePayload : null,
+    questionBankShareRelayDeck,
+    questionBankShareRelayTitle: questionBankShareRelayDeck ? questionBankShareRelayDeck.title : '',
+    questionBankShareRelayLine: questionBankShareRelayDeck ? questionBankShareRelayDeck.reportLine : '',
+    questionBankShareRelayGameRule: questionBankShareRelayDeck ? questionBankShareRelayDeck.gameRule : '',
+    questionBankShareRelayParentDecision: questionBankShareRelayDeck ? questionBankShareRelayDeck.parentDecisionLine : '',
+    questionBankShareRelayShareLine: questionBankShareRelayDeck ? questionBankShareRelayDeck.shareLine : '',
+    questionBankShareRelayCards: questionBankShareRelayDeck && Array.isArray(questionBankShareRelayDeck.relayCards)
+      ? questionBankShareRelayDeck.relayCards
+      : [],
+    questionBankShareRelayWindows: questionBankShareRelayDeck && Array.isArray(questionBankShareRelayDeck.reviewWindows)
+      ? questionBankShareRelayDeck.reviewWindows
+      : [],
+    questionBankShareRelayPayload: questionBankShareRelayDeck ? questionBankShareRelayDeck.safeSharePayload : null,
     sevenSubjectMasterySprint,
     sevenSubjectMasterySprintLine: sevenSubjectMasterySprint ? sevenSubjectMasterySprint.parentDecisionLine : '',
     sevenSubjectMasterySprintSubjects: sevenSubjectMasterySprint ? sevenSubjectMasterySprint.subjects : [],

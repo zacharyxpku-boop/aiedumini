@@ -187,6 +187,11 @@ Page({
         course_unit_blackboard: safeDecodeShareParam(query.course_unit_blackboard),
         course_unit_recall_route: safeDecodeShareParam(query.course_unit_recall_route),
         course_unit_game_route: safeDecodeShareParam(query.course_unit_game_route),
+        question_bank_relay_label: safeDecodeShareParam(query.question_bank_relay_label),
+        question_bank_relay_first_step: safeDecodeShareParam(query.question_bank_relay_first_step),
+        question_bank_relay_parent_check: safeDecodeShareParam(query.question_bank_relay_parent_check),
+        question_bank_relay_route: safeDecodeShareParam(query.question_bank_relay_route),
+        question_bank_relay_boundary: safeDecodeShareParam(query.question_bank_relay_boundary),
         socratic_report_status: safeDecodeShareParam(query.socratic_report_status),
         socratic_report_action: safeDecodeShareParam(query.socratic_report_action),
         socratic_report_decision: safeDecodeShareParam(query.socratic_report_decision),
@@ -228,6 +233,11 @@ Page({
         course_unit_blackboard: safeDecodeShareParam(query.course_unit_blackboard),
         course_unit_recall_route: safeDecodeShareParam(query.course_unit_recall_route),
         course_unit_game_route: safeDecodeShareParam(query.course_unit_game_route),
+        question_bank_relay_label: safeDecodeShareParam(query.question_bank_relay_label),
+        question_bank_relay_first_step: safeDecodeShareParam(query.question_bank_relay_first_step),
+        question_bank_relay_parent_check: safeDecodeShareParam(query.question_bank_relay_parent_check),
+        question_bank_relay_route: safeDecodeShareParam(query.question_bank_relay_route),
+        question_bank_relay_boundary: safeDecodeShareParam(query.question_bank_relay_boundary),
         socratic_report_status: safeDecodeShareParam(query.socratic_report_status),
         socratic_report_action: safeDecodeShareParam(query.socratic_report_action),
         socratic_report_decision: safeDecodeShareParam(query.socratic_report_decision),
@@ -847,6 +857,10 @@ Page({
     const unitLine = incoming.course_unit_label
       ? `${incoming.course_unit_subject || '当前学科'} · ${incoming.course_unit_label}`
       : '';
+    const questionBankRelayRoute = navigation.normalizeRoute(incoming.question_bank_relay_route || unitRoute);
+    const questionBankRelayLine = incoming.question_bank_relay_label
+      ? `题型接力：${incoming.question_bank_relay_label}。先说第一步，不看原题答案。`
+      : '';
     const hasSocraticReport = !!(
       incoming.socratic_report_status ||
       incoming.socratic_report_action ||
@@ -877,6 +891,10 @@ Page({
       unitDecisionLine: incoming.course_unit_parent_decision || '',
       unitReportLine: incoming.course_unit_report_contract || '',
       unitBlackboardLine: incoming.course_unit_blackboard || '',
+      questionBankRelayLine,
+      questionBankRelayFirstStepLine: incoming.question_bank_relay_first_step ? `题型第一步：${incoming.question_bank_relay_first_step}` : '',
+      questionBankRelayParentCheckLine: incoming.question_bank_relay_parent_check ? `家长检查：${incoming.question_bank_relay_parent_check}` : '',
+      questionBankRelayBoundaryLine: incoming.question_bank_relay_boundary ? `题型分享边界：${incoming.question_bank_relay_boundary}` : '',
       socraticReportStatus: incoming.socratic_report_status || '',
       socraticReportActionLine: incoming.socratic_report_action ? `点拨行动：${incoming.socratic_report_action}` : '',
       socraticReportDecisionLine: incoming.socratic_report_decision ? `家长判断：${incoming.socratic_report_decision}` : '',
@@ -897,8 +915,8 @@ Page({
         {
           id: 'challenge',
           label: incoming.course_unit_label ? '练这个单元' : '轻挑战',
-          route: unitRoute,
-          reason: incoming.course_unit_parent_decision || incoming.challenge_goal || actionLabel,
+          route: questionBankRelayRoute,
+          reason: incoming.question_bank_relay_parent_check || incoming.course_unit_parent_decision || incoming.challenge_goal || actionLabel,
           evidence: incoming.challenge_rule || '5分钟轻回访'
         },
         {

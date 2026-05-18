@@ -302,6 +302,13 @@ Page({
     const trajectoryRows = courseUnitMasteryTrajectory && Array.isArray(courseUnitMasteryTrajectory.trajectories)
       ? courseUnitMasteryTrajectory.trajectories.slice(0, 3)
       : [];
+    const questionBankShareRelayDeck = storage.buildQuestionBankShareRelayDeck
+      ? storage.buildQuestionBankShareRelayDeck({
+        courseUnitMap,
+        courseUnitQuestionBank,
+        subjectSkillDepth
+      })
+      : null;
     return {
       mode,
       modeLabel: labels[mode] || labels.balanced,
@@ -368,6 +375,15 @@ Page({
       courseUnitQuestionBankLine: courseUnitQuestionBank ? courseUnitQuestionBank.summary : '',
       courseUnitQuestionBankCards: courseUnitQuestionBank && Array.isArray(courseUnitQuestionBank.activeCards)
         ? courseUnitQuestionBank.activeCards.slice(0, 6)
+        : [],
+      questionBankShareRelayDeckTitle: questionBankShareRelayDeck ? questionBankShareRelayDeck.title : '',
+      questionBankShareRelayDeckLine: questionBankShareRelayDeck ? questionBankShareRelayDeck.gameRule : '',
+      questionBankShareRelayParentLine: questionBankShareRelayDeck ? questionBankShareRelayDeck.parentDecisionLine : '',
+      questionBankShareRelayCards: questionBankShareRelayDeck && Array.isArray(questionBankShareRelayDeck.relayCards)
+        ? questionBankShareRelayDeck.relayCards.slice(0, 4)
+        : [],
+      questionBankShareRelayWindows: questionBankShareRelayDeck && Array.isArray(questionBankShareRelayDeck.reviewWindows)
+        ? questionBankShareRelayDeck.reviewWindows
         : [],
       commercialDepthRunwayTitle: commercialDepthRunway ? commercialDepthRunway.title : '',
       commercialDepthRunwayLine: commercialDepthRunway ? commercialDepthRunway.gameLine : '',

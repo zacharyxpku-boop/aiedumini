@@ -82,6 +82,13 @@
         <view class="story-mission-rule" wx:for="{{challengeBrief.courseUnitQuestionBankCards}}" wx:key="id">样例：{{item.sampleStem}}｜第一步：{{item.firstStepHint}}｜近迁移：{{item.nearTransferStem}}</view>
         <view class="story-mission-rule" wx:for="{{challengeBrief.courseUnitQuestionBankCards}}" wx:key="id">进阶路径：{{item.progression.entryTask}}｜明天：{{item.progression.nextDayRevisit}}</view>
         <view class="story-mission-rule" wx:for="{{challengeBrief.courseUnitQuestionBankCards}}" wx:key="id">掌握门槛：{{item.progression.masteryGate}}</view>
+      <view class="story-mission" wx:if="{{challengeBrief.questionBankShareRelayDeckTitle}}">
+        <view class="story-mission-title">{{challengeBrief.questionBankShareRelayDeckTitle}}</view>
+        <view class="story-mission-line">{{challengeBrief.questionBankShareRelayDeckLine}}</view>
+        <view class="story-mission-rule">{{challengeBrief.questionBankShareRelayParentLine}}</view>
+        <view class="story-mission-rule" wx:for="{{challengeBrief.questionBankShareRelayCards}}" wx:key="id">接力卡：{{item.label}}｜第一步：{{item.firstStep}}｜{{item.parentCheck}}</view>
+        <view class="story-mission-rule" wx:for="{{challengeBrief.questionBankShareRelayWindows}}" wx:key="id">{{item.label}}：{{item.action}}</view>
+      </view>
       <view class="story-mission" wx:if="{{challengeBrief.commercialDepthRunwayTitle}}">
         <view class="story-mission-title">{{challengeBrief.commercialDepthRunwayTitle}}</view>
         <view class="story-mission-line">{{challengeBrief.commercialDepthRunwayLine}}</view>

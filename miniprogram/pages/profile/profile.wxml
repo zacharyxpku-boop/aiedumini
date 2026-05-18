@@ -752,6 +752,17 @@
           <text wx:for="{{learningReportSummary.questionBankDecisionReviewWindows}}" wx:key="id">{{item.label}}回访：{{item.action}}</text>
           <text wx:for="{{learningReportSummary.questionBankDecisionEvidence}}" wx:key="*this">决策证据：{{item}}</text>
         </view>
+        <view class="parent-brief-block" wx:if="{{learningReportSummary.questionBankShareRelayDeck}}">
+          <text class="parent-brief-label">{{learningReportSummary.questionBankShareRelayTitle}}</text>
+          <text>{{learningReportSummary.questionBankShareRelayLine}}</text>
+          <text>{{learningReportSummary.questionBankShareRelayGameRule}}</text>
+          <text>{{learningReportSummary.questionBankShareRelayParentDecision}}</text>
+          <text>{{learningReportSummary.questionBankShareRelayShareLine}}</text>
+          <text wx:for="{{learningReportSummary.questionBankShareRelayCards}}" wx:key="id">接力卡：{{item.label}}｜第一步：{{item.firstStep}}｜家长检查：{{item.parentCheck}}</text>
+          <text wx:for="{{learningReportSummary.questionBankShareRelayWindows}}" wx:key="id">{{item.label}}：{{item.action}}</text>
+          <text wx:if="{{learningReportSummary.questionBankShareRelayPayload}}">可分享字段：{{learningReportSummary.questionBankShareRelayPayload.allowed_fields}}</text>
+          <text wx:if="{{learningReportSummary.questionBankShareRelayPayload}}">禁止字段：{{learningReportSummary.questionBankShareRelayPayload.blocked_fields}}</text>
+        </view>
         <view class="parent-brief-block" wx:if="{{learningReportSummary.fallbackRecoveryReportBridge}}">
           <text class="parent-brief-label">{{learningReportSummary.fallbackRecoveryTitle}}</text>
           <text>{{learningReportSummary.fallbackRecoveryReportLine}}</text>
@@ -1084,6 +1095,14 @@
           <view>家长判断：{{dailyShareCard.socraticMemoryRelay.decision}}</view>
           <view>不加题规则：{{dailyShareCard.socraticMemoryRelay.noIncreaseRule}}</view>
           <view>分享边界：{{dailyShareCard.socraticMemoryRelay.shareBoundary}}</view>
+        </view>
+        <view class="share-conversation-card" wx:if="{{dailyShareCard.questionBankShareRelayDeck}}">
+          <view class="share-conversation-title">{{dailyShareCard.questionBankShareRelayDeck.title}}</view>
+          <view>{{dailyShareCard.questionBankShareRelayDeck.gameRule}}</view>
+          <view>{{dailyShareCard.questionBankShareRelayDeck.parentDecisionLine}}</view>
+          <view>{{dailyShareCard.questionBankShareRelayDeck.shareLine}}</view>
+          <view wx:for="{{dailyShareCard.questionBankShareRelayDeck.relayCards}}" wx:key="id">题型接力：{{item.label}}｜第一步：{{item.firstStep}}</view>
+          <view wx:for="{{dailyShareCard.questionBankShareRelayDeck.reviewWindows}}" wx:key="id">{{item.label}}：{{item.action}}</view>
         </view>
         <view class="share-conversation-card" wx:if="{{communityShareRelayBoard}}">
           <view class="share-conversation-title">{{communityShareRelayBoard.title}}</view>

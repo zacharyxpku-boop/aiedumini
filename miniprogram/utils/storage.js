@@ -4737,6 +4737,70 @@ function buildCommunityShareRelayBoard(input = {}) {
   };
 }
 
+function buildQuestionBankShareRelayDeck(options = {}) {
+  const courseUnitMap = options.courseUnitMap || buildCourseUnitMap(options);
+  const courseUnitQuestionBank = options.courseUnitQuestionBank || buildCourseUnitQuestionBank({ courseUnitMap });
+  const weeklyEvidenceFlywheel = options.weeklyEvidenceFlywheel || buildWeeklyEvidenceFlywheel({
+    courseUnitMap,
+    courseUnitQuestionBank
+  });
+  const communityShareRelayBoard = options.communityShareRelayBoard || buildCommunityShareRelayBoard(options);
+  const activeCards = courseUnitQuestionBank && Array.isArray(courseUnitQuestionBank.activeCards)
+    ? courseUnitQuestionBank.activeCards
+    : [];
+  const sourceCards = activeCards.length
+    ? activeCards
+    : (courseUnitQuestionBank && Array.isArray(courseUnitQuestionBank.cards) ? courseUnitQuestionBank.cards.slice(0, 5) : []);
+  const reviewWindows = [
+    { id: 'tonight', label: '今晚', action: '只做 3 张主动回忆卡，必须说出第一步。' },
+    { id: 'tomorrow', label: '明天', action: '只回访 1 张最不稳的卡，不增加题量。' },
+    { id: 'day_7', label: '第 7 天', action: '用 1 道小变式验证迁移，不看单次分数。' }
+  ];
+  const relayCards = sourceCards.slice(0, 5).map((card, index) => ({
+    id: card.id || `question_bank_share_${index + 1}`,
+    label: card.label || `题型接力卡 ${index + 1}`,
+    subjectLabel: card.subjectLabel || '',
+    type: card.type || 'active_recall',
+    challengePrompt: card.prompt || card.sampleStem || '用自己的材料说出第一步。',
+    firstStep: card.firstStepHint || (card.progression && card.progression.entryTask) || '先说出第一步。',
+    visualMove: card.visualMove || '在小黑板只画第一笔，不展开完整答案。',
+    parentCheck: card.progression && card.progression.masteryGate
+      ? card.progression.masteryGate
+      : '家长只看孩子能否自己说出第一步。',
+    shareCopy: `接力「${card.label || '题型卡'}」：用自己的材料说第一步，不晒原题和答案。`,
+    route: '/pages/arcade/arcade?from=question_bank_relay',
+    evidenceRequired: [card.evidenceRequired || 'child_first_step', 'active_recall_done', 'next_day_revisit']
+  }));
+  const allowedFields = ['subjectLabel', 'type', 'firstStep', 'reviewWindow', 'parentCheck', 'route'];
+  const blockedFields = ['original_photo', 'full_dialogue', 'score', 'ranking', 'private_comment', 'original_answer'];
+  return {
+    id: 'question_bank_share_relay_deck',
+    title: '题型题库接力牌组',
+    status: relayCards.length >= 3 ? 'ready' : 'waiting_question_bank',
+    questionCardCount: Number(courseUnitQuestionBank && (courseUnitQuestionBank.questionCount || courseUnitQuestionBank.cards && courseUnitQuestionBank.cards.length) || 0),
+    activeRelayCount: relayCards.length,
+    relayCards,
+    reviewWindows,
+    gameRule: '游戏只抽题型卡做主动回忆、错因回放和近迁移；没有第一步证据不发 XP。',
+    parentDecisionLine: '家长只判断三件事：第一步是否能说出、错因是否复现、明天是否能回访。',
+    reportLine: `报告把 ${relayCards.length} 张题型接力卡写入本周证据，不用单次分数更新长期画像。`,
+    shareLine: '分享只带题型、第一步、回访窗口和家长检查句，不带原题照片、完整对话、分数或排名。',
+    communityLine: communityShareRelayBoard && communityShareRelayBoard.noRankingLine
+      ? communityShareRelayBoard.noRankingLine
+      : '社区接力不排行、不晒分，只复用学习动作。',
+    weeklyLine: weeklyEvidenceFlywheel && weeklyEvidenceFlywheel.memoryLine
+      ? weeklyEvidenceFlywheel.memoryLine
+      : '主动回忆、错因回放、间隔回看形成记忆反馈。',
+    safeSharePayload: {
+      allowed_fields: allowedFields,
+      blocked_fields: blockedFields,
+      relay_card_count: relayCards.length,
+      review_windows: reviewWindows.map((item) => item.id)
+    },
+    evidenceRequired: ['question_bank_card', 'active_recall_done', 'wrong_cause_return', 'next_day_revisit', 'safe_share_payload', 'parent_check_line']
+  };
+}
+
 function saveIncomingShare(share = {}) {
   const code = share.share_code || share.code || '';
   if (!code) return null;
@@ -4778,6 +4842,11 @@ function saveIncomingShare(share = {}) {
     course_unit_blackboard: share.course_unit_blackboard || '',
     course_unit_recall_route: share.course_unit_recall_route || '',
     course_unit_game_route: share.course_unit_game_route || '',
+    question_bank_relay_label: share.question_bank_relay_label || '',
+    question_bank_relay_first_step: share.question_bank_relay_first_step || '',
+    question_bank_relay_parent_check: share.question_bank_relay_parent_check || '',
+    question_bank_relay_route: share.question_bank_relay_route || '',
+    question_bank_relay_boundary: share.question_bank_relay_boundary || '',
     created_at: share.created_at || new Date().toISOString()
   };
   set(KEYS.incomingShare, record);
@@ -8145,6 +8214,7 @@ module.exports = {
   buildSafeRelayChallengePacket,
   buildShareChallengePlan,
   buildCommunityShareRelayBoard,
+  buildQuestionBankShareRelayDeck,
   saveIncomingShare,
   appendShareRun,
   loadClientIdentity,

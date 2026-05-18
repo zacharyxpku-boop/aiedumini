@@ -402,6 +402,10 @@
         <view class="share-relay-evidence" wx:if="{{incomingShareRelay.unitDecisionLine}}">{{incomingShareRelay.unitDecisionLine}}</view>
         <view class="share-relay-evidence" wx:if="{{incomingShareRelay.unitReportLine}}">{{incomingShareRelay.unitReportLine}}</view>
         <view class="share-relay-evidence" wx:if="{{incomingShareRelay.unitBlackboardLine}}">{{incomingShareRelay.unitBlackboardLine}}</view>
+        <view class="share-relay-evidence" wx:if="{{incomingShareRelay.questionBankRelayLine}}">{{incomingShareRelay.questionBankRelayLine}}</view>
+        <view class="share-relay-evidence" wx:if="{{incomingShareRelay.questionBankRelayFirstStepLine}}">{{incomingShareRelay.questionBankRelayFirstStepLine}}</view>
+        <view class="share-relay-evidence" wx:if="{{incomingShareRelay.questionBankRelayParentCheckLine}}">{{incomingShareRelay.questionBankRelayParentCheckLine}}</view>
+        <view class="share-relay-evidence" wx:if="{{incomingShareRelay.questionBankRelayBoundaryLine}}">{{incomingShareRelay.questionBankRelayBoundaryLine}}</view>
         <view class="share-relay-evidence" wx:if="{{incomingShareRelay.socraticReportStatus}}">点拨状态：{{incomingShareRelay.socraticReportStatus}}</view>
         <view class="share-relay-evidence" wx:if="{{incomingShareRelay.socraticReportActionLine}}">{{incomingShareRelay.socraticReportActionLine}}</view>
         <view class="share-relay-evidence" wx:if="{{incomingShareRelay.socraticReportDecisionLine}}">{{incomingShareRelay.socraticReportDecisionLine}}</view>
