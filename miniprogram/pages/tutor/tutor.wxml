@@ -131,6 +131,8 @@
             <view class="receipt-board-line" wx:for="{{thinkingReceipt.courseUnitQuestionBankCards}}" wx:key="id">{{item.sampleStem}}</view>
             <view class="receipt-board-parent" wx:for="{{thinkingReceipt.courseUnitQuestionBankCards}}" wx:key="id">第一步：{{item.firstStepHint}} / 小黑板：{{item.blackboardMove}}</view>
             <view class="receipt-board-line" wx:for="{{thinkingReceipt.courseUnitQuestionBankCards}}" wx:key="id">近迁移：{{item.nearTransferStem}} / 家长：{{item.parentCheck}}</view>
+            <view class="receipt-board-parent" wx:for="{{thinkingReceipt.courseUnitQuestionBankCards}}" wx:key="id">进阶：{{item.progression.entryTask}} / 掌握门槛：{{item.progression.masteryGate}}</view>
+            <view class="receipt-board-line" wx:for="{{thinkingReceipt.courseUnitQuestionBankCards}}" wx:key="id">明天回访：{{item.progression.nextDayRevisit}}</view>
             <view class="receipt-board-avoid">{{thinkingReceipt.courseUnitQuestionBank.boundary}}</view>
           </view>
           <view class="receipt-first-step-board" wx:if="{{thinkingReceipt.sevenSubjectMasterySprint}}">

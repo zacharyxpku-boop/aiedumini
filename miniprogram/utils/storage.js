@@ -5749,6 +5749,46 @@ function buildQuestionSampleCard(unit = {}, type = 'active_recall', index = 0) {
   });
 }
 
+function buildQuestionProgressionCard(unit = {}, card = {}, index = 0) {
+  const subject = unit.subjectLabel || card.subjectLabel || '学科';
+  const label = unit.unitLabel || '当前单元';
+  const visualMove = card.visualMove || (unit.blackboardBlueprint && unit.blackboardBlueprint.firstStroke) || `小黑板只写 ${label} 的第一步`;
+  const wrongCause = card.wrongCause || (unit.wrongCauseAtlas && unit.wrongCauseAtlas[0]) || `${label} 的错因还没有命名`;
+  const evidence = card.evidenceRequired || 'child_first_step';
+  const typeText = {
+    active_recall: '主动回忆',
+    wrong_cause: '错因修复',
+    near_transfer: '近迁移'
+  }[card.type] || '题型练习';
+  const entryTask = card.type === 'wrong_cause'
+    ? `先让孩子把 ${label} 卡住的位置说成一句话。`
+    : card.type === 'near_transfer'
+      ? `先保留 ${label} 的方法，只替换一个条件。`
+      : `先让孩子不看答案复述 ${label} 的第一步。`;
+  const repairTask = card.type === 'wrong_cause'
+    ? `用小黑板标出“已知、目标、卡点”，只修 ${wrongCause}。`
+    : `如果说不出第一步，退回小黑板：${visualMove}。`;
+  const nearTransferTask = card.type === 'near_transfer'
+    ? `再换一个数字、材料或语境，让孩子说“哪里没变，哪里变了”。`
+    : `做一道同类小变式，只检查方法能不能搬家。`;
+  const nextDayRevisit = `明天只回访 1 次：遮住答案，让孩子先说 ${label} 的第一步和错因名。`;
+  const masteryGate = `连续两次做到“第一步说清 + 错因命名 + 近迁移不慌”，才算 ${typeText} 通过。`;
+  const parentEvidence = `家长只记录 ${evidence}，不记录原题答案、分数、完整对话或排名。`;
+  return {
+    id: `${card.id || unit.id || 'question'}_progression_${index + 1}`,
+    stageCount: 6,
+    entryTask,
+    repairTask,
+    nearTransferTask,
+    nextDayRevisit,
+    masteryGate,
+    parentEvidence,
+    visualBoardStep: visualMove,
+    safetyBoundary: '只沉淀第一步、错因、近迁移和回访证据；不生成完整答案，不替孩子写过程。',
+    classroomBridge: `${subject} 老师可用这张卡观察孩子是否真正会迁移，而不是只看今晚刷了几题。`
+  };
+}
+
 function buildCourseUnitQuestionBank(options = {}) {
   const courseUnitMap = options.courseUnitMap || buildCourseUnitMap(options);
   const active = courseUnitMap && courseUnitMap.active ? courseUnitMap.active : null;
@@ -5798,7 +5838,12 @@ function buildCourseUnitQuestionBank(options = {}) {
         evidenceRequired: 'near_transfer_attempted'
       }
     ];
-    return list.concat(cards.map((card, cardIndex) => Object.assign({}, card, buildQuestionSampleCard(unit, card.type, cardIndex))));
+    return list.concat(cards.map((card, cardIndex) => {
+      const sample = buildQuestionSampleCard(unit, card.type, cardIndex);
+      return Object.assign({}, card, sample, {
+        progression: buildQuestionProgressionCard(unit, card, cardIndex)
+      });
+    }));
   }, []);
   const activeUnitIds = activeUnits.reduce((acc, unit) => {
     acc[unit.id] = true;
@@ -5819,6 +5864,9 @@ function buildCourseUnitQuestionBank(options = {}) {
     subjectCount: subjects.length,
     questionCount: questionCards.length,
     sampleCount: questionCards.filter((card) => card.sampleStem && card.firstStepHint && card.nearTransferStem).length,
+    progressionCount: questionCards.filter((card) => card.progression && card.progression.entryTask && card.progression.masteryGate).length,
+    progressionStageCount: questionCards.reduce((sum, card) => sum + Number(card.progression && card.progression.stageCount || 0), 0),
+    masteryGateCount: questionCards.filter((card) => card.progression && card.progression.masteryGate).length,
     byType,
     cards: questionCards,
     activeCards,
