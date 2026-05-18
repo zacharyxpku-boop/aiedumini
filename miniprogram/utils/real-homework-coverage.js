@@ -1,22 +1,22 @@
 const SUBJECT_COUNTS = [
-  { id: 'math', label: '数学', count: 63, nextGap: '比例、百分数、几何角、函数图像、二次函数顶点、全等证明、相似面积比、单位量比较、统计抽样、概率、不放回样本空间、移项符号、浓度/分段收费/年龄/行程/利润/几何方程继续补跨学科词面误判样本。' },
-  { id: 'physics', label: '物理', count: 48, nextGap: '受力、光路、电路、串并联电流、浮力密度、压强面积、电路故障、欧姆定律变量控制、杠杆力臂、电功率、热效率、热传递、状态变化和图像题继续补真实卡点。' },
-  { id: 'chemistry', label: '化学', count: 50, nextGap: '实验现象、气体验证、溶液质量分数、金属活动性、守恒、微粒观、酸碱指示剂、pH 加液方向、变量控制、开放体系、粗盐提纯、反应速率、溶解度曲线、过滤操作、离子共存和气体检验继续拆错因。' },
-  { id: 'english', label: '英语', count: 51, nextGap: '语法信号、现在完成时、比较级、被动语态、介词范围、定语从句、非谓语目的、状语从句 unless、代词指代、完形上下文、阅读推断、标题题和逻辑连词继续扩样。' },
-  { id: 'biology', label: '生物', count: 48, nextGap: '显微镜高低倍、遗传显隐性、生态系统成分、呼吸作用、光合呼吸区分、人体循环、血糖调节、反射弧、蒸腾作用、生态角色和能量流动继续验证小黑板边界。' },
-  { id: 'geography', label: '地理', count: 50, nextGap: '经纬网、等高线河流流向、气候图、气候类型、交通/农业/工业区位、地球自转时差、纬度气温、季风成因、板块边界、人口迁移继续验证空间和区位误判。' },
-  { id: 'chinese', label: '语文', count: 60, nextGap: '阅读概括、记叙文标题线索、议论文论据作用、古诗意象、修辞赏析、说明方法、说明语言、说明顺序、文言虚词、句式转换、写作起步、段落中心、选材、语段衔接、结尾照应、细节描写、病句修改继续压测。' }
+  { id: 'math', label: '数学', count: 65, nextGap: '比例、百分数、几何角、函数图像、二次函数顶点、全等证明、相似面积比、单位量比较、统计抽样、概率、不放回样本空间、移项符号、浓度/分段收费/年龄/行程/利润/几何方程继续补跨学科词面误判样本。' },
+  { id: 'physics', label: '物理', count: 50, nextGap: '受力、光路、电路、串并联电流、浮力密度、压强面积、电路故障、欧姆定律变量控制、杠杆力臂、电功率、热效率、热传递、状态变化和图像题继续补真实卡点。' },
+  { id: 'chemistry', label: '化学', count: 52, nextGap: '实验现象、气体验证、溶液质量分数、金属活动性、守恒、微粒观、酸碱指示剂、pH 加液方向、变量控制、开放体系、粗盐提纯、反应速率、溶解度曲线、过滤操作、离子共存和气体检验继续拆错因。' },
+  { id: 'english', label: '英语', count: 53, nextGap: '语法信号、现在完成时、比较级、被动语态、介词范围、定语从句、非谓语目的、状语从句 unless、代词指代、完形上下文、阅读推断、标题题和逻辑连词继续扩样。' },
+  { id: 'biology', label: '生物', count: 50, nextGap: '显微镜高低倍、遗传显隐性、生态系统成分、呼吸作用、光合呼吸区分、人体循环、血糖调节、反射弧、蒸腾作用、生态角色和能量流动继续验证小黑板边界。' },
+  { id: 'geography', label: '地理', count: 52, nextGap: '经纬网、等高线河流流向、气候图、气候类型、交通/农业/工业区位、地球自转时差、纬度气温、季风成因、板块边界、人口迁移继续验证空间和区位误判。' },
+  { id: 'chinese', label: '语文', count: 62, nextGap: '阅读概括、记叙文标题线索、议论文论据作用、古诗意象、修辞赏析、说明方法、说明语言、说明顺序、文言虚词、句式转换、写作起步、段落中心、选材、语段衔接、结尾照应、细节描写、病句修改继续压测。' }
 ];
 
 const TYPE_COUNTS = [
-  { id: 'math_word_problem', label: '数学应用/建模', count: 47, firstStep: '先翻译数量关系、图形关系、变化基准、统计总量、抽样代表性、概率分母、不放回样本空间、比例份数、单位量、函数坐标、二次函数顶点、全等对应条件或相似维度。' },
+  { id: 'math_word_problem', label: '数学应用/建模', count: 49, firstStep: '先翻译数量关系、图形关系、变化基准、统计总量、抽样代表性、概率分母、不放回样本空间、比例份数、单位量、函数坐标、二次函数顶点、全等对应条件或相似维度。' },
   { id: 'equation_setup', label: '方程/不等式建模', count: 16, firstStep: '先设未知数、写等量或不等量关系，或拆浓度、分段收费、不等式变形规则、移项符号、同步时间点。' },
-  { id: 'physics_diagram', label: '物理图解', count: 48, firstStep: '先定对象、方向、单位、路径、串并联分支、力臂、受力面积、电表位置、故障位置、控制变量、热量方向、热效率输入输出、浮力决定量、状态变化或决定量。' },
-  { id: 'chemistry_experiment', label: '化学实验/变化', count: 50, firstStep: '先列反应物、现象、体系边界、微粒解释、守恒关系、唯一变量、酸碱性质、金属活动性、溶液总质量、pH 起点方向、过滤/提纯条件、溶解度曲线定位、离子共存排查和气体检验试剂。' },
-  { id: 'english_sentence', label: '英语句法/上下文', count: 39, firstStep: '先找时态、持续时间信号、主语、比较、被动、介词范围、先行词、从句成分、目的关系、unless 逻辑、代词指代或上下文信号。' },
-  { id: 'reading_question', label: '阅读证据', count: 50, firstStep: '先判断题目类型，再回文定位证据、标题线索、议论文观点、意象、修辞本体喻体、说明方法、说明语言、文言功能、说明顺序、标题中心或推断行为。' },
-  { id: 'biology_process', label: '生物过程', count: 48, firstStep: '先分结构、功能、方向、变量、能量流动、生态角色、调节路径、显微镜操作、显隐性基因、光合呼吸条件、蒸腾路径、生态成分、过程条件或循环路径。' },
-  { id: 'geography_map', label: '地理图示', count: 50, firstStep: '先看图例、方向、经纬、纬度热量、地球自转方向、海拔、等高线形态、太阳高度、气候证据、农业/工业区位条件、水汽来源、板块边界、人口迁移推拉力或成因链。' },
+  { id: 'physics_diagram', label: '物理图解', count: 50, firstStep: '先定对象、方向、单位、路径、串并联分支、力臂、受力面积、电表位置、故障位置、控制变量、热量方向、热效率输入输出、浮力决定量、状态变化或决定量。' },
+  { id: 'chemistry_experiment', label: '化学实验/变化', count: 52, firstStep: '先列反应物、现象、体系边界、微粒解释、守恒关系、唯一变量、酸碱性质、金属活动性、溶液总质量、pH 起点方向、过滤/提纯条件、溶解度曲线定位、离子共存排查和气体检验试剂。' },
+  { id: 'english_sentence', label: '英语句法/上下文', count: 41, firstStep: '先找时态、持续时间信号、主语、比较、被动、介词范围、先行词、从句成分、目的关系、unless 逻辑、代词指代或上下文信号。' },
+  { id: 'reading_question', label: '阅读证据', count: 52, firstStep: '先判断题目类型，再回文定位证据、标题线索、议论文观点、意象、修辞本体喻体、说明方法、说明语言、文言功能、说明顺序、标题中心或推断行为。' },
+  { id: 'biology_process', label: '生物过程', count: 50, firstStep: '先分结构、功能、方向、变量、能量流动、生态角色、调节路径、显微镜操作、显隐性基因、光合呼吸条件、蒸腾路径、生态成分、过程条件或循环路径。' },
+  { id: 'geography_map', label: '地理图示', count: 52, firstStep: '先看图例、方向、经纬、纬度热量、地球自转方向、海拔、等高线形态、太阳高度、气候证据、农业/工业区位条件、水汽来源、板块边界、人口迁移推拉力或成因链。' },
   { id: 'writing_process', label: '写作过程', count: 22, firstStep: '先写一句朴素事实、段落中心、一个可见细节、结尾照应、语段顺序、修改成分残缺或选一个核心材料，不追求完整成文。' }
 ];
 
@@ -468,6 +468,86 @@ const QUESTION_TYPE_CLUSTER_RUNWAY = [
   }
 ];
 
+const LONGITUDINAL_PRESSURE_SCENARIO_LEDGER = [
+  {
+    id: 'math_ratio_recurrence',
+    subject: '数学',
+    taskType: 'math_word_problem',
+    recurringWrongCause: '连续百分数和比例题反复换错基准量',
+    evidenceWindow: ['今晚第一步', '明天同错因回访', '第 7 天近迁移'],
+    localReleaseGate: '同错因少于 2 次稳定复述前，只释放基准量复习动作，不释放掌握结论。',
+    reportDecision: '写“本周先稳定基准量是谁”，不写“已掌握比例应用题”。',
+    parentHandoff: '家长只问：这次百分数变化的基准量是谁？',
+    shareBoundary: '分享只显示“基准量挑战第 2 天”，不显示原题、答案或作答结果。'
+  },
+  {
+    id: 'physics_circuit_recurrence',
+    subject: '物理',
+    taskType: 'physics_diagram',
+    recurringWrongCause: '串并联电流路径和电表位置反复混淆',
+    evidenceWindow: ['今晚第一根箭头', '明天路径回忆', '第 7 天换电路图'],
+    localReleaseGate: '未先画路径和电表位置前，只释放路径卡，不释放电学图像稳定结论。',
+    reportDecision: '写“先画路径再判断电表”，不写“电学已经掌握”。',
+    parentHandoff: '家长只问：电流从哪里出发，在哪里分叉？',
+    shareBoundary: '分享只显示“先画路径挑战”，不显示电路原图或完整解法。'
+  },
+  {
+    id: 'chinese_evidence_recurrence',
+    subject: '语文',
+    taskType: 'reading_question',
+    recurringWrongCause: '阅读题凭印象作答，没有回原文定位证据句',
+    evidenceWindow: ['今晚证据句', '明天题型回忆', '第 7 天换文本迁移'],
+    localReleaseGate: '未连续给出证据句前，只释放定位动作，不做长期阅读画像判断。',
+    reportDecision: '写“先指出证据句”，不写“阅读理解长期薄弱”。',
+    parentHandoff: '家长只问：原文哪一句支持你的答案？',
+    shareBoundary: '分享只显示“证据句挑战”，不带原文全文、答案或老师点评。'
+  },
+  {
+    id: 'chem_system_boundary_recurrence',
+    subject: '化学',
+    taskType: 'chemistry_experiment',
+    recurringWrongCause: '溶液和气体实验反复漏看体系边界',
+    evidenceWindow: ['今晚体系边界', '明天证据链', '第 7 天换试剂'],
+    localReleaseGate: '体系边界和证据链未闭合前，只释放小黑板，不写实验掌握。',
+    reportDecision: '写“先定体系边界”，不写“化学实验已掌握”。',
+    parentHandoff: '家长只问：反应前后哪些物质还在体系里？',
+    shareBoundary: '分享只显示“体系边界挑战”，不显示实验原题答案。'
+  },
+  {
+    id: 'geo_map_rule_recurrence',
+    subject: '地理',
+    taskType: 'geography_map',
+    recurringWrongCause: '气候图和等高线题反复先看结论，不先读图例规则',
+    evidenceWindow: ['今晚读图规则', '明天坐标/图例回忆', '第 7 天换图迁移'],
+    localReleaseGate: '未先说图例、方向、月份或成因链前，不写空间思维长期标签。',
+    reportDecision: '写“先说读图规则”，不写“空间思维长期落后”。',
+    parentHandoff: '家长只问：这张图先看图例、方向还是月份？',
+    shareBoundary: '分享只显示“读图规则挑战”，不显示学校班级和作答结果。'
+  },
+  {
+    id: 'english_signal_recurrence',
+    subject: '英语',
+    taskType: 'english_sentence',
+    recurringWrongCause: '时态和从句题反复不先圈信号词',
+    evidenceWindow: ['今晚信号词', '明天上下文回忆', '第 7 天混合句型'],
+    localReleaseGate: '答案前未出现信号词和上下文证据前，不释放语法系统掌握。',
+    reportDecision: '写“先圈信号词和证据句”，不写“语法已系统掌握”。',
+    parentHandoff: '家长只问：哪个词或哪句话支持这个形式？',
+    shareBoundary: '分享只显示“信号词挑战”，不显示完整作业句子。'
+  },
+  {
+    id: 'biology_process_recurrence',
+    subject: '生物',
+    taskType: 'biology_process',
+    recurringWrongCause: '过程题反复把结构、功能、条件和结果混在一起',
+    evidenceWindow: ['今晚过程箭头', '明天结构功能拆分', '第 7 天换系统'],
+    localReleaseGate: '未能拆出结构、条件、过程和结果前，不写生物过程已掌握。',
+    reportDecision: '写“先分四格”，不写“理解力差”或“已掌握”。',
+    parentHandoff: '家长只问：这是结构、条件、过程还是结果？',
+    shareBoundary: '分享只显示“四格过程挑战”，不显示原题图。'
+  }
+];
+
 function buildRealHomeworkCoverageMatrix(options = {}) {
   const activeSubject = String(options.subject || '').trim();
   const active = SUBJECT_COUNTS.find((item) => item.id === activeSubject || item.label === activeSubject) || SUBJECT_COUNTS[0];
@@ -488,15 +568,18 @@ function buildRealHomeworkCoverageMatrix(options = {}) {
     publicSourcePolicy: PUBLIC_K12_USE_POLICY,
     publicK12UseWorkbench: PUBLIC_K12_USE_WORKBENCH,
     implementationDecisionMatrix: K12_PUBLIC_IMPLEMENTATION_DECISION_MATRIX,
+    longitudinalPressureScenarioLedger: LONGITUDINAL_PRESSURE_SCENARIO_LEDGER,
     publicWorkbenchLine: `已把 ${PUBLIC_K12_USE_WORKBENCH.length} 类可用资料拆成“可直接用 / 本地代码更好 / AI 更好 / 禁用”四格决策。`,
     publicSourceLine: `已把 ${PUBLIC_K12_SOURCE_LEDGER.length} 类公开/一方资料沉淀为本地规则资产：题型、错因、第一步、小黑板、回访、报告和分享边界。`,
     publicSourceBlockedLine: '禁止把公开资料变成原题答案库、拍照搜题承诺、排名晒分或全科动态板书承诺。',
     clusterRunwayLine: `已把 ${QUESTION_TYPE_CLUSTER_RUNWAY.length} 个高频题型簇接成“第一步-错因-小黑板-回访-分享”本地闭环。`,
+    longitudinalLine: `已把 ${LONGITUDINAL_PRESSURE_SCENARIO_LEDGER.length} 条跨周复发场景接成本地 release gate：先看复发证据，再决定报告、奖励、分享和家校协同能不能释放。`,
     totalSamples,
     totalSubjects: SUBJECT_COUNTS.length,
     totalTypes,
     totalPublicSources: PUBLIC_K12_SOURCE_LEDGER.length,
     totalQuestionTypeClusters: QUESTION_TYPE_CLUSTER_RUNWAY.length,
+    totalLongitudinalPressureScenarios: LONGITUDINAL_PRESSURE_SCENARIO_LEDGER.length,
     reportLine: `报告可引用 ${totalSamples} 个压力样本的第一步、错因、小黑板和回访动作。`,
     parentLine: `家长侧只看 ${active.label} 当前错因和下一次回访，不看孩子完整对话、分数或排名。`,
     nextExpansionLine: active.nextGap,
@@ -520,5 +603,6 @@ module.exports = {
   PUBLIC_K12_USE_POLICY,
   PUBLIC_K12_USE_WORKBENCH,
   K12_PUBLIC_IMPLEMENTATION_DECISION_MATRIX,
+  LONGITUDINAL_PRESSURE_SCENARIO_LEDGER,
   buildRealHomeworkCoverageMatrix
 };
