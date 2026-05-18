@@ -626,6 +626,28 @@ function buildGizmoLikeMemoryProtocol(profile = {}, cards = [], events = [], res
     rule: '同一错因连续 2 次失败，升级为顽固卡，回到第一步小黑板和家长一句话复盘。',
     route: stickyCount || needsRepair ? '/pages/review/review' : '/pages/tutor/tutor'
   };
+  const habitHookLoop = {
+    id: 'daily_90s_memory_hook',
+    title: needsRepair ? '90 秒救援回忆' : '90 秒掌握保温',
+    entryLine: `今天只抢回「${weakKey}」这一类第一步，不开新题海。`,
+    quickStartActions: [
+      { id: 'cover_answer', label: '遮住答案', seconds: 15, action: '只说第一步，不说最终结果。' },
+      { id: 'wrong_cause_snap', label: '点错因', seconds: 20, action: `说出「${weakKey}」为什么会卡。` },
+      { id: 'micro_variant', label: '小变式', seconds: 35, action: '换数字或换材料，仍只开第一步。' },
+      { id: 'tomorrow_lock', label: '锁明天', seconds: 20, action: '选 1 张明天回访卡，防止当场会、明天忘。' }
+    ],
+    variableRewardSignals: [
+      { id: 'first_step_clear', label: '第一步说清', reward: '+XP', guardrail: '不奖励抄答案。' },
+      { id: 'wrong_cause_named', label: '错因说准', reward: '点亮错因徽章', guardrail: '不奖励刷题量。' },
+      { id: 'next_day_kept', label: '明天还记得', reward: '连续回忆火苗', guardrail: '不展示排名。' }
+    ],
+    relapseRecovery: [
+      { id: 'miss_once', trigger: '错 1 次', action: '降到二选一提示。' },
+      { id: 'miss_twice', trigger: '同错因错 2 次', action: '冻结新题，回第一步小黑板。' },
+      { id: 'miss_after_sleep', trigger: '隔天忘记', action: '只做原错因复现，不加题。' }
+    ],
+    shareNudge: '可以分享“90 秒回忆挑战”，只带动作和回访时间，不带原题、答案、分数或排名。'
+  };
   return {
     id: 'gizmo_like_memory_protocol',
     title: needsRepair ? '高频记忆训练协议' : '掌握巩固训练协议',
@@ -652,8 +674,9 @@ function buildGizmoLikeMemoryProtocol(profile = {}, cards = [], events = [], res
       payloadFields: ['weak_key', 'return_window', 'parent_contract', 'no_score', 'no_original_photo'],
       line: '分享只带挑战动作和回访时间，不带原题照片、完整对话、分数、排名或私密评价。'
     },
+    habitHookLoop,
     recentMisses,
-    evidenceRequired: ['daily_minimum_recall', 'anti_cram_throttle', 'leech_card_escalation', 'return_windows', 'parent_memory_contract', 'share_safe_memory_challenge']
+    evidenceRequired: ['daily_minimum_recall', 'anti_cram_throttle', 'leech_card_escalation', 'return_windows', 'parent_memory_contract', 'share_safe_memory_challenge', 'daily_90s_memory_hook']
   };
 }
 

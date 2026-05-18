@@ -4613,6 +4613,41 @@ function buildShareChallengePlan(input = {}) {
     noRankingLine: '不排行、不晒分、不暴露原题，只留行动证据。',
     doneSignal: '接收者完成 1 次主动回忆、1 次错因回退、1 次明天回访预约。'
   };
+  const shareHookDeck = [
+    {
+      id: 'ninety_second_recall',
+      title: '90 秒回忆挑战',
+      visibleLine: `不看答案，说出这类题第一步：${firstStep}`,
+      receiverPrompt: '你也用自己的作业试一次，只说第一步。',
+      proofSignal: '留下 1 句孩子自己的第一步。'
+    },
+    {
+      id: 'wrong_cause_snap',
+      title: '错因快照',
+      visibleLine: actionLabel || '今天只修同一个错因。',
+      receiverPrompt: '接力者只找自己的同类错因，不比较谁做得快。',
+      proofSignal: '留下错因标签和明天回访卡。'
+    },
+    {
+      id: 'day7_return',
+      title: '第 7 天回访',
+      visibleLine: '现在会不算结束，第 7 天还能说出来才算稳。',
+      receiverPrompt: '接收后自动带回轻回访，不进入题海。',
+      proofSignal: '留下回访时间，不晒分数。'
+    }
+  ];
+  const naturalSpreadTriggers = [
+    { id: 'parent_reassurance', trigger: '家长想知道今晚怎么帮', hook: '转发的是一句可照做的话，不是成绩单。' },
+    { id: 'peer_copyable', trigger: '同学也卡同类题', hook: '对方用自己的材料复刻第一步，不复制原题。' },
+    { id: 'weekly_return', trigger: '一周后还想确认', hook: '第 7 天自动回到同一错因的小变式。' }
+  ];
+  const communityRipplePlan = {
+    id: 'safe_learning_ripple',
+    title: '安全学习涟漪',
+    rule: '一个分享最多带出一个同类第一步挑战，不扩散原题、不扩散答案、不扩散排名。',
+    loop: ['发起者留第一步', '接收者用自己的材料复刻', '家长只问一句', '明天回访同一错因'],
+    conversionLine: '自然裂变只建立在可复用动作上，不建立在晒成绩或制造焦虑上。'
+  };
   const parentDecisionPayload = {
     tonightQuestion: `今晚只问一句：${firstStep}`,
     evidenceToCheck: ['孩子自己的第一步', '错因是否回到卡片', '明天是否能复述'],
@@ -4656,6 +4691,9 @@ function buildShareChallengePlan(input = {}) {
     reviewCadence,
     relayChain,
     communityChallengeCard,
+    shareHookDeck,
+    naturalSpreadTriggers,
+    communityRipplePlan,
     returnPathContract,
     privacyBoundary,
     peerSafeLine,
@@ -4676,6 +4714,8 @@ function buildShareChallengePlan(input = {}) {
       relay_privacy: privacyBoundary,
       relay_review: sevenDayReviewPayload.day7,
       relay_first_step: firstStep,
+      relay_hook: shareHookDeck[0].title,
+      relay_spread_trigger: naturalSpreadTriggers[0].id,
       relay_id: safeRelayChallengePacket.query.relay_id,
       relay_receiver_action: safeRelayChallengePacket.query.relay_receiver_action,
       relay_parent_check: safeRelayChallengePacket.query.relay_parent_check,
@@ -4764,6 +4804,9 @@ function buildCommunityShareRelayBoard(input = {}) {
     privacyBoundary: plan.privacyBoundary,
     peerSafeLine: plan.peerSafeLine,
     safeRelayChallengePacket: plan.safeRelayChallengePacket,
+    shareHookDeck: plan.shareHookDeck || [],
+    naturalSpreadTriggers: plan.naturalSpreadTriggers || [],
+    communityRipplePlan: plan.communityRipplePlan || {},
     visualRelayProtocol,
     visualRelayProofChecklist,
     visualRelayBoundary: '社区小黑板接力只传第一步、复刻动作、家长检查和回访安排；不传原题、答案、分数、排名或完整对话。',
