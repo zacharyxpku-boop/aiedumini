@@ -66,6 +66,18 @@ const TASK_TYPE_PROMPTS = {
 
 function detectTaskType(text = '', selected = {}) {
   const source = `${text || ''} ${selected.text || ''}`;
+  if (/化学.*(方程式|配平|反应方程|原子个数)/.test(source)) {
+    return 'chemistry_experiment';
+  }
+  if (/英语阅读|Why did|回文定位|证据句|best title|阅读标题/.test(source)) {
+    return 'reading_question';
+  }
+  if (/数学.*(浓度|混合|盐水|含盐率|分段收费|起步价|超过部分|出租车|水费|电费)|方程|等量关系|未知数|设.*x|列方程|年龄|相遇|追及|利润|成本|售价|长方形周长|几何方程/.test(source)) {
+    return 'equation_setup';
+  }
+  if (/英语.*(because|although|when|状语从句|连词|非谓语|to do|定语从句|关系代词)|although|in order to|to do/.test(source)) {
+    return 'english_sentence';
+  }
   if (/化学|反应|方程式|溶液|气体|沉淀|酸碱|守恒|配平/.test(source)) {
     return 'chemistry_experiment';
   }
@@ -74,9 +86,6 @@ function detectTaskType(text = '', selected = {}) {
   }
   if (/作文|写作|提纲|润色|病句|段落中心|细节描写|动作、语言|动作细节|语言描写|神态|只改一句|不通顺/.test(source)) {
     return 'writing_process';
-  }
-  if (/方程|等量关系|未知数|设.*x|列方程|年龄|相遇|追及|利润|成本|售价|长方形周长|几何方程/.test(source)) {
-    return 'equation_setup';
   }
   if (/数学统计图|平均每天|平均数|概率题|摸到红球|有利结果|总结果/.test(source)) {
     return 'math_word_problem';
@@ -1216,6 +1225,106 @@ function inferHomeworkPressureSignal(text = '', taskType = 'unknown') {
       boardMove: '小黑板只画“重复关键词 -> 全文中心 -> 标题”。',
       parentCheck: '先问：这个选项覆盖全文，还是只覆盖一段？',
       reviewMove: '换一篇短文，仍先找重复关键词和全文中心。'
+    },
+    {
+      id: 'mixture_equation_concentration',
+      taskType: 'equation_setup',
+      patterns: [/溶液浓度|混合|盐水|含盐率|质量分数|设.*克/],
+      firstStep: '先设需要加入 x 克，再把溶质质量和溶液总质量分开写。',
+      wrongCause: '把溶质质量和溶液总质量混在一起，没有先写浓度等量关系。',
+      boardMove: '小黑板只写“溶质质量 / 溶液总质量 = 浓度”。',
+      parentCheck: '先问：分子是溶质，还是整杯溶液？加入后总质量变了吗？',
+      reviewMove: '换成加水稀释，仍先分溶质质量和溶液总质量。'
+    },
+    {
+      id: 'piecewise_fee_equation',
+      taskType: 'equation_setup',
+      patterns: [/分段收费|起步价|超过部分|出租车|水费|电费|设.*公里|设.*吨/],
+      firstStep: '先判断是否超过起步范围，再把超过部分单独表示。',
+      wrongCause: '把全部数量都按同一个单价算，没有先拆起步部分和超过部分。',
+      boardMove: '小黑板只画“起步部分 + 超过部分 = 总费用”。',
+      parentCheck: '先问：哪些数量已经包含在起步价里？超过部分是多少？',
+      reviewMove: '换成阶梯水费，仍先拆基础部分和超过部分。'
+    },
+    {
+      id: 'english_nonfinite_purpose',
+      taskType: 'english_sentence',
+      patterns: [/to do|非谓语|目的|in order to|动词不定式|去做某事/],
+      firstStep: '先判断空格表示目的，再用 to do 结构。',
+      wrongCause: '只看中文“去做”，没有判断它在句中表示目的。',
+      boardMove: '小黑板只写“目的 -> to do”。',
+      parentCheck: '先问：这个动作是目的，还是正在发生的动作？',
+      reviewMove: '换成 in order to 句型，仍先判断目的关系。'
+    },
+    {
+      id: 'english_adverbial_because',
+      taskType: 'english_sentence',
+      patterns: [/because|although|when|状语从句|连词|让步|原因/],
+      firstStep: '先判断两个句子之间是原因、让步还是时间关系。',
+      wrongCause: '只凭中文意思选连词，没有先判断逻辑关系。',
+      boardMove: '小黑板只画“前句关系 -> 连词 -> 后句”。',
+      parentCheck: '先问：后一句是在解释原因，还是在转折让步？',
+      reviewMove: '换成 although，仍先判断让步关系。'
+    },
+    {
+      id: 'chinese_poetry_imagery',
+      taskType: 'reading_question',
+      patterns: [/古诗|意象|诗句|景物|情感|借景抒情/],
+      firstStep: '先圈诗句里的景物意象，再说它可能承载的情感。',
+      wrongCause: '只翻译字面意思，没有把景物和情感连接起来。',
+      boardMove: '小黑板只画“景物意象 -> 情感方向”。',
+      parentCheck: '先问：诗里写了哪一个景物？它让人感觉冷、暖、远还是近？',
+      reviewMove: '换一首写月亮的诗，仍先圈意象再说情感。'
+    },
+    {
+      id: 'chinese_expository_method',
+      taskType: 'reading_question',
+      patterns: [/说明文|说明方法|列数字|作比较|打比方|说明作用/],
+      firstStep: '先判断用了哪一种说明方法，再说它帮助说明了什么特点。',
+      wrongCause: '只背说明方法名称，没有回到对象特点和表达作用。',
+      boardMove: '小黑板只画“方法名称 -> 对象特点 -> 作用”。',
+      parentCheck: '先问：这句话说明的是哪个对象的哪个特点？',
+      reviewMove: '换成作比较句，仍先说方法和对象特点。'
+    },
+    {
+      id: 'chinese_writing_ending_echo',
+      taskType: 'writing_process',
+      patterns: [/作文结尾|结尾|照应开头|升华|收束|点题/],
+      firstStep: '先回看开头写了什么，再用一句话照应主题。',
+      wrongCause: '结尾想突然升华，反而和前文事件断开。',
+      boardMove: '小黑板只画“开头关键词 -> 结尾照应句”。',
+      parentCheck: '先问：结尾有没有回到开头那件事或那个感受？',
+      reviewMove: '换一篇作文，仍先找开头关键词再写结尾一句。'
+    },
+    {
+      id: 'chinese_writing_material_cut',
+      taskType: 'writing_process',
+      patterns: [/选材|材料太多|详略|重点事件|跑题|删掉/],
+      firstStep: '先选一个最能证明主题的事件，其余材料先放旁边。',
+      wrongCause: '把所有经历都写进去，没有围绕主题筛材料。',
+      boardMove: '小黑板只画“主题 -> 最能证明的一件事”。',
+      parentCheck: '先问：哪一件事最能说明题目里的关键词？',
+      reviewMove: '换一个主题，仍先选最能证明主题的一件事。'
+    },
+    {
+      id: 'physics_heat_transfer',
+      taskType: 'physics_diagram',
+      patterns: [/热传递|温度|内能|吸热|放热|热量|高温物体/],
+      firstStep: '先判断热量总是从高温物体传向低温物体。',
+      wrongCause: '把温度、热量和内能混成一个概念。',
+      boardMove: '小黑板只画“高温 -> 低温”的热量方向箭头。',
+      parentCheck: '先问：热量方向看温度高低，还是看物体大小？',
+      reviewMove: '换成热水和冷勺子，仍先判断热量方向。'
+    },
+    {
+      id: 'chem_particle_model',
+      taskType: 'chemistry_experiment',
+      patterns: [/微粒|分子|原子|扩散|间隔|水分子|微观解释/],
+      firstStep: '先判断现象要用分子在不断运动或分子间有间隔解释。',
+      wrongCause: '只描述宏观现象，没有转到微粒运动和间隔。',
+      boardMove: '小黑板只画“宏观现象 -> 微粒运动/间隔”。',
+      parentCheck: '先问：这个现象说明分子在运动，还是分子之间有间隔？',
+      reviewMove: '换成酒精和水混合体积变化，仍先找微粒解释。'
     }
   ];
   if (/没说|缺少|题干不全|条件不完整|没有给/.test(source)) {
