@@ -419,6 +419,8 @@
         <view class="bridge-title">{{arcadeResultActionBridge.headline}}</view>
         <view class="bridge-line">{{arcadeResultActionBridge.evidenceLine}}</view>
         <view class="bridge-line">{{arcadeResultActionBridge.tomorrowLine}}</view>
+        <view class="bridge-line" wx:if="{{arcadeResultActionBridge.masteryGateLine}}">{{arcadeResultActionBridge.masteryGateLine}}</view>
+        <view class="bridge-line" wx:if="{{arcadeResultActionBridge.parentEvidenceLine}}">{{arcadeResultActionBridge.parentEvidenceLine}}</view>
         <view class="bridge-share">{{arcadeResultActionBridge.shareLine}}</view>
         <view class="bridge-action-grid">
           <button

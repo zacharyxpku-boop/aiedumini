@@ -802,6 +802,27 @@ Page({
     return xpAccepted;
   },
 
+  buildQuestionProgressionSignal(result = {}, wrongAnswers = []) {
+    const bank = this.data.courseUnitQuestionBank || {};
+    const activeCards = Array.isArray(bank.activeCards) ? bank.activeCards : [];
+    const progressionCards = activeCards.filter((card) => card && card.progression);
+    const first = progressionCards[0] || {};
+    const progression = first.progression || {};
+    const accuracy = Number(result.accuracy || 0);
+    const status = accuracy >= 80 && !wrongAnswers.length ? 'mastery_gate_ready' : 'needs_next_revisit';
+    return {
+      status,
+      activeCardCount: progressionCards.length,
+      stageCount: progressionCards.reduce((sum, card) => sum + Number(card.progression && card.progression.stageCount || 0), 0),
+      masteryGateCount: progressionCards.filter((card) => card.progression && card.progression.masteryGate).length,
+      nextDayRevisit: progression.nextDayRevisit || '明天只回访一张最不稳的题型卡。',
+      masteryGate: progression.masteryGate || '第一步、错因、近迁移连续稳定两次再通过。',
+      parentEvidence: progression.parentEvidence || '家长只看第一步、错因和回访证据，不看分数排名。',
+      visualBoardStep: progression.visualBoardStep || '',
+      safetyBoundary: progression.safetyBoundary || '不生成完整答案，不替孩子写过程。'
+    };
+  },
+
   finishRound(answers, bestCombo, score, lives) {
     const result = arcade.summarizeAttempt({
       gameType: this.data.selectedGame || 'whack',
@@ -844,6 +865,7 @@ Page({
       }, { gameType: savedResult.gameType })
       : null;
     const incomingShare = storage.loadIncomingShare ? storage.loadIncomingShare() : null;
+    const questionProgressionSignal = this.buildQuestionProgressionSignal(savedResult, wrongAnswers);
     storage.appendSyncMutation('arcade_attempt', {
       game_type: savedResult.gameType,
       total: savedResult.total,
@@ -862,6 +884,11 @@ Page({
       course_unit_trajectory_rows: this.data.courseUnitMasteryTrajectory && Array.isArray(this.data.courseUnitMasteryTrajectory.trajectories)
         ? this.data.courseUnitMasteryTrajectory.trajectories.length
         : 0,
+      question_progression_status: questionProgressionSignal.status,
+      question_progression_cards: questionProgressionSignal.activeCardCount,
+      question_progression_stages: questionProgressionSignal.stageCount,
+      question_progression_mastery_gates: questionProgressionSignal.masteryGateCount,
+      question_progression_revisit: questionProgressionSignal.nextDayRevisit,
       retention_mode: gameRetentionLoop && gameRetentionLoop.mode,
       retention_next_route: gameRetentionLoop && gameRetentionLoop.nextRoute,
       retention_weak_key: gameRetentionLoop && gameRetentionLoop.weakKey,
@@ -914,6 +941,8 @@ Page({
           subjectDepthLabel: this.data.subjectSkillDepth && this.data.subjectSkillDepth.label,
           curriculumSpine: this.data.curriculumSpine,
           courseUnitMap: this.data.courseUnitMap,
+          courseUnitQuestionBank: this.data.courseUnitQuestionBank,
+          questionProgressionSignal,
           nextPracticePlan: cause,
           score: Number(savedResult.accuracy || 0),
           adaptiveMode: this.data.adaptiveChallenge && this.data.adaptiveChallenge.mode,
@@ -956,6 +985,11 @@ Page({
         course_unit_trajectory_rows: this.data.courseUnitMasteryTrajectory && Array.isArray(this.data.courseUnitMasteryTrajectory.trajectories)
           ? this.data.courseUnitMasteryTrajectory.trajectories.length
           : 0,
+        question_progression_status: questionProgressionSignal.status,
+        question_progression_cards: questionProgressionSignal.activeCardCount,
+        question_progression_stages: questionProgressionSignal.stageCount,
+        question_progression_mastery_gates: questionProgressionSignal.masteryGateCount,
+        question_progression_revisit: questionProgressionSignal.nextDayRevisit,
         quest_arc_stage: this.data.questArcMission && this.data.questArcMission.currentStage,
         quest_arc_mission: this.data.questArcMission && this.data.questArcMission.title,
         retention_mode: gameRetentionLoop && gameRetentionLoop.mode,
@@ -1013,6 +1047,7 @@ Page({
       repairFocus,
       gameRetentionLoop,
       highFrequencyPracticeLoop,
+      questionProgressionSignal,
       wrongAnswers,
       incomingShare
     });
@@ -1021,6 +1056,7 @@ Page({
       resultAdvice: arcade.buildRoundAdvice(savedResult, savedResult.gameType),
       gameRetentionLoop,
       highFrequencyPracticeLoop,
+      questionProgressionSignal,
       arcadeResultActionBridge,
       challengeBrief: Object.assign({}, this.data.challengeBrief || {}, {
         resultLine: savedResult.accuracy >= Number((this.data.challengeBrief && this.data.challengeBrief.targetAccuracy) || 80)
@@ -1075,6 +1111,7 @@ Page({
     const wrongCount = Array.isArray(context.wrongAnswers) ? context.wrongAnswers.length : Number(result.wrong || 0);
     const retention = context.gameRetentionLoop || {};
     const highFrequency = context.highFrequencyPracticeLoop || {};
+    const progression = context.questionProgressionSignal || {};
     const shareCode = context.incomingShare && context.incomingShare.share_code ? context.incomingShare.share_code : '';
     const headline = result.passed
       ? '这局可以收口：明天轻回看一张卡'
@@ -1111,7 +1148,9 @@ Page({
       title: '本局之后做什么',
       headline,
       evidenceLine,
-      tomorrowLine: retention.tomorrowLine || highFrequency.parentShareLine || '明天只回看最不稳的一张卡。',
+      tomorrowLine: progression.nextDayRevisit || retention.tomorrowLine || highFrequency.parentShareLine || '明天只回看最不稳的一张卡。',
+      masteryGateLine: progression.masteryGate || '',
+      parentEvidenceLine: progression.parentEvidence || '',
       shareLine: shareCode ? `来自分享接力 ${shareCode}，本局结果会继续承接。` : '家长页会显示本局证据和下一步。',
       actions
     };
