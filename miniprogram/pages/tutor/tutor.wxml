@@ -224,6 +224,8 @@
             <view class="receipt-board-avoid">{{thinkingReceipt.realHomeworkCoverageMatrix.summary}}</view>
             <view class="receipt-board-line">当前科目：{{thinkingReceipt.realHomeworkCoverageMatrix.activeSubject.label}} · {{thinkingReceipt.realHomeworkCoverageMatrix.activeSubject.count}} 个压力样本</view>
             <view class="receipt-board-line">{{thinkingReceipt.realHomeworkCoverageMatrix.publicSourceLine}}</view>
+            <view class="receipt-board-line">{{thinkingReceipt.realHomeworkCoverageMatrix.clusterRunwayLine}}</view>
+            <view class="receipt-board-parent" wx:for="{{thinkingReceipt.realHomeworkQuestionTypeClusters}}" wx:key="id">{{item.subject}} · {{item.pressureFamily}}：{{item.firstStepRule}}</view>
             <view class="receipt-board-parent" wx:for="{{thinkingReceipt.realHomeworkPublicSources}}" wx:key="id">{{item.label}}：本地规则管{{item.localRuleUse[0]}}，AI 只管{{item.aiUse[0]}}</view>
             <view class="receipt-board-parent" wx:for="{{thinkingReceipt.realHomeworkCoverageClusters}}" wx:key="id">{{item.label}}：{{item.firstStep}}</view>
             <view class="receipt-board-line" wx:for="{{thinkingReceipt.realHomeworkCoverageTypes}}" wx:key="id">{{item.label}}：{{item.firstStep}}</view>

@@ -1023,6 +1023,9 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     realHomeworkCoverageClusters: realHomeworkCoverageMatrix && Array.isArray(realHomeworkCoverageMatrix.sampleClusters)
       ? realHomeworkCoverageMatrix.sampleClusters
       : [],
+    realHomeworkQuestionTypeClusters: realHomeworkCoverageMatrix && Array.isArray(realHomeworkCoverageMatrix.questionTypeClusterRunway)
+      ? realHomeworkCoverageMatrix.questionTypeClusterRunway
+      : [],
     realHomeworkPublicSources: realHomeworkCoverageMatrix && Array.isArray(realHomeworkCoverageMatrix.publicSourceLedger)
       ? realHomeworkCoverageMatrix.publicSourceLedger
       : [],
