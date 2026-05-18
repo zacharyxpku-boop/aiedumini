@@ -1212,6 +1212,97 @@ function buildQuestionBankRecallReportBridge(input = {}, parentDecisionTrust = {
   };
 }
 
+function buildPortraitDecisionReleaseSystem(input = {}, parentDecisionTrust = {}, portraitConfidence = {}, portraitEvidenceMaturity = {}, questionBankRecallReportBridge = {}) {
+  const gameEvidence = input.gameEvidence || {};
+  const highFrequencyLoop = input.highFrequencyPracticeLoop || gameEvidence.highFrequencyPracticeLoop || {};
+  const scheduler = input.adaptiveRecallScheduler || highFrequencyLoop.adaptiveRecallScheduler || {};
+  const schedulerBoxes = Array.isArray(scheduler.schedulerBoxes) ? scheduler.schedulerBoxes : [];
+  const reviewQueue = Array.isArray(scheduler.reviewQueue) ? scheduler.reviewQueue : [];
+  const unlockRules = Array.isArray(scheduler.unlockRules) ? scheduler.unlockRules : [];
+  const leechRules = Array.isArray(scheduler.leechRules) ? scheduler.leechRules : [];
+  const trustScore = Number(parentDecisionTrust.score || 0);
+  const evidenceScore = Number(portraitConfidence.evidenceScore || 0);
+  const maturityScore = Number(portraitEvidenceMaturity.maturityScore || 0);
+  const hasTomorrow = reviewQueue.some((item) => String(item.releaseEvidence || '').indexOf('next_day_revisit') >= 0);
+  const hasDay7 = reviewQueue.some((item) => String(item.releaseEvidence || '').indexOf('long_term_portrait_gate') >= 0);
+  const recallReady = questionBankRecallReportBridge.status === 'ready' && Number(questionBankRecallReportBridge.workoutCardCount || 0) >= 3;
+  const releaseScore = Math.max(0, Math.min(100,
+    Math.round(trustScore * 0.32 + Math.min(evidenceScore, 140) * 0.22 + maturityScore * 0.26 + (hasTomorrow ? 10 : 0) + (hasDay7 ? 10 : 0))
+  ));
+  const releaseLevel = releaseScore >= 75 && hasTomorrow && hasDay7
+    ? 'portrait_candidate'
+    : releaseScore >= 50 && hasTomorrow
+      ? 'action_only'
+      : 'collect_more_evidence';
+  return {
+    id: 'portrait_decision_release_system',
+    title: '长期画像放行系统',
+    releaseLevel,
+    releaseScore,
+    summary: releaseLevel === 'portrait_candidate'
+      ? '当前可以作为长期画像候选证据，但仍按第 7 天复核后再写入稳定结论。'
+      : releaseLevel === 'action_only'
+        ? '当前只能支持今晚和明天的家庭行动，不支持给孩子贴长期标签。'
+        : '当前证据不足，只能继续收集第一步、错因和回访证据。',
+    releaseLanes: [
+      {
+        id: 'tonight_action',
+        label: '今晚行动',
+        status: trustScore >= 30 ? 'released' : 'blocked',
+        releaseRule: '有明确第一步或错因，就允许做一个低压动作。',
+        blockedRule: '没有孩子自己的第一步，不给行动结论。',
+        evidence: 'child_first_step'
+      },
+      {
+        id: 'tomorrow_revisit',
+        label: '明天回访',
+        status: hasTomorrow ? 'released' : 'blocked',
+        releaseRule: '调度器里出现明天回访卡，才允许判断是否转身还记得。',
+        blockedRule: '没有隔天回访，不判断掌握。',
+        evidence: 'next_day_revisit'
+      },
+      {
+        id: 'day3_transfer',
+        label: '第3天变式',
+        status: releaseScore >= 55 && recallReady ? 'candidate' : 'blocked',
+        releaseRule: '错因回放稳定后，才开放小变式。',
+        blockedRule: '错因急救未完成，不加新题量。',
+        evidence: 'near_transfer_attempt'
+      },
+      {
+        id: 'day7_portrait',
+        label: '第7天画像',
+        status: releaseLevel === 'portrait_candidate' ? 'candidate' : 'blocked',
+        releaseRule: '第7天仍能迁移，才写入长期画像候选结论。',
+        blockedRule: '少于7天证据，只能作为家庭行动记录。',
+        evidence: 'long_term_portrait_gate'
+      }
+    ],
+    schedulerBoxes,
+    reviewQueue,
+    releaseLocks: [
+      '没有明天回访，不写入长期画像。',
+      '没有第 7 天小变式，不把单次正确当稳定能力。',
+      '同一错因仍在急救盒时，不增加题量。',
+      '家长报告不展示完整对话、原题照片、分数排名或私密评价。'
+    ],
+    parentDecisionLine: releaseLevel === 'portrait_candidate'
+      ? '家长可以把它当作画像候选证据，但要等第 7 天复核后再稳定下来。'
+      : releaseLevel === 'action_only'
+        ? '家长今晚只做一个动作：问第一步，明天回访，不下长期判断。'
+        : '家长先收证据，不评价孩子能力。',
+    actionQueue: [
+      { id: 'ask_first_step', label: '先问第一步', route: '/pages/tutor/tutor', evidence: 'child_first_step' },
+      { id: 'run_revisit', label: '明天回访', route: '/pages/review/review', evidence: 'next_day_revisit' },
+      { id: 'play_memory', label: '高频回忆', route: '/pages/arcade/arcade', evidence: 'adaptive_recall_scheduler' },
+      { id: 'review_portrait', label: '第7天再看画像', route: '/pages/profile/profile', evidence: 'long_term_portrait_gate' }
+    ],
+    xpReleaseLine: scheduler.xpGate || 'XP 只能跟随回访证据释放，不作为分数排名。',
+    shareBoundary: scheduler.shareBoundary || '分享只带行动、回访窗口和证据缺口，不带原题照片、完整答案、完整对话、分数或排名。',
+    evidenceRequired: ['parent_decision_trust', 'portrait_confidence', 'portrait_evidence_maturity', 'adaptive_recall_scheduler', 'next_day_revisit', 'long_term_portrait_gate', 'safe_share_boundary'].concat(unlockRules, leechRules).slice(0, 12)
+  };
+}
+
 function buildLearningReportDraft(input = {}) {
   const sources = normalizeReportSources(input);
   const allText = [input.sourceText || '', input.scoreText || ''].concat(sources.map((source) => source.text || '')).join('\n');
@@ -1252,6 +1343,7 @@ function buildLearningReportDraft(input = {}) {
   const socraticMemoryReportBridge = buildSocraticMemoryReportBridge(input, parentDecisionTrustSystem, portraitConfidenceSystem);
   const questionBankDecisionBridge = buildQuestionBankDecisionBridge(input, parentDecisionTrustSystem, portraitConfidenceSystem);
   const questionBankRecallReportBridge = buildQuestionBankRecallReportBridge(input, parentDecisionTrustSystem, portraitConfidenceSystem);
+  const portraitDecisionReleaseSystem = buildPortraitDecisionReleaseSystem(input, parentDecisionTrustSystem, portraitConfidenceSystem, portraitEvidenceMaturitySystem, questionBankRecallReportBridge);
   const missing = missingItems(parts);
   const reportDraft = {
     id: input.id || `learning_report_${String(nowIso(input.now)).slice(0, 10).replace(/-/g, '')}`,
@@ -1288,6 +1380,7 @@ function buildLearningReportDraft(input = {}) {
     socraticMemoryReportBridge,
     questionBankDecisionBridge,
     questionBankRecallReportBridge,
+    portraitDecisionReleaseSystem,
     generatedAt: nowIso(input.now),
     missingItems: missing,
     sourceIntegrity: {
@@ -1326,6 +1419,7 @@ function buildLearningReportDraft(input = {}) {
     socraticMemoryReportBridge,
     questionBankDecisionBridge,
     questionBankRecallReportBridge,
+    portraitDecisionReleaseSystem,
     reportCompleteness: completeness,
     reportStatus: {
       state: completeness >= 30 ? 'ready' : 'draft',
@@ -1356,6 +1450,7 @@ module.exports = {
   buildSocraticMemoryReportBridge,
   buildQuestionBankDecisionBridge,
   buildQuestionBankRecallReportBridge,
+  buildPortraitDecisionReleaseSystem,
   normalizeReportSources,
   confidenceLabel
 };

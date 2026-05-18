@@ -882,6 +882,9 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
   const questionBankRecallReportBridge = learningReport.buildQuestionBankRecallReportBridge
     ? learningReport.buildQuestionBankRecallReportBridge({ gameEvidence }, parentDecisionTrustSystem, portraitConfidenceSystem)
     : (draft.questionBankRecallReportBridge || null);
+  const portraitDecisionReleaseSystem = learningReport.buildPortraitDecisionReleaseSystem
+    ? learningReport.buildPortraitDecisionReleaseSystem({ gameEvidence }, parentDecisionTrustSystem, portraitConfidenceSystem, portraitEvidenceMaturitySystem, questionBankRecallReportBridge)
+    : (draft.portraitDecisionReleaseSystem || null);
   const fallbackRecoveryReportBridge = latestThinkingReceipt && latestThinkingReceipt.fallback_recovery_bridge
     ? latestThinkingReceipt.fallback_recovery_bridge
     : null;
@@ -1089,6 +1092,26 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
       : [],
     questionBankRecallReportEvidence: questionBankRecallReportBridge && Array.isArray(questionBankRecallReportBridge.evidenceRequired)
       ? questionBankRecallReportBridge.evidenceRequired
+      : [],
+    portraitDecisionReleaseSystem,
+    portraitDecisionReleaseTitle: portraitDecisionReleaseSystem ? portraitDecisionReleaseSystem.title : '',
+    portraitDecisionReleaseLevel: portraitDecisionReleaseSystem ? portraitDecisionReleaseSystem.releaseLevel : '',
+    portraitDecisionReleaseScore: portraitDecisionReleaseSystem ? Number(portraitDecisionReleaseSystem.releaseScore || 0) : 0,
+    portraitDecisionReleaseSummary: portraitDecisionReleaseSystem ? portraitDecisionReleaseSystem.summary : '',
+    portraitDecisionReleaseLanes: portraitDecisionReleaseSystem && Array.isArray(portraitDecisionReleaseSystem.releaseLanes)
+      ? portraitDecisionReleaseSystem.releaseLanes
+      : [],
+    portraitDecisionReleaseLocks: portraitDecisionReleaseSystem && Array.isArray(portraitDecisionReleaseSystem.releaseLocks)
+      ? portraitDecisionReleaseSystem.releaseLocks
+      : [],
+    portraitDecisionReleaseQueue: portraitDecisionReleaseSystem && Array.isArray(portraitDecisionReleaseSystem.actionQueue)
+      ? portraitDecisionReleaseSystem.actionQueue
+      : [],
+    portraitDecisionReleaseParentLine: portraitDecisionReleaseSystem ? portraitDecisionReleaseSystem.parentDecisionLine : '',
+    portraitDecisionReleaseXpLine: portraitDecisionReleaseSystem ? portraitDecisionReleaseSystem.xpReleaseLine : '',
+    portraitDecisionReleaseShareBoundary: portraitDecisionReleaseSystem ? portraitDecisionReleaseSystem.shareBoundary : '',
+    portraitDecisionReleaseEvidence: portraitDecisionReleaseSystem && Array.isArray(portraitDecisionReleaseSystem.evidenceRequired)
+      ? portraitDecisionReleaseSystem.evidenceRequired
       : [],
     fallbackRecoveryReportBridge,
     fallbackRecoveryTitle: fallbackRecoveryReportBridge ? fallbackRecoveryReportBridge.title : '',

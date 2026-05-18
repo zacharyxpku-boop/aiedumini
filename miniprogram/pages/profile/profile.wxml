@@ -791,6 +791,19 @@
           <text wx:for="{{learningReportSummary.questionBankRecallReportPhases}}" wx:key="id">训练阶段：{{item.label}}｜{{item.rule}}</text>
           <text wx:for="{{learningReportSummary.questionBankRecallReportEvidence}}" wx:key="*this">画像证据：{{item}}</text>
         </view>
+        <view class="parent-brief-block" wx:if="{{learningReportSummary.portraitDecisionReleaseSystem}}">
+          <text class="parent-brief-label">长期画像放行系统</text>
+          <text wx:if="{{learningReportSummary.portraitDecisionReleaseTitle}}">{{learningReportSummary.portraitDecisionReleaseTitle}}</text>
+          <text>放行等级：{{learningReportSummary.portraitDecisionReleaseLevel}}｜放行分：{{learningReportSummary.portraitDecisionReleaseScore}}</text>
+          <text>{{learningReportSummary.portraitDecisionReleaseSummary}}</text>
+          <text>{{learningReportSummary.portraitDecisionReleaseParentLine}}</text>
+          <text wx:for="{{learningReportSummary.portraitDecisionReleaseLanes}}" wx:key="id">放行层：{{item.label}}｜{{item.status}}｜{{item.releaseRule}}｜挡板：{{item.blockedRule}}</text>
+          <text wx:for="{{learningReportSummary.portraitDecisionReleaseLocks}}" wx:key="*this">画像锁：{{item}}</text>
+          <text wx:for="{{learningReportSummary.portraitDecisionReleaseQueue}}" wx:key="id">下一步：{{item.label}}｜证据 {{item.evidence}}</text>
+          <text wx:if="{{learningReportSummary.portraitDecisionReleaseXpLine}}">{{learningReportSummary.portraitDecisionReleaseXpLine}}</text>
+          <text wx:if="{{learningReportSummary.portraitDecisionReleaseShareBoundary}}">分享边界：{{learningReportSummary.portraitDecisionReleaseShareBoundary}}</text>
+          <text wx:for="{{learningReportSummary.portraitDecisionReleaseEvidence}}" wx:key="*this">放行证据：{{item}}</text>
+        </view>
         <view class="parent-brief-block" wx:if="{{learningReportSummary.questionBankShareRelayDeck}}">
           <text class="parent-brief-label">{{learningReportSummary.questionBankShareRelayTitle}}</text>
           <text>{{learningReportSummary.questionBankShareRelayLine}}</text>
