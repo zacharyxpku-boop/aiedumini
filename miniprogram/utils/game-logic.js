@@ -834,6 +834,73 @@ function buildQuestionBankRecallWorkout(questionBankMemoryBridge = {}, recallInt
   };
 }
 
+function buildDailyMemorySprintDeck(questionBankRecallWorkout = {}, memoryFeedbackController = {}, gizmoLikeMemoryProtocol = {}, xpFeedbackPolicy = {}, result = {}) {
+  const workoutCards = Array.isArray(questionBankRecallWorkout.workoutCards) ? questionBankRecallWorkout.workoutCards : [];
+  const phases = Array.isArray(questionBankRecallWorkout.phases) ? questionBankRecallWorkout.phases : [];
+  const returnWindows = Array.isArray(gizmoLikeMemoryProtocol.returnWindows) ? gizmoLikeMemoryProtocol.returnWindows : [];
+  const wrong = Math.max(0, Number(result.wrong || 0));
+  const accuracy = Number.isFinite(Number(result.accuracy)) ? Number(result.accuracy) : 0;
+  const rescue = memoryFeedbackController.severity === 'high' || questionBankRecallWorkout.mode === 'rescue' || wrong >= 2 || accuracy < 60;
+  const sprintCards = [
+    {
+      id: 'open_recall',
+      label: '开局回忆',
+      minutes: 2,
+      action: workoutCards[0] ? workoutCards[0].action : '遮住答案，说出第一步。',
+      proof: 'child_first_step',
+      route: '/pages/review/review'
+    },
+    {
+      id: 'wrong_cause_replay',
+      label: '错因返场',
+      minutes: rescue ? 4 : 3,
+      action: workoutCards[1] ? workoutCards[1].action : '只复述一个错因，不加新题。',
+      proof: 'wrong_cause_named',
+      route: '/pages/review/review'
+    },
+    {
+      id: 'spaced_revisit',
+      label: '间隔回访',
+      minutes: 2,
+      action: returnWindows[1] ? returnWindows[1].action : '明天只抽最不稳的一张卡。',
+      proof: 'next_day_revisit',
+      route: '/pages/review/review'
+    },
+    {
+      id: 'near_transfer_unlock',
+      label: '近迁移解锁',
+      minutes: rescue ? 0 : 3,
+      action: rescue ? '本轮未解锁；先把错因修稳。' : (workoutCards[3] ? workoutCards[3].action : '换一个小条件，确认方法能迁移。'),
+      proof: rescue ? 'locked_by_wrong_cause' : 'near_transfer_attempt',
+      route: rescue ? '/pages/review/review' : '/pages/tutor/tutor'
+    }
+  ];
+  const lockRules = [
+    '没说出第一步，不开放近迁移。',
+    '同一错因连续 2 次失败，下一轮只做错因返场。',
+    '没有明天回访证据，XP 不进入长期画像。'
+  ];
+  return {
+    id: 'daily_memory_sprint_deck',
+    title: rescue ? '今日记忆急救冲刺' : '今日记忆冲刺',
+    mode: rescue ? 'rescue_sprint' : 'growth_sprint',
+    summary: rescue
+      ? '今天先抢救同一错因，不开放新题量。'
+      : '今天用 4 个短冲刺把主动回忆、错因、回访和迁移连起来。',
+    sprintCards,
+    lockRules,
+    streakMeters: [
+      { id: 'first_step', label: '第一步连续性', target: 2, current: Number(result.correct || 0) >= 2 ? 1 : 0, rule: '连续两天能说第一步才算稳定。' },
+      { id: 'wrong_cause', label: '错因稳定性', target: 2, current: wrong ? 0 : 1, rule: '同错因不再重复才进入近迁移。' },
+      { id: 'revisit', label: '回访兑现', target: 1, current: 0, rule: '明天回来复述一次，才写入画像。' }
+    ],
+    xpLine: xpFeedbackPolicy.rewardLine || 'XP 只奖励主动回忆、错因修复和回访兑现。',
+    parentLine: '家长只看 4 件事：第一步、错因、明天回访、是否解锁近迁移。',
+    shareBoundary: '冲刺分享只带动作和回访窗口，不带原题、答案、分数、排名或完整对话。',
+    evidenceRequired: ['daily_memory_sprint', 'sprint_cards', 'lock_rules', 'streak_meters', 'xp_gate', 'parent_line', 'safe_share_boundary']
+  };
+}
+
 function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], result = {}, challenge = {}, questSet = {}, options = {}) {
   const safeCards = Array.isArray(cards) ? cards : [];
   const safeEvents = Array.isArray(events) ? events : [];
@@ -912,6 +979,13 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
     gizmoLikeMemoryProtocol,
     result
   );
+  const dailyMemorySprintDeck = buildDailyMemorySprintDeck(
+    questionBankRecallWorkout,
+    memoryFeedbackController,
+    gizmoLikeMemoryProtocol,
+    xpFeedbackPolicy,
+    result
+  );
   return {
     title: needsRepair ? '高频修复循环' : '高频巩固循环',
     mode: needsRepair ? 'repair_recall' : 'mastery_recall',
@@ -930,13 +1004,14 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
     socraticQualityMemoryBridge,
     questionBankMemoryBridge,
     questionBankRecallWorkout,
+    dailyMemorySprintDeck,
     xpRule: 'XP 只奖励主动回忆、错因修复和次日回访，不奖励盲刷题量。',
     leechRule: needsRepair
       ? `同一错因连续 2 次错，会降到第一步小黑板。`
       : '连续 2 次说清第一步，才进入变式练习。',
     parentShareLine: `家长复盘只看：孩子能否自己说出「${weakKey}」的第一步。`,
     nextRoute: needsRepair ? '/pages/review/review' : '/pages/tutor/tutor',
-    evidenceRequired: ['active_recall_cards', 'spaced_review_plan', 'wrong_cause_return', 'quest_cadence', 'memory_feedback_controller', 'recall_intensity_plan', 'wrong_cause_replay_deck', 'xp_feedback_policy', 'quest_arc_runway', 'gizmo_like_memory_protocol', 'socratic_quality_memory_bridge', 'question_bank_memory_bridge', 'question_bank_recall_workout', 'parent_share_line'],
+    evidenceRequired: ['active_recall_cards', 'spaced_review_plan', 'wrong_cause_return', 'quest_cadence', 'memory_feedback_controller', 'recall_intensity_plan', 'wrong_cause_replay_deck', 'xp_feedback_policy', 'quest_arc_runway', 'gizmo_like_memory_protocol', 'socratic_quality_memory_bridge', 'question_bank_memory_bridge', 'question_bank_recall_workout', 'daily_memory_sprint_deck', 'parent_share_line'],
     weakKey
   };
 }
@@ -953,6 +1028,7 @@ module.exports = {
   buildGizmoLikeMemoryProtocol,
   buildHighFrequencyPracticeLoop,
   buildMemoryFeedbackController,
+  buildDailyMemorySprintDeck,
   buildQuestionBankMemoryBridge,
   buildQuestionBankRecallWorkout,
   buildQuestArcRunway,

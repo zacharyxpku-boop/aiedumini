@@ -893,6 +893,9 @@ Page({
     const questionBankRecallWorkout = highFrequencyPracticeLoop && highFrequencyPracticeLoop.questionBankRecallWorkout
       ? highFrequencyPracticeLoop.questionBankRecallWorkout
       : null;
+    const dailyMemorySprintDeck = highFrequencyPracticeLoop && highFrequencyPracticeLoop.dailyMemorySprintDeck
+      ? highFrequencyPracticeLoop.dailyMemorySprintDeck
+      : null;
     const questArcSignal = storage.recordQuestArcGameSignal
       ? storage.recordQuestArcGameSignal({
         mission: this.data.questArcMission,
@@ -985,6 +988,21 @@ Page({
         : 0,
       question_bank_recall_workout_boundary: questionBankRecallWorkout
         ? questionBankRecallWorkout.shareBoundary
+        : '',
+      daily_memory_sprint_mode: dailyMemorySprintDeck
+        ? dailyMemorySprintDeck.mode
+        : '',
+      daily_memory_sprint_cards: dailyMemorySprintDeck && Array.isArray(dailyMemorySprintDeck.sprintCards)
+        ? dailyMemorySprintDeck.sprintCards.length
+        : 0,
+      daily_memory_sprint_locks: dailyMemorySprintDeck && Array.isArray(dailyMemorySprintDeck.lockRules)
+        ? dailyMemorySprintDeck.lockRules.length
+        : 0,
+      daily_memory_sprint_streak_meters: dailyMemorySprintDeck && Array.isArray(dailyMemorySprintDeck.streakMeters)
+        ? dailyMemorySprintDeck.streakMeters.length
+        : 0,
+      daily_memory_sprint_boundary: dailyMemorySprintDeck
+        ? dailyMemorySprintDeck.shareBoundary
         : '',
       share_code: incomingShare && incomingShare.share_code ? incomingShare.share_code : ''
     });
@@ -1122,6 +1140,21 @@ Page({
           : 0,
         question_bank_recall_workout_boundary: questionBankRecallWorkout
           ? questionBankRecallWorkout.shareBoundary
+          : '',
+        daily_memory_sprint_mode: dailyMemorySprintDeck
+          ? dailyMemorySprintDeck.mode
+          : '',
+        daily_memory_sprint_cards: dailyMemorySprintDeck && Array.isArray(dailyMemorySprintDeck.sprintCards)
+          ? dailyMemorySprintDeck.sprintCards.length
+          : 0,
+        daily_memory_sprint_locks: dailyMemorySprintDeck && Array.isArray(dailyMemorySprintDeck.lockRules)
+          ? dailyMemorySprintDeck.lockRules.length
+          : 0,
+        daily_memory_sprint_streak_meters: dailyMemorySprintDeck && Array.isArray(dailyMemorySprintDeck.streakMeters)
+          ? dailyMemorySprintDeck.streakMeters.length
+          : 0,
+        daily_memory_sprint_boundary: dailyMemorySprintDeck
+          ? dailyMemorySprintDeck.shareBoundary
           : '',
         boss_gap: this.data.adaptiveChallenge && this.data.adaptiveChallenge.bossCard
           ? this.data.adaptiveChallenge.bossCard.key

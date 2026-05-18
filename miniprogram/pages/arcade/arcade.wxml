@@ -458,6 +458,23 @@
           <view class="retention-loop-step">{{highFrequencyPracticeLoop.questionBankRecallWorkout.noCramRule}}</view>
           <view class="retention-loop-step">{{highFrequencyPracticeLoop.questionBankRecallWorkout.shareBoundary}}</view>
         </view>
+        <view class="high-frequency-section" wx:if="{{highFrequencyPracticeLoop.dailyMemorySprintDeck}}">
+          <view class="high-frequency-label">{{highFrequencyPracticeLoop.dailyMemorySprintDeck.title}}</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.dailyMemorySprintDeck.summary}}</view>
+          <view class="high-frequency-item" wx:for="{{highFrequencyPracticeLoop.dailyMemorySprintDeck.sprintCards}}" wx:key="id">
+            <text>{{item.label}} · {{item.minutes}} 分钟</text>
+            <text>{{item.action}}</text>
+            <text>证据：{{item.proof}}</text>
+          </view>
+          <view class="retention-loop-step" wx:for="{{highFrequencyPracticeLoop.dailyMemorySprintDeck.lockRules}}" wx:key="*this">锁定规则：{{item}}</view>
+          <view class="high-frequency-item" wx:for="{{highFrequencyPracticeLoop.dailyMemorySprintDeck.streakMeters}}" wx:key="id">
+            <text>{{item.label}}：{{item.current}} / {{item.target}}</text>
+            <text>{{item.rule}}</text>
+          </view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.dailyMemorySprintDeck.xpLine}}</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.dailyMemorySprintDeck.parentLine}}</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.dailyMemorySprintDeck.shareBoundary}}</view>
+        </view>
         <view class="retention-loop-foot">{{highFrequencyPracticeLoop.parentShareLine}}</view>
       </view>
       <view class="next-action-card" wx:if="{{challengeBrief.resultLine}}">
