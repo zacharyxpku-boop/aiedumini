@@ -843,6 +843,80 @@ function buildPortraitConfidenceSystem(parts = {}, matrix = [], portrait = {}, c
   };
 }
 
+function buildParentDecisionTrustSystem(parts = {}, matrix = [], portraitConfidence = {}, familyDecision = {}, classroom = {}) {
+  const diagnosis = Array.isArray(matrix) ? matrix : [];
+  const primary = diagnosis.find((item) => String(item.status || '').indexOf('\u652f\u6301') >= 0) || diagnosis[0] || {};
+  const subject = primary.subject || '\u5f53\u524d\u5b66\u79d1';
+  const cause = primary.mainCause || '\u7b2c\u4e00\u6b65\u4e0d\u6e05';
+  const ledger = Array.isArray(portraitConfidence.evidenceLedger) ? portraitConfidence.evidenceLedger : [];
+  const thresholds = Array.isArray(portraitConfidence.decisionThresholds) ? portraitConfidence.decisionThresholds : [];
+  const readyEvidence = ledger.filter((item) => item.status === 'ready').length;
+  const weakEvidence = ledger.filter((item) => item.status === 'weak' || item.status === 'missing').length;
+  const metThresholds = thresholds.filter((item) => item.met).length;
+  const score = Math.max(0, Math.min(100, readyEvidence * 22 + metThresholds * 12 - weakEvidence * 8));
+  const level = score >= 72 ? 'can_decide' : score >= 44 ? 'observe_first' : 'collect_evidence';
+  const decisionLine = level === 'can_decide'
+    ? `今晚可以围绕 ${subject} 的 ${cause} 做一次低压干预，但 7 天内仍需复核。`
+    : level === 'observe_first'
+      ? `今晚只做 ${subject} 的第一步观察，不升级题量，也不改长期判断。`
+      : `当前证据不足，只能收集 ${subject} 的第一步和错因证据。`;
+  return {
+    id: 'parent_decision_trust_system',
+    title: '家长决策可信度系统',
+    level,
+    score,
+    decisionLine,
+    decisionDeck: [
+      {
+        id: 'tonight',
+        label: '今晚能不能行动',
+        verdict: level === 'collect_evidence' ? '先收证据' : '可以做一个小动作',
+        action: familyDecision.tonightDecision || `只处理 ${subject} 的 ${cause}，不加题量。`,
+        evidence: 'child_first_step'
+      },
+      {
+        id: 'portrait',
+        label: '能不能更新长期画像',
+        verdict: metThresholds >= 2 ? '可临时更新' : '先不要定性',
+        action: '至少等到明天回访和第 7 天复核后再写入长期画像。',
+        evidence: 'next_day_revisit / day7_review'
+      },
+      {
+        id: 'load',
+        label: '能不能增加难度',
+        verdict: '暂不增加',
+        action: '连续两天能独立说出第一步后，才增加近迁移或题量。',
+        evidence: 'two_day_first_step_stable'
+      },
+      {
+        id: 'help',
+        label: '什么时候需要家长介入',
+        verdict: String(primary.status || '').indexOf('\u652f\u6301') >= 0 ? '需要低压介入' : '先观察',
+        action: classroom.stopRule || '连续两次说不出第一步，就退回小黑板，不继续讲答案。',
+        evidence: 'repeated_wrong_cause'
+      }
+    ],
+    guardrails: [
+      '不按一次分数给孩子贴标签。',
+      '不把完整对话、原始照片、排名或隐私评论放进分享卡。',
+      '不因为报告很完整就直接加题量。',
+      '不把 AI 建议当成老师结论，只当今晚行动参考。'
+    ],
+    evidenceGaps: ledger
+      .filter((item) => item.status !== 'ready')
+      .map((item) => `${item.label}：${item.proof}`)
+      .slice(0, 4),
+    weeklyDecisionReview: [
+      { day: '今晚', check: '孩子是否能说出第一步', action: '只问一句，不讲完整答案。' },
+      { day: '明天', check: `${cause} 是否复现`, action: '换一张同类卡回访。' },
+      { day: '第 3 天', check: '能不能做近迁移', action: '只换一个条件，不增加难度。' },
+      { day: '第 7 天', check: '证据是否足够稳定', action: '再决定进入长期画像、继续观察或降级。' }
+    ],
+    shareBoundary: '分享只带行动建议、证据缺口和回访时间，不带原题、答案、分数、排名和完整对话。',
+    route: familyDecision.route || '/pages/profile/profile?from=parent_decision_trust'
+  };
+}
+
 function buildLearningReportDraft(input = {}) {
   const sources = normalizeReportSources(input);
   const allText = [input.sourceText || '', input.scoreText || ''].concat(sources.map((source) => source.text || '')).join('\n');
@@ -877,6 +951,7 @@ function buildLearningReportDraft(input = {}) {
   const classroomDecisionBoard = buildClassroomDecisionBoard(parts, diagnosisMatrix, recommendationPlan, solutionMap);
   const familyDecisionMemo = buildFamilyDecisionMemo(parts, diagnosisMatrix, recommendationPlan, solutionMap, longTermPortrait, classroomDecisionBoard);
   const portraitConfidenceSystem = buildPortraitConfidenceSystem(parts, diagnosisMatrix, longTermPortrait, classroomDecisionBoard, familyDecisionMemo);
+  const parentDecisionTrustSystem = buildParentDecisionTrustSystem(parts, diagnosisMatrix, portraitConfidenceSystem, familyDecisionMemo, classroomDecisionBoard);
   const missing = missingItems(parts);
   const reportDraft = {
     id: input.id || `learning_report_${String(nowIso(input.now)).slice(0, 10).replace(/-/g, '')}`,
@@ -907,6 +982,7 @@ function buildLearningReportDraft(input = {}) {
     classroomDecisionBoard,
     familyDecisionMemo,
     portraitConfidenceSystem,
+    parentDecisionTrustSystem,
     generatedAt: nowIso(input.now),
     missingItems: missing,
     sourceIntegrity: {
@@ -939,6 +1015,7 @@ function buildLearningReportDraft(input = {}) {
     classroomDecisionBoard,
     familyDecisionMemo,
     portraitConfidenceSystem,
+    parentDecisionTrustSystem,
     reportCompleteness: completeness,
     reportStatus: {
       state: completeness >= 30 ? 'ready' : 'draft',
@@ -963,6 +1040,7 @@ module.exports = {
   buildLongTermLearningPortrait,
   buildClassroomDecisionBoard,
   buildPortraitConfidenceSystem,
+  buildParentDecisionTrustSystem,
   normalizeReportSources,
   confidenceLabel
 };

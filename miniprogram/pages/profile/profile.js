@@ -713,6 +713,7 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
   const classroomDecisionBoard = reportState.classroomDecisionBoard || draft.classroomDecisionBoard || {};
   const familyDecisionMemo = reportState.familyDecisionMemo || draft.familyDecisionMemo || {};
   const portraitConfidenceSystem = reportState.portraitConfidenceSystem || draft.portraitConfidenceSystem || {};
+  const parentDecisionTrustSystem = reportState.parentDecisionTrustSystem || draft.parentDecisionTrustSystem || {};
   const matrix = Array.isArray(draft.diagnosisMatrix) ? draft.diagnosisMatrix : [];
   const tendencies = Array.isArray(draft.capabilityTendencies) ? draft.capabilityTendencies : [];
   const effectiveCourseUnitMap = courseUnitMap || (storage.buildCourseUnitMap ? storage.buildCourseUnitMap({}) : null);
@@ -887,6 +888,7 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     classroomSuccessRule: classroomDecisionBoard.successRule || '',
     familyDecisionMemo,
     portraitConfidenceSystem,
+    parentDecisionTrustSystem,
     portraitConfidenceTitle: portraitConfidenceSystem.title || '',
     portraitConfidenceLevel: portraitConfidenceSystem.confidenceLevel || '',
     portraitConfidenceScore: Number(portraitConfidenceSystem.evidenceScore || 0),
@@ -897,6 +899,15 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     portraitParentTrustContract: portraitConfidenceSystem.parentTrustContract || null,
     portraitConfidenceEscalationRule: portraitConfidenceSystem.escalationRule || '',
     portraitConfidenceFamilyDecisionLine: portraitConfidenceSystem.familyDecisionLine || '',
+    parentDecisionTrustTitle: parentDecisionTrustSystem.title || '',
+    parentDecisionTrustLevel: parentDecisionTrustSystem.level || '',
+    parentDecisionTrustScore: Number(parentDecisionTrustSystem.score || 0),
+    parentDecisionTrustLine: parentDecisionTrustSystem.decisionLine || '',
+    parentDecisionTrustDeck: Array.isArray(parentDecisionTrustSystem.decisionDeck) ? parentDecisionTrustSystem.decisionDeck : [],
+    parentDecisionTrustGuardrails: Array.isArray(parentDecisionTrustSystem.guardrails) ? parentDecisionTrustSystem.guardrails : [],
+    parentDecisionTrustGaps: Array.isArray(parentDecisionTrustSystem.evidenceGaps) ? parentDecisionTrustSystem.evidenceGaps : [],
+    parentDecisionTrustWeeklyReview: Array.isArray(parentDecisionTrustSystem.weeklyDecisionReview) ? parentDecisionTrustSystem.weeklyDecisionReview : [],
+    parentDecisionTrustShareBoundary: parentDecisionTrustSystem.shareBoundary || '',
     familyDecisionTitle: familyDecisionMemo.title || '',
     familyDecisionTonight: familyDecisionMemo.tonightDecision || '',
     familyDecisionDoNotDo: Array.isArray(familyDecisionMemo.doNotDo) ? familyDecisionMemo.doNotDo : [],
