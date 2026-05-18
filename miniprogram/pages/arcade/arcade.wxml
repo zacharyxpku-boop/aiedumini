@@ -86,6 +86,13 @@
         <view class="story-mission-rule" wx:for="{{challengeBrief.commercialDepthRunwayLanes}}" wx:key="id">{{item.label}}：{{item.evidenceLine}}｜下一步：{{item.nextAction}}</view>
         <view class="story-mission-rule" wx:for="{{challengeBrief.commercialDepthMemoryCadence}}" wx:key="id">{{item.label}}：{{item.action}}</view>
       </view>
+      <view class="story-mission" wx:if="{{challengeBrief.sevenSubjectMasterySprintTitle}}">
+        <view class="story-mission-title">{{challengeBrief.sevenSubjectMasterySprintTitle}}</view>
+        <view class="story-mission-line">{{challengeBrief.sevenSubjectMasterySprintLine}}</view>
+        <view class="story-mission-rule" wx:for="{{challengeBrief.sevenSubjectMasterySprintLanes}}" wx:key="id">{{item.label}}：{{item.target}}</view>
+        <view class="story-mission-rule" wx:for="{{challengeBrief.sevenSubjectMasterySprintSubjects}}" wx:key="id">{{item.label}}：{{item.memoryGameTarget}}</view>
+        <view class="story-mission-rule">{{challengeBrief.sevenSubjectMasterySprintMoat}}</view>
+      </view>
       <view class="challenge-brief-sub" wx:if="{{challengeBrief.evidenceBiasLine}}">为什么开这局：{{challengeBrief.evidenceBiasLine}}</view>
     </view>
 

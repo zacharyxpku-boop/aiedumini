@@ -738,6 +738,16 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
       subjectSkillDepth
     })
     : null;
+  const sevenSubjectMasterySprint = storage.buildSevenSubjectMasterySprint
+    ? storage.buildSevenSubjectMasterySprint({
+      courseUnitMap: effectiveCourseUnitMap,
+      courseUnitMasteryTrajectory,
+      courseUnitQuestionBank,
+      commercialDepthRunway,
+      weeklyEvidenceFlywheel,
+      subjectSkillDepth
+    })
+    : null;
   const mainDiagnosis = matrix.find((item) => item.status === '需要支持') || matrix[0] || null;
   const sevenDayPlan = Array.isArray(plan.sevenDayPlan) ? plan.sevenDayPlan.slice(0, 7) : [];
   const dayOne = sevenDayPlan[0] || {};
@@ -846,6 +856,10 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     weeklyEvidenceFlywheelLine: weeklyEvidenceFlywheel ? weeklyEvidenceFlywheel.parentTrustLine : '',
     weeklyEvidenceFlywheelDays: weeklyEvidenceFlywheel ? weeklyEvidenceFlywheel.days : [],
     weeklyEvidenceFlywheelSharePayload: weeklyEvidenceFlywheel ? weeklyEvidenceFlywheel.sharePayload : null,
+    sevenSubjectMasterySprint,
+    sevenSubjectMasterySprintLine: sevenSubjectMasterySprint ? sevenSubjectMasterySprint.parentDecisionLine : '',
+    sevenSubjectMasterySprintSubjects: sevenSubjectMasterySprint ? sevenSubjectMasterySprint.subjects : [],
+    sevenSubjectMasterySprintLanes: sevenSubjectMasterySprint ? sevenSubjectMasterySprint.lanes : [],
     longTermPortrait,
     longTermPortraitLine: longTermPortrait.learnerPattern || '',
     longTermPortraitStabilityLine: longTermPortrait.stabilityLine || '',

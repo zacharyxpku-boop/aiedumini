@@ -105,6 +105,7 @@ Page({
     surfaceDepthPack: null,
     capabilityMaturityQueue: null,
     unifiedNextAction: null,
+    sevenSubjectMasterySprint: null,
     learningLoopCards: [
       {
         id: 'socratic',
@@ -437,6 +438,7 @@ Page({
       surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('home') : null,
       capabilityMaturityQueue: storage.buildCapabilityMaturityQueue ? storage.buildCapabilityMaturityQueue() : null,
       unifiedNextAction: storage.buildUnifiedNextActionController ? storage.buildUnifiedNextActionController({ surface: 'home' }) : null,
+      sevenSubjectMasterySprint: storage.buildSevenSubjectMasterySprint ? storage.buildSevenSubjectMasterySprint() : null,
       todayFocus,
       tonightPlan,
       routeStrip: this.buildRouteStrip('plan', tonightPlan),

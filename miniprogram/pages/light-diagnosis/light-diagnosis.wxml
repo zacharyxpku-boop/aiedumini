@@ -2,7 +2,20 @@
   <view class="light-title">手动选题型</view>
   <view class="light-subtitle">先手动确认科目和卡点，咕点再给第一步建议。</view>
   <view class="hint-card">咕点根据你选的科目和卡点给出建议，不是自动识别答案。</view>
-
+  <view class="global-depth-card" wx:if="{{sevenSubjectMasterySprint}}">
+    <view class="global-depth-title">{{sevenSubjectMasterySprint.title}}</view>
+    <view class="global-depth-summary">{{sevenSubjectMasterySprint.summary}}</view>
+    <view class="global-depth-note">{{sevenSubjectMasterySprint.tutorBoundaryLine}}</view>
+    <view class="global-depth-note">{{sevenSubjectMasterySprint.nextBuildLine}}</view>
+    <view class="global-depth-grid">
+      <view class="global-depth-chip ready" wx:for="{{sevenSubjectMasterySprint.subjects}}" wx:key="id">
+        <text>{{item.label}}</text>
+        <text>{{item.tutorDepthTarget}}</text>
+        <text>{{item.visualBoardTarget}}</text>
+        <text>{{item.readinessGate}}</text>
+      </view>
+    </view>
+  </view>
 
   <view class="global-depth-card" wx:if="{{surfaceDepthPack}}">
     <view class="global-depth-head">

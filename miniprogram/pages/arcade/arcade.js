@@ -94,6 +94,15 @@ Page({
         subjectSkillDepth
       })
       : null;
+    const sevenSubjectMasterySprint = storage.buildSevenSubjectMasterySprint
+      ? storage.buildSevenSubjectMasterySprint({
+        courseUnitMap,
+        courseUnitMasteryTrajectory,
+        courseUnitQuestionBank,
+        commercialDepthRunway,
+        subjectSkillDepth
+      })
+      : null;
     const taskBoundCards = this.cardsForRecentTaskType(recentTaskType, loopFocus);
     const loopBoundCards = this.loopBoundCards(dueCards.concat(fallbackCards), taskBoundCards, loopFocus);
     const cards = loopBoundCards.length ? loopBoundCards : (dueCards.length ? dueCards : (fallbackCards.length ? fallbackCards : taskBoundCards));
@@ -141,7 +150,7 @@ Page({
       dailyQuestSet,
       adaptiveChallenge,
       questArcMission,
-      challengeBrief: this.buildChallengeBrief(dailyQuestSet, adaptiveChallenge, questArcMission, evidenceBias, subjectSkillDepth, curriculumSpine, courseUnitMap, courseUnitMasteryTrajectory, courseUnitQuestionBank, commercialDepthRunway),
+      challengeBrief: this.buildChallengeBrief(dailyQuestSet, adaptiveChallenge, questArcMission, evidenceBias, subjectSkillDepth, curriculumSpine, courseUnitMap, courseUnitMasteryTrajectory, courseUnitQuestionBank, commercialDepthRunway, sevenSubjectMasterySprint),
       surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('arcade') : null,
       subjectSkillDepth,
       curriculumSpine,
@@ -149,6 +158,7 @@ Page({
       courseUnitMasteryTrajectory,
       courseUnitQuestionBank,
       commercialDepthRunway,
+      sevenSubjectMasterySprint,
       result: null,
       resultAdvice: null,
       gameRetentionLoop: null,
@@ -276,7 +286,7 @@ Page({
     return arcade.buildWhackRound(cards, { limit: size });
   },
 
-  buildChallengeBrief(dailyQuestSet = {}, adaptiveChallenge = {}, questArcMission = null, evidenceBias = null, subjectSkillDepth = null, curriculumSpine = null, courseUnitMap = null, courseUnitMasteryTrajectory = null, courseUnitQuestionBank = null, commercialDepthRunway = null) {
+  buildChallengeBrief(dailyQuestSet = {}, adaptiveChallenge = {}, questArcMission = null, evidenceBias = null, subjectSkillDepth = null, curriculumSpine = null, courseUnitMap = null, courseUnitMasteryTrajectory = null, courseUnitQuestionBank = null, commercialDepthRunway = null, sevenSubjectMasterySprint = null) {
     const quests = Array.isArray(dailyQuestSet.quests) ? dailyQuestSet.quests : [];
     const activeQuest = quests.find((item) => item && item.progress < item.target) || quests[0] || {};
     const mode = adaptiveChallenge.mode || 'balanced';
@@ -366,6 +376,15 @@ Page({
         : [],
       commercialDepthMemoryCadence: commercialDepthRunway && Array.isArray(commercialDepthRunway.memoryCadence)
         ? commercialDepthRunway.memoryCadence
+        : [],
+      sevenSubjectMasterySprintTitle: sevenSubjectMasterySprint ? sevenSubjectMasterySprint.title : '',
+      sevenSubjectMasterySprintLine: sevenSubjectMasterySprint ? sevenSubjectMasterySprint.gameIntensityLine : '',
+      sevenSubjectMasterySprintMoat: sevenSubjectMasterySprint ? sevenSubjectMasterySprint.moatLine : '',
+      sevenSubjectMasterySprintLanes: sevenSubjectMasterySprint && Array.isArray(sevenSubjectMasterySprint.lanes)
+        ? sevenSubjectMasterySprint.lanes
+        : [],
+      sevenSubjectMasterySprintSubjects: sevenSubjectMasterySprint && Array.isArray(sevenSubjectMasterySprint.subjects)
+        ? sevenSubjectMasterySprint.subjects.slice(0, 3)
         : []
     };
   },

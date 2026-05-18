@@ -125,6 +125,13 @@
             <view class="receipt-board-parent" wx:for="{{thinkingReceipt.questionTypeCoverageAtlas.paths}}" wx:key="id">{{item.taskType}}：{{item.probeCount}} 追问 / {{item.visualMoveCount}} 小黑板 / {{item.fallbackCount}} 兜底</view>
             <view class="receipt-board-avoid">{{thinkingReceipt.questionTypeCoverageAtlas.boundary}}</view>
           </view>
+          <view class="receipt-first-step-board" wx:if="{{thinkingReceipt.sevenSubjectMasterySprint}}">
+            <view class="receipt-diagnostic-title">{{thinkingReceipt.sevenSubjectMasterySprint.title}}</view>
+            <view class="receipt-board-avoid">{{thinkingReceipt.sevenSubjectMasterySprint.tutorBoundaryLine}}</view>
+            <view class="receipt-board-line">{{thinkingReceipt.sevenSubjectMasterySprint.summary}}</view>
+            <view class="receipt-board-parent" wx:for="{{thinkingReceipt.sevenSubjectMasterySprint.lanes}}" wx:key="id">{{item.label}}：{{item.target}}</view>
+            <view class="receipt-board-avoid">{{thinkingReceipt.sevenSubjectMasterySprint.moatLine}}</view>
+          </view>
           <view class="receipt-first-step-board" wx:if="{{thinkingReceipt.visualSocraticMatrix}}">
             <view class="receipt-diagnostic-title">{{thinkingReceipt.visualSocraticMatrix.title}}</view>
             <view class="receipt-board-avoid">{{thinkingReceipt.visualSocraticMatrix.visualBoundary}}</view>

@@ -666,6 +666,15 @@
           <text>{{learningReportSummary.weeklyEvidenceFlywheel.acceptanceLine}}</text>
           <text>{{learningReportSummary.weeklyEvidenceFlywheel.moatLine}}</text>
         </view>
+        <view class="parent-brief-block" wx:if="{{learningReportSummary.sevenSubjectMasterySprint}}">
+          <text class="parent-brief-label">{{learningReportSummary.sevenSubjectMasterySprint.title}}</text>
+          <text>{{learningReportSummary.sevenSubjectMasterySprint.summary}}</text>
+          <text>{{learningReportSummary.sevenSubjectMasterySprintLine}}</text>
+          <text wx:for="{{learningReportSummary.sevenSubjectMasterySprintLanes}}" wx:key="id">{{item.label}}：{{item.target}}</text>
+          <text wx:for="{{learningReportSummary.sevenSubjectMasterySprintSubjects}}" wx:key="id">{{item.label}}：{{item.parentDecisionTarget}}｜{{item.shareRelayTarget}}</text>
+          <text>{{learningReportSummary.sevenSubjectMasterySprint.shareBoundaryLine}}</text>
+          <text>{{learningReportSummary.sevenSubjectMasterySprint.moatLine}}</text>
+        </view>
         <view class="parent-brief-block">
           <text class="parent-brief-label">学业矩阵</text>
           <text>{{learningReportSummary.diagnosisLine}}</text>

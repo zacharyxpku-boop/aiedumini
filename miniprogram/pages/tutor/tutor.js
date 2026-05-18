@@ -187,6 +187,15 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
   const questionTypeCoverageAtlas = tutorLadder.buildQuestionTypeCoverageAtlas
     ? tutorLadder.buildQuestionTypeCoverageAtlas(subjectSkillDepth && subjectSkillDepth.taskType ? subjectSkillDepth.taskType : 'unknown')
     : null;
+  const sevenSubjectMasterySprint = storage.buildSevenSubjectMasterySprint
+    ? storage.buildSevenSubjectMasterySprint({
+      courseUnitMap,
+      commercialDepthRunway,
+      subjectSkillDepth,
+      sourceText: latestUserText,
+      thought: latestUserText
+    })
+    : null;
   const studentFirst = userMessages.some((item) => String(item.text || '').length >= 8 && !/答案|直接|代写|帮我写/.test(String(item.text || '')));
   const blockedAnswer = (masterySignal && masterySignal.status === 'blocked_answer_request')
     || (pasteRisk && pasteRisk.level === 'high');
@@ -245,6 +254,7 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
     activeCourseUnit,
     commercialDepthRunway,
     questionTypeCoverageAtlas,
+    sevenSubjectMasterySprint,
     handoffPlan,
     checks: [
       { id: 'first', label: '先有自己的想法', done: studentFirst, detail: studentFirst ? '已经说出一步或一个问题' : '还需要先交出自己的第一步' },

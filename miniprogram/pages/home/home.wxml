@@ -187,6 +187,25 @@
         </view>
         <view class="surface-depth-note">{{capabilityMaturityQueue.positioningLine}}</view>
       </view>
+      <view class="surface-depth-card" wx:if="{{sevenSubjectMasterySprint}}">
+        <view class="surface-depth-head">
+          <view>
+            <view class="surface-depth-title">{{sevenSubjectMasterySprint.title}}</view>
+            <view class="surface-depth-subtitle">{{sevenSubjectMasterySprint.summary}}</view>
+          </view>
+          <view class="surface-depth-score">{{sevenSubjectMasterySprint.subjectCount}}科</view>
+        </view>
+        <view class="surface-depth-next">{{sevenSubjectMasterySprint.nextBuildLine}}</view>
+        <view class="surface-depth-grid">
+          <view class="surface-depth-chip" wx:for="{{sevenSubjectMasterySprint.subjects}}" wx:key="id">
+            <text class="surface-depth-chip-title">{{item.displayTitle}}</text>
+            <text class="surface-depth-chip-line">{{item.contentScaleTarget}}</text>
+            <text class="surface-depth-chip-line">{{item.visualBoardTarget}}</text>
+            <text class="surface-depth-chip-line">{{item.memoryGameTarget}}</text>
+          </view>
+        </view>
+        <view class="surface-depth-note">{{sevenSubjectMasterySprint.moatLine}}</view>
+      </view>
       <view class="quest-arc-card" wx:if="{{learningQuestArc}}">
         <view class="quest-arc-head">
           <view>

@@ -5938,6 +5938,89 @@ function buildWeeklyEvidenceFlywheel(options = {}) {
   };
 }
 
+function buildSevenSubjectMasterySprint(options = {}) {
+  const courseUnitMap = options.courseUnitMap || buildCourseUnitMap(options);
+  const courseUnitQuestionBank = options.courseUnitQuestionBank || buildCourseUnitQuestionBank({ courseUnitMap });
+  const courseUnitMasteryTrajectory = options.courseUnitMasteryTrajectory || buildCourseUnitMasteryTrajectory({ courseUnitMap });
+  const commercialDepthRunway = options.commercialDepthRunway || buildCommercialDepthRunway({
+    courseUnitMap,
+    courseUnitQuestionBank,
+    courseUnitMasteryTrajectory,
+    subjectSkillDepth: options.subjectSkillDepth
+  });
+  const weeklyEvidenceFlywheel = options.weeklyEvidenceFlywheel || buildWeeklyEvidenceFlywheel({
+    courseUnitMap,
+    courseUnitQuestionBank,
+    courseUnitMasteryTrajectory,
+    commercialDepthRunway,
+    subjectSkillDepth: options.subjectSkillDepth
+  });
+  const subjects = courseUnitMap && Array.isArray(courseUnitMap.subjects) ? courseUnitMap.subjects : [];
+  const safeSharePayload = weeklyEvidenceFlywheel && weeklyEvidenceFlywheel.sharePayload
+    ? weeklyEvidenceFlywheel.sharePayload
+    : {
+      allowed_fields: ['subject', 'first_step', 'wrong_cause', 'next_action'],
+      blocked_fields: ['original_photo', 'full_dialogue', 'score', 'ranking', 'private_comment']
+    };
+  const sprintSubjects = subjects.map((subject, index) => {
+    const units = Array.isArray(subject.units) ? subject.units : [];
+    const firstUnit = units[0] || {};
+    const secondUnit = units[1] || firstUnit;
+    const thirdUnit = units[2] || secondUnit;
+    return {
+      id: subject.id || `subject_${index + 1}`,
+      label: subject.label || `学科 ${index + 1}`,
+      displayTitle: subject.label || `学科 ${index + 1}`,
+      route: subject.route || '/pages/tutor/tutor',
+      contentScaleTarget: `${units.length || 3} 个单元 / 每单元 3 类题卡 / 每类保留第一步、错因、近迁移`,
+      tutorDepthTarget: firstUnit.diagnosticProbes && firstUnit.diagnosticProbes[0]
+        ? firstUnit.diagnosticProbes[0]
+        : '先问题型轴，再问第一步，不直接讲完整答案。',
+      visualBoardTarget: firstUnit.blackboardBlueprint && firstUnit.blackboardBlueprint.firstStroke
+        ? firstUnit.blackboardBlueprint.firstStroke
+        : '只画第一笔、关系线或检查点，画到孩子能开口就停。',
+      memoryGameTarget: secondUnit.practiceLoop && secondUnit.practiceLoop.recall
+        ? secondUnit.practiceLoop.recall
+        : '每天 3 张主动回忆卡，错因卡隔天回看。',
+      parentDecisionTarget: thirdUnit.parentAction || firstUnit.parentAction || '家长只判断孩子能否说出第一步和下一次先查什么。',
+      shareRelayTarget: thirdUnit.shareContract || firstUnit.shareContract || '分享只带行动卡和证据合同，不带原题答案、完整对话、分数或排名。',
+      evidenceKeys: ['child_first_step', 'wrong_cause_named', 'near_transfer_attempted', 'next_day_revisit'],
+      readinessGate: '至少连续 7 天出现第一步、错因、回看、近迁移四类证据，才进入长期画像。'
+    };
+  });
+  const totalUnitCount = subjects.reduce((sum, subject) => sum + Number(subject.unitCount || (subject.units ? subject.units.length : 0)), 0);
+  const totalQuestionCards = courseUnitQuestionBank && Array.isArray(courseUnitQuestionBank.cards)
+    ? courseUnitQuestionBank.cards.length
+    : sprintSubjects.length * 3;
+  return {
+    id: 'seven_subject_mastery_sprint',
+    title: '七科掌握冲刺',
+    summary: `把 ${sprintSubjects.length} 科从入口文案加厚成题型、点拨、小黑板、游戏回忆、家长证据和安全分享的同一套闭环。`,
+    readiness: sprintSubjects.length >= 7 && totalQuestionCards >= 9 ? 'cross_module_ready' : 'building',
+    subjectCount: sprintSubjects.length,
+    unitCount: totalUnitCount,
+    questionCardCount: totalQuestionCards,
+    subjects: sprintSubjects,
+    activeSubject: sprintSubjects[0] || null,
+    lanes: [
+      { id: 'content_scale', label: '内容规模', target: '每科至少 3 个单元、9 张可复用题卡，先覆盖高频家庭作业题型。' },
+      { id: 'ai_depth', label: 'AI 点拨深度', target: '题型轴 + 第一问 + 小黑板第一笔 + 失败兜底，不走直接答案。' },
+      { id: 'memory_game', label: '游戏记忆反馈', target: '主动回忆、错因回放、隔天回看、近迁移挑战进入同一条 quest。' },
+      { id: 'parent_trust', label: '家长报告可信度', target: '报告只给家庭动作、证据是否足够、是否需要陪做，不给排名焦虑。' },
+      { id: 'safe_share', label: '安全分享接力', target: '分享只传行动、证据、下一步，屏蔽原图、完整对话、分数、排名和私密评论。' }
+    ],
+    parentDecisionLine: '家长看到的是“今晚陪不陪、问哪一句、明天看什么证据”，不是一堵数据墙。',
+    gameIntensityLine: '游戏强度按 3 张回忆卡、1 张错因卡、1 个近迁移动作推进，避免空刷 XP。',
+    tutorBoundaryLine: '点拨只做到孩子能说第一步，不替孩子完成整题。',
+    shareBoundaryLine: safeSharePayload.blocked_fields && safeSharePayload.blocked_fields.length
+      ? `安全分享禁止：${safeSharePayload.blocked_fields.join(' / ')}`
+      : '安全分享禁止原图、完整对话、分数、排名和私密评论。',
+    moatLine: '护城河不是七科都能讲，而是每科都沉淀家庭证据、错因画像和下一次行动。',
+    nextBuildLine: '下一轮优先补真实题型样本：数学应用题、英语听写、物理图像题三类先打穿。',
+    generatedAt: options.now ? new Date(options.now).toISOString() : rcNowIso()
+  };
+}
+
 function detectAvoidancePattern(patternInput = loadTaskTypePattern()) {
   const byTaskType = (patternInput && patternInput.byTaskType) || {};
   const candidates = Object.keys(byTaskType).map((type) => {
@@ -7788,6 +7871,7 @@ module.exports = {
   buildCourseUnitQuestionBank,
   buildCommercialDepthRunway,
   buildWeeklyEvidenceFlywheel,
+  buildSevenSubjectMasterySprint,
   childStepQuality,
   normalizeFirstStepEvidence,
   saveChildArticulatedStep,
