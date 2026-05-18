@@ -1159,6 +1159,9 @@
           <view>{{communityShareRelayBoard.privacyBoundary}}</view>
           <view>{{communityShareRelayBoard.peerSafeLine}}</view>
           <view wx:for="{{communityShareRelayBoard.lanes}}" wx:key="id">{{item.label}}：{{item.action}}｜{{item.evidence}}</view>
+          <view wx:for="{{communityShareRelayBoard.visualRelayProtocol}}" wx:key="id">小黑板接力协议：{{item.label}}｜{{item.action}}｜证据 {{item.evidence}}｜禁止 {{item.blocked}}</view>
+          <view wx:for="{{communityShareRelayBoard.visualRelayProofChecklist}}" wx:key="*this">小黑板证据清单：{{item}}</view>
+          <view wx:if="{{communityShareRelayBoard.visualRelayBoundary}}">小黑板接力边界：{{communityShareRelayBoard.visualRelayBoundary}}</view>
           <view wx:for="{{communityShareRelayBoard.recentRuns}}" wx:key="id">接力记录：{{item.code}} · {{item.evidence}}</view>
           <view>{{communityShareRelayBoard.contractLine}}</view>
           <view>{{communityShareRelayBoard.returnPathLine}}</view>

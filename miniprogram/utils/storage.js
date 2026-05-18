@@ -4710,6 +4710,42 @@ function buildCommunityShareRelayBoard(input = {}) {
       route: '/pages/profile/profile?from=community_parent'
     }
   ];
+  const visualRelayProtocol = [
+    {
+      id: 'starter_board',
+      label: '发起者小黑板',
+      action: plan.communityChallengeCard ? `只画第一步：${plan.communityChallengeCard.firstStep}` : '只画第一步，不画答案。',
+      evidence: 'starter_first_step_board',
+      blocked: '不上传原题照片、不晒答案。'
+    },
+    {
+      id: 'receiver_rebuild',
+      label: '接收者复刻',
+      action: plan.safeRelayChallengePacket ? plan.safeRelayChallengePacket.receiverAction : '用自己的材料复刻同类第一步。',
+      evidence: 'receiver_rebuilt_first_step',
+      blocked: '不复制发起者作业，不比较速度。'
+    },
+    {
+      id: 'parent_check',
+      label: '家长检查',
+      action: plan.safeRelayChallengePacket ? plan.safeRelayChallengePacket.parentCheck : '只问孩子第一步先看哪里。',
+      evidence: 'parent_checked_first_step',
+      blocked: '不追问完整解法，不贴标签。'
+    },
+    {
+      id: 'return_visit',
+      label: '回访闭环',
+      action: plan.safeRelayChallengePacket ? plan.safeRelayChallengePacket.nextDayRevisit : '明天只回访一张最不稳的卡。',
+      evidence: 'next_day_relay_revisit',
+      blocked: '不把一次做对当长期画像结论。'
+    }
+  ];
+  const visualRelayProofChecklist = [
+    '发起者留下第一步小黑板',
+    '接收者用自己的材料复刻',
+    '家长只检查第一步',
+    '明天完成一次回访'
+  ];
   return {
     id: 'community_share_relay_board',
     title: '社区轻接力看板',
@@ -4721,6 +4757,9 @@ function buildCommunityShareRelayBoard(input = {}) {
     privacyBoundary: plan.privacyBoundary,
     peerSafeLine: plan.peerSafeLine,
     safeRelayChallengePacket: plan.safeRelayChallengePacket,
+    visualRelayProtocol,
+    visualRelayProofChecklist,
+    visualRelayBoundary: '社区小黑板接力只传第一步、复刻动作、家长检查和回访安排；不传原题、答案、分数、排名或完整对话。',
     relayEvidenceCount,
     lanes,
     recentRuns: recentRuns.map((item) => ({
