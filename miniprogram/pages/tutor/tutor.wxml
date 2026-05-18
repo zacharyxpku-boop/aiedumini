@@ -185,6 +185,18 @@
             <view class="receipt-diagnostic-sub">小黑板：{{thinkingReceipt.socratic_fallback_plan.blackboardMove}}</view>
             <view class="receipt-diagnostic-sub">停止规则：{{thinkingReceipt.socratic_fallback_plan.stopRule}}</view>
           </view>
+          <view class="receipt-fallback-plan" wx:if="{{thinkingReceipt.visual_socratic_recovery}}">
+            <view class="receipt-diagnostic-title">{{thinkingReceipt.visual_socratic_recovery.title}}</view>
+            <view class="receipt-diagnostic-line">兜底模式：{{thinkingReceipt.visual_socratic_recovery.recoveryMode}}</view>
+            <view class="receipt-diagnostic-line" wx:for="{{thinkingReceipt.visual_socratic_recovery.boardLayers}}" wx:key="id">小黑板：{{item.label}}｜{{item.move}}</view>
+            <view class="receipt-diagnostic-sub" wx:for="{{thinkingReceipt.visual_socratic_recovery.failureBranches}}" wx:key="id">失败分支：{{item.trigger}}｜{{item.move}}</view>
+            <view class="receipt-choice-row">
+              <text wx:for="{{thinkingReceipt.visual_socratic_recovery.microChoiceScript}}" wx:key="id">{{item.label}}：{{item.text}}</text>
+            </view>
+            <view class="receipt-diagnostic-sub">{{thinkingReceipt.visual_socratic_recovery.parentHandoff.line}}</view>
+            <view class="receipt-diagnostic-sub">{{thinkingReceipt.visual_socratic_recovery.parentHandoff.shareBoundary}}</view>
+            <view class="receipt-diagnostic-sub" wx:for="{{thinkingReceipt.visual_socratic_recovery.exitCriteria}}" wx:key="*this">退出条件：{{item}}</view>
+          </view>
           <view class="receipt-move-row" wx:if="{{thinkingReceipt.allowed_moves.length}}">
             <text wx:for="{{thinkingReceipt.allowed_moves}}" wx:key="*this">{{item}}</text>
           </view>

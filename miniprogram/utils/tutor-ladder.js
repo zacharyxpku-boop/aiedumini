@@ -368,6 +368,49 @@ function buildSocraticFallbackPlan(taskType, item, probe, context = {}) {
   };
 }
 
+function buildVisualSocraticRecoveryProtocol(taskType, item, probe, fallbackPlan = {}, context = {}) {
+  const normalized = normalizeLevel(item && item.level);
+  const answerBlocked = fallbackPlan.mode === 'answer_boundary' || !!context.answerBlocked;
+  const weakAxis = probe && probe.axis ? probe.axis : 'first_step';
+  const taskPrompt = probe && probe.prompt ? probe.prompt : (TASK_TYPE_PROMPTS[taskType] || TASK_TYPE_PROMPTS.unknown);
+  const recoveryMode = answerBlocked
+    ? 'answer_boundary_board'
+    : normalized >= 4
+      ? 'low_threshold_board'
+      : 'first_step_board';
+  return {
+    id: `visual_socratic_recovery_${taskType || 'unknown'}_${recoveryMode}`,
+    title: '\u89c6\u89c9\u5c0f\u9ed1\u677f\u5931\u8d25\u515c\u5e95',
+    recoveryMode,
+    weakAxis,
+    boardLayers: [
+      { id: 'locate', label: '\u5b9a\u4f4d', move: `\u53ea\u6807\u51fa\u300c${weakAxis}\u300d\u5bf9\u5e94\u7684\u9898\u76ee\u4f4d\u7f6e\u3002` },
+      { id: 'first_stroke', label: '\u7b2c\u4e00\u7b14', move: `\u5c0f\u9ed1\u677f\u53ea\u5199\u4e00\u53e5\uff1a${taskPrompt}` },
+      { id: 'student_return', label: '\u5b69\u5b50\u8bf4\u56de\u6765', move: '\u8ba9\u5b69\u5b50\u7528\u81ea\u5df1\u7684\u8bdd\u8bf4\u51fa\u4e0b\u4e00\u4e2a\u5c0f\u52a8\u4f5c\u3002' }
+    ],
+    failureBranches: [
+      { id: 'silent', trigger: '\u6c89\u9ed8\u6216\u8bf4\u4e0d\u4f1a', move: '\u964d\u5230 A/B \u5fae\u9009\u62e9\uff0c\u4e0d\u8ffd\u95ee\u539f\u56e0\u3002', route: '/pages/tutor/tutor?from=visual_recovery' },
+      { id: 'asks_answer', trigger: '\u76f4\u63a5\u8981\u7b54\u6848', move: '\u62e6\u4f4f\u5b8c\u6574\u7b54\u6848\uff0c\u53ea\u56de\u5230\u9898\u76ee\u95ee\u4ec0\u4e48\u3002', route: '/pages/tutor/tutor?from=answer_boundary' },
+      { id: 'same_miss', trigger: '\u540c\u4e00\u9519\u56e0\u8fde\u7eed\u5361\u4f4f', move: '\u505c\u6b62\u52a0\u9898\uff0c\u8f6c\u9519\u56e0\u5361\u548c\u9694\u5929\u56de\u8bbf\u3002', route: '/pages/review/review?from=visual_recovery' }
+    ],
+    microChoiceScript: fallbackPlan.microChoices || [
+      { id: 'a', label: 'A', text: '\u5148\u627e\u9898\u76ee\u7ed9\u4e86\u4ec0\u4e48' },
+      { id: 'b', label: 'B', text: '\u5148\u770b\u9898\u76ee\u95ee\u4ec0\u4e48' }
+    ],
+    parentHandoff: {
+      line: '\u5bb6\u957f\u53ea\u590d\u8ff0\u5c0f\u9ed1\u677f\u7b2c\u4e00\u53e5\uff0c\u4e0d\u8865\u5b8c\u6574\u89e3\u6cd5\u3002',
+      check: '\u5b69\u5b50\u80fd\u5426\u81ea\u5df1\u8bf4\u51fa\u4e0b\u4e00\u4e2a\u5c0f\u52a8\u4f5c\uff1f',
+      shareBoundary: '\u5206\u4eab\u53ea\u5e26\u5361\u70b9\u548c\u7b2c\u4e00\u6b65\uff0c\u4e0d\u5e26\u539f\u9898\u7167\u7247\u3001\u5b8c\u6574\u5bf9\u8bdd\u6216\u5206\u6570\u3002'
+    },
+    exitCriteria: [
+      '\u5b69\u5b50\u9009\u51fa A/B \u5e76\u8bf4\u4e00\u53e5\u7406\u7531\u5c31\u505c\u3002',
+      '\u8fde\u7eed 2 \u6b21\u80fd\u8bf4\u51fa\u7b2c\u4e00\u6b65\uff0c\u624d\u8fdb\u53d8\u5f0f\u7ec3\u4e60\u3002',
+      '\u8fde\u7eed 2 \u6b21\u8bf4\u4e0d\u51fa\uff0c\u8f6c\u590d\u4e60\u5361\u548c\u5bb6\u957f\u4e00\u53e5\u8bdd\u590d\u76d8\u3002'
+    ],
+    evidenceRequired: ['visual_board_layer', 'child_micro_choice', 'parent_handoff_line', 'no_full_answer_boundary', 'next_day_revisit']
+  };
+}
+
 function stepIntro(item) {
   const level = normalizeLevel(item && item.level);
   const title = item && item.title ? item.title : '看清第一步';
@@ -406,6 +449,7 @@ function buildTutorReply(text, options = {}) {
     const questionTypePath = buildQuestionTypeSocraticPath(taskType, item, probe);
     const socraticContract = buildSocraticContract(taskType, item, probe);
     const socraticFallbackPlan = buildSocraticFallbackPlan(taskType, item, probe, { answerBlocked: true });
+    const visualSocraticRecovery = buildVisualSocraticRecoveryProtocol(taskType, item, probe, socraticFallbackPlan, { answerBlocked: true });
     return {
       reply: withStepIntro(item, '我不能直接替你写答案，但可以陪你先找第一步。先说题目问什么，或者圈出一个已知条件。'),
       hint_level: 1,
@@ -416,6 +460,7 @@ function buildTutorReply(text, options = {}) {
       question_type_socratic_path: questionTypePath,
       socratic_contract: socraticContract,
       socratic_fallback_plan: socraticFallbackPlan,
+      visual_socratic_recovery: visualSocraticRecovery,
       allowed_moves: probe.allowedMoves,
       transfer_prompt: probe.transferPrompt,
       next_action: '先说题目问什么，或者圈出一个已知条件。',
@@ -437,6 +482,7 @@ function buildTutorReply(text, options = {}) {
   const socraticContract = buildSocraticContract(taskType, item, probe);
   const stuckCount = countRecentStuck(messages, text);
   const socraticFallbackPlan = buildSocraticFallbackPlan(taskType, item, probe, { stuckCount });
+  const visualSocraticRecovery = buildVisualSocraticRecoveryProtocol(taskType, item, probe, socraticFallbackPlan, { stuckCount });
   const reply = stuckCount >= 3
     ? `我们把门槛再降一点。先看${target}：下面两个选项选一个就行，A 先找已知条件，B 先看题目问什么。选完我给一个相似例子。`
     : item.reply;
@@ -451,6 +497,7 @@ function buildTutorReply(text, options = {}) {
     question_type_socratic_path: questionTypePath,
     socratic_contract: socraticContract,
     socratic_fallback_plan: socraticFallbackPlan,
+    visual_socratic_recovery: visualSocraticRecovery,
     allowed_moves: probe.allowedMoves,
     transfer_prompt: probe.transferPrompt,
     next_action: item.level >= 5 ? '把方法做成复习卡或生成一道小变式。' : '先回一句你的第一步。',
@@ -496,6 +543,7 @@ module.exports = {
   diagnosticProbe,
   buildSocraticContract,
   buildSocraticFallbackPlan,
+  buildVisualSocraticRecoveryProtocol,
   buildQuestionTypeSocraticPath,
   buildQuestionTypeCoverageAtlas,
   MISCONCEPTION_MAP,

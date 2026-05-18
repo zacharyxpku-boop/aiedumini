@@ -691,6 +691,7 @@ Page({
       question_type_socratic_path: result && result.question_type_socratic_path ? result.question_type_socratic_path : null,
       socratic_contract: result && result.socratic_contract ? result.socratic_contract : null,
       socratic_fallback_plan: result && result.socratic_fallback_plan ? result.socratic_fallback_plan : null,
+      visual_socratic_recovery: result && result.visual_socratic_recovery ? result.visual_socratic_recovery : null,
       allowed_moves: result && result.allowed_moves ? result.allowed_moves : [],
       transfer_prompt: result && result.transfer_prompt ? result.transfer_prompt : ''
     });
@@ -729,6 +730,13 @@ Page({
           : 0,
         socratic_contract: result.socratic_contract || null,
         socratic_fallback_mode: result.socratic_fallback_plan && result.socratic_fallback_plan.mode,
+        visual_recovery_mode: result.visual_socratic_recovery && result.visual_socratic_recovery.recoveryMode,
+        visual_recovery_layers: result.visual_socratic_recovery && Array.isArray(result.visual_socratic_recovery.boardLayers)
+          ? result.visual_socratic_recovery.boardLayers.length
+          : 0,
+        visual_recovery_branches: result.visual_socratic_recovery && Array.isArray(result.visual_socratic_recovery.failureBranches)
+          ? result.visual_socratic_recovery.failureBranches.length
+          : 0,
         allowed_moves: result.allowed_moves || [],
         transfer_prompt: result.transfer_prompt || ''
       });
