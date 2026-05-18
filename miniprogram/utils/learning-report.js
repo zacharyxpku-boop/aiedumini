@@ -917,6 +917,86 @@ function buildParentDecisionTrustSystem(parts = {}, matrix = [], portraitConfide
   };
 }
 
+function buildLongitudinalPortraitTimeline(parts = {}, matrix = [], portrait = {}, portraitConfidence = {}, parentDecisionTrust = {}, familyDecision = {}) {
+  const diagnosis = Array.isArray(matrix) ? matrix : [];
+  const primary = diagnosis.find((item) => String(item.status || '').indexOf('支持') >= 0) || diagnosis[0] || {};
+  const subject = primary.subject || '当前学科';
+  const cause = primary.mainCause || '第一步不清';
+  const evidenceLedger = Array.isArray(portraitConfidence.evidenceLedger) ? portraitConfidence.evidenceLedger : [];
+  const weakLedger = evidenceLedger.filter((item) => item.status !== 'ready');
+  const weeklyReview = Array.isArray(parentDecisionTrust.weeklyDecisionReview) ? parentDecisionTrust.weeklyDecisionReview : [];
+  const evidenceToCollect = Array.isArray(portrait.evidenceToCollect) && portrait.evidenceToCollect.length
+    ? portrait.evidenceToCollect
+    : ['child_first_step', 'wrong_cause_card', 'next_day_revisit'];
+  const timeline = [
+    {
+      id: 'tonight',
+      day: '今晚',
+      portraitQuestion: `${subject} 这类题，孩子能不能先说出第一步？`,
+      evidence: 'child_first_step',
+      parentAction: familyDecision.tonightDecision || `只处理 ${subject} 的 ${cause}，不加题量。`,
+      decision: '只生成今晚行动，不更新长期结论。'
+    },
+    {
+      id: 'tomorrow',
+      day: '明天',
+      portraitQuestion: `${cause} 是否还能被孩子自己复述？`,
+      evidence: 'next_day_revisit',
+      parentAction: '换一张同类小卡回访，不看单次分数。',
+      decision: '如果复述失败，降到小黑板；如果复述成功，进入近迁移。'
+    },
+    {
+      id: 'day_3',
+      day: '第3天',
+      portraitQuestion: '换一个小条件后，第一步还能不能迁移？',
+      evidence: 'near_transfer_attempt',
+      parentAction: '只换一个条件，不增加题量。',
+      decision: '迁移成功才进入题型训练；迁移失败继续错因回放。'
+    },
+    {
+      id: 'day_7',
+      day: '第7天',
+      portraitQuestion: `${subject} 的 ${cause} 是否连续出现？`,
+      evidence: 'weekly_action_card',
+      parentAction: '用一张周复盘行动卡判断加题量还是降阶。',
+      decision: '满足 3 类证据一致，才写入长期画像候选。'
+    },
+    {
+      id: 'day_14',
+      day: '第14天',
+      portraitQuestion: '同一方法是否跨两周稳定？',
+      evidence: 'two_week_stability_check',
+      parentAction: '只比较证据，不比较排名。',
+      decision: '稳定后才升级学习策略；不稳定则保留观察。'
+    }
+  ];
+  const updateGates = [
+    { id: 'candidate', label: '候选画像', rule: '有今晚第一步 + 明天回访，才进入候选。', evidence: ['child_first_step', 'next_day_revisit'] },
+    { id: 'weekly', label: '周画像', rule: '第 7 天至少 3 类证据一致，才更新画像。', evidence: ['wrong_cause_card', 'near_transfer_attempt', 'weekly_action_card'] },
+    { id: 'stable', label: '稳定画像', rule: '连续两周同一方法有效，才升级策略。', evidence: ['two_week_stability_check'] },
+    { id: 'downgrade', label: '降级条件', rule: '连续 2 次沉默、要答案或同错因失败，立刻回小黑板。', evidence: ['silent_child', 'answer_request', 'repeated_wrong_cause'] }
+  ];
+  return {
+    id: 'longitudinal_portrait_timeline',
+    title: '长期画像时间轴',
+    status: evidenceLedger.length >= 4 ? 'trackable' : 'collecting',
+    summary: `围绕 ${subject} 的「${cause}」，把今晚动作、明天回访、第 7 天复核和两周稳定性连成一条画像线。`,
+    parentLine: '家长每次只看一个问题：孩子是否能用自己的话说出第一步。',
+    timeline,
+    updateGates,
+    riskTransitions: [
+      `${cause} 连续 2 次出现：降题量，回小黑板。`,
+      '孩子沉默或只要答案：停止讲解，改二选一启动。',
+      '连续 2 天能独立复述第一步：允许进入近迁移。',
+      '第 7 天证据不足：不更新长期画像，只保留今晚建议。'
+    ],
+    evidenceBacklog: weakLedger.map((item) => `${item.label}：${item.proof}`).concat(evidenceToCollect).slice(0, 6),
+    weeklyReview,
+    shareBoundary: '时间轴只分享画像问题、回访动作和证据缺口；不分享原题、答案、分数、排名或完整对话。',
+    evidenceRequired: ['longitudinal_timeline', 'update_gates', 'risk_transitions', 'evidence_backlog', 'privacy_boundary']
+  };
+}
+
 function buildSocraticMemoryReportBridge(input = {}, parentDecisionTrust = {}, portraitConfidence = {}) {
   const gameEvidence = input.gameEvidence || {};
   const highFrequencyLoop = input.highFrequencyPracticeLoop || gameEvidence.highFrequencyPracticeLoop || {};
@@ -1080,6 +1160,7 @@ function buildLearningReportDraft(input = {}) {
   const familyDecisionMemo = buildFamilyDecisionMemo(parts, diagnosisMatrix, recommendationPlan, solutionMap, longTermPortrait, classroomDecisionBoard);
   const portraitConfidenceSystem = buildPortraitConfidenceSystem(parts, diagnosisMatrix, longTermPortrait, classroomDecisionBoard, familyDecisionMemo);
   const parentDecisionTrustSystem = buildParentDecisionTrustSystem(parts, diagnosisMatrix, portraitConfidenceSystem, familyDecisionMemo, classroomDecisionBoard);
+  const longitudinalPortraitTimeline = buildLongitudinalPortraitTimeline(parts, diagnosisMatrix, longTermPortrait, portraitConfidenceSystem, parentDecisionTrustSystem, familyDecisionMemo);
   const socraticMemoryReportBridge = buildSocraticMemoryReportBridge(input, parentDecisionTrustSystem, portraitConfidenceSystem);
   const questionBankDecisionBridge = buildQuestionBankDecisionBridge(input, parentDecisionTrustSystem, portraitConfidenceSystem);
   const questionBankRecallReportBridge = buildQuestionBankRecallReportBridge(input, parentDecisionTrustSystem, portraitConfidenceSystem);
@@ -1114,6 +1195,7 @@ function buildLearningReportDraft(input = {}) {
     familyDecisionMemo,
     portraitConfidenceSystem,
     parentDecisionTrustSystem,
+    longitudinalPortraitTimeline,
     socraticMemoryReportBridge,
     questionBankDecisionBridge,
     questionBankRecallReportBridge,
@@ -1150,6 +1232,7 @@ function buildLearningReportDraft(input = {}) {
     familyDecisionMemo,
     portraitConfidenceSystem,
     parentDecisionTrustSystem,
+    longitudinalPortraitTimeline,
     socraticMemoryReportBridge,
     questionBankDecisionBridge,
     questionBankRecallReportBridge,
@@ -1178,6 +1261,7 @@ module.exports = {
   buildClassroomDecisionBoard,
   buildPortraitConfidenceSystem,
   buildParentDecisionTrustSystem,
+  buildLongitudinalPortraitTimeline,
   buildSocraticMemoryReportBridge,
   buildQuestionBankDecisionBridge,
   buildQuestionBankRecallReportBridge,

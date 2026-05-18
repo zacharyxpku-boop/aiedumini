@@ -720,6 +720,18 @@
           <text wx:if="{{learningReportSummary.portraitConfidenceEscalationRule}}">升级/降级：{{learningReportSummary.portraitConfidenceEscalationRule}}</text>
           <text wx:if="{{learningReportSummary.portraitConfidenceFamilyDecisionLine}}">家庭决策：{{learningReportSummary.portraitConfidenceFamilyDecisionLine}}</text>
         </view>
+        <view class="parent-brief-block" wx:if="{{learningReportSummary.longitudinalPortraitTimeline}}">
+          <text class="parent-brief-label">长期画像时间轴</text>
+          <text wx:if="{{learningReportSummary.longitudinalPortraitTimelineTitle}}">{{learningReportSummary.longitudinalPortraitTimelineTitle}}</text>
+          <text>状态：{{learningReportSummary.longitudinalPortraitTimelineStatus}}</text>
+          <text>{{learningReportSummary.longitudinalPortraitTimelineSummary}}</text>
+          <text>{{learningReportSummary.longitudinalPortraitTimelineParentLine}}</text>
+          <text wx:for="{{learningReportSummary.longitudinalPortraitTimelineRows}}" wx:key="id">时间轴：{{item.day}}｜{{item.portraitQuestion}}｜证据 {{item.evidence}}｜{{item.decision}}</text>
+          <text wx:for="{{learningReportSummary.longitudinalPortraitUpdateGates}}" wx:key="id">画像门槛：{{item.label}}｜{{item.rule}}</text>
+          <text wx:for="{{learningReportSummary.longitudinalPortraitRiskTransitions}}" wx:key="*this">转向规则：{{item}}</text>
+          <text wx:for="{{learningReportSummary.longitudinalPortraitEvidenceBacklog}}" wx:key="*this">待补证据：{{item}}</text>
+          <text wx:if="{{learningReportSummary.longitudinalPortraitShareBoundary}}">分享边界：{{learningReportSummary.longitudinalPortraitShareBoundary}}</text>
+        </view>
         <view class="parent-brief-block" wx:if="{{learningReportSummary.parentDecisionTrustTitle}}">
           <text class="parent-brief-label">家长决策可信度</text>
           <text>决策等级：{{learningReportSummary.parentDecisionTrustLevel}}｜可信分：{{learningReportSummary.parentDecisionTrustScore}}</text>

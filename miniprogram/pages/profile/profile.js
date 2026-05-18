@@ -782,6 +782,7 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
   const familyDecisionMemo = reportState.familyDecisionMemo || draft.familyDecisionMemo || {};
   const portraitConfidenceSystem = reportState.portraitConfidenceSystem || draft.portraitConfidenceSystem || {};
   const parentDecisionTrustSystem = reportState.parentDecisionTrustSystem || draft.parentDecisionTrustSystem || {};
+  const longitudinalPortraitTimeline = reportState.longitudinalPortraitTimeline || draft.longitudinalPortraitTimeline || {};
   const matrix = Array.isArray(draft.diagnosisMatrix) ? draft.diagnosisMatrix : [];
   const tendencies = Array.isArray(draft.capabilityTendencies) ? draft.capabilityTendencies : [];
   const effectiveCourseUnitMap = courseUnitMap || (storage.buildCourseUnitMap ? storage.buildCourseUnitMap({}) : null);
@@ -992,6 +993,16 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     familyDecisionMemo,
     portraitConfidenceSystem,
     parentDecisionTrustSystem,
+    longitudinalPortraitTimeline,
+    longitudinalPortraitTimelineTitle: longitudinalPortraitTimeline.title || '',
+    longitudinalPortraitTimelineStatus: longitudinalPortraitTimeline.status || '',
+    longitudinalPortraitTimelineSummary: longitudinalPortraitTimeline.summary || '',
+    longitudinalPortraitTimelineParentLine: longitudinalPortraitTimeline.parentLine || '',
+    longitudinalPortraitTimelineRows: Array.isArray(longitudinalPortraitTimeline.timeline) ? longitudinalPortraitTimeline.timeline : [],
+    longitudinalPortraitUpdateGates: Array.isArray(longitudinalPortraitTimeline.updateGates) ? longitudinalPortraitTimeline.updateGates : [],
+    longitudinalPortraitRiskTransitions: Array.isArray(longitudinalPortraitTimeline.riskTransitions) ? longitudinalPortraitTimeline.riskTransitions : [],
+    longitudinalPortraitEvidenceBacklog: Array.isArray(longitudinalPortraitTimeline.evidenceBacklog) ? longitudinalPortraitTimeline.evidenceBacklog : [],
+    longitudinalPortraitShareBoundary: longitudinalPortraitTimeline.shareBoundary || '',
     portraitConfidenceTitle: portraitConfidenceSystem.title || '',
     portraitConfidenceLevel: portraitConfidenceSystem.confidenceLevel || '',
     portraitConfidenceScore: Number(portraitConfidenceSystem.evidenceScore || 0),
