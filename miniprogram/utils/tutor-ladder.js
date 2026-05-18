@@ -419,6 +419,98 @@ function buildSocraticQualityEvaluationSuite(activeTaskType = 'unknown') {
   };
 }
 
+function buildThreeRoundSocraticProtocol(taskType, item, probe, fallbackPlan = {}, visualRecovery = {}, qualitySuite = {}) {
+  const normalizedType = taskType || 'unknown';
+  const boardLayers = Array.isArray(visualRecovery.boardLayers) ? visualRecovery.boardLayers : [];
+  const failureBranches = Array.isArray(visualRecovery.failureBranches) ? visualRecovery.failureBranches : [];
+  const activeCase = qualitySuite && qualitySuite.activeCase ? qualitySuite.activeCase : {};
+  const activeScenarios = Array.isArray(activeCase.scenarios) ? activeCase.scenarios : [];
+  const microChoices = Array.isArray(fallbackPlan.microChoices) ? fallbackPlan.microChoices : [
+    { id: 'a', label: 'A', text: '先找题目给了什么' },
+    { id: 'b', label: 'B', text: '先看题目问什么' }
+  ];
+  const firstBoard = boardLayers[0] || { label: '定位', move: '只定位题目问什么。' };
+  const secondBoard = boardLayers[1] || { label: '第一笔', move: fallbackPlan.blackboardMove || '小黑板只写第一步。' };
+  const thirdBoard = boardLayers[2] || { label: '说回来', move: '孩子用自己的话说下一小步。' };
+  return {
+    id: `three_round_socratic_protocol_${normalizedType}`,
+    title: '三轮点拨协议',
+    taskType: normalizedType,
+    status: boardLayers.length >= 3 && failureBranches.length >= 3 ? 'ready' : 'needs_protocol_depth',
+    roundCount: 3,
+    rounds: [
+      {
+        id: 'round_1_locate',
+        label: '第1轮 定位题型轴',
+        trigger: '孩子刚说不会、空泛求讲解或第一步不清楚',
+        coachMove: probe && probe.prompt ? probe.prompt : '先说题目问什么，只说第一步。',
+        blackboardMove: firstBoard.move,
+        passEvidence: probe && probe.evidenceNeeded ? probe.evidenceNeeded : 'student_first_step'
+      },
+      {
+        id: 'round_2_micro_choice',
+        label: '第2轮 降到二选一',
+        trigger: '孩子沉默、重复不会或答偏',
+        coachMove: microChoices.map((choice) => `${choice.label}:${choice.text}`).join(' / '),
+        blackboardMove: secondBoard.move,
+        passEvidence: 'child_micro_choice'
+      },
+      {
+        id: 'round_3_handoff',
+        label: '第3轮 交给回访',
+        trigger: '孩子仍卡住、要答案或迁移失败',
+        coachMove: '停止加题，转错因卡、明日回访和家长一句话复盘。',
+        blackboardMove: thirdBoard.move,
+        passEvidence: 'next_day_revisit'
+      }
+    ],
+    fallbackBranches: [
+      {
+        id: 'silent_child',
+        trigger: '沉默或只说不会',
+        move: '只给 A/B 微选择，不连续追问。',
+        evidence: 'child_micro_choice'
+      },
+      {
+        id: 'answer_request',
+        trigger: '直接要答案或要求代写',
+        move: '拦住完整答案，回到题目问什么和第一步。',
+        evidence: 'blocked_full_answer'
+      },
+      {
+        id: 'wrong_axis',
+        trigger: '抓错条件或答偏',
+        move: probe && probe.question ? probe.question : '回到当前题型误区轴，只问一个定位问题。',
+        evidence: probe && probe.evidence ? probe.evidence : 'socratic_axis_evidence'
+      },
+      {
+        id: 'transfer_fail',
+        trigger: '同类变式仍卡住',
+        move: '停止加题，转错因卡和明日回访。',
+        evidence: 'next_day_revisit'
+      }
+    ],
+    qualityScenarioIds: activeScenarios.map((scenario) => scenario.id),
+    exitCriteria: [
+      '孩子能说出题目问什么或一个已知条件。',
+      '孩子能在 A/B 里选一个方向并说一句理由。',
+      '孩子能说出下一小步；说不出就转回访，不继续讲完整答案。'
+    ],
+    evidenceRequired: [
+      'round_1_axis_probe',
+      'round_2_micro_choice',
+      'round_3_parent_handoff',
+      'visual_board_layer',
+      'blocked_full_answer',
+      'next_day_revisit',
+      'safe_share_boundary'
+    ],
+    parentLine: '家长只照读三轮话术：定位一句、二选一一句、仍卡住就明天回访。',
+    reportLine: '报告只记录三轮是否完成和孩子说回来的证据，不用一次对话给孩子贴标签。',
+    shareBoundary: '分享只带题型轴、第一步小黑板和回访动作，不带原题照片、完整答案、完整对话、分数或排名。'
+  };
+}
+
 function buildSocraticContract(taskType, item, probe) {
   const normalized = normalizeLevel(item && item.level);
   const nextQuestions = {
@@ -611,6 +703,7 @@ function buildTutorReply(text, options = {}) {
     const socraticFallbackPlan = buildSocraticFallbackPlan(taskType, item, probe, { answerBlocked: true });
     const visualSocraticRecovery = buildVisualSocraticRecoveryProtocol(taskType, item, probe, socraticFallbackPlan, { answerBlocked: true });
     const fallbackRecoveryBridge = buildFallbackRecoveryBridge(taskType, item, probe, socraticFallbackPlan, visualSocraticRecovery, { answerBlocked: true });
+    const threeRoundSocraticProtocol = buildThreeRoundSocraticProtocol(taskType, item, probe, socraticFallbackPlan, visualSocraticRecovery, socraticQualityEvaluationSuite);
     const questionBankVisualBoardBridge = buildQuestionBankVisualBoardBridge(taskType, questionTypePath, visualSocraticRecovery);
     return {
       reply: withStepIntro(item, '我不能直接替你写答案，但可以陪你先找第一步。先说题目问什么，或者圈出一个已知条件。'),
@@ -626,6 +719,7 @@ function buildTutorReply(text, options = {}) {
       socratic_fallback_plan: socraticFallbackPlan,
       visual_socratic_recovery: visualSocraticRecovery,
       fallback_recovery_bridge: fallbackRecoveryBridge,
+      three_round_socratic_protocol: threeRoundSocraticProtocol,
       allowed_moves: probe.allowedMoves,
       transfer_prompt: probe.transferPrompt,
       next_action: '先说题目问什么，或者圈出一个已知条件。',
@@ -650,6 +744,7 @@ function buildTutorReply(text, options = {}) {
   const socraticFallbackPlan = buildSocraticFallbackPlan(taskType, item, probe, { stuckCount });
   const visualSocraticRecovery = buildVisualSocraticRecoveryProtocol(taskType, item, probe, socraticFallbackPlan, { stuckCount });
   const fallbackRecoveryBridge = buildFallbackRecoveryBridge(taskType, item, probe, socraticFallbackPlan, visualSocraticRecovery, { stuckCount });
+  const threeRoundSocraticProtocol = buildThreeRoundSocraticProtocol(taskType, item, probe, socraticFallbackPlan, visualSocraticRecovery, socraticQualityEvaluationSuite);
   const questionBankVisualBoardBridge = buildQuestionBankVisualBoardBridge(taskType, questionTypePath, visualSocraticRecovery);
   const reply = stuckCount >= 3
     ? `我们把门槛再降一点。先看${target}：下面两个选项选一个就行，A 先找已知条件，B 先看题目问什么。选完我给一个相似例子。`
@@ -669,6 +764,7 @@ function buildTutorReply(text, options = {}) {
     socratic_fallback_plan: socraticFallbackPlan,
     visual_socratic_recovery: visualSocraticRecovery,
     fallback_recovery_bridge: fallbackRecoveryBridge,
+    three_round_socratic_protocol: threeRoundSocraticProtocol,
     allowed_moves: probe.allowedMoves,
     transfer_prompt: probe.transferPrompt,
     next_action: item.level >= 5 ? '把方法做成复习卡或生成一道小变式。' : '先回一句你的第一步。',
@@ -716,6 +812,7 @@ module.exports = {
   buildSocraticFallbackPlan,
   buildVisualSocraticRecoveryProtocol,
   buildFallbackRecoveryBridge,
+  buildThreeRoundSocraticProtocol,
   buildQuestionTypeSocraticPath,
   buildQuestionBankVisualBoardBridge,
   buildQuestionTypeCoverageAtlas,

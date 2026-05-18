@@ -144,6 +144,15 @@
             <view class="receipt-board-avoid">{{thinkingReceipt.socraticQualityEvaluationSuite.activeCase.passLine}}</view>
             <view class="receipt-board-avoid">{{thinkingReceipt.socraticQualityEvaluationSuite.shareBoundary}}</view>
           </view>
+          <view class="receipt-first-step-board" wx:if="{{thinkingReceipt.three_round_socratic_protocol}}">
+            <view class="receipt-diagnostic-title">{{thinkingReceipt.three_round_socratic_protocol.title}}</view>
+            <view class="receipt-board-avoid">{{thinkingReceipt.three_round_socratic_protocol.parentLine}}</view>
+            <view class="receipt-board-line" wx:for="{{thinkingReceipt.three_round_socratic_protocol.rounds}}" wx:key="id">{{item.label}}：{{item.coachMove}}</view>
+            <view class="receipt-board-parent" wx:for="{{thinkingReceipt.three_round_socratic_protocol.rounds}}" wx:key="id">小黑板：{{item.blackboardMove}}｜证据：{{item.passEvidence}}</view>
+            <view class="receipt-board-line" wx:for="{{thinkingReceipt.three_round_socratic_protocol.fallbackBranches}}" wx:key="id">失败兜底：{{item.trigger}}｜{{item.move}}</view>
+            <view class="receipt-board-avoid">{{thinkingReceipt.three_round_socratic_protocol.reportLine}}</view>
+            <view class="receipt-board-avoid">{{thinkingReceipt.three_round_socratic_protocol.shareBoundary}}</view>
+          </view>
           <view class="receipt-first-step-board" wx:if="{{thinkingReceipt.courseUnitQuestionBank}}">
             <view class="receipt-diagnostic-title">{{thinkingReceipt.courseUnitQuestionBank.title}}</view>
             <view class="receipt-board-avoid">{{thinkingReceipt.courseUnitQuestionBank.summary}}</view>

@@ -700,6 +700,7 @@ Page({
       socratic_fallback_plan: result && result.socratic_fallback_plan ? result.socratic_fallback_plan : null,
       visual_socratic_recovery: result && result.visual_socratic_recovery ? result.visual_socratic_recovery : null,
       fallback_recovery_bridge: result && result.fallback_recovery_bridge ? result.fallback_recovery_bridge : null,
+      three_round_socratic_protocol: result && result.three_round_socratic_protocol ? result.three_round_socratic_protocol : null,
       allowed_moves: result && result.allowed_moves ? result.allowed_moves : [],
       transfer_prompt: result && result.transfer_prompt ? result.transfer_prompt : ''
     });
@@ -757,6 +758,16 @@ Page({
           : 0,
         fallback_recovery_evidence: result.fallback_recovery_bridge && Array.isArray(result.fallback_recovery_bridge.evidenceRequired)
           ? result.fallback_recovery_bridge.evidenceRequired.length
+          : 0,
+        three_round_socratic_protocol: result.three_round_socratic_protocol || null,
+        three_round_socratic_rounds: result.three_round_socratic_protocol && Array.isArray(result.three_round_socratic_protocol.rounds)
+          ? result.three_round_socratic_protocol.rounds.length
+          : 0,
+        three_round_socratic_fallbacks: result.three_round_socratic_protocol && Array.isArray(result.three_round_socratic_protocol.fallbackBranches)
+          ? result.three_round_socratic_protocol.fallbackBranches.length
+          : 0,
+        three_round_socratic_evidence: result.three_round_socratic_protocol && Array.isArray(result.three_round_socratic_protocol.evidenceRequired)
+          ? result.three_round_socratic_protocol.evidenceRequired.length
           : 0,
         allowed_moves: result.allowed_moves || [],
         transfer_prompt: result.transfer_prompt || ''
