@@ -790,6 +790,59 @@ function buildFamilyDecisionMemo(parts = {}, matrix = [], recommendationPlan = {
   };
 }
 
+function buildPortraitConfidenceSystem(parts = {}, matrix = [], portrait = {}, classroom = {}, familyDecision = {}) {
+  const diagnosis = Array.isArray(matrix) ? matrix : [];
+  const subjects = Object.keys(parts.parsedScores || {});
+  const assessmentCount = Array.isArray(parts.assessmentAnswers) ? parts.assessmentAnswers.length : 0;
+  const sourceCount = Array.isArray(parts.reportSources) ? parts.reportSources.length : 0;
+  const behaviorCount = parts.behaviorSignals ? Object.keys(parts.behaviorSignals).length : 0;
+  const emotionCount = parts.emotionSignals ? Object.keys(parts.emotionSignals).length : 0;
+  const evidenceScore = subjects.length * 10 + Math.min(assessmentCount, 15) * 3 + sourceCount * 8 + behaviorCount * 5 + emotionCount * 4;
+  const confidenceLevel = evidenceScore >= 120 ? 'high' : evidenceScore >= 70 ? 'medium' : 'low';
+  const primary = diagnosis.find((item) => String(item.status || '').indexOf('\u652f\u6301') >= 0) || diagnosis[0] || {};
+  const subject = primary.subject || '\u5f53\u524d\u5b66\u79d1';
+  const cause = primary.mainCause || '\u7b2c\u4e00\u6b65\u4e0d\u6e05';
+  const readyCount = [subjects.length >= 3, assessmentCount >= 8, behaviorCount >= 2].filter(Boolean).length;
+  const evidenceLedger = [
+    { id: 'score_or_task', label: '\u6210\u7ee9/\u4efb\u52a1\u8bc1\u636e', status: subjects.length >= 3 ? 'ready' : 'weak', proof: subjects.length ? `${subjects.length} \u4e2a\u5b66\u79d1\u5df2\u8bb0\u5f55` : '\u7f3a\u5c11\u53ef\u786e\u8ba4\u5b66\u79d1\u8bb0\u5f55' },
+    { id: 'assessment', label: '\u753b\u50cf\u95ee\u5377', status: assessmentCount >= 8 ? 'ready' : 'weak', proof: `${assessmentCount}/15 \u4e2a\u95ee\u9898\u5df2\u8bb0\u5f55` },
+    { id: 'behavior', label: '\u505a\u9898\u8fc7\u7a0b', status: behaviorCount >= 2 ? 'ready' : 'weak', proof: behaviorCount ? `${behaviorCount} \u7c7b\u884c\u4e3a\u4fe1\u53f7` : '\u7f3a\u5c11\u771f\u5b9e\u505a\u9898\u8fc7\u7a0b' },
+    { id: 'next_day', label: '\u9694\u5929\u56de\u8bbf', status: portrait.nextReviewCadence ? 'pending' : 'missing', proof: portrait.nextReviewCadence || '\u9700\u8981\u660e\u5929\u56de\u8bbf\u9a8c\u8bc1' }
+  ];
+  return {
+    id: 'portrait_confidence_system',
+    title: '\u957f\u671f\u753b\u50cf\u53ef\u4fe1\u5ea6\u8d26\u672c',
+    confidenceLevel,
+    evidenceScore,
+    summary: confidenceLevel === 'high'
+      ? '\u5f53\u524d\u8bc1\u636e\u8db3\u591f\u5f62\u6210\u9636\u6bb5\u5224\u65ad\uff0c\u4f46\u4ecd\u6309 7 \u5929\u56de\u8bbf\u66f4\u65b0\uff0c\u4e0d\u6309\u5355\u6b21\u5206\u6570\u5b9a\u6027\u3002'
+      : confidenceLevel === 'medium'
+        ? '\u5f53\u524d\u53ef\u4ee5\u6307\u5bfc\u4eca\u665a\u884c\u52a8\uff0c\u4f46\u957f\u671f\u753b\u50cf\u8fd8\u9700\u8981\u9694\u5929\u548c\u7b2c 7 \u5929\u8bc1\u636e\u786e\u8ba4\u3002'
+        : '\u5f53\u524d\u53ea\u80fd\u4f5c\u4e3a\u5feb\u901f\u5efa\u8bae\uff0c\u4e0d\u80fd\u5f53\u4f5c\u957f\u671f\u7ed3\u8bba\u3002',
+    evidenceLedger,
+    decisionThresholds: [
+      { id: 'act_tonight', label: '\u4eca\u665a\u53ef\u884c\u52a8', rule: '\u6709\u4e00\u4e2a\u660e\u786e\u5361\u70b9\u548c\u4e00\u4e2a\u53ef\u6267\u884c\u7b2c\u4e00\u6b65\u5373\u53ef\u884c\u52a8\u3002', met: !!primary.mainCause },
+      { id: 'update_portrait', label: '\u66f4\u65b0\u753b\u50cf', rule: '\u81f3\u5c11 3 \u7c7b\u8bc1\u636e\u540c\u65f6\u6307\u5411\u540c\u4e00\u9519\u56e0\uff0c\u624d\u66f4\u65b0\u957f\u671f\u753b\u50cf\u3002', met: readyCount >= 3 },
+      { id: 'increase_load', label: '\u589e\u52a0\u9898\u91cf', rule: '\u8fde\u7eed 2 \u5929\u80fd\u72ec\u7acb\u8bf4\u51fa\u7b2c\u4e00\u6b65\uff0c\u624d\u589e\u52a0\u53d8\u5f0f\u6216\u9898\u91cf\u3002', met: false },
+      { id: 'reduce_load', label: '\u964d\u7ea7\u5904\u7406', rule: '\u540c\u4e00\u9519\u56e0\u8fde\u7eed 2 \u6b21\u5931\u8d25\uff0c\u7acb\u5373\u964d\u5230\u5c0f\u9ed1\u677f\u548c\u9519\u56e0\u5361\u3002', met: String(primary.status || '').indexOf('\u652f\u6301') >= 0 }
+    ],
+    observationCadence: [
+      { day: '\u4eca\u665a', check: `${subject} \u662f\u5426\u80fd\u8bf4\u51fa\u7b2c\u4e00\u6b65`, action: '\u53ea\u8bb0\u5f55\u5b69\u5b50\u539f\u8bdd\uff0c\u4e0d\u8bb2\u5b8c\u6574\u7b54\u6848\u3002' },
+      { day: '\u660e\u5929', check: `${cause} \u662f\u5426\u8fd8\u80fd\u590d\u8ff0`, action: '\u6362\u4e00\u5f20\u540c\u7c7b\u5361\u56de\u8bbf\u3002' },
+      { day: '\u7b2c 3 \u5929', check: '\u80fd\u5426\u505a\u8fd1\u8fc1\u79fb', action: '\u6362\u4e00\u4e2a\u5c0f\u6761\u4ef6\uff0c\u4e0d\u52a0\u96be\u5ea6\u3002' },
+      { day: '\u7b2c 7 \u5929', check: '\u662f\u5426\u8fdb\u5165\u957f\u671f\u753b\u50cf', action: '\u7528\u65b0\u9519\u9898/\u5c0f\u6d4b\u590d\u6838\u7ed3\u8bba\u3002' }
+    ],
+    parentTrustContract: {
+      line: '\u62a5\u544a\u53ea\u7ed9\u5bb6\u5ead\u884c\u52a8\u5efa\u8bae\uff0c\u4e0d\u628a\u5b69\u5b50\u8d34\u6807\u7b7e\u3002',
+      doNotShow: ['\u5b8c\u6574\u5bf9\u8bdd', '\u539f\u59cb\u7167\u7247', '\u6392\u540d\u523a\u6fc0', '\u5355\u6b21\u5206\u6570\u5b9a\u6027'],
+      shareLine: '\u53ef\u5206\u4eab\u7684\u53ea\u6709\u884c\u52a8\u5efa\u8bae\u3001\u56de\u8bbf\u65f6\u95f4\u548c\u8bc1\u636e\u7f3a\u53e3\u3002'
+    },
+    escalationRule: classroom.escalationRule || '7 \u5929\u5185\u540c\u4e00\u9519\u56e0\u51fa\u73b0 3 \u6b21\uff0c\u5148\u964d\u9898\u91cf\uff0c\u518d\u56de\u5c0f\u9ed1\u677f\u3002',
+    familyDecisionLine: familyDecision.tonightDecision || `\u4eca\u665a\u53ea\u5904\u7406 ${subject} \u7684 ${cause}\u3002`,
+    evidenceRequired: ['evidence_ledger', 'decision_thresholds', 'observation_cadence', 'parent_trust_contract']
+  };
+}
+
 function buildLearningReportDraft(input = {}) {
   const sources = normalizeReportSources(input);
   const allText = [input.sourceText || '', input.scoreText || ''].concat(sources.map((source) => source.text || '')).join('\n');
@@ -823,6 +876,7 @@ function buildLearningReportDraft(input = {}) {
   const longTermPortrait = buildLongTermLearningPortrait(parts, diagnosisMatrix, capabilityTendencies);
   const classroomDecisionBoard = buildClassroomDecisionBoard(parts, diagnosisMatrix, recommendationPlan, solutionMap);
   const familyDecisionMemo = buildFamilyDecisionMemo(parts, diagnosisMatrix, recommendationPlan, solutionMap, longTermPortrait, classroomDecisionBoard);
+  const portraitConfidenceSystem = buildPortraitConfidenceSystem(parts, diagnosisMatrix, longTermPortrait, classroomDecisionBoard, familyDecisionMemo);
   const missing = missingItems(parts);
   const reportDraft = {
     id: input.id || `learning_report_${String(nowIso(input.now)).slice(0, 10).replace(/-/g, '')}`,
@@ -852,6 +906,7 @@ function buildLearningReportDraft(input = {}) {
     longTermPortrait,
     classroomDecisionBoard,
     familyDecisionMemo,
+    portraitConfidenceSystem,
     generatedAt: nowIso(input.now),
     missingItems: missing,
     sourceIntegrity: {
@@ -883,6 +938,7 @@ function buildLearningReportDraft(input = {}) {
     longTermPortrait,
     classroomDecisionBoard,
     familyDecisionMemo,
+    portraitConfidenceSystem,
     reportCompleteness: completeness,
     reportStatus: {
       state: completeness >= 30 ? 'ready' : 'draft',
@@ -906,6 +962,7 @@ module.exports = {
   buildLearningReportDraft,
   buildLongTermLearningPortrait,
   buildClassroomDecisionBoard,
+  buildPortraitConfidenceSystem,
   normalizeReportSources,
   confidenceLabel
 };

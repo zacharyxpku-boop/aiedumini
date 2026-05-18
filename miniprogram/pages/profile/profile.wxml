@@ -703,6 +703,18 @@
           <text wx:if="{{learningReportSummary.longTermPortraitParentRule}}">家长判断：{{learningReportSummary.longTermPortraitParentRule}}</text>
           <text wx:if="{{learningReportSummary.longTermPortraitTeacherConference}}">沟通老师：{{learningReportSummary.longTermPortraitTeacherConference}}</text>
         </view>
+        <view class="parent-brief-block" wx:if="{{learningReportSummary.portraitConfidenceTitle}}">
+          <text class="parent-brief-label">长期画像可信度账本</text>
+          <text>置信等级：{{learningReportSummary.portraitConfidenceLevel}}｜证据分：{{learningReportSummary.portraitConfidenceScore}}</text>
+          <text>{{learningReportSummary.portraitConfidenceSummary}}</text>
+          <text wx:for="{{learningReportSummary.portraitConfidenceLedger}}" wx:key="id">证据账本：{{item.label}}｜{{item.status}}｜{{item.proof}}</text>
+          <text wx:for="{{learningReportSummary.portraitDecisionThresholds}}" wx:key="id">决策阈值：{{item.label}}｜{{item.rule}}</text>
+          <text wx:for="{{learningReportSummary.portraitObservationCadence}}" wx:key="day">观察周期：{{item.day}}｜{{item.check}}｜{{item.action}}</text>
+          <text wx:if="{{learningReportSummary.portraitParentTrustContract}}">{{learningReportSummary.portraitParentTrustContract.line}}</text>
+          <text wx:if="{{learningReportSummary.portraitParentTrustContract}}">分享边界：{{learningReportSummary.portraitParentTrustContract.shareLine}}</text>
+          <text wx:if="{{learningReportSummary.portraitConfidenceEscalationRule}}">升级/降级：{{learningReportSummary.portraitConfidenceEscalationRule}}</text>
+          <text wx:if="{{learningReportSummary.portraitConfidenceFamilyDecisionLine}}">家庭决策：{{learningReportSummary.portraitConfidenceFamilyDecisionLine}}</text>
+        </view>
         <view class="parent-brief-block" wx:if="{{learningReportSummary.classroomDecisionLine}}">
           <text class="parent-brief-label">课堂级决策板</text>
           <text>{{learningReportSummary.classroomDecisionLine}}</text>

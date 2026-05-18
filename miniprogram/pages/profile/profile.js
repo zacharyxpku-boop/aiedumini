@@ -712,6 +712,7 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
   const longTermPortrait = reportState.longTermPortrait || draft.longTermPortrait || {};
   const classroomDecisionBoard = reportState.classroomDecisionBoard || draft.classroomDecisionBoard || {};
   const familyDecisionMemo = reportState.familyDecisionMemo || draft.familyDecisionMemo || {};
+  const portraitConfidenceSystem = reportState.portraitConfidenceSystem || draft.portraitConfidenceSystem || {};
   const matrix = Array.isArray(draft.diagnosisMatrix) ? draft.diagnosisMatrix : [];
   const tendencies = Array.isArray(draft.capabilityTendencies) ? draft.capabilityTendencies : [];
   const effectiveCourseUnitMap = courseUnitMap || (storage.buildCourseUnitMap ? storage.buildCourseUnitMap({}) : null);
@@ -885,6 +886,17 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     classroomEscalationRule: classroomDecisionBoard.escalationRule || '',
     classroomSuccessRule: classroomDecisionBoard.successRule || '',
     familyDecisionMemo,
+    portraitConfidenceSystem,
+    portraitConfidenceTitle: portraitConfidenceSystem.title || '',
+    portraitConfidenceLevel: portraitConfidenceSystem.confidenceLevel || '',
+    portraitConfidenceScore: Number(portraitConfidenceSystem.evidenceScore || 0),
+    portraitConfidenceSummary: portraitConfidenceSystem.summary || '',
+    portraitConfidenceLedger: Array.isArray(portraitConfidenceSystem.evidenceLedger) ? portraitConfidenceSystem.evidenceLedger : [],
+    portraitDecisionThresholds: Array.isArray(portraitConfidenceSystem.decisionThresholds) ? portraitConfidenceSystem.decisionThresholds : [],
+    portraitObservationCadence: Array.isArray(portraitConfidenceSystem.observationCadence) ? portraitConfidenceSystem.observationCadence : [],
+    portraitParentTrustContract: portraitConfidenceSystem.parentTrustContract || null,
+    portraitConfidenceEscalationRule: portraitConfidenceSystem.escalationRule || '',
+    portraitConfidenceFamilyDecisionLine: portraitConfidenceSystem.familyDecisionLine || '',
     familyDecisionTitle: familyDecisionMemo.title || '',
     familyDecisionTonight: familyDecisionMemo.tonightDecision || '',
     familyDecisionDoNotDo: Array.isArray(familyDecisionMemo.doNotDo) ? familyDecisionMemo.doNotDo : [],
