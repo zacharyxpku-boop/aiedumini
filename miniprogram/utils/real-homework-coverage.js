@@ -416,6 +416,92 @@ const PUBLIC_K12_USE_WORKBENCH = [
   }
 ];
 
+const PUBLIC_K12_ANTI_FAKE_THICKNESS_GATES = [
+  {
+    id: 'source_to_sample_gate',
+    productRisk: '把公开资料直接堆成“题库很多”的假厚度。',
+    localCodeMustOwn: ['来源分级', '样本改写', '题型归一', '答案泄漏拦截'],
+    aiCanHelp: ['把第一步改写成孩子能接住的追问'],
+    proofRequired: ['source_id_present', 'sample_specific_first_step', 'no_original_answer'],
+    rejectIf: ['原题全文进入前台', '出现标准答案索引', '没有错因却进入报告']
+  },
+  {
+    id: 'socratic_axis_gate',
+    productRisk: '苏格拉底看起来会聊，但问法没有命中题型和错因。',
+    localCodeMustOwn: ['追问轴', '停止条件', '失败降阶', '禁止直接答案'],
+    aiCanHelp: ['同一追问换语气', '孩子二次卡住后的鼓励表达'],
+    proofRequired: ['task_type_axis_selected', 'three_round_no_answer', 'fallback_micro_choice'],
+    rejectIf: ['AI 决定能否给答案', '连续追问仍不落到第一步', '把讲解写成完整题解']
+  },
+  {
+    id: 'visual_blackboard_gate',
+    productRisk: '借鉴千问板书后变成假全科动态板书承诺。',
+    localCodeMustOwn: ['题型到板书动作映射', '第一笔图解', '退出条件', '答案边界'],
+    aiCanHelp: ['解释为什么先画这一笔'],
+    proofRequired: ['board_move_present', 'first_step_only', 'exit_criteria_present'],
+    rejectIf: ['承诺拍照识题', '自动生成完整板书答案', '没有图示边界']
+  },
+  {
+    id: 'memory_game_gate',
+    productRisk: '学 Gizmo 的高频记忆，但只做积分装饰，没有真实复习价值。',
+    localCodeMustOwn: ['回访窗口', 'XP 发放', '变式解锁', '连续失败降阶'],
+    aiCanHelp: ['把复习提醒写得不枯燥'],
+    proofRequired: ['wrong_cause_reappears', 'day7_variant_gate', 'xp_not_awarded_by_ai'],
+    rejectIf: ['只发 XP 不要求证据', '没有明天/第7天回访', '用排名刺激传播']
+  },
+  {
+    id: 'report_portrait_gate',
+    productRisk: '报告看起来专业，但证据不足就给长期画像。',
+    localCodeMustOwn: ['证据计数', '跨周趋势', '置信度门槛', '家校字段白名单'],
+    aiCanHelp: ['把已释放证据翻译成家长/老师能执行的一句话'],
+    proofRequired: ['evidence_count_met', 'cross_week_signal', 'safe_handoff_fields_only'],
+    rejectIf: ['一题就贴长期标签', '公开完整对话', '公开分数排名']
+  },
+  {
+    id: 'share_growth_gate',
+    productRisk: '为了裂变牺牲隐私，晒原题、答案、排名。',
+    localCodeMustOwn: ['可见字段白名单', '禁传字段黑名单', '接收者自带材料', '回流参数'],
+    aiCanHelp: ['分享卡标题和温和鼓励'],
+    proofRequired: ['blocked_original_question', 'blocked_score_rank', 'receiver_own_material'],
+    rejectIf: ['原题照片外传', '完整答案外传', '排名/正确率刺激转发']
+  }
+];
+
+const PUBLIC_K12_IMPLEMENTATION_PLAYBOOK = [
+  {
+    id: 'direct_use',
+    label: '可以直接用',
+    useFor: ['学科分类', '能力标签', '公开来源分级', '减负与隐私边界'],
+    mustStayLocal: ['来源白名单', '页面落点', '禁用字段'],
+    aiRole: '不需要 AI 决策，只能做中文解释。',
+    miniappLanding: ['/pages/tutor/tutor', '/pages/profile/profile']
+  },
+  {
+    id: 'local_code_better',
+    label: '本地代码更好',
+    useFor: ['题型路由', '错因命中', '第一步小黑板', '回访间隔', 'XP 与解锁', '报告释放', '分享字段'],
+    mustStayLocal: ['release gate', 'privacy gate', 'reward gate', 'mastery gate'],
+    aiRole: 'AI 不参与放行，只改写已确定内容。',
+    miniappLanding: ['/pages/home/home', '/pages/review/review', '/pages/arcade/arcade']
+  },
+  {
+    id: 'ai_better',
+    label: 'AI 更好',
+    useFor: ['苏格拉底追问语气', '同一第一步的多种说法', '家长报告解释', '降阶鼓励'],
+    mustStayLocal: ['追问轴', '直接答案拦截', '失败兜底'],
+    aiRole: 'AI 只负责“怎么说”，不负责“问什么、能否通过”。',
+    miniappLanding: ['/pages/tutor/tutor', '/pages/profile/profile']
+  },
+  {
+    id: 'must_reject',
+    label: '必须拒绝',
+    useFor: ['原题全文搬运', '标准答案库', '拍照搜题承诺', '全科动态板书承诺', '分数排名传播'],
+    mustStayLocal: ['negative_sample_block', 'copy_boundary_check', 'share_blocklist'],
+    aiRole: 'AI 也不能生成或包装这些承诺。',
+    miniappLanding: ['/pages/legal/legal', '/pages/home/home']
+  }
+];
+
 const K12_PUBLIC_IMPLEMENTATION_DECISION_MATRIX = [
   {
     id: 'homework_archetype_pressure',
@@ -732,12 +818,16 @@ function buildRealHomeworkCoverageMatrix(options = {}) {
     publicK12CandidatePool: PUBLIC_K12_CANDIDATE_POOL,
     publicK12UseWorkbench: PUBLIC_K12_USE_WORKBENCH,
     implementationDecisionMatrix: K12_PUBLIC_IMPLEMENTATION_DECISION_MATRIX,
+    antiFakeThicknessGates: PUBLIC_K12_ANTI_FAKE_THICKNESS_GATES,
+    implementationPlaybook: PUBLIC_K12_IMPLEMENTATION_PLAYBOOK,
     longitudinalPressureScenarioLedger: LONGITUDINAL_PRESSURE_SCENARIO_LEDGER,
     publicWorkbenchLine: `已把 ${PUBLIC_K12_USE_WORKBENCH.length} 类可用资料拆成“可直接用 / 本地代码更好 / AI 更好 / 禁用”四格决策。`,
     publicAssetPipelineLine: `已把 ${PUBLIC_K12_ASSET_PIPELINE.length} 类公开/一方/竞品资料转成采集-本地化-禁用-落地页面流水线。`,
     publicCandidatePoolLine: `已把 ${PUBLIC_K12_CANDIDATE_POOL.length} 条可扩内容候选按 A+/A/B 分级，先过本地化和禁用字段检查再进入样本库。`,
     publicSourceLine: `已把 ${PUBLIC_K12_SOURCE_LEDGER.length} 类公开/一方资料沉淀为本地规则资产：题型、错因、第一步、小黑板、回访、报告和分享边界。`,
     publicSourceBlockedLine: '禁止把公开资料变成原题答案库、拍照搜题承诺、排名晒分或全科动态板书承诺。',
+    antiFakeThicknessLine: `已把 ${PUBLIC_K12_ANTI_FAKE_THICKNESS_GATES.length} 类“看起来厚但实际不准”的风险做成硬门槛：来源、苏格拉底、小黑板、记忆游戏、报告画像和分享增长都必须有证据再放行。`,
+    implementationPlaybookLine: `已把公开 K12 资料分成 ${PUBLIC_K12_IMPLEMENTATION_PLAYBOOK.length} 种处理方式：直接用、本地代码更好、AI 更好、必须拒绝。`,
     clusterRunwayLine: `已把 ${QUESTION_TYPE_CLUSTER_RUNWAY.length} 个高频题型簇接成“第一步-错因-小黑板-回访-分享”本地闭环。`,
     longitudinalLine: `已把 ${LONGITUDINAL_PRESSURE_SCENARIO_LEDGER.length} 条跨周复发场景接成本地 release gate：先看复发证据，再决定报告、奖励、分享和家校协同能不能释放。`,
     totalSamples,
@@ -772,6 +862,8 @@ module.exports = {
   PUBLIC_K12_ASSET_PIPELINE,
   PUBLIC_K12_CANDIDATE_POOL,
   PUBLIC_K12_USE_WORKBENCH,
+  PUBLIC_K12_ANTI_FAKE_THICKNESS_GATES,
+  PUBLIC_K12_IMPLEMENTATION_PLAYBOOK,
   K12_PUBLIC_IMPLEMENTATION_DECISION_MATRIX,
   LONGITUDINAL_PRESSURE_SCENARIO_LEDGER,
   buildRealHomeworkCoverageMatrix
