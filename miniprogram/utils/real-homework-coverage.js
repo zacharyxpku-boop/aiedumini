@@ -225,7 +225,40 @@ const K12_PUBLIC_IMPLEMENTATION_DECISION_MATRIX = [
     localCodeBetter: ['可见字段', '禁传字段', '回流参数', '接收者自己的材料', '传播门槛'],
     aiBetter: ['分享卡一句话标题和温和鼓励'],
     evidenceGate: ['blocked_original_question', 'blocked_score_rank', 'receiver_own_material']
+  },
+  {
+    id: 'gizmo_memory_loop',
+    productQuestion: 'Gizmo 式高频记忆循环由谁决策？',
+    decision: '本地规则决定回访窗口、错因重现、XP 和解锁；AI 只负责把复习提示说得不枯燥。',
+    localCodeBetter: ['间隔复习窗口', '错因重现', '变式解锁门槛', 'XP 发放', '连续失败降阶'],
+    aiBetter: ['复习提醒文案', '孩子畏难时的鼓励语气', '同一错因的一句话解释'],
+    evidenceGate: ['wrong_cause_reappears', 'variant_gate_passed', 'xp_not_awarded_by_ai']
+  },
+  {
+    id: 'question_bank_course_system',
+    productQuestion: '题库/课程体系能否直接由 AI 生成？',
+    decision: '题型、能力、错因、进阶和掌握门槛由本地规则与稳定资产决定；AI 只生成可替换表达。',
+    localCodeBetter: ['学科节点', '题型卡', '错因模型', '进阶门槛', '掌握释放'],
+    aiBetter: ['同一题型讲法改写', '年级化表达', '家长版解释'],
+    evidenceGate: ['course_unit_card_exists', 'wrong_cause_model_exists', 'mastery_gate_local']
+  },
+  {
+    id: 'intake_import_public_material',
+    productQuestion: '公开资料和家长输入哪些能直接用？',
+    decision: '只接收用户主动输入的作业摘要、卡点和错因说法；公开资料只抽象题型，不作为原题和答案来源。',
+    localCodeBetter: ['输入字段裁剪', '敏感信息过滤', '题型归一', '来源记录', '失败输入回退'],
+    aiBetter: ['口语化作业改写成任务摘要', '生成首个追问'],
+    evidenceGate: ['user_supplied_summary', 'source_boundary_logged', 'no_photo_recognition_claim']
+  },
+  {
+    id: 'longitudinal_portrait_home_school',
+    productQuestion: '长期画像和家校协同能否由 AI 直接判断？',
+    decision: '本地证据和置信度门槛先判断可不可以写；AI 只把已释放证据改写成家长/老师可看的短摘要。',
+    localCodeBetter: ['跨周趋势', '证据积累', '置信度门槛', '家校字段白名单', '不分享字段黑名单'],
+    aiBetter: ['家长版一句话', '老师版观察摘要', '不责备孩子的表达'],
+    evidenceGate: ['confidence_threshold_met', 'safe_handoff_fields_only', 'no_score_rank_raw_dialogue']
   }
+
 ];
 
 const QUESTION_TYPE_CLUSTER_RUNWAY = [
