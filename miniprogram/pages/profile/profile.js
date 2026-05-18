@@ -1417,6 +1417,13 @@ function buildProfileReadinessSnapshot(input = {}) {
   const next = input.unifiedNextAction || {};
   const evidence = input.globalEvidenceBrief || {};
   const surface = input.surfaceDepthPack || {};
+  const aiMatrix = acceptance.aiUsageDecisionMatrix || {};
+  const aiRows = Array.isArray(aiMatrix.rows) ? aiMatrix.rows : [];
+  const findAiRow = (id) => aiRows.find((item) => item && item.id === id) || {};
+  const socraticAi = findAiRow('socratic_hint_generation');
+  const reportAi = findAiRow('report_draft_interpretation');
+  const boardAi = findAiRow('visual_blackboard_explanation');
+  const localRuleRows = aiRows.filter((item) => item && item.decision === 'local_rule_required');
   const gateList = Array.isArray(acceptance.readinessGateChecklist) ? acceptance.readinessGateChecklist : [];
   const localGateList = gateList.filter((item) => item && item.id !== 'external_launch_config_clear');
   const localPassed = localGateList.length > 0 && localGateList.every((item) => item.passed);
@@ -1431,6 +1438,24 @@ function buildProfileReadinessSnapshot(input = {}) {
   const boundaryLine = localPassed
     ? (externalBlocked ? '当前适合小范围家庭试用；公开分发前再完成正式小程序身份。' : '当前可以用真实材料做一轮家庭试用。')
     : '不承诺自动出答案，只保留第一步、回访和家长复盘证据。';
+  const aiBoundaryRows = [
+    {
+      id: 'need_ai',
+      label: '需要智能生成',
+      body: `${socraticAi.label || '作业点拨追问'}：把题干、卡点和孩子原话改写成追问；本地规则先拦截直接给答案。`
+    },
+    {
+      id: 'ai_enhanced',
+      label: '可增强但不依赖',
+      body: `${reportAi.label || '学习报告'}、${boardAi.label || '第一步小黑板'}可以更自然；没有智能生成时仍按证据账本给行动建议。`
+    },
+    {
+      id: 'local_rule',
+      label: '必须本地稳定',
+      body: `复习调度、XP、分享隐私、家长结论和安全边界共 ${localRuleRows.length || 6} 类必须规则可跑，不能交给模型临场决定。`
+    }
+  ];
+  const aiBoundaryReleaseRule = '即使暂时不用大模型，入口、点拨兜底、错因卡、复习、家长复盘和安全分享也必须能跑。';
   return {
     title: '今晚闭环状态',
     conclusion,
@@ -1439,6 +1464,10 @@ function buildProfileReadinessSnapshot(input = {}) {
     nextActionLabel: next.actionLabel || '继续补一条真实材料',
     nextActionReason: next.reasonLine || (depth.nextBestAction || '让下一步有真实依据'),
     boundaryLine,
+    aiBoundaryTitle: '智能能力边界',
+    aiBoundarySummary: aiMatrix.principle || '高不确定解释用智能生成，确定性闭环用本地规则。',
+    aiBoundaryRows,
+    aiBoundaryReleaseRule,
     readyCount: depth.readyCount || compass.readyCount || 0,
     totalCount: depth.totalCount || compass.totalCount || 0
   };

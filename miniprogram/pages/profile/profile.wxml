@@ -74,6 +74,17 @@
               <button class="profile-small-primary" bindtap="runUnifiedNextAction">{{profileReadinessSnapshot.nextActionLabel}}</button>
             </view>
             <view class="parent-brief-reason">{{profileReadinessSnapshot.boundaryLine}}</view>
+            <view class="ai-boundary-panel" wx:if="{{profileReadinessSnapshot.aiBoundaryRows}}">
+              <view class="ai-boundary-head">
+                <text>{{profileReadinessSnapshot.aiBoundaryTitle}}</text>
+                <text>{{profileReadinessSnapshot.aiBoundarySummary}}</text>
+              </view>
+              <view class="ai-boundary-row" wx:for="{{profileReadinessSnapshot.aiBoundaryRows}}" wx:key="id">
+                <text class="ai-boundary-label">{{item.label}}</text>
+                <text class="ai-boundary-body">{{item.body}}</text>
+              </view>
+              <view class="ai-boundary-rule">{{profileReadinessSnapshot.aiBoundaryReleaseRule}}</view>
+            </view>
           </view>
         </view>
 

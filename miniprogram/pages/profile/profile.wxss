@@ -1563,6 +1563,62 @@ page {
   color: #4E6359;
 }
 
+.ai-boundary-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+  padding: 16rpx;
+  border: 1rpx solid rgba(27, 67, 50, 0.10);
+  border-radius: 20rpx;
+  background: rgba(255, 255, 255, 0.74);
+}
+
+.ai-boundary-head {
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+}
+
+.ai-boundary-head text:first-child {
+  color: #1B4332;
+  font-size: 25rpx;
+  font-weight: 1000;
+}
+
+.ai-boundary-head text:last-child,
+.ai-boundary-rule {
+  color: #52635A;
+  font-size: 22rpx;
+  font-weight: 720;
+  line-height: 1.42;
+}
+
+.ai-boundary-row {
+  display: grid;
+  grid-template-columns: 152rpx minmax(0, 1fr);
+  gap: 12rpx;
+  align-items: start;
+}
+
+.ai-boundary-label {
+  color: #1F2933;
+  font-size: 22rpx;
+  font-weight: 1000;
+  line-height: 1.36;
+}
+
+.ai-boundary-body {
+  color: #405048;
+  font-size: 22rpx;
+  font-weight: 700;
+  line-height: 1.46;
+}
+
+.ai-boundary-rule {
+  padding-top: 10rpx;
+  border-top: 1rpx solid rgba(27, 67, 50, 0.08);
+}
+
 .capability-ledger-card {
   margin-top: 18rpx;
   background: #FFFDF7;
