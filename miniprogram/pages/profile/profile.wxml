@@ -794,6 +794,18 @@
           <text wx:for="{{learningReportSummary.questionBankRecallReportPhases}}" wx:key="id">训练阶段：{{item.label}}｜{{item.rule}}</text>
           <text wx:for="{{learningReportSummary.questionBankRecallReportEvidence}}" wx:key="*this">画像证据：{{item}}</text>
         </view>
+        <view class="parent-brief-block" wx:if="{{learningReportSummary.memoryRiskReleaseModel}}">
+          <text class="parent-brief-label">{{learningReportSummary.memoryRiskReleaseTitle}}</text>
+          <text>放行状态：{{learningReportSummary.memoryRiskReleaseLevel}}</text>
+          <text>{{learningReportSummary.memoryRiskReleaseSummary}}</text>
+          <text>{{learningReportSummary.memoryRiskParentDecisionLine}}</text>
+          <text>{{learningReportSummary.memoryRiskXpReleaseLine}}</text>
+          <text wx:for="{{learningReportSummary.memoryRiskSignals}}" wx:key="id">记忆风险：{{item.label}}｜{{item.level}}｜{{item.evidence}}</text>
+          <text wx:for="{{learningReportSummary.memoryForgettingWarnings}}" wx:key="id">遗忘预警：{{item.label}}｜{{item.warning}}｜{{item.action}}</text>
+          <text wx:for="{{learningReportSummary.memoryVariantReleaseGates}}" wx:key="id">变式放行：{{item.label}}｜{{item.status}}｜{{item.rule}}</text>
+          <text>分享边界：{{learningReportSummary.memoryRiskShareBoundary}}</text>
+          <text wx:for="{{learningReportSummary.memoryRiskEvidence}}" wx:key="*this">记忆证据：{{item}}</text>
+        </view>
         <view class="parent-brief-block" wx:if="{{learningReportSummary.portraitDecisionReleaseSystem}}">
           <text class="parent-brief-label">长期画像放行系统</text>
           <text wx:if="{{learningReportSummary.portraitDecisionReleaseTitle}}">{{learningReportSummary.portraitDecisionReleaseTitle}}</text>

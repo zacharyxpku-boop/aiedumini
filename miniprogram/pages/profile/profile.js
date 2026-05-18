@@ -877,6 +877,9 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
   });
   const todaySession = storage.getTodaySession ? storage.getTodaySession() : {};
   const gameEvidence = todaySession && todaySession.gameEvidence ? todaySession.gameEvidence : {};
+  const memoryRiskReleaseModel = gameEvidence.highFrequencyPracticeLoop && gameEvidence.highFrequencyPracticeLoop.memoryRiskReleaseModel
+    ? gameEvidence.highFrequencyPracticeLoop.memoryRiskReleaseModel
+    : (draft.memoryRiskReleaseModel || null);
   const socraticMemoryReportBridge = learningReport.buildSocraticMemoryReportBridge
     ? learningReport.buildSocraticMemoryReportBridge({ gameEvidence }, parentDecisionTrustSystem, portraitConfidenceSystem)
     : (draft.socraticMemoryReportBridge || null);
@@ -1101,6 +1104,25 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
       : [],
     questionBankRecallReportEvidence: questionBankRecallReportBridge && Array.isArray(questionBankRecallReportBridge.evidenceRequired)
       ? questionBankRecallReportBridge.evidenceRequired
+      : [],
+    memoryRiskReleaseModel,
+    memoryRiskReleaseTitle: memoryRiskReleaseModel ? memoryRiskReleaseModel.title : '',
+    memoryRiskReleaseLevel: memoryRiskReleaseModel ? memoryRiskReleaseModel.level : '',
+    memoryRiskReleaseSummary: memoryRiskReleaseModel ? memoryRiskReleaseModel.summary : '',
+    memoryRiskSignals: memoryRiskReleaseModel && Array.isArray(memoryRiskReleaseModel.riskSignals)
+      ? memoryRiskReleaseModel.riskSignals
+      : [],
+    memoryForgettingWarnings: memoryRiskReleaseModel && Array.isArray(memoryRiskReleaseModel.forgettingWarnings)
+      ? memoryRiskReleaseModel.forgettingWarnings
+      : [],
+    memoryVariantReleaseGates: memoryRiskReleaseModel && Array.isArray(memoryRiskReleaseModel.variantReleaseGates)
+      ? memoryRiskReleaseModel.variantReleaseGates
+      : [],
+    memoryRiskParentDecisionLine: memoryRiskReleaseModel ? memoryRiskReleaseModel.parentDecisionLine : '',
+    memoryRiskXpReleaseLine: memoryRiskReleaseModel ? memoryRiskReleaseModel.xpReleaseLine : '',
+    memoryRiskShareBoundary: memoryRiskReleaseModel ? memoryRiskReleaseModel.shareBoundary : '',
+    memoryRiskEvidence: memoryRiskReleaseModel && Array.isArray(memoryRiskReleaseModel.evidenceRequired)
+      ? memoryRiskReleaseModel.evidenceRequired
       : [],
     portraitDecisionReleaseSystem,
     portraitDecisionReleaseTitle: portraitDecisionReleaseSystem ? portraitDecisionReleaseSystem.title : '',

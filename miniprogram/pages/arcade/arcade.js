@@ -899,6 +899,9 @@ Page({
     const adaptiveRecallScheduler = highFrequencyPracticeLoop && highFrequencyPracticeLoop.adaptiveRecallScheduler
       ? highFrequencyPracticeLoop.adaptiveRecallScheduler
       : null;
+    const memoryRiskReleaseModel = highFrequencyPracticeLoop && highFrequencyPracticeLoop.memoryRiskReleaseModel
+      ? highFrequencyPracticeLoop.memoryRiskReleaseModel
+      : null;
     const questArcSignal = storage.recordQuestArcGameSignal
       ? storage.recordQuestArcGameSignal({
         mission: this.data.questArcMission,
@@ -1019,6 +1022,17 @@ Page({
       adaptive_recall_scheduler_evidence: adaptiveRecallScheduler && Array.isArray(adaptiveRecallScheduler.evidenceRequired)
         ? adaptiveRecallScheduler.evidenceRequired.length
         : 0,
+      memory_risk_release_level: memoryRiskReleaseModel ? memoryRiskReleaseModel.level : '',
+      memory_risk_signals: memoryRiskReleaseModel && Array.isArray(memoryRiskReleaseModel.riskSignals)
+        ? memoryRiskReleaseModel.riskSignals.length
+        : 0,
+      memory_forgetting_warnings: memoryRiskReleaseModel && Array.isArray(memoryRiskReleaseModel.forgettingWarnings)
+        ? memoryRiskReleaseModel.forgettingWarnings.length
+        : 0,
+      memory_variant_release_gates: memoryRiskReleaseModel && Array.isArray(memoryRiskReleaseModel.variantReleaseGates)
+        ? memoryRiskReleaseModel.variantReleaseGates.length
+        : 0,
+      memory_risk_share_boundary: memoryRiskReleaseModel ? memoryRiskReleaseModel.shareBoundary : '',
       share_code: incomingShare && incomingShare.share_code ? incomingShare.share_code : ''
     });
     if (storage.saveTodaySession) {
@@ -1183,6 +1197,17 @@ Page({
         adaptive_recall_scheduler_evidence: adaptiveRecallScheduler && Array.isArray(adaptiveRecallScheduler.evidenceRequired)
           ? adaptiveRecallScheduler.evidenceRequired.length
           : 0,
+        memory_risk_release_level: memoryRiskReleaseModel ? memoryRiskReleaseModel.level : '',
+        memory_risk_signals: memoryRiskReleaseModel && Array.isArray(memoryRiskReleaseModel.riskSignals)
+          ? memoryRiskReleaseModel.riskSignals.length
+          : 0,
+        memory_forgetting_warnings: memoryRiskReleaseModel && Array.isArray(memoryRiskReleaseModel.forgettingWarnings)
+          ? memoryRiskReleaseModel.forgettingWarnings.length
+          : 0,
+        memory_variant_release_gates: memoryRiskReleaseModel && Array.isArray(memoryRiskReleaseModel.variantReleaseGates)
+          ? memoryRiskReleaseModel.variantReleaseGates.length
+          : 0,
+        memory_risk_share_boundary: memoryRiskReleaseModel ? memoryRiskReleaseModel.shareBoundary : '',
         boss_gap: this.data.adaptiveChallenge && this.data.adaptiveChallenge.bossCard
           ? this.data.adaptiveChallenge.bossCard.key
           : '',

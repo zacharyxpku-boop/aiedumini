@@ -999,6 +999,113 @@ function buildAdaptiveRecallScheduler(questionBankRecallWorkout = {}, dailyMemor
   };
 }
 
+function buildMemoryRiskReleaseModel(adaptiveRecallScheduler = {}, wrongCauseReplayDeck = {}, questionBankRecallWorkout = {}, result = {}, options = {}) {
+  const wrong = Math.max(0, Number(result.wrong || 0));
+  const accuracy = Number.isFinite(Number(result.accuracy)) ? Number(result.accuracy) : 0;
+  const reviewQueue = Array.isArray(adaptiveRecallScheduler.reviewQueue) ? adaptiveRecallScheduler.reviewQueue : [];
+  const replayCards = Array.isArray(wrongCauseReplayDeck.cards) ? wrongCauseReplayDeck.cards : [];
+  const workoutCards = Array.isArray(questionBankRecallWorkout.workoutCards) ? questionBankRecallWorkout.workoutCards : [];
+  const weakKey = options.weakKey || (replayCards[0] && (replayCards[0].wrongCause || replayCards[0].label)) || '第一步';
+  const rescue = adaptiveRecallScheduler.mode === 'leech_rescue_schedule' || wrong >= 2 || accuracy < 60;
+  const riskSignals = [
+    {
+      id: 'wrong_cause_resurface',
+      label: '错因复燃',
+      level: wrong >= 2 || replayCards.length >= 2 ? 'high' : wrong ? 'watch' : 'low',
+      evidence: wrong ? `本轮错 ${wrong} 次，先回到「${weakKey}」错因。` : '本轮暂未出现明显复燃。'
+    },
+    {
+      id: 'forgetting_warning',
+      label: '遗忘预警',
+      level: accuracy < 60 ? 'high' : accuracy < 80 ? 'watch' : 'low',
+      evidence: accuracy ? `正确率 ${accuracy}%，需要明天遮答案回访。` : '还没有足够正确率证据。'
+    },
+    {
+      id: 'continuous_revisit',
+      label: '连续回访',
+      level: reviewQueue.length >= 4 ? 'ready' : 'watch',
+      evidence: reviewQueue.length >= 4 ? '已排到今晚、明天、第3天、第7天。' : '回访队列还不完整。'
+    },
+    {
+      id: 'variant_release',
+      label: '变式放行',
+      level: rescue ? 'blocked' : 'watch',
+      evidence: rescue ? '错因未稳定，暂不放行新变式。' : '可准备 1 道近迁移小变式，但仍需明天回访确认。'
+    }
+  ];
+  const forgettingWarnings = [
+    {
+      id: 'same_night',
+      label: '今晚',
+      warning: rescue ? '先抢救同一错因，不增加新题量。' : '今晚只保留 2 张主动回忆卡。',
+      action: reviewQueue[0] ? reviewQueue[0].action : `遮住答案，说出「${weakKey}」第一步。`
+    },
+    {
+      id: 'tomorrow',
+      label: '明天',
+      warning: '如果明天说不出第一步，说明只是当场会，不写入掌握。',
+      action: reviewQueue[1] ? reviewQueue[1].action : '明天只回访最不稳的一张卡。'
+    },
+    {
+      id: 'day3',
+      label: '第3天',
+      warning: rescue ? '错因没稳前，第3天不开放变式。' : '第3天只换一个条件，不做整套新题。',
+      action: reviewQueue[2] ? reviewQueue[2].action : '做一道小变式，先说哪里没变。'
+    },
+    {
+      id: 'day7',
+      label: '第7天',
+      warning: '第7天仍能迁移，才允许进入长期画像。',
+      action: reviewQueue[3] ? reviewQueue[3].action : '第7天再判断是否写入画像。'
+    }
+  ];
+  const variantReleaseGates = [
+    {
+      id: 'first_step_stable',
+      label: '第一步稳定',
+      status: wrong === 0 ? 'ready' : 'blocked',
+      rule: '孩子能遮住答案说出第一步，才进入下一盒。'
+    },
+    {
+      id: 'wrong_cause_quiet',
+      label: '错因不复燃',
+      status: replayCards.length <= 1 && wrong <= 1 ? 'ready' : 'blocked',
+      rule: '同错因不连续出现，才放行近迁移。'
+    },
+    {
+      id: 'revisit_kept',
+      label: '回访兑现',
+      status: reviewQueue.length >= 4 ? 'scheduled' : 'blocked',
+      rule: '明天回访完成后，才进入第3天变式。'
+    }
+  ];
+  const leechRecoveryPlan = [
+    { id: 'name', label: '命名错因', action: `先说清「${weakKey}」到底卡在哪。` },
+    { id: 'board', label: '退回小黑板', action: '只画第一步和证据点，不讲完整答案。' },
+    { id: 'revisit', label: '明天回访', action: '明天遮答案复述同一错因。' },
+    { id: 'release', label: '变式放行', action: '错因安静后，只放 1 道近迁移小题。' }
+  ];
+  const blocked = variantReleaseGates.filter((gate) => gate.status === 'blocked').length;
+  return {
+    id: 'memory_risk_release_model',
+    title: rescue ? '记忆急救放行模型' : '记忆风险放行模型',
+    level: blocked >= 2 || rescue ? 'rescue' : blocked ? 'watch' : 'release_ready',
+    summary: rescue
+      ? `「${weakKey}」有复燃风险，今晚只修旧错因，不开放新变式。`
+      : `「${weakKey}」可进入连续回访，但要等明天证据再写入画像。`,
+    riskSignals,
+    forgettingWarnings,
+    variantReleaseGates,
+    leechRecoveryPlan,
+    parentDecisionLine: rescue
+      ? '家长今晚只问错因和第一步，不加题、不追速度。'
+      : '家长只看明天是否还能说第一步，再决定要不要给小变式。',
+    xpReleaseLine: 'XP 只作为行为反馈；没有明天回访和变式证据，不进入长期画像。',
+    shareBoundary: '记忆风险分享只带行动建议、能力缺口和回访窗口，不带原题、答案、孩子隐私、原始表现、分数或排名。',
+    evidenceRequired: ['wrong_cause_resurface', 'forgetting_warning', 'continuous_revisit', 'variant_release_gate', 'parent_decision_line', 'safe_share_boundary']
+  };
+}
+
 function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], result = {}, challenge = {}, questSet = {}, options = {}) {
   const safeCards = Array.isArray(cards) ? cards : [];
   const safeEvents = Array.isArray(events) ? events : [];
@@ -1091,6 +1198,13 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
     result,
     { source: 'high_frequency_practice_loop' }
   );
+  const memoryRiskReleaseModel = buildMemoryRiskReleaseModel(
+    adaptiveRecallScheduler,
+    wrongCauseReplayDeck,
+    questionBankRecallWorkout,
+    result,
+    { weakKey }
+  );
   return {
     title: needsRepair ? '高频修复循环' : '高频巩固循环',
     mode: needsRepair ? 'repair_recall' : 'mastery_recall',
@@ -1111,13 +1225,14 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
     questionBankRecallWorkout,
     dailyMemorySprintDeck,
     adaptiveRecallScheduler,
+    memoryRiskReleaseModel,
     xpRule: 'XP 只奖励主动回忆、错因修复和次日回访，不奖励盲刷题量。',
     leechRule: needsRepair
       ? `同一错因连续 2 次错，会降到第一步小黑板。`
       : '连续 2 次说清第一步，才进入变式练习。',
     parentShareLine: `家长复盘只看：孩子能否自己说出「${weakKey}」的第一步。`,
     nextRoute: needsRepair ? '/pages/review/review' : '/pages/tutor/tutor',
-    evidenceRequired: ['active_recall_cards', 'spaced_review_plan', 'wrong_cause_return', 'quest_cadence', 'memory_feedback_controller', 'recall_intensity_plan', 'wrong_cause_replay_deck', 'xp_feedback_policy', 'quest_arc_runway', 'gizmo_like_memory_protocol', 'socratic_quality_memory_bridge', 'question_bank_memory_bridge', 'question_bank_recall_workout', 'daily_memory_sprint_deck', 'adaptive_recall_scheduler', 'parent_share_line'],
+    evidenceRequired: ['active_recall_cards', 'spaced_review_plan', 'wrong_cause_return', 'quest_cadence', 'memory_feedback_controller', 'recall_intensity_plan', 'wrong_cause_replay_deck', 'xp_feedback_policy', 'quest_arc_runway', 'gizmo_like_memory_protocol', 'socratic_quality_memory_bridge', 'question_bank_memory_bridge', 'question_bank_recall_workout', 'daily_memory_sprint_deck', 'adaptive_recall_scheduler', 'memory_risk_release_model', 'parent_share_line'],
     weakKey
   };
 }
@@ -1135,6 +1250,7 @@ module.exports = {
   buildHighFrequencyPracticeLoop,
   buildMemoryFeedbackController,
   buildAdaptiveRecallScheduler,
+  buildMemoryRiskReleaseModel,
   buildDailyMemorySprintDeck,
   buildQuestionBankMemoryBridge,
   buildQuestionBankRecallWorkout,

@@ -486,11 +486,28 @@
             <text>{{item.action}}</text>
             <text>放行证据：{{item.releaseEvidence}}</text>
           </view>
-          <view class="retention-loop-step" wx:for="{{highFrequencyPracticeLoop.adaptiveRecallScheduler.unlockRules}}" wx:key="*this">解锁规则：{{item}}</view>
+          <view class="retention-loop-step" wx:for="{{highFrequencyPracticeLoop.adaptiveRecallScheduler.unlockRules}}" wx:key="*this">放行规则：{{item}}</view>
           <view class="retention-loop-step" wx:for="{{highFrequencyPracticeLoop.adaptiveRecallScheduler.leechRules}}" wx:key="*this">急救规则：{{item}}</view>
           <view class="retention-loop-step">{{highFrequencyPracticeLoop.adaptiveRecallScheduler.xpGate}}</view>
           <view class="retention-loop-step">{{highFrequencyPracticeLoop.adaptiveRecallScheduler.parentLine}}</view>
           <view class="retention-loop-step">{{highFrequencyPracticeLoop.adaptiveRecallScheduler.shareBoundary}}</view>
+        </view>
+        <view class="high-frequency-section" wx:if="{{highFrequencyPracticeLoop.memoryRiskReleaseModel}}">
+          <view class="high-frequency-label">{{highFrequencyPracticeLoop.memoryRiskReleaseModel.title}}</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.memoryRiskReleaseModel.summary}}</view>
+          <view class="high-frequency-item" wx:for="{{highFrequencyPracticeLoop.memoryRiskReleaseModel.riskSignals}}" wx:key="id">
+            <text>{{item.label}} · {{item.level}}</text>
+            <text>{{item.evidence}}</text>
+          </view>
+          <view class="high-frequency-item" wx:for="{{highFrequencyPracticeLoop.memoryRiskReleaseModel.forgettingWarnings}}" wx:key="id">
+            <text>{{item.label}}遗忘预警</text>
+            <text>{{item.warning}}</text>
+            <text>{{item.action}}</text>
+          </view>
+          <view class="retention-loop-step" wx:for="{{highFrequencyPracticeLoop.memoryRiskReleaseModel.variantReleaseGates}}" wx:key="id">变式放行：{{item.label}}｜{{item.status}}｜{{item.rule}}</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.memoryRiskReleaseModel.parentDecisionLine}}</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.memoryRiskReleaseModel.xpReleaseLine}}</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.memoryRiskReleaseModel.shareBoundary}}</view>
         </view>
         <view class="retention-loop-foot">{{highFrequencyPracticeLoop.parentShareLine}}</view>
       </view>
