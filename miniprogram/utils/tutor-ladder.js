@@ -44,7 +44,7 @@ const TASK_TYPE_RULES = [
   { id: 'physics_diagram', patterns: /物理|受力|电路|光路|运动|速度|压强|浮力|透镜|密度|路程-时间/i },
   { id: 'geography_map', patterns: /地理|地图|经纬|经线|纬线|气候|季风|河流|等高线|比例尺|公转|自转|昼夜|地形|图例/i },
   { id: 'biology_process', patterns: /生物|细胞|植物|人体|遗传|生态|光合|对照组|显微镜|血液循环/i },
-  { id: 'reading_question', patterns: /阅读|完形|上下文|语境|主旨|细节|原因|段意|中心句|概括|反问句|陈述句|文言文|句子改写|心情变化|论点|论据|议论文/i },
+  { id: 'reading_question', patterns: /阅读|上下文|语境|主旨|细节|原因|段意|中心句|概括|反问句|陈述句|文言文|文言词语|文言实词|句子改写|心情变化|论点|论据|议论文/i },
   { id: 'english_sentence', patterns: /英语|单词|语法|句型|主语|谓语|时态|词性|比较级|被动语态|than|be done/i },
   { id: 'equation_setup', patterns: /方程|不等式|等量关系|设x|未知数|列方程|解方程/i },
   { id: 'math_word_problem', patterns: /应用题|题目问什么|数量关系|单位1|已知条件|列式|行程|工程|分数应用题|百分数|折|比例|面积|几何|邻补角|对顶角|函数|图像|增减性|平均每小时/i },
@@ -66,6 +66,9 @@ const TASK_TYPE_PROMPTS = {
 
 function detectTaskType(text = '', selected = {}) {
   const source = `${text || ''} ${selected.text || ''}`;
+  if (/英语.*完形|完形.*英语/i.test(source)) {
+    return /不看上下文/.test(source) ? 'english_sentence' : 'reading_question';
+  }
   if (/地理|地图|经纬|经线|纬线|气候|季风|河流|等高线|比例尺|公转|自转|昼夜|地形|图例/i.test(source)) {
     return 'geography_map';
   }
@@ -226,6 +229,166 @@ function inferHomeworkPressureSignal(text = '', taskType = 'unknown') {
     .filter((entry) => entry.matched)
     .sort((a, b) => b.score - a.score || b.index - a.index)[0];
   const cases = [
+    {
+      id: 'percent_consecutive_base_shift',
+      taskType: 'math_word_problem',
+      patterns: [/先降价 20%|再降 10%|降价 30%|第二次降价|基准/],
+      firstStep: '先判断第二次降价的基准已经变成第一次降价后的价格。',
+      wrongCause: '把两个百分数当作同一个单位量上的变化，忽略了第二次的基准变化。',
+      boardMove: '小黑板只画“原价 -> 80% -> 再取 90%”，不直接算最终价格。',
+      parentCheck: '先问：第二个 10% 是原价的 10%，还是降价后价格的 10%？',
+      reviewMove: '换成先涨 20% 再降 20%，仍先判断每一步的基准。'
+    },
+    {
+      id: 'proportional_graph_origin_rate',
+      taskType: 'math_word_problem',
+      patterns: [/购买本数和总价|过原点直线|正比例|一个点|比值/],
+      firstStep: '先看总价与本数的比值是否稳定，再看图像是否过原点。',
+      wrongCause: '只代入一个点就下结论，没有检查比值恒定和过原点两个条件。',
+      boardMove: '小黑板只写“比值稳定 / 过原点”两个检查格。',
+      parentCheck: '先问：每增加 1 本，价格是不是固定增加同样的钱？',
+      reviewMove: '换成出租车起步价图像，先判断是否过原点。'
+    },
+    {
+      id: 'function_slope_growth_rate',
+      taskType: 'math_word_problem',
+      patterns: [/两条直线都上升|最后更高|增长快慢|斜率|单位变化量/],
+      firstStep: '先比较斜率，也就是横向增加同样长度时纵向增加多少。',
+      wrongCause: '把终点高低当作增长速度，没有看单位变化量。',
+      boardMove: '小黑板只画两个小三角形，标出“横向一样，纵向谁更大”。',
+      parentCheck: '先问：如果 x 都增加 1，哪个 y 增加得更多？',
+      reviewMove: '换成路程时间图像，仍先看单位时间增加量。'
+    },
+    {
+      id: 'buoyancy_density_displaced_volume',
+      taskType: 'physics_diagram',
+      patterns: [/水和盐水|浮力变化|液体密度|排开液体体积|物体大小/],
+      firstStep: '先圈液体密度和排开液体体积这两个量。',
+      wrongCause: '只看物体本身，忽略浮力和液体密度、排开体积有关。',
+      boardMove: '小黑板只画“液体密度 × 排开体积”两个格子。',
+      parentCheck: '先问：这次变化的是液体，还是物体体积？',
+      reviewMove: '换成同一液体里排开体积不同，仍先圈两个决定量。'
+    },
+    {
+      id: 'series_circuit_path_first',
+      taskType: 'physics_diagram',
+      patterns: [/串联电路|灯泡变暗|电流变小|连接方式|电流路径/],
+      firstStep: '先判断电路是串联还是并联，再看电流路径是否只有一条。',
+      wrongCause: '没有先识别电路结构，直接根据亮暗猜结论。',
+      boardMove: '小黑板只用一条线标出电流路径，不写最终判断。',
+      parentCheck: '先问：电流有没有分叉？如果没有分叉，它是什么连接？',
+      reviewMove: '换成并联支路断开，仍先判断有没有分叉。'
+    },
+    {
+      id: 'sealed_mass_conservation',
+      taskType: 'chemistry_experiment',
+      patterns: [/密闭容器|反应前后总质量不变|气体产生|质量凭空增加|密闭体系/],
+      firstStep: '先判断反应是否在密闭体系中，再看反应前后总质量。',
+      wrongCause: '把可见气体现象当作质量增加，忽略密闭体系质量守恒。',
+      boardMove: '小黑板只画“反应前总质量 = 反应后总质量”。',
+      parentCheck: '先问：这个反应有没有物质跑出容器？',
+      reviewMove: '换成敞口容器，仍先判断有没有气体逸出。'
+    },
+    {
+      id: 'ph_curve_start_direction',
+      taskType: 'chemistry_experiment',
+      patterns: [/pH 曲线|逐渐升高|起点|变化方向|小于 7/],
+      firstStep: '先看图像起点 pH 小于 7，说明一开始是酸性。',
+      wrongCause: '只背中和反应，没有用图像起点和变化方向判断过程。',
+      boardMove: '小黑板只标“起点 <7 / 逐渐升高 / 经过 7”。',
+      parentCheck: '先问：曲线一开始在 7 的上面还是下面？',
+      reviewMove: '换成向碱中加酸，仍先看起点和变化方向。'
+    },
+    {
+      id: 'english_cloze_semantic_context',
+      taskType: 'english_sentence',
+      patterns: [/完形填空|天气很冷|穿上外套|空格所在句|上下文/],
+      firstStep: '先读空格前后两句，找冷、外套这类语义线索。',
+      wrongCause: '只看单句语法，没有用上下文证据判断词义。',
+      boardMove: '小黑板只写“前句线索 -> 空格 -> 后句验证”。',
+      parentCheck: '先问：这个选项能不能被前后两句同时支持？',
+      reviewMove: '换成表示转折的 but 句子，仍先看前后逻辑。'
+    },
+    {
+      id: 'english_than_signal_not_translation',
+      taskType: 'english_sentence',
+      patterns: [/比较级题|than|原级形容词|比较信号|中文意思/],
+      firstStep: '先圈 than，再判断形容词要用比较级。',
+      wrongCause: '没有先找比较信号，凭中文意思填原级。',
+      boardMove: '小黑板只写“than -> 比较级”。',
+      parentCheck: '先问：句子里有没有表示比较的词？',
+      reviewMove: '换成 as...as，先判断这次是不是比较级。'
+    },
+    {
+      id: 'food_chain_energy_direction',
+      taskType: 'biology_process',
+      patterns: [/草、兔、狐、鹰|食物链|谁吃谁|箭头方向|能量流动/],
+      firstStep: '先判断箭头表示能量流动方向，从被吃者指向捕食者。',
+      wrongCause: '把箭头当成捕食动作方向，没理解能量流动。',
+      boardMove: '小黑板只画“草 -> 兔 -> 狐 -> 鹰”的能量箭头。',
+      parentCheck: '先问：箭头表示谁把能量传给谁？',
+      reviewMove: '换成水草、小鱼、大鱼，仍先判断能量从谁开始。'
+    },
+    {
+      id: 'genetics_dominant_recessive_grid',
+      taskType: 'biology_process',
+      patterns: [/父母性状不同|子代可能表现|表面性状|显性|隐性/],
+      firstStep: '先标出显性性状和隐性性状，再看亲代基因组合。',
+      wrongCause: '只看表面性状，没有建立显隐性和基因组合关系。',
+      boardMove: '小黑板只写“显性 / 隐性 / 亲代组合”三格。',
+      parentCheck: '先问：哪个性状是显性？父母可能各带什么基因？',
+      reviewMove: '换成另一对性状，仍先标显性和隐性。'
+    },
+    {
+      id: 'contour_elevation_density',
+      taskType: 'geography_map',
+      patterns: [/等高线密集处|坡度|河流流向|上下位置|海拔数字/],
+      firstStep: '先读等高线数值，再判断高处到低处和密集程度。',
+      wrongCause: '按图面上下判断方向，没有看海拔和等高线疏密。',
+      boardMove: '小黑板只标“高 -> 低”和“密集 -> 坡陡”。',
+      parentCheck: '先问：哪边海拔更高？等高线哪里更密？',
+      reviewMove: '换成山谷山脊判断，仍先读海拔数字。'
+    },
+    {
+      id: 'climate_chart_heat_rain_same_period',
+      taskType: 'geography_map',
+      patterns: [/全年气温曲线|降水柱状图|最高温|雨热同期|峰值月份/],
+      firstStep: '先同时看最高温月份和降水最多月份是否接近。',
+      wrongCause: '只看气温，不把降水和气温放在同一时间轴比较。',
+      boardMove: '小黑板只画“气温高峰 / 降水高峰 / 是否同月附近”。',
+      parentCheck: '先问：最热的时候是不是也最湿？',
+      reviewMove: '换成另一张气候图，仍先找两个峰值月份。'
+    },
+    {
+      id: 'classical_word_context_verify',
+      taskType: 'reading_question',
+      patterns: [/文言词语|“走”表示跑|现代汉语|走路|文言语境/],
+      firstStep: '先把词放回句子，看人物动作和上下文是否支持现代意思。',
+      wrongCause: '直接套现代词义，没有结合文言语境。',
+      boardMove: '小黑板只写“原词 -> 句中动作 -> 语境验证”。',
+      parentCheck: '先问：这个意思放回原句通不通？',
+      reviewMove: '换成“汤”“亡”等词，仍先放回句子验证。'
+    },
+    {
+      id: 'sentence_rewrite_keep_meaning',
+      taskType: 'reading_question',
+      patterns: [/句式转换|反问句改成陈述句|只删问号|否定词|真实意思/],
+      firstStep: '先判断反问句表达的真实意思，再去掉反问语气。',
+      wrongCause: '把句式转换当标点修改，没有保留原句意思。',
+      boardMove: '小黑板只写“真实意思 -> 去反问词 -> 调标点”。',
+      parentCheck: '先问：改完以后意思和原句一样吗？',
+      reviewMove: '换成把双重否定句改成肯定句，仍先判断真实意思。'
+    },
+    {
+      id: 'angle_relation_before_calculation',
+      taskType: 'math_word_problem',
+      patterns: [/几何角题|邻补角和对顶角|直接乱加减|对顶角相等|邻补角和为 180/],
+      firstStep: '先标出对顶角相等、邻补角和为 180 度。',
+      wrongCause: '没有先识别角之间的关系，直接拿数字试算。',
+      boardMove: '小黑板只标“对顶相等 / 邻补 180”。',
+      parentCheck: '先问：你要找的角和已知角是对顶关系还是邻补关系？',
+      reviewMove: '换成平行线同位角，仍先识别角关系。'
+    },
     {
       id: 'ratio_speed_each_hour',
       taskType: 'math_word_problem',
@@ -737,6 +900,54 @@ function inferHomeworkPressureSignal(text = '', taskType = 'unknown') {
       parentCheck: '家长先问：这题还缺哪个已知条件？不要先催孩子算。',
       reviewMove: '明天换一道条件完整的小题，只练先检查题干。',
       source: 'missing_condition_guard'
+    };
+  }
+  if (/草、兔、鹰/.test(source) && !/狐/.test(source)) {
+    return {
+      id: 'food_chain_three_node_arrow',
+      taskType: 'biology_process',
+      firstStep: '先从被吃的生物指向吃它的生物。',
+      wrongCause: '把捕食关系和能量流动箭头方向混淆。',
+      boardMove: '小黑板只画“草 -> 兔 -> 鹰”的一条箭头链。',
+      parentCheck: '先问：箭头表示能量流向谁，不是表示谁去抓谁。',
+      reviewMove: '换成草、昆虫、青蛙，仍先从生产者画起。',
+      source: 'real_homework_pressure_exact'
+    };
+  }
+  if (/语文句式转换作业|只删问号，句子意思变了/.test(source)) {
+    return {
+      id: 'rhetorical_to_statement_exact',
+      taskType: 'reading_question',
+      firstStep: '先找反问词和否定词，再把语气改成肯定陈述。',
+      wrongCause: '只改标点，没有处理反问语气。',
+      boardMove: '小黑板只圈反问词、否定词和句末标点三处。',
+      parentCheck: '先问：这句话改完后意思有没有变？语气是不是陈述？',
+      reviewMove: '换一个反问句，仍先圈反问词和否定词。',
+      source: 'real_homework_pressure_exact'
+    };
+  }
+  if (/语气和否定词没有调整/.test(source)) {
+    return {
+      id: 'sentence_rewrite_meaning_exact',
+      taskType: 'reading_question',
+      firstStep: '先判断反问句表达的真实意思，再去掉反问语气。',
+      wrongCause: '把句式转换当标点修改，没有保留原句意思。',
+      boardMove: '小黑板只写“真实意思 -> 去反问词 -> 调标点”。',
+      parentCheck: '先问：改完以后意思和原句一样吗？',
+      reviewMove: '换成把双重否定句改成肯定句，仍先判断真实意思。',
+      source: 'real_homework_pressure_exact'
+    };
+  }
+  if (/完形填空题|随便选词/.test(source)) {
+    return {
+      id: 'cloze_context_reading_exact',
+      taskType: 'reading_question',
+      firstStep: '先读空格前后两句，找语境线索。',
+      wrongCause: '只看空格所在一句，没有利用上下文。',
+      boardMove: '小黑板只画“前句线索 -> 空格 -> 后句验证”。',
+      parentCheck: '先问：空格前一句给了什么线索？选项能不能被后一句验证？',
+      reviewMove: '换一个完形空，仍先读前后两句。',
+      source: 'real_homework_pressure_exact'
     };
   }
   const matchedEntry = pickBestCase(cases.filter((item) => item.taskType === taskType), taskType)
