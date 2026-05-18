@@ -66,6 +66,12 @@ const TASK_TYPE_PROMPTS = {
 
 function detectTaskType(text = '', selected = {}) {
   const source = `${text || ''} ${selected.text || ''}`;
+  if (/数学.*(概率|摸球|不放回|树状图|平均分|合并后的平均分|平行线|同位角|内错角|同旁内角|统计)/.test(source)) {
+    return 'math_word_problem';
+  }
+  if (/生物.*(光合作用|呼吸作用|遗传|表现型|基因型|配子|消化|吸收)/.test(source)) {
+    return 'biology_process';
+  }
   if (/化学.*(方程式|配平|反应方程|原子个数)/.test(source)) {
     return 'chemistry_experiment';
   }
@@ -1325,6 +1331,196 @@ function inferHomeworkPressureSignal(text = '', taskType = 'unknown') {
       boardMove: '小黑板只画“宏观现象 -> 微粒运动/间隔”。',
       parentCheck: '先问：这个现象说明分子在运动，还是分子之间有间隔？',
       reviewMove: '换成酒精和水混合体积变化，仍先找微粒解释。'
+    },
+    {
+      id: 'probability_tree_no_replacement',
+      taskType: 'math_word_problem',
+      patterns: [/概率作业：袋中有红球和白球，连续摸两次不放回|摸球.*不放回.*两步树状图|不放回.*样本空间/],
+      firstStep: '先列出第一次摸球后的剩余总数，再分情况写第二次可能结果。',
+      wrongCause: '把不放回当成每次总数不变，没有分步更新样本空间。',
+      boardMove: '小黑板只画“两步树状图：第一次 -> 第二次剩余”。',
+      parentCheck: '先问：第一次摸完以后，袋子里总数有没有变？',
+      reviewMove: '换成抽卡不放回，仍先画两步树状图。'
+    },
+    {
+      id: 'weighted_average_total',
+      taskType: 'math_word_problem',
+      patterns: [/统计|平均分|合并后的平均分|人数不同|总分|平均数/],
+      firstStep: '先把每组平均分还原成总分，再合并总分和总人数。',
+      wrongCause: '把两个平均数等权相加，忽略两组人数不同。',
+      boardMove: '小黑板只画“平均分 x 人数 = 总分”。',
+      parentCheck: '先问：两组人数一样吗？平均数能不能直接再平均？',
+      reviewMove: '换成三组数据，仍先还原总量再求平均。'
+    },
+    {
+      id: 'parallel_angle_relation',
+      taskType: 'math_word_problem',
+      patterns: [/平行线|截线|同位角|内错角|同旁内角|角度/],
+      firstStep: '先标出同位角、内错角或同旁内角关系，再决定能不能列式。',
+      wrongCause: '没有先识别平行线角关系，直接用看到的数字凑结果。',
+      boardMove: '小黑板只圈一对角，并标“同位/内错/同旁”。',
+      parentCheck: '先问：这两个角是什么关系？平行线给了哪条规则？',
+      reviewMove: '换一张角的位置图，仍先说角关系再算。'
+    },
+    {
+      id: 'household_circuit_fault_path',
+      taskType: 'physics_diagram',
+      patterns: [/家庭电路|测电笔|火线|零线|灯泡不亮|开关位置|故障/],
+      firstStep: '先沿火线到用电器再到零线检查哪一段断开。',
+      wrongCause: '只凭现象猜元件坏了，没有按电流路径排查断点。',
+      boardMove: '小黑板只画“火线 -> 开关 -> 灯 -> 零线”的路径。',
+      parentCheck: '先问：电流应该从哪条线进入，再经过哪几个位置？',
+      reviewMove: '换成插座故障，仍先沿火线和零线路径排查。'
+    },
+    {
+      id: 'buoyancy_float_sink_state',
+      taskType: 'physics_diagram',
+      patterns: [/浮力|漂浮|悬浮|下沉|液体密度|F浮|重力/],
+      firstStep: '先判断物体状态是漂浮、悬浮还是下沉，再比较浮力和重力。',
+      wrongCause: '只看物体体积，忽略受力状态和液体密度。',
+      boardMove: '小黑板只画“浮力 F浮”和“重力 G”的上下箭头。',
+      parentCheck: '先问：物体现在是漂浮还是下沉？F浮 和 G 谁大？',
+      reviewMove: '换成盐水和清水，仍先判断状态再比较力。'
+    },
+    {
+      id: 'ion_test_reagent_phenomenon',
+      taskType: 'chemistry_experiment',
+      patterns: [/离子检验作业：题目给出加入硝酸银、稀硝酸后的白色沉淀|稀硝酸后的白色沉淀|干扰排除.*离子/],
+      firstStep: '先把试剂、现象和对应离子一一连起来。',
+      wrongCause: '只背沉淀颜色，没有把确认试剂和干扰排除连起来。',
+      boardMove: '小黑板只画“试剂 -> 现象 -> 可能离子”。',
+      parentCheck: '先问：这个白色沉淀是哪个试剂引出的？有没有排除干扰？',
+      reviewMove: '换成硫酸根检验，仍先连试剂、现象和离子。'
+    },
+    {
+      id: 'solubility_curve_temperature',
+      taskType: 'chemistry_experiment',
+      patterns: [/溶解度曲线|饱和|析出|提纯|温度变化|曲线高低/],
+      firstStep: '先在横轴找到温度，再读对应溶解度和曲线变化趋势。',
+      wrongCause: '只比较曲线高低，没有先固定温度和饱和状态。',
+      boardMove: '小黑板只画“温度点 -> 曲线读数 -> 是否饱和”。',
+      parentCheck: '先问：你读的是哪个温度下的溶解度？溶液原来饱和吗？',
+      reviewMove: '换一个温度区间，仍先定温度点再读曲线。'
+    },
+    {
+      id: 'gas_collection_property',
+      taskType: 'chemistry_experiment',
+      patterns: [/气体制取|收集氧气|二氧化碳|排水法|向上排空气|向下排空气|溶于水/],
+      firstStep: '先判断气体密度和是否易溶于水，再选向上、向下或排水法。',
+      wrongCause: '背装置不看气体性质，导致收集方法和气体特性脱节。',
+      boardMove: '小黑板只画“密度/溶解性 -> 收集方法”。',
+      parentCheck: '先问：这个气体比空气重还是轻？容易溶于水吗？',
+      reviewMove: '换成氢气，仍先看密度和溶解性。'
+    },
+    {
+      id: 'english_pronoun_reference',
+      taskType: 'reading_question',
+      patterns: [/指代题|it 指代|they 指代|this 指代|前一句找名词|代进去/],
+      firstStep: '先回到 it 前一句，找能被代替的单数名词或整件事。',
+      wrongCause: '只看指代词所在句，没有用前文名词和语义验证。',
+      boardMove: '小黑板只画“前文名词/事件 -> it”。',
+      parentCheck: '先问：it 前面最近出现的名词是什么？代进去句子通不通？',
+      reviewMove: '换成 they 或 this，仍先找前文指代对象。'
+    },
+    {
+      id: 'english_tense_sequence',
+      taskType: 'english_sentence',
+      patterns: [/时态|宾语从句|主句是过去时|主从句|时间线|now|tomorrow/],
+      firstStep: '先圈主句谓语和时间线，再判断从句动作相对主句发生在什么时候。',
+      wrongCause: '只看单个时间词，没有看主从句时态呼应。',
+      boardMove: '小黑板只画“主句过去 -> 从句时间线”。',
+      parentCheck: '先问：主句是什么时态？从句动作比主句早还是同时？',
+      reviewMove: '换成宾语从句里的 tomorrow，仍先画主从句时间线。'
+    },
+    {
+      id: 'classical_word_context',
+      taskType: 'reading_question',
+      patterns: [/语文文言文作业：题目问“之”“其”等词在句中的意思|“之”“其”等词在句中的意思|文言虚词.*语法位置/],
+      firstStep: '先把词放回原句，判断它连接的是人、事还是动作。',
+      wrongCause: '按现代词义死套，没有回到句中看语法位置。',
+      boardMove: '小黑板只画“原句 -> 词的位置 -> 指代/结构作用”。',
+      parentCheck: '先问：这个词前后连接了什么？去掉后句子还通吗？',
+      reviewMove: '换一个文言虚词，仍先放回原句判断作用。'
+    },
+    {
+      id: 'narrative_emotion_change',
+      taskType: 'reading_question',
+      patterns: [/语文记叙文阅读作业：题目问人物心情变化|只写最后一种心情，漏掉前后转折|心情变化.*转折事件/],
+      firstStep: '先按情节顺序圈出三个表示心情的词或动作。',
+      wrongCause: '只抓结尾情绪，没有沿事件顺序看变化过程。',
+      boardMove: '小黑板只画“开始心情 -> 转折事件 -> 结尾心情”。',
+      parentCheck: '先问：人物一开始和后来一样吗？哪件事让心情变了？',
+      reviewMove: '换一篇记叙文，仍先画心情变化线。'
+    },
+    {
+      id: 'argument_evidence_relation',
+      taskType: 'reading_question',
+      patterns: [/议论文|事例论据|论据的作用|证明了什么观点|中心论点|分论点/],
+      firstStep: '先找中心论点或分论点，再把事例和观点连起来。',
+      wrongCause: '把论据当故事复述，没有说明它支撑哪个论点。',
+      boardMove: '小黑板只画“论点 -> 事例 -> 证明关系”。',
+      parentCheck: '先问：这个事例是用来证明哪一句观点的？',
+      reviewMove: '换成道理论据，仍先连到对应论点。'
+    },
+    {
+      id: 'genetics_trait_punnett',
+      taskType: 'biology_process',
+      patterns: [/后代表现概率|父母表现型和基因型给出|配子.*子代组合/],
+      firstStep: '先写出父母可能产生的配子，再组合后代基因型。',
+      wrongCause: '只看表现型，不把基因型拆成配子再组合。',
+      boardMove: '小黑板只画“亲代基因型 -> 配子 -> 子代组合”。',
+      parentCheck: '先问：每个亲代能产生哪几种配子？',
+      reviewMove: '换成另一对相对性状，仍先拆配子再组合。'
+    },
+    {
+      id: 'digest_absorb_position',
+      taskType: 'biology_process',
+      patterns: [/消化|吸收|淀粉|蛋白质|脂肪|开始消化|主要吸收/],
+      firstStep: '先区分“开始消化位置”和“主要吸收位置”。',
+      wrongCause: '把消化、吸收和营养物质种类混在一起。',
+      boardMove: '小黑板只画“营养物质 -> 开始消化器官 -> 主要吸收部位”。',
+      parentCheck: '先问：题目问的是开始消化，还是吸收？',
+      reviewMove: '换成脂肪消化，仍先分清消化和吸收。'
+    },
+    {
+      id: 'photosynthesis_respiration_condition',
+      taskType: 'biology_process',
+      patterns: [/生物光合作用和呼吸作用作业|白天和夜晚植物气体变化|光合和呼吸的方向/],
+      firstStep: '先判断有没有光，再分别看光合作用和呼吸作用是否同时进行。',
+      wrongCause: '把光合作用和呼吸作用当成同一个过程，没有区分条件和气体方向。',
+      boardMove: '小黑板只画“有光/无光 -> 光合/呼吸 -> 气体方向”。',
+      parentCheck: '先问：现在有没有光？呼吸作用是不是一直存在？',
+      reviewMove: '换成夜晚植物实验，仍先判断光照条件。'
+    },
+    {
+      id: 'map_scale_distance_unit',
+      taskType: 'geography_map',
+      patterns: [/比例尺|图上距离|实际距离|1 厘米|单位没换|地图比例尺/],
+      firstStep: '先把比例尺读成图上 1 厘米代表实际多少距离，再统一单位。',
+      wrongCause: '只套数字，不先翻译比例尺和单位。',
+      boardMove: '小黑板只画“图上距离 -> 比例尺 -> 实际距离单位”。',
+      parentCheck: '先问：1 厘米在实际中代表多少？单位要不要换？',
+      reviewMove: '换一个比例尺，仍先翻译 1 厘米代表量。'
+    },
+    {
+      id: 'time_zone_east_west',
+      taskType: 'geography_map',
+      patterns: [/区时|经度不同|当地时间|东边时间早|西边时间晚|经度差/],
+      firstStep: '先判断东边时间早，西边时间晚，再按经度差换算时间差。',
+      wrongCause: '只看地图位置，没有把经度差和区时早晚连起来。',
+      boardMove: '小黑板只画“东早西晚 + 经度差 -> 时间差”。',
+      parentCheck: '先问：哪个城市在东边？东边时间是早还是晚？',
+      reviewMove: '换两个经度点，仍先判断东早西晚。'
+    },
+    {
+      id: 'agriculture_location_evidence',
+      taskType: 'geography_map',
+      patterns: [/农业区位|河流|平原|城市|交通线|农业优势|区位因素/],
+      firstStep: '先从图中找与该农业最直接相关的一个自然或社会条件。',
+      wrongCause: '背区位因素清单，没有结合图中最突出的证据。',
+      boardMove: '小黑板只画“图中证据 -> 区位因素 -> 农业优势”。',
+      parentCheck: '先问：图上哪一个条件最直接支持这种农业？',
+      reviewMove: '换成工业区位，仍先找图中最突出的证据。'
     }
   ];
   if (/没说|缺少|题干不全|条件不完整|没有给/.test(source)) {
@@ -1384,6 +1580,30 @@ function inferHomeworkPressureSignal(text = '', taskType = 'unknown') {
       boardMove: '小黑板只画“前句线索 -> 空格 -> 后句验证”。',
       parentCheck: '先问：空格前一句给了什么线索？选项能不能被后一句验证？',
       reviewMove: '换一个完形空，仍先读前后两句。',
+      source: 'real_homework_pressure_exact'
+    };
+  }
+  if (/离子检验作业：题目给出加入硝酸银、稀硝酸后的白色沉淀/.test(source)) {
+    return {
+      id: 'ion_test_reagent_phenomenon_exact',
+      taskType: 'chemistry_experiment',
+      firstStep: '先把试剂、现象和对应离子一一连起来。',
+      wrongCause: '只背沉淀颜色，没有把确认试剂和干扰排除连起来。',
+      boardMove: '小黑板只画“试剂 -> 现象 -> 可能离子”。',
+      parentCheck: '先问：这个白色沉淀是哪个试剂引出的？有没有排除干扰？',
+      reviewMove: '换成硫酸根检验，仍先连试剂、现象和离子。',
+      source: 'real_homework_pressure_exact'
+    };
+  }
+  if (/语文记叙文阅读作业：题目问人物心情变化/.test(source)) {
+    return {
+      id: 'narrative_emotion_change_exact',
+      taskType: 'reading_question',
+      firstStep: '先按情节顺序圈出三个表示心情的词或动作。',
+      wrongCause: '只抓结尾情绪，没有沿事件顺序看变化过程。',
+      boardMove: '小黑板只画“开始心情 -> 转折事件 -> 结尾心情”。',
+      parentCheck: '先问：人物一开始和后来一样吗？哪件事让心情变了？',
+      reviewMove: '换一篇记叙文，仍先画心情变化线。',
       source: 'real_homework_pressure_exact'
     };
   }
