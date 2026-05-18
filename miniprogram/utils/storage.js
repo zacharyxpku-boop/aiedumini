@@ -8634,6 +8634,119 @@ function buildRealHomeworkCoverageMatrix(options = {}) {
   };
 }
 
+function buildReportPressureTruthAudit(coverageMatrix = {}, options = {}) {
+  const subjectRows = Array.isArray(coverageMatrix.subjectRows) ? coverageMatrix.subjectRows : [];
+  const typeRows = Array.isArray(coverageMatrix.typeRows) ? coverageMatrix.typeRows : [];
+  const clusters = Array.isArray(coverageMatrix.sampleClusters) ? coverageMatrix.sampleClusters : [];
+  const totalSamples = Number(coverageMatrix.totalSamples || subjectRows.reduce((sum, item) => sum + Number(item.count || 0), 0));
+  const totalSubjects = Number(coverageMatrix.totalSubjects || subjectRows.length);
+  const totalTypes = Number(coverageMatrix.totalTypes || typeRows.length);
+  const topSubjects = subjectRows
+    .slice()
+    .sort((a, b) => Number(b.count || 0) - Number(a.count || 0))
+    .slice(0, 4);
+  const weakestSubject = subjectRows
+    .slice()
+    .sort((a, b) => Number(a.count || 0) - Number(b.count || 0))[0] || {};
+  const pressureRows = clusters.slice(0, 6).map((item) => ({
+    id: item.id,
+    label: item.label,
+    sampleCount: item.count || 0,
+    firstStep: item.firstStep || '',
+    wrongCauseGate: item.pressure || '',
+    boardMove: item.boardMove || '',
+    reportUse: item.revisit || '',
+    parentCheck: item.parentCheck || '',
+    localOwner: '本地规则判定题型、错因、小黑板动作和回访窗口；AI 只改写追问语气。',
+    falseThickRisk: '如果只出现通用鼓励、直接答案、没有隔日回访或没有样本级错因，报告必须降级。'
+  }));
+  const failureTraps = [
+    {
+      id: 'generic_wrong_cause',
+      label: '错因太泛',
+      risk: '只说“基础不牢”或“审题不清”，没有命中题型里的具体误区。',
+      localGate: '必须出现 sample_specific_wrong_cause。',
+      fallback: '退回第一步小黑板，不写入长期画像。'
+    },
+    {
+      id: 'board_not_visual',
+      label: '小黑板不成图',
+      risk: '只有文字讲解，没有关系箭头、变量格、证据链或图像读法。',
+      localGate: '必须出现 visual_board_move。',
+      fallback: '只给一笔图解动作，不给完整解法。'
+    },
+    {
+      id: 'no_revisit',
+      label: '没有回访',
+      risk: '今晚会了就升级画像，缺少明天和第 7 天复核。',
+      localGate: '必须出现 next_day_revisit 和 day7_variant。',
+      fallback: '保持观察态，只进入明天回访。'
+    },
+    {
+      id: 'unsafe_handoff',
+      label: '家校交接泄露',
+      risk: '把原题、答案、分数、排名或完整对话发出去。',
+      localGate: '只允许 evidence_packet、parent_action、teacher_question。',
+      fallback: '降级为家长私有复盘卡。'
+    },
+    {
+      id: 'ai_over_decision',
+      label: 'AI 越权判断',
+      risk: 'AI 根据一次对话判断能力、排名、长期标签或加题量。',
+      localGate: '长期画像必须由本地证据门控制。',
+      fallback: 'AI 只生成一句追问或家长解释，不生成决策。'
+    }
+  ];
+  const reportGates = [
+    { id: 'sample_specific', label: '样本级命中', evidence: `${totalSamples} 个压力样本必须命中题型、错因、板书、家长检查、迁移。` },
+    { id: 'seven_subject', label: '七科覆盖', evidence: `${totalSubjects} 科都要有可回访的真实作业压力样本。` },
+    { id: 'question_type', label: '题型簇覆盖', evidence: `${totalTypes} 类题型必须有本地第一步入口。` },
+    { id: 'privacy', label: '隐私边界', evidence: '报告、分享、家校交接都不带原题、答案、分数、排名、完整对话。' },
+    { id: 'local_ai_boundary', label: '本地/AI 分工', evidence: '本地管路由、错因、放行、分享字段；AI 管语气和解释变体。' },
+    { id: 'teacher_handoff', label: '老师可读', evidence: '家校交接只给问题清单、证据包和下一步观察，不给结论标签。' }
+  ];
+  const sourceDecision = [
+    { id: 'use_public_k12', label: '公开资料直接可用', use: '课标能力、题型方向、常见错因、作业压力场景。' },
+    { id: 'local_code_better', label: '本地代码更好', use: '题型路由、错因分类、长期画像放行、分享字段、隐私阻断、回访节奏。' },
+    { id: 'ai_better', label: 'AI 更好', use: '苏格拉底追问语气、家长可读解释、同一第一步的多种说法。' },
+    { id: 'do_not_use', label: '不能直接用', use: '原题答案库、拍题搜答案承诺、全科动态板书承诺、排名传播。' }
+  ];
+  const readiness = totalSamples >= 254 && totalSubjects >= 7 && totalTypes >= 9
+    ? 'report_pressure_ready'
+    : 'collect_more_samples';
+  return {
+    id: 'report_pressure_truth_audit',
+    title: '报告抗虚胖审计',
+    readiness,
+    sampleLine: `当前报告接入 ${totalSamples} 个真实作业压力样本、${totalSubjects} 科、${totalTypes} 类题型；不足时不写长期画像。`,
+    summary: readiness === 'report_pressure_ready'
+      ? '报告不只展示结论，必须能追溯到样本级错因、小黑板动作、隔日回访和家校交接边界。'
+      : '样本规模或题型覆盖不足，报告只能给今晚动作，不能给长期判断。',
+    topSubjects,
+    weakestSubject,
+    pressureRows,
+    failureTraps,
+    reportGates,
+    sourceDecision,
+    localRuleLine: '本地规则拥有最终决策权：题型、错因、小黑板、回访、长期画像、分享字段、家校交接。',
+    aiUseLine: 'AI 只负责把本地规则产物说得更像老师追问和家长说明，不负责最终答案或放行。',
+    handoffLine: '老师侧只看证据包和问题清单：孩子第一步、错因复现、明天回访、第 7 天迁移。',
+    shareBoundary: '不分享原题照片、完整答案、完整对话、分数、排名、孩子隐私评价。',
+    nextExpansionLine: weakestSubject && weakestSubject.label
+      ? `下一轮优先补 ${weakestSubject.label} 的真实作业压力样本和第 7 天迁移证据。`
+      : '下一轮继续补真实作业压力样本和第 7 天迁移证据。',
+    evidenceRequired: [
+      'sample_specific_wrong_cause',
+      'visual_board_move',
+      'next_day_revisit',
+      'day7_variant',
+      'home_school_evidence_packet',
+      'safe_share_boundary',
+      'local_ai_decision_boundary'
+    ]
+  };
+}
+
 module.exports = {
   KEYS,
   ensureLocalUserId,
@@ -8791,6 +8904,7 @@ module.exports = {
   buildProductReadiness,
   buildAcceptanceReport,
   buildRealHomeworkCoverageMatrix,
+  buildReportPressureTruthAudit,
   loadReviewLoop,
   saveReviewLoop,
   updateReviewLoopForRating,

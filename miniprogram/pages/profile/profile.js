@@ -940,6 +940,12 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
       subject: subjectSkillDepth && subjectSkillDepth.subject ? subjectSkillDepth.subject : ''
     })
     : null;
+  const reportPressureTruthAudit = storage.buildReportPressureTruthAudit
+    ? storage.buildReportPressureTruthAudit(realHomeworkCoverageMatrix || {}, {
+      reportState,
+      subjectSkillDepth
+    })
+    : null;
   return {
     title: draft.title || '学习画像',
     modeLabel: reportState.reportProgress && reportState.reportProgress.label ? reportState.reportProgress.label : '0% · 快速版',
@@ -1031,6 +1037,20 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
       : [],
     realHomeworkImplementationDecisions: realHomeworkCoverageMatrix && Array.isArray(realHomeworkCoverageMatrix.implementationDecisionMatrix)
       ? realHomeworkCoverageMatrix.implementationDecisionMatrix
+      : [],
+    reportPressureTruthAudit,
+    reportPressureTruthLine: reportPressureTruthAudit ? reportPressureTruthAudit.sampleLine : '',
+    reportPressureTruthRows: reportPressureTruthAudit && Array.isArray(reportPressureTruthAudit.pressureRows)
+      ? reportPressureTruthAudit.pressureRows
+      : [],
+    reportPressureFailureTraps: reportPressureTruthAudit && Array.isArray(reportPressureTruthAudit.failureTraps)
+      ? reportPressureTruthAudit.failureTraps
+      : [],
+    reportPressureGates: reportPressureTruthAudit && Array.isArray(reportPressureTruthAudit.reportGates)
+      ? reportPressureTruthAudit.reportGates
+      : [],
+    reportPressureSourceDecision: reportPressureTruthAudit && Array.isArray(reportPressureTruthAudit.sourceDecision)
+      ? reportPressureTruthAudit.sourceDecision
       : [],
     weeklyEvidenceFlywheel,
     weeklyEvidenceFlywheelLine: weeklyEvidenceFlywheel ? weeklyEvidenceFlywheel.parentTrustLine : '',

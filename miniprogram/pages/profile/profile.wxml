@@ -696,6 +696,20 @@
           <text>{{learningReportSummary.realHomeworkCoverageMatrix.boundary}}</text>
           <text>{{learningReportSummary.realHomeworkCoverageMatrix.publicSourceBlockedLine}}</text>
         </view>
+        <view class="parent-brief-block" wx:if="{{learningReportSummary.reportPressureTruthAudit}}">
+          <text class="parent-brief-label">{{learningReportSummary.reportPressureTruthAudit.title}}</text>
+          <text>{{learningReportSummary.reportPressureTruthAudit.summary}}</text>
+          <text>{{learningReportSummary.reportPressureTruthLine}}</text>
+          <text>{{learningReportSummary.reportPressureTruthAudit.localRuleLine}}</text>
+          <text>{{learningReportSummary.reportPressureTruthAudit.aiUseLine}}</text>
+          <text wx:for="{{learningReportSummary.reportPressureTruthRows}}" wx:key="id">压测簇：{{item.label}}｜{{item.sampleCount}} 个｜第一步：{{item.firstStep}}｜报告用法：{{item.reportUse}}</text>
+          <text wx:for="{{learningReportSummary.reportPressureFailureTraps}}" wx:key="id">虚胖风险：{{item.label}}｜{{item.risk}}｜退回：{{item.fallback}}</text>
+          <text wx:for="{{learningReportSummary.reportPressureGates}}" wx:key="id">报告门槛：{{item.label}}｜{{item.evidence}}</text>
+          <text wx:for="{{learningReportSummary.reportPressureSourceDecision}}" wx:key="id">实现判断：{{item.label}}｜{{item.use}}</text>
+          <text>{{learningReportSummary.reportPressureTruthAudit.handoffLine}}</text>
+          <text>{{learningReportSummary.reportPressureTruthAudit.shareBoundary}}</text>
+          <text>{{learningReportSummary.reportPressureTruthAudit.nextExpansionLine}}</text>
+        </view>
         <view class="parent-brief-block" wx:if="{{learningReportSummary.weeklyEvidenceFlywheel}}">
           <text class="parent-brief-label">{{learningReportSummary.weeklyEvidenceFlywheel.title}}</text>
           <text>{{learningReportSummary.weeklyEvidenceFlywheel.summary}}</text>
