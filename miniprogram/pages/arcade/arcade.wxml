@@ -475,6 +475,23 @@
           <view class="retention-loop-step">{{highFrequencyPracticeLoop.dailyMemorySprintDeck.parentLine}}</view>
           <view class="retention-loop-step">{{highFrequencyPracticeLoop.dailyMemorySprintDeck.shareBoundary}}</view>
         </view>
+        <view class="high-frequency-section" wx:if="{{highFrequencyPracticeLoop.adaptiveRecallScheduler}}">
+          <view class="high-frequency-label">{{highFrequencyPracticeLoop.adaptiveRecallScheduler.title}}</view>
+          <view class="high-frequency-item" wx:for="{{highFrequencyPracticeLoop.adaptiveRecallScheduler.schedulerBoxes}}" wx:key="id">
+            <text>{{item.label}} · {{item.window}}</text>
+            <text>{{item.unlockRule}}</text>
+          </view>
+          <view class="high-frequency-item" wx:for="{{highFrequencyPracticeLoop.adaptiveRecallScheduler.reviewQueue}}" wx:key="id">
+            <text>{{item.label}}：{{item.dueWindow}}</text>
+            <text>{{item.action}}</text>
+            <text>放行证据：{{item.releaseEvidence}}</text>
+          </view>
+          <view class="retention-loop-step" wx:for="{{highFrequencyPracticeLoop.adaptiveRecallScheduler.unlockRules}}" wx:key="*this">解锁规则：{{item}}</view>
+          <view class="retention-loop-step" wx:for="{{highFrequencyPracticeLoop.adaptiveRecallScheduler.leechRules}}" wx:key="*this">急救规则：{{item}}</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.adaptiveRecallScheduler.xpGate}}</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.adaptiveRecallScheduler.parentLine}}</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.adaptiveRecallScheduler.shareBoundary}}</view>
+        </view>
         <view class="retention-loop-foot">{{highFrequencyPracticeLoop.parentShareLine}}</view>
       </view>
       <view class="next-action-card" wx:if="{{challengeBrief.resultLine}}">

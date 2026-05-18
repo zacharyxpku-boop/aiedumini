@@ -896,6 +896,9 @@ Page({
     const dailyMemorySprintDeck = highFrequencyPracticeLoop && highFrequencyPracticeLoop.dailyMemorySprintDeck
       ? highFrequencyPracticeLoop.dailyMemorySprintDeck
       : null;
+    const adaptiveRecallScheduler = highFrequencyPracticeLoop && highFrequencyPracticeLoop.adaptiveRecallScheduler
+      ? highFrequencyPracticeLoop.adaptiveRecallScheduler
+      : null;
     const questArcSignal = storage.recordQuestArcGameSignal
       ? storage.recordQuestArcGameSignal({
         mission: this.data.questArcMission,
@@ -1004,6 +1007,18 @@ Page({
       daily_memory_sprint_boundary: dailyMemorySprintDeck
         ? dailyMemorySprintDeck.shareBoundary
         : '',
+      adaptive_recall_scheduler_mode: adaptiveRecallScheduler
+        ? adaptiveRecallScheduler.mode
+        : '',
+      adaptive_recall_scheduler_boxes: adaptiveRecallScheduler && Array.isArray(adaptiveRecallScheduler.schedulerBoxes)
+        ? adaptiveRecallScheduler.schedulerBoxes.length
+        : 0,
+      adaptive_recall_scheduler_queue: adaptiveRecallScheduler && Array.isArray(adaptiveRecallScheduler.reviewQueue)
+        ? adaptiveRecallScheduler.reviewQueue.length
+        : 0,
+      adaptive_recall_scheduler_evidence: adaptiveRecallScheduler && Array.isArray(adaptiveRecallScheduler.evidenceRequired)
+        ? adaptiveRecallScheduler.evidenceRequired.length
+        : 0,
       share_code: incomingShare && incomingShare.share_code ? incomingShare.share_code : ''
     });
     if (storage.saveTodaySession) {
@@ -1156,6 +1171,18 @@ Page({
         daily_memory_sprint_boundary: dailyMemorySprintDeck
           ? dailyMemorySprintDeck.shareBoundary
           : '',
+        adaptive_recall_scheduler_mode: adaptiveRecallScheduler
+          ? adaptiveRecallScheduler.mode
+          : '',
+        adaptive_recall_scheduler_boxes: adaptiveRecallScheduler && Array.isArray(adaptiveRecallScheduler.schedulerBoxes)
+          ? adaptiveRecallScheduler.schedulerBoxes.length
+          : 0,
+        adaptive_recall_scheduler_queue: adaptiveRecallScheduler && Array.isArray(adaptiveRecallScheduler.reviewQueue)
+          ? adaptiveRecallScheduler.reviewQueue.length
+          : 0,
+        adaptive_recall_scheduler_evidence: adaptiveRecallScheduler && Array.isArray(adaptiveRecallScheduler.evidenceRequired)
+          ? adaptiveRecallScheduler.evidenceRequired.length
+          : 0,
         boss_gap: this.data.adaptiveChallenge && this.data.adaptiveChallenge.bossCard
           ? this.data.adaptiveChallenge.bossCard.key
           : '',

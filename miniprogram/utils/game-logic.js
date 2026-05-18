@@ -901,6 +901,104 @@ function buildDailyMemorySprintDeck(questionBankRecallWorkout = {}, memoryFeedba
   };
 }
 
+function buildAdaptiveRecallScheduler(questionBankRecallWorkout = {}, dailyMemorySprintDeck = {}, gizmoLikeMemoryProtocol = {}, result = {}, options = {}) {
+  const workoutCards = Array.isArray(questionBankRecallWorkout.workoutCards) ? questionBankRecallWorkout.workoutCards : [];
+  const sprintCards = Array.isArray(dailyMemorySprintDeck.sprintCards) ? dailyMemorySprintDeck.sprintCards : [];
+  const returnWindows = Array.isArray(gizmoLikeMemoryProtocol.returnWindows) ? gizmoLikeMemoryProtocol.returnWindows : [];
+  const wrong = Math.max(0, Number(result.wrong || 0));
+  const accuracy = Number.isFinite(Number(result.accuracy)) ? Number(result.accuracy) : 0;
+  const rescue = questionBankRecallWorkout.mode === 'rescue' || gizmoLikeMemoryProtocol.intensityTier === 'leech_rescue' || wrong >= 2 || accuracy < 60;
+  const sourceCards = workoutCards.length ? workoutCards : sprintCards.map((card) => ({
+    id: card.id,
+    label: card.label,
+    action: card.action,
+    parentCheck: card.proof
+  }));
+  const schedulerBoxes = [
+    {
+      id: 'box_0_now',
+      label: '现在急救',
+      window: returnWindows[0] ? returnWindows[0].label : '今晚',
+      quota: rescue ? 3 : 2,
+      unlockRule: '只要孩子能说第一步，不要求完整解法。',
+      route: '/pages/review/review'
+    },
+    {
+      id: 'box_1_tomorrow',
+      label: '明天回访',
+      window: returnWindows[1] ? returnWindows[1].label : '明天',
+      quota: 1,
+      unlockRule: '隔天仍能说出第一步，才算记住。',
+      route: '/pages/review/review'
+    },
+    {
+      id: 'box_2_day3',
+      label: '第3天变式',
+      window: returnWindows[2] ? returnWindows[2].label : '第 3 天',
+      quota: rescue ? 0 : 1,
+      unlockRule: '错因稳定后才开放小变式。',
+      route: '/pages/tutor/tutor'
+    },
+    {
+      id: 'box_3_day7',
+      label: '第7天画像',
+      window: returnWindows[3] ? returnWindows[3].label : '第 7 天',
+      quota: rescue ? 0 : 1,
+      unlockRule: '第 7 天仍能迁移，才写入长期画像。',
+      route: '/pages/profile/profile'
+    }
+  ];
+  const reviewQueue = sourceCards.slice(0, 4).map((card, index) => {
+    const box = schedulerBoxes[Math.min(index, schedulerBoxes.length - 1)];
+    return {
+      id: card.id || `scheduled_recall_${index + 1}`,
+      order: index + 1,
+      label: card.label || `回忆卡 ${index + 1}`,
+      action: card.action || card.firstStep || '遮住答案，说出第一步。',
+      dueWindow: box.window,
+      schedulerBox: box.id,
+      releaseEvidence: index === 0 ? 'child_first_step' : index === 1 ? 'next_day_revisit' : index === 2 ? 'near_transfer_attempt' : 'long_term_portrait_gate',
+      route: box.route
+    };
+  });
+  while (reviewQueue.length < 4) {
+    const index = reviewQueue.length;
+    const box = schedulerBoxes[index];
+    reviewQueue.push({
+      id: `synthetic_scheduled_recall_${index + 1}`,
+      order: index + 1,
+      label: box.label,
+      action: index === 0 ? '遮住答案，说出第一步。' : index === 1 ? '明天只回访最不稳的一张卡。' : index === 2 ? '做一道小变式。' : '第 7 天再判断是否写入画像。',
+      dueWindow: box.window,
+      schedulerBox: box.id,
+      releaseEvidence: index === 0 ? 'child_first_step' : index === 1 ? 'next_day_revisit' : index === 2 ? 'near_transfer_attempt' : 'long_term_portrait_gate',
+      route: box.route
+    });
+  }
+  return {
+    id: 'adaptive_recall_scheduler',
+    title: rescue ? '错因急救调度器' : '间隔回忆调度器',
+    mode: rescue ? 'leech_rescue_schedule' : 'spaced_recall_schedule',
+    schedulerBoxes,
+    reviewQueue,
+    unlockRules: [
+      '没有第一步证据，不进入明天回访。',
+      '没有明天回访，不进入第 3 天变式。',
+      '没有第 7 天迁移，不写入长期画像。'
+    ],
+    leechRules: [
+      '同一错因连续 2 次失败，回到现在急救盒。',
+      '急救盒只做旧卡，不加新题量。',
+      '急救通过后仍要等明天回访确认。'
+    ],
+    xpGate: 'XP 跟随调度盒释放：现在只给行为证据，明天回访后才进入掌握记录。',
+    parentLine: '家长只看卡片在哪个盒子：现在急救、明天回访、第3天变式、第7天画像。',
+    shareBoundary: '调度分享只带盒子、动作和回访窗口，不带原题照片、完整答案、完整对话、分数或排名。',
+    evidenceRequired: ['adaptive_recall_scheduler', 'scheduler_boxes', 'review_queue', 'unlock_rules', 'leech_rules', 'xp_gate', 'parent_line', 'safe_share_boundary'],
+    source: options.source || 'arcade_high_frequency_loop'
+  };
+}
+
 function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], result = {}, challenge = {}, questSet = {}, options = {}) {
   const safeCards = Array.isArray(cards) ? cards : [];
   const safeEvents = Array.isArray(events) ? events : [];
@@ -986,6 +1084,13 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
     xpFeedbackPolicy,
     result
   );
+  const adaptiveRecallScheduler = buildAdaptiveRecallScheduler(
+    questionBankRecallWorkout,
+    dailyMemorySprintDeck,
+    gizmoLikeMemoryProtocol,
+    result,
+    { source: 'high_frequency_practice_loop' }
+  );
   return {
     title: needsRepair ? '高频修复循环' : '高频巩固循环',
     mode: needsRepair ? 'repair_recall' : 'mastery_recall',
@@ -1005,13 +1110,14 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
     questionBankMemoryBridge,
     questionBankRecallWorkout,
     dailyMemorySprintDeck,
+    adaptiveRecallScheduler,
     xpRule: 'XP 只奖励主动回忆、错因修复和次日回访，不奖励盲刷题量。',
     leechRule: needsRepair
       ? `同一错因连续 2 次错，会降到第一步小黑板。`
       : '连续 2 次说清第一步，才进入变式练习。',
     parentShareLine: `家长复盘只看：孩子能否自己说出「${weakKey}」的第一步。`,
     nextRoute: needsRepair ? '/pages/review/review' : '/pages/tutor/tutor',
-    evidenceRequired: ['active_recall_cards', 'spaced_review_plan', 'wrong_cause_return', 'quest_cadence', 'memory_feedback_controller', 'recall_intensity_plan', 'wrong_cause_replay_deck', 'xp_feedback_policy', 'quest_arc_runway', 'gizmo_like_memory_protocol', 'socratic_quality_memory_bridge', 'question_bank_memory_bridge', 'question_bank_recall_workout', 'daily_memory_sprint_deck', 'parent_share_line'],
+    evidenceRequired: ['active_recall_cards', 'spaced_review_plan', 'wrong_cause_return', 'quest_cadence', 'memory_feedback_controller', 'recall_intensity_plan', 'wrong_cause_replay_deck', 'xp_feedback_policy', 'quest_arc_runway', 'gizmo_like_memory_protocol', 'socratic_quality_memory_bridge', 'question_bank_memory_bridge', 'question_bank_recall_workout', 'daily_memory_sprint_deck', 'adaptive_recall_scheduler', 'parent_share_line'],
     weakKey
   };
 }
@@ -1028,6 +1134,7 @@ module.exports = {
   buildGizmoLikeMemoryProtocol,
   buildHighFrequencyPracticeLoop,
   buildMemoryFeedbackController,
+  buildAdaptiveRecallScheduler,
   buildDailyMemorySprintDeck,
   buildQuestionBankMemoryBridge,
   buildQuestionBankRecallWorkout,
