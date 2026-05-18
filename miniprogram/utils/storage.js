@@ -5768,6 +5768,77 @@ function buildCourseUnitQuestionBank(options = {}) {
   };
 }
 
+function buildCommercialDepthRunway(options = {}) {
+  const courseUnitMap = options.courseUnitMap || buildCourseUnitMap(options);
+  const courseUnitQuestionBank = options.courseUnitQuestionBank || buildCourseUnitQuestionBank({ courseUnitMap });
+  const courseUnitMasteryTrajectory = options.courseUnitMasteryTrajectory || buildCourseUnitMasteryTrajectory({ courseUnitMap });
+  const subjectSkillDepth = options.subjectSkillDepth || buildSubjectSkillDepth(options);
+  const activeUnit = courseUnitMap && courseUnitMap.active && Array.isArray(courseUnitMap.active.units)
+    ? courseUnitMap.active.units[0]
+    : null;
+  const activeCards = Array.isArray(courseUnitQuestionBank.activeCards) ? courseUnitQuestionBank.activeCards : [];
+  const weakest = courseUnitMasteryTrajectory && courseUnitMasteryTrajectory.weakest
+    ? courseUnitMasteryTrajectory.weakest
+    : null;
+  const lanes = [
+    {
+      id: 'question_type_depth',
+      label: '题型级内容深度',
+      route: '/pages/light-diagnosis/light-diagnosis',
+      evidenceLine: `已有 ${activeCards.length} 张单元题库卡，覆盖主动回忆、错因诊断、近迁移。`,
+      nextAction: activeCards[0] ? activeCards[0].prompt : '先补一张主动回忆卡',
+      proof: activeCards.slice(0, 3).map((card) => `${card.label}：${card.evidenceRequired}`)
+    },
+    {
+      id: 'memory_feedback',
+      label: '游戏记忆反馈',
+      route: '/pages/arcade/arcade',
+      evidenceLine: weakest
+        ? `${weakest.unitLabel} 当前掌握度 ${weakest.masteryScore}，先用低压回忆修 ${weakest.regressionRisk}。`
+        : '先完成一局主动回忆，再生成错因回放和间隔回访。',
+      nextAction: '今天只打 3 张回忆卡，错因卡自动回到下一轮',
+      proof: ['首轮主动回忆', '错因回放', '明日轻回看']
+    },
+    {
+      id: 'parent_decision_trust',
+      label: '家长报告可信度',
+      route: '/pages/profile/profile',
+      evidenceLine: weakest
+        ? `家长只看 ${weakest.unitLabel} 的下一证据：${weakest.nextEvidence}`
+        : '报告先说明证据够不够，再建议家长是否介入。',
+      nextAction: weakest ? weakest.parentInterventionLevel : '先收集孩子第一步、错因、次日回看三类证据',
+      proof: ['不展示排名', '不承诺提分', '只给下一步家庭动作']
+    }
+  ];
+  const readyCount = lanes.filter((lane) => lane.proof && lane.proof.length >= 3).length;
+  return {
+    id: 'commercial_depth_runway',
+    title: '三线加厚作战板',
+    summary: `题型、记忆、家长决策 ${readyCount}/${lanes.length} 条线已有可执行证据。`,
+    boundary: '只做第一步小黑板、错因图解、近迁移和家长行动判断；不承诺全科拍题自动板书或直接答案。',
+    lanes,
+    visualBoardMoves: [
+      activeUnit && activeUnit.blackboardBlueprint ? activeUnit.blackboardBlueprint.firstStroke : subjectSkillDepth.firstStep,
+      activeUnit && activeUnit.blackboardBlueprint ? activeUnit.blackboardBlueprint.visualPrompt : subjectSkillDepth.parentQuestion,
+      activeUnit && activeUnit.blackboardBlueprint ? activeUnit.blackboardBlueprint.stopRule : '画到第一步就停，不替孩子完成答案'
+    ].filter(Boolean),
+    memoryCadence: [
+      { id: 'today', label: '今天', action: '3 张主动回忆卡，只问第一步' },
+      { id: 'tomorrow', label: '明天', action: '错因卡轻回看，答错不扣信心' },
+      { id: 'day7', label: '第 7 天', action: '做 1 张近迁移卡，确认方法能搬家' }
+    ],
+    parentDecisionRubric: [
+      '孩子能说第一步：家长只确认，不加讲解',
+      '孩子只说不会：回到小黑板第一笔',
+      '同类小变式仍错：报告标记为需要陪伴修卡点'
+    ],
+    reportLine: '报告不只汇总结果，而是给出下一证据、介入等级和一周观察口径。',
+    gameLine: '游戏不只给 XP，而是把主动回忆、错因回放、间隔回看接成记忆反馈。',
+    tutorLine: '点拨不讲完整答案，只暴露题型轴、小黑板第一笔和失败兜底。',
+    shareLine: '分享只带行动卡和证据合同，不带原题、完整对话、分数或排名。'
+  };
+}
+
 function detectAvoidancePattern(patternInput = loadTaskTypePattern()) {
   const byTaskType = (patternInput && patternInput.byTaskType) || {};
   const candidates = Object.keys(byTaskType).map((type) => {
@@ -7616,6 +7687,7 @@ module.exports = {
   buildCourseUnitMap,
   buildCourseUnitMasteryTrajectory,
   buildCourseUnitQuestionBank,
+  buildCommercialDepthRunway,
   childStepQuality,
   normalizeFirstStepEvidence,
   saveChildArticulatedStep,

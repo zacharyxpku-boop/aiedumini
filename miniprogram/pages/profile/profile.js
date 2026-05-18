@@ -721,6 +721,14 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
   const courseUnitQuestionBank = storage.buildCourseUnitQuestionBank
     ? storage.buildCourseUnitQuestionBank({ courseUnitMap: effectiveCourseUnitMap })
     : null;
+  const commercialDepthRunway = storage.buildCommercialDepthRunway
+    ? storage.buildCommercialDepthRunway({
+      courseUnitMap: effectiveCourseUnitMap,
+      courseUnitMasteryTrajectory,
+      courseUnitQuestionBank,
+      subjectSkillDepth
+    })
+    : null;
   const mainDiagnosis = matrix.find((item) => item.status === '需要支持') || matrix[0] || null;
   const sevenDayPlan = Array.isArray(plan.sevenDayPlan) ? plan.sevenDayPlan.slice(0, 7) : [];
   const dayOne = sevenDayPlan[0] || {};
@@ -820,6 +828,11 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     courseUnitQuestionBank,
     courseUnitQuestionBankLine: courseUnitQuestionBank ? courseUnitQuestionBank.reportLine : '',
     courseUnitQuestionBankCards: courseUnitQuestionBank ? courseUnitQuestionBank.activeCards : [],
+    commercialDepthRunway,
+    commercialDepthRunwayLine: commercialDepthRunway ? commercialDepthRunway.reportLine : '',
+    commercialDepthRunwayLanes: commercialDepthRunway ? commercialDepthRunway.lanes : [],
+    commercialDepthParentRubric: commercialDepthRunway ? commercialDepthRunway.parentDecisionRubric : [],
+    commercialDepthVisualBoardMoves: commercialDepthRunway ? commercialDepthRunway.visualBoardMoves : [],
     longTermPortrait,
     longTermPortraitLine: longTermPortrait.learnerPattern || '',
     longTermPortraitStabilityLine: longTermPortrait.stabilityLine || '',

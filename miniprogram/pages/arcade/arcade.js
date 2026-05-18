@@ -86,6 +86,14 @@ Page({
     const courseUnitQuestionBank = storage.buildCourseUnitQuestionBank
       ? storage.buildCourseUnitQuestionBank({ courseUnitMap })
       : null;
+    const commercialDepthRunway = storage.buildCommercialDepthRunway
+      ? storage.buildCommercialDepthRunway({
+        courseUnitMap,
+        courseUnitMasteryTrajectory,
+        courseUnitQuestionBank,
+        subjectSkillDepth
+      })
+      : null;
     const taskBoundCards = this.cardsForRecentTaskType(recentTaskType, loopFocus);
     const loopBoundCards = this.loopBoundCards(dueCards.concat(fallbackCards), taskBoundCards, loopFocus);
     const cards = loopBoundCards.length ? loopBoundCards : (dueCards.length ? dueCards : (fallbackCards.length ? fallbackCards : taskBoundCards));
@@ -133,13 +141,14 @@ Page({
       dailyQuestSet,
       adaptiveChallenge,
       questArcMission,
-      challengeBrief: this.buildChallengeBrief(dailyQuestSet, adaptiveChallenge, questArcMission, evidenceBias, subjectSkillDepth, curriculumSpine, courseUnitMap, courseUnitMasteryTrajectory, courseUnitQuestionBank),
+      challengeBrief: this.buildChallengeBrief(dailyQuestSet, adaptiveChallenge, questArcMission, evidenceBias, subjectSkillDepth, curriculumSpine, courseUnitMap, courseUnitMasteryTrajectory, courseUnitQuestionBank, commercialDepthRunway),
       surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('arcade') : null,
       subjectSkillDepth,
       curriculumSpine,
       courseUnitMap,
       courseUnitMasteryTrajectory,
       courseUnitQuestionBank,
+      commercialDepthRunway,
       result: null,
       resultAdvice: null,
       gameRetentionLoop: null,
@@ -267,7 +276,7 @@ Page({
     return arcade.buildWhackRound(cards, { limit: size });
   },
 
-  buildChallengeBrief(dailyQuestSet = {}, adaptiveChallenge = {}, questArcMission = null, evidenceBias = null, subjectSkillDepth = null, curriculumSpine = null, courseUnitMap = null, courseUnitMasteryTrajectory = null, courseUnitQuestionBank = null) {
+  buildChallengeBrief(dailyQuestSet = {}, adaptiveChallenge = {}, questArcMission = null, evidenceBias = null, subjectSkillDepth = null, curriculumSpine = null, courseUnitMap = null, courseUnitMasteryTrajectory = null, courseUnitQuestionBank = null, commercialDepthRunway = null) {
     const quests = Array.isArray(dailyQuestSet.quests) ? dailyQuestSet.quests : [];
     const activeQuest = quests.find((item) => item && item.progress < item.target) || quests[0] || {};
     const mode = adaptiveChallenge.mode || 'balanced';
@@ -348,6 +357,15 @@ Page({
       courseUnitQuestionBankLine: courseUnitQuestionBank ? courseUnitQuestionBank.summary : '',
       courseUnitQuestionBankCards: courseUnitQuestionBank && Array.isArray(courseUnitQuestionBank.activeCards)
         ? courseUnitQuestionBank.activeCards.slice(0, 3)
+        : [],
+      commercialDepthRunwayTitle: commercialDepthRunway ? commercialDepthRunway.title : '',
+      commercialDepthRunwayLine: commercialDepthRunway ? commercialDepthRunway.gameLine : '',
+      commercialDepthRunwayBoundary: commercialDepthRunway ? commercialDepthRunway.boundary : '',
+      commercialDepthRunwayLanes: commercialDepthRunway && Array.isArray(commercialDepthRunway.lanes)
+        ? commercialDepthRunway.lanes
+        : [],
+      commercialDepthMemoryCadence: commercialDepthRunway && Array.isArray(commercialDepthRunway.memoryCadence)
+        ? commercialDepthRunway.memoryCadence
         : []
     };
   },

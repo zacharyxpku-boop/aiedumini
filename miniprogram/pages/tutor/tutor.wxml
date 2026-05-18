@@ -146,6 +146,12 @@
             <view class="receipt-board-avoid">{{thinkingReceipt.activeCourseUnit.practiceLoop.repair}}</view>
             <view class="receipt-board-avoid">{{thinkingReceipt.activeCourseUnit.reportContract}}</view>
           </view>
+          <view class="receipt-first-step-board" wx:if="{{thinkingReceipt.commercialDepthRunway}}">
+            <view class="receipt-diagnostic-title">{{thinkingReceipt.commercialDepthRunway.title}}</view>
+            <view class="receipt-board-avoid">{{thinkingReceipt.commercialDepthRunway.boundary}}</view>
+            <view class="receipt-board-line" wx:for="{{thinkingReceipt.commercialDepthRunway.lanes}}" wx:key="id">{{item.label}}：{{item.nextAction}}</view>
+            <view class="receipt-board-parent" wx:for="{{thinkingReceipt.commercialDepthRunway.visualBoardMoves}}" wx:key="*this">小黑板：{{item}}</view>
+          </view>
           <view class="receipt-contract" wx:if="{{thinkingReceipt.socratic_contract}}">
             <view class="receipt-diagnostic-title">{{thinkingReceipt.socratic_contract.title}}</view>
             <view class="receipt-diagnostic-line">为什么这样问：{{thinkingReceipt.socratic_contract.whyThisQuestion}}</view>

@@ -176,6 +176,14 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
   const activeCourseUnit = courseUnitMap && courseUnitMap.active && Array.isArray(courseUnitMap.active.units)
     ? courseUnitMap.active.units[0]
     : null;
+  const commercialDepthRunway = storage.buildCommercialDepthRunway
+    ? storage.buildCommercialDepthRunway({
+      courseUnitMap,
+      subjectSkillDepth,
+      sourceText: latestUserText,
+      thought: latestUserText
+    })
+    : null;
   const questionTypeCoverageAtlas = tutorLadder.buildQuestionTypeCoverageAtlas
     ? tutorLadder.buildQuestionTypeCoverageAtlas(subjectSkillDepth && subjectSkillDepth.taskType ? subjectSkillDepth.taskType : 'unknown')
     : null;
@@ -235,6 +243,7 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
     visualSocraticMatrix,
     courseUnitMap,
     activeCourseUnit,
+    commercialDepthRunway,
     questionTypeCoverageAtlas,
     handoffPlan,
     checks: [

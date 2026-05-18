@@ -97,6 +97,20 @@
     </view>
   </view>
 
+  <view class="global-depth-card" wx:if="{{commercialDepthRunway}}">
+    <view class="global-depth-title">{{commercialDepthRunway.title}}</view>
+    <view class="global-depth-summary">{{commercialDepthRunway.summary}}</view>
+    <view class="global-depth-note">{{commercialDepthRunway.boundary}}</view>
+    <view class="global-depth-note">{{commercialDepthRunway.tutorLine}}</view>
+    <view class="global-depth-grid">
+      <view class="global-depth-chip ready" wx:for="{{commercialDepthRunway.lanes}}" wx:key="id">
+        <text>{{item.label}}</text>
+        <text>{{item.evidenceLine}}</text>
+        <text>{{item.nextAction}}</text>
+      </view>
+    </view>
+  </view>
+
   <view class="section-title">这道题是什么科目？</view>
   <view class="choice-row">
     <view class="choice-chip {{subject === item.id ? 'active' : ''}}" wx:for="{{subjectOptions}}" wx:key="id" data-id="{{item.id}}" bindtap="chooseSubject">{{item.label}}</view>

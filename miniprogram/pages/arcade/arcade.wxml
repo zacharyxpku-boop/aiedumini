@@ -79,6 +79,13 @@
         <view class="story-mission-rule" wx:if="{{challengeBrief.courseUnitQuestionBankTitle}}">{{challengeBrief.courseUnitQuestionBankTitle}}：{{challengeBrief.courseUnitQuestionBankLine}}</view>
         <view class="story-mission-rule" wx:for="{{challengeBrief.courseUnitQuestionBankCards}}" wx:key="id">题库卡：{{item.label}}｜{{item.prompt}}｜{{item.evidenceRequired}}</view>
       </view>
+      <view class="story-mission" wx:if="{{challengeBrief.commercialDepthRunwayTitle}}">
+        <view class="story-mission-title">{{challengeBrief.commercialDepthRunwayTitle}}</view>
+        <view class="story-mission-line">{{challengeBrief.commercialDepthRunwayLine}}</view>
+        <view class="story-mission-rule">{{challengeBrief.commercialDepthRunwayBoundary}}</view>
+        <view class="story-mission-rule" wx:for="{{challengeBrief.commercialDepthRunwayLanes}}" wx:key="id">{{item.label}}：{{item.evidenceLine}}｜下一步：{{item.nextAction}}</view>
+        <view class="story-mission-rule" wx:for="{{challengeBrief.commercialDepthMemoryCadence}}" wx:key="id">{{item.label}}：{{item.action}}</view>
+      </view>
       <view class="challenge-brief-sub" wx:if="{{challengeBrief.evidenceBiasLine}}">为什么开这局：{{challengeBrief.evidenceBiasLine}}</view>
     </view>
 

@@ -647,6 +647,15 @@
           <text>{{learningReportSummary.courseUnitQuestionBankLine}}</text>
           <text wx:for="{{learningReportSummary.courseUnitQuestionBankCards}}" wx:key="id">题库卡：{{item.label}} · {{item.prompt}} · {{item.answerBoundary}}</text>
         </view>
+        <view class="parent-brief-block" wx:if="{{learningReportSummary.commercialDepthRunway}}">
+          <text class="parent-brief-label">{{learningReportSummary.commercialDepthRunway.title}}</text>
+          <text>{{learningReportSummary.commercialDepthRunway.summary}}</text>
+          <text>{{learningReportSummary.commercialDepthRunway.boundary}}</text>
+          <text>{{learningReportSummary.commercialDepthRunwayLine}}</text>
+          <text wx:for="{{learningReportSummary.commercialDepthRunwayLanes}}" wx:key="id">加厚线：{{item.label}}｜{{item.evidenceLine}}｜{{item.nextAction}}</text>
+          <text wx:for="{{learningReportSummary.commercialDepthParentRubric}}" wx:key="*this">家长判断：{{item}}</text>
+          <text wx:for="{{learningReportSummary.commercialDepthVisualBoardMoves}}" wx:key="*this">小黑板：{{item}}</text>
+        </view>
         <view class="parent-brief-block">
           <text class="parent-brief-label">学业矩阵</text>
           <text>{{learningReportSummary.diagnosisLine}}</text>

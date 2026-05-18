@@ -33,16 +33,21 @@ Page({
     lightSeedBank: null,
     subjectSeedLibrary: null,
     courseUnitMap: null,
-    courseUnitQuestionBank: null
+    courseUnitQuestionBank: null,
+    commercialDepthRunway: null
   },
 
   onLoad() {
+    const subjectSeedLibrary = storage.buildSubjectSeedLibrary ? storage.buildSubjectSeedLibrary({ subject: this.data.subject }) : null;
+    const courseUnitMap = storage.buildCourseUnitMap ? storage.buildCourseUnitMap({ subject: this.data.subject }) : null;
+    const courseUnitQuestionBank = storage.buildCourseUnitQuestionBank ? storage.buildCourseUnitQuestionBank({ courseUnitMap }) : null;
     this.setData({
       surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('light_diagnosis') : null,
       lightSeedBank: storage.buildLightEntrySeedBank ? storage.buildLightEntrySeedBank('light_diagnosis') : null,
-      subjectSeedLibrary: storage.buildSubjectSeedLibrary ? storage.buildSubjectSeedLibrary({ subject: this.data.subject }) : null,
-      courseUnitMap: storage.buildCourseUnitMap ? storage.buildCourseUnitMap({ subject: this.data.subject }) : null,
-      courseUnitQuestionBank: storage.buildCourseUnitQuestionBank ? storage.buildCourseUnitQuestionBank({ subject: this.data.subject }) : null
+      subjectSeedLibrary,
+      courseUnitMap,
+      courseUnitQuestionBank,
+      commercialDepthRunway: storage.buildCommercialDepthRunway ? storage.buildCommercialDepthRunway({ courseUnitMap, courseUnitQuestionBank }) : null
     });
   },
 
@@ -68,13 +73,17 @@ Page({
 
   chooseSubject(event) {
     const subject = event.currentTarget.dataset.id;
+    const subjectSeedLibrary = storage.buildSubjectSeedLibrary ? storage.buildSubjectSeedLibrary({ subject }) : this.data.subjectSeedLibrary;
+    const courseUnitMap = storage.buildCourseUnitMap ? storage.buildCourseUnitMap({ subject }) : this.data.courseUnitMap;
+    const courseUnitQuestionBank = storage.buildCourseUnitQuestionBank ? storage.buildCourseUnitQuestionBank({ courseUnitMap }) : this.data.courseUnitQuestionBank;
     this.setData({
       subject,
       diagnosis: null,
       result: null,
-      subjectSeedLibrary: storage.buildSubjectSeedLibrary ? storage.buildSubjectSeedLibrary({ subject }) : this.data.subjectSeedLibrary,
-      courseUnitMap: storage.buildCourseUnitMap ? storage.buildCourseUnitMap({ subject }) : this.data.courseUnitMap,
-      courseUnitQuestionBank: storage.buildCourseUnitQuestionBank ? storage.buildCourseUnitQuestionBank({ subject }) : this.data.courseUnitQuestionBank
+      subjectSeedLibrary,
+      courseUnitMap,
+      courseUnitQuestionBank,
+      commercialDepthRunway: storage.buildCommercialDepthRunway ? storage.buildCommercialDepthRunway({ courseUnitMap, courseUnitQuestionBank }) : this.data.commercialDepthRunway
     });
   },
 
