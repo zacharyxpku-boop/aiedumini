@@ -387,6 +387,21 @@
           <view class="retention-loop-step">{{highFrequencyPracticeLoop.questArcRunway.bossLine}}</view>
           <view class="retention-loop-step">{{highFrequencyPracticeLoop.questArcRunway.completionRule}}</view>
         </view>
+        <view class="high-frequency-section" wx:if="{{highFrequencyPracticeLoop.gizmoLikeMemoryProtocol}}">
+          <view class="high-frequency-label">{{highFrequencyPracticeLoop.gizmoLikeMemoryProtocol.title}}</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.gizmoLikeMemoryProtocol.parentContract.line}}</view>
+          <view class="high-frequency-item" wx:for="{{highFrequencyPracticeLoop.gizmoLikeMemoryProtocol.dailyMinimumRounds}}" wx:key="id">
+            <text>{{item.label}} · {{item.target}}</text>
+            <text>{{item.rule}}</text>
+          </view>
+          <view class="high-frequency-item" wx:for="{{highFrequencyPracticeLoop.gizmoLikeMemoryProtocol.returnWindows}}" wx:key="id">
+            <text>{{item.label}}</text>
+            <text>{{item.action}}</text>
+          </view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.gizmoLikeMemoryProtocol.antiCramThrottle.xpRule}}</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.gizmoLikeMemoryProtocol.leechEscalation.rule}}</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.gizmoLikeMemoryProtocol.shareSafeChallenge.line}}</view>
+        </view>
         <view class="retention-loop-foot">{{highFrequencyPracticeLoop.parentShareLine}}</view>
       </view>
       <view class="next-action-card" wx:if="{{challengeBrief.resultLine}}">

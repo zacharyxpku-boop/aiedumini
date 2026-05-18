@@ -885,6 +885,15 @@ Page({
       quest_arc_runway_stages: highFrequencyPracticeLoop && highFrequencyPracticeLoop.questArcRunway
         ? highFrequencyPracticeLoop.questArcRunway.stages.length
         : 0,
+      gizmo_memory_protocol_tier: highFrequencyPracticeLoop && highFrequencyPracticeLoop.gizmoLikeMemoryProtocol
+        ? highFrequencyPracticeLoop.gizmoLikeMemoryProtocol.intensityTier
+        : '',
+      gizmo_memory_return_windows: highFrequencyPracticeLoop && highFrequencyPracticeLoop.gizmoLikeMemoryProtocol
+        ? highFrequencyPracticeLoop.gizmoLikeMemoryProtocol.returnWindows.length
+        : 0,
+      gizmo_memory_anti_cram: highFrequencyPracticeLoop && highFrequencyPracticeLoop.gizmoLikeMemoryProtocol
+        ? highFrequencyPracticeLoop.gizmoLikeMemoryProtocol.antiCramThrottle.active
+        : false,
       share_code: incomingShare && incomingShare.share_code ? incomingShare.share_code : ''
     });
     if (storage.saveTodaySession) {
@@ -976,6 +985,15 @@ Page({
         quest_arc_runway_stages: highFrequencyPracticeLoop && highFrequencyPracticeLoop.questArcRunway
           ? highFrequencyPracticeLoop.questArcRunway.stages.length
           : 0,
+        gizmo_memory_protocol_tier: highFrequencyPracticeLoop && highFrequencyPracticeLoop.gizmoLikeMemoryProtocol
+          ? highFrequencyPracticeLoop.gizmoLikeMemoryProtocol.intensityTier
+          : '',
+        gizmo_memory_return_windows: highFrequencyPracticeLoop && highFrequencyPracticeLoop.gizmoLikeMemoryProtocol
+          ? highFrequencyPracticeLoop.gizmoLikeMemoryProtocol.returnWindows.length
+          : 0,
+        gizmo_memory_anti_cram: highFrequencyPracticeLoop && highFrequencyPracticeLoop.gizmoLikeMemoryProtocol
+          ? highFrequencyPracticeLoop.gizmoLikeMemoryProtocol.antiCramThrottle.active
+          : false,
         boss_gap: this.data.adaptiveChallenge && this.data.adaptiveChallenge.bossCard
           ? this.data.adaptiveChallenge.bossCard.key
           : '',
