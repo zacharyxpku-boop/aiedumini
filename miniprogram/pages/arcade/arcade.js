@@ -1033,6 +1033,15 @@ Page({
         ? memoryRiskReleaseModel.variantReleaseGates.length
         : 0,
       memory_risk_share_boundary: memoryRiskReleaseModel ? memoryRiskReleaseModel.shareBoundary : '',
+      peer_memory_relay_mode: highFrequencyPracticeLoop && highFrequencyPracticeLoop.peerMemoryRelayLeague
+        ? highFrequencyPracticeLoop.peerMemoryRelayLeague.mode
+        : '',
+      peer_memory_relay_lanes: highFrequencyPracticeLoop && highFrequencyPracticeLoop.peerMemoryRelayLeague
+        ? highFrequencyPracticeLoop.peerMemoryRelayLeague.lanes.length
+        : 0,
+      peer_memory_relay_blocked_fields: highFrequencyPracticeLoop && highFrequencyPracticeLoop.peerMemoryRelayLeague
+        ? highFrequencyPracticeLoop.peerMemoryRelayLeague.blockedFields.length
+        : 0,
       share_code: incomingShare && incomingShare.share_code ? incomingShare.share_code : ''
     });
     if (storage.saveTodaySession) {
@@ -1208,6 +1217,15 @@ Page({
           ? memoryRiskReleaseModel.variantReleaseGates.length
           : 0,
         memory_risk_share_boundary: memoryRiskReleaseModel ? memoryRiskReleaseModel.shareBoundary : '',
+        peer_memory_relay_mode: highFrequencyPracticeLoop && highFrequencyPracticeLoop.peerMemoryRelayLeague
+          ? highFrequencyPracticeLoop.peerMemoryRelayLeague.mode
+          : '',
+        peer_memory_relay_lanes: highFrequencyPracticeLoop && highFrequencyPracticeLoop.peerMemoryRelayLeague
+          ? highFrequencyPracticeLoop.peerMemoryRelayLeague.lanes.length
+          : 0,
+        peer_memory_relay_blocked_fields: highFrequencyPracticeLoop && highFrequencyPracticeLoop.peerMemoryRelayLeague
+          ? highFrequencyPracticeLoop.peerMemoryRelayLeague.blockedFields.length
+          : 0,
         boss_gap: this.data.adaptiveChallenge && this.data.adaptiveChallenge.bossCard
           ? this.data.adaptiveChallenge.bossCard.key
           : '',

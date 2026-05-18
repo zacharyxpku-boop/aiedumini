@@ -526,6 +526,19 @@
           <view class="retention-loop-step">{{highFrequencyPracticeLoop.memoryRiskReleaseModel.xpReleaseLine}}</view>
           <view class="retention-loop-step">{{highFrequencyPracticeLoop.memoryRiskReleaseModel.shareBoundary}}</view>
         </view>
+        <view class="high-frequency-section" wx:if="{{highFrequencyPracticeLoop.peerMemoryRelayLeague}}">
+          <view class="high-frequency-label">{{highFrequencyPracticeLoop.peerMemoryRelayLeague.title}}</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.peerMemoryRelayLeague.parentLine}}</view>
+          <view class="high-frequency-item" wx:for="{{highFrequencyPracticeLoop.peerMemoryRelayLeague.lanes}}" wx:key="id">
+            <text>{{item.label}} · {{item.locked ? '先锁定' : '可执行'}}</text>
+            <text>{{item.action}}</text>
+            <text>{{item.proof}}</text>
+          </view>
+          <view class="retention-loop-step" wx:for="{{highFrequencyPracticeLoop.peerMemoryRelayLeague.relayWindows}}" wx:key="id">接力窗口：{{item.label}}｜{{item.action}}</view>
+          <view class="retention-loop-step" wx:for="{{highFrequencyPracticeLoop.peerMemoryRelayLeague.scoreboardReplacement}}" wx:key="id">接力证据：{{item.label}}｜{{item.value}}</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.peerMemoryRelayLeague.shareLine}}</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.peerMemoryRelayLeague.aiBoundary}}</view>
+        </view>
         <view class="retention-loop-foot">{{highFrequencyPracticeLoop.parentShareLine}}</view>
       </view>
       <view class="next-action-card" wx:if="{{challengeBrief.resultLine}}">
