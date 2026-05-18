@@ -4,6 +4,7 @@ const reviewCards = require('../../utils/review-cards');
 const storage = require('../../utils/storage');
 const navigation = require('../../utils/navigation');
 const api = require('../../utils/api');
+const tutorLadder = require('../../utils/tutor-ladder');
 
 Page({
   data: {
@@ -847,6 +848,9 @@ Page({
         { weakKey: repairFocus && repairFocus.title ? repairFocus.title : '' }
       )
       : null;
+    const socraticQualityEvaluationSuite = tutorLadder.buildSocraticQualityEvaluationSuite
+      ? tutorLadder.buildSocraticQualityEvaluationSuite(this.data.recentTaskType || 'unknown')
+      : null;
     const highFrequencyPracticeLoop = gameLogic.buildHighFrequencyPracticeLoop
       ? gameLogic.buildHighFrequencyPracticeLoop(
         gameRetention && gameRetention.profile ? gameRetention.profile : profile,
@@ -855,8 +859,16 @@ Page({
         savedResult,
         this.data.adaptiveChallenge,
         this.data.dailyQuestSet,
-        { retentionLoop: gameRetentionLoop, weakKey: repairFocus && repairFocus.title ? repairFocus.title : '' }
+        {
+          retentionLoop: gameRetentionLoop,
+          weakKey: repairFocus && repairFocus.title ? repairFocus.title : '',
+          taskType: this.data.recentTaskType || 'unknown',
+          socraticQualityEvaluationSuite
+        }
       )
+      : null;
+    const socraticQualityMemoryBridge = highFrequencyPracticeLoop && highFrequencyPracticeLoop.socraticQualityMemoryBridge
+      ? highFrequencyPracticeLoop.socraticQualityMemoryBridge
       : null;
     const questArcSignal = storage.recordQuestArcGameSignal
       ? storage.recordQuestArcGameSignal({
@@ -921,6 +933,15 @@ Page({
       gizmo_memory_anti_cram: highFrequencyPracticeLoop && highFrequencyPracticeLoop.gizmoLikeMemoryProtocol
         ? highFrequencyPracticeLoop.gizmoLikeMemoryProtocol.antiCramThrottle.active
         : false,
+      socratic_quality_memory_scenarios: socraticQualityMemoryBridge
+        ? socraticQualityMemoryBridge.scenarioCount
+        : 0,
+      socratic_quality_memory_actions: socraticQualityMemoryBridge && Array.isArray(socraticQualityMemoryBridge.memoryActions)
+        ? socraticQualityMemoryBridge.memoryActions.length
+        : 0,
+      socratic_quality_memory_xp_gate: socraticQualityMemoryBridge
+        ? socraticQualityMemoryBridge.xpGate
+        : '',
       share_code: incomingShare && incomingShare.share_code ? incomingShare.share_code : ''
     });
     if (storage.saveTodaySession) {
@@ -1028,6 +1049,15 @@ Page({
         gizmo_memory_anti_cram: highFrequencyPracticeLoop && highFrequencyPracticeLoop.gizmoLikeMemoryProtocol
           ? highFrequencyPracticeLoop.gizmoLikeMemoryProtocol.antiCramThrottle.active
           : false,
+        socratic_quality_memory_scenarios: socraticQualityMemoryBridge
+          ? socraticQualityMemoryBridge.scenarioCount
+          : 0,
+        socratic_quality_memory_actions: socraticQualityMemoryBridge && Array.isArray(socraticQualityMemoryBridge.memoryActions)
+          ? socraticQualityMemoryBridge.memoryActions.length
+          : 0,
+        socratic_quality_memory_xp_gate: socraticQualityMemoryBridge
+          ? socraticQualityMemoryBridge.xpGate
+          : '',
         boss_gap: this.data.adaptiveChallenge && this.data.adaptiveChallenge.bossCard
           ? this.data.adaptiveChallenge.bossCard.key
           : '',

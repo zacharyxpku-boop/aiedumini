@@ -404,6 +404,18 @@
           <view class="retention-loop-step">{{highFrequencyPracticeLoop.gizmoLikeMemoryProtocol.leechEscalation.rule}}</view>
           <view class="retention-loop-step">{{highFrequencyPracticeLoop.gizmoLikeMemoryProtocol.shareSafeChallenge.line}}</view>
         </view>
+        <view class="high-frequency-section" wx:if="{{highFrequencyPracticeLoop.socraticQualityMemoryBridge}}">
+          <view class="high-frequency-label">{{highFrequencyPracticeLoop.socraticQualityMemoryBridge.title}}</view>
+          <view class="retention-loop-step">覆盖 {{highFrequencyPracticeLoop.socraticQualityMemoryBridge.scenarioCount}} 个点拨质量场景</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.socraticQualityMemoryBridge.reviewDeckRule}}</view>
+          <view class="high-frequency-item" wx:for="{{highFrequencyPracticeLoop.socraticQualityMemoryBridge.memoryActions}}" wx:key="id">
+            <text>{{item.title}}</text>
+            <text>{{item.memoryAction}}</text>
+          </view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.socraticQualityMemoryBridge.xpGate}}</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.socraticQualityMemoryBridge.parentLine}}</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.socraticQualityMemoryBridge.privacyBoundary}}</view>
+        </view>
         <view class="retention-loop-foot">{{highFrequencyPracticeLoop.parentShareLine}}</view>
       </view>
       <view class="next-action-card" wx:if="{{challengeBrief.resultLine}}">

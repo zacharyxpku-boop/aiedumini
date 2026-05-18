@@ -657,6 +657,82 @@ function buildGizmoLikeMemoryProtocol(profile = {}, cards = [], events = [], res
   };
 }
 
+function buildSocraticQualityMemoryBridge(qualitySuite = {}, result = {}, retention = {}, options = {}) {
+  const cases = Array.isArray(qualitySuite.cases) ? qualitySuite.cases : [];
+  const activeCase = qualitySuite.activeCase || cases.find((item) => item && item.active) || cases[0] || {};
+  const activeScenarios = Array.isArray(activeCase.scenarios) ? activeCase.scenarios : [];
+  const scenarioCount = Number(qualitySuite.totalScenarioCount || 0) || cases.reduce((sum, item) => {
+    return sum + (Array.isArray(item.scenarios) ? item.scenarios.length : 0);
+  }, 0);
+  const weakKey = retention.weakKey || options.weakKey || activeCase.probeGate || '第一步';
+  const wrong = Math.max(0, Number(result.wrong || 0));
+  const accuracy = Number.isFinite(Number(result.accuracy)) ? Number(result.accuracy) : 0;
+  const needsRescue = wrong > 0 || accuracy < Number(options.targetAccuracy || 80) || retention.mode === 'repair';
+  const actionMap = {
+    silent_child: {
+      title: '沉默时先做 A/B 回忆',
+      memoryAction: '只问一个二选一问题，让孩子先选方向，再进入 1 张回忆卡。',
+      gameRule: '本轮不加新题，只记录 child_micro_choice。',
+      evidence: 'child_micro_choice'
+    },
+    answer_request: {
+      title: '要答案时拦完整答案',
+      memoryAction: '停止给结果，把回忆卡降到“题目问什么”和“第一步是什么”。',
+      gameRule: '没有说出第一步，不发放通关 XP。',
+      evidence: 'blocked_full_answer'
+    },
+    wrong_axis: {
+      title: '答偏时回到误区轴',
+      memoryAction: '把错因卡放到本局第一张，只追问一个定位问题。',
+      gameRule: '同一误区连续两次答偏，转入错因回放。',
+      evidence: 'socratic_axis_evidence'
+    },
+    transfer_fail: {
+      title: '迁移失败时做次日回访',
+      memoryAction: '保留 1 张相似变式到明天，不在今晚继续堆题。',
+      gameRule: '明日回访能说出第一步，才开放变式练习。',
+      evidence: 'next_day_transfer_check'
+    }
+  };
+  const fallbackScenarios = ['silent_child', 'answer_request', 'wrong_axis', 'transfer_fail'].map((id) => ({
+    id,
+    expectedMove: actionMap[id].memoryAction,
+    passEvidence: actionMap[id].evidence
+  }));
+  const sourceScenarios = activeScenarios.length ? activeScenarios : fallbackScenarios;
+  const memoryActions = sourceScenarios.map((scenario, index) => {
+    const mapped = actionMap[scenario.id] || {
+      title: `质量场景 ${index + 1}`,
+      memoryAction: scenario.expectedMove || '回到第一步主动回忆。',
+      gameRule: '只记录可复盘动作，不记录完整答案。',
+      evidence: scenario.passEvidence || 'socratic_memory_evidence'
+    };
+    return {
+      id: scenario.id || `quality_memory_${index + 1}`,
+      title: mapped.title,
+      trigger: scenario.trigger || '',
+      memoryAction: mapped.memoryAction,
+      expectedMove: scenario.expectedMove || mapped.memoryAction,
+      gameRule: mapped.gameRule,
+      evidence: scenario.passEvidence || mapped.evidence,
+      route: scenario.id === 'transfer_fail' ? '/pages/review/review' : '/pages/tutor/tutor'
+    };
+  });
+  return {
+    id: 'socratic_quality_memory_bridge',
+    title: needsRescue ? '点拨质量接入错因回忆' : '点拨质量接入巩固回忆',
+    scenarioCount,
+    activeTaskType: activeCase.taskType || options.taskType || 'unknown',
+    activeScenario: memoryActions[0] || null,
+    memoryActions,
+    xpGate: '只有说出第一步、完成错因回放或次日回访，才发放 XP；盲刷题量不加分。',
+    reviewDeckRule: `本轮优先回收「${weakKey}」相关卡，再进入新题。`,
+    parentLine: '家长只看孩子是否说出第一步、是否完成回访，不看完整答案、分数或排名。',
+    privacyBoundary: '不带原题照片、完整对话、分数、排名、私密评价或原始答案。',
+    evidenceRequired: ['socratic_quality_scenario', 'first_step_recall', 'blocked_answer_boundary', 'wrong_axis_replay', 'next_day_transfer_check']
+  };
+}
+
 function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], result = {}, challenge = {}, questSet = {}, options = {}) {
   const safeCards = Array.isArray(cards) ? cards : [];
   const safeEvents = Array.isArray(events) ? events : [];
@@ -710,6 +786,16 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
     weakKey,
     targetAccuracy: challenge.targetAccuracy || 80
   });
+  const socraticQualityMemoryBridge = buildSocraticQualityMemoryBridge(
+    options.socraticQualityEvaluationSuite || {},
+    result,
+    retention,
+    {
+      weakKey,
+      taskType: options.taskType || challenge.taskType || '',
+      targetAccuracy: challenge.targetAccuracy || 80
+    }
+  );
   return {
     title: needsRepair ? '高频修复循环' : '高频巩固循环',
     mode: needsRepair ? 'repair_recall' : 'mastery_recall',
@@ -725,13 +811,14 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
     xpFeedbackPolicy,
     questArcRunway,
     gizmoLikeMemoryProtocol,
+    socraticQualityMemoryBridge,
     xpRule: 'XP 只奖励主动回忆、错因修复和次日回访，不奖励盲刷题量。',
     leechRule: needsRepair
       ? `同一错因连续 2 次错，会降到第一步小黑板。`
       : '连续 2 次说清第一步，才进入变式练习。',
     parentShareLine: `家长复盘只看：孩子能否自己说出「${weakKey}」的第一步。`,
     nextRoute: needsRepair ? '/pages/review/review' : '/pages/tutor/tutor',
-    evidenceRequired: ['active_recall_cards', 'spaced_review_plan', 'wrong_cause_return', 'quest_cadence', 'memory_feedback_controller', 'recall_intensity_plan', 'wrong_cause_replay_deck', 'xp_feedback_policy', 'quest_arc_runway', 'gizmo_like_memory_protocol', 'parent_share_line'],
+    evidenceRequired: ['active_recall_cards', 'spaced_review_plan', 'wrong_cause_return', 'quest_cadence', 'memory_feedback_controller', 'recall_intensity_plan', 'wrong_cause_replay_deck', 'xp_feedback_policy', 'quest_arc_runway', 'gizmo_like_memory_protocol', 'socratic_quality_memory_bridge', 'parent_share_line'],
     weakKey
   };
 }
@@ -750,6 +837,7 @@ module.exports = {
   buildMemoryFeedbackController,
   buildQuestArcRunway,
   buildRecallIntensityPlan,
+  buildSocraticQualityMemoryBridge,
   buildWrongCauseReplayDeck,
   buildXpFeedbackPolicy,
   buildKnowledgeGap,
