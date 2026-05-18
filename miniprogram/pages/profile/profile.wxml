@@ -736,6 +736,16 @@
           <text wx:for="{{learningReportSummary.longitudinalPortraitEvidenceBacklog}}" wx:key="*this">待补证据：{{item}}</text>
           <text wx:if="{{learningReportSummary.longitudinalPortraitShareBoundary}}">分享边界：{{learningReportSummary.longitudinalPortraitShareBoundary}}</text>
         </view>
+        <view class="parent-brief-block" wx:if="{{learningReportSummary.portraitEvidenceMaturityTitle}}">
+          <text class="parent-brief-label">长期画像证据成熟度</text>
+          <text>成熟等级：{{learningReportSummary.portraitEvidenceMaturityLevel}}｜成熟分：{{learningReportSummary.portraitEvidenceMaturityScore}}</text>
+          <text>{{learningReportSummary.portraitEvidenceMaturitySummary}}</text>
+          <text wx:for="{{learningReportSummary.portraitEvidenceMaturityLanes}}" wx:key="id">证据层：{{item.label}}｜可做：{{item.allowedDecision}}｜不可做：{{item.blockedDecision}}</text>
+          <text wx:for="{{learningReportSummary.portraitEvidenceDecisionLocks}}" wx:key="id">决策锁：{{item.lock}}｜解锁：{{item.release}}</text>
+          <text wx:for="{{learningReportSummary.portraitEvidenceUpdateGates}}" wx:key="id">画像更新镜像：{{item.label}}｜{{item.rule}}</text>
+          <text wx:if="{{learningReportSummary.portraitEvidenceMaturityParentAction}}">家长动作：{{learningReportSummary.portraitEvidenceMaturityParentAction}}</text>
+          <text wx:if="{{learningReportSummary.portraitEvidenceMaturityShareBoundary}}">分享边界：{{learningReportSummary.portraitEvidenceMaturityShareBoundary}}</text>
+        </view>
         <view class="parent-brief-block" wx:if="{{learningReportSummary.parentDecisionTrustTitle}}">
           <text class="parent-brief-label">家长决策可信度</text>
           <text>决策等级：{{learningReportSummary.parentDecisionTrustLevel}}｜可信分：{{learningReportSummary.parentDecisionTrustScore}}</text>

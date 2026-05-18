@@ -783,6 +783,7 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
   const portraitConfidenceSystem = reportState.portraitConfidenceSystem || draft.portraitConfidenceSystem || {};
   const parentDecisionTrustSystem = reportState.parentDecisionTrustSystem || draft.parentDecisionTrustSystem || {};
   const longitudinalPortraitTimeline = reportState.longitudinalPortraitTimeline || draft.longitudinalPortraitTimeline || {};
+  const portraitEvidenceMaturitySystem = reportState.portraitEvidenceMaturitySystem || draft.portraitEvidenceMaturitySystem || {};
   const matrix = Array.isArray(draft.diagnosisMatrix) ? draft.diagnosisMatrix : [];
   const tendencies = Array.isArray(draft.capabilityTendencies) ? draft.capabilityTendencies : [];
   const effectiveCourseUnitMap = courseUnitMap || (storage.buildCourseUnitMap ? storage.buildCourseUnitMap({}) : null);
@@ -1000,6 +1001,7 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     portraitConfidenceSystem,
     parentDecisionTrustSystem,
     longitudinalPortraitTimeline,
+    portraitEvidenceMaturitySystem,
     longitudinalPortraitTimelineTitle: longitudinalPortraitTimeline.title || '',
     longitudinalPortraitTimelineStatus: longitudinalPortraitTimeline.status || '',
     longitudinalPortraitTimelineSummary: longitudinalPortraitTimeline.summary || '',
@@ -1009,6 +1011,15 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     longitudinalPortraitRiskTransitions: Array.isArray(longitudinalPortraitTimeline.riskTransitions) ? longitudinalPortraitTimeline.riskTransitions : [],
     longitudinalPortraitEvidenceBacklog: Array.isArray(longitudinalPortraitTimeline.evidenceBacklog) ? longitudinalPortraitTimeline.evidenceBacklog : [],
     longitudinalPortraitShareBoundary: longitudinalPortraitTimeline.shareBoundary || '',
+    portraitEvidenceMaturityTitle: portraitEvidenceMaturitySystem.title || '',
+    portraitEvidenceMaturityLevel: portraitEvidenceMaturitySystem.maturityLevel || '',
+    portraitEvidenceMaturityScore: Number(portraitEvidenceMaturitySystem.maturityScore || 0),
+    portraitEvidenceMaturitySummary: portraitEvidenceMaturitySystem.summary || '',
+    portraitEvidenceMaturityLanes: Array.isArray(portraitEvidenceMaturitySystem.maturityLanes) ? portraitEvidenceMaturitySystem.maturityLanes : [],
+    portraitEvidenceDecisionLocks: Array.isArray(portraitEvidenceMaturitySystem.decisionLocks) ? portraitEvidenceMaturitySystem.decisionLocks : [],
+    portraitEvidenceUpdateGates: Array.isArray(portraitEvidenceMaturitySystem.updateGateMirror) ? portraitEvidenceMaturitySystem.updateGateMirror : [],
+    portraitEvidenceMaturityParentAction: portraitEvidenceMaturitySystem.parentAction || '',
+    portraitEvidenceMaturityShareBoundary: portraitEvidenceMaturitySystem.shareBoundary || '',
     portraitConfidenceTitle: portraitConfidenceSystem.title || '',
     portraitConfidenceLevel: portraitConfidenceSystem.confidenceLevel || '',
     portraitConfidenceScore: Number(portraitConfidenceSystem.evidenceScore || 0),

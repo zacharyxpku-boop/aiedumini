@@ -997,6 +997,93 @@ function buildLongitudinalPortraitTimeline(parts = {}, matrix = [], portrait = {
   };
 }
 
+function buildPortraitEvidenceMaturitySystem(parts = {}, portraitConfidence = {}, parentDecisionTrust = {}, longitudinalTimeline = {}, familyDecision = {}) {
+  const ledger = Array.isArray(portraitConfidence.evidenceLedger) ? portraitConfidence.evidenceLedger : [];
+  const thresholds = Array.isArray(portraitConfidence.decisionThresholds) ? portraitConfidence.decisionThresholds : [];
+  const updateGates = Array.isArray(longitudinalTimeline.updateGates) ? longitudinalTimeline.updateGates : [];
+  const timeline = Array.isArray(longitudinalTimeline.timeline) ? longitudinalTimeline.timeline : [];
+  const readyEvidence = ledger.filter((item) => item.status === 'ready').length;
+  const weakEvidence = ledger.filter((item) => item.status !== 'ready').length;
+  const metThresholds = thresholds.filter((item) => item.met).length;
+  const maturityScore = Math.max(0, Math.min(100, readyEvidence * 18 + metThresholds * 14 + timeline.length * 4 - weakEvidence * 6));
+  const maturityLevel = maturityScore >= 76 ? '可进入周画像' : maturityScore >= 48 ? '只支持今晚行动' : '先补证据';
+  const primaryAction = familyDecision.tonightDecision || '今晚只做一个第一步动作，不加题量。';
+  const maturityLanes = [
+    {
+      id: 'tonight_action',
+      label: '今晚行动证据',
+      minimumEvidence: ['孩子说出第一步', '错因被命名'],
+      allowedDecision: primaryAction,
+      blockedDecision: '不能据此给孩子贴长期标签。'
+    },
+    {
+      id: 'next_day_check',
+      label: '隔日回访证据',
+      minimumEvidence: ['同类题回访', '孩子能复述错因'],
+      allowedDecision: '可以决定明天继续同一小步或退回小黑板。',
+      blockedDecision: '不能因为当晚做对就增加题量。'
+    },
+    {
+      id: 'weekly_portrait',
+      label: '周画像证据',
+      minimumEvidence: ['第 7 天复核', '近迁移一次', '家长低压观察'],
+      allowedDecision: '可以把错因写入长期画像候选。',
+      blockedDecision: '不能分享分数、排名、原题答案或完整对话。'
+    },
+    {
+      id: 'two_week_stability',
+      label: '两周稳定证据',
+      minimumEvidence: ['两周同类证据一致', '策略调整后仍有效'],
+      allowedDecision: '可以升级策略或进入更高一层题型。',
+      blockedDecision: '不能跳过老师/家长人工判断。'
+    }
+  ];
+  const decisionLocks = [
+    {
+      id: 'no_label',
+      lock: '证据少于 3 类时，不更新长期画像，只生成今晚行动。',
+      release: '补齐第一步、错因、隔日回访三类证据。'
+    },
+    {
+      id: 'no_load_increase',
+      lock: '没有连续两天稳定复述时，不增加题量。',
+      release: '连续两次能说清第一步和错因。'
+    },
+    {
+      id: 'no_public_ranking',
+      lock: '任何分享都不带分数、排名、原题和完整对话。',
+      release: '只允许分享行动建议、回访时间和证据缺口。'
+    },
+    {
+      id: 'no_auto_teacher_claim',
+      lock: 'AI 报告不替代老师判断。',
+      release: '需要老师沟通时，只输出证据包和问题清单。'
+    }
+  ];
+  return {
+    id: 'portrait_evidence_maturity_system',
+    title: '长期画像证据成熟度',
+    maturityLevel,
+    maturityScore,
+    summary: `${maturityLevel}：当前 ${readyEvidence} 类证据 ready，${weakEvidence} 类证据待补，${metThresholds} 个决策阈值已满足。`,
+    maturityLanes,
+    decisionLocks,
+    updateGateMirror: updateGates.slice(0, 4).map((gate) => ({
+      id: gate.id,
+      label: gate.label,
+      rule: gate.rule,
+      evidence: Array.isArray(gate.evidence) ? gate.evidence.join(' / ') : ''
+    })),
+    parentAction: maturityScore >= 76
+      ? '家长可以做一次周复盘，但仍只看证据，不看排名。'
+      : maturityScore >= 48
+        ? primaryAction
+        : '先补一条孩子自己的第一步，再生成判断。',
+    shareBoundary: '成熟度只分享证据层级、行动建议和待补证据；不分享原题、答案、分数、排名或完整对话。',
+    evidenceRequired: ['maturity_lanes', 'decision_locks', 'update_gate_mirror', 'parent_action', 'safe_share_boundary']
+  };
+}
+
 function buildSocraticMemoryReportBridge(input = {}, parentDecisionTrust = {}, portraitConfidence = {}) {
   const gameEvidence = input.gameEvidence || {};
   const highFrequencyLoop = input.highFrequencyPracticeLoop || gameEvidence.highFrequencyPracticeLoop || {};
@@ -1161,6 +1248,7 @@ function buildLearningReportDraft(input = {}) {
   const portraitConfidenceSystem = buildPortraitConfidenceSystem(parts, diagnosisMatrix, longTermPortrait, classroomDecisionBoard, familyDecisionMemo);
   const parentDecisionTrustSystem = buildParentDecisionTrustSystem(parts, diagnosisMatrix, portraitConfidenceSystem, familyDecisionMemo, classroomDecisionBoard);
   const longitudinalPortraitTimeline = buildLongitudinalPortraitTimeline(parts, diagnosisMatrix, longTermPortrait, portraitConfidenceSystem, parentDecisionTrustSystem, familyDecisionMemo);
+  const portraitEvidenceMaturitySystem = buildPortraitEvidenceMaturitySystem(parts, portraitConfidenceSystem, parentDecisionTrustSystem, longitudinalPortraitTimeline, familyDecisionMemo);
   const socraticMemoryReportBridge = buildSocraticMemoryReportBridge(input, parentDecisionTrustSystem, portraitConfidenceSystem);
   const questionBankDecisionBridge = buildQuestionBankDecisionBridge(input, parentDecisionTrustSystem, portraitConfidenceSystem);
   const questionBankRecallReportBridge = buildQuestionBankRecallReportBridge(input, parentDecisionTrustSystem, portraitConfidenceSystem);
@@ -1196,6 +1284,7 @@ function buildLearningReportDraft(input = {}) {
     portraitConfidenceSystem,
     parentDecisionTrustSystem,
     longitudinalPortraitTimeline,
+    portraitEvidenceMaturitySystem,
     socraticMemoryReportBridge,
     questionBankDecisionBridge,
     questionBankRecallReportBridge,
@@ -1233,6 +1322,7 @@ function buildLearningReportDraft(input = {}) {
     portraitConfidenceSystem,
     parentDecisionTrustSystem,
     longitudinalPortraitTimeline,
+    portraitEvidenceMaturitySystem,
     socraticMemoryReportBridge,
     questionBankDecisionBridge,
     questionBankRecallReportBridge,
@@ -1262,6 +1352,7 @@ module.exports = {
   buildPortraitConfidenceSystem,
   buildParentDecisionTrustSystem,
   buildLongitudinalPortraitTimeline,
+  buildPortraitEvidenceMaturitySystem,
   buildSocraticMemoryReportBridge,
   buildQuestionBankDecisionBridge,
   buildQuestionBankRecallReportBridge,
