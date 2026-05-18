@@ -1116,6 +1116,106 @@ function inferHomeworkPressureSignal(text = '', taskType = 'unknown') {
       boardMove: '小黑板只画“高海拔 -> 低海拔”的箭头。',
       parentCheck: '先问：河流看地图上方下方，还是看海拔高低？',
       reviewMove: '换一张等高线河流图，仍先找高处和低处。'
+    },
+    {
+      id: 'physics_lever_pivot',
+      taskType: 'physics_diagram',
+      patterns: [/杠杆|支点|动力臂|阻力臂|撬棍|平衡条件/],
+      firstStep: '先标支点，再分别找动力臂和阻力臂。',
+      wrongCause: '把力的大小和力臂混在一起，没有先确定支点。',
+      boardMove: '小黑板只画“支点 O -> 动力臂 / 阻力臂”两条线。',
+      parentCheck: '先问：支点在哪里？力臂是到力的作用线的距离，还是杆的长度？',
+      reviewMove: '换成剪刀或跷跷板，仍先标支点和两个力臂。'
+    },
+    {
+      id: 'physics_electric_power_unit',
+      taskType: 'physics_diagram',
+      patterns: [/电功率|额定功率|电压|电流|P=UI|单位换算|千瓦时/],
+      firstStep: '先圈电压、电流和单位，再判断用 P=UI 还是电能关系。',
+      wrongCause: '只套公式，没有先统一单位和区分功率、电能。',
+      boardMove: '小黑板只写“P=UI / 单位先统一”。',
+      parentCheck: '先问：题目问功率还是电能？单位有没有从千瓦时换清楚？',
+      reviewMove: '换一个用电器参数，仍先圈电压、电流和单位。'
+    },
+    {
+      id: 'chem_filter_impurity',
+      taskType: 'chemistry_experiment',
+      patterns: [/过滤|滤纸|滤液|沉淀|不溶性杂质|玻璃棒引流/],
+      firstStep: '先判断要分离的是不溶性固体和液体。',
+      wrongCause: '把过滤当成万能分离方法，没有先看杂质是否溶于水。',
+      boardMove: '小黑板只画“浑浊液 -> 滤纸 -> 滤液/滤渣”。',
+      parentCheck: '先问：这个杂质是溶在水里，还是不溶在水里？',
+      reviewMove: '换成食盐水和泥沙，仍先判断能不能过滤。'
+    },
+    {
+      id: 'chem_reaction_rate_surface',
+      taskType: 'chemistry_experiment',
+      patterns: [/反应速率|颗粒大小|温度|浓度|表面积|快慢/],
+      firstStep: '先找唯一改变的条件，再判断它怎样影响反应速率。',
+      wrongCause: '把多个条件同时变化，导致不知道速率变化由谁引起。',
+      boardMove: '小黑板只画“唯一变量 -> 速率快慢”。',
+      parentCheck: '先问：这两组实验只有哪一个条件不同？',
+      reviewMove: '把颗粒大小换成温度，仍先找唯一变量。'
+    },
+    {
+      id: 'biology_microscope_magnification',
+      taskType: 'biology_process',
+      patterns: [/显微镜|目镜|物镜|放大倍数|总放大倍数|倍数相乘/],
+      firstStep: '先找目镜倍数和物镜倍数，再相乘得到总放大倍数。',
+      wrongCause: '把目镜和物镜倍数相加，没有理解总放大倍数是相乘。',
+      boardMove: '小黑板只写“目镜倍数 × 物镜倍数”。',
+      parentCheck: '先问：显微镜有几个镜头参与放大？倍数是加还是乘？',
+      reviewMove: '换一组目镜和物镜倍数，仍先相乘。'
+    },
+    {
+      id: 'biology_ecosystem_component',
+      taskType: 'biology_process',
+      patterns: [/生态系统|生产者|消费者|分解者|非生物部分|成分/],
+      firstStep: '先把题中对象分成生产者、消费者、分解者和非生物部分。',
+      wrongCause: '只按动物植物分类，没有按生态系统功能分类。',
+      boardMove: '小黑板只画“四栏：生产者 / 消费者 / 分解者 / 非生物”。',
+      parentCheck: '先问：这个对象在生态系统里负责制造、消耗还是分解？',
+      reviewMove: '换一个池塘生态系统，仍先分四类。'
+    },
+    {
+      id: 'geo_climate_type_match',
+      taskType: 'geography_map',
+      patterns: [/气候类型|气温曲线|降水柱状图|雨热同期|夏季高温多雨/],
+      firstStep: '先看最冷月气温，再看降水集中在哪个季节。',
+      wrongCause: '只背气候名称，没有用气温和降水两个证据匹配。',
+      boardMove: '小黑板只画“最冷月气温 / 降水季节”两格。',
+      parentCheck: '先问：你用了气温证据，还是只看了降水？',
+      reviewMove: '换一张气候图，仍先看最冷月和降水季节。'
+    },
+    {
+      id: 'geo_industrial_location',
+      taskType: 'geography_map',
+      patterns: [/工业区位|原料|交通|市场|劳动力|布局原因/],
+      firstStep: '先判断题目问的是原料、交通、市场还是劳动力因素。',
+      wrongCause: '把所有区位因素都背上，没有结合图中最突出的条件。',
+      boardMove: '小黑板只画“图中条件 -> 区位因素”。',
+      parentCheck: '先问：图上最明显的条件是什么？它对应哪类区位因素？',
+      reviewMove: '换成农业区位，仍先找图中条件再对应因素。'
+    },
+    {
+      id: 'english_clause_connector',
+      taskType: 'english_sentence',
+      patterns: [/定语从句|关系代词|which|who|that|先行词|从句/],
+      firstStep: '先找先行词是人还是物，再选关系词。',
+      wrongCause: '只看空格后面缺词，没有先判断先行词类型。',
+      boardMove: '小黑板只写“先行词：人/物 -> 关系词”。',
+      parentCheck: '先问：被修饰的词是人还是物？从句里缺主语还是宾语？',
+      reviewMove: '换一个先行词，仍先判断人或物。'
+    },
+    {
+      id: 'english_reading_title',
+      taskType: 'reading_question',
+      patterns: [/英语阅读标题|best title|标题|主旨|全文反复出现|中心/],
+      firstStep: '先找全文反复出现的关键词，再排除只说局部细节的选项。',
+      wrongCause: '把某一段的细节当成全文标题，没有抓全文中心。',
+      boardMove: '小黑板只画“重复关键词 -> 全文中心 -> 标题”。',
+      parentCheck: '先问：这个选项覆盖全文，还是只覆盖一段？',
+      reviewMove: '换一篇短文，仍先找重复关键词和全文中心。'
     }
   ];
   if (/没说|缺少|题干不全|条件不完整|没有给/.test(source)) {
