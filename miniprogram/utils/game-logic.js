@@ -1367,6 +1367,53 @@ function buildPeerMemoryRelayLeague(dailyMemoryPrescription = {}, questionTypeCl
   };
 }
 
+function buildMicroRecallPrescriptionEngine(dailyMemoryPrescription = {}, peerMemoryRelayLeague = {}, gizmoLikeMemoryProtocol = {}, result = {}, options = {}) {
+  const weakKey = options.weakKey || dailyMemoryPrescription.weakKey || gizmoLikeMemoryProtocol.weakKey || 'first_step';
+  const mode = dailyMemoryPrescription.mode || 'steady';
+  const wrong = Math.max(0, Number(result.wrong || 0));
+  const accuracy = Number.isFinite(Number(result.accuracy)) ? Number(result.accuracy) : 0;
+  const rescue = mode === 'rescue' || wrong >= 2 || (accuracy > 0 && accuracy < 60);
+  const daily90SecondPlan = [
+    { id: 'cover', seconds: 15, action: 'cover_answer_and_name_first_step', evidence: 'answer_hidden' },
+    { id: 'speak', seconds: 25, action: `student_speaks_${weakKey}`, evidence: 'student_first_step' },
+    { id: 'repair', seconds: 30, action: 'name_wrong_cause_once', evidence: 'wrong_cause_named' },
+    { id: 'lock', seconds: 20, action: 'lock_tomorrow_revisit_card', evidence: 'next_day_revisit_locked' }
+  ];
+  const recallDoseByRisk = {
+    rescue: { newCards: 0, recallCards: 2, transferCards: 0, maxMinutes: 6 },
+    steady: { newCards: 1, recallCards: 3, transferCards: 1, maxMinutes: 10 },
+    sprint: { newCards: 2, recallCards: 4, transferCards: 2, maxMinutes: 14 }
+  };
+  const peerRelayOpen = peerMemoryRelayLeague.mode === 'peer_relay_ready' && !rescue;
+  return {
+    id: 'micro_recall_prescription_engine',
+    localDeterministic: true,
+    mode: rescue ? 'rescue' : mode,
+    weakKey,
+    daily90SecondPlan,
+    recallDoseByRisk,
+    todayDose: recallDoseByRisk[rescue ? 'rescue' : mode] || recallDoseByRisk.steady,
+    xpHoldRules: [
+      { id: 'no_first_step_no_xp', hold: true, rule: 'No XP release without student_first_step evidence.' },
+      { id: 'wrong_cause_repeat_hold', hold: rescue, rule: 'Repeated wrong cause keeps XP and new cards on hold.' },
+      { id: 'next_day_required', hold: true, rule: 'Long-term mastery waits for next-day revisit evidence.' }
+    ],
+    unlockEvidenceGates: [
+      { id: 'variant_unlock', open: !rescue && accuracy >= 80, evidence: ['student_first_step', 'wrong_cause_quiet'] },
+      { id: 'day7_portrait_unlock', open: false, evidence: ['next_day_revisit', 'day7_transfer'] },
+      { id: 'peer_relay_unlock', open: peerRelayOpen, evidence: ['own_material_relay', 'privacy_safe_fields'] }
+    ],
+    peerRelayGate: {
+      open: peerRelayOpen,
+      mode: peerRelayOpen ? 'safe_peer_relay' : 'parent_only',
+      rule: 'Peer relay opens only when local recall evidence is stable and blocked fields stay clean.'
+    },
+    blockedFields: ['original_question', 'original_answer', 'photo', 'score', 'ranking', 'full_dialogue', 'private_comment'],
+    proofOfLifeEvents: ['answer_hidden', 'student_first_step', 'wrong_cause_named', 'next_day_revisit_locked', 'own_material_relay'],
+    aiBoundary: 'AI may rewrite prompts and encouragement; local code decides dose, XP hold, unlocks, peer relay, report release, and blocked fields.'
+  };
+}
+
 function buildQuestionTypeClusterMemoryProtocol(questionTypeClusters = [], result = {}, options = {}) {
   const clusters = Array.isArray(questionTypeClusters) ? questionTypeClusters : [];
   const accuracy = Number.isFinite(Number(result.accuracy)) ? Number(result.accuracy) : 0;
@@ -1547,6 +1594,13 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
     result,
     { weakKey }
   );
+  const microRecallPrescriptionEngine = buildMicroRecallPrescriptionEngine(
+    dailyMemoryPrescription,
+    peerMemoryRelayLeague,
+    gizmoLikeMemoryProtocol,
+    result,
+    { weakKey }
+  );
   return {
     title: needsRepair ? '高频修复循环' : '高频巩固循环',
     mode: needsRepair ? 'repair_recall' : 'mastery_recall',
@@ -1572,13 +1626,14 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
     dailyMemoryPrescription,
     questionTypeClusterMemoryProtocol,
     peerMemoryRelayLeague,
+    microRecallPrescriptionEngine,
     xpRule: 'XP 只奖励主动回忆、错因修复和次日回访，不奖励盲刷题量。',
     leechRule: needsRepair
       ? `同一错因连续 2 次错，会降到第一步小黑板。`
       : '连续 2 次说清第一步，才进入变式练习。',
     parentShareLine: `家长复盘只看：孩子能否自己说出「${weakKey}」的第一步。`,
     nextRoute: needsRepair ? '/pages/review/review' : '/pages/tutor/tutor',
-    evidenceRequired: ['active_recall_cards', 'spaced_review_plan', 'wrong_cause_return', 'quest_cadence', 'memory_feedback_controller', 'recall_intensity_plan', 'wrong_cause_replay_deck', 'xp_feedback_policy', 'quest_arc_runway', 'gizmo_like_memory_protocol', 'socratic_quality_memory_bridge', 'question_bank_memory_bridge', 'question_bank_recall_workout', 'daily_memory_sprint_deck', 'adaptive_recall_scheduler', 'memory_risk_release_model', 'memory_comeback_loop', 'daily_memory_prescription', 'question_type_cluster_memory_protocol', 'peer_memory_relay_league', 'parent_share_line'],
+    evidenceRequired: ['active_recall_cards', 'spaced_review_plan', 'wrong_cause_return', 'quest_cadence', 'memory_feedback_controller', 'recall_intensity_plan', 'wrong_cause_replay_deck', 'xp_feedback_policy', 'quest_arc_runway', 'gizmo_like_memory_protocol', 'socratic_quality_memory_bridge', 'question_bank_memory_bridge', 'question_bank_recall_workout', 'daily_memory_sprint_deck', 'adaptive_recall_scheduler', 'memory_risk_release_model', 'memory_comeback_loop', 'daily_memory_prescription', 'question_type_cluster_memory_protocol', 'peer_memory_relay_league', 'micro_recall_prescription_engine', 'parent_share_line'],
     weakKey
   };
 }
@@ -1596,6 +1651,7 @@ module.exports = {
   buildHighFrequencyPracticeLoop,
   buildDailyMemoryPrescription,
   buildPeerMemoryRelayLeague,
+  buildMicroRecallPrescriptionEngine,
   buildQuestionTypeClusterMemoryProtocol,
   buildMemoryFeedbackController,
   buildMemoryComebackLoop,

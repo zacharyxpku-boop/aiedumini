@@ -4754,6 +4754,27 @@ function buildShareChallengePlan(input = {}) {
     reviewCadence,
     route
   });
+  const familyRelayGrowthProtocol = {
+    id: 'family_relay_growth_protocol',
+    localDeterministic: true,
+    senderReason: 'share_a_reusable_first_step_not_an_answer',
+    receiverOwnMaterialAction: `receiver_uses_own_material_to_repeat_first_step:${firstStep}`,
+    parentSafeReassurance: 'no_original_question_no_answer_no_score_no_ranking_no_full_dialogue',
+    returnWindows: [
+      { id: 'tonight', action: '90_second_first_step_recall', evidence: 'receiver_first_step' },
+      { id: 'day3', action: 'near_transfer_with_own_material', evidence: 'receiver_near_transfer' },
+      { id: 'day7', action: 'confirm_transfer_before_portrait_release', evidence: 'day7_transfer_check' }
+    ],
+    proofOfLifeEvents: ['receiver_first_step', 'wrong_cause_echo', 'next_day_revisit_locked', 'day7_transfer_check'],
+    blockedFields: ['original_question', 'original_answer', 'original_photo', 'score', 'ranking', 'full_dialogue', 'private_comment'],
+    noRankingRule: 'No ranking, score, speed comparison, original question, original answer, or screenshot can be used as a growth hook.',
+    peerRelayGate: {
+      status: spreadReadinessGate.status,
+      open: spreadReadinessGate.status === 'peer_relay_ready',
+      rule: 'Local readiness gate opens peer relay only after first-step, wrong-cause, review-window, and safe-packet checks pass.'
+    },
+    aiBoundary: 'AI may rewrite the card copy; local code decides share fields, relay status, return windows, and privacy blocks.'
+  };
   return {
     id: 'share_challenge_plan',
     title: '同伴轻挑战',
@@ -4770,6 +4791,7 @@ function buildShareChallengePlan(input = {}) {
     shareHookDeck,
     naturalSpreadTriggers,
     naturalSpreadLoop,
+    familyRelayGrowthProtocol,
     communityRipplePlan,
     receiverOnboardingDeck,
     viralProofLedger,
@@ -4813,6 +4835,8 @@ function buildShareChallengePlan(input = {}) {
       relay_completion_signal: safeRelayChallengePacket.query.relay_completion_signal,
       relay_return_path: safeRelayChallengePacket.query.relay_return_path,
       relay_spread_status: spreadReadinessGate.status,
+      relay_growth_protocol: familyRelayGrowthProtocol.id,
+      relay_growth_gate: familyRelayGrowthProtocol.peerRelayGate.status,
       relay_spread_score: String(spreadReadinessGate.score),
       relay_spread_line: spreadReadinessGate.shareModeLine,
       relay_spread_fallback: spreadReadinessGate.fallbackLine,
