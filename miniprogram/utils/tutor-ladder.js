@@ -475,6 +475,45 @@ function buildVisualSocraticRecoveryProtocol(taskType, item, probe, fallbackPlan
   };
 }
 
+function buildFallbackRecoveryBridge(taskType, item, probe, fallbackPlan = {}, visualRecovery = {}, context = {}) {
+  const boardLayers = Array.isArray(visualRecovery.boardLayers) ? visualRecovery.boardLayers : [];
+  const failureBranches = Array.isArray(visualRecovery.failureBranches) ? visualRecovery.failureBranches : [];
+  const exitCriteria = Array.isArray(visualRecovery.exitCriteria) ? visualRecovery.exitCriteria : [];
+  const microChoices = Array.isArray(fallbackPlan.microChoices) ? fallbackPlan.microChoices : [];
+  const mode = visualRecovery.recoveryMode || fallbackPlan.mode || 'first_step_board';
+  const trigger = fallbackPlan.trigger || (context.answerBlocked ? '孩子直接要答案' : '孩子卡住或沉默');
+  const activeBoard = boardLayers[0] || { label: '定位', move: '只定位题目问什么。' };
+  return {
+    id: `fallback_recovery_bridge_${taskType || 'unknown'}_${mode}`,
+    title: '失败兜底流转桥',
+    mode,
+    trigger,
+    taskType: taskType || 'unknown',
+    nextSmallAction: fallbackPlan.firstMove || activeBoard.move,
+    blackboardLine: fallbackPlan.blackboardMove || activeBoard.move,
+    microChoiceLine: microChoices.length
+      ? microChoices.map((choice) => `${choice.label}:${choice.text}`).join(' / ')
+      : 'A:先找已知条件 / B:先看题目问什么',
+    boardLayerCount: boardLayers.length,
+    failureBranchCount: failureBranches.length,
+    exitCriteriaCount: exitCriteria.length,
+    recoverySequence: [
+      { id: 'stop_answer', label: '先停答案', action: '拦住完整答案或代写请求，只保留第一步。' },
+      { id: 'draw_first', label: '画第一笔', action: fallbackPlan.blackboardMove || activeBoard.move },
+      { id: 'micro_choice', label: '降到二选一', action: microChoices.length ? microChoices[0].text : '先选 A 或 B。' },
+      { id: 'handoff', label: '交给回访', action: '仍卡住就转复习卡和明天回访，不继续加题。' }
+    ],
+    parentDecisionLine: visualRecovery.parentHandoff && visualRecovery.parentHandoff.line
+      ? visualRecovery.parentHandoff.line
+      : '家长只复述第一步问题，不补完整答案。',
+    reportLine: `本轮兜底从 ${mode} 进入，已有 ${boardLayers.length} 层小黑板、${failureBranches.length} 个失败分支和 ${exitCriteria.length} 条退出条件。`,
+    shareBoundary: visualRecovery.parentHandoff && visualRecovery.parentHandoff.shareBoundary
+      ? visualRecovery.parentHandoff.shareBoundary
+      : '分享只带卡点和第一步，不带原题照片、完整对话或分数。',
+    evidenceRequired: ['fallback_trigger', 'visual_board_layer', 'child_micro_choice', 'no_full_answer_boundary', 'parent_handoff_line', 'exit_criteria']
+  };
+}
+
 function stepIntro(item) {
   const level = normalizeLevel(item && item.level);
   const title = item && item.title ? item.title : '看清第一步';
@@ -515,6 +554,7 @@ function buildTutorReply(text, options = {}) {
     const socraticContract = buildSocraticContract(taskType, item, probe);
     const socraticFallbackPlan = buildSocraticFallbackPlan(taskType, item, probe, { answerBlocked: true });
     const visualSocraticRecovery = buildVisualSocraticRecoveryProtocol(taskType, item, probe, socraticFallbackPlan, { answerBlocked: true });
+    const fallbackRecoveryBridge = buildFallbackRecoveryBridge(taskType, item, probe, socraticFallbackPlan, visualSocraticRecovery, { answerBlocked: true });
     return {
       reply: withStepIntro(item, '我不能直接替你写答案，但可以陪你先找第一步。先说题目问什么，或者圈出一个已知条件。'),
       hint_level: 1,
@@ -527,6 +567,7 @@ function buildTutorReply(text, options = {}) {
       socratic_contract: socraticContract,
       socratic_fallback_plan: socraticFallbackPlan,
       visual_socratic_recovery: visualSocraticRecovery,
+      fallback_recovery_bridge: fallbackRecoveryBridge,
       allowed_moves: probe.allowedMoves,
       transfer_prompt: probe.transferPrompt,
       next_action: '先说题目问什么，或者圈出一个已知条件。',
@@ -550,6 +591,7 @@ function buildTutorReply(text, options = {}) {
   const stuckCount = countRecentStuck(messages, text);
   const socraticFallbackPlan = buildSocraticFallbackPlan(taskType, item, probe, { stuckCount });
   const visualSocraticRecovery = buildVisualSocraticRecoveryProtocol(taskType, item, probe, socraticFallbackPlan, { stuckCount });
+  const fallbackRecoveryBridge = buildFallbackRecoveryBridge(taskType, item, probe, socraticFallbackPlan, visualSocraticRecovery, { stuckCount });
   const reply = stuckCount >= 3
     ? `我们把门槛再降一点。先看${target}：下面两个选项选一个就行，A 先找已知条件，B 先看题目问什么。选完我给一个相似例子。`
     : item.reply;
@@ -566,6 +608,7 @@ function buildTutorReply(text, options = {}) {
     socratic_contract: socraticContract,
     socratic_fallback_plan: socraticFallbackPlan,
     visual_socratic_recovery: visualSocraticRecovery,
+    fallback_recovery_bridge: fallbackRecoveryBridge,
     allowed_moves: probe.allowedMoves,
     transfer_prompt: probe.transferPrompt,
     next_action: item.level >= 5 ? '把方法做成复习卡或生成一道小变式。' : '先回一句你的第一步。',
@@ -612,6 +655,7 @@ module.exports = {
   buildSocraticContract,
   buildSocraticFallbackPlan,
   buildVisualSocraticRecoveryProtocol,
+  buildFallbackRecoveryBridge,
   buildQuestionTypeSocraticPath,
   buildQuestionTypeCoverageAtlas,
   buildSocraticQualityEvaluationSuite,

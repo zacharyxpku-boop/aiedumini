@@ -208,6 +208,17 @@
             <view class="receipt-diagnostic-sub">{{thinkingReceipt.visual_socratic_recovery.parentHandoff.shareBoundary}}</view>
             <view class="receipt-diagnostic-sub" wx:for="{{thinkingReceipt.visual_socratic_recovery.exitCriteria}}" wx:key="*this">退出条件：{{item}}</view>
           </view>
+          <view class="receipt-fallback-plan" wx:if="{{thinkingReceipt.fallback_recovery_bridge}}">
+            <view class="receipt-diagnostic-title">{{thinkingReceipt.fallback_recovery_bridge.title}}</view>
+            <view class="receipt-diagnostic-line">触发：{{thinkingReceipt.fallback_recovery_bridge.trigger}}</view>
+            <view class="receipt-diagnostic-line">下一小步：{{thinkingReceipt.fallback_recovery_bridge.nextSmallAction}}</view>
+            <view class="receipt-diagnostic-sub">小黑板：{{thinkingReceipt.fallback_recovery_bridge.blackboardLine}}</view>
+            <view class="receipt-diagnostic-sub">微选择：{{thinkingReceipt.fallback_recovery_bridge.microChoiceLine}}</view>
+            <view class="receipt-diagnostic-sub" wx:for="{{thinkingReceipt.fallback_recovery_bridge.recoverySequence}}" wx:key="id">{{item.label}}：{{item.action}}</view>
+            <view class="receipt-diagnostic-sub">{{thinkingReceipt.fallback_recovery_bridge.parentDecisionLine}}</view>
+            <view class="receipt-diagnostic-sub">{{thinkingReceipt.fallback_recovery_bridge.reportLine}}</view>
+            <view class="receipt-diagnostic-sub">{{thinkingReceipt.fallback_recovery_bridge.shareBoundary}}</view>
+          </view>
           <view class="receipt-move-row" wx:if="{{thinkingReceipt.allowed_moves.length}}">
             <text wx:for="{{thinkingReceipt.allowed_moves}}" wx:key="*this">{{item}}</text>
           </view>

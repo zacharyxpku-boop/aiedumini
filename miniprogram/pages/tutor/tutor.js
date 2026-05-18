@@ -696,6 +696,7 @@ Page({
       socratic_contract: result && result.socratic_contract ? result.socratic_contract : null,
       socratic_fallback_plan: result && result.socratic_fallback_plan ? result.socratic_fallback_plan : null,
       visual_socratic_recovery: result && result.visual_socratic_recovery ? result.visual_socratic_recovery : null,
+      fallback_recovery_bridge: result && result.fallback_recovery_bridge ? result.fallback_recovery_bridge : null,
       allowed_moves: result && result.allowed_moves ? result.allowed_moves : [],
       transfer_prompt: result && result.transfer_prompt ? result.transfer_prompt : ''
     });
@@ -740,6 +741,13 @@ Page({
           : 0,
         visual_recovery_branches: result.visual_socratic_recovery && Array.isArray(result.visual_socratic_recovery.failureBranches)
           ? result.visual_socratic_recovery.failureBranches.length
+          : 0,
+        fallback_recovery_mode: result.fallback_recovery_bridge && result.fallback_recovery_bridge.mode,
+        fallback_recovery_sequence: result.fallback_recovery_bridge && Array.isArray(result.fallback_recovery_bridge.recoverySequence)
+          ? result.fallback_recovery_bridge.recoverySequence.length
+          : 0,
+        fallback_recovery_evidence: result.fallback_recovery_bridge && Array.isArray(result.fallback_recovery_bridge.evidenceRequired)
+          ? result.fallback_recovery_bridge.evidenceRequired.length
           : 0,
         allowed_moves: result.allowed_moves || [],
         transfer_prompt: result.transfer_prompt || ''

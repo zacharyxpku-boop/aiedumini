@@ -436,6 +436,9 @@
             <text>{{item.label}}：</text>{{item.text}}
           </view>
         </view>
+        <view class="process-summary-line" wx:if="{{tutorProcessSummary.fallbackRecoveryLine}}">{{tutorProcessSummary.fallbackRecoveryLine}}</view>
+        <view class="process-summary-line" wx:if="{{tutorProcessSummary.fallbackParentDecisionLine}}">{{tutorProcessSummary.fallbackParentDecisionLine}}</view>
+        <view class="process-summary-line" wx:if="{{tutorProcessSummary.fallbackShareBoundary}}">{{tutorProcessSummary.fallbackShareBoundary}}</view>
       </view>
 
       <view class="family-summary-card teacher-lite profile-subtle-card">
@@ -748,6 +751,15 @@
           <text wx:for="{{learningReportSummary.questionBankDecisionDeck}}" wx:key="id">题型卡：{{item.label}}｜第一步：{{item.firstStep}}｜掌握门槛：{{item.masteryGate}}</text>
           <text wx:for="{{learningReportSummary.questionBankDecisionReviewWindows}}" wx:key="id">{{item.label}}回访：{{item.action}}</text>
           <text wx:for="{{learningReportSummary.questionBankDecisionEvidence}}" wx:key="*this">决策证据：{{item}}</text>
+        </view>
+        <view class="parent-brief-block" wx:if="{{learningReportSummary.fallbackRecoveryReportBridge}}">
+          <text class="parent-brief-label">{{learningReportSummary.fallbackRecoveryTitle}}</text>
+          <text>{{learningReportSummary.fallbackRecoveryReportLine}}</text>
+          <text>下一小步：{{learningReportSummary.fallbackRecoveryNextAction}}</text>
+          <text>{{learningReportSummary.fallbackRecoveryParentDecision}}</text>
+          <text>{{learningReportSummary.fallbackRecoveryShareBoundary}}</text>
+          <text wx:for="{{learningReportSummary.fallbackRecoverySequence}}" wx:key="id">兜底流转：{{item.label}}｜{{item.action}}</text>
+          <text wx:for="{{learningReportSummary.fallbackRecoveryEvidence}}" wx:key="*this">兜底证据：{{item}}</text>
         </view>
         <view class="parent-brief-block" wx:if="{{learningReportSummary.classroomDecisionLine}}">
           <text class="parent-brief-label">课堂级决策板</text>

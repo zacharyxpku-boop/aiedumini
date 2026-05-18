@@ -174,6 +174,7 @@ function buildTutorProcessSummary(todayFocus, thinkingReceipts, tutorMessages) {
   const receipts = Array.isArray(thinkingReceipts) ? thinkingReceipts : [];
   const messages = Array.isArray(tutorMessages) ? tutorMessages : [];
   const latestReceipt = receipts[0] || {};
+  const fallbackBridge = latestReceipt.fallback_recovery_bridge || null;
   const childText = (todayFocus && (todayFocus.sourceText || todayFocus.thought))
     || latestReceipt.selected_text
     || ((messages || []).filter((item) => item.role === 'user').slice(-1)[0] || {}).text
@@ -189,8 +190,14 @@ function buildTutorProcessSummary(todayFocus, thinkingReceipts, tutorMessages) {
     collapsed: true,
     items: [
       { id: 'child', label: '孩子原话', text: childText },
-      { id: 'prompt', label: '咕点追问', text: tutorText }
-    ].slice(0, 2),
+      { id: 'prompt', label: '咕点追问', text: tutorText },
+      fallbackBridge ? { id: 'fallback', label: '失败兜底', text: fallbackBridge.reportLine || fallbackBridge.nextSmallAction || '' } : null,
+      fallbackBridge ? { id: 'blackboard', label: '小黑板', text: fallbackBridge.blackboardLine || '' } : null
+    ].filter(Boolean).slice(0, 4),
+    fallbackRecoveryBridge: fallbackBridge,
+    fallbackRecoveryLine: fallbackBridge ? fallbackBridge.reportLine : '',
+    fallbackParentDecisionLine: fallbackBridge ? fallbackBridge.parentDecisionLine : '',
+    fallbackShareBoundary: fallbackBridge ? fallbackBridge.shareBoundary : '',
     repairedStep,
     noDirectAnswer: true
   };
@@ -723,7 +730,7 @@ function buildCourseUnitDecisionBoard(courseUnitMap = null) {
   };
 }
 
-function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, subjectSkillDepth, curriculumSpine, visualSocraticMatrix, courseUnitMap) {
+function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, subjectSkillDepth, curriculumSpine, visualSocraticMatrix, courseUnitMap, latestThinkingReceipt = null) {
   const globalEvidenceBrief = storage.buildGlobalEvidenceBrief ? storage.buildGlobalEvidenceBrief() : null;
   const capabilityLedger = capabilityEvidenceLedger || (storage.buildCapabilityEvidenceLedger ? storage.buildCapabilityEvidenceLedger({ globalEvidenceBrief }) : null);
   const nextCapability = capabilityLedger && capabilityLedger.nextCapability ? capabilityLedger.nextCapability : null;
@@ -824,6 +831,9 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
   const questionBankDecisionBridge = learningReport.buildQuestionBankDecisionBridge
     ? learningReport.buildQuestionBankDecisionBridge({ gameEvidence }, parentDecisionTrustSystem, portraitConfidenceSystem)
     : (draft.questionBankDecisionBridge || null);
+  const fallbackRecoveryReportBridge = latestThinkingReceipt && latestThinkingReceipt.fallback_recovery_bridge
+    ? latestThinkingReceipt.fallback_recovery_bridge
+    : null;
   return {
     title: draft.title || '学习画像',
     modeLabel: reportState.reportProgress && reportState.reportProgress.label ? reportState.reportProgress.label : '0% · 快速版',
@@ -970,6 +980,18 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
       : [],
     questionBankDecisionEvidence: questionBankDecisionBridge && Array.isArray(questionBankDecisionBridge.evidenceRequired)
       ? questionBankDecisionBridge.evidenceRequired
+      : [],
+    fallbackRecoveryReportBridge,
+    fallbackRecoveryTitle: fallbackRecoveryReportBridge ? fallbackRecoveryReportBridge.title : '',
+    fallbackRecoveryReportLine: fallbackRecoveryReportBridge ? fallbackRecoveryReportBridge.reportLine : '',
+    fallbackRecoveryNextAction: fallbackRecoveryReportBridge ? fallbackRecoveryReportBridge.nextSmallAction : '',
+    fallbackRecoveryParentDecision: fallbackRecoveryReportBridge ? fallbackRecoveryReportBridge.parentDecisionLine : '',
+    fallbackRecoveryShareBoundary: fallbackRecoveryReportBridge ? fallbackRecoveryReportBridge.shareBoundary : '',
+    fallbackRecoverySequence: fallbackRecoveryReportBridge && Array.isArray(fallbackRecoveryReportBridge.recoverySequence)
+      ? fallbackRecoveryReportBridge.recoverySequence
+      : [],
+    fallbackRecoveryEvidence: fallbackRecoveryReportBridge && Array.isArray(fallbackRecoveryReportBridge.evidenceRequired)
+      ? fallbackRecoveryReportBridge.evidenceRequired
       : [],
     familyDecisionTitle: familyDecisionMemo.title || '',
     familyDecisionTonight: familyDecisionMemo.tonightDecision || '',
@@ -1360,7 +1382,7 @@ Page({
       moduleFlowCompass,
       capabilityEvidenceLedger
     }) : null;
-    learningReportSummary = buildLearningReportSummary(learningReportState || {}, capabilityEvidenceLedger, subjectSkillDepth, curriculumSpine, visualSocraticMatrix, courseUnitMap);
+    learningReportSummary = buildLearningReportSummary(learningReportState || {}, capabilityEvidenceLedger, subjectSkillDepth, curriculumSpine, visualSocraticMatrix, courseUnitMap, latestThinkingReceipt);
     const dailyShareCard = buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCauseSummary, todayFocus, globalEvidenceBrief, reportDailyActionQueue, unifiedNextAction, capabilityEvidenceLedger, subjectSkillDepth, curriculumSpine, visualSocraticMatrix, courseUnitMap, learningReportSummary);
     const communityShareRelayBoard = storage.buildCommunityShareRelayBoard
       ? storage.buildCommunityShareRelayBoard({
