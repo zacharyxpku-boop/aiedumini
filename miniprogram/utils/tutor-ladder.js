@@ -1,4 +1,4 @@
-const ANSWER_REQUEST_RE = /直接告诉我答案|求答案|不想写过程|拍照出答案|直接给结果|告诉我答案|给答案|答案是什么|直接说结果|帮我写答案|代写|tell me the answer/i;
+const ANSWER_REQUEST_RE = /直接告诉我答案|求答案|不想写过程|拍照出答案|直接给结果|告诉我答案|给答案|答案是什么|直接说结果|帮我写答案|直接帮孩子写|帮孩子写.*字|成文|代写|替他.*写|直接替|完整板书.*结论|最后结论|直接给拍题|假装已经识别|tell me the answer/i;
 const STUCK_RE = /不会下一步|不知道下一步|不会列式|还是不会|又不会|我不会|卡住|卡住了|不会写|没思路|读不懂|看不懂|不知道怎么写|不会做|不懂/;
 
 const HINT_LADDER = [
@@ -41,13 +41,13 @@ const HINT_LADDER = [
 
 const TASK_TYPE_RULES = [
   { id: 'chemistry_experiment', patterns: /化学|反应|方程式|溶液|气体|沉淀|颜色|酸碱|守恒|配平/i },
-  { id: 'equation_setup', patterns: /方程|等量关系|设x|未知数|列方程|解方程/i },
-  { id: 'math_word_problem', patterns: /应用题|题目问什么|数量关系|单位1|已知条件|列式|行程|工程|分数应用题|几何|邻补角|对顶角|函数|图像|增减性|平均每小时/i },
-  { id: 'reading_question', patterns: /阅读|主旨|细节|原因|段意|中心句|概括|反问句|陈述句|文言文|句子改写|心情变化/i },
-  { id: 'english_sentence', patterns: /英语|单词|语法|句型|主语|谓语|时态|词性/i },
-  { id: 'physics_diagram', patterns: /物理|受力|电路|光路|运动|速度|压强|浮力|透镜/i },
-  { id: 'biology_process', patterns: /生物|细胞|植物|人体|遗传|生态|光合|对照组/i },
-  { id: 'geography_map', patterns: /地理|地图|经纬|气候|公转|自转|昼夜|地形|图例/i },
+  { id: 'physics_diagram', patterns: /物理|受力|电路|光路|运动|速度|压强|浮力|透镜|密度|路程-时间/i },
+  { id: 'geography_map', patterns: /地理|地图|经纬|经线|纬线|气候|季风|河流|等高线|比例尺|公转|自转|昼夜|地形|图例/i },
+  { id: 'biology_process', patterns: /生物|细胞|植物|人体|遗传|生态|光合|对照组|显微镜|血液循环/i },
+  { id: 'reading_question', patterns: /阅读|完形|上下文|语境|主旨|细节|原因|段意|中心句|概括|反问句|陈述句|文言文|句子改写|心情变化|论点|论据|议论文/i },
+  { id: 'english_sentence', patterns: /英语|单词|语法|句型|主语|谓语|时态|词性|比较级|被动语态|than|be done/i },
+  { id: 'equation_setup', patterns: /方程|不等式|等量关系|设x|未知数|列方程|解方程/i },
+  { id: 'math_word_problem', patterns: /应用题|题目问什么|数量关系|单位1|已知条件|列式|行程|工程|分数应用题|百分数|折|比例|面积|几何|邻补角|对顶角|函数|图像|增减性|平均每小时/i },
   { id: 'writing_process', patterns: /作文|写作|开头|结尾|提纲|续写|作文题/i }
 ];
 
@@ -205,6 +205,23 @@ function diagnosticProbe(taskType, level) {
 
 function inferHomeworkPressureSignal(text = '', taskType = 'unknown') {
   const source = String(text || '');
+  const scorePattern = (pattern) => {
+    const rawParts = String(pattern && pattern.source ? pattern.source : '')
+      .split('|')
+      .map((part) => part.replace(/[()\\^$.*+?[\]{}]/g, '').trim())
+      .filter((part) => part.length >= 2);
+    const hitCount = rawParts.filter((part) => source.includes(part)).length;
+    return hitCount * 10 + rawParts.join('').length / 1000;
+  };
+  const pickBestCase = (items, expectedTaskType) => items
+    .map((item, index) => {
+      const bestPatternScore = Math.max(...item.patterns.map(scorePattern));
+      const matched = item.patterns.some((pattern) => pattern.test(source));
+      const taskScore = item.taskType === expectedTaskType ? 100 : 0;
+      return { item, index, matched, score: taskScore + bestPatternScore };
+    })
+    .filter((entry) => entry.matched)
+    .sort((a, b) => b.score - a.score || b.index - a.index)[0];
   const cases = [
     {
       id: 'ratio_speed_each_hour',
@@ -495,17 +512,240 @@ function inferHomeworkPressureSignal(text = '', taskType = 'unknown') {
       boardMove: '小黑板只画“时间、地点、人物、事件”四格，不评价文采。',
       parentCheck: '先问：先写一句发生了什么，不用一开始就写得漂亮。',
       reviewMove: '换一个作文题，仍先写一件事的第一句。'
+    },
+    {
+      id: 'percent_discount',
+      taskType: 'math_word_problem',
+      patterns: [/八折|七五折|折扣|原价|现价|80%|百分数/],
+      firstStep: '先把八折翻译成现价是原价的 80%。',
+      wrongCause: '把折扣当成少掉的具体钱数，没有先翻译百分数含义。',
+      boardMove: '小黑板只写“八折 = 现价占原价 80%”。',
+      parentCheck: '先问：八折说的是现价占原价的几成，不是少几元。',
+      reviewMove: '换成七五折，仍先说现价占原价百分之几。'
+    },
+    {
+      id: 'ratio_scale_one_unit',
+      taskType: 'math_word_problem',
+      patterns: [/图纸|2 厘米|6 米|5 厘米|每 1 厘米|比例/],
+      firstStep: '先求图上 1 厘米对应实际 3 米。',
+      wrongCause: '没有先找每 1 厘米对应量，直接把图上长度相乘。',
+      boardMove: '小黑板只画“2 厘米 -> 6 米，所以 1 厘米 -> 3 米”。',
+      parentCheck: '先问：图上 1 厘米到底代表实际多少？',
+      reviewMove: '把图上 5 厘米换成 7 厘米，仍先求 1 厘米对应量。'
+    },
+    {
+      id: 'composite_area_subtract',
+      taskType: 'math_word_problem',
+      patterns: [/组合图形|面积|长方形|正方形|挖去|剩余面积/],
+      firstStep: '先判断剩余面积等于大长方形面积减小正方形面积。',
+      wrongCause: '没有先分清整体和被挖掉的部分。',
+      boardMove: '小黑板只画“大图形 - 挖掉部分 = 剩余”。',
+      parentCheck: '先问：这题求的是整个图形，还是被挖掉后剩下的部分？',
+      reviewMove: '换成挖去一个三角形，仍先说整体减去哪一块。'
+    },
+    {
+      id: 'inequality_negative_sign',
+      taskType: 'equation_setup',
+      patterns: [/不等式|除以负数|乘以负数|不等号方向|反向/],
+      firstStep: '先标出这一步是除以负数。',
+      wrongCause: '把不等式变形当成方程变形，忘记负数会改变不等号方向。',
+      boardMove: '小黑板只写“除以负数 -> 不等号反向”。',
+      parentCheck: '先问：这一步两边是除以正数还是负数？不等号方向要不要变？',
+      reviewMove: '换成乘以负数，仍先判断不等号方向。'
+    },
+    {
+      id: 'quadratic_vertex_form',
+      taskType: 'math_word_problem',
+      patterns: [/二次函数|抛物线|顶点式|开口方向|h、k|二次项系数/],
+      firstStep: '先从顶点式读出顶点和开口方向。',
+      wrongCause: '没有先读式子结构，直接代数计算。',
+      boardMove: '小黑板只圈顶点式里的 h、k 和二次项系数符号。',
+      parentCheck: '先问：这个式子能直接读出顶点吗？开口看哪个符号？',
+      reviewMove: '换一个顶点式，仍先圈 h、k 和开口符号。'
+    },
+    {
+      id: 'chinese_main_idea',
+      taskType: 'reading_question',
+      patterns: [/概括|主要内容|谁做了什么|结果怎样|细节都抄/],
+      firstStep: '先用“谁做了什么，结果怎样”压成一句话。',
+      wrongCause: '把细节堆砌当概括，没有抓人物、事件和结果。',
+      boardMove: '小黑板只画“谁 -> 做什么 -> 结果”三格。',
+      parentCheck: '先问：这句话能不能去掉两个细节，还保留主要意思？',
+      reviewMove: '换一篇写劳动的小短文，仍先压成谁做什么。'
+    },
+    {
+      id: 'argument_evidence',
+      taskType: 'reading_question',
+      patterns: [/议论文|论点|论据|事例|证明观点|个人观点/],
+      firstStep: '先找到文章中心论点，再圈支撑它的事例论据。',
+      wrongCause: '把个人观点当答案，没有区分论点和论据。',
+      boardMove: '小黑板只画“论点 -> 事例论据 -> 证明关系”。',
+      parentCheck: '先问：这句话是作者观点，还是用来证明观点的例子？',
+      reviewMove: '换一段议论文，仍先圈论点和事例。'
+    },
+    {
+      id: 'english_comparative_than',
+      taskType: 'english_sentence',
+      patterns: [/比较级|than|tall|heavy|加 -er/i],
+      firstStep: '先找比较信号 than，再判断用比较级。',
+      wrongCause: '没有先看比较信号，直接填形容词原形。',
+      boardMove: '小黑板只圈 than，写“比较级”。',
+      parentCheck: '先问：句子里有没有 than？它提示比较还是原级？',
+      reviewMove: '把 tall 换成 heavy，仍先找 than。'
+    },
+    {
+      id: 'english_passive_be_done',
+      taskType: 'english_sentence',
+      patterns: [/被动语态|The bridge|build|built|be 动词|be done/i],
+      firstStep: '先判断主语是动作承受者，再写 be done 结构。',
+      wrongCause: '只记过去分词，没有检查被动语态需要 be 动词。',
+      boardMove: '小黑板只写“承受者 + be + done”。',
+      parentCheck: '先问：桥是自己建造，还是被建造？be 动词有没有位置？',
+      reviewMove: '换成 The room clean，仍先判断承受者和 be done。'
+    },
+    {
+      id: 'english_cloze_context',
+      taskType: 'reading_question',
+      patterns: [/完形填空|空格|前后两句|语境线索|后句验证/],
+      firstStep: '先读空格前后两句，找语境线索。',
+      wrongCause: '只看空格所在一句，没有利用上下文。',
+      boardMove: '小黑板只画“前句线索 -> 空格 -> 后句验证”。',
+      parentCheck: '先问：空格前一句给了什么线索？选项能不能被后一句验证？',
+      reviewMove: '换一个完形空，仍先读前后两句。'
+    },
+    {
+      id: 'density_unit',
+      taskType: 'physics_diagram',
+      patterns: [/密度|质量|体积|单位|m \/ 体积|统一单位/],
+      firstStep: '先把质量和体积分别圈出并统一单位。',
+      wrongCause: '没有先分清质量、体积和单位。',
+      boardMove: '小黑板只画“质量 m / 体积 V -> 密度”。',
+      parentCheck: '先问：你圈出的哪个是质量，哪个是体积？单位统一了吗？',
+      reviewMove: '换一个体积单位，仍先统一单位再说公式。'
+    },
+    {
+      id: 'pressure_area',
+      taskType: 'physics_diagram',
+      patterns: [/压强|正放|侧放|受力面积|接触面积|压力/],
+      firstStep: '先判断压力是否不变，再比较受力面积。',
+      wrongCause: '只看压力大小，忽略受力面积对压强的影响。',
+      boardMove: '小黑板只画“压力相同，接触面积不同”。',
+      parentCheck: '先问：压力有没有变？接触面积变大还是变小？',
+      reviewMove: '换成书本平放和立放，仍先比较面积。'
+    },
+    {
+      id: 'speed_graph_slope',
+      taskType: 'physics_diagram',
+      patterns: [/速度图像|路程-时间|斜率|终点数值|单位时间/],
+      firstStep: '先判断速度看路程随时间变化的斜率。',
+      wrongCause: '把终点路程当速度，没有看单位时间变化量。',
+      boardMove: '小黑板只画“时间增加 1 份，路程增加几份”。',
+      parentCheck: '先问：速度看终点数值，还是看每单位时间走多少？',
+      reviewMove: '换一条更陡的直线，仍先比较单位时间路程。'
+    },
+    {
+      id: 'metal_activity_displacement',
+      taskType: 'chemistry_experiment',
+      patterns: [/金属活动性|铁片|硫酸铜|红色物质|置换|活泼/],
+      firstStep: '先判断铁比铜活泼，可能把铜置换出来。',
+      wrongCause: '只记实验颜色，没有连接金属活动性顺序。',
+      boardMove: '小黑板只画“活泼金属 -> 置换较不活泼金属”。',
+      parentCheck: '先问：红色物质可能是谁？铁和铜谁更活泼？',
+      reviewMove: '换成锌和硫酸铜，仍先比较活动性。'
+    },
+    {
+      id: 'solution_mass_fraction',
+      taskType: 'chemistry_experiment',
+      patterns: [/溶质质量分数|10 克盐|90 克水|溶液质量|分母/],
+      firstStep: '先判断溶液质量等于溶质质量加溶剂质量。',
+      wrongCause: '把溶剂质量当分母，没有先求溶液总质量。',
+      boardMove: '小黑板只画“溶质 10g + 水 90g = 溶液 100g”。',
+      parentCheck: '先问：质量分数的分母是水，还是整个溶液？',
+      reviewMove: '换成 5 克盐和 45 克水，仍先求溶液质量。'
+    },
+    {
+      id: 'ph_neutralization_trend',
+      taskType: 'chemistry_experiment',
+      patterns: [/中和|氢氧化钠|pH|酸性|加碱|变化趋势/],
+      firstStep: '先判断加入碱会让酸性逐渐减弱，pH 上升。',
+      wrongCause: '只背酸碱名称，没有看 pH 变化方向。',
+      boardMove: '小黑板只画“加碱 -> 酸性减弱 -> pH 上升”。',
+      parentCheck: '先问：加入的是酸还是碱？pH 应该往大变还是往小变？',
+      reviewMove: '换成向碱中加酸，仍先判断 pH 方向。'
+    },
+    {
+      id: 'microscope_reverse_move',
+      taskType: 'biology_process',
+      patterns: [/显微镜|物像偏左上|玻片|移动方向|相反/],
+      firstStep: '先记住显微镜下物像移动方向与玻片移动方向相反。',
+      wrongCause: '按肉眼直觉移动，没有考虑显微镜成像相反。',
+      boardMove: '小黑板只画“物像偏左上 -> 玻片向左上移”的反向规则提示。',
+      parentCheck: '先问：你移动的是玻片，不是屏幕上的物像，对吗？',
+      reviewMove: '换成物像偏右下，仍先判断玻片移动方向。'
+    },
+    {
+      id: 'blood_circulation_route',
+      taskType: 'biology_process',
+      patterns: [/血液循环|体循环|肺循环|左心室|右心房|心腔/],
+      firstStep: '先判断体循环从左心室出发，回到右心房。',
+      wrongCause: '把肺循环和体循环的起点终点混淆。',
+      boardMove: '小黑板只画“左心室 -> 全身 -> 右心房”。',
+      parentCheck: '先问：这题问体循环还是肺循环？起点是哪一个心腔？',
+      reviewMove: '换成肺循环，仍先说起点和终点。'
+    },
+    {
+      id: 'lat_lon_hemisphere',
+      taskType: 'geography_map',
+      patterns: [/经纬网|经线|纬线|半球|东西经|南北纬/],
+      firstStep: '先分清纬度判断南北半球，经度判断东西半球。',
+      wrongCause: '把经线纬线的作用混在一起。',
+      boardMove: '小黑板只画“纬度看南北，经度看东西”。',
+      parentCheck: '先问：南北半球先看经度还是纬度？东西半球呢？',
+      reviewMove: '换一个经纬度点，仍先分南北再分东西。'
+    },
+    {
+      id: 'monsoon_water_vapor',
+      taskType: 'geography_map',
+      patterns: [/季风|夏季风|降水|海洋|陆地|水汽/],
+      firstStep: '先判断夏季风从海洋吹向陆地，带来水汽。',
+      wrongCause: '只背风向，没有连接水汽来源和降水。',
+      boardMove: '小黑板只画“海洋 -> 陆地 -> 水汽 -> 降水”。',
+      parentCheck: '先问：这股风从哪里来？有没有带来水汽？',
+      reviewMove: '换成冬季风，仍先判断来自海洋还是陆地。'
+    },
+    {
+      id: 'river_flows_downhill',
+      taskType: 'geography_map',
+      patterns: [/河流流向|等高线|高处|低处|海拔变化|地图上下/],
+      firstStep: '先看地势高低，河流从高处流向低处。',
+      wrongCause: '把地图上下当成实际流向，没有看海拔变化。',
+      boardMove: '小黑板只画“高海拔 -> 低海拔”的箭头。',
+      parentCheck: '先问：河流看地图上方下方，还是看海拔高低？',
+      reviewMove: '换一张等高线河流图，仍先找高处和低处。'
     }
   ];
-  const matched = cases.find((item) => item.taskType === taskType && item.patterns.some((pattern) => pattern.test(source)))
-    || cases.find((item) => item.patterns.some((pattern) => pattern.test(source)));
+  if (/没说|缺少|题干不全|条件不完整|没有给/.test(source)) {
+    return {
+      id: `missing_condition_${taskType || 'unknown'}`,
+      taskType: taskType || 'unknown',
+      firstStep: '第一步先停下来补题干条件，不根据缺失信息硬算。',
+      wrongCause: '题干条件不完整时仍想直接计算，容易把猜测当答案。',
+      boardMove: '小黑板只画“已知条件 / 缺少条件 / 题目问题”三栏。',
+      parentCheck: '家长先问：这题还缺哪个已知条件？不要先催孩子算。',
+      reviewMove: '明天换一道条件完整的小题，只练先检查题干。',
+      source: 'missing_condition_guard'
+    };
+  }
+  const matchedEntry = pickBestCase(cases.filter((item) => item.taskType === taskType), taskType)
+    || pickBestCase(cases, taskType);
+  const matched = matchedEntry && matchedEntry.item;
   if (!matched) {
     return {
       id: `generic_${taskType || 'unknown'}`,
       taskType: taskType || 'unknown',
       firstStep: TASK_TYPE_PROMPTS[taskType] || TASK_TYPE_PROMPTS.unknown,
       wrongCause: (MISCONCEPTION_MAP[taskType] && Object.values(MISCONCEPTION_MAP[taskType])[0]) || MISCONCEPTION_MAP.unknown.first_step,
-      boardMove: '小黑板只画第一步入口，不写完整答案。',
+      boardMove: '小黑板只画第一步入口，不写最终结果。',
       parentCheck: '家长只问孩子第一步先看哪里。',
       reviewMove: '明天换一题小变式，只回访同一个第一步。',
       source: 'generic_task_type'
