@@ -402,6 +402,12 @@
         <view class="share-relay-evidence" wx:if="{{incomingShareRelay.unitDecisionLine}}">{{incomingShareRelay.unitDecisionLine}}</view>
         <view class="share-relay-evidence" wx:if="{{incomingShareRelay.unitReportLine}}">{{incomingShareRelay.unitReportLine}}</view>
         <view class="share-relay-evidence" wx:if="{{incomingShareRelay.unitBlackboardLine}}">{{incomingShareRelay.unitBlackboardLine}}</view>
+        <view class="share-relay-evidence" wx:if="{{incomingShareRelay.socraticReportStatus}}">点拨状态：{{incomingShareRelay.socraticReportStatus}}</view>
+        <view class="share-relay-evidence" wx:if="{{incomingShareRelay.socraticReportActionLine}}">{{incomingShareRelay.socraticReportActionLine}}</view>
+        <view class="share-relay-evidence" wx:if="{{incomingShareRelay.socraticReportDecisionLine}}">{{incomingShareRelay.socraticReportDecisionLine}}</view>
+        <view class="share-relay-evidence" wx:if="{{incomingShareRelay.socraticReportNoIncreaseLine}}">{{incomingShareRelay.socraticReportNoIncreaseLine}}</view>
+        <view class="share-relay-evidence" wx:if="{{incomingShareRelay.socraticReportParentProofLine}}">{{incomingShareRelay.socraticReportParentProofLine}}</view>
+        <view class="share-relay-evidence" wx:if="{{incomingShareRelay.socraticReportBoundaryLine}}">{{incomingShareRelay.socraticReportBoundaryLine}}</view>
         <view class="share-relay-evidence">{{incomingShareRelay.returnContractLine}}</view>
         <view class="share-relay-grid">
           <button

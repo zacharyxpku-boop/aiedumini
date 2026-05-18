@@ -186,7 +186,13 @@ Page({
         course_unit_share_contract: safeDecodeShareParam(query.course_unit_share_contract),
         course_unit_blackboard: safeDecodeShareParam(query.course_unit_blackboard),
         course_unit_recall_route: safeDecodeShareParam(query.course_unit_recall_route),
-        course_unit_game_route: safeDecodeShareParam(query.course_unit_game_route)
+        course_unit_game_route: safeDecodeShareParam(query.course_unit_game_route),
+        socratic_report_status: safeDecodeShareParam(query.socratic_report_status),
+        socratic_report_action: safeDecodeShareParam(query.socratic_report_action),
+        socratic_report_decision: safeDecodeShareParam(query.socratic_report_decision),
+        socratic_report_no_increase: safeDecodeShareParam(query.socratic_report_no_increase),
+        socratic_report_parent_proof: safeDecodeShareParam(query.socratic_report_parent_proof),
+        socratic_report_boundary: safeDecodeShareParam(query.socratic_report_boundary)
       }) : {
         code: query.share,
         share_code: query.share,
@@ -222,6 +228,12 @@ Page({
         course_unit_blackboard: safeDecodeShareParam(query.course_unit_blackboard),
         course_unit_recall_route: safeDecodeShareParam(query.course_unit_recall_route),
         course_unit_game_route: safeDecodeShareParam(query.course_unit_game_route),
+        socratic_report_status: safeDecodeShareParam(query.socratic_report_status),
+        socratic_report_action: safeDecodeShareParam(query.socratic_report_action),
+        socratic_report_decision: safeDecodeShareParam(query.socratic_report_decision),
+        socratic_report_no_increase: safeDecodeShareParam(query.socratic_report_no_increase),
+        socratic_report_parent_proof: safeDecodeShareParam(query.socratic_report_parent_proof),
+        socratic_report_boundary: safeDecodeShareParam(query.socratic_report_boundary),
         action_label: query.action === 'wrong_cause_revisit'
           ? '明天先回看这张错因卡'
           : query.action === 'due_card_revisit'
@@ -262,7 +274,13 @@ Page({
             course_unit_subject: safeDecodeShareParam(query.course_unit_subject),
             course_unit_parent_decision: safeDecodeShareParam(query.course_unit_parent_decision),
             course_unit_report_contract: safeDecodeShareParam(query.course_unit_report_contract),
-            course_unit_share_contract: safeDecodeShareParam(query.course_unit_share_contract)
+            course_unit_share_contract: safeDecodeShareParam(query.course_unit_share_contract),
+            socratic_report_status: safeDecodeShareParam(query.socratic_report_status),
+            socratic_report_action: safeDecodeShareParam(query.socratic_report_action),
+            socratic_report_decision: safeDecodeShareParam(query.socratic_report_decision),
+            socratic_report_no_increase: safeDecodeShareParam(query.socratic_report_no_increase),
+            socratic_report_parent_proof: safeDecodeShareParam(query.socratic_report_parent_proof),
+            socratic_report_boundary: safeDecodeShareParam(query.socratic_report_boundary)
           }
         });
       }
@@ -290,7 +308,13 @@ Page({
           course_unit_subject: safeDecodeShareParam(query.course_unit_subject),
           course_unit_parent_decision: safeDecodeShareParam(query.course_unit_parent_decision),
           course_unit_report_contract: safeDecodeShareParam(query.course_unit_report_contract),
-          course_unit_share_contract: safeDecodeShareParam(query.course_unit_share_contract)
+          course_unit_share_contract: safeDecodeShareParam(query.course_unit_share_contract),
+          socratic_report_status: safeDecodeShareParam(query.socratic_report_status),
+          socratic_report_action: safeDecodeShareParam(query.socratic_report_action),
+          socratic_report_decision: safeDecodeShareParam(query.socratic_report_decision),
+          socratic_report_no_increase: safeDecodeShareParam(query.socratic_report_no_increase),
+          socratic_report_parent_proof: safeDecodeShareParam(query.socratic_report_parent_proof),
+          socratic_report_boundary: safeDecodeShareParam(query.socratic_report_boundary)
         }
       }).catch(() => {});
       this.setData({
@@ -823,10 +847,22 @@ Page({
     const unitLine = incoming.course_unit_label
       ? `${incoming.course_unit_subject || '当前学科'} · ${incoming.course_unit_label}`
       : '';
+    const hasSocraticReport = !!(
+      incoming.socratic_report_status ||
+      incoming.socratic_report_action ||
+      incoming.socratic_report_decision ||
+      incoming.socratic_report_no_increase ||
+      incoming.socratic_report_parent_proof ||
+      incoming.socratic_report_boundary
+    );
+    const socraticReportSummary = hasSocraticReport
+      ? `这张卡带回点拨质量证据：${incoming.socratic_report_status || '待复核'}。先执行报告里的最小动作，不加题、不看排名。`
+      : '';
+    const socraticReportEvidence = incoming.socratic_report_decision || incoming.socratic_report_action || '';
     return {
       title: '回流接力板',
-      summary: unitLine ? `这张卡带回一个单元动作：${unitLine}。先复用第一步，不看排名。` : '朋友分享的不是排名，是一个可复用的小动作。先选一条路，按点会留下接力证据。',
-      evidenceLine: incoming.course_unit_share_contract || incoming.capability_label || incoming.challenge_goal || actionLabel,
+      summary: socraticReportSummary || (unitLine ? `这张卡带回一个单元动作：${unitLine}。先复用第一步，不看排名。` : '朋友分享的不是排名，是一个可复用的小动作。先选一条路，按点会留下接力证据。'),
+      evidenceLine: socraticReportEvidence || incoming.course_unit_share_contract || incoming.capability_label || incoming.challenge_goal || actionLabel,
       firstStepLine: `先做第一步：${firstStep}`,
       privacyLine,
       reviewLine,
@@ -841,6 +877,12 @@ Page({
       unitDecisionLine: incoming.course_unit_parent_decision || '',
       unitReportLine: incoming.course_unit_report_contract || '',
       unitBlackboardLine: incoming.course_unit_blackboard || '',
+      socraticReportStatus: incoming.socratic_report_status || '',
+      socraticReportActionLine: incoming.socratic_report_action ? `点拨行动：${incoming.socratic_report_action}` : '',
+      socraticReportDecisionLine: incoming.socratic_report_decision ? `家长判断：${incoming.socratic_report_decision}` : '',
+      socraticReportNoIncreaseLine: incoming.socratic_report_no_increase ? `不加题规则：${incoming.socratic_report_no_increase}` : '',
+      socraticReportParentProofLine: incoming.socratic_report_parent_proof ? `家长证据：${incoming.socratic_report_parent_proof}` : '',
+      socraticReportBoundaryLine: incoming.socratic_report_boundary ? `分享边界：${incoming.socratic_report_boundary}` : '',
       returnContractLine: safeRelayPacket
         ? '接力成立条件：自己的第一步、错因回退、明天回访预约都要留下证据。'
         : '接力成立条件：主动回忆、错因回退、明天回访三件事至少完成一件并留下记录。',
@@ -849,7 +891,7 @@ Page({
           id: 'repair',
           label: '先修卡点',
           route: '/pages/review/review?from=share_relay&mode=wrong_cause',
-          reason: incoming.capability_gap ? `先补 ${incoming.capability_gap} 这条能力缺口。` : actionDetail,
+          reason: incoming.socratic_report_action || (incoming.capability_gap ? `先补 ${incoming.capability_gap} 这条能力缺口。` : actionDetail),
           evidence: '错因接力'
         },
         {
@@ -863,7 +905,7 @@ Page({
           id: 'parent',
           label: '给家长看',
           route: '/pages/profile/profile?from=share_relay',
-          reason: '只看今晚动作、证据和明天复核，不做排行。',
+          reason: incoming.socratic_report_decision || '只看今晚动作、证据和明天复核，不做排行。',
           evidence: '家庭复盘'
         }
       ]
@@ -1569,8 +1611,11 @@ Page({
       next: 'arcade'
     });
     const incoming = this.data.incomingShare || (storage.loadIncomingShare && storage.loadIncomingShare()) || {};
+    const socraticReportQuery = incoming.share_code
+      ? `&socratic_report_status=${encodeURIComponent(incoming.socratic_report_status || '')}&socratic_report_action=${encodeURIComponent(incoming.socratic_report_action || '')}&socratic_report_decision=${encodeURIComponent(incoming.socratic_report_decision || '')}&socratic_report_no_increase=${encodeURIComponent(incoming.socratic_report_no_increase || '')}&socratic_report_parent_proof=${encodeURIComponent(incoming.socratic_report_parent_proof || '')}&socratic_report_boundary=${encodeURIComponent(incoming.socratic_report_boundary || '')}`
+      : '';
     const query = incoming.share_code
-      ? `?from=share&share=${incoming.share_code}&mode=${incoming.mode || ''}&identity=${encodeURIComponent(incoming.identity_tag || '')}&action=${incoming.parent_next_action || ''}&capability_gap=${encodeURIComponent(incoming.capability_gap || '')}&capability_label=${encodeURIComponent(incoming.capability_label || '')}&challenge_goal=${encodeURIComponent(incoming.challenge_goal || '')}&challenge_rule=${encodeURIComponent(incoming.challenge_rule || '')}`
+      ? `?from=share&share=${incoming.share_code}&mode=${incoming.mode || ''}&identity=${encodeURIComponent(incoming.identity_tag || '')}&action=${incoming.parent_next_action || ''}&capability_gap=${encodeURIComponent(incoming.capability_gap || '')}&capability_label=${encodeURIComponent(incoming.capability_label || '')}&challenge_goal=${encodeURIComponent(incoming.challenge_goal || '')}&challenge_rule=${encodeURIComponent(incoming.challenge_rule || '')}${socraticReportQuery}`
       : '';
     wx.navigateTo({ url: `/pages/arcade/arcade${query}` });
   },
@@ -1578,8 +1623,11 @@ Page({
   goSharedChallenge() {
     const incoming = this.data.incomingShare || (storage.loadIncomingShare && storage.loadIncomingShare()) || {};
     const route = navigation.normalizeRoute(incoming.challenge_route || incoming.capability_route || '/pages/arcade/arcade');
+    const socraticReportQuery = incoming.share_code
+      ? `&socratic_report_status=${encodeURIComponent(incoming.socratic_report_status || '')}&socratic_report_action=${encodeURIComponent(incoming.socratic_report_action || '')}&socratic_report_decision=${encodeURIComponent(incoming.socratic_report_decision || '')}&socratic_report_no_increase=${encodeURIComponent(incoming.socratic_report_no_increase || '')}&socratic_report_parent_proof=${encodeURIComponent(incoming.socratic_report_parent_proof || '')}&socratic_report_boundary=${encodeURIComponent(incoming.socratic_report_boundary || '')}`
+      : '';
     const query = incoming.share_code
-      ? `from=share&share=${incoming.share_code}&mode=${incoming.mode || ''}&identity=${encodeURIComponent(incoming.identity_tag || '')}&action=${incoming.parent_next_action || ''}&capability_gap=${encodeURIComponent(incoming.capability_gap || '')}&capability_label=${encodeURIComponent(incoming.capability_label || '')}&challenge_goal=${encodeURIComponent(incoming.challenge_goal || '')}&challenge_rule=${encodeURIComponent(incoming.challenge_rule || '')}&relay_privacy=${encodeURIComponent(incoming.relay_privacy || '')}&relay_review=${encodeURIComponent(incoming.relay_review || '')}&relay_first_step=${encodeURIComponent(incoming.relay_first_step || '')}&relay_id=${encodeURIComponent(incoming.relay_id || '')}&relay_receiver_action=${encodeURIComponent(incoming.relay_receiver_action || '')}&relay_parent_check=${encodeURIComponent(incoming.relay_parent_check || '')}&relay_next_revisit=${encodeURIComponent(incoming.relay_next_revisit || '')}&relay_allowed_fields=${encodeURIComponent(incoming.relay_allowed_fields || '')}&relay_blocked_fields=${encodeURIComponent(incoming.relay_blocked_fields || '')}&relay_completion_signal=${encodeURIComponent(incoming.relay_completion_signal || '')}&relay_return_path=${encodeURIComponent(incoming.relay_return_path || '')}`
+      ? `from=share&share=${incoming.share_code}&mode=${incoming.mode || ''}&identity=${encodeURIComponent(incoming.identity_tag || '')}&action=${incoming.parent_next_action || ''}&capability_gap=${encodeURIComponent(incoming.capability_gap || '')}&capability_label=${encodeURIComponent(incoming.capability_label || '')}&challenge_goal=${encodeURIComponent(incoming.challenge_goal || '')}&challenge_rule=${encodeURIComponent(incoming.challenge_rule || '')}&relay_privacy=${encodeURIComponent(incoming.relay_privacy || '')}&relay_review=${encodeURIComponent(incoming.relay_review || '')}&relay_first_step=${encodeURIComponent(incoming.relay_first_step || '')}&relay_id=${encodeURIComponent(incoming.relay_id || '')}&relay_receiver_action=${encodeURIComponent(incoming.relay_receiver_action || '')}&relay_parent_check=${encodeURIComponent(incoming.relay_parent_check || '')}&relay_next_revisit=${encodeURIComponent(incoming.relay_next_revisit || '')}&relay_allowed_fields=${encodeURIComponent(incoming.relay_allowed_fields || '')}&relay_blocked_fields=${encodeURIComponent(incoming.relay_blocked_fields || '')}&relay_completion_signal=${encodeURIComponent(incoming.relay_completion_signal || '')}&relay_return_path=${encodeURIComponent(incoming.relay_return_path || '')}${socraticReportQuery}`
       : '';
     const target = query && route.indexOf('?') < 0 ? `${route}?${query}` : route;
     this.trackShareActivation('challenge_started', {
@@ -1590,7 +1638,13 @@ Page({
       challenge_route: incoming.challenge_route || '',
       relay_privacy: incoming.relay_privacy || '',
       relay_review: incoming.relay_review || '',
-      relay_first_step: incoming.relay_first_step || ''
+      relay_first_step: incoming.relay_first_step || '',
+      socratic_report_status: incoming.socratic_report_status || '',
+      socratic_report_action: incoming.socratic_report_action || '',
+      socratic_report_decision: incoming.socratic_report_decision || '',
+      socratic_report_no_increase: incoming.socratic_report_no_increase || '',
+      socratic_report_parent_proof: incoming.socratic_report_parent_proof || '',
+      socratic_report_boundary: incoming.socratic_report_boundary || ''
     });
     if (!navigation.navigateLearningRoute(target)) {
       wx.navigateTo({ url: '/pages/arcade/arcade' });
@@ -1601,8 +1655,11 @@ Page({
     const dataset = event.currentTarget.dataset || {};
     const incoming = this.data.incomingShare || (storage.loadIncomingShare && storage.loadIncomingShare()) || {};
     const route = navigation.normalizeRoute(dataset.route || '/pages/arcade/arcade', '/pages/arcade/arcade');
+    const socraticReportQuery = incoming.share_code
+      ? `&socratic_report_status=${encodeURIComponent(incoming.socratic_report_status || '')}&socratic_report_action=${encodeURIComponent(incoming.socratic_report_action || '')}&socratic_report_decision=${encodeURIComponent(incoming.socratic_report_decision || '')}&socratic_report_no_increase=${encodeURIComponent(incoming.socratic_report_no_increase || '')}&socratic_report_parent_proof=${encodeURIComponent(incoming.socratic_report_parent_proof || '')}&socratic_report_boundary=${encodeURIComponent(incoming.socratic_report_boundary || '')}`
+      : '';
     const query = incoming.share_code && route.indexOf('?') < 0
-      ? `?from=share_relay&share=${incoming.share_code}&mode=${incoming.mode || ''}&identity=${encodeURIComponent(incoming.identity_tag || '')}&action=${incoming.parent_next_action || ''}&capability_gap=${encodeURIComponent(incoming.capability_gap || '')}&capability_label=${encodeURIComponent(incoming.capability_label || '')}&challenge_goal=${encodeURIComponent(incoming.challenge_goal || '')}&challenge_rule=${encodeURIComponent(incoming.challenge_rule || '')}&relay_privacy=${encodeURIComponent(incoming.relay_privacy || '')}&relay_review=${encodeURIComponent(incoming.relay_review || '')}&relay_first_step=${encodeURIComponent(incoming.relay_first_step || '')}&relay_id=${encodeURIComponent(incoming.relay_id || '')}&relay_receiver_action=${encodeURIComponent(incoming.relay_receiver_action || '')}&relay_parent_check=${encodeURIComponent(incoming.relay_parent_check || '')}&relay_next_revisit=${encodeURIComponent(incoming.relay_next_revisit || '')}&relay_allowed_fields=${encodeURIComponent(incoming.relay_allowed_fields || '')}&relay_blocked_fields=${encodeURIComponent(incoming.relay_blocked_fields || '')}&relay_completion_signal=${encodeURIComponent(incoming.relay_completion_signal || '')}&relay_return_path=${encodeURIComponent(incoming.relay_return_path || '')}`
+      ? `?from=share_relay&share=${incoming.share_code}&mode=${incoming.mode || ''}&identity=${encodeURIComponent(incoming.identity_tag || '')}&action=${incoming.parent_next_action || ''}&capability_gap=${encodeURIComponent(incoming.capability_gap || '')}&capability_label=${encodeURIComponent(incoming.capability_label || '')}&challenge_goal=${encodeURIComponent(incoming.challenge_goal || '')}&challenge_rule=${encodeURIComponent(incoming.challenge_rule || '')}&relay_privacy=${encodeURIComponent(incoming.relay_privacy || '')}&relay_review=${encodeURIComponent(incoming.relay_review || '')}&relay_first_step=${encodeURIComponent(incoming.relay_first_step || '')}&relay_id=${encodeURIComponent(incoming.relay_id || '')}&relay_receiver_action=${encodeURIComponent(incoming.relay_receiver_action || '')}&relay_parent_check=${encodeURIComponent(incoming.relay_parent_check || '')}&relay_next_revisit=${encodeURIComponent(incoming.relay_next_revisit || '')}&relay_allowed_fields=${encodeURIComponent(incoming.relay_allowed_fields || '')}&relay_blocked_fields=${encodeURIComponent(incoming.relay_blocked_fields || '')}&relay_completion_signal=${encodeURIComponent(incoming.relay_completion_signal || '')}&relay_return_path=${encodeURIComponent(incoming.relay_return_path || '')}${socraticReportQuery}`
       : '';
     const target = `${route}${query}`;
     const action = {
@@ -1636,7 +1693,11 @@ Page({
         payload: {
           action_id: action.actionId,
           reason: action.reasonLine,
-          evidence: action.evidenceLine
+          evidence: action.evidenceLine,
+          socratic_report_status: incoming.socratic_report_status || '',
+          socratic_report_action: incoming.socratic_report_action || '',
+          socratic_report_decision: incoming.socratic_report_decision || '',
+          socratic_report_no_increase: incoming.socratic_report_no_increase || ''
         }
       });
     }
@@ -1644,7 +1705,11 @@ Page({
       action_id: action.actionId,
       route: target,
       reason: action.reasonLine,
-      evidence: action.evidenceLine
+      evidence: action.evidenceLine,
+      socratic_report_status: incoming.socratic_report_status || '',
+      socratic_report_action: incoming.socratic_report_action || '',
+      socratic_report_decision: incoming.socratic_report_decision || '',
+      socratic_report_no_increase: incoming.socratic_report_no_increase || ''
     });
     if (!navigation.navigateLearningRoute(target)) {
       wx.navigateTo({ url: '/pages/arcade/arcade' });
@@ -1687,7 +1752,13 @@ Page({
         capability_route: incoming.capability_route || '',
         challenge_goal: incoming.challenge_goal || '',
         challenge_rule: incoming.challenge_rule || '',
-        challenge_route: incoming.challenge_route || ''
+        challenge_route: incoming.challenge_route || '',
+        socratic_report_status: incoming.socratic_report_status || '',
+        socratic_report_action: incoming.socratic_report_action || '',
+        socratic_report_decision: incoming.socratic_report_decision || '',
+        socratic_report_no_increase: incoming.socratic_report_no_increase || '',
+        socratic_report_parent_proof: incoming.socratic_report_parent_proof || '',
+        socratic_report_boundary: incoming.socratic_report_boundary || ''
       }, payload || {})
     }).catch(() => {});
   },

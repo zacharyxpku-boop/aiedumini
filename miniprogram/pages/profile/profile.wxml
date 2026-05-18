@@ -1055,6 +1055,13 @@
             {{dailyShareCard.shareChallengePlan.safeRelayChallengePacket.noRankingRule}}
           </view>
         </view>
+        <view class="share-conversation-card" wx:if="{{dailyShareCard.socraticMemoryRelay}}">
+          <view class="share-conversation-title">{{dailyShareCard.socraticMemoryRelay.title}}</view>
+          <view>点拨行动：{{dailyShareCard.socraticMemoryRelay.action}}</view>
+          <view>家长判断：{{dailyShareCard.socraticMemoryRelay.decision}}</view>
+          <view>不加题规则：{{dailyShareCard.socraticMemoryRelay.noIncreaseRule}}</view>
+          <view>分享边界：{{dailyShareCard.socraticMemoryRelay.shareBoundary}}</view>
+        </view>
         <view class="share-conversation-card" wx:if="{{communityShareRelayBoard}}">
           <view class="share-conversation-title">{{communityShareRelayBoard.title}}</view>
           <view>{{communityShareRelayBoard.summary}}</view>

@@ -357,7 +357,7 @@ function buildShareCode(profile, reviewSummary, gameProfileCard) {
   return hash.toString(36).slice(0, 6).toUpperCase();
 }
 
-function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCauseSummary, todayFocus, globalEvidenceBrief, reportDailyActionQueue, unifiedNextAction, capabilityEvidenceLedger, subjectSkillDepth, curriculumSpine, visualSocraticMatrix, courseUnitMap) {
+function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCauseSummary, todayFocus, globalEvidenceBrief, reportDailyActionQueue, unifiedNextAction, capabilityEvidenceLedger, subjectSkillDepth, curriculumSpine, visualSocraticMatrix, courseUnitMap, learningReportSummary) {
   const review = reviewSummary || {};
   const game = gameProfileCard || {};
   const progress = review.progress || {};
@@ -408,13 +408,27 @@ function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCause
   const challengeQuery = shareChallengePlan && shareChallengePlan.query
     ? `&challenge_goal=${encodeURIComponent(shareChallengePlan.query.challenge_goal || '')}&challenge_rule=${encodeURIComponent(shareChallengePlan.query.challenge_rule || '')}&challenge_route=${encodeURIComponent(shareChallengePlan.query.challenge_route || '')}&relay_privacy=${encodeURIComponent(shareChallengePlan.query.relay_privacy || '')}&relay_review=${encodeURIComponent(shareChallengePlan.query.relay_review || '')}&relay_first_step=${encodeURIComponent(shareChallengePlan.query.relay_first_step || '')}&relay_id=${encodeURIComponent(shareChallengePlan.query.relay_id || '')}&relay_receiver_action=${encodeURIComponent(shareChallengePlan.query.relay_receiver_action || '')}&relay_parent_check=${encodeURIComponent(shareChallengePlan.query.relay_parent_check || '')}&relay_next_revisit=${encodeURIComponent(shareChallengePlan.query.relay_next_revisit || '')}&relay_allowed_fields=${encodeURIComponent(shareChallengePlan.query.relay_allowed_fields || '')}&relay_blocked_fields=${encodeURIComponent(shareChallengePlan.query.relay_blocked_fields || '')}&relay_completion_signal=${encodeURIComponent(shareChallengePlan.query.relay_completion_signal || '')}&relay_return_path=${encodeURIComponent(shareChallengePlan.query.relay_return_path || '')}`
     : '';
+  const socraticMemoryRelay = learningReportSummary && learningReportSummary.socraticMemoryReportBridge
+    ? {
+      title: learningReportSummary.socraticMemoryReportTitle || '点拨质量接力',
+      status: learningReportSummary.socraticMemoryReportStatus || '',
+      action: learningReportSummary.socraticMemoryReportPrimaryAction || '',
+      decision: learningReportSummary.socraticMemoryReportDecisionLine || '',
+      noIncreaseRule: learningReportSummary.socraticMemoryReportNoIncreaseRule || '',
+      parentProof: learningReportSummary.socraticMemoryReportParentProofLine || '',
+      shareBoundary: learningReportSummary.socraticMemoryReportShareBoundary || ''
+    }
+    : null;
+  const socraticReportQuery = socraticMemoryRelay
+    ? `&socratic_report_status=${encodeURIComponent(socraticMemoryRelay.status)}&socratic_report_action=${encodeURIComponent(socraticMemoryRelay.action)}&socratic_report_decision=${encodeURIComponent(socraticMemoryRelay.decision)}&socratic_report_no_increase=${encodeURIComponent(socraticMemoryRelay.noIncreaseRule)}&socratic_report_parent_proof=${encodeURIComponent(socraticMemoryRelay.parentProof)}&socratic_report_boundary=${encodeURIComponent(socraticMemoryRelay.shareBoundary)}`
+    : '';
   const courseUnitDecision = buildCourseUnitDecisionBoard(courseUnitMap);
   const courseUnitQuery = courseUnitDecision
     ? `&course_unit_label=${encodeURIComponent(courseUnitDecision.unitLabel || '')}&course_unit_subject=${encodeURIComponent(courseUnitDecision.subjectLabel || '')}&course_unit_tier=${encodeURIComponent(courseUnitDecision.tier || '')}&course_unit_parent_decision=${encodeURIComponent(courseUnitDecision.parentTonightDecision || '')}&course_unit_report_contract=${encodeURIComponent(courseUnitDecision.reportContract || '')}&course_unit_share_contract=${encodeURIComponent(courseUnitDecision.shareContract || '')}&course_unit_blackboard=${encodeURIComponent(courseUnitDecision.blackboardLine || '')}&course_unit_recall_route=${encodeURIComponent(courseUnitDecision.recallRoute || '')}&course_unit_game_route=${encodeURIComponent(courseUnitDecision.gameRoute || '')}`
     : '';
-  const path = `/pages/home/home?share=${code}&from=daily_card&challenge=arcade&mode=same_identity&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}${courseUnitQuery}`;
-  const parentPath = `/pages/home/home?share=${code}&from=parent_card&mode=parent_recap&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}${courseUnitQuery}`;
-  const peerPath = `/pages/home/home?share=${code}&from=peer_challenge&challenge=arcade&mode=same_identity&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}${courseUnitQuery}`;
+  const path = `/pages/home/home?share=${code}&from=daily_card&challenge=arcade&mode=same_identity&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}${courseUnitQuery}${socraticReportQuery}`;
+  const parentPath = `/pages/home/home?share=${code}&from=parent_card&mode=parent_recap&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}${courseUnitQuery}${socraticReportQuery}`;
+  const peerPath = `/pages/home/home?share=${code}&from=peer_challenge&challenge=arcade&mode=same_identity&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}${courseUnitQuery}${socraticReportQuery}`;
   const parentShareTitle = todayFocus && todayFocus.title
     ? `今晚先看这一处：${storage.formatIssueType(todayFocus.issueType || '卡点')} · ${todayFocus.title}`
     : '给家里看的今日学习复盘';
@@ -485,6 +499,7 @@ function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCause
       evidenceRequired: ['parent_question_used', 'child_first_step', 'next_day_revisit']
     },
     shareChallengePlan,
+    socraticMemoryRelay,
     familyActionCard: {
       title: '家庭行动卡',
       judgement: todayFocus && todayFocus.repairStatus === 'completed'
@@ -584,6 +599,11 @@ function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCause
       safe_relay_packet: shareChallengePlan && shareChallengePlan.safeRelayChallengePacket,
       safe_relay_allowed_fields: shareChallengePlan && shareChallengePlan.safeRelayChallengePacket && shareChallengePlan.safeRelayChallengePacket.allowedFields,
       safe_relay_blocked_fields: shareChallengePlan && shareChallengePlan.safeRelayChallengePacket && shareChallengePlan.safeRelayChallengePacket.blockedFields,
+      socratic_report_status: socraticMemoryRelay && socraticMemoryRelay.status,
+      socratic_report_action: socraticMemoryRelay && socraticMemoryRelay.action,
+      socratic_report_decision: socraticMemoryRelay && socraticMemoryRelay.decision,
+      socratic_report_no_increase: socraticMemoryRelay && socraticMemoryRelay.noIncreaseRule,
+      socratic_report_boundary: socraticMemoryRelay && socraticMemoryRelay.shareBoundary,
       evidence_brief: evidenceBrief && evidenceBrief.reportLine,
       capability_gap_id: nextCapability && nextCapability.id,
       capability_gap_label: nextCapability && nextCapability.label,
@@ -1321,7 +1341,7 @@ Page({
       capabilityEvidenceLedger
     }) : null;
     learningReportSummary = buildLearningReportSummary(learningReportState || {}, capabilityEvidenceLedger, subjectSkillDepth, curriculumSpine, visualSocraticMatrix, courseUnitMap);
-    const dailyShareCard = buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCauseSummary, todayFocus, globalEvidenceBrief, reportDailyActionQueue, unifiedNextAction, capabilityEvidenceLedger, subjectSkillDepth, curriculumSpine, visualSocraticMatrix, courseUnitMap);
+    const dailyShareCard = buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCauseSummary, todayFocus, globalEvidenceBrief, reportDailyActionQueue, unifiedNextAction, capabilityEvidenceLedger, subjectSkillDepth, curriculumSpine, visualSocraticMatrix, courseUnitMap, learningReportSummary);
     const communityShareRelayBoard = storage.buildCommunityShareRelayBoard
       ? storage.buildCommunityShareRelayBoard({
         focus: todayFocus,
