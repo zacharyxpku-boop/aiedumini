@@ -876,6 +876,14 @@ Page({
       proofOfLifeSignal: incoming.relay_proof_signal || '',
       guardrailLine: incoming.relay_guardrail || ''
     };
+    const spreadReadinessGate = incoming.relay_spread_status ? {
+      status: incoming.relay_spread_status,
+      score: incoming.relay_spread_score || '',
+      shareModeLine: incoming.relay_spread_line || '',
+      fallbackLine: incoming.relay_spread_fallback || '',
+      reasonLine: incoming.relay_spread_reason || '',
+      requiredEvidence: incoming.relay_spread_required || ''
+    } : null;
     const safeRelayPacket = incoming.relay_id ? {
       relayId: incoming.relay_id,
       receiverAction: incoming.relay_receiver_action || actionDetail,
@@ -932,6 +940,10 @@ Page({
       naturalSpreadDay7Line: naturalSpread.day7ReturnLine ? `第 7 天：${naturalSpread.day7ReturnLine}` : '',
       naturalSpreadProofLine: naturalSpread.proofOfLifeSignal ? `完成信号：${naturalSpread.proofOfLifeSignal}` : '',
       naturalSpreadGuardrailLine: naturalSpread.guardrailLine ? `裂变护栏：${naturalSpread.guardrailLine}` : '',
+      spreadReadinessGate,
+      spreadReadinessLine: spreadReadinessGate ? `传播门槛：${spreadReadinessGate.shareModeLine || spreadReadinessGate.status}` : '',
+      spreadFallbackLine: spreadReadinessGate ? `不足时：${spreadReadinessGate.fallbackLine}` : '',
+      spreadEvidenceLine: spreadReadinessGate ? `需要证据：${spreadReadinessGate.requiredEvidence}` : '',
       safeRelayPacket,
       receiverActionLine: safeRelayPacket && safeRelayPacket.receiverAction,
       parentCheckLine: safeRelayPacket && safeRelayPacket.parentCheck,

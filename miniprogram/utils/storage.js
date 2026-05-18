@@ -4742,6 +4742,18 @@ function buildShareChallengePlan(input = {}) {
     parentCheck: parentDecisionPayload.tonightQuestion,
     nextDayRevisit: sevenDayReviewPayload.day7
   });
+  const spreadReadinessGate = buildShareSpreadReadinessGate({
+    focus,
+    capability,
+    subjectSkillDepth: subjectDepth,
+    firstStep,
+    safeRelayChallengePacket,
+    shareHookDeck,
+    naturalSpreadLoop,
+    evidenceRequired: ['active_recall_cards', 'child_first_step', 'wrong_cause_return', 'next_day_revisit'],
+    reviewCadence,
+    route
+  });
   return {
     id: 'share_challenge_plan',
     title: '同伴轻挑战',
@@ -4768,6 +4780,7 @@ function buildShareChallengePlan(input = {}) {
     wrongCauseReplayPayload,
     sevenDayReviewPayload,
     safeRelayChallengePacket,
+    spreadReadinessGate,
     evidenceContractLine: '接力成立必须同时有：第一步、错因回退、明天回访；缺一项就只算邀请，不算学习闭环。',
     shareRelayActions,
     parentEvidenceLine: '家长只看三件事：孩子是否自己说第一步、错因是否回到卡片、明天是否还能复述。',
@@ -4798,8 +4811,84 @@ function buildShareChallengePlan(input = {}) {
       relay_allowed_fields: safeRelayChallengePacket.query.relay_allowed_fields,
       relay_blocked_fields: safeRelayChallengePacket.query.relay_blocked_fields,
       relay_completion_signal: safeRelayChallengePacket.query.relay_completion_signal,
-      relay_return_path: safeRelayChallengePacket.query.relay_return_path
+      relay_return_path: safeRelayChallengePacket.query.relay_return_path,
+      relay_spread_status: spreadReadinessGate.status,
+      relay_spread_score: String(spreadReadinessGate.score),
+      relay_spread_line: spreadReadinessGate.shareModeLine,
+      relay_spread_fallback: spreadReadinessGate.fallbackLine,
+      relay_spread_reason: spreadReadinessGate.reasons.join(' / '),
+      relay_spread_required: spreadReadinessGate.requiredEvidence.join(',')
     }
+  };
+}
+
+function buildShareSpreadReadinessGate(input = {}) {
+  const safePacket = input.safeRelayChallengePacket || null;
+  const blockedFields = safePacket && Array.isArray(safePacket.blockedFields)
+    ? safePacket.blockedFields
+    : [];
+  const allowedFields = safePacket && Array.isArray(safePacket.allowedFields)
+    ? safePacket.allowedFields
+    : ['share_code', 'first_step', 'capability_gap', 'receiver_action', 'parent_check', 'next_day_revisit'];
+  const evidenceRequired = Array.isArray(input.evidenceRequired) && input.evidenceRequired.length
+    ? input.evidenceRequired
+    : ['child_first_step', 'wrong_cause_return', 'next_day_revisit'];
+  const firstStep = input.firstStep || (input.subjectSkillDepth && input.subjectSkillDepth.firstStep) || '';
+  const subjectLabel = input.subjectSkillDepth && input.subjectSkillDepth.label ? input.subjectSkillDepth.label : '当前卡点';
+  const hasSafeBlocks = ['original_answer', 'ranking', 'score', 'full_dialogue', 'original_photo']
+    .every((field) => blockedFields.includes(field));
+  const signals = [
+    {
+      id: 'has_first_step',
+      ready: !!firstStep,
+      reason: firstStep ? '已有可复刻的第一步' : '缺少孩子能复述的第一步'
+    },
+    {
+      id: 'has_wrong_cause_or_action',
+      ready: !!(input.capability && input.capability.nextAction) || evidenceRequired.includes('wrong_cause_return'),
+      reason: '有错因回退或下一步动作'
+    },
+    {
+      id: 'has_review_return',
+      ready: Array.isArray(input.reviewCadence) && input.reviewCadence.length >= 3,
+      reason: '有明天和第 7 天回访'
+    },
+    {
+      id: 'has_safe_packet',
+      ready: !!safePacket && hasSafeBlocks,
+      reason: hasSafeBlocks ? '隐私字段已被本地规则拦截' : '分享字段边界不足'
+    },
+    {
+      id: 'has_receiver_hook',
+      ready: Array.isArray(input.shareHookDeck) && input.shareHookDeck.length >= 3,
+      reason: '接收者有可执行动作'
+    }
+  ];
+  const score = Math.round(signals.filter((item) => item.ready).length / signals.length * 100);
+  const missing = signals.filter((item) => !item.ready).map((item) => item.reason);
+  const status = score >= 80 ? 'peer_relay_ready' : score >= 60 ? 'needs_evidence' : 'parent_only';
+  const shareModeLine = status === 'peer_relay_ready'
+    ? `可发同伴接力：只传${subjectLabel}的第一步、错因回访和明天动作。`
+    : status === 'needs_evidence'
+      ? '先补齐第一步、错因回退和回访证据，再开放同伴接力。'
+      : '当前只建议家长内用，不做同伴传播。';
+  const fallbackLine = status === 'peer_relay_ready'
+    ? '如果接收者要答案，自动退回小黑板第一步，不展示完整解法。'
+    : '证据不足时降级为家长复盘卡，只保留今晚行动和明天回访。';
+  return {
+    id: 'share_spread_readiness_gate',
+    status,
+    score,
+    signals,
+    reasons: signals.filter((item) => item.ready).map((item) => item.reason),
+    missing,
+    requiredEvidence: evidenceRequired,
+    allowedFields,
+    blockedFields,
+    shareModeLine,
+    fallbackLine,
+    noRankingRule: '不晒分、不排名、不传原题照片、不传完整对话、不传最终答案。',
+    route: input.route || '/pages/arcade/arcade'
   };
 }
 
@@ -4882,6 +4971,14 @@ function buildCommunityShareRelayBoard(input = {}) {
     shareHookDeck: plan.shareHookDeck || [],
     naturalSpreadTriggers: plan.naturalSpreadTriggers || [],
     naturalSpreadLoop: plan.naturalSpreadLoop || {},
+    spreadReadinessGate: plan.spreadReadinessGate || buildShareSpreadReadinessGate({
+      safeRelayChallengePacket: plan.safeRelayChallengePacket,
+      shareHookDeck: plan.shareHookDeck,
+      naturalSpreadLoop: plan.naturalSpreadLoop,
+      evidenceRequired: plan.evidenceRequired,
+      reviewCadence: plan.reviewCadence,
+      route: plan.route
+    }),
     communityRipplePlan: plan.communityRipplePlan || {},
     visualRelayProtocol,
     visualRelayProofChecklist,
@@ -8672,6 +8769,7 @@ module.exports = {
   loadShareRuns,
   loadIncomingShare,
   buildSafeRelayChallengePacket,
+  buildShareSpreadReadinessGate,
   buildShareChallengePlan,
   buildCommunityShareRelayBoard,
   buildQuestionBankShareRelayDeck,

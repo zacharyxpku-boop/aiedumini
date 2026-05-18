@@ -398,6 +398,9 @@
         <view class="share-relay-evidence" wx:if="{{incomingShareRelay.naturalSpreadDay7Line}}">{{incomingShareRelay.naturalSpreadDay7Line}}</view>
         <view class="share-relay-evidence" wx:if="{{incomingShareRelay.naturalSpreadProofLine}}">{{incomingShareRelay.naturalSpreadProofLine}}</view>
         <view class="share-relay-evidence" wx:if="{{incomingShareRelay.naturalSpreadGuardrailLine}}">{{incomingShareRelay.naturalSpreadGuardrailLine}}</view>
+        <view class="share-relay-evidence" wx:if="{{incomingShareRelay.spreadReadinessLine}}">{{incomingShareRelay.spreadReadinessLine}}</view>
+        <view class="share-relay-evidence" wx:if="{{incomingShareRelay.spreadFallbackLine}}">{{incomingShareRelay.spreadFallbackLine}}</view>
+        <view class="share-relay-evidence" wx:if="{{incomingShareRelay.spreadEvidenceLine}}">{{incomingShareRelay.spreadEvidenceLine}}</view>
         <view class="share-relay-evidence" wx:if="{{incomingShareRelay.receiverActionLine}}">接收动作：{{incomingShareRelay.receiverActionLine}}</view>
         <view class="share-relay-evidence" wx:if="{{incomingShareRelay.parentCheckLine}}">{{incomingShareRelay.parentCheckLine}}</view>
         <view class="share-relay-evidence" wx:if="{{incomingShareRelay.nextDayRevisitLine}}">{{incomingShareRelay.nextDayRevisitLine}}</view>

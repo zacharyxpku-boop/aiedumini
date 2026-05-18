@@ -1224,6 +1224,12 @@
           <view wx:if="{{dailyShareCard.shareChallengePlan.naturalSpreadLoop}}">
             裂变护栏：{{dailyShareCard.shareChallengePlan.naturalSpreadLoop.viralGuardrails}}
           </view>
+          <view wx:if="{{dailyShareCard.shareChallengePlan.spreadReadinessGate}}">
+            传播门槛：{{dailyShareCard.shareChallengePlan.spreadReadinessGate.shareModeLine}}
+          </view>
+          <view wx:if="{{dailyShareCard.shareChallengePlan.spreadReadinessGate}}">
+            降级规则：{{dailyShareCard.shareChallengePlan.spreadReadinessGate.fallbackLine}}
+          </view>
           <view wx:if="{{dailyShareCard.shareChallengePlan.safeRelayChallengePacket}}">
             {{dailyShareCard.shareChallengePlan.safeRelayChallengePacket.title}}：{{dailyShareCard.shareChallengePlan.safeRelayChallengePacket.evidenceContract}}
           </view>
@@ -1273,6 +1279,9 @@
           <view>{{communityShareRelayBoard.peerSafeLine}}</view>
           <view wx:if="{{communityShareRelayBoard.naturalSpreadLoop}}">
             自然裂变：{{communityShareRelayBoard.naturalSpreadLoop.inviteLine}}｜{{communityShareRelayBoard.naturalSpreadLoop.proofOfLifeSignal}}
+          </view>
+          <view wx:if="{{communityShareRelayBoard.spreadReadinessGate}}">
+            传播状态：{{communityShareRelayBoard.spreadReadinessGate.status}}｜{{communityShareRelayBoard.spreadReadinessGate.shareModeLine}}
           </view>
           <view wx:for="{{communityShareRelayBoard.lanes}}" wx:key="id">{{item.label}}：{{item.action}}｜{{item.evidence}}</view>
           <view wx:for="{{communityShareRelayBoard.visualRelayProtocol}}" wx:key="id">小黑板接力协议：{{item.label}}｜{{item.action}}｜证据 {{item.evidence}}｜禁止 {{item.blocked}}</view>
