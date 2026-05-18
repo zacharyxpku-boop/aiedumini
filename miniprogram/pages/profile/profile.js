@@ -729,6 +729,15 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
       subjectSkillDepth
     })
     : null;
+  const weeklyEvidenceFlywheel = storage.buildWeeklyEvidenceFlywheel
+    ? storage.buildWeeklyEvidenceFlywheel({
+      courseUnitMap: effectiveCourseUnitMap,
+      courseUnitMasteryTrajectory,
+      courseUnitQuestionBank,
+      commercialDepthRunway,
+      subjectSkillDepth
+    })
+    : null;
   const mainDiagnosis = matrix.find((item) => item.status === '需要支持') || matrix[0] || null;
   const sevenDayPlan = Array.isArray(plan.sevenDayPlan) ? plan.sevenDayPlan.slice(0, 7) : [];
   const dayOne = sevenDayPlan[0] || {};
@@ -833,6 +842,10 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     commercialDepthRunwayLanes: commercialDepthRunway ? commercialDepthRunway.lanes : [],
     commercialDepthParentRubric: commercialDepthRunway ? commercialDepthRunway.parentDecisionRubric : [],
     commercialDepthVisualBoardMoves: commercialDepthRunway ? commercialDepthRunway.visualBoardMoves : [],
+    weeklyEvidenceFlywheel,
+    weeklyEvidenceFlywheelLine: weeklyEvidenceFlywheel ? weeklyEvidenceFlywheel.parentTrustLine : '',
+    weeklyEvidenceFlywheelDays: weeklyEvidenceFlywheel ? weeklyEvidenceFlywheel.days : [],
+    weeklyEvidenceFlywheelSharePayload: weeklyEvidenceFlywheel ? weeklyEvidenceFlywheel.sharePayload : null,
     longTermPortrait,
     longTermPortraitLine: longTermPortrait.learnerPattern || '',
     longTermPortraitStabilityLine: longTermPortrait.stabilityLine || '',

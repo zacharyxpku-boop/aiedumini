@@ -656,6 +656,16 @@
           <text wx:for="{{learningReportSummary.commercialDepthParentRubric}}" wx:key="*this">家长判断：{{item}}</text>
           <text wx:for="{{learningReportSummary.commercialDepthVisualBoardMoves}}" wx:key="*this">小黑板：{{item}}</text>
         </view>
+        <view class="parent-brief-block" wx:if="{{learningReportSummary.weeklyEvidenceFlywheel}}">
+          <text class="parent-brief-label">{{learningReportSummary.weeklyEvidenceFlywheel.title}}</text>
+          <text>{{learningReportSummary.weeklyEvidenceFlywheel.summary}}</text>
+          <text>{{learningReportSummary.weeklyEvidenceFlywheelLine}}</text>
+          <text>{{learningReportSummary.weeklyEvidenceFlywheel.portraitLine}}</text>
+          <text>{{learningReportSummary.weeklyEvidenceFlywheel.privacyBoundary}}</text>
+          <text wx:for="{{learningReportSummary.weeklyEvidenceFlywheelDays}}" wx:key="day">第{{item.day}}天 {{item.label}}：{{item.childAction}}｜证据 {{item.evidence}}｜家长 {{item.parentDecision}}</text>
+          <text>{{learningReportSummary.weeklyEvidenceFlywheel.acceptanceLine}}</text>
+          <text>{{learningReportSummary.weeklyEvidenceFlywheel.moatLine}}</text>
+        </view>
         <view class="parent-brief-block">
           <text class="parent-brief-label">学业矩阵</text>
           <text>{{learningReportSummary.diagnosisLine}}</text>
@@ -1001,6 +1011,14 @@
           <view wx:for="{{communityShareRelayBoard.recentRuns}}" wx:key="id">接力记录：{{item.code}} · {{item.evidence}}</view>
           <view>{{communityShareRelayBoard.contractLine}}</view>
           <view>{{communityShareRelayBoard.returnPathLine}}</view>
+        </view>
+        <view class="share-conversation-card" wx:if="{{learningReportSummary.weeklyEvidenceFlywheel}}">
+          <view class="share-conversation-title">{{learningReportSummary.weeklyEvidenceFlywheel.title}}</view>
+          <view>{{learningReportSummary.weeklyEvidenceFlywheel.shareLine}}</view>
+          <view>{{learningReportSummary.weeklyEvidenceFlywheel.privacyBoundary}}</view>
+          <view wx:for="{{learningReportSummary.weeklyEvidenceFlywheelDays}}" wx:key="day">第{{item.day}}天：{{item.label}}｜{{item.evidence}}</view>
+          <view>可分享字段：{{learningReportSummary.weeklyEvidenceFlywheelSharePayload.allowed_fields}}</view>
+          <view>禁止字段：{{learningReportSummary.weeklyEvidenceFlywheelSharePayload.blocked_fields}}</view>
         </view>
         <view class="share-invite">{{dailyShareCard.inviteLine}}</view>
         <view class="wechat-share-row">

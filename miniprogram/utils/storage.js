@@ -5839,6 +5839,105 @@ function buildCommercialDepthRunway(options = {}) {
   };
 }
 
+function buildWeeklyEvidenceFlywheel(options = {}) {
+  const courseUnitMap = options.courseUnitMap || buildCourseUnitMap(options);
+  const courseUnitQuestionBank = options.courseUnitQuestionBank || buildCourseUnitQuestionBank({ courseUnitMap });
+  const courseUnitMasteryTrajectory = options.courseUnitMasteryTrajectory || buildCourseUnitMasteryTrajectory({ courseUnitMap });
+  const commercialDepthRunway = options.commercialDepthRunway || buildCommercialDepthRunway({
+    courseUnitMap,
+    courseUnitQuestionBank,
+    courseUnitMasteryTrajectory,
+    subjectSkillDepth: options.subjectSkillDepth
+  });
+  const communityShareRelayBoard = options.communityShareRelayBoard || buildCommunityShareRelayBoard(options);
+  const activeCards = Array.isArray(courseUnitQuestionBank.activeCards) ? courseUnitQuestionBank.activeCards : [];
+  const weakest = courseUnitMasteryTrajectory && courseUnitMasteryTrajectory.weakest
+    ? courseUnitMasteryTrajectory.weakest
+    : {};
+  const lanes = Array.isArray(commercialDepthRunway.lanes) ? commercialDepthRunway.lanes : [];
+  const days = [
+    {
+      day: 1,
+      label: '说出第一步',
+      childAction: activeCards[0] ? activeCards[0].prompt : '先说第一步',
+      evidence: 'child_first_step',
+      parentDecision: '能说出第一步就收口，不继续讲完整答案',
+      gameReturn: '主动回忆 3 张'
+    },
+    {
+      day: 2,
+      label: '命名错因',
+      childAction: activeCards[1] ? activeCards[1].prompt : '说出卡在哪里',
+      evidence: 'wrong_cause_named',
+      parentDecision: '只问错因，不追问分数',
+      gameReturn: '错因回放 1 轮'
+    },
+    {
+      day: 3,
+      label: '近迁移',
+      childAction: activeCards[2] ? activeCards[2].prompt : '做一张小变式',
+      evidence: 'near_transfer_attempted',
+      parentDecision: '看方法能不能搬家，不用刷题量证明',
+      gameReturn: '小变式轻挑战'
+    },
+    {
+      day: 4,
+      label: '隔天回看',
+      childAction: weakest.nextEvidence || '回看昨天错因卡',
+      evidence: 'next_day_revisit',
+      parentDecision: weakest.parentInterventionLevel || '证据不足时先陪孩子复述第一步',
+      gameReturn: '间隔回访'
+    },
+    {
+      day: 5,
+      label: '小黑板复述',
+      childAction: '把第一笔、小图、停止点各说一句',
+      evidence: 'visual_board_replay',
+      parentDecision: '能复述图解就不补课式讲解',
+      gameReturn: '视觉步骤排序'
+    },
+    {
+      day: 6,
+      label: '家庭判断',
+      childAction: '说出下次先检查哪里',
+      evidence: 'parent_decision_receipt',
+      parentDecision: '家长只决定明天陪不陪，不做情绪评价',
+      gameReturn: '错因标签回收'
+    },
+    {
+      day: 7,
+      label: '周复盘',
+      childAction: '选一张最有用的行动卡',
+      evidence: 'weekly_action_card',
+      parentDecision: '只看证据是否变稳定，不做排名比较',
+      gameReturn: '近迁移验收'
+    }
+  ];
+  return {
+    id: 'weekly_evidence_flywheel',
+    title: '7 天证据飞轮',
+    summary: `用 ${days.length} 天把题型卡、游戏回忆、家长判断和安全分享连成长期画像。`,
+    readiness: days.length >= 7 && lanes.length >= 3 ? 'closed_loop' : 'building',
+    days,
+    lanes,
+    parentTrustLine: weakest.unitLabel
+      ? `本周家长只盯 ${weakest.unitLabel}：${weakest.nextEvidence || '下一证据'}。`
+      : '本周家长只盯第一步、错因、隔天回看三类证据。',
+    portraitLine: '长期画像来自连续证据，不来自一次测评或一次聊天。',
+    memoryLine: commercialDepthRunway.gameLine || '主动回忆、错因回放、间隔回看形成记忆反馈。',
+    shareLine: communityShareRelayBoard.noRankingLine || '分享只做行动接力，不做排名比较。',
+    privacyBoundary: '不分享原题照片、完整对话、孩子分数、排名或隐私评价。',
+    sharePayload: {
+      flywheel_id: 'weekly_evidence_flywheel',
+      evidence_days: days.length,
+      allowed_fields: ['day_label', 'child_action', 'evidence', 'parent_decision'],
+      blocked_fields: ['original_photo', 'full_dialogue', 'score', 'ranking', 'private_comment']
+    },
+    acceptanceLine: '一周后必须能回答：孩子第一步是否更稳定、错因是否更具体、同类小变式是否能迁移。',
+    moatLine: '护城河不是题量，而是家庭证据连续沉淀后形成的低压学习画像。'
+  };
+}
+
 function detectAvoidancePattern(patternInput = loadTaskTypePattern()) {
   const byTaskType = (patternInput && patternInput.byTaskType) || {};
   const candidates = Object.keys(byTaskType).map((type) => {
@@ -7688,6 +7787,7 @@ module.exports = {
   buildCourseUnitMasteryTrajectory,
   buildCourseUnitQuestionBank,
   buildCommercialDepthRunway,
+  buildWeeklyEvidenceFlywheel,
   childStepQuality,
   normalizeFirstStepEvidence,
   saveChildArticulatedStep,
