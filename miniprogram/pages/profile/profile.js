@@ -1029,6 +1029,9 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     realHomeworkPublicSources: realHomeworkCoverageMatrix && Array.isArray(realHomeworkCoverageMatrix.publicSourceLedger)
       ? realHomeworkCoverageMatrix.publicSourceLedger
       : [],
+    realHomeworkImplementationDecisions: realHomeworkCoverageMatrix && Array.isArray(realHomeworkCoverageMatrix.implementationDecisionMatrix)
+      ? realHomeworkCoverageMatrix.implementationDecisionMatrix
+      : [],
     weeklyEvidenceFlywheel,
     weeklyEvidenceFlywheelLine: weeklyEvidenceFlywheel ? weeklyEvidenceFlywheel.parentTrustLine : '',
     weeklyEvidenceFlywheelDays: weeklyEvidenceFlywheel ? weeklyEvidenceFlywheel.days : [],

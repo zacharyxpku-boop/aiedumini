@@ -1,23 +1,23 @@
 const SUBJECT_COUNTS = [
-  { id: 'math', label: '数学', count: 37, nextGap: '比例、百分数、几何角、函数图像、统计平均数、概率、浓度/分段收费/年龄/行程/利润/几何方程继续补跨学科词面误判样本。' },
-  { id: 'physics', label: '物理', count: 25, nextGap: '受力、光路、电路、浮力、压强、电路故障、杠杆、电功率、热传递、状态变化和图像题继续补真实卡点。' },
-  { id: 'chemistry', label: '化学', count: 27, nextGap: '实验现象、气体验证、溶液、守恒、微粒观、酸碱指示剂、变量控制、开放体系、反应速率、溶解度曲线、过滤操作、离子检验继续拆错因。' },
-  { id: 'english', label: '英语', count: 28, nextGap: '语法信号、比较级、被动语态、定语从句、非谓语、状语从句、完形上下文、阅读推断、标题题和逻辑连词继续扩样。' },
-  { id: 'biology', label: '生物', count: 25, nextGap: '显微镜、遗传、生态系统成分、呼吸作用、人体循环、血糖调节、反射弧和能量流动继续验证小黑板边界。' },
-  { id: 'geography', label: '地理', count: 27, nextGap: '经纬网、等高线、气候图、气候类型、交通/农业/工业区位、地球运动、季风成因继续验证空间误判。' },
-  { id: 'chinese', label: '语文', count: 35, nextGap: '阅读概括、古诗意象、说明方法、说明顺序、文言虚词、句式转换、写作起步、段落中心、选材、结尾照应、细节描写、病句修改继续压测。' }
+  { id: 'math', label: '数学', count: 42, nextGap: '比例、百分数、几何角、函数图像、统计抽样、概率、浓度/分段收费/年龄/行程/利润/几何方程继续补跨学科词面误判样本。' },
+  { id: 'physics', label: '物理', count: 30, nextGap: '受力、光路、电路、浮力密度、压强、电路故障、杠杆、电功率、热传递、状态变化和图像题继续补真实卡点。' },
+  { id: 'chemistry', label: '化学', count: 32, nextGap: '实验现象、气体验证、溶液、守恒、微粒观、酸碱指示剂、变量控制、开放体系、反应速率、溶解度曲线、过滤操作、离子检验继续拆错因。' },
+  { id: 'english', label: '英语', count: 33, nextGap: '语法信号、比较级、被动语态、定语从句、非谓语、状语从句、完形上下文、阅读推断、标题题和逻辑连词继续扩样。' },
+  { id: 'biology', label: '生物', count: 30, nextGap: '显微镜、遗传、生态系统成分、呼吸作用、人体循环、血糖调节、反射弧、蒸腾作用和能量流动继续验证小黑板边界。' },
+  { id: 'geography', label: '地理', count: 32, nextGap: '经纬网、等高线、气候图、气候类型、交通/农业/工业区位、地球运动、季风成因继续验证空间误判。' },
+  { id: 'chinese', label: '语文', count: 40, nextGap: '阅读概括、古诗意象、说明方法、说明语言、说明顺序、文言虚词、句式转换、写作起步、段落中心、选材、结尾照应、细节描写、病句修改继续压测。' }
 ];
 
 const TYPE_COUNTS = [
-  { id: 'math_word_problem', label: '数学应用/建模', count: 25, firstStep: '先翻译数量关系、图形关系、变化基准、统计总量、概率分母、比例份数或函数坐标。' },
+  { id: 'math_word_problem', label: '数学应用/建模', count: 29, firstStep: '先翻译数量关系、图形关系、变化基准、统计总量、抽样代表性、概率分母、比例份数或函数坐标。' },
   { id: 'equation_setup', label: '方程/不等式建模', count: 12, firstStep: '先设未知数、写等量关系，或拆浓度、分段收费、不等式变形规则、同步时间点。' },
-  { id: 'physics_diagram', label: '物理图解', count: 25, firstStep: '先定对象、方向、单位、路径、力臂、受力面积、电表位置、热量方向、状态变化或决定量。' },
-  { id: 'chemistry_experiment', label: '化学实验/变化', count: 27, firstStep: '先列反应物、现象、体系边界、微粒解释、守恒关系、唯一变量、酸碱性质、过滤条件、曲线定位和检验试剂。' },
-  { id: 'english_sentence', label: '英语句法/上下文', count: 20, firstStep: '先找时态、主语、比较、被动、先行词、目的关系、逻辑连词或上下文信号。' },
-  { id: 'reading_question', label: '阅读证据', count: 30, firstStep: '先判断题目类型，再回文定位证据、意象、说明方法、文言功能、说明顺序、标题中心或推断行为。' },
-  { id: 'biology_process', label: '生物过程', count: 25, firstStep: '先分结构、功能、方向、变量、能量流动、生态角色、调节路径、过程条件或循环路径。' },
-  { id: 'geography_map', label: '地理图示', count: 27, firstStep: '先看图例、方向、经纬、海拔、等高线形态、气候证据、区位条件、水汽来源或成因链。' },
-  { id: 'writing_process', label: '写作过程', count: 13, firstStep: '先写一句朴素事实、段落中心、一个可见细节、结尾照应、修改成分残缺或选一个核心材料，不追求完整成文。' }
+  { id: 'physics_diagram', label: '物理图解', count: 30, firstStep: '先定对象、方向、单位、路径、力臂、受力面积、电表位置、热量方向、浮力决定量、状态变化或决定量。' },
+  { id: 'chemistry_experiment', label: '化学实验/变化', count: 32, firstStep: '先列反应物、现象、体系边界、微粒解释、守恒关系、唯一变量、酸碱性质、过滤条件、曲线定位和检验试剂。' },
+  { id: 'english_sentence', label: '英语句法/上下文', count: 24, firstStep: '先找时态、主语、比较、被动、先行词、从句成分、目的关系、逻辑连词或上下文信号。' },
+  { id: 'reading_question', label: '阅读证据', count: 33, firstStep: '先判断题目类型，再回文定位证据、意象、说明方法、说明语言、文言功能、说明顺序、标题中心或推断行为。' },
+  { id: 'biology_process', label: '生物过程', count: 30, firstStep: '先分结构、功能、方向、变量、能量流动、生态角色、调节路径、蒸腾路径、过程条件或循环路径。' },
+  { id: 'geography_map', label: '地理图示', count: 32, firstStep: '先看图例、方向、经纬、海拔、等高线形态、太阳高度、气候证据、区位条件、水汽来源或成因链。' },
+  { id: 'writing_process', label: '写作过程', count: 16, firstStep: '先写一句朴素事实、段落中心、一个可见细节、结尾照应、修改成分残缺或选一个核心材料，不追求完整成文。' }
 ];
 
 const SAMPLE_CLUSTERS = [
@@ -185,6 +185,49 @@ const PUBLIC_K12_USE_POLICY = {
   ]
 };
 
+const K12_PUBLIC_IMPLEMENTATION_DECISION_MATRIX = [
+  {
+    id: 'homework_archetype_pressure',
+    productQuestion: '公开作业/考试题型能不能直接用来扩题库？',
+    decision: '只转写为压力样本和题型簇，不搬原题、不做答案库。',
+    localCodeBetter: ['题型识别', '错因命中', '第一步小黑板', '回访窗口', '负样本拦截'],
+    aiBetter: ['把同一个第一步改写成更像老师的追问', '孩子二次卡住后的降阶语气'],
+    evidenceGate: ['sample_specific_first_step', 'sample_specific_wrong_cause', 'no_final_answer_leak']
+  },
+  {
+    id: 'socratic_dialogue',
+    productQuestion: '苏格拉底问答应该本地写死还是调用 AI？',
+    decision: '本地代码决定问什么轴，AI 只负责怎么说。',
+    localCodeBetter: ['追问轴选择', '不直接给答案', '失败降阶', '停止条件', '安全边界'],
+    aiBetter: ['同义追问', '鼓励语气', '根据孩子原话换一种解释'],
+    evidenceGate: ['axis_selected_by_task_type', 'three_round_no_answer', 'fallback_micro_choice']
+  },
+  {
+    id: 'visual_blackboard',
+    productQuestion: '要不要做千问式全科动态板书？',
+    decision: '先做可信第一步小黑板，不承诺全科动态板书。',
+    localCodeBetter: ['板书层级', '第一笔图解动作', '禁写最终答案', '图示退出条件'],
+    aiBetter: ['把板书步骤解释成孩子听得懂的话'],
+    evidenceGate: ['board_move_present', 'answer_boundary_visible', 'exit_criteria_present']
+  },
+  {
+    id: 'parent_report_portrait',
+    productQuestion: '家长报告用 AI 直接判断孩子画像吗？',
+    decision: '本地证据门槛决定能不能写画像，AI 只做解释。',
+    localCodeBetter: ['证据字段裁剪', '跨周趋势', '家校摘要', '画像置信度', '行动释放门槛'],
+    aiBetter: ['把证据翻译成家长今晚能做的一句话'],
+    evidenceGate: ['evidence_count', 'cross_week_signal', 'home_school_safe_fields']
+  },
+  {
+    id: 'community_share',
+    productQuestion: '分享要不要展示分数、排名、原题来刺激转发？',
+    decision: '不展示分数排名和原题，用安全接力挑战承接自然传播。',
+    localCodeBetter: ['可见字段', '禁传字段', '回流参数', '接收者自己的材料', '传播门槛'],
+    aiBetter: ['分享卡一句话标题和温和鼓励'],
+    evidenceGate: ['blocked_original_question', 'blocked_score_rank', 'receiver_own_material']
+  }
+];
+
 const QUESTION_TYPE_CLUSTER_RUNWAY = [
   {
     id: 'math_quantity_relation_cluster',
@@ -341,6 +384,7 @@ function buildRealHomeworkCoverageMatrix(options = {}) {
     questionTypeClusterRunway: QUESTION_TYPE_CLUSTER_RUNWAY,
     publicSourceLedger: PUBLIC_K12_SOURCE_LEDGER,
     publicSourcePolicy: PUBLIC_K12_USE_POLICY,
+    implementationDecisionMatrix: K12_PUBLIC_IMPLEMENTATION_DECISION_MATRIX,
     publicSourceLine: `已把 ${PUBLIC_K12_SOURCE_LEDGER.length} 类公开/一方资料沉淀为本地规则资产：题型、错因、第一步、小黑板、回访、报告和分享边界。`,
     publicSourceBlockedLine: '禁止把公开资料变成原题答案库、拍照搜题承诺、排名晒分或全科动态板书承诺。',
     clusterRunwayLine: `已把 ${QUESTION_TYPE_CLUSTER_RUNWAY.length} 个高频题型簇接成“第一步-错因-小黑板-回访-分享”本地闭环。`,
@@ -370,5 +414,6 @@ module.exports = {
   QUESTION_TYPE_CLUSTER_RUNWAY,
   PUBLIC_K12_SOURCE_LEDGER,
   PUBLIC_K12_USE_POLICY,
+  K12_PUBLIC_IMPLEMENTATION_DECISION_MATRIX,
   buildRealHomeworkCoverageMatrix
 };
