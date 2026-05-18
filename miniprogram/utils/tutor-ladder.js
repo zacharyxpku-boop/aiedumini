@@ -299,6 +299,62 @@ function buildQuestionTypeCoverageAtlas(activeTaskType = 'unknown') {
   };
 }
 
+function buildQuestionBankVisualBoardBridge(taskType = 'unknown', questionTypePath = {}, visualRecovery = {}) {
+  const path = questionTypePath || {};
+  const moves = Array.isArray(path.visualMoves) ? path.visualMoves : [];
+  const probes = Array.isArray(path.probeBank) ? path.probeBank : [];
+  const fallback = Array.isArray(path.fallbackLadder) ? path.fallbackLadder : [];
+  const recoveryLayers = Array.isArray(visualRecovery.boardLayers) ? visualRecovery.boardLayers : [];
+  const activeMove = moves[0] || {};
+  const activeProbe = probes[0] || {};
+  const boardLayers = [
+    {
+      id: 'read_question',
+      label: '读题定位',
+      drawAction: activeMove.boardMove || '小黑板只圈出题目问什么。',
+      studentLine: activeProbe.question || '先说题目问什么，不说完整答案。',
+      evidence: 'student_states_question_target'
+    },
+    {
+      id: 'mark_evidence',
+      label: '标证据',
+      drawAction: moves[1] ? moves[1].boardMove : (recoveryLayers[1] ? recoveryLayers[1].move : '只画已知条件和关系线。'),
+      studentLine: '孩子指出一个已知条件或一个关系词。',
+      evidence: 'student_marks_one_condition'
+    },
+    {
+      id: 'first_move',
+      label: '第一步',
+      drawAction: moves[2] ? moves[2].boardMove : (recoveryLayers[2] ? recoveryLayers[2].move : '只写第一步入口，不写后续解法。'),
+      studentLine: '孩子用自己的话说下一小步。',
+      evidence: 'student_says_first_move'
+    }
+  ];
+  return {
+    id: `question_bank_visual_board_bridge_${taskType || 'unknown'}`,
+    title: '题型第一步小黑板',
+    taskType: path.taskType || taskType || 'unknown',
+    status: boardLayers.length >= 3 ? 'ready' : 'needs_board_layers',
+    boardLayers,
+    failureBranches: fallback.slice(0, 3).map((item) => ({
+      id: item.id,
+      trigger: item.trigger,
+      boardMove: item.move,
+      route: item.route
+    })),
+    exitCriteria: [
+      '孩子能说出题目问什么。',
+      '孩子能指出一个已知条件或关系词。',
+      '孩子能说出第一步，不需要完整答案。'
+    ],
+    parentLine: path.parentCheckLine || '家长只问第一步，不检查完整答案。',
+    reportLine: `本题型已有 ${probes.length} 条追问轴、${moves.length} 个可视化动作和 ${fallback.length} 个失败兜底。`,
+    noFullAnswerBoundary: path.noFullAnswerBoundary || '不输出完整答案，不代写，不承诺全科自动板书。',
+    shareBoundary: '分享只带题型、第一步板书层和回访动作，不带原题照片、完整答案、分数、排名或完整对话。',
+    evidenceRequired: ['question_type_visual_board', 'student_first_move', 'failure_branch', 'exit_criteria', 'no_full_answer_boundary', 'safe_share_boundary']
+  };
+}
+
 function buildSocraticQualityEvaluationSuite(activeTaskType = 'unknown') {
   const taskTypes = Object.keys(MISCONCEPTION_MAP);
   const cases = taskTypes.map((taskType) => {
@@ -555,6 +611,7 @@ function buildTutorReply(text, options = {}) {
     const socraticFallbackPlan = buildSocraticFallbackPlan(taskType, item, probe, { answerBlocked: true });
     const visualSocraticRecovery = buildVisualSocraticRecoveryProtocol(taskType, item, probe, socraticFallbackPlan, { answerBlocked: true });
     const fallbackRecoveryBridge = buildFallbackRecoveryBridge(taskType, item, probe, socraticFallbackPlan, visualSocraticRecovery, { answerBlocked: true });
+    const questionBankVisualBoardBridge = buildQuestionBankVisualBoardBridge(taskType, questionTypePath, visualSocraticRecovery);
     return {
       reply: withStepIntro(item, '我不能直接替你写答案，但可以陪你先找第一步。先说题目问什么，或者圈出一个已知条件。'),
       hint_level: 1,
@@ -563,6 +620,7 @@ function buildTutorReply(text, options = {}) {
       coach_step_label: stepIntro(item),
       diagnostic_probe: probe,
       question_type_socratic_path: questionTypePath,
+      question_bank_visual_board_bridge: questionBankVisualBoardBridge,
       socratic_quality_evaluation_suite: socraticQualityEvaluationSuite,
       socratic_contract: socraticContract,
       socratic_fallback_plan: socraticFallbackPlan,
@@ -592,6 +650,7 @@ function buildTutorReply(text, options = {}) {
   const socraticFallbackPlan = buildSocraticFallbackPlan(taskType, item, probe, { stuckCount });
   const visualSocraticRecovery = buildVisualSocraticRecoveryProtocol(taskType, item, probe, socraticFallbackPlan, { stuckCount });
   const fallbackRecoveryBridge = buildFallbackRecoveryBridge(taskType, item, probe, socraticFallbackPlan, visualSocraticRecovery, { stuckCount });
+  const questionBankVisualBoardBridge = buildQuestionBankVisualBoardBridge(taskType, questionTypePath, visualSocraticRecovery);
   const reply = stuckCount >= 3
     ? `我们把门槛再降一点。先看${target}：下面两个选项选一个就行，A 先找已知条件，B 先看题目问什么。选完我给一个相似例子。`
     : item.reply;
@@ -604,6 +663,7 @@ function buildTutorReply(text, options = {}) {
     coach_step_label: stepIntro(item),
     diagnostic_probe: probe,
     question_type_socratic_path: questionTypePath,
+    question_bank_visual_board_bridge: questionBankVisualBoardBridge,
     socratic_quality_evaluation_suite: socraticQualityEvaluationSuite,
     socratic_contract: socraticContract,
     socratic_fallback_plan: socraticFallbackPlan,
@@ -657,6 +717,7 @@ module.exports = {
   buildVisualSocraticRecoveryProtocol,
   buildFallbackRecoveryBridge,
   buildQuestionTypeSocraticPath,
+  buildQuestionBankVisualBoardBridge,
   buildQuestionTypeCoverageAtlas,
   buildSocraticQualityEvaluationSuite,
   MISCONCEPTION_MAP,

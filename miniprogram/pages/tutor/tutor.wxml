@@ -118,6 +118,16 @@
             <view class="receipt-board-avoid">{{thinkingReceipt.question_type_socratic_path.evidenceContractLine}}</view>
             <view class="receipt-board-avoid">{{thinkingReceipt.question_type_socratic_path.noFullAnswerBoundary}}</view>
           </view>
+          <view class="receipt-first-step-board" wx:if="{{thinkingReceipt.question_bank_visual_board_bridge}}">
+            <view class="receipt-diagnostic-title">{{thinkingReceipt.question_bank_visual_board_bridge.title}}</view>
+            <view class="receipt-board-line" wx:for="{{thinkingReceipt.question_bank_visual_board_bridge.boardLayers}}" wx:key="id">{{item.label}}：{{item.drawAction}}｜孩子说：{{item.studentLine}}</view>
+            <view class="receipt-board-parent" wx:for="{{thinkingReceipt.question_bank_visual_board_bridge.failureBranches}}" wx:key="id">卡住分支：{{item.trigger}}｜{{item.boardMove}}</view>
+            <view class="receipt-board-line" wx:for="{{thinkingReceipt.question_bank_visual_board_bridge.exitCriteria}}" wx:key="*this">退出标准：{{item}}</view>
+            <view class="receipt-board-avoid">{{thinkingReceipt.question_bank_visual_board_bridge.parentLine}}</view>
+            <view class="receipt-board-avoid">{{thinkingReceipt.question_bank_visual_board_bridge.reportLine}}</view>
+            <view class="receipt-board-avoid">{{thinkingReceipt.question_bank_visual_board_bridge.noFullAnswerBoundary}}</view>
+            <view class="receipt-board-avoid">{{thinkingReceipt.question_bank_visual_board_bridge.shareBoundary}}</view>
+          </view>
           <view class="receipt-first-step-board" wx:if="{{thinkingReceipt.questionTypeCoverageAtlas}}">
             <view class="receipt-diagnostic-title">{{thinkingReceipt.questionTypeCoverageAtlas.title}}</view>
             <view class="receipt-board-avoid">{{thinkingReceipt.questionTypeCoverageAtlas.summary}}</view>
