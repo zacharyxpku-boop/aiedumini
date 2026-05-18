@@ -219,6 +219,14 @@
             <view class="receipt-board-line" wx:for="{{thinkingReceipt.commercialDepthRunway.lanes}}" wx:key="id">{{item.label}}：{{item.nextAction}}</view>
             <view class="receipt-board-parent" wx:for="{{thinkingReceipt.commercialDepthRunway.visualBoardMoves}}" wx:key="*this">小黑板：{{item}}</view>
           </view>
+          <view class="receipt-first-step-board" wx:if="{{thinkingReceipt.realHomeworkCoverageMatrix}}">
+            <view class="receipt-diagnostic-title">{{thinkingReceipt.realHomeworkCoverageMatrix.title}}</view>
+            <view class="receipt-board-avoid">{{thinkingReceipt.realHomeworkCoverageMatrix.summary}}</view>
+            <view class="receipt-board-line">当前科目：{{thinkingReceipt.realHomeworkCoverageMatrix.activeSubject.label}} · {{thinkingReceipt.realHomeworkCoverageMatrix.activeSubject.count}} 个压力样本</view>
+            <view class="receipt-board-parent" wx:for="{{thinkingReceipt.realHomeworkCoverageClusters}}" wx:key="id">{{item.label}}：{{item.firstStep}}</view>
+            <view class="receipt-board-line" wx:for="{{thinkingReceipt.realHomeworkCoverageTypes}}" wx:key="id">{{item.label}}：{{item.firstStep}}</view>
+            <view class="receipt-board-avoid">{{thinkingReceipt.realHomeworkCoverageMatrix.boundary}}</view>
+          </view>
           <view class="receipt-contract" wx:if="{{thinkingReceipt.socratic_contract}}">
             <view class="receipt-diagnostic-title">{{thinkingReceipt.socratic_contract.title}}</view>
             <view class="receipt-diagnostic-line">为什么这样问：{{thinkingReceipt.socratic_contract.whyThisQuestion}}</view>

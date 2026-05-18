@@ -216,6 +216,11 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
     })
     : null;
   const studentFirst = userMessages.some((item) => String(item.text || '').length >= 8 && !/答案|直接|代写|帮我写/.test(String(item.text || '')));
+  const realHomeworkCoverageMatrix = storage.buildRealHomeworkCoverageMatrix
+    ? storage.buildRealHomeworkCoverageMatrix({
+      subject: selected && selected.subject ? selected.subject : (subjectSkillDepth && subjectSkillDepth.subject) || ''
+    })
+    : null;
   const blockedAnswer = (masterySignal && masterySignal.status === 'blocked_answer_request')
     || (pasteRisk && pasteRisk.level === 'high');
   const namedWrongCause = safeMessages.some((item) => /错因|卡在|审题|建模|条件|单位|符号|第一步/.test(String(item.text || '')));
@@ -283,6 +288,16 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
       ? courseUnitQuestionBank.activeTransferLadders.slice(0, 3)
       : [],
     commercialDepthRunway,
+    realHomeworkCoverageMatrix,
+    realHomeworkCoverageSubjects: realHomeworkCoverageMatrix && Array.isArray(realHomeworkCoverageMatrix.subjectRows)
+      ? realHomeworkCoverageMatrix.subjectRows.slice(0, 7)
+      : [],
+    realHomeworkCoverageTypes: realHomeworkCoverageMatrix && Array.isArray(realHomeworkCoverageMatrix.typeRows)
+      ? realHomeworkCoverageMatrix.typeRows.slice(0, 4)
+      : [],
+    realHomeworkCoverageClusters: realHomeworkCoverageMatrix && Array.isArray(realHomeworkCoverageMatrix.sampleClusters)
+      ? realHomeworkCoverageMatrix.sampleClusters.slice(0, 3)
+      : [],
     questionTypeCoverageAtlas,
     socraticQualityEvaluationSuite,
     socraticPromptQualityJudge,

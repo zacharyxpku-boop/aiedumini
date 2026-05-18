@@ -934,6 +934,11 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
       socraticPromptQualityJudge
     )
     : null);
+  const realHomeworkCoverageMatrix = storage.buildRealHomeworkCoverageMatrix
+    ? storage.buildRealHomeworkCoverageMatrix({
+      subject: subjectSkillDepth && subjectSkillDepth.subject ? subjectSkillDepth.subject : ''
+    })
+    : null;
   return {
     title: draft.title || '学习画像',
     modeLabel: reportState.reportProgress && reportState.reportProgress.label ? reportState.reportProgress.label : '0% · 快速版',
@@ -1006,6 +1011,17 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     commercialDepthRunwayLanes: commercialDepthRunway ? commercialDepthRunway.lanes : [],
     commercialDepthParentRubric: commercialDepthRunway ? commercialDepthRunway.parentDecisionRubric : [],
     commercialDepthVisualBoardMoves: commercialDepthRunway ? commercialDepthRunway.visualBoardMoves : [],
+    realHomeworkCoverageMatrix,
+    realHomeworkCoverageLine: realHomeworkCoverageMatrix ? realHomeworkCoverageMatrix.reportLine : '',
+    realHomeworkCoverageSubjects: realHomeworkCoverageMatrix && Array.isArray(realHomeworkCoverageMatrix.subjectRows)
+      ? realHomeworkCoverageMatrix.subjectRows
+      : [],
+    realHomeworkCoverageTypes: realHomeworkCoverageMatrix && Array.isArray(realHomeworkCoverageMatrix.typeRows)
+      ? realHomeworkCoverageMatrix.typeRows.slice(0, 6)
+      : [],
+    realHomeworkCoverageClusters: realHomeworkCoverageMatrix && Array.isArray(realHomeworkCoverageMatrix.sampleClusters)
+      ? realHomeworkCoverageMatrix.sampleClusters
+      : [],
     weeklyEvidenceFlywheel,
     weeklyEvidenceFlywheelLine: weeklyEvidenceFlywheel ? weeklyEvidenceFlywheel.parentTrustLine : '',
     weeklyEvidenceFlywheelDays: weeklyEvidenceFlywheel ? weeklyEvidenceFlywheel.days : [],

@@ -41,6 +41,13 @@ try {
   productReadiness = null;
 }
 
+let realHomeworkCoverage = null;
+try {
+  realHomeworkCoverage = require('./real-homework-coverage');
+} catch (error) {
+  realHomeworkCoverage = null;
+}
+
 const KEYS = {
   state: 'ydzx.priority.state.v1',
   selectedHomework: 'ydzx.selected.homework.v1',
@@ -8467,6 +8474,36 @@ function familyCalibrationProfile() {
   };
 }
 
+function buildRealHomeworkCoverageMatrix(options = {}) {
+  if (realHomeworkCoverage && realHomeworkCoverage.buildRealHomeworkCoverageMatrix) {
+    return realHomeworkCoverage.buildRealHomeworkCoverageMatrix(options);
+  }
+  return {
+    id: 'real_homework_coverage_matrix',
+    title: '真实作业压力覆盖矩阵',
+    summary: '真实作业压力样本暂不可用，先按第一步、错因、小黑板和家长回访继续收证据。',
+    boundary: '不做拍题答案库，不展示原题答案，不分享完整对话、分数或排名。',
+    sourceLine: '等待本地样本资产加载后展示覆盖科目和题型。',
+    activeSubject: { id: 'math', label: '数学', count: 0, nextGap: '继续补真实题型样本。' },
+    subjectRows: [],
+    typeRows: [],
+    sampleClusters: [],
+    totalSamples: 0,
+    totalSubjects: 0,
+    totalTypes: 0,
+    reportLine: '报告只引用可验证的第一步、错因和回访证据。',
+    parentLine: '家长侧只看下一步动作，不看孩子完整对话、分数或排名。',
+    nextExpansionLine: '继续补真实题型样本。',
+    evidenceRequired: [
+      'sample_specific_first_step',
+      'sample_specific_wrong_cause',
+      'visual_board_move',
+      'parent_check_line',
+      'next_day_revisit'
+    ]
+  };
+}
+
 module.exports = {
   KEYS,
   ensureLocalUserId,
@@ -8622,6 +8659,7 @@ module.exports = {
   buildRecentLearningSummary,
   buildProductReadiness,
   buildAcceptanceReport,
+  buildRealHomeworkCoverageMatrix,
   loadReviewLoop,
   saveReviewLoop,
   updateReviewLoopForRating,

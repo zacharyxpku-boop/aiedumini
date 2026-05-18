@@ -669,6 +669,16 @@
           <text wx:for="{{learningReportSummary.commercialDepthParentRubric}}" wx:key="*this">家长判断：{{item}}</text>
           <text wx:for="{{learningReportSummary.commercialDepthVisualBoardMoves}}" wx:key="*this">小黑板：{{item}}</text>
         </view>
+        <view class="parent-brief-block" wx:if="{{learningReportSummary.realHomeworkCoverageMatrix}}">
+          <text class="parent-brief-label">{{learningReportSummary.realHomeworkCoverageMatrix.title}}</text>
+          <text>{{learningReportSummary.realHomeworkCoverageMatrix.summary}}</text>
+          <text>{{learningReportSummary.realHomeworkCoverageLine}}</text>
+          <text>{{learningReportSummary.realHomeworkCoverageMatrix.parentLine}}</text>
+          <text wx:for="{{learningReportSummary.realHomeworkCoverageSubjects}}" wx:key="id">{{item.label}}：{{item.count}} 个压力样本｜待补：{{item.nextGap}}</text>
+          <text wx:for="{{learningReportSummary.realHomeworkCoverageClusters}}" wx:key="id">真实卡点：{{item.label}}｜第一步：{{item.firstStep}}｜家长：{{item.parentCheck}}</text>
+          <text wx:for="{{learningReportSummary.realHomeworkCoverageTypes}}" wx:key="id">题型入口：{{item.label}}｜{{item.firstStep}}</text>
+          <text>{{learningReportSummary.realHomeworkCoverageMatrix.boundary}}</text>
+        </view>
         <view class="parent-brief-block" wx:if="{{learningReportSummary.weeklyEvidenceFlywheel}}">
           <text class="parent-brief-label">{{learningReportSummary.weeklyEvidenceFlywheel.title}}</text>
           <text>{{learningReportSummary.weeklyEvidenceFlywheel.summary}}</text>
