@@ -299,6 +299,70 @@ function buildQuestionTypeCoverageAtlas(activeTaskType = 'unknown') {
   };
 }
 
+function buildSocraticQualityEvaluationSuite(activeTaskType = 'unknown') {
+  const taskTypes = Object.keys(MISCONCEPTION_MAP);
+  const cases = taskTypes.map((taskType) => {
+    const path = buildQuestionTypeSocraticPath(taskType, { level: 3 }, diagnosticProbe(taskType, 3));
+    const firstProbe = path.probeBank[0] || {};
+    const fallback = path.fallbackLadder[0] || {};
+    return {
+      id: `quality_case_${taskType}`,
+      taskType,
+      active: taskType === activeTaskType,
+      probeGate: firstProbe.misconception || '',
+      visualGate: path.visualMoves[0] ? path.visualMoves[0].boardMove : '',
+      fallbackGate: fallback.move || '',
+      scenarios: [
+        {
+          id: 'silent_child',
+          trigger: '孩子沉默或只说不会',
+          expectedMove: '降到 A/B 微选择，让孩子先选一个方向',
+          passEvidence: 'child_micro_choice'
+        },
+        {
+          id: 'answer_request',
+          trigger: '孩子直接要答案或要求代写',
+          expectedMove: '拦住完整答案，只回到题目问什么和第一步',
+          passEvidence: 'blocked_full_answer'
+        },
+        {
+          id: 'wrong_axis',
+          trigger: '孩子答偏或抓错条件',
+          expectedMove: firstProbe.question || '回到当前题型误区轴，只问一个定位问题',
+          passEvidence: firstProbe.evidence || 'socratic_axis_evidence'
+        },
+        {
+          id: 'transfer_fail',
+          trigger: '同类小变式仍然卡住',
+          expectedMove: '停止加题，转错因卡和明日回访',
+          passEvidence: 'next_day_revisit'
+        }
+      ],
+      passLine: '通过标准：孩子能说出自己的第一步；说不出时有降阶；要答案时不泄露完整答案；迁移失败时回访。',
+      parentLine: '家长只看第一步、A/B 选择、错因回退和明天回访，不看完整解法。'
+    };
+  });
+  const activeCase = cases.find((item) => item.taskType === activeTaskType) || cases.find((item) => item.taskType === 'unknown') || cases[0];
+  return {
+    id: 'socratic_quality_evaluation_suite',
+    title: '题型质量评测集',
+    activeTaskType: activeCase ? activeCase.taskType : 'unknown',
+    summary: `覆盖 ${cases.length} 类题型，每类用 4 个真实卡住场景验收追问、可视化提示和失败兜底。`,
+    cases,
+    totalScenarioCount: cases.reduce((sum, item) => sum + item.scenarios.length, 0),
+    gates: [
+      '不输出完整答案',
+      '必须要孩子说第一步',
+      '沉默时降到 A/B 微选择',
+      '答偏时回到题型误区轴',
+      '迁移失败时转明日回访'
+    ],
+    activeCase,
+    reportLine: '这不是多讲一点，而是把每种卡住场景变成可复测的点拨质量门槛。',
+    shareBoundary: '评测只沉淀动作证据，不分享原题照片、完整对话、分数或排名。'
+  };
+}
+
 function buildSocraticContract(taskType, item, probe) {
   const normalized = normalizeLevel(item && item.level);
   const nextQuestions = {
@@ -447,6 +511,7 @@ function buildTutorReply(text, options = {}) {
     const item = ladderItem(1);
     const probe = diagnosticProbe(taskType, item.level);
     const questionTypePath = buildQuestionTypeSocraticPath(taskType, item, probe);
+    const socraticQualityEvaluationSuite = buildSocraticQualityEvaluationSuite(taskType);
     const socraticContract = buildSocraticContract(taskType, item, probe);
     const socraticFallbackPlan = buildSocraticFallbackPlan(taskType, item, probe, { answerBlocked: true });
     const visualSocraticRecovery = buildVisualSocraticRecoveryProtocol(taskType, item, probe, socraticFallbackPlan, { answerBlocked: true });
@@ -458,6 +523,7 @@ function buildTutorReply(text, options = {}) {
       coach_step_label: stepIntro(item),
       diagnostic_probe: probe,
       question_type_socratic_path: questionTypePath,
+      socratic_quality_evaluation_suite: socraticQualityEvaluationSuite,
       socratic_contract: socraticContract,
       socratic_fallback_plan: socraticFallbackPlan,
       visual_socratic_recovery: visualSocraticRecovery,
@@ -479,6 +545,7 @@ function buildTutorReply(text, options = {}) {
   const item = ladderItem(level);
   const probe = diagnosticProbe(taskType, item.level);
   const questionTypePath = buildQuestionTypeSocraticPath(taskType, item, probe);
+  const socraticQualityEvaluationSuite = buildSocraticQualityEvaluationSuite(taskType);
   const socraticContract = buildSocraticContract(taskType, item, probe);
   const stuckCount = countRecentStuck(messages, text);
   const socraticFallbackPlan = buildSocraticFallbackPlan(taskType, item, probe, { stuckCount });
@@ -495,6 +562,7 @@ function buildTutorReply(text, options = {}) {
     coach_step_label: stepIntro(item),
     diagnostic_probe: probe,
     question_type_socratic_path: questionTypePath,
+    socratic_quality_evaluation_suite: socraticQualityEvaluationSuite,
     socratic_contract: socraticContract,
     socratic_fallback_plan: socraticFallbackPlan,
     visual_socratic_recovery: visualSocraticRecovery,
@@ -546,6 +614,7 @@ module.exports = {
   buildVisualSocraticRecoveryProtocol,
   buildQuestionTypeSocraticPath,
   buildQuestionTypeCoverageAtlas,
+  buildSocraticQualityEvaluationSuite,
   MISCONCEPTION_MAP,
   detectTaskType,
   buildTutorReply,

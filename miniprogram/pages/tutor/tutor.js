@@ -191,6 +191,9 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
   const questionTypeCoverageAtlas = tutorLadder.buildQuestionTypeCoverageAtlas
     ? tutorLadder.buildQuestionTypeCoverageAtlas(subjectSkillDepth && subjectSkillDepth.taskType ? subjectSkillDepth.taskType : 'unknown')
     : null;
+  const socraticQualityEvaluationSuite = tutorLadder.buildSocraticQualityEvaluationSuite
+    ? tutorLadder.buildSocraticQualityEvaluationSuite(subjectSkillDepth && subjectSkillDepth.taskType ? subjectSkillDepth.taskType : 'unknown')
+    : null;
   const sevenSubjectMasterySprint = storage.buildSevenSubjectMasterySprint
     ? storage.buildSevenSubjectMasterySprint({
       courseUnitMap,
@@ -263,6 +266,7 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
       : [],
     commercialDepthRunway,
     questionTypeCoverageAtlas,
+    socraticQualityEvaluationSuite,
     sevenSubjectMasterySprint,
     handoffPlan,
     checks: [

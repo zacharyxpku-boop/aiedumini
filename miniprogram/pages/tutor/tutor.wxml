@@ -125,6 +125,15 @@
             <view class="receipt-board-parent" wx:for="{{thinkingReceipt.questionTypeCoverageAtlas.paths}}" wx:key="id">{{item.taskType}}：{{item.probeCount}} 追问 / {{item.visualMoveCount}} 小黑板 / {{item.fallbackCount}} 兜底</view>
             <view class="receipt-board-avoid">{{thinkingReceipt.questionTypeCoverageAtlas.boundary}}</view>
           </view>
+          <view class="receipt-first-step-board" wx:if="{{thinkingReceipt.socraticQualityEvaluationSuite}}">
+            <view class="receipt-diagnostic-title">{{thinkingReceipt.socraticQualityEvaluationSuite.title}}</view>
+            <view class="receipt-board-avoid">{{thinkingReceipt.socraticQualityEvaluationSuite.summary}}</view>
+            <view class="receipt-board-line">{{thinkingReceipt.socraticQualityEvaluationSuite.reportLine}}</view>
+            <view class="receipt-board-parent" wx:for="{{thinkingReceipt.socraticQualityEvaluationSuite.gates}}" wx:key="*this">门槛：{{item}}</view>
+            <view class="receipt-board-line" wx:for="{{thinkingReceipt.socraticQualityEvaluationSuite.activeCase.scenarios}}" wx:key="id">{{item.trigger}}：{{item.expectedMove}}</view>
+            <view class="receipt-board-avoid">{{thinkingReceipt.socraticQualityEvaluationSuite.activeCase.passLine}}</view>
+            <view class="receipt-board-avoid">{{thinkingReceipt.socraticQualityEvaluationSuite.shareBoundary}}</view>
+          </view>
           <view class="receipt-first-step-board" wx:if="{{thinkingReceipt.courseUnitQuestionBank}}">
             <view class="receipt-diagnostic-title">{{thinkingReceipt.courseUnitQuestionBank.title}}</view>
             <view class="receipt-board-avoid">{{thinkingReceipt.courseUnitQuestionBank.summary}}</view>
