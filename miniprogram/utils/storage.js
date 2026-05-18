@@ -4683,6 +4683,35 @@ function buildShareChallengePlan(input = {}) {
     loop: ['发起者留第一步', '接收者用自己的材料复刻', '家长只问一句', '明天回访同一错因'],
     conversionLine: '自然裂变只建立在可复用动作上，不建立在晒成绩或制造焦虑上。'
   };
+  const receiverOnboardingDeck = [
+    {
+      id: 'understand',
+      label: '先看懂',
+      visibleLine: '这不是答案卡，是第一步动作卡。',
+      receiverAction: '用自己的题说出同类第一步。',
+      evidence: 'receiver_understands_no_answer'
+    },
+    {
+      id: 'try',
+      label: '试一次',
+      visibleLine: '90 秒内只说第一步，不看答案。',
+      receiverAction: '完成 1 张主动回忆卡。',
+      evidence: 'receiver_first_step_attempt'
+    },
+    {
+      id: 'return',
+      label: '明天回访',
+      visibleLine: '明天还能说出来，才算接力完成。',
+      receiverAction: '预约明天同一错因回访。',
+      evidence: 'receiver_next_day_revisit'
+    }
+  ];
+  const viralProofLedger = [
+    { id: 'first_step_only', label: '只晒第一步', safe: true, blocked: 'final_answer' },
+    { id: 'own_material', label: '用自己的材料', safe: true, blocked: 'original_question' },
+    { id: 'no_rank', label: '不排行不晒分', safe: true, blocked: 'ranking_score' },
+    { id: 'day7_return', label: '第 7 天回流', safe: true, blocked: 'one_shot_invite' }
+  ];
   const parentDecisionPayload = {
     tonightQuestion: `今晚只问一句：${firstStep}`,
     evidenceToCheck: ['孩子自己的第一步', '错因是否回到卡片', '明天是否能复述'],
@@ -4730,6 +4759,8 @@ function buildShareChallengePlan(input = {}) {
     naturalSpreadTriggers,
     naturalSpreadLoop,
     communityRipplePlan,
+    receiverOnboardingDeck,
+    viralProofLedger,
     returnPathContract,
     privacyBoundary,
     peerSafeLine,
@@ -4758,6 +4789,8 @@ function buildShareChallengePlan(input = {}) {
       relay_day7_return: naturalSpreadLoop.day7ReturnLine,
       relay_proof_signal: naturalSpreadLoop.proofOfLifeSignal,
       relay_guardrail: naturalSpreadLoop.viralGuardrails.join(','),
+      relay_receiver_onboarding: receiverOnboardingDeck.map((item) => item.id).join(','),
+      relay_proof_ledger: viralProofLedger.map((item) => item.id).join(','),
       relay_id: safeRelayChallengePacket.query.relay_id,
       relay_receiver_action: safeRelayChallengePacket.query.relay_receiver_action,
       relay_parent_check: safeRelayChallengePacket.query.relay_parent_check,

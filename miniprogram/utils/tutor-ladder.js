@@ -66,6 +66,18 @@ const TASK_TYPE_PROMPTS = {
 
 function detectTaskType(text = '', selected = {}) {
   const source = `${text || ''} ${selected.text || ''}`;
+  if (/化学|反应|方程式|溶液|气体|沉淀|酸碱|守恒|配平/.test(source)) {
+    return 'chemistry_experiment';
+  }
+  if (/地理|地球运动|地图|经纬|经线|纬线|气候|季风|河流|等高线|比例尺|公转|自转|昼夜|地形|图例/.test(source)) {
+    return 'geography_map';
+  }
+  if (/作文|写作|提纲|润色|病句|段落中心|细节描写|动作、语言|动作细节|语言描写|神态|只改一句|不通顺/.test(source)) {
+    return 'writing_process';
+  }
+  if (/方程|等量关系|未知数|设.*x|列方程|年龄|相遇|追及|利润|成本|售价|长方形周长|几何方程/.test(source)) {
+    return 'equation_setup';
+  }
   if (/数学统计图|平均每天|平均数|概率题|摸到红球|有利结果|总结果/.test(source)) {
     return 'math_word_problem';
   }
@@ -586,6 +598,46 @@ function inferHomeworkPressureSignal(text = '', taskType = 'unknown') {
       reviewMove: '把 48 和 6 换成别的数，先保留同一个等量关系。'
     },
     {
+      id: 'age_future_equation',
+      taskType: 'equation_setup',
+      patterns: [/年龄|今年|几年后|倍数关系|设孩子|设.*岁|列方程/],
+      firstStep: '先设孩子今年 x 岁，再把妈妈今年和几年后的年龄都写出来。',
+      wrongCause: '只看今年的倍数关系，没有把几年后两个人都同时增加写进方程。',
+      boardMove: '小黑板只写“孩子=x，妈妈=3x，几年后两边都+同一个数”。',
+      parentCheck: '先问：几年后是谁增加了？是一个人加，还是两个人都加？',
+      reviewMove: '把 4 年后换成 5 年后，仍先把两个人几年后的年龄写出来。'
+    },
+    {
+      id: 'meeting_equation_distance',
+      taskType: 'equation_setup',
+      patterns: [/相遇|追及|速度|时间|路程|同时出发|等量关系/],
+      firstStep: '先把未知时间设为 x，再写出两人路程之和等于总路程。',
+      wrongCause: '急着用速度相加计算，没有先确认是相遇还是追及的等量关系。',
+      boardMove: '小黑板只画“两段路程相加 = 总路程”的线段。',
+      parentCheck: '先问：这题是相遇，还是追及？两段路程最后凑成什么？',
+      reviewMove: '换成追及题，仍先说清楚路程差还是路程和。'
+    },
+    {
+      id: 'profit_equation_unknown_cost',
+      taskType: 'equation_setup',
+      patterns: [/利润|成本|售价|打折|盈利|亏损|列方程/],
+      firstStep: '先设成本为 x，再把售价、利润或折扣都用 x 表示。',
+      wrongCause: '把售价、成本和利润混在一起，没有先确定未知数代表成本还是售价。',
+      boardMove: '小黑板只写“售价 - 成本 = 利润”。',
+      parentCheck: '先问：你设的 x 是成本还是售价？利润是哪两个量相减？',
+      reviewMove: '把盈利换成亏损，仍先写售价、成本和差额关系。'
+    },
+    {
+      id: 'perimeter_equation_rectangle',
+      taskType: 'equation_setup',
+      patterns: [/长方形|周长|长比宽|宽为 x|几何方程|列方程/],
+      firstStep: '先设宽为 x，再把长表示成和 x 有关的式子。',
+      wrongCause: '直接套周长公式，但没有先把长和宽都用同一个未知数表示。',
+      boardMove: '小黑板只写“宽=x，长=x+差量，周长=2×(长+宽)”。',
+      parentCheck: '先问：周长公式里需要哪两个量？长能不能先用 x 表示？',
+      reviewMove: '把长宽差换一个数，仍先写宽和长的表达式。'
+    },
+    {
       id: 'circuit_path',
       taskType: 'physics_diagram',
       patterns: [/电路|串联|并联|电流路径|灯泡|开关|分叉/],
@@ -824,6 +876,36 @@ function inferHomeworkPressureSignal(text = '', taskType = 'unknown') {
       boardMove: '小黑板只画“时间、地点、人物、事件”四格，不评价文采。',
       parentCheck: '先问：先写一句发生了什么，不用一开始就写得漂亮。',
       reviewMove: '换一个作文题，仍先写一件事的第一句。'
+    },
+    {
+      id: 'writing_outline_anchor',
+      taskType: 'writing_process',
+      patterns: [/写作提纲|提纲|中心句|段落|围绕|跑题/],
+      firstStep: '先写这一段的中心句，只说这一段围绕哪一个意思。',
+      wrongCause: '没有先定段落中心，想到哪里写到哪里，容易跑题。',
+      boardMove: '小黑板只画“中心句 -> 一个例子 -> 一句感受”。',
+      parentCheck: '先问：这一段只想说明哪一个意思？',
+      reviewMove: '换成下一段，仍先写中心句再补例子。'
+    },
+    {
+      id: 'writing_detail_scene',
+      taskType: 'writing_process',
+      patterns: [/细节|动作|语言|神态|画面|具体|描写/],
+      firstStep: '先补一个动作细节，不急着把整段重写。',
+      wrongCause: '只写概括句，没有用动作、语言或神态把画面落下来。',
+      boardMove: '小黑板只列“动作 / 语言 / 神态”三格，先填一格。',
+      parentCheck: '先问：这一句能不能加一个看得见的动作？',
+      reviewMove: '换一个场景，仍只补一个动作或一句语言。'
+    },
+    {
+      id: 'writing_rewrite_one_sentence',
+      taskType: 'writing_process',
+      patterns: [/修改|病句|不通顺|润色|只改一句|语序/],
+      firstStep: '先只改最不通顺的一句，不推翻整段。',
+      wrongCause: '把修改作文当成重写全文，导致孩子重新卡住。',
+      boardMove: '小黑板只画“原句 -> 哪里别扭 -> 改一句”。',
+      parentCheck: '先问：这一段哪一句读起来最不顺？只改那一句。',
+      reviewMove: '换一段短文，仍先找最不顺的一句。'
     },
     {
       id: 'percent_discount',

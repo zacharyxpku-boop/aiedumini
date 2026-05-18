@@ -1,23 +1,23 @@
 const SUBJECT_COUNTS = [
-  { id: 'math', label: '数学', count: 23, nextGap: '比例、百分数、几何角、函数图像、统计平均数、概率继续补变式压力样本。' },
+  { id: 'math', label: '数学', count: 27, nextGap: '比例、百分数、几何角、函数图像、统计平均数、概率、年龄/行程/利润/几何方程继续补变式压力样本。' },
   { id: 'physics', label: '物理', count: 15, nextGap: '受力、光路、电路、浮力、压强、电路故障、图像题继续补真实卡点。' },
   { id: 'chemistry', label: '化学', count: 16, nextGap: '实验现象、气体验证、溶液、守恒、酸碱图像、溶解度曲线、离子检验继续拆错因。' },
   { id: 'english', label: '英语', count: 17, nextGap: '语法信号、比较级、被动语态、完形上下文、阅读推断继续扩样。' },
   { id: 'biology', label: '生物', count: 15, nextGap: '显微镜、遗传、生态、呼吸作用、人体循环继续验证小黑板边界。' },
   { id: 'geography', label: '地理', count: 17, nextGap: '经纬网、等高线、气候图、地球运动、季风成因继续验证空间误判。' },
-  { id: 'chinese', label: '语文', count: 17, nextGap: '阅读概括、古诗意象、说明顺序、文言词语、句式转换、写作起步继续压测。' }
+  { id: 'chinese', label: '语文', count: 23, nextGap: '阅读概括、古诗意象、说明顺序、文言词语、句式转换、写作起步、段落中心、细节描写和单句修改继续压测。' }
 ];
 
 const TYPE_COUNTS = [
   { id: 'math_word_problem', label: '数学应用/建模', count: 19, firstStep: '先翻译数量关系、图形关系、变化基准、统计总量或概率分母。' },
-  { id: 'equation_setup', label: '方程/不等式建模', count: 4, firstStep: '先设未知数或标出变形规则。' },
+  { id: 'equation_setup', label: '方程/不等式建模', count: 8, firstStep: '先设未知数、写等量关系，或标出不等式变形规则。' },
   { id: 'physics_diagram', label: '物理图解', count: 15, firstStep: '先定对象、方向、单位、路径、受力面积、电表位置或决定量。' },
   { id: 'chemistry_experiment', label: '化学实验/变化', count: 16, firstStep: '先列反应物、现象、体系边界、守恒关系、曲线定位和检验试剂。' },
   { id: 'english_sentence', label: '英语句法/上下文', count: 12, firstStep: '先找时态、主语、比较、被动或上下文信号。' },
   { id: 'reading_question', label: '阅读证据', count: 19, firstStep: '先判断题目类型，再回文定位证据、意象、说明顺序或推断行为。' },
   { id: 'biology_process', label: '生物过程', count: 15, firstStep: '先分结构、功能、方向、变量、能量流动、过程条件或循环路径。' },
   { id: 'geography_map', label: '地理图示', count: 17, firstStep: '先看图例、方向、经纬、海拔、峰值、水汽来源或成因链。' },
-  { id: 'writing_process', label: '写作起步', count: 3, firstStep: '先写一句朴素事实，不追求完整成文。' }
+  { id: 'writing_process', label: '写作过程', count: 9, firstStep: '先写一句朴素事实、段落中心或一个可见细节，不追求完整成文。' }
 ];
 
 const SAMPLE_CLUSTERS = [
@@ -67,14 +67,14 @@ const SAMPLE_CLUSTERS = [
   },
   {
     id: 'language_evidence_start',
-    label: '阅读证据/文言语境/写作起步',
+    label: '阅读证据/文言语境/写作过程',
     subject: '语文/英语',
-    count: 6,
-    pressure: '孩子凭感觉选阅读题、按现代词义理解文言、作文想一次写完整导致迟迟不落笔。',
-    firstStep: '阅读先找证据句；文言先放回句子；写作先写一句事实。',
-    boardMove: '小黑板只画“题型 -> 证据”“原词 -> 语境”或“时间地点人物事件”。',
-    parentCheck: '家长只问：原文哪一句支持你？这个意思放回句子通不通？先写发生了什么？',
-    revisit: '明天换短文、词语或作文题，只检查证据定位和第一句。'
+    count: 12,
+    pressure: '孩子凭感觉选阅读题、按现代词义理解文言、作文想一次写完整，或写作没有中心句、细节和单句修改入口。',
+    firstStep: '阅读先找证据句；文言先放回句子；写作先写一句事实、一个中心句或一个动作细节。',
+    boardMove: '小黑板只画“题型 -> 证据”“原词 -> 语境”“中心句 -> 例子”或“动作/语言/神态”。',
+    parentCheck: '家长只问：原文哪一句支持你？这个意思放回句子通不通？这一段只说明哪一个意思？',
+    revisit: '明天换短文、词语或作文题，只检查证据定位、段落中心和一个可见细节。'
   },
   {
     id: 'english_signal_context',

@@ -1129,6 +1129,81 @@ function buildMemoryRiskReleaseModel(adaptiveRecallScheduler = {}, wrongCauseRep
   };
 }
 
+function buildMemoryComebackLoop(dailyMemorySprintDeck = {}, adaptiveRecallScheduler = {}, memoryRiskReleaseModel = {}, result = {}, options = {}) {
+  const weakKey = options.weakKey || '第一步';
+  const sprintCards = Array.isArray(dailyMemorySprintDeck.sprintCards) ? dailyMemorySprintDeck.sprintCards : [];
+  const reviewQueue = Array.isArray(adaptiveRecallScheduler.reviewQueue) ? adaptiveRecallScheduler.reviewQueue : [];
+  const riskLevel = memoryRiskReleaseModel.level || 'watch';
+  const wrong = Math.max(0, Number(result.wrong || 0));
+  const rescue = riskLevel === 'rescue' || wrong >= 2;
+  const comebackSteps = [
+    {
+      id: 'open_90s',
+      label: '90 秒开局',
+      action: `只打开 1 张「${weakKey}」回忆卡，遮住答案说第一步。`,
+      evidence: 'daily_90s_memory_hook'
+    },
+    {
+      id: 'wrong_cause_echo',
+      label: '错因回声',
+      action: '说出这次错因和上次是否一样；一样就不加新题。',
+      evidence: 'wrong_cause_echo'
+    },
+    {
+      id: 'tomorrow_lock',
+      label: '明天锁定',
+      action: '预约明天同一张卡回访，没回访不放行变式。',
+      evidence: 'next_day_locked'
+    },
+    {
+      id: 'day7_release',
+      label: '第 7 天放行',
+      action: '第 7 天能做近迁移，才写入长期画像。',
+      evidence: 'day7_transfer_release'
+    }
+  ];
+  const frictionReducers = [
+    { id: 'one_tap_resume', label: '一键继续', rule: '从上次失败卡继续，不重新找入口。' },
+    { id: 'micro_quota', label: '小配额', rule: rescue ? '急救模式只做 2 张，不用刷满。' : '稳定模式最多 4 张，防止疲劳。' },
+    { id: 'parent_one_line', label: '家长一句话', rule: `家长只问：${weakKey} 的第一步还能说出来吗？` }
+  ];
+  const socialProofHooks = [
+    {
+      id: 'i_did_first_step',
+      visibleLine: '我没有晒答案，只留下了一个第一步。',
+      receiverAction: '你也用自己的题说一个第一步。',
+      blocked: ['score', 'ranking', 'original_question']
+    },
+    {
+      id: 'tomorrow_revisit_invite',
+      visibleLine: '明天回来验证一次，才算真的会。',
+      receiverAction: '接收者自动进入明天回访。',
+      blocked: ['full_dialogue', 'final_answer', 'private_comment']
+    },
+    {
+      id: 'wrong_cause_buddy',
+      visibleLine: '同一个错因，找一个同类第一步。',
+      receiverAction: '接力者只标自己的错因，不比较速度。',
+      blocked: ['speed_compare', 'class_rank', 'photo']
+    }
+  ];
+  return {
+    id: 'memory_comeback_loop',
+    title: rescue ? '记忆回流急救环' : '记忆回流巩固环',
+    mode: rescue ? 'rescue_comeback' : 'steady_comeback',
+    comebackSteps,
+    frictionReducers,
+    socialProofHooks,
+    sourceSprintCount: sprintCards.length,
+    sourceReviewWindows: reviewQueue.length,
+    resumeRoute: rescue ? '/pages/review/review?from=memory_comeback' : '/pages/arcade/arcade?from=memory_comeback',
+    parentLine: `今晚只确认「${weakKey}」能不能遮答案说第一步，不能就回到小黑板。`,
+    shareLine: '分享只展示回流动作和回访窗口，不展示原题、最终答案、分数、排名、完整对话或孩子隐私。',
+    releaseGate: '必须同时有 90 秒回忆、明天回访和第 7 天近迁移，才允许写入长期画像。',
+    evidenceRequired: ['daily_90s_memory_hook', 'wrong_cause_echo', 'next_day_locked', 'day7_transfer_release', 'safe_social_proof']
+  };
+}
+
 function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], result = {}, challenge = {}, questSet = {}, options = {}) {
   const safeCards = Array.isArray(cards) ? cards : [];
   const safeEvents = Array.isArray(events) ? events : [];
@@ -1228,6 +1303,13 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
     result,
     { weakKey }
   );
+  const memoryComebackLoop = buildMemoryComebackLoop(
+    dailyMemorySprintDeck,
+    adaptiveRecallScheduler,
+    memoryRiskReleaseModel,
+    result,
+    { weakKey }
+  );
   return {
     title: needsRepair ? '高频修复循环' : '高频巩固循环',
     mode: needsRepair ? 'repair_recall' : 'mastery_recall',
@@ -1249,13 +1331,14 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
     dailyMemorySprintDeck,
     adaptiveRecallScheduler,
     memoryRiskReleaseModel,
+    memoryComebackLoop,
     xpRule: 'XP 只奖励主动回忆、错因修复和次日回访，不奖励盲刷题量。',
     leechRule: needsRepair
       ? `同一错因连续 2 次错，会降到第一步小黑板。`
       : '连续 2 次说清第一步，才进入变式练习。',
     parentShareLine: `家长复盘只看：孩子能否自己说出「${weakKey}」的第一步。`,
     nextRoute: needsRepair ? '/pages/review/review' : '/pages/tutor/tutor',
-    evidenceRequired: ['active_recall_cards', 'spaced_review_plan', 'wrong_cause_return', 'quest_cadence', 'memory_feedback_controller', 'recall_intensity_plan', 'wrong_cause_replay_deck', 'xp_feedback_policy', 'quest_arc_runway', 'gizmo_like_memory_protocol', 'socratic_quality_memory_bridge', 'question_bank_memory_bridge', 'question_bank_recall_workout', 'daily_memory_sprint_deck', 'adaptive_recall_scheduler', 'memory_risk_release_model', 'parent_share_line'],
+    evidenceRequired: ['active_recall_cards', 'spaced_review_plan', 'wrong_cause_return', 'quest_cadence', 'memory_feedback_controller', 'recall_intensity_plan', 'wrong_cause_replay_deck', 'xp_feedback_policy', 'quest_arc_runway', 'gizmo_like_memory_protocol', 'socratic_quality_memory_bridge', 'question_bank_memory_bridge', 'question_bank_recall_workout', 'daily_memory_sprint_deck', 'adaptive_recall_scheduler', 'memory_risk_release_model', 'memory_comeback_loop', 'parent_share_line'],
     weakKey
   };
 }
@@ -1272,6 +1355,7 @@ module.exports = {
   buildGizmoLikeMemoryProtocol,
   buildHighFrequencyPracticeLoop,
   buildMemoryFeedbackController,
+  buildMemoryComebackLoop,
   buildAdaptiveRecallScheduler,
   buildMemoryRiskReleaseModel,
   buildDailyMemorySprintDeck,
