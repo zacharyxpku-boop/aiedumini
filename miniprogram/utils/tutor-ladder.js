@@ -66,6 +66,24 @@ const TASK_TYPE_PROMPTS = {
 
 function detectTaskType(text = '', selected = {}) {
   const source = `${text || ''} ${selected.text || ''}`;
+  if (/调酸奶饮品|原味酸奶和水按 3:2|酸奶占几份/.test(source)) {
+    return 'math_word_problem';
+  }
+  if (/数学函数图像作业|水温随时间变化|横轴、纵轴和每一段/.test(source)) {
+    return 'math_word_problem';
+  }
+  if (/物理压强作业|同一压力作用在不同受力面积|受力面积变了吗/.test(source)) {
+    return 'physics_diagram';
+  }
+  if (/物理热学作业|冰熔化和水升温|温度-时间图/.test(source)) {
+    return 'physics_diagram';
+  }
+  if (/语文说明文阅读.*海陆风|题目问说明方法/.test(source)) {
+    return 'reading_question';
+  }
+  if (/生物人体调节作业|血糖升高.*胰岛素|人体调节过程/.test(source)) {
+    return 'biology_process';
+  }
   if (/数学.*(概率|摸球|不放回|树状图|平均分|合并后的平均分|平行线|同位角|内错角|同旁内角|统计)/.test(source)) {
     return 'math_word_problem';
   }
@@ -1521,8 +1539,292 @@ function inferHomeworkPressureSignal(text = '', taskType = 'unknown') {
       boardMove: '小黑板只画“图中证据 -> 区位因素 -> 农业优势”。',
       parentCheck: '先问：图上哪一个条件最直接支持这种农业？',
       reviewMove: '换成工业区位，仍先找图中最突出的证据。'
+    },
+    {
+      id: 'yogurt_ratio_concentration_cross_subject',
+      taskType: 'math_word_problem',
+      patterns: [/调酸奶饮品|原味酸奶和水按 3:2|酸奶占几份/],
+      firstStep: '先把 3:2 翻译成总份数 5 份，再判断题目问的是其中几份。',
+      wrongCause: '被“浓度、酸奶”干扰，没有先看比例份数。',
+      boardMove: '小黑板只画“酸奶 3 份 + 水 2 份 = 总 5 份”。',
+      parentCheck: '先问：这里每 5 份里酸奶占几份？',
+      reviewMove: '换成果汁和水 4:1，仍先画份数。'
+    },
+    {
+      id: 'temperature_function_graph_cross_subject',
+      taskType: 'math_word_problem',
+      patterns: [/数学函数图像作业|水温随时间变化|横轴、纵轴和每一段/],
+      firstStep: '先看横轴、纵轴和每一段的变化趋势，再判断哪一段升得快。',
+      wrongCause: '把图像当情景常识题，没有读坐标和分段变化。',
+      boardMove: '小黑板只画“时间轴 -> 温度轴 -> 分段上升/不变/下降”。',
+      parentCheck: '先问：横轴是什么，纵轴是什么？哪一段变化最快？',
+      reviewMove: '换成路程-时间图，仍先读坐标和斜率。'
+    },
+    {
+      id: 'piecewise_fee_starting_price',
+      taskType: 'equation_setup',
+      patterns: [/分段收费题|前 2 千米起步价|总费用 = 起步价/],
+      firstStep: '先把总费用拆成起步价和超过部分费用，再设未知数或列式。',
+      wrongCause: '没有区分免费/起步段和超过段。',
+      boardMove: '小黑板只画“总费用 = 起步价 + 超过部分”。',
+      parentCheck: '先问：哪一段已经包含在起步价里？',
+      reviewMove: '换成水费、电费阶梯收费，仍先拆分段。'
+    },
+    {
+      id: 'gas_pressure_area_cross_subject',
+      taskType: 'physics_diagram',
+      patterns: [/物理压强作业|同一压力作用在不同受力面积|受力面积变了吗/],
+      firstStep: '先确定压力大小和受力面积，再用压强看“力分到多大面积”。',
+      wrongCause: '只看情景词，没有抓住压力和受力面积两个量。',
+      boardMove: '小黑板只画“压力 F -> 面积 S -> 压强 p”。',
+      parentCheck: '先问：压力变了吗？受力面积变了吗？',
+      reviewMove: '换成书包背带宽窄，仍先看受力面积。'
+    },
+    {
+      id: 'heat_state_change_not_chemistry',
+      taskType: 'physics_diagram',
+      patterns: [/物理热学作业|冰熔化和水升温|温度-时间图/],
+      firstStep: '先判断哪一段温度不变、哪一段吸热升温。',
+      wrongCause: '把状态变化当化学反应，没有先读温度-时间图。',
+      boardMove: '小黑板只画“吸热 -> 温度变化/状态变化”。',
+      parentCheck: '先问：这段温度有没有变？物质有没有变成新物质？',
+      reviewMove: '换成水沸腾图像，仍先看温度平台。'
+    },
+    {
+      id: 'circuit_short_open_fault_meter',
+      taskType: 'physics_diagram',
+      patterns: [/电路故障作业|电压表示数接近电源电压|断路还是短路/],
+      firstStep: '先看电压表测哪两点，再判断这两点之间是否断路。',
+      wrongCause: '凭现象猜，没有先定位电表连接位置。',
+      boardMove: '小黑板只画“电压表两端 -> 是否有电压 -> 断/短判断”。',
+      parentCheck: '先问：电压表接在哪两个点？它读的是哪一段？',
+      reviewMove: '换成电流表示数异常，仍先看仪表位置。'
+    },
+    {
+      id: 'chem_control_variable_temperature',
+      taskType: 'chemistry_experiment',
+      patterns: [/比较温度对反应快慢的影响|唯一改变的变量是温度|控制变量/],
+      firstStep: '先找唯一改变的变量是温度，再确认其他条件相同。',
+      wrongCause: '只解释温度现象，没有说对照实验的唯一变量。',
+      boardMove: '小黑板只画“改变温度；其他条件相同；比较反应快慢”。',
+      parentCheck: '先问：两组实验只有哪一个条件不同？',
+      reviewMove: '换成浓度影响反应速率，仍先找唯一变量。'
+    },
+    {
+      id: 'acid_base_indicator_property',
+      taskType: 'chemistry_experiment',
+      patterns: [/紫色石蕊|遇酸变红|先判断溶液酸碱性/],
+      firstStep: '先判断待测溶液是酸性还是碱性，再对应指示剂颜色。',
+      wrongCause: '死背颜色，没有先判断酸碱性。',
+      boardMove: '小黑板只画“溶液性质 -> 指示剂 -> 颜色”。',
+      parentCheck: '先问：这瓶溶液先判断成酸性还是碱性？',
+      reviewMove: '换成酚酞，仍先判断酸碱性。'
+    },
+    {
+      id: 'mass_conservation_open_system',
+      taskType: 'chemistry_experiment',
+      patterns: [/质量守恒题|气体逸出|体系是否封闭/],
+      firstStep: '先判断体系是否封闭，气体是否跑出装置。',
+      wrongCause: '只看天平示数，没有区分封闭体系和开放体系。',
+      boardMove: '小黑板只画“反应物总质量 -> 气体是否逸出 -> 天平示数”。',
+      parentCheck: '先问：气体有没有留在装置里？',
+      reviewMove: '换成密闭容器反应，仍先判断体系边界。'
+    },
+    {
+      id: 'because_although_logic',
+      taskType: 'english_sentence',
+      patterns: [/because 和 although|原因关系还是转折关系|前后两句是原因/],
+      firstStep: '先判断前后两句是原因关系还是转折关系。',
+      wrongCause: '背中文意思，不看句子逻辑。',
+      boardMove: '小黑板只画“前句关系 -> 原因/转折 -> 连词”。',
+      parentCheck: '先问：后一句是在解释原因，还是和前一句相反？',
+      reviewMove: '换成 so/but，仍先判断逻辑关系。'
+    },
+    {
+      id: 'relative_pronoun_antecedent',
+      taskType: 'english_sentence',
+      patterns: [/who\/which\/that|先行词|关系代词/],
+      firstStep: '先圈出先行词，再判断它是人还是物。',
+      wrongCause: '不找先行词，只凭空格附近词猜关系代词。',
+      boardMove: '小黑板只画“先行词 -> 人/物 -> 关系代词”。',
+      parentCheck: '先问：这个从句修饰前面的哪个词？',
+      reviewMove: '换成 whose/where，仍先找先行词。'
+    },
+    {
+      id: 'english_inference_text_evidence',
+      taskType: 'reading_question',
+      patterns: [/What can we infer|合理推断|原文证据/],
+      firstStep: '先回到原文定位相关句，再判断哪一项是合理推断而不是原文照抄。',
+      wrongCause: '把熟悉词当答案，没有区分原文信息和推断。',
+      boardMove: '小黑板只画“原文证据 -> 合理推出 -> 选项”。',
+      parentCheck: '先问：原文哪一句支持这个推断？',
+      reviewMove: '换成 best title，仍先定位核心证据。'
+    },
+    {
+      id: 'expository_method_sea_land_breeze',
+      taskType: 'reading_question',
+      patterns: [/语文说明文阅读.*海陆风|题目问说明方法|举例、列数字或作比较/],
+      firstStep: '先判断题目问说明方法，不是问自然成因，再回文找举例、列数字或作比较。',
+      wrongCause: '被文章内容带跑，没有先看题目问法。',
+      boardMove: '小黑板只画“题目问法 -> 回文证据 -> 说明方法”。',
+      parentCheck: '先问：这题问的是内容原因，还是文章怎么说明？',
+      reviewMove: '换成介绍桥梁结构的说明文，仍先判断题目问法。'
+    },
+    {
+      id: 'classical_zhi_function_word',
+      taskType: 'reading_question',
+      patterns: [/比较“之”|句中位置|代词、助词还是动词/],
+      firstStep: '先看“之”前后词语和句子成分，再判断是代词、助词还是动词。',
+      wrongCause: '把常见意思套进去，没有看句中功能。',
+      boardMove: '小黑板只画“前后词 -> 句中位置 -> 用法”。',
+      parentCheck: '先问：这个“之”后面接的是什么？它在句子里做什么？',
+      reviewMove: '换成“其/而”，仍先看位置和功能。'
+    },
+    {
+      id: 'composition_material_one_detail',
+      taskType: 'writing_process',
+      patterns: [/那一次，我懂得了坚持|想写三个例子|最具体的材料/],
+      firstStep: '先只选一个最具体的材料，再写一个看得见的动作细节。',
+      wrongCause: '贪多求全，没有选一个能展开的核心材料。',
+      boardMove: '小黑板只画“一个材料 -> 一个动作细节 -> 一句感受”。',
+      parentCheck: '先问：哪一个例子最能看见动作？',
+      reviewMove: '换成“我学会了合作”，仍先选一个具体材料。'
+    },
+    {
+      id: 'blood_sugar_regulation_not_chemistry',
+      taskType: 'biology_process',
+      patterns: [/血糖升高.*胰岛素|人体调节过程|试管反应/],
+      firstStep: '先判断这是人体调节过程，再按“血糖变化 -> 激素调节 -> 恢复稳定”排顺序。',
+      wrongCause: '被“糖”字干扰，没有抓住人体调节过程。',
+      boardMove: '小黑板只画“血糖升高 -> 胰岛素 -> 血糖下降”。',
+      parentCheck: '先问：这个过程发生在人体调节里，还是试管反应里？',
+      reviewMove: '换成体温调节，仍先画变化和调节结果。'
+    },
+    {
+      id: 'reflex_arc_path',
+      taskType: 'biology_process',
+      patterns: [/反射弧作业|手碰热水缩回|信息传递路径/],
+      firstStep: '先按感受器、传入神经、神经中枢、传出神经、效应器排路径。',
+      wrongCause: '只描述感受，没有画信息传递顺序。',
+      boardMove: '小黑板只画“感受器 -> 神经中枢 -> 效应器”。',
+      parentCheck: '先问：刺激最先被哪个结构接收？',
+      reviewMove: '换成膝跳反射，仍先排反射弧路径。'
+    },
+    {
+      id: 'ecosystem_energy_arrow',
+      taskType: 'biology_process',
+      patterns: [/草、兔、狐|能量流动方向|箭头画成谁吃谁/],
+      firstStep: '先确定生产者，再按能量从被吃者流向捕食者画箭头。',
+      wrongCause: '把箭头理解成捕食动作，没有理解能量流动方向。',
+      boardMove: '小黑板只画“草 -> 兔 -> 狐”的能量方向。',
+      parentCheck: '先问：能量最开始从哪个生物进入这条链？',
+      reviewMove: '换成食物网，仍先找生产者和能量方向。'
+    },
+    {
+      id: 'contour_valley_ridge_direction',
+      taskType: 'geography_map',
+      patterns: [/判断山谷和山脊|弯曲方向|凸向高处/],
+      firstStep: '先看等高线弯曲方向，再判断凸向高处是山谷、凸向低处是山脊。',
+      wrongCause: '只看坡陡坡缓，没有判断地形部位。',
+      boardMove: '小黑板只画“等高线弯曲方向 -> 高/低处 -> 山谷/山脊”。',
+      parentCheck: '先问：等高线是向高处弯，还是向低处弯？',
+      reviewMove: '换成鞍部或陡崖，仍先看等高线形态。'
+    },
+    {
+      id: 'climate_graph_temperature_precipitation',
+      taskType: 'geography_map',
+      patterns: [/气候图作业|气温曲线和降水柱状图|降水季节分配/],
+      firstStep: '先判断最冷月/最热月气温，再看降水集中在哪个季节。',
+      wrongCause: '只看温度，不综合气温和降水。',
+      boardMove: '小黑板只画“气温范围 + 降水季节 -> 气候类型”。',
+      parentCheck: '先问：降水最多在什么季节？',
+      reviewMove: '换一张气候图，仍先读气温和降水两个证据。'
+    },
+    {
+      id: 'transport_location_map_evidence',
+      taskType: 'geography_map',
+      patterns: [/交通区位作业|交通线布局原因|线路走向/],
+      firstStep: '先从图中找最直接影响线路走向的地形或城市分布证据。',
+      wrongCause: '背因素清单，没有用图上证据解释线路。',
+      boardMove: '小黑板只画“图中证据 -> 影响线路 -> 布局原因”。',
+      parentCheck: '先问：线路为什么绕开这里，图上能看到什么证据？',
+      reviewMove: '换成城市选址题，仍先找图中最直接证据。'
+    },
+    {
+      id: 'climate_graph_full_year_trend',
+      taskType: 'geography_map',
+      patterns: [/气候图题.*只看一个月数据|全年气温曲线和降水柱状图.*只看一个月/],
+      firstStep: '先看全年气温变化，再看降水季节分配。',
+      wrongCause: '只看单月数据，没有读全年趋势。',
+      boardMove: '小黑板只画“气温全年趋势”和“降水集中季节”两条提示。',
+      parentCheck: '先问：你看的是全年趋势，还是只看了一个月？',
+      reviewMove: '换一张气候图，仍先看全年再看季节。'
+    },
+    {
+      id: 'food_chain_energy_four_nodes',
+      taskType: 'biology_process',
+      patterns: [/草、兔、狐、鹰|箭头方向按谁吃谁|能量流动方向/],
+      firstStep: '先判断箭头表示能量流动方向，从被吃者指向捕食者。',
+      wrongCause: '把箭头当成捕食动作方向，没理解能量流动。',
+      boardMove: '小黑板只画“草 -> 兔 -> 狐 -> 鹰”的能量箭头。',
+      parentCheck: '先问：箭头表示谁把能量传给谁？',
+      reviewMove: '换成水草、小鱼、大鱼，仍先判断能量从谁开始。'
+    },
+    {
+      id: 'climate_chart_hot_wet_same_time',
+      taskType: 'geography_map',
+      patterns: [/只看最高温.*雨热同期|最高温月份和降水最多月份/],
+      firstStep: '先同时看最高温月份和降水最多月份是否接近。',
+      wrongCause: '只看气温，不把降水和气温放在同一时间轴比较。',
+      boardMove: '小黑板只画“气温高峰 / 降水高峰 / 是否同月附近”。',
+      parentCheck: '先问：最热的时候是不是也最湿？',
+      reviewMove: '换成另一张气候图，仍先找两个峰值月份。'
+    },
+    {
+      id: 'climate_type_evidence_match',
+      taskType: 'geography_map',
+      patterns: [/气候类型作业|只背名称|气温和降水两个证据/],
+      firstStep: '先看最冷月气温，再看降水集中在哪个季节。',
+      wrongCause: '只背气候名称，没有用气温和降水两个证据匹配。',
+      boardMove: '小黑板只画“最冷月气温 / 降水季节”两格。',
+      parentCheck: '先问：你用了气温证据，还是只看了降水？',
+      reviewMove: '换一张气候图，仍先看最冷月和降水季节。'
     }
   ];
+  const exactSourcePriority = [
+    [/调酸奶饮品/, 'yogurt_ratio_concentration_cross_subject'],
+    [/水温随时间变化/, 'temperature_function_graph_cross_subject'],
+    [/前 2 千米起步价/, 'piecewise_fee_starting_price'],
+    [/同一压力作用在不同受力面积/, 'gas_pressure_area_cross_subject'],
+    [/冰熔化和水升温/, 'heat_state_change_not_chemistry'],
+    [/电压表示数接近电源电压/, 'circuit_short_open_fault_meter'],
+    [/温度对反应快慢的影响/, 'chem_control_variable_temperature'],
+    [/紫色石蕊/, 'acid_base_indicator_property'],
+    [/气体逸出/, 'mass_conservation_open_system'],
+    [/because 和 although/, 'because_although_logic'],
+    [/who\/which\/that/, 'relative_pronoun_antecedent'],
+    [/What can we infer/, 'english_inference_text_evidence'],
+    [/海陆风形成/, 'expository_method_sea_land_breeze'],
+    [/比较“之”/, 'classical_zhi_function_word'],
+    [/那一次，我懂得了坚持/, 'composition_material_one_detail'],
+    [/饭后血糖升高/, 'blood_sugar_regulation_not_chemistry'],
+    [/手碰热水缩回/, 'reflex_arc_path'],
+    [/草、兔、狐、鹰/, 'food_chain_energy_four_nodes'],
+    [/草、兔、狐组成食物链/, 'ecosystem_energy_arrow'],
+    [/判断山谷和山脊/, 'contour_valley_ridge_direction'],
+    [/读气温曲线和降水柱状图，判断气候类型/, 'climate_graph_temperature_precipitation'],
+    [/交通线布局原因/, 'transport_location_map_evidence']
+    , [/气候图题.*只看一个月数据/, 'climate_graph_full_year_trend']
+    , [/全年气温曲线和降水柱状图.*只看一个月/, 'climate_graph_full_year_trend']
+    , [/只看最高温.*雨热同期/, 'climate_chart_hot_wet_same_time']
+    , [/气候类型作业/, 'climate_type_evidence_match']
+  ];
+  const exactPriority = exactSourcePriority
+    .map(([pattern, id]) => (pattern.test(source) ? cases.find((item) => item.id === id) : null))
+    .filter(Boolean)[0];
+  if (exactPriority) {
+    return Object.assign({}, exactPriority, { source: 'real_homework_pressure_exact' });
+  }
   if (/没说|缺少|题干不全|条件不完整|没有给/.test(source)) {
     return {
       id: `missing_condition_${taskType || 'unknown'}`,
