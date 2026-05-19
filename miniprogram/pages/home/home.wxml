@@ -456,6 +456,7 @@
         <view class="share-relay-evidence" wx:if="{{incomingShareRelay.tonightReleaseGateLine}}">{{incomingShareRelay.tonightReleaseGateLine}}</view>
         <view class="share-relay-evidence" wx:if="{{incomingShareRelay.tonightShareBoundaryLine}}">{{incomingShareRelay.tonightShareBoundaryLine}}</view>
         <view class="share-relay-evidence">{{incomingShareRelay.returnContractLine}}</view>
+        <view class="share-relay-evidence" wx:if="{{incomingShareRelay.receiverCompletionLine}}">{{incomingShareRelay.receiverCompletionLine}}</view>
         <view class="share-relay-grid">
           <button
             class="share-relay-action"

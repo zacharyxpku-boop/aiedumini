@@ -974,6 +974,15 @@ Page({
         focus_title: focus && focus.title
       });
     }
+    if (storage.recordShareRelayCompletion) {
+      storage.recordShareRelayCompletion({
+        firstStep: miniActionText,
+        wrongCause: focus && (focus.wrongCauseLabel || focus.weakPoint || focus.title),
+        route: '/pages/review/review',
+        evidence: 'receiver_first_step_repair_completed',
+        title: '接收者完成修卡点第一步'
+      });
+    }
     this.setData({
       todayFocus: focus || this.data.todayFocus,
       gameRunway: Object.assign({}, this.data.gameRunway || {}, { percent: 100 }),

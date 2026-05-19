@@ -1482,6 +1482,7 @@
           <view class="share-conversation-title">{{communityShareRelayBoard.title}}</view>
           <view>{{communityShareRelayBoard.summary}}</view>
           <view>{{communityShareRelayBoard.noRankingLine}}</view>
+          <view wx:if="{{communityShareRelayBoard.returnRateLabel}}">{{communityShareRelayBoard.returnRateLabel}}</view>
           <view>{{communityShareRelayBoard.privacyBoundary}}</view>
           <view>{{communityShareRelayBoard.peerSafeLine}}</view>
           <view wx:if="{{communityShareRelayBoard.naturalSpreadLoop}}">
@@ -1509,6 +1510,7 @@
           <view wx:for="{{communityShareRelayBoard.visualRelayProofChecklist}}" wx:key="*this">小黑板证据清单：{{item}}</view>
           <view wx:if="{{communityShareRelayBoard.visualRelayBoundary}}">小黑板接力边界：{{communityShareRelayBoard.visualRelayBoundary}}</view>
           <view wx:for="{{communityShareRelayBoard.recentRuns}}" wx:key="id">接力记录：{{item.code}} · {{item.evidence}}</view>
+          <view wx:for="{{communityShareRelayBoard.challengeCompletions}}" wx:key="id">完成回流：{{item.share_code || item.code}} · {{item.completion_kind || item.type}}</view>
           <view>{{communityShareRelayBoard.contractLine}}</view>
           <view>{{communityShareRelayBoard.returnPathLine}}</view>
           <view wx:if="{{communityShareRelayBoard.safeRelayChallengePacket}}">

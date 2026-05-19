@@ -616,6 +616,8 @@
         <view class="bridge-line" wx:if="{{arcadeResultActionBridge.masteryGateLine}}">{{arcadeResultActionBridge.masteryGateLine}}</view>
         <view class="bridge-line" wx:if="{{arcadeResultActionBridge.parentEvidenceLine}}">{{arcadeResultActionBridge.parentEvidenceLine}}</view>
         <view class="bridge-share">{{arcadeResultActionBridge.shareLine}}</view>
+        <view class="bridge-line" wx:if="{{arcadeResultActionBridge.primaryShareLabel}}">{{arcadeResultActionBridge.primaryShareLabel}}｜{{arcadeResultActionBridge.returnWindow}}</view>
+        <view class="bridge-line" wx:if="{{arcadeResultActionBridge.shareChallengeTitle}}">接力任务：{{arcadeResultActionBridge.shareChallengeTitle}}｜{{arcadeResultActionBridge.receiverRoute}}</view>
         <view class="bridge-action-grid">
           <button
             class="bridge-action"

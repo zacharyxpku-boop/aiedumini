@@ -768,7 +768,13 @@ function buildSafeSharePayload(card = {}, intent = 'peer_challenge', extra = {})
     'course_unit_parent_decision',
     'course_unit_share_contract',
     'course_unit_recall_route',
-    'course_unit_game_route'
+    'course_unit_game_route',
+    'relay_review',
+    'relay_next_revisit',
+    'relay_spread_status',
+    'relay_season_status',
+    'wrong_cause_next_revisit',
+    'source_challenge_route'
   ];
   const denylist = [
     'original_question',

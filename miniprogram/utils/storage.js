@@ -4002,7 +4002,17 @@ function buildFirstStepBlackboardBlueprint(input = {}) {
     reportLine: `${curriculum.subjectLabel}报告只记录第一笔证据：${firstMove.evidence || subjectDepth.firstStep}。`,
     gameHook: `轻练习优先生成 3 张「${firstMove.label}」主动回忆卡。`,
     shareLine: `分享时只带走第一步小黑板和家长追问，不带完整答案。`,
+    answerPolicy: 'first_step_only_no_full_answer',
     evidenceRequired: ['first_stroke_marked', 'child_first_step', 'parent_one_question', 'next_day_revisit'],
+    exitCriteria: [
+      'child_can_name_first_step',
+      'child_can_point_to_evidence',
+      'parent_can_repeat_one_question',
+      'next_day_revisit_scheduled'
+    ],
+    blockedFields: ['full_answer', 'original_question_photo', 'score', 'ranking', 'full_dialogue'],
+    localCodeOwns: ['board_layer_choice', 'stop_rule', 'answer_policy', 'exit_gate'],
+    aiRole: 'explain_the_same_first_step_in_child_friendly_words',
     route: curriculum.route || subjectDepth.route || '/pages/tutor/tutor'
   };
 }
@@ -6277,6 +6287,14 @@ function buildCommunityShareRelayBoard(input = {}) {
   const recentRuns = shareRuns.slice(0, 5);
   const relayEvidenceCount = recentRuns.filter((item) => item && (item.share_intent || item.type || item.payload)).length;
   const receiverCompletionCount = shareRuns.filter((item) => item && item.type === 'share_relay_receiver_completion').length;
+  const challengeCompletions = shareRuns.filter((item) => item && (
+    item.type === 'share_relay_receiver_completion'
+    || item.type === 'share_receiver_completion'
+    || item.completion_kind
+  )).slice(0, 6);
+  const returnRateLabel = shareRuns.length
+    ? `接力完成 ${challengeCompletions.length}/${shareRuns.length}，只看动作闭环，不做分数排名。`
+    : '还没有接力样本，先发起一张90秒第一步挑战。';
   const lanes = [
     {
       id: 'sender',
@@ -6289,7 +6307,9 @@ function buildCommunityShareRelayBoard(input = {}) {
       id: 'receiver',
       label: '接收者',
       action: incoming && incoming.share_code ? (incoming.action_label || '用自己的材料复刻同类第一步') : '等待一张可接力的学习动作卡',
-      evidence: incoming && incoming.share_code ? `已接到 ${incoming.share_code}` : '还没有回流记录',
+      evidence: receiverCompletionCount
+        ? `已完成 ${receiverCompletionCount} 次接收者第一步回写`
+        : incoming && incoming.share_code ? `已接到 ${incoming.share_code}` : '还没有回流记录',
       route: '/pages/home/home?from=community_relay'
     },
     {
@@ -6379,6 +6399,12 @@ function buildCommunityShareRelayBoard(input = {}) {
     visualRelayProofChecklist,
     visualRelayBoundary: '社区小黑板接力只传第一步、复刻动作、家长检查和回访安排；不传原题、答案、分数、排名或完整对话。',
     relayEvidenceCount,
+    receiverCompletionCount,
+    challengeCompletions,
+    returnRateLabel,
+    receiverCompletionLine: receiverCompletionCount
+      ? `接收者已用自己的材料完成 ${receiverCompletionCount} 次第一步回写，已写入分享/回流证据。`
+      : '接收者还需用自己的材料完成 1 次第一步回写，才算接力闭环。',
     lanes,
     recentRuns: recentRuns.map((item) => ({
       id: item.id || item.share_code || item.code,
@@ -7894,6 +7920,33 @@ function buildPressureSampleEvidence(sample = {}, unit = {}, type = 'active_reca
   };
 }
 
+function pickOerResourceForUnit(unit = {}, type = 'active_recall', index = 0) {
+  const ledger = realHomeworkCoverage && Array.isArray(realHomeworkCoverage.PUBLIC_K12_OPEN_SOURCE_RESOURCE_LEDGER)
+    ? realHomeworkCoverage.PUBLIC_K12_OPEN_SOURCE_RESOURCE_LEDGER
+    : [];
+  if (!ledger.length) return null;
+  const subjectText = `${unit.subjectId || ''} ${unit.subjectLabel || ''} ${unit.unitLabel || ''} ${unit.taskType || ''}`.toLowerCase();
+  const typeText = String(type || '').toLowerCase();
+  const scored = ledger.map((resource, resourceIndex) => {
+    const haystack = [
+      resource.id,
+      resource.label,
+      resource.sourceType,
+      (resource.localizeAsCode || []).join(' '),
+      (resource.directUse || []).join(' ')
+    ].join(' ').toLowerCase();
+    let score = 0;
+    if (/math|数学|代数|几何|函数|图形/.test(subjectText) && /math|geogebra|illustrative|openup/.test(haystack)) score += 8;
+    if (/physics|物理|science|科学|化学|生物/.test(subjectText) && /phet|openscied|stax|libretexts|science/.test(haystack)) score += 8;
+    if (/english|英语|语文|language/.test(subjectText) && /standard|khan|oer/.test(haystack)) score += 4;
+    if (typeText.includes('recall') && /recall|practice|warmup|adaptive/.test(haystack)) score += 4;
+    if (typeText.includes('wrong') && /misconception|evidence|diagnostic|wrong/.test(haystack)) score += 4;
+    if (typeText.includes('transfer') && /routine|visual|activity|problem/.test(haystack)) score += 4;
+    return { resource, resourceIndex, score };
+  }).sort((a, b) => b.score - a.score || a.resourceIndex - b.resourceIndex);
+  return scored.length ? scored[(index % Math.min(scored.length, 6))].resource : null;
+}
+
 function buildQuestionSampleCard(unit = {}, type = 'active_recall', index = 0, options = {}) {
   const subject = unit.subjectLabel || '学科';
   const label = unit.unitLabel || '当前单元';
@@ -7926,7 +7979,17 @@ function buildQuestionSampleCard(unit = {}, type = 'active_recall', index = 0, o
   const sample = samples[type] || samples.active_recall;
   const sourceSample = findPressureSampleForUnit(unit, type, index, options.realHomeworkPressureSamples);
   const sourceEvidence = buildPressureSampleEvidence(sourceSample, unit, type);
+  const oerResource = pickOerResourceForUnit(unit, type, index);
   return Object.assign({}, sample, {
+    oerResourceId: oerResource && oerResource.id,
+    oerReuseLevel: oerResource && (oerResource.reuseLevel || 'structure_only'),
+    oerDerivedArtifact: oerResource && (oerResource.derivedArtifact || 'localized_question_type_action_card'),
+    oerAttributionRequired: !!(oerResource && oerResource.attributionRequired),
+    derivedFrom: 'structure_only',
+    answerPolicy: 'first_step_only_no_full_answer',
+    blockedFields: ['original_question', 'full_answer', 'score', 'ranking', 'full_dialogue'],
+    aiRole: 'socratic_wording_only',
+    localCodeOwns: ['source_match', 'question_type_route', 'answer_policy', 'xp_unlock', 'share_boundary'],
     sourceBacked: !!sourceEvidence,
     sourceSampleId: sourceEvidence && sourceEvidence.sourceSampleId,
     sourceId: sourceEvidence && sourceEvidence.sourceId,
@@ -10660,6 +10723,7 @@ module.exports = {
   buildQuestionBankVisualShareRelayDeck,
   saveIncomingShare,
   appendShareRun,
+  recordShareRelayCompletion,
   loadClientIdentity,
   saveClientIdentity,
   loadSyncState,

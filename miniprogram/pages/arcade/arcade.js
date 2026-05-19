@@ -1206,6 +1206,22 @@ Page({
         }
       });
     }
+    if (incomingShare && incomingShare.share_code && storage.recordShareRelayCompletion) {
+      storage.recordShareRelayCompletion({
+        incomingShare,
+        firstStep: incomingShare.relay_first_step
+          || incomingShare.question_bank_relay_first_step
+          || (this.data.subjectSkillDepth && this.data.subjectSkillDepth.firstStep)
+          || '',
+        wrongCause: incomingShare.wrong_cause_label
+          || incomingShare.capability_gap
+          || (gameRetentionLoop && gameRetentionLoop.weakKey)
+          || '',
+        route: '/pages/arcade/arcade',
+        evidence: savedResult.passed ? 'receiver_90_second_recall_passed' : 'receiver_90_second_recall_attempted',
+        title: '接收者完成 90 秒回忆接力'
+      });
+    }
     api.submitEvent({
       event: 'arcade_completed',
       source: 'arcade',
@@ -1471,6 +1487,13 @@ Page({
     ].join(' · ');
     const actions = [
       {
+        id: 'peer_90s_relay',
+        label: '发起90秒接力',
+        route: '/pages/profile/profile?from=arcade_peer_relay',
+        reason: '把本局第一步变成好友可复刻的安全挑战，不晒分、不晒答案。',
+        capabilityId: 'share_return'
+      },
+      {
         id: 'review',
         label: wrongCount ? '先修错卡' : '明天回看',
         route: '/pages/review/review',
@@ -1496,6 +1519,17 @@ Page({
       title: '本局之后做什么',
       headline,
       evidenceLine,
+      primaryShareLabel: '发起90秒回忆挑战',
+      shareChallengeTitle: wrongCount ? '错因第一步接力' : '同类第一步接力',
+      returnWindow: '今晚接力，明天只回看一张最不稳的卡',
+      receiverRoute: '/pages/arcade/arcade?from=peer_90s_relay',
+      shareChallengePayload: {
+        share_intent: 'peer_90s_relay',
+        relay_review: 'ninety_second_first_step',
+        relay_next_revisit: 'tomorrow_one_card',
+        relay_spread_status: 'no_ranking_no_score',
+        source_challenge_route: '/pages/arcade/arcade?from=peer_90s_relay'
+      },
       tomorrowLine: progression.nextDayRevisit || retention.tomorrowLine || highFrequency.parentShareLine || '明天只回看最不稳的一张卡。',
       masteryGateLine: progression.masteryGate || '',
       parentEvidenceLine: progression.parentEvidence || '',

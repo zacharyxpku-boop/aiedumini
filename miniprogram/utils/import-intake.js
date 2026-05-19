@@ -301,6 +301,20 @@ function buildUploadIntakePacket(text = '', imagePaths = [], materialType = '') 
     boundary: '只把用户提供的文字拆成回忆卡，不抓链接、不解析文件、不生成完整答案。'
   };
   const requiredNextEvidence = buildRequiredNextEvidence(intakeSourceSchema, kind);
+  const requiredTextFields = ['question_type', 'child_original_thought', 'stuck_first_step', 'wrong_cause_guess'];
+  const structuredCapturePrompts = [
+    { id: 'question_type', label: '题型', prompt: '这份材料更像哪类题：审题、列式、概念、实验、阅读、表达，还是记忆？' },
+    { id: 'child_original_thought', label: '孩子原想法', prompt: '孩子当时第一反应是什么？只写一句原话或近似表达。' },
+    { id: 'stuck_first_step', label: '卡住第一步', prompt: '他卡在读题、找条件、列关系、套概念、检查，还是迁移？' },
+    { id: 'wrong_cause_guess', label: '错因猜测', prompt: '先猜一个最可能错因，之后用明天回访验证，不直接下结论。' }
+  ];
+  const photoEvidencePolicy = {
+    mode: 'local_file_reference_only',
+    ocrClaim: false,
+    releaseGate: 'photo_needs_structured_text_before_report_or_tutor_release',
+    allowedUse: ['local_archive', 'parent_context', 'manual_text_capture_prompt'],
+    blockedUse: ['photo_ocr_claim', 'auto_answer', 'score_ranking', 'public_share']
+  };
   const reportSeed = {
     type: images.length ? 'photo_plus_text_intake' : 'text_intake',
     label: materialSource ? materialSource.label : (kind === 'photo_evidence_needs_text' ? '照片留档' : '作业/错题文字'),
@@ -316,7 +330,10 @@ function buildUploadIntakePacket(text = '', imagePaths = [], materialType = '') 
     portraitConfidenceWeight: intakeSourceSchema.id === 'talent_assessment' ? 0 : 1,
     scoreRankingPolicy: intakeSourceSchema.id === 'talent_assessment'
       ? 'degrade_to_unreleased_reference'
-      : 'release_only_with_confirmed_score_sheet_or_homework_evidence'
+      : 'release_only_with_confirmed_score_sheet_or_homework_evidence',
+    requiredTextFields,
+    structuredCapturePrompts,
+    photoEvidencePolicy
   };
   const nextActionQueue = buildNextActionQueue(kind, classified, materialSource || classified.sourceMeta || null, images);
   return {
@@ -337,6 +354,9 @@ function buildUploadIntakePacket(text = '', imagePaths = [], materialType = '') 
     intakeSourceSchemas: INTAKE_SOURCE_SCHEMAS,
     nextActionQueue,
     blockedFields,
+    requiredTextFields,
+    structuredCapturePrompts,
+    photoEvidencePolicy,
     reviewSeed,
     reportSeed,
     aiBoundary: 'AI 只负责改写提示和追问；来源识别、路线、放行、分享字段由本地规则决定。'

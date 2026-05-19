@@ -306,7 +306,19 @@ Page({
         },
         behaviorSignals: {
           studyMinutes: Number(this.data.minutes || 0) || '',
-          homeworkMinutes: Number(this.data.minutes || 0) || ''
+          homeworkMinutes: Number(this.data.minutes || 0) || '',
+          wrongCause: reportSeed.wrongCause || (wrongbook.imported ? 'wrong_question_imported_needs_first_step_check' : ''),
+          firstStep: reportSeed.firstStep || (uploadIntakePacket && uploadIntakePacket.requiredTextFields ? 'requires_structured_first_step_capture' : ''),
+          parentQuestion: '今晚只问：这题第一步你先看哪里？',
+          nextDayRevisit: '明天遮住答案，只回看一张最不稳的卡',
+          sourceSchemaId: decisionSource.sourceSchemaId,
+          requiredNextEvidence: decisionSource.requiredNextEvidence,
+          structuredCapturePrompts: uploadIntakePacket && Array.isArray(uploadIntakePacket.structuredCapturePrompts)
+            ? uploadIntakePacket.structuredCapturePrompts
+            : [],
+          photoEvidencePolicy: uploadIntakePacket && uploadIntakePacket.photoEvidencePolicy
+            ? uploadIntakePacket.photoEvidencePolicy
+            : null
         },
         emotionSignals: {},
         interestSignals: {},
