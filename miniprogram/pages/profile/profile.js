@@ -1602,11 +1602,12 @@ function buildProfileReadinessSnapshot(input = {}) {
   ];
   const aiBoundaryReleaseRule = '即使暂时不用大模型，入口、点拨兜底、错因卡、复习、家长复盘和安全分享也必须能跑。';
   const finalTargetRows = Array.isArray(finalTargetGapMeter.rows)
-    ? finalTargetGapMeter.rows.slice(0, 4).map((item) => ({
+    ? finalTargetGapMeter.rows.map((item) => ({
       id: item.id,
       label: item.label,
       status: item.status === 'ready' ? '已成型' : item.status === 'external_blocked' ? '差外部配置' : '还要加厚',
       progress: Number(item.progress || 0),
+      route: item.route || '/pages/profile/profile',
       nextAction: item.nextAction || ''
     }))
     : [];
@@ -2902,6 +2903,36 @@ Page({
         label: item.label || action.actionLabel,
         route,
         readiness: 'capability_maturity_queue'
+      });
+    }
+    navigation.navigateLearningRoute(route);
+  },
+
+  runFinalTargetAction(event) {
+    const dataset = event.currentTarget.dataset || {};
+    const snapshot = this.data.profileReadinessSnapshot || {};
+    const rows = Array.isArray(snapshot.finalTargetRows) ? snapshot.finalTargetRows : [];
+    const item = rows.find((entry) => entry.id === dataset.id) || {};
+    const route = dataset.route || item.route || '/pages/profile/profile';
+    const action = {
+      source: 'final_target_gap_meter',
+      sourceLabel: '竞品级商用目标差距表',
+      actionId: item.id || dataset.id || 'final_target_next',
+      actionLabel: item.label || '继续推进最终目标',
+      reasonLine: `${item.status || '待推进'} · ${Number(item.progress || 0)}%`,
+      evidenceLine: item.nextAction || snapshot.finalTargetNextAction || '',
+      route
+    };
+    if (storage.recordUnifiedNextAction) {
+      storage.recordUnifiedNextAction(Object.assign({}, action, { surface: 'profile' }));
+    }
+    if (storage.recordSurfaceDepthAction) {
+      storage.recordSurfaceDepthAction({
+        surface: 'profile',
+        dimensionId: action.actionId,
+        label: action.actionLabel,
+        route,
+        readiness: 'final_target_gap_meter'
       });
     }
     navigation.navigateLearningRoute(route);

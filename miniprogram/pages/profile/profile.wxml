@@ -93,6 +93,7 @@
               <view class="final-target-row" wx:for="{{profileReadinessSnapshot.finalTargetRows}}" wx:key="id">
                 <text class="ai-boundary-label">{{item.label}}｜{{item.status}}｜{{item.progress}}%</text>
                 <text class="ai-boundary-body">{{item.nextAction}}</text>
+                <button class="profile-small-primary" data-id="{{item.id}}" data-route="{{item.route}}" bindtap="runFinalTargetAction">去推进</button>
               </view>
               <view class="ai-boundary-rule">下一步：{{profileReadinessSnapshot.finalTargetNextAction}}</view>
               <view class="ai-boundary-rule">汇报节奏：{{profileReadinessSnapshot.finalTargetCadence}}</view>

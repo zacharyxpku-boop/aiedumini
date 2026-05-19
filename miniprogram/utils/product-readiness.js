@@ -376,6 +376,7 @@ const FINAL_TARGET_REQUIREMENTS = [
     benchmark: '对标 Gizmo 的资料进来就能变成练习，但只承诺粘贴摘录和自有材料。',
     dimensionIds: ['material_to_review', 'local_resilience'],
     requiredLocalEvidence: ['upload_to_report_material', 'material_to_review'],
+    route: '/pages/upload/upload?from=final_target_gap&target=chinese_material_import',
     nextAction: '继续把公众号摘录、网页摘录、PDF 摘录转成来源包和回访卡，不做自动抓取承诺。'
   },
   {
@@ -384,6 +385,7 @@ const FINAL_TARGET_REQUIREMENTS = [
     benchmark: '对标 Gizmo 的 active recall 和 spaced repetition。',
     dimensionIds: ['spaced_recall', 'game_retention'],
     requiredLocalEvidence: ['review_to_recall', 'practice_to_record'],
+    route: '/pages/review/review?from=final_target_gap&target=active_recall_loop',
     nextAction: '把今日 3 张主动回忆、错因回放、明日回访继续压到 Review 和 Arcade 的同一条链上。'
   },
   {
@@ -392,6 +394,7 @@ const FINAL_TARGET_REQUIREMENTS = [
     benchmark: '对标 Khanmigo 的不代写、不泄答案、追问孩子下一步。',
     dimensionIds: ['guided_tutor'],
     requiredLocalEvidence: ['home_to_tutor', 'tutor_to_focus'],
+    route: '/pages/tutor/tutor?from=final_target_gap&target=socratic_tutor_depth',
     nextAction: 'AI 只做追问语气和解释改写，本地继续收紧题型、错因、停止条件和安全回退。'
   },
   {
@@ -400,6 +403,7 @@ const FINAL_TARGET_REQUIREMENTS = [
     benchmark: '对标 Khan Academy 的课程骨架，但先做中国 K12 课标结构和题型蓝图。',
     dimensionIds: ['material_to_review', 'guided_tutor', 'spaced_recall'],
     requiredLocalEvidence: ['module_to_recall_card', 'report_to_plan'],
+    route: '/pages/module/module?from=final_target_gap&target=curriculum_question_bank',
     nextAction: '继续把 7 科题型卡沉淀为第一步、小黑板、错因、迁移和掌握门槛，不复制公开原题。'
   },
   {
@@ -408,6 +412,7 @@ const FINAL_TARGET_REQUIREMENTS = [
     benchmark: '借鉴千问板书式讲解，但不追全科动态板书和拍题出答案。',
     dimensionIds: ['guided_tutor', 'parent_evidence'],
     requiredLocalEvidence: ['tutor_to_focus', 'focus_to_review_evidence'],
+    route: '/pages/tutor/tutor?from=final_target_gap&target=visual_first_step_board',
     nextAction: '只画对象、条件、方向、证据句或空位，继续避免完整答案和假动态板书。'
   },
   {
@@ -416,6 +421,7 @@ const FINAL_TARGET_REQUIREMENTS = [
     benchmark: '对标 Khanmigo 的家长/老师可见证据，但聚焦家庭今晚行动。',
     dimensionIds: ['parent_evidence', 'weekly_pattern', 'mastery_rubric', 'outcome_review'],
     requiredLocalEvidence: ['weekly_pattern_to_next_action', 'mastery_to_intervention'],
+    route: '/pages/profile/profile?from=final_target_gap&target=parent_longitudinal_portrait',
     nextAction: '继续把 1/3/7 晚证据、两周稳定门和干预复盘做成家长一句话决策。'
   },
   {
@@ -424,6 +430,7 @@ const FINAL_TARGET_REQUIREMENTS = [
     benchmark: '借微信生态做接力，不做排行榜、晒分和公共原题传播。',
     dimensionIds: ['share_return', 'decision_path'],
     requiredLocalEvidence: ['share_to_landing_next_action'],
+    route: '/pages/home/home?from=final_target_gap&target=wechat_safe_share_relay',
     nextAction: '继续让分享卡带下一步、错因和接收侧动作，不带原题、答案、照片、分数和排名。'
   },
   {
@@ -432,6 +439,7 @@ const FINAL_TARGET_REQUIREMENTS = [
     benchmark: '对标真实可商用小程序，而不是本机 Demo。',
     dimensionIds: ['local_resilience'],
     requiredExternalBlockers: ['real_appid', 'production_ai_provider'],
+    route: '/pages/profile/profile?from=final_target_gap&target=commercial_launch_ops',
     nextAction: '本地代码继续保持可跑；公开发布前必须完成真实 AppID、生产模型、内容安全和真机体验。'
   }
 ];
@@ -507,6 +515,7 @@ function buildFinalTargetGapMeter(readiness = {}, acceptanceBits = {}) {
       missingDimensionIds: (target.dimensionIds || []).filter((id) => !dimensionMap[id] || !dimensionMap[id].ready),
       missingFlowIds: (target.requiredLocalEvidence || []).filter((id) => !flowMap[id] || flowMap[id].status !== 'closed'),
       externalBlockerIds: externalEvidence.filter((item) => item.blockingLaunch).map((item) => item.id),
+      route: target.route,
       nextAction: target.nextAction
     };
   });
