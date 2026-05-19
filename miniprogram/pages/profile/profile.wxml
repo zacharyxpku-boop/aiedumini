@@ -1046,6 +1046,10 @@
           <text wx:for="{{learningReportSummary.familyDecisionDoNotDo}}" wx:key="*this">今晚不做：{{item}}</text>
           <text wx:for="{{learningReportSummary.familyDecisionEvidenceChecklist}}" wx:key="*this">证据清单：{{item}}</text>
           <text wx:for="{{learningReportSummary.familyDecisionParentMeetingScript}}" wx:key="*this">复盘问题：{{item}}</text>
+          <text wx:for="{{learningReportSummary.familyDecisionIntakeSourcePlan}}" wx:key="id">可录入：{{item.label}}｜{{item.whatToUpload}}｜本地：{{item.localRule}}｜AI：{{item.aiUse}}</text>
+          <text wx:if="{{learningReportSummary.familyDecisionPublicK12SourceStrategy}}">公开资料：{{learningReportSummary.familyDecisionPublicK12SourceStrategy.useAs}}</text>
+          <text wx:if="{{learningReportSummary.familyDecisionPublicK12SourceStrategy}}">不用作：{{learningReportSummary.familyDecisionPublicK12SourceStrategy.doNotUseAs}}</text>
+          <text wx:for="{{learningReportSummary.familyDecisionAiLocalWorkSplit}}" wx:key="id">{{item.label}}：{{item.action}}</text>
           <text wx:for="{{learningReportSummary.familyDecisionWeeklyReviewAgenda}}" wx:key="*this">周复盘：{{item}}</text>
           <text wx:for="{{learningReportSummary.familyDecisionParentActionLadder}}" wx:key="level">家长动作 {{item.level}}：{{item.label}}｜{{item.action}}</text>
           <text wx:if="{{learningReportSummary.familyDecisionSevenDayGate}}">7天继续：{{learningReportSummary.familyDecisionSevenDayGate.continueRule}}</text>

@@ -775,6 +775,47 @@ function buildFamilyDecisionMemo(parts = {}, matrix = [], recommendationPlan = {
       '家长有没有忍住不讲完整答案？',
       '下周是加一点变式，还是继续降阶？'
     ],
+    intakeSourcePlan: [
+      {
+        id: 'score_sheet',
+        label: '成绩单/周测',
+        whatToUpload: '粘贴分数、班级位置或老师反馈摘要',
+        localRule: '只做学科强弱、趋势和待确认字段，不做排名羞辱。',
+        aiUse: '把数字翻译成家长能听懂的行动建议。'
+      },
+      {
+        id: 'wrong_question_paper',
+        label: '错题/试卷',
+        whatToUpload: '上传或粘贴错题、孩子原想法和卡住的一步',
+        localRule: '抽成题型、错因、第一步、明天回访和第 7 天复核。',
+        aiUse: '生成苏格拉底追问、小黑板话术和同错因小变式。'
+      },
+      {
+        id: 'talent_assessment',
+        label: '天赋测评/学习偏好',
+        whatToUpload: '录入第三方测评摘要，或完成 15 题快速测评',
+        localRule: '只作为学习偏好候选，必须和作业证据、回访证据交叉确认。',
+        aiUse: '解释孩子更适合先看图、先复述、先动笔还是先拆步骤。'
+      },
+      {
+        id: 'school_feedback',
+        label: '学校/老师材料',
+        whatToUpload: '录入老师评语、课堂观察、作业批注或家校沟通要点',
+        localRule: '只生成观察问题、家庭动作和安全交接字段。',
+        aiUse: '把家校沟通整理成不带原题和隐私的短摘要。'
+      }
+    ],
+    publicK12SourceStrategy: {
+      title: '公开资料借力方式',
+      useAs: '借课程标准、学段、学科核心素养、题型结构和交互框架。',
+      doNotUseAs: '不复制教材正文、教辅题库、平台视频、讲义图片或他人解析。',
+      productUse: '本地代码把公开骨架转成 grade/subject/unit/concept/ability/evidence；AI 只基于用户自己的资料改写解释。'
+    },
+    aiLocalWorkSplit: [
+      { id: 'local', label: '本地规则管', action: '资料类型、证据门槛、题型轴、错因、复习间隔、分享字段和报告放行。' },
+      { id: 'ai', label: 'AI 管', action: '儿童可听懂的解释、家长摘要、追问改写、小黑板文案和同错因变式。' },
+      { id: 'blocked', label: '禁止交给 AI', action: '最终答案、掌握结论、天赋定性、分数排名、奖励发放和家校放行。' }
+    ],
     parentActionLadder: [
       { level: 1, label: '只问一句', action: solution.parentScript || plan.parentLine || '这一步你准备先看哪里？' },
       { level: 2, label: '给二选一', action: '让孩子在两个入口里选一个' },
