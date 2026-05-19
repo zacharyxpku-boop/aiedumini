@@ -51,6 +51,7 @@ Page({
     dailyReturnMission: null,
     dailyReturnContract: null,
     reviewReturnSeed: null,
+    nextDayReturnEvidence: null,
     spacedRecallPolicy: null,
     arcadeResultActionBridge: null,
     emptyGuide: null,
@@ -214,6 +215,12 @@ Page({
         : null,
       dailyReturnContract: previewHighFrequencyPracticeLoop && previewHighFrequencyPracticeLoop.dailyReturnContract
         ? previewHighFrequencyPracticeLoop.dailyReturnContract
+        : null,
+      reviewReturnSeed: previewHighFrequencyPracticeLoop && previewHighFrequencyPracticeLoop.reviewReturnSeed
+        ? previewHighFrequencyPracticeLoop.reviewReturnSeed
+        : null,
+      nextDayReturnEvidence: previewHighFrequencyPracticeLoop && previewHighFrequencyPracticeLoop.nextDayReturnEvidence
+        ? previewHighFrequencyPracticeLoop.nextDayReturnEvidence
         : null,
       emptyGuide: this.emptyGuide(selectedGame, round),
       feedbackText: (round.questions || round.tracks || round.pairs || []).length ? this.openingHint(selectedGame) : '还没有适合游戏化的真实学习卡。'
@@ -1102,6 +1109,9 @@ Page({
     const reviewReturnSeed = highFrequencyPracticeLoop && highFrequencyPracticeLoop.reviewReturnSeed
       ? highFrequencyPracticeLoop.reviewReturnSeed
       : null;
+    const nextDayReturnEvidence = highFrequencyPracticeLoop && highFrequencyPracticeLoop.nextDayReturnEvidence
+      ? highFrequencyPracticeLoop.nextDayReturnEvidence
+      : (dailyReturnContract && dailyReturnContract.nextDayReturnEvidence ? dailyReturnContract.nextDayReturnEvidence : null);
     const spacedRecallPolicy = highFrequencyPracticeLoop && highFrequencyPracticeLoop.spacedRecallPolicy
       ? highFrequencyPracticeLoop.spacedRecallPolicy
       : null;
@@ -1273,6 +1283,12 @@ Page({
       daily_return_contract_blocked_fields: dailyReturnContract && dailyReturnContract.shareCard
         ? dailyReturnContract.shareCard.blockedFields.join(',')
         : '',
+      next_day_return_agreed: nextDayReturnEvidence ? !!nextDayReturnEvidence.agreed : false,
+      next_day_return_due_at: nextDayReturnEvidence ? nextDayReturnEvidence.dueAt : '',
+      next_day_return_route: nextDayReturnEvidence ? nextDayReturnEvidence.route : '',
+      next_day_return_blocked_fields: nextDayReturnEvidence && Array.isArray(nextDayReturnEvidence.blockedFields)
+        ? nextDayReturnEvidence.blockedFields.join(',')
+        : '',
       review_return_seed_mode: reviewReturnSeed ? reviewReturnSeed.mode : '',
       review_return_seed_next_route: reviewReturnSeed ? reviewReturnSeed.nextRoute : '',
       review_return_seed_wrong_cards: reviewReturnSeed && Array.isArray(reviewReturnSeed.wrongCardIds)
@@ -1321,7 +1337,9 @@ Page({
           rewardLine,
           gameRetentionLoop,
           highFrequencyPracticeLoop,
+          dailyReturnContract,
           reviewReturnSeed,
+          nextDayReturnEvidence,
           spacedRecallPolicy
         }
       });
@@ -1388,6 +1406,12 @@ Page({
           : 0,
         daily_return_contract_blocked_fields: dailyReturnContract && dailyReturnContract.shareCard
           ? dailyReturnContract.shareCard.blockedFields.join(',')
+          : '',
+        next_day_return_agreed: nextDayReturnEvidence ? !!nextDayReturnEvidence.agreed : false,
+        next_day_return_due_at: nextDayReturnEvidence ? nextDayReturnEvidence.dueAt : '',
+        next_day_return_route: nextDayReturnEvidence ? nextDayReturnEvidence.route : '',
+        next_day_return_blocked_fields: nextDayReturnEvidence && Array.isArray(nextDayReturnEvidence.blockedFields)
+          ? nextDayReturnEvidence.blockedFields.join(',')
           : '',
         memory_feedback_severity: highFrequencyPracticeLoop && highFrequencyPracticeLoop.memoryFeedbackController
           ? highFrequencyPracticeLoop.memoryFeedbackController.severity
@@ -1551,6 +1575,9 @@ Page({
       reviewReturnSeed: highFrequencyPracticeLoop && highFrequencyPracticeLoop.reviewReturnSeed
         ? highFrequencyPracticeLoop.reviewReturnSeed
         : this.data.reviewReturnSeed,
+      nextDayReturnEvidence: highFrequencyPracticeLoop && highFrequencyPracticeLoop.nextDayReturnEvidence
+        ? highFrequencyPracticeLoop.nextDayReturnEvidence
+        : (dailyReturnContract && dailyReturnContract.nextDayReturnEvidence ? dailyReturnContract.nextDayReturnEvidence : this.data.nextDayReturnEvidence),
       spacedRecallPolicy: highFrequencyPracticeLoop && highFrequencyPracticeLoop.spacedRecallPolicy
         ? highFrequencyPracticeLoop.spacedRecallPolicy
         : this.data.spacedRecallPolicy,
@@ -1605,6 +1632,7 @@ Page({
       dailyReturnMission: null,
       dailyReturnContract: null,
       reviewReturnSeed: null,
+      nextDayReturnEvidence: null,
       spacedRecallPolicy: null,
       emptyGuide: this.emptyGuide(this.data.selectedGame, round),
       feedbackText: '新一局开始。'

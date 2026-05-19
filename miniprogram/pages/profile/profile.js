@@ -1173,6 +1173,9 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
         highFrequencyPracticeLoop: highFrequencyLoopForReport
       })
       : null);
+  const aiLocalImplementationMatrix = reportState.aiLocalImplementationMatrix
+    || draft.aiLocalImplementationMatrix
+    || null;
   const memoryRiskReleaseModel = gameEvidence.highFrequencyPracticeLoop && gameEvidence.highFrequencyPracticeLoop.memoryRiskReleaseModel
     ? gameEvidence.highFrequencyPracticeLoop.memoryRiskReleaseModel
     : (draft.memoryRiskReleaseModel || null);
@@ -1558,6 +1561,29 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     gameReturnEvidenceRequired: gameReturnEvidence && Array.isArray(gameReturnEvidence.evidenceRequired)
       ? gameReturnEvidence.evidenceRequired
       : [],
+    aiLocalImplementationMatrix,
+    aiLocalImplementationTitle: aiLocalImplementationMatrix ? aiLocalImplementationMatrix.title : '',
+    aiLocalImplementationSummary: aiLocalImplementationMatrix ? aiLocalImplementationMatrix.summary : '',
+    aiLocalImplementationRows: aiLocalImplementationMatrix && Array.isArray(aiLocalImplementationMatrix.rows)
+      ? aiLocalImplementationMatrix.rows
+      : [],
+    aiLocalImplementationLocalCodeOwns: aiLocalImplementationMatrix && Array.isArray(aiLocalImplementationMatrix.localCodeOwns)
+      ? aiLocalImplementationMatrix.localCodeOwns
+      : [],
+    aiLocalImplementationAiBetterFor: aiLocalImplementationMatrix && Array.isArray(aiLocalImplementationMatrix.aiBetterFor)
+      ? aiLocalImplementationMatrix.aiBetterFor
+      : [],
+    aiLocalImplementationAiMustNotOwn: aiLocalImplementationMatrix && Array.isArray(aiLocalImplementationMatrix.aiMustNotOwn)
+      ? aiLocalImplementationMatrix.aiMustNotOwn
+      : [],
+    aiLocalImplementationBlockedFields: aiLocalImplementationMatrix && Array.isArray(aiLocalImplementationMatrix.blockedFields)
+      ? aiLocalImplementationMatrix.blockedFields
+      : [],
+    aiLocalImplementationNextBuildOrder: aiLocalImplementationMatrix && Array.isArray(aiLocalImplementationMatrix.nextBuildOrder)
+      ? aiLocalImplementationMatrix.nextBuildOrder
+      : [],
+    aiLocalImplementationBoundary: aiLocalImplementationMatrix ? aiLocalImplementationMatrix.productBoundaryLine : '',
+    aiLocalImplementationReleaseGate: aiLocalImplementationMatrix ? aiLocalImplementationMatrix.releaseGate : '',
     sourceEvidenceLedgerTitle: sourceEvidenceLedger.title || '',
     sourceEvidenceLedgerSummary: sourceEvidenceLedger.summary || '',
     sourceEvidenceLedgerLocalRule: sourceEvidenceLedger.localRule || '',

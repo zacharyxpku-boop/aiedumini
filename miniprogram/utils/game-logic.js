@@ -1970,14 +1970,15 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
     ninetySecondRecallComboEngine,
     realHomeworkPressureMemoryPrescription,
     peerMemoryRelayLeague
-  }, result, { weakKey });
+  }, result, { weakKey, now });
   const dailyReturnContract = buildDailyReturnContract({
     dailyReturnMission,
     dailyMemoryPrescription,
     memoryComebackLoop,
     dailyMemorySprintDeck,
-    adaptiveRecallScheduler
-  }, result, { weakKey });
+    adaptiveRecallScheduler,
+    reviewReturnSeed
+  }, result, { weakKey, now });
   return {
     title: needsRepair ? '高频修复循环' : '高频巩固循环',
     mode: needsRepair ? 'repair_recall' : 'mastery_recall',
@@ -2011,13 +2012,14 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
     realHomeworkPressureMemoryPrescription,
     dailyReturnMission,
     dailyReturnContract,
+    nextDayReturnEvidence: dailyReturnContract.nextDayReturnEvidence || null,
     xpRule: 'XP 只奖励主动回忆、错因修复和次日回访，不奖励盲刷题量。',
     leechRule: needsRepair
       ? `同一错因连续 2 次错，会降到第一步小黑板。`
       : '连续 2 次说清第一步，才进入变式练习。',
     parentShareLine: `家长复盘只看：孩子能否自己说出「${weakKey}」的第一步。`,
     nextRoute: needsRepair ? '/pages/review/review' : '/pages/tutor/tutor',
-    evidenceRequired: ['active_recall_cards', 'spaced_review_plan', 'review_return_seed', 'spaced_recall_policy', 'wrong_cause_return', 'quest_cadence', 'memory_feedback_controller', 'recall_intensity_plan', 'wrong_cause_replay_deck', 'xp_feedback_policy', 'quest_arc_runway', 'gizmo_like_memory_protocol', 'socratic_quality_memory_bridge', 'question_bank_memory_bridge', 'question_bank_recall_workout', 'daily_memory_sprint_deck', 'adaptive_recall_scheduler', 'memory_risk_release_model', 'memory_comeback_loop', 'daily_memory_prescription', 'question_type_cluster_memory_protocol', 'peer_memory_relay_league', 'micro_recall_prescription_engine', 'ninety_second_recall_combo_engine', 'real_homework_pressure_memory_prescription', 'daily_return_mission', 'daily_return_contract', 'parent_share_line'],
+    evidenceRequired: ['active_recall_cards', 'spaced_review_plan', 'review_return_seed', 'spaced_recall_policy', 'wrong_cause_return', 'quest_cadence', 'memory_feedback_controller', 'recall_intensity_plan', 'wrong_cause_replay_deck', 'xp_feedback_policy', 'quest_arc_runway', 'gizmo_like_memory_protocol', 'socratic_quality_memory_bridge', 'question_bank_memory_bridge', 'question_bank_recall_workout', 'daily_memory_sprint_deck', 'adaptive_recall_scheduler', 'memory_risk_release_model', 'memory_comeback_loop', 'daily_memory_prescription', 'question_type_cluster_memory_protocol', 'peer_memory_relay_league', 'micro_recall_prescription_engine', 'ninety_second_recall_combo_engine', 'real_homework_pressure_memory_prescription', 'daily_return_mission', 'daily_return_contract', 'next_day_return_evidence', 'parent_share_line'],
     weakKey
   };
 }
@@ -2121,7 +2123,9 @@ function buildDailyReturnContract(highFrequency = {}, report = {}, options = {})
   const comeback = highFrequency.memoryComebackLoop || {};
   const sprint = highFrequency.dailyMemorySprintDeck || {};
   const scheduler = highFrequency.adaptiveRecallScheduler || {};
+  const reviewReturnSeed = highFrequency.reviewReturnSeed || {};
   const weakKey = options.weakKey || mission.weakKey || prescription.weakKey || '第一步';
+  const now = options.now || new Date();
   const rescue = mission.mode === 'rescue_return' || prescription.mode === 'rescue' || Number(report.wrong || 0) >= 2;
   const loop = [
     {
@@ -2160,6 +2164,33 @@ function buildDailyReturnContract(highFrequency = {}, report = {}, options = {})
   const blockedFields = Array.from(new Set([]
     .concat(Array.isArray(mission.blockedFields) ? mission.blockedFields : [])
     .concat(['original_question', 'source_answer', 'full_solution', 'full_dialogue', 'score', 'ranking', 'private_comment'])));
+  const tomorrowStep = loop.find((item) => item.id === 'tomorrow_revisit') || loop[1] || {};
+  const seedPolicy = reviewReturnSeed.spacedRecallPolicy || {};
+  const nextDayReturnEvidence = {
+    id: 'arcade_next_day_return_evidence',
+    status: 'agreed_local_contract',
+    agreed: true,
+    dueAt: addDays(now, 1),
+    dueWindow: 'tomorrow',
+    route: reviewReturnSeed.nextRoute || tomorrowStep.route || '/pages/review/review?mode=recall_return',
+    action: tomorrowStep.action || '',
+    proof: tomorrowStep.proof || 'next_day_revisit_result',
+    weakKey,
+    source: 'daily_return_contract',
+    localOnly: true,
+    blockedFields,
+    reviewReturnSeed: {
+      id: reviewReturnSeed.id || 'review_return_seed',
+      mode: reviewReturnSeed.mode || '',
+      nextRoute: reviewReturnSeed.nextRoute || '',
+      wrongCardIds: Array.isArray(reviewReturnSeed.wrongCardIds) ? reviewReturnSeed.wrongCardIds : [],
+      dueCardIds: Array.isArray(reviewReturnSeed.dueCardIds) ? reviewReturnSeed.dueCardIds : [],
+      recallCardIds: Array.isArray(reviewReturnSeed.recallCardIds) ? reviewReturnSeed.recallCardIds : [],
+      nextDayCardIds: Array.isArray(seedPolicy.nextDayCardIds) ? seedPolicy.nextDayCardIds : [],
+      releaseGate: seedPolicy.releaseGate || '',
+      blockedFields: Array.isArray(reviewReturnSeed.blockedFields) ? reviewReturnSeed.blockedFields : blockedFields
+    }
+  };
   return {
     id: 'daily_return_contract',
     title: rescue ? '每日回流合约：先救一个错因' : '每日回流合约',
@@ -2183,12 +2214,13 @@ function buildDailyReturnContract(highFrequency = {}, report = {}, options = {})
       blockedFields,
       receiverAction: '对方只能接力第一步和回访动作，不能看到原题、答案、照片或完整对话。'
     },
+    nextDayReturnEvidence,
     localAiBoundary: {
       localCodeOwns: ['recall_schedule', 'xp_gate', 'portrait_release_gate', 'share_field_allowlist', 'privacy_blocklist'],
       aiOwns: ['child_friendly_rewrite', 'parent_copy_rewrite', 'blackboard_prompt_variant'],
       aiMustNotOwn: ['final_answer', 'mastery_claim', 'ranking_or_score_claim', 'privacy_decision']
     },
-    evidenceRequired: ['daily_return_loop', 'xp_unlock_rule', 'portrait_unlock_rule', 'safe_share_card', 'parent_receipt', 'local_ai_boundary'],
+    evidenceRequired: ['daily_return_loop', 'xp_unlock_rule', 'portrait_unlock_rule', 'safe_share_card', 'parent_receipt', 'local_ai_boundary', 'next_day_return_evidence'],
     sourceSignals: {
       sprintReady: !!(sprint && sprint.status),
       schedulerReady: !!(scheduler && scheduler.status),

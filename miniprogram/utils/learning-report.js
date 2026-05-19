@@ -2059,6 +2059,98 @@ function buildParentDecisionBook(input = {}) {
   };
 }
 
+function buildAiLocalImplementationMatrix(input = {}) {
+  const sourceEvidenceLedger = input.sourceEvidenceLedger || {};
+  const reportEvidenceReleaseGate = input.reportEvidenceReleaseGate || {};
+  const gameReturnEvidence = input.gameReturnEvidence || {};
+  const parentDecisionBook = input.parentDecisionBook || {};
+  const safeHandoff = reportEvidenceReleaseGate.homeSchoolSafeHandoff || {};
+  const blockedFields = Array.from(new Set([]
+    .concat(Array.isArray(safeHandoff.blockedFields) ? safeHandoff.blockedFields : [])
+    .concat(Array.isArray(gameReturnEvidence.blockedFields) ? gameReturnEvidence.blockedFields : [])
+    .concat(['original_question', 'photo', 'full_answer', 'full_dialogue', 'score', 'ranking', 'talent_label'])));
+  const rows = [
+    {
+      id: 'k12_content_scale',
+      label: 'K12 内容规模',
+      localCodeOwns: ['source_registry_gate', 'chapter_route', 'question_type_axis', 'answer_boundary', 'coverage_audit'],
+      aiBetterFor: ['把公开资料结构改写成儿童能懂的第一步问题', '生成同错因的不同中文问法'],
+      aiMustNotOwn: ['复制公开资料原文', '生成标准答案库', '声称官方合作或全覆盖'],
+      releaseGate: '结构可用，原文/答案/图片不可进入公开小程序卡片。',
+      productAction: '继续扩大 source-backed 题型卡，但每张卡必须有来源边界、第一步、错因和回访证据。'
+    },
+    {
+      id: 'socratic_tutoring',
+      label: '苏格拉底点拨',
+      localCodeOwns: ['direct_answer_guard', 'hint_level', 'stop_condition', 'thinking_receipt', 'report_evidence'],
+      aiBetterFor: ['追问语气', '孩子能听懂的解释', '家长低压话术', '小黑板口播'],
+      aiMustNotOwn: ['最终答案', 'XP 发放', '掌握判定', '长期画像更新'],
+      releaseGate: 'AI 只能在本地安全边界内改写表达；孩子说出第一步前不进入完整讲解。',
+      productAction: '用大规模错题/卡点样本压测追问质量，失败时降级到 A/B 微提示。'
+    },
+    {
+      id: 'visual_blackboard',
+      label: '第一步小黑板',
+      localCodeOwns: ['board_move_type', 'stop_rule', 'unsafe_full_board_block', 'share_safe_fields'],
+      aiBetterFor: ['把第一笔画法说得更像老师', '生成不同学科的板书提示文案'],
+      aiMustNotOwn: ['全科自动板书承诺', '完整解题过程', '未验证图像推理结论'],
+      releaseGate: '只画第一笔、证据点和卡点，不承诺千问式全科动态板书。',
+      productAction: '先把物理/化学/地理/数学的第一步图解模板做稳定，再考虑更强视觉生成。'
+    },
+    {
+      id: 'game_retention',
+      label: '游戏和间隔回访',
+      localCodeOwns: ['review_queue', 'spaced_recall_policy', 'xp_gate', 'daily_return_contract', 'leech_rule'],
+      aiBetterFor: ['挑战文案', '鼓励语', '错因卡换一种说法'],
+      aiMustNotOwn: ['排行榜刺激', '分数排名', '刷题量奖励', '掌握结论'],
+      releaseGate: gameReturnEvidence.releaseGate || 'first_step_and_wrong_cause_before_xp_or_share',
+      productAction: '把 XP 绑定第一步、错因复述、次日回访和第 7 天变式，不奖励盲刷数量。'
+    },
+    {
+      id: 'parent_decision_report',
+      label: '家长决策报告',
+      localCodeOwns: ['portrait_release_gate', 'home_school_allowed_fields', 'blocked_fields', 'next_evidence_queue'],
+      aiBetterFor: ['报告摘要', '家长一句话', '老师沟通摘要'],
+      aiMustNotOwn: ['天赋定性', '升学判断', '长期掌握结论', '隐私字段放行'],
+      releaseGate: reportEvidenceReleaseGate.releaseDecision || 'collect_more_evidence',
+      productAction: parentDecisionBook.oneSentenceDecision || '只给今晚行动和下一证据，不把单次表现写成长期结论。'
+    },
+    {
+      id: 'safe_share_relay',
+      label: '安全分享接力',
+      localCodeOwns: ['allowlist_payload', 'denylist_payload', 'relay_completion', 'privacy_boundary'],
+      aiBetterFor: ['分享标题', '挑战钩子', '接收者提示'],
+      aiMustNotOwn: ['可分享字段决策', '原题/照片/答案外传', '公开社区排名'],
+      releaseGate: '分享只带行动、第一步、错因标签和回访窗口。',
+      productAction: '社区化先做安全接力，不做开放题库社区。'
+    },
+    {
+      id: 'talent_and_upload_report',
+      label: '天赋测评/错题上传',
+      localCodeOwns: ['source_type_classification', 'method_candidate_only', 'score_release_policy', 'required_next_evidence'],
+      aiBetterFor: ['把测评结果改写成学习方法候选', '把错题材料摘要成家长能懂的动作'],
+      aiMustNotOwn: ['天赋定性', '人格标签', '分数排名刺激', '自动判卷结论'],
+      releaseGate: '天赋报告只能生成方法候选，必须用错题、第一步和回访证据交叉验证。',
+      productAction: '上传材料先进入证据账本，再生成家庭决策书，不直接生成孩子定性。'
+    }
+  ];
+  return {
+    id: 'ai_local_implementation_matrix',
+    title: 'AI / 本地代码能力分工矩阵',
+    summary: '本地代码负责规则、证据、放行、奖励、隐私和分享；AI 负责高熵表达、追问、小黑板话术和家长摘要。',
+    rows,
+    rowCount: rows.length,
+    localCodeOwns: Array.from(new Set(rows.reduce((list, row) => list.concat(row.localCodeOwns || []), []))).slice(0, 24),
+    aiBetterFor: Array.from(new Set(rows.reduce((list, row) => list.concat(row.aiBetterFor || []), []))).slice(0, 20),
+    aiMustNotOwn: Array.from(new Set(rows.reduce((list, row) => list.concat(row.aiMustNotOwn || []), []))).slice(0, 24),
+    blockedFields,
+    sourceUsePolicy: sourceEvidenceLedger.aiBoundary || 'AI 只做摘要、追问和表达改写；不做天赋定性、掌握结论、分数排名或完整答案。',
+    productBoundaryLine: '要加厚的是本地可验证闭环；AI 只在本地边界内提升讲解和表达，不替代证据闸。',
+    nextBuildOrder: ['次日回访回执', 'Tutor 有效性回执', '公开资料挑战卡入游戏', '安全分享接收测试', '家长报告周/月证据'],
+    releaseGate: '任何新能力必须同时说明 localCodeOwns、aiBetterFor、aiMustNotOwn、blockedFields 和 evidenceRequired。'
+  };
+}
+
 function buildGameReturnEvidence(input = {}) {
   const dailyReturnContract = input.dailyReturnContract || null;
   const reviewReturnSeed = input.reviewReturnSeed || null;
@@ -2182,6 +2274,12 @@ function buildLearningReportDraft(input = {}) {
     sourceEvidenceLedger,
     portraitConfidenceSystem
   });
+  const aiLocalImplementationMatrix = buildAiLocalImplementationMatrix({
+    sourceEvidenceLedger,
+    reportEvidenceReleaseGate,
+    gameReturnEvidence,
+    parentDecisionBook
+  });
   const missing = missingItems(parts);
   const reportDraft = {
     id: input.id || `learning_report_${String(nowIso(input.now)).slice(0, 10).replace(/-/g, '')}`,
@@ -2232,6 +2330,7 @@ function buildLearningReportDraft(input = {}) {
     spacedRecallPolicy,
     gameReturnEvidence,
     parentDecisionBook,
+    aiLocalImplementationMatrix,
     generatedAt: nowIso(input.now),
     missingItems: missing,
     sourceIntegrity: {
@@ -2288,6 +2387,7 @@ function buildLearningReportDraft(input = {}) {
     spacedRecallPolicy,
     gameReturnEvidence,
     parentDecisionBook,
+    aiLocalImplementationMatrix,
     reportCompleteness: completeness,
     reportStatus: {
       state: completeness >= 30 ? 'ready' : 'draft',

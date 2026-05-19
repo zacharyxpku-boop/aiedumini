@@ -408,6 +408,13 @@
         <view class="retention-loop-step">{{gameRetentionLoop.tomorrowLine}}</view>
         <view class="retention-loop-foot">{{gameRetentionLoop.xpLine}} {{gameRetentionLoop.habitCue}}</view>
       </view>
+      <view class="next-day-return-card" wx:if="{{nextDayReturnEvidence}}">
+        <view class="next-day-return-kicker">次日回访证据</view>
+        <view class="next-day-return-title">明天回访已约定</view>
+        <view class="next-day-return-line">路线：{{nextDayReturnEvidence.route}}</view>
+        <view class="next-day-return-line">到期：{{nextDayReturnEvidence.dueAt}}</view>
+        <view class="next-day-return-line">安全字段：{{nextDayReturnEvidence.blockedFields.length}} 项已拦截</view>
+      </view>
       <view class="retention-loop-card high-frequency-card" wx:if="{{highFrequencyPracticeLoop}}">
         <view class="retention-loop-kicker">高频回忆计划</view>
         <view class="retention-loop-title">{{highFrequencyPracticeLoop.title}}</view>

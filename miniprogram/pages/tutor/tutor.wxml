@@ -82,6 +82,13 @@
           <text>{{tutorTurnState.evidenceLine}}</text>
         </view>
         <view class="receipt-focus">{{thinkingReceipt.focus}}</view>
+          <view class="socratic-feedback-panel">
+            <view class="socratic-feedback-actions">
+              <button class="socratic-feedback-button primary" data-status="first_step_spoken" bindtap="recordSocraticEffectivenessFeedback">我能说第一步了</button>
+              <button class="socratic-feedback-button" data-status="still_blocked" bindtap="recordSocraticEffectivenessFeedback">还卡住</button>
+            </view>
+            <view class="socratic-feedback-state" wx:if="{{socraticFeedbackStatus}}">已记录：{{socraticFeedbackStatus}}</view>
+          </view>
           <view class="receipt-diagnostic" wx:if="{{thinkingReceipt.diagnostic_probe}}">
             <view class="receipt-diagnostic-title">这轮怎么追问</view>
             <view class="receipt-diagnostic-line">{{thinkingReceipt.diagnostic_probe.prompt}}</view>

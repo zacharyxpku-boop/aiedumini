@@ -594,6 +594,54 @@ page {
   font-weight: 820;
 }
 
+.socratic-feedback-panel {
+  display: grid;
+  gap: 10rpx;
+  margin-top: 18rpx;
+}
+
+.socratic-feedback-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12rpx;
+}
+
+.socratic-feedback-button {
+  display: flex;
+  min-width: 0;
+  min-height: 72rpx;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0 14rpx;
+  color: #1B4332;
+  background: #FFFFFF;
+  border: 1rpx solid rgba(27, 67, 50, 0.18);
+  border-radius: 18rpx;
+  box-shadow: none;
+  font-size: 23rpx;
+  font-weight: 1000;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.socratic-feedback-button::after {
+  border: 0;
+}
+
+.socratic-feedback-button.primary {
+  color: #FFFFFF;
+  background: #1B4332;
+  border-color: #1B4332;
+}
+
+.socratic-feedback-state {
+  color: #667A6C;
+  font-size: 20rpx;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
 .receipt-diagnostic {
   margin-top: 18rpx;
   padding: 18rpx;

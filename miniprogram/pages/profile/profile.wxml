@@ -1069,6 +1069,15 @@
           <text wx:for="{{learningReportSummary.gameReturnEvidenceAiMayRewrite}}" wx:key="*this">AI 可改写：{{item}}</text>
           <text wx:for="{{learningReportSummary.gameReturnEvidenceRequired}}" wx:key="*this">审计证据：{{item}}</text>
         </view>
+        <view class="parent-brief-block" wx:if="{{learningReportSummary.aiLocalImplementationMatrix}}">
+          <text class="parent-brief-label">{{learningReportSummary.aiLocalImplementationTitle}}</text>
+          <text>{{learningReportSummary.aiLocalImplementationSummary}}</text>
+          <text wx:if="{{learningReportSummary.aiLocalImplementationBoundary}}">{{learningReportSummary.aiLocalImplementationBoundary}}</text>
+          <text wx:if="{{learningReportSummary.aiLocalImplementationReleaseGate}}">新增能力门槛：{{learningReportSummary.aiLocalImplementationReleaseGate}}</text>
+          <text wx:for="{{learningReportSummary.aiLocalImplementationRows}}" wx:key="id">能力分工：{{item.label}}｜本地：{{item.localCodeOwns[0]}}｜AI：{{item.aiBetterFor[0]}}｜禁用：{{item.aiMustNotOwn[0]}}</text>
+          <text wx:for="{{learningReportSummary.aiLocalImplementationNextBuildOrder}}" wx:key="*this">下一加厚：{{item}}</text>
+          <text wx:for="{{learningReportSummary.aiLocalImplementationBlockedFields}}" wx:key="*this">禁止字段：{{item}}</text>
+        </view>
         <view class="parent-brief-block" wx:if="{{learningReportSummary.sourceEvidenceLedger}}">
           <text class="parent-brief-label">{{learningReportSummary.sourceEvidenceLedgerTitle}}</text>
           <text>{{learningReportSummary.sourceEvidenceLedgerSummary}}</text>

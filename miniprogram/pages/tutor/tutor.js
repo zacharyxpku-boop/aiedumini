@@ -3,6 +3,23 @@ const storage = require('../../utils/storage');
 const navigation = require('../../utils/navigation');
 const tutorLadder = require('../../utils/tutor-ladder');
 
+const SOCRATIC_EFFECTIVENESS_BLOCKED_FIELDS = [
+  'original_question',
+  'full_answer',
+  'answer_key',
+  'original_answer',
+  'photo',
+  'full_dialogue',
+  'score',
+  'ranking',
+  'private_comment'
+];
+
+const SOCRATIC_EFFECTIVENESS_STATUS = {
+  first_step_spoken: true,
+  still_blocked: true
+};
+
 const QUICK_ACTIONS = [
   { id: 'read_problem', label: '提示 1/5', desc: '先复述题意，找已知条件' },
   { id: 'write_first_step', label: '提示 2/5', desc: '追问第一步想做什么' },
@@ -342,6 +359,32 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
   };
 }
 
+function makeReceiptId(prefix = 'receipt') {
+  return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+}
+
+function buildSocraticEffectivenessEvent(status, receipt = {}, turnState = {}) {
+  const safeStatus = SOCRATIC_EFFECTIVENESS_STATUS[status] ? status : 'still_blocked';
+  const turnId = receipt.turnId || receipt.turn_id || '';
+  const fallbackId = turnId
+    ? ''
+    : (receipt.fallbackId || receipt.fallback_id || `fallback_${turnState.roundIndex || 'turn'}_${Date.now()}`);
+  const createdAt = new Date().toISOString();
+  return {
+    event: 'socratic_effectiveness_feedback',
+    receiptType: 'thinking_receipt',
+    status: safeStatus,
+    createdAt,
+    created_at: createdAt,
+    turnId,
+    fallbackId,
+    blockedFields: SOCRATIC_EFFECTIVENESS_BLOCKED_FIELDS.slice(),
+    coachStep: receipt.coach_step || receipt.activeStep || '',
+    hintLevel: Number(turnState.hintLevel || receipt.hint_level || 0),
+    roundIndex: Number(turnState.roundIndex || 0)
+  };
+}
+
 function normalizeTags(tags) {
   if (!Array.isArray(tags)) return [];
   return tags.map((item) => {
@@ -548,6 +591,8 @@ Page({
     pasteRisk: null,
     coachConsole: null,
     thinkingReceipt: null,
+    socraticFeedbackStatus: '',
+    socraticFeedbackRecordedAt: '',
     surfaceDepthPack: null,
     unifiedNextAction: null,
     showTutorDetails: false
@@ -580,7 +625,9 @@ Page({
     const tutorTurnState = tutorLadder.nextTutorTurnState
       ? tutorLadder.nextTutorTurnState('', messages, this.data.currentHintLevel, selected)
       : null;
-    const receipt = buildThinkingReceipt(messages, null, pasteRisk, this.data.activeStep, selected);
+    const receipt = Object.assign({}, buildThinkingReceipt(messages, null, pasteRisk, this.data.activeStep, selected), {
+      fallbackId: `initial_${messages.length}`
+    });
     this.setData({
       selected,
       selectedEvidence,
@@ -591,6 +638,8 @@ Page({
       pasteRisk,
       coachConsole: coachConsole(selected, misconceptionTags, null, pasteRisk, this.data.activeStep),
       thinkingReceipt: receipt,
+      socraticFeedbackStatus: '',
+      socraticFeedbackRecordedAt: '',
       tutorTurnState,
       surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('tutor') : null,
       unifiedNextAction: storage.buildUnifiedNextActionController ? storage.buildUnifiedNextActionController({ surface: 'tutor' }) : null
@@ -775,6 +824,7 @@ Page({
     const pasteRisk = pasteRiskSignal(next);
     const receipt = buildThinkingReceipt(next, masterySignal, pasteRisk, coachStep, this.data.selected);
     const diagnosticReceipt = Object.assign({}, receipt, {
+      turnId: makeReceiptId('tutor_turn'),
       tutor_turn_state: mergedTurnState,
       tutorTurnState: mergedTurnState,
       diagnostic_probe: result && result.diagnostic_probe ? result.diagnostic_probe : null,
@@ -899,9 +949,36 @@ Page({
       pedagogy: pedagogyPanel(this.data.selected, this.data.misconceptionTags, masterySignal),
       pasteRisk,
       coachConsole: coachConsole(this.data.selected, this.data.misconceptionTags, masterySignal, pasteRisk, coachStep),
-      thinkingReceipt: diagnosticReceipt
+      thinkingReceipt: diagnosticReceipt,
+      socraticFeedbackStatus: '',
+      socraticFeedbackRecordedAt: ''
     });
     this.syncTutorSignal(masterySignal, coachStep);
+  },
+
+  recordSocraticEffectivenessFeedback(event) {
+    const status = event && event.currentTarget && event.currentTarget.dataset
+      ? event.currentTarget.dataset.status
+      : '';
+    const receipt = this.data.thinkingReceipt || {};
+    const turnState = this.data.tutorTurnState || receipt.tutorTurnState || receipt.tutor_turn_state || {};
+    const item = buildSocraticEffectivenessEvent(status, receipt, turnState);
+    const existing = storage.get(storage.KEYS.tutorEvents, []);
+    const next = [item].concat(Array.isArray(existing) ? existing : []).slice(0, 160);
+    storage.set(storage.KEYS.tutorEvents, next);
+    if (storage.appendSyncMutation) {
+      storage.appendSyncMutation('socratic_effectiveness_feedback', item);
+    }
+    this.setData({
+      socraticFeedbackStatus: item.status,
+      socraticFeedbackRecordedAt: item.createdAt
+    });
+    if (typeof wx !== 'undefined' && wx.showToast) {
+      wx.showToast({
+        title: item.status === 'first_step_spoken' ? '已记录第一步' : '已记录卡点',
+        icon: 'none'
+      });
+    }
   },
 
   clearChat() {
@@ -917,7 +994,11 @@ Page({
       masterySignal: null,
       nextAction: '先用一句话说清题目真正问什么。',
       tutorTurnState: null,
-      thinkingReceipt: buildThinkingReceipt(messages, null, pasteRiskSignal(messages), this.data.activeStep, this.data.selected)
+      thinkingReceipt: Object.assign({}, buildThinkingReceipt(messages, null, pasteRiskSignal(messages), this.data.activeStep, this.data.selected), {
+        fallbackId: `clear_${messages.length}_${Date.now()}`
+      }),
+      socraticFeedbackStatus: '',
+      socraticFeedbackRecordedAt: ''
     });
   },
 
