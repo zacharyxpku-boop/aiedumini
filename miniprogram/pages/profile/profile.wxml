@@ -1365,6 +1365,7 @@
           <view wx:for="{{communityShareRelayBoard.peerRelaySeasonArc.milestones}}" wx:key="id">赛季节点：{{item.day}}｜{{item.title}}｜{{item.evidence}}</view>
           <view wx:for="{{communityShareRelayBoard.peerRelayChallengeLadder.stages}}" wx:key="id">接力阶梯：{{item.label}}｜{{item.visibleLine}}｜{{item.receiverAction}}｜证据 {{item.proofRequired}}</view>
           <view wx:for="{{communityShareRelayBoard.copyableChallengeTemplates}}" wx:key="id">可复制挑战：{{item.title}}｜{{item.copy}}｜证据 {{item.proofRequired}}</view>
+          <view wx:for="{{communityShareRelayBoard.sourceBackedChallengeDeck}}" wx:key="id">来源挑战：{{item.title}}｜{{item.receiverPrompt}}｜使用判断 {{item.commercialDecision}}｜许可 {{item.licenseSignal}}</view>
           <view wx:if="{{communityShareRelayBoard.localSpreadReleaseGate}}">
             本地放行门禁：{{communityShareRelayBoard.localSpreadReleaseGate.status}}｜{{communityShareRelayBoard.localSpreadReleaseGate.rule}}
           </view>

@@ -212,7 +212,15 @@ Page({
         tonight_parent_question: safeDecodeShareParam(query.tonight_parent_question),
         tonight_tomorrow: safeDecodeShareParam(query.tonight_tomorrow),
         tonight_release_gate: safeDecodeShareParam(query.tonight_release_gate),
-        tonight_share_boundary: safeDecodeShareParam(query.tonight_share_boundary)
+        tonight_share_boundary: safeDecodeShareParam(query.tonight_share_boundary),
+        source_challenge_count: safeDecodeShareParam(query.source_challenge_count),
+        source_challenge_first: safeDecodeShareParam(query.source_challenge_first),
+        source_challenge_prompt: safeDecodeShareParam(query.source_challenge_prompt),
+        source_challenge_license: safeDecodeShareParam(query.source_challenge_license),
+        source_challenge_decision: safeDecodeShareParam(query.source_challenge_decision),
+        source_challenge_local_rule: safeDecodeShareParam(query.source_challenge_local_rule),
+        source_challenge_blocked: safeDecodeShareParam(query.source_challenge_blocked),
+        source_challenge_route: safeDecodeShareParam(query.source_challenge_route)
       }) : {
         code: query.share,
         share_code: query.share,
@@ -274,6 +282,14 @@ Page({
         tonight_tomorrow: safeDecodeShareParam(query.tonight_tomorrow),
         tonight_release_gate: safeDecodeShareParam(query.tonight_release_gate),
         tonight_share_boundary: safeDecodeShareParam(query.tonight_share_boundary),
+        source_challenge_count: safeDecodeShareParam(query.source_challenge_count),
+        source_challenge_first: safeDecodeShareParam(query.source_challenge_first),
+        source_challenge_prompt: safeDecodeShareParam(query.source_challenge_prompt),
+        source_challenge_license: safeDecodeShareParam(query.source_challenge_license),
+        source_challenge_decision: safeDecodeShareParam(query.source_challenge_decision),
+        source_challenge_local_rule: safeDecodeShareParam(query.source_challenge_local_rule),
+        source_challenge_blocked: safeDecodeShareParam(query.source_challenge_blocked),
+        source_challenge_route: safeDecodeShareParam(query.source_challenge_route),
         action_label: query.action === 'wrong_cause_revisit'
           ? '明天先回看这张错因卡'
           : query.action === 'due_card_revisit'
@@ -320,7 +336,10 @@ Page({
             socratic_report_decision: safeDecodeShareParam(query.socratic_report_decision),
             socratic_report_no_increase: safeDecodeShareParam(query.socratic_report_no_increase),
             socratic_report_parent_proof: safeDecodeShareParam(query.socratic_report_parent_proof),
-            socratic_report_boundary: safeDecodeShareParam(query.socratic_report_boundary)
+            socratic_report_boundary: safeDecodeShareParam(query.socratic_report_boundary),
+            source_challenge_first: safeDecodeShareParam(query.source_challenge_first),
+            source_challenge_prompt: safeDecodeShareParam(query.source_challenge_prompt),
+            source_challenge_decision: safeDecodeShareParam(query.source_challenge_decision)
           }
         });
       }
@@ -354,7 +373,10 @@ Page({
           socratic_report_decision: safeDecodeShareParam(query.socratic_report_decision),
           socratic_report_no_increase: safeDecodeShareParam(query.socratic_report_no_increase),
           socratic_report_parent_proof: safeDecodeShareParam(query.socratic_report_parent_proof),
-          socratic_report_boundary: safeDecodeShareParam(query.socratic_report_boundary)
+          socratic_report_boundary: safeDecodeShareParam(query.socratic_report_boundary),
+          source_challenge_first: safeDecodeShareParam(query.source_challenge_first),
+          source_challenge_prompt: safeDecodeShareParam(query.source_challenge_prompt),
+          source_challenge_decision: safeDecodeShareParam(query.source_challenge_decision)
         }
       }).catch(() => {});
       this.setData({
@@ -902,6 +924,17 @@ Page({
       days: incoming.relay_season_days || '',
       localGate: incoming.relay_season_gate || ''
     } : null;
+    const sourceChallengeRoute = navigation.normalizeRoute(incoming.source_challenge_route || challengeRoute);
+    const sourceChallengeDeck = incoming.source_challenge_prompt ? {
+      count: incoming.source_challenge_count || '',
+      sourceLabel: incoming.source_challenge_first || '公开/OER资料',
+      prompt: incoming.source_challenge_prompt,
+      licenseSignal: incoming.source_challenge_license || '',
+      commercialDecision: incoming.source_challenge_decision || '',
+      localRule: incoming.source_challenge_local_rule || '',
+      blockedFields: incoming.source_challenge_blocked || '',
+      route: sourceChallengeRoute
+    } : null;
     const safeRelayPacket = incoming.relay_id ? {
       relayId: incoming.relay_id,
       receiverAction: incoming.relay_receiver_action || actionDetail,
@@ -970,6 +1003,13 @@ Page({
       peerRelaySeasonLine: peerRelaySeasonArc ? `7天接力赛季：${peerRelaySeasonArc.seasonLine || peerRelaySeasonArc.status}` : '',
       peerRelaySeasonDayLine: peerRelaySeasonArc ? `赛季节点：${peerRelaySeasonArc.days}` : '',
       peerRelaySeasonGateLine: peerRelaySeasonArc ? `赛季门禁：${peerRelaySeasonArc.localGate}` : '',
+      sourceChallengeDeck,
+      sourceChallengeLine: sourceChallengeDeck ? `来源挑战：${sourceChallengeDeck.sourceLabel} · ${sourceChallengeDeck.count || 1} 组可借鉴结构。` : '',
+      sourceChallengePromptLine: sourceChallengeDeck ? sourceChallengeDeck.prompt : '',
+      sourceChallengeDecisionLine: sourceChallengeDeck && sourceChallengeDeck.commercialDecision ? `使用判断：${sourceChallengeDeck.commercialDecision}` : '',
+      sourceChallengeLocalRuleLine: sourceChallengeDeck && sourceChallengeDeck.localRule ? sourceChallengeDeck.localRule : '',
+      sourceChallengeBlockedLine: sourceChallengeDeck && sourceChallengeDeck.blockedFields ? `禁带字段：${sourceChallengeDeck.blockedFields}` : '',
+      sourceChallengeLicenseLine: sourceChallengeDeck && sourceChallengeDeck.licenseSignal ? `许可提醒：${sourceChallengeDeck.licenseSignal}` : '',
       safeRelayPacket,
       receiverActionLine: safeRelayPacket && safeRelayPacket.receiverAction,
       parentCheckLine: safeRelayPacket && safeRelayPacket.parentCheck,
@@ -1026,6 +1066,13 @@ Page({
           route: '/pages/profile/profile?from=share_relay',
           reason: incoming.socratic_report_decision || '只看今晚动作、证据和明天复核，不做排行。',
           evidence: '家庭复盘'
+        },
+        {
+          id: 'source_challenge',
+          label: '来源挑战',
+          route: sourceChallengeRoute,
+          reason: sourceChallengeDeck ? sourceChallengeDeck.prompt : '用公开资料结构，换成自己的作业材料做一次第一步挑战。',
+          evidence: '公开结构本地化'
         },
         {
           id: 'visual_board_relay',

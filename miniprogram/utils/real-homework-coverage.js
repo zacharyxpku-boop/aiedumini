@@ -570,6 +570,48 @@ const PUBLIC_K12_OPEN_SOURCE_RESOURCE_LEDGER = [
     mustNotUse: ['直接搬运教材段落', '复制习题答案', '把大学教材难度下放给小初学生'],
     miniappLanding: ['/pages/module/module', '/pages/tutor/tutor'],
     acceptanceGate: ['age_band_adapted', 'no_copied_paragraph', 'first_step_only']
+  },
+  {
+    id: 'geogebra_classroom_activity',
+    label: 'GeoGebra 课堂活动',
+    sourceType: 'open_math_visual_activity',
+    sourceUrl: 'https://www.geogebra.org/',
+    licenseSignal: 'community materials may have different licenses; verify each activity before reuse',
+    commercialDecision: '只借鉴几何/函数的可视化操作结构，不复制活动、不嵌入外部交互、不宣称官方合作',
+    directUse: ['几何拖拽观察结构', '函数图像变量变化', '坐标/角度可视化动作'],
+    localizeAsCode: ['geometry_board_move', 'function_variable_prompt', 'visual_exit_gate', 'drag_observation_rule'],
+    aiBetterFor: ['把拖拽观察改写成孩子能复述的第一步问题'],
+    mustNotUse: ['复制活动文件', '直接嵌入未授权交互', '把可视化观察写成完整答案'],
+    miniappLanding: ['/pages/tutor/tutor', '/pages/arcade/arcade', '/pages/profile/profile'],
+    acceptanceGate: ['visual_action_rewritten', 'no_external_embed', 'first_step_observation_only']
+  },
+  {
+    id: 'libretexts_stem_reference',
+    label: 'LibreTexts STEM 开放教材',
+    sourceType: 'open_textbook_reference',
+    sourceUrl: 'https://libretexts.org/',
+    licenseSignal: 'LibreTexts content commonly uses Creative Commons licenses; attribution and book-level terms must be checked',
+    commercialDecision: '借鉴概念层级和术语解释路径，不搬运段落、不直接导入题目答案、不把高阶内容下放为小初结论',
+    directUse: ['概念层级', '术语关系', '实验/过程解释结构'],
+    localizeAsCode: ['concept_prerequisite_ladder', 'glossary_axis', 'process_board_move', 'age_band_gate'],
+    aiBetterFor: ['把术语关系翻译成中文家庭作业里的小黑板旁白'],
+    mustNotUse: ['复制教材段落', '复制习题答案', '忽略年龄段直接前台展示'],
+    miniappLanding: ['/pages/module/module', '/pages/tutor/tutor', '/pages/profile/profile'],
+    acceptanceGate: ['age_band_checked', 'no_copied_text', 'concept_ladder_local']
+  },
+  {
+    id: 'khan_academy_learning_design',
+    label: 'Khan Academy 学习设计公开观察',
+    sourceType: 'public_learning_design_reference',
+    sourceUrl: 'https://www.khanacademy.org/',
+    licenseSignal: 'Khan Academy content and platform features are not a free content bank; use only public design observation unless terms allow reuse',
+    commercialDecision: '只借鉴 mastery、提示层级和教师/家长工具思路，不复制课程内容、不搬运练习、不宣称 Khanmigo 能力',
+    directUse: ['掌握门槛设计', '提示层级', '教师/家长视角结构'],
+    localizeAsCode: ['mastery_gate', 'hint_ladder', 'parent_teacher_safe_digest', 'overdiagnosis_lock'],
+    aiBetterFor: ['把提示层级解释成不直接给答案的中文追问'],
+    mustNotUse: ['复制课程视频/练习', '冒充 Khanmigo', '把外部掌握度当本地画像'],
+    miniappLanding: ['/pages/tutor/tutor', '/pages/profile/profile', '/pages/review/review'],
+    acceptanceGate: ['local_mastery_evidence', 'no_content_copy', 'no_brand_claim']
   }
 ];
 

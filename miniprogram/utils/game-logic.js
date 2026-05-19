@@ -771,7 +771,7 @@ function buildCourseUnitQuestionBankPlayableCards(courseUnitQuestionBank = {}, o
       const haystack = [card.id, card.type, card.label, card.prompt, card.sampleStem, card.subjectLabel, card.wrongCause].join(' ');
       return haystack.indexOf(taskType) >= 0 || haystack.indexOf(options.subject || '') >= 0 || haystack.indexOf(options.wrongCauseLabel || '') >= 0 || !focusText;
     })
-    .slice(0, options.rescueMode ? 3 : 4);
+    .slice(0, options.rescueMode ? 4 : 9);
   return sourceCards.map((card, index) => {
     const progression = card.progression || {};
     const firstStep = card.firstStepHint || progression.entryTask || options.firstStep || `先说出「${weakKey}」的第一步`;

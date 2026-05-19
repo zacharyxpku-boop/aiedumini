@@ -5025,6 +5025,24 @@ function buildShareChallengePlan(input = {}) {
     { id: 'no_rank', label: '不排行不晒分', safe: true, blocked: 'ranking_score' },
     { id: 'day7_return', label: '第 7 天回流', safe: true, blocked: 'one_shot_invite' }
   ];
+  const oerResources = realHomeworkCoverage && Array.isArray(realHomeworkCoverage.PUBLIC_K12_OPEN_SOURCE_RESOURCE_LEDGER)
+    ? realHomeworkCoverage.PUBLIC_K12_OPEN_SOURCE_RESOURCE_LEDGER
+    : [];
+  const sourceBackedChallengeDeck = oerResources.slice(0, 8).map((resource, index) => ({
+    id: `source_backed_${resource.id || index}`,
+    title: `${resource.label || '公开资料'} · 90 秒同类挑战`,
+    sourceLabel: resource.label || '',
+    sourceUrl: resource.sourceUrl || '',
+    licenseSignal: resource.licenseSignal || '使用前检查来源边界',
+    commercialDecision: resource.commercialDecision || '只借鉴结构，不复制原文或答案',
+    receiverPrompt: `用自己的作业材料，借这个来源的「${(resource.directUse || ['概念结构'])[0]}」做一次同类第一步：${firstStep}`,
+    localRule: `本地代码只接收 ${((resource.localizeAsCode || ['task_type'])[0])}，AI 只改写提示语气。`,
+    aiLine: (resource.aiBetterFor || ['把提示改写成孩子听得懂的一句话'])[0],
+    shareLine: `来源只做结构参考：${resource.commercialDecision || '不复制原文、不搬运答案。'}`,
+    evidenceRequired: ['receiver_own_material', 'first_step_only', 'wrong_cause_echo', 'next_day_revisit'],
+    blockedFields: ['original_question', 'original_answer', 'copied_paragraph', 'score', 'ranking', 'full_dialogue', 'private_comment'],
+    route
+  }));
   const parentDecisionPayload = {
     tonightQuestion: `今晚只问一句：${firstStep}`,
     evidenceToCheck: ['孩子自己的第一步', '错因是否回到卡片', '明天是否能复述'],
@@ -5125,6 +5143,7 @@ function buildShareChallengePlan(input = {}) {
     naturalSpreadTriggers,
     naturalSpreadLoop,
     familyRelayGrowthProtocol,
+    sourceBackedChallengeDeck,
     wrongCauseViralChallengePack,
     communityRipplePlan,
     receiverOnboardingDeck,
@@ -5164,6 +5183,14 @@ function buildShareChallengePlan(input = {}) {
       relay_guardrail: naturalSpreadLoop.viralGuardrails.join(','),
       relay_receiver_onboarding: receiverOnboardingDeck.map((item) => item.id).join(','),
       relay_proof_ledger: viralProofLedger.map((item) => item.id).join(','),
+      source_challenge_count: String(sourceBackedChallengeDeck.length),
+      source_challenge_first: sourceBackedChallengeDeck[0] ? sourceBackedChallengeDeck[0].sourceLabel : '',
+      source_challenge_prompt: sourceBackedChallengeDeck[0] ? sourceBackedChallengeDeck[0].receiverPrompt : '',
+      source_challenge_license: sourceBackedChallengeDeck[0] ? sourceBackedChallengeDeck[0].licenseSignal : '',
+      source_challenge_decision: sourceBackedChallengeDeck[0] ? sourceBackedChallengeDeck[0].commercialDecision : '',
+      source_challenge_local_rule: sourceBackedChallengeDeck[0] ? sourceBackedChallengeDeck[0].localRule : '',
+      source_challenge_blocked: sourceBackedChallengeDeck[0] ? sourceBackedChallengeDeck[0].blockedFields.join(',') : '',
+      source_challenge_route: sourceBackedChallengeDeck[0] ? sourceBackedChallengeDeck[0].route : route,
       relay_id: safeRelayChallengePacket.query.relay_id,
       relay_receiver_action: safeRelayChallengePacket.query.relay_receiver_action,
       relay_parent_check: safeRelayChallengePacket.query.relay_parent_check,
@@ -5349,6 +5376,7 @@ function buildCommunityShareRelayBoard(input = {}) {
     peerSafeLine: plan.peerSafeLine,
     safeRelayChallengePacket: plan.safeRelayChallengePacket,
     shareHookDeck: plan.shareHookDeck || [],
+    sourceBackedChallengeDeck: plan.sourceBackedChallengeDeck || [],
     naturalSpreadTriggers: plan.naturalSpreadTriggers || [],
     naturalSpreadLoop: plan.naturalSpreadLoop || {},
     spreadReadinessGate: plan.spreadReadinessGate || buildShareSpreadReadinessGate({
