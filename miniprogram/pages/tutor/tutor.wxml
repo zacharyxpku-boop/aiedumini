@@ -69,14 +69,19 @@
         </view>
 
         <view class="receipt-card" wx:if="{{thinkingReceipt}}">
-          <view class="receipt-head">
-            <view>
-              <view class="receipt-title">这轮卡点 · 思路记录</view>
-              <view class="receipt-subtitle">{{thinkingReceipt.status}}</view>
-            </view>
-            <view class="receipt-score">{{thinkingReceipt.score}}</view>
+        <view class="receipt-head">
+          <view>
+            <view class="receipt-title">这轮卡点 · 思路记录</view>
+            <view class="receipt-subtitle">{{thinkingReceipt.status}}</view>
           </view>
-          <view class="receipt-focus">{{thinkingReceipt.focus}}</view>
+          <view class="receipt-score">{{thinkingReceipt.score}}</view>
+        </view>
+        <view class="receipt-turnline" wx:if="{{tutorTurnState}}">
+          <text>{{tutorTurnState.roundLabel}}</text>
+          <text>{{tutorTurnState.shouldHandoff ? '准备交给家长只问一句' : '继续只问一步'}}</text>
+          <text>{{tutorTurnState.evidenceLine}}</text>
+        </view>
+        <view class="receipt-focus">{{thinkingReceipt.focus}}</view>
           <view class="receipt-diagnostic" wx:if="{{thinkingReceipt.diagnostic_probe}}">
             <view class="receipt-diagnostic-title">这轮怎么追问</view>
             <view class="receipt-diagnostic-line">{{thinkingReceipt.diagnostic_probe.prompt}}</view>

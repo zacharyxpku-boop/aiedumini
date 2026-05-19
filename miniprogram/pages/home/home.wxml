@@ -66,14 +66,7 @@
         <view class="yesterday-review-title">{{yesterdayReviewCard.noticeText}}</view>
         <view class="yesterday-review-step">{{yesterdayReviewCard.childArticulatedStep}}</view>
       </view>
-      <view class="friend-primary-grid" data-role="friend-safe-primary">
-        <view class="friend-primary-card {{item.id === 'focus' && !focusEntryReady ? 'is-disabled' : ''}}" wx:for="{{learningLoopCards}}" wx:key="id" data-action="{{item.action}}" bindtap="runPath">
-          <view class="friend-primary-title">{{item.title}}</view>
-          <view class="friend-primary-body">{{item.body}}</view>
-          <view class="friend-primary-cta">{{item.id === 'focus' && !focusEntryReady ? '先确认第一步' : item.cta}}</view>
-        </view>
-      </view>
-      <view class="composer-card rc14-main-card" wx:if="{{false}}" bindtap="goTutor">
+      <view class="composer-card rc14-main-card" bindtap="goTutor">
           <view class="composer-chat-head">
           <view class="composer-avatar"><view></view><view></view></view>
           <view class="composer-chat-copy">
@@ -120,6 +113,17 @@
         </view>
         <view class="focus-feedback" wx:if="{{focusFeedback}}">{{focusFeedback}}</view>
       </view>
+      <view class="friend-primary-grid" data-role="friend-safe-primary">
+        <view class="friend-primary-card {{item.id === 'focus' && !focusEntryReady ? 'is-disabled' : ''}}" wx:for="{{learningLoopCards}}" wx:key="id" data-action="{{item.action}}" bindtap="runPath">
+          <view class="friend-primary-title">{{item.title}}</view>
+          <view class="friend-primary-body">{{item.body}}</view>
+          <view class="friend-primary-cta">{{item.id === 'focus' && !focusEntryReady ? '先确认第一步' : item.cta}}</view>
+        </view>
+      </view>
+      </view>
+      <view class="weak-verdict-actions-shell" wx:if="{{showWeakVerdict}}">
+        <button class="weak-verdict-primary" data-action="{{weaknessVerdict.primaryAction}}" bindtap="runTodayAction">{{weaknessVerdict.primaryLabel}}</button>
+        <button class="weak-verdict-secondary" data-action="{{weaknessVerdict.secondaryAction}}" bindtap="runTodayAction">{{weaknessVerdict.secondaryLabel}}</button>
       </view>
       <view class="scenario-loop-pack" wx:if="{{localScenarioCases.length}}">
         <view class="scenario-loop-head">

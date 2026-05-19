@@ -540,6 +540,7 @@ Page({
     currentHintLevel: 1,
     nextAction: '先用一句话说清题目真正问什么。',
     masterySignal: null,
+    tutorTurnState: null,
     quickActions: QUICK_ACTIONS,
     guidedTutorModes: GUIDED_TUTOR_MODES,
     messages: [],
@@ -576,6 +577,9 @@ Page({
     ];
 
     const pasteRisk = pasteRiskSignal(messages);
+    const tutorTurnState = tutorLadder.nextTutorTurnState
+      ? tutorLadder.nextTutorTurnState('', messages, this.data.currentHintLevel, selected)
+      : null;
     const receipt = buildThinkingReceipt(messages, null, pasteRisk, this.data.activeStep, selected);
     this.setData({
       selected,
@@ -587,6 +591,7 @@ Page({
       pasteRisk,
       coachConsole: coachConsole(selected, misconceptionTags, null, pasteRisk, this.data.activeStep),
       thinkingReceipt: receipt,
+      tutorTurnState,
       surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('tutor') : null,
       unifiedNextAction: storage.buildUnifiedNextActionController ? storage.buildUnifiedNextActionController({ surface: 'tutor' }) : null
     });
@@ -699,18 +704,21 @@ Page({
     }
 
     const localHintLevel = tutorLadder.classifyHintLevel(input, this.data.messages, this.data.currentHintLevel);
+    const turnState = tutorLadder.nextTutorTurnState
+      ? tutorLadder.nextTutorTurnState(input, this.data.messages, this.data.currentHintLevel, selected)
+      : null;
     if (tutorLadder.isAnswerRequest(input) || tutorLadder.isStuckText(input)) {
       this.appendAssistant(tutorLadder.buildTutorReply(input, {
         messages: this.data.messages,
         currentHintLevel: this.data.currentHintLevel,
         selected
-      }));
+      }), turnState);
       return;
     }
 
     api.checkContent(input).then((check) => {
       if (check && check.safe === false) {
-        this.appendAssistant(safetyReply(check, input, selected, step, misconceptionText));
+        this.appendAssistant(safetyReply(check, input, selected, step, misconceptionText), turnState);
         return null;
       }
       return api.sendTutorMessage({
@@ -727,7 +735,7 @@ Page({
           misconception_tags: this.data.misconceptionTags,
           homework_plan: state.homework_plan || null
         }
-      }).then((res) => {
+        }).then((res) => {
         const localContract = tutorLadder.buildSocraticAiLocalBoundaryContract
           ? tutorLadder.buildSocraticAiLocalBoundaryContract(tutorLadder.detectTaskType ? tutorLadder.detectTaskType(input, selected) : 'unknown', {})
           : null;
@@ -739,15 +747,15 @@ Page({
             selected
           })
           : fallbackReply(input, selected, step, misconceptionText);
-        this.appendAssistant(guarded);
+        this.appendAssistant(guarded, turnState);
         return null;
       });
     }).catch(() => {
-      this.appendAssistant(fallbackReply(input, selected, step, misconceptionText));
+      this.appendAssistant(fallbackReply(input, selected, step, misconceptionText), turnState);
     });
   },
 
-  appendAssistant(result) {
+  appendAssistant(result, turnState = null) {
     const reply = result && result.reply ? result.reply : '先把你的第一步发来。';
     const next = this.data.messages.concat([{
       role: 'assistant',
@@ -757,10 +765,13 @@ Page({
     const masterySignal = result && result.mastery_signal ? result.mastery_signal : null;
     const coachStep = result && result.coach_step ? result.coach_step : this.data.activeStep;
     const currentHintLevel = result && result.hint_level ? Number(result.hint_level) : this.data.currentHintLevel;
+    const mergedTurnState = result && (result.tutor_turn_state || result.tutorTurnState) ? (result.tutor_turn_state || result.tutorTurnState) : turnState;
     storage.set(storage.KEYS.tutorMessages, next.slice(-20));
     const pasteRisk = pasteRiskSignal(next);
     const receipt = buildThinkingReceipt(next, masterySignal, pasteRisk, coachStep, this.data.selected);
     const diagnosticReceipt = Object.assign({}, receipt, {
+      tutor_turn_state: mergedTurnState,
+      tutorTurnState: mergedTurnState,
       diagnostic_probe: result && result.diagnostic_probe ? result.diagnostic_probe : null,
       question_type_socratic_path: result && result.question_type_socratic_path ? result.question_type_socratic_path : null,
       socratic_contract: result && result.socratic_contract ? result.socratic_contract : null,
@@ -876,6 +887,7 @@ Page({
       loading: false,
       activeStep: coachStep,
       currentHintLevel,
+      tutorTurnState: mergedTurnState,
       coachStepLabel: result && (result.hint_label || result.coach_step_label) ? (result.hint_label || result.coach_step_label) : this.data.coachStepLabel,
       nextAction: result && result.next_action ? result.next_action : this.data.nextAction,
       masterySignal,
@@ -895,10 +907,11 @@ Page({
       }
     ];
     storage.set(storage.KEYS.tutorMessages, messages);
-    this.setData({
+      this.setData({
       messages,
       masterySignal: null,
       nextAction: '先用一句话说清题目真正问什么。',
+      tutorTurnState: null,
       thinkingReceipt: buildThinkingReceipt(messages, null, pasteRiskSignal(messages), this.data.activeStep, this.data.selected)
     });
   },

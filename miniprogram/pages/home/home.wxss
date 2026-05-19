@@ -709,10 +709,17 @@
 }
 
 .weak-verdict-actions {
-  display: none;
+  display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 12rpx;
   margin-top: 18rpx;
+}
+
+.weak-verdict-actions-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12rpx;
+  margin: 12rpx 0 0;
 }
 
 .weak-verdict-primary,

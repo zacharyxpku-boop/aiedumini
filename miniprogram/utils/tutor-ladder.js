@@ -188,6 +188,50 @@ function classifyHintLevel(text, messages = [], currentHintLevel = 1) {
   return normalizeLevel(currentHintLevel);
 }
 
+function nextTutorTurnState(text, messages = [], currentHintLevel = 1, selected = {}) {
+  const safeMessages = Array.isArray(messages) ? messages : [];
+  const assistantCount = safeMessages.filter((item) => item && item.role === 'assistant').length;
+  const userCount = safeMessages.filter((item) => item && item.role === 'user').length + (text ? 1 : 0);
+  const taskType = detectTaskType(text, selected);
+  const pressureSignal = inferHomeworkPressureSignal(`${text || ''} ${selected && selected.text ? selected.text : ''}`, taskType);
+  const hintLevel = classifyHintLevel(text, safeMessages, currentHintLevel);
+  const roundIndex = Math.min(3, Math.max(1, assistantCount + 1));
+  const answerRequest = isAnswerRequest(text);
+  const stuckCount = countRecentStuck(safeMessages, text);
+  const shouldHandoff = answerRequest || stuckCount >= 3 || hintLevel >= 4 || (roundIndex >= 3 && isStuckText(text));
+  const ladderForRound = ladderItem(roundIndex);
+  return {
+    roundIndex,
+    roundLabel: `第 ${roundIndex} 轮`,
+    assistantCount,
+    userCount,
+    taskType,
+    pressureSignal,
+    hintLevel,
+    shouldHandoff,
+    fallbackBranch: answerRequest
+      ? 'answer_request'
+      : shouldHandoff && stuckCount >= 3
+        ? 'parent_handoff'
+        : shouldHandoff
+          ? 'two_choice_micro_choice'
+          : 'normal_step_probe',
+    coachMove: ladderForRound.reply,
+    coachStep: ladderForRound.step,
+    nextAction: ladderForRound.title,
+    nextQuestion: pressureSignal.parentCheck || '你先说第一步是什么？',
+    blackboardMove: pressureSignal.boardMove || '小黑板只画入口关系。',
+    parentHandoffLine: shouldHandoff
+      ? '如果还卡住，就交给家长只问一句检查点，明天再回访。'
+      : '先问、再提示、再看能不能自己说回去。',
+    stopRule: shouldHandoff
+      ? '三轮后仍卡住，停止继续追问，转家长检查句和明日回访。'
+      : '这一轮只问一步，不展开整题结论。',
+    shouldUseTwoChoice: hintLevel >= 4 || stuckCount >= 2,
+    evidenceLine: `轮次 ${roundIndex} · ${answerRequest ? '要答案' : shouldHandoff ? '准备交接' : '继续追问'} · ${pressureSignal.firstStep || '先说第一步'}`
+  };
+}
+
 function buildSocraticContract(taskType, signal) {
   return {
     id: 'socratic_contract',
@@ -689,6 +733,7 @@ function buildTutorReply(text, options = {}) {
   const sourceText = `${text || ''} ${selected.text || ''}`;
   const taskType = detectTaskType(text, selected);
   const pressureSignal = inferHomeworkPressureSignal(sourceText, taskType);
+  const turnState = nextTutorTurnState(text, messages, currentHintLevel, selected);
   const taskPrompt = pressureSignal.firstStep || TASK_TYPE_PROMPTS[taskType] || TASK_TYPE_PROMPTS.unknown;
   const answerRequest = isAnswerRequest(text);
   const level = answerRequest ? 1 : classifyHintLevel(text, messages, currentHintLevel);
@@ -724,6 +769,8 @@ function buildTutorReply(text, options = {}) {
       confidence: answerRequest ? 0.92 : 0.74,
       evidence_needed: pressureSignal.firstStep
     },
+    tutor_turn_state: turnState,
+    tutorTurnState: turnState,
     homework_boundary: true,
     real_homework_pressure_signal: pressureSignal,
     socratic_contract: buildSocraticContract(taskType, pressureSignal),
@@ -793,6 +840,7 @@ module.exports = {
   buildThreeRoundSocraticProtocol,
   buildSocraticAiLocalBoundaryContract,
   buildAnswerBoundaryEvidence,
+  nextTutorTurnState,
   guardAiTutorReply,
   buildTutorReply,
   simulateThreeRoundSocratic,
