@@ -256,6 +256,7 @@ Page({
     factoryStudioStatus: '粘贴课堂笔记、PPT 提纲、视频字幕或卡点总结。',
     surfaceDepthPack: null,
     publicK12ContentOps: null,
+    competitiveMoatWorkbench: null,
     showAdvancedTools: false
   },
 
@@ -330,6 +331,9 @@ Page({
       challengeHub: this.buildChallengeHub(reviewSummary, arcadeCards, gameModes),
       surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('tools') : null,
       publicK12ContentOps: this.buildPublicK12ContentOps(realHomeworkCoverageMatrix, reviewSummary, factorySummary),
+      competitiveMoatWorkbench: storage.buildCompetitiveMoatWorkbench
+        ? storage.buildCompetitiveMoatWorkbench({ realHomeworkCoverageMatrix })
+        : null,
       gameModes,
       setupGameModes,
       playgroundGames,

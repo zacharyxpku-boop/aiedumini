@@ -118,7 +118,11 @@ Page({
       title: context.title || '来自刚上传的资料',
       line: context.line || '这轮复习优先处理刚上传材料生成的卡，不散到普通队列里。',
       actionLabel: context.actionLabel || '修这张卡',
-      blockedFields: Array.isArray(context.blockedFields) ? context.blockedFields : []
+      blockedFields: Array.isArray(context.blockedFields) ? context.blockedFields : [],
+      openMaicBridgeStatus: context.openMaicDecisionBridge && context.openMaicDecisionBridge.qualityGate
+        ? context.openMaicDecisionBridge.qualityGate.status
+        : '',
+      returnRoute: context.returnRoute || context.actionRoute || ''
     };
   },
 
@@ -151,6 +155,8 @@ Page({
       currentQuestion: current && current.question ? current.question : '',
       matchedCount,
       blockedFields: context.blockedFields || [],
+      openMaicBridgeStatus: context.openMaicBridgeStatus || '',
+      returnRoute: context.returnRoute || '',
       next: matchedCount ? '先修这张卡，再进入轻练习。' : '未找到对应卡，会先展示当前到期卡。'
     };
   },

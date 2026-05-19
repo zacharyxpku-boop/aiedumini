@@ -192,6 +192,8 @@
         </view>
         <view class="intake-packet-feedback">{{lastReportCta.line}}</view>
         <view class="intake-packet-boundary">禁传字段：{{lastReportCta.blockedFields}}</view>
+        <view class="intake-packet-boundary" wx:if="{{lastReportCta.openMaicTaskPlanAudit}}">OpenMAIC 任务单：{{lastReportCta.openMaicTaskPlanAudit.sceneCount}} 场景 / {{lastReportCta.openMaicTaskPlanAudit.gateCount}} 门槛</view>
+        <view class="intake-packet-boundary" wx:if="{{lastReportCta.safeRelayPayload}}">回流动作：{{lastReportCta.safeRelayPayload.returnRoute}}</view>
         <view class="upload-flow-actions">
           <button bindtap="viewLatestReport">查看家长报告</button>
           <button bindtap="runReportFollowupAction">{{lastReportCta.actionLabel}}</button>

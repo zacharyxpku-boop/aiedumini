@@ -11132,6 +11132,260 @@ function buildReportPressureTruthAudit(coverageMatrix = {}, options = {}) {
   };
 }
 
+function buildCompetitiveMoatWorkbench(options = {}) {
+  const coverageMatrix = options.realHomeworkCoverageMatrix || buildRealHomeworkCoverageMatrix(options);
+  const courseUnitMap = options.courseUnitMap || buildCourseUnitMap(options);
+  const courseUnitQuestionBank = options.courseUnitQuestionBank || buildCourseUnitQuestionBank({ courseUnitMap });
+  const sevenSubjectMasterySprint = options.sevenSubjectMasterySprint || buildSevenSubjectMasterySprint({
+    courseUnitMap,
+    courseUnitQuestionBank
+  });
+  const reportPressureTruthAudit = options.reportPressureTruthAudit || buildReportPressureTruthAudit(coverageMatrix, options);
+  const resources = Array.isArray(coverageMatrix.publicK12OpenSourceResourceLedger)
+    ? coverageMatrix.publicK12OpenSourceResourceLedger
+    : [];
+  const challenges = Array.isArray(coverageMatrix.publicK12IntakeChallengeDeck)
+    ? coverageMatrix.publicK12IntakeChallengeDeck
+    : [];
+  const sourceDecision = Array.isArray(reportPressureTruthAudit.sourceDecision)
+    ? reportPressureTruthAudit.sourceDecision
+    : [];
+  const localDecision = sourceDecision.find((item) => item.id === 'local_code_better') || {};
+  const aiDecision = sourceDecision.find((item) => item.id === 'ai_better') || {};
+  const doNotUse = sourceDecision.find((item) => item.id === 'do_not_use') || {};
+  const subjects = courseUnitMap && Array.isArray(courseUnitMap.subjects) ? courseUnitMap.subjects : [];
+  const questionCards = courseUnitQuestionBank && Array.isArray(courseUnitQuestionBank.cards)
+    ? courseUnitQuestionBank.cards
+    : [];
+  const highLeverageLanes = [
+    {
+      id: 'content_depth',
+      label: '内容规模',
+      target: '七科课程单元、题型轴、错因轴、小黑板动作、近迁移和回访窗口全部本地化。',
+      currentEvidence: `${subjects.length} 科 / ${courseUnitMap.unitCount || 0} 单元 / ${questionCards.length} 张题型卡`,
+      localCodeOwns: ['course_unit_map', 'question_type_axis', 'wrong_cause_atlas', 'license_gate'],
+      aiBetterFor: ['把已通过许可门的第一步提示改写成儿童可懂问法'],
+      nextAction: '继续扩充真实作业压力样本，不复制公开原题和答案。'
+    },
+    {
+      id: 'ai_tutor_depth',
+      label: 'AI点拨深度',
+      target: 'AI 只负责苏格拉底追问、家长解释和小黑板话术；答案边界、停止条件、本地兜底必须可跑。',
+      currentEvidence: `${reportPressureTruthAudit.threeRoundSocraticRiskCount || 0} 个三轮追问风险 / 本地答案边界已接入`,
+      localCodeOwns: ['answer_boundary', 'hint_level', 'stop_condition', 'fallback_recovery'],
+      aiBetterFor: ['child_friendly_socratic_wording', 'parent_explanation', 'blackboard_prompt_variant'],
+      nextAction: '用真实错题压测沉默、求答案、错因泛化、迁移失败四类兜底。'
+    },
+    {
+      id: 'gizmo_memory_game',
+      label: '高频游戏留存',
+      target: '每天只有一个主回忆动作：90秒遮答案说第一步、错因回声、明日回访、第7天迁移。',
+      currentEvidence: sevenSubjectMasterySprint.gameIntensityLine || 'Review/Arcade 已接主动回忆和错因回流。',
+      localCodeOwns: ['spaced_recall_scheduler', 'xp_gate', 'streak_rescue', 'non_ranking_board'],
+      aiBetterFor: ['鼓励语和挑战卡文案改写'],
+      nextAction: '把每日回访从“可见面板”继续压成首页第一行动。'
+    },
+    {
+      id: 'parent_decision_report',
+      label: '家长决策书',
+      target: '天赋/学习偏好只做方法候选；错题、试卷、老师反馈和回访证据共同决定下一步。',
+      currentEvidence: reportPressureTruthAudit.sampleLine || '报告接入样本级错因、小黑板、家长检查和回访证据。',
+      localCodeOwns: ['portrait_release_gate', 'method_candidate_only', 'home_school_allowed_fields', 'evidence_ledger'],
+      aiBetterFor: ['把证据账本改写成家长能执行的一句话'],
+      nextAction: '继续把上传材料变成“今晚做什么/不做什么/缺什么证据”。'
+    },
+    {
+      id: 'safe_share_relay',
+      label: '安全分享接力',
+      target: '分享只带第一步、错因、回访窗口和接收者动作，不带原题、答案、照片、分数、排名。',
+      currentEvidence: '分享回流已接 home/profile/review/arcade 路由和 blockedFields。',
+      localCodeOwns: ['allowlist_payload', 'denylist_payload', 'return_route', 'relay_completion'],
+      aiBetterFor: ['邀请语改写'],
+      nextAction: '把接收者自己的材料接入同题型第一步挑战。'
+    }
+  ];
+  const sourcePolicyRows = [
+    {
+      id: 'openmaic',
+      label: 'OpenMAIC',
+      decision: '只借机制，不接代码',
+      use: '两阶段任务计划、事件流、动作引擎、质量门。',
+      blocked: '不复制 AGPL 代码、prompt、素材；不部署成闭源服务端；不承诺完整 AI 课堂。'
+    },
+    {
+      id: 'public_k12',
+      label: '公开K12/OER',
+      decision: '先过来源许可账本',
+      use: '课标结构、题型方向、常见错因、教学活动形态。',
+      blocked: '不搬原题、答案、解析、教材图、课件截图、视频逐字稿。'
+    },
+    {
+      id: 'family_upload',
+      label: '家庭上传材料',
+      decision: '只用于本家庭报告',
+      use: '错题/试卷进错因与回访；天赋测评进方法候选；老师反馈进家校摘要。',
+      blocked: '不外传孩子材料；不根据一次测评贴天赋标签。'
+    }
+  ];
+  const sourceLicenseGateRows = [
+    {
+      id: 'public_domain',
+      label: 'public_domain / cc_by',
+      status: 'can_seed_structure',
+      productUse: '可以进入题型轴、错因轴、小黑板模板和回访窗口，但仍要保留来源记录和去相似化检查。',
+      blockedUse: '不能暗示官方背书，不能搬运原题答案包。'
+    },
+    {
+      id: 'cc_by_sa',
+      label: 'cc_by_sa / share_alike',
+      status: 'structure_reference_only',
+      productUse: '只做结构参考：题型、课堂活动、板书顺序、教师提问方式。',
+      blockedUse: '不把原文、改编题、解析或图片放进闭源商业运行包。'
+    },
+    {
+      id: 'cc_by_nc',
+      label: 'cc_by_nc / nc_sa',
+      status: 'commercial_blocked_until_license',
+      productUse: '只记录为研究来源，帮助我们设计原创题型和错因分类。',
+      blockedUse: '商业小程序内不得直接复用内容、讲义、题目、答案或素材。'
+    },
+    {
+      id: 'unknown_or_proprietary',
+      label: 'unknown / proprietary',
+      status: 'blocked',
+      productUse: '不进入运行包，只能作为人工研究线索。',
+      blockedUse: '不抓取、不改写、不生成近似题，不做公开分享。'
+    }
+  ];
+  const openMaicScenePack = [
+    {
+      id: 'outline',
+      label: '大纲',
+      localCodeOwns: '把输入材料拆成题型、错因、第一步、回访窗口。',
+      aiBetterFor: '把第一步改写成孩子能回答的一句话。'
+    },
+    {
+      id: 'scene',
+      label: '场景',
+      localCodeOwns: '生成小黑板、主动回忆卡、轻练习、家长回执和安全分享。',
+      aiBetterFor: '生成不同语气的追问和家长解释。'
+    },
+    {
+      id: 'playback',
+      label: '回放',
+      localCodeOwns: '记录事件流、完成证据、XP 放行、次日回访和第 7 天迁移。',
+      aiBetterFor: '总结过程，但不能改写证据事实。'
+    },
+    {
+      id: 'quality_gate',
+      label: '质量门',
+      localCodeOwns: '答案边界、license gate、隐私字段、长期画像放行和分享字段。',
+      aiBetterFor: '只做可读性润色。'
+    }
+  ];
+  const competitiveExecutionBoard = [
+    {
+      id: 'gizmo_loop',
+      label: 'Gizmo式记忆循环',
+      tonightAction: '90 秒遮答案说第一步；错因回声；明天同类回访；第 7 天小变式。',
+      evidenceRequired: ['active_recall', 'wrong_cause_replay', 'next_day_revisit', 'day7_transfer'],
+      blockedFields: ['ranking', 'score_compare', 'full_answer']
+    },
+    {
+      id: 'khanmigo_tutor',
+      label: 'Khanmigo式引导点拨',
+      tonightAction: '三轮苏格拉底：看题目问什么、选第一步入口、交给家长一句检查。',
+      evidenceRequired: ['child_first_step', 'hint_level', 'parent_receipt', 'safe_share_boundary'],
+      blockedFields: ['final_answer', 'mastery_claim', 'talent_label']
+    },
+    {
+      id: 'openmaic_board',
+      label: 'OpenMAIC式小黑板',
+      tonightAction: '只画关系入口，不画完整解法；每一层都要求孩子说证据。',
+      evidenceRequired: ['board_entry_not_solution', 'student_says_evidence', 'exit_ticket'],
+      blockedFields: ['copied_prompt', 'copied_asset', 'full_ai_classroom_claim']
+    },
+    {
+      id: 'parent_book',
+      label: '家庭决策书',
+      tonightAction: '天赋测评只给方法候选；错题试卷决定先修哪一步；老师材料生成家校摘要。',
+      evidenceRequired: ['source_type', 'method_candidate', 'wrong_paper_card', 'home_school_digest'],
+      blockedFields: ['fixed_talent_label', 'private_comment', 'original_photo']
+    }
+  ];
+  const reportInputLanes = [
+    {
+      id: 'talent_assessment',
+      label: '天赋/学习偏好',
+      acceptedInput: '第三方测评摘要或小程序内 15 题偏好测评',
+      output: '学习方法候选、验证计划、家长观察句',
+      releaseRule: '没有错题、隔天回访和第 7 天迁移，不更新长期画像。'
+    },
+    {
+      id: 'wrong_question_paper',
+      label: '错题/试卷',
+      acceptedInput: '错题描述、试卷错因、老师批注、孩子第一步',
+      output: '题型定位、错因卡、小黑板入口、轻练习和回访卡',
+      releaseRule: '不生成整卷答案、不自动判分、不做排名刺激。'
+    },
+    {
+      id: 'school_material',
+      label: '学校/老师材料',
+      acceptedInput: '老师反馈、课堂观察、作业要求',
+      output: '家校沟通摘要、老师可看证据包、家庭配合动作',
+      releaseRule: '只带观察问题和下一步动作，不带原题照片、答案、分数或完整对话。'
+    }
+  ];
+  return {
+    id: 'competitive_moat_workbench',
+    title: '竞品级加厚工作台',
+    summary: '对标 Gizmo 的主动回忆与游戏留存、Khanmigo 的引导式点拨、OpenMAIC 的事件流与质量门，但产品仍聚焦家庭晚间作业闭环。',
+    status: resources.length >= 10 && subjects.length >= 7 && questionCards.length >= 21 ? 'local_moat_building' : 'needs_more_content_evidence',
+    progressPercent: Math.min(92, Math.round((resources.length * 2 + subjects.length * 5 + questionCards.length + challenges.length) / 1.4)),
+    sourcePolicyRows,
+    sourceLicenseGateRows,
+    openMaicScenePack,
+    competitiveExecutionBoard,
+    reportInputLanes,
+    highLeverageLanes,
+    aiLocalDecision: {
+      id: 'ai_local_decision',
+      localBetter: localDecision.use || '本地代码负责题型路由、错因分类、长期画像放行、分享字段、隐私阻断、回访节奏。',
+      aiBetter: aiDecision.use || 'AI 更适合苏格拉底追问语气、家长可读解释、同一第一步的多种说法。',
+      doNotUse: doNotUse.use || '不能直接使用原题答案库、拍题搜答案承诺、全科动态板书承诺、排名传播。'
+    },
+    nextOneDayBuild: [
+      '把每日记忆回流压成一个主行动，而不是多个面板。',
+      '继续把公开K12资料登记为结构资产，不把原题和答案放进运行包。',
+      '把天赋/学习偏好入口保持为方法候选，必须用错题、次日回访、第7天迁移验证。',
+      '每个新能力都同时写清 localCodeOwns、aiBetterFor、blockedFields、evidenceRequired。'
+    ],
+    blockedClaims: [
+      '拍题自动出答案',
+      '完整AI课堂生成',
+      '天赋定性',
+      '分数排名比较',
+      '复制开源或公开题库内容',
+      '未验证就写长期画像'
+    ],
+    evidenceRequired: [
+      'source_license_gate',
+      'local_ai_decision_boundary',
+      'course_unit_question_bank',
+      'daily_memory_return',
+      'parent_report_release_gate',
+      'safe_share_relay'
+    ],
+    sourceCounts: {
+      publicK12Resources: resources.length,
+      intakeChallengeCards: challenges.length,
+      subjects: subjects.length,
+      courseUnits: courseUnitMap.unitCount || 0,
+      questionCards: questionCards.length
+    }
+  };
+}
+
 module.exports = {
   KEYS,
   ensureLocalUserId,
@@ -11309,6 +11563,7 @@ module.exports = {
   buildRealHomeworkCoverageMatrix,
   buildRightsBoundaryEnvelope,
   buildReportPressureTruthAudit,
+  buildCompetitiveMoatWorkbench,
   loadReviewLoop,
   saveReviewLoop,
   updateReviewLoopForRating,

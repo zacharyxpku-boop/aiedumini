@@ -5,6 +5,7 @@ const navigation = require('../../utils/navigation');
 const privacy = require('../../utils/privacy');
 const reviewCards = require('../../utils/review-cards');
 const importIntake = require('../../utils/import-intake');
+const openMaicInspiredPlan = require('../../utils/openmaic-inspired-plan');
 
 const WRONG_QUESTION_RE = /错题|订正|错因|卡住|不会|总错|做错|漏|粗心|单位|条件|等量关系|建模|符号|公式|审题/;
 
@@ -342,6 +343,34 @@ Page({
     const actionRoute = sourceSchemaId === 'wrong_question_paper'
       ? `/pages/review/review?from=upload_report_ready&${query}`
       : `/pages/tutor/tutor?from=upload_report_ready&${query}`;
+    const reportDraft = reportState && reportState.reportDraft ? reportState.reportDraft : {};
+    const openMaicTaskPlan = openMaicInspiredPlan.buildOpenMaicInspiredTaskPlan({
+      taskType: sourceSchemaId,
+      pressureSignal: {
+        taskType: sourceSchemaId,
+        firstStep: (reportDraft.familyDecisionMemo && reportDraft.familyDecisionMemo.decisionCard && reportDraft.familyDecisionMemo.decisionCard.firstStep)
+          || (reportDraft.tonightDecisionBrief && reportDraft.tonightDecisionBrief.nextAction)
+          || '先让孩子说出第一步。',
+        wrongCause: (reportDraft.familyDecisionMemo && reportDraft.familyDecisionMemo.decisionCard && reportDraft.familyDecisionMemo.decisionCard.cause)
+          || (decisionSource.sourceSchemaLabel || '资料还需要真实作业证据确认。'),
+        parentCheck: (reportDraft.familyDecisionMemo && reportDraft.familyDecisionMemo.parentMeetingScript && reportDraft.familyDecisionMemo.parentMeetingScript[0])
+          || '你先说第一步，不用算完整题。',
+        reviewMove: '明天遮住答案，只回访同一个第一步。'
+      }
+    });
+    const openMaicDecisionBridge = openMaicInspiredPlan.buildOpenMaicInspiredDecisionBridge(openMaicTaskPlan, reportDraft, {
+      nextStep: actionRoute
+    }, {
+      summary: sourceSchemaId === 'wrong_question_paper' ? '错题先进入错因复现，再放行轻练习。' : '资料先进入第一步回访，再放行报告。'
+    });
+    const safeRelayPayload = Object.assign({}, openMaicDecisionBridge.shareRelayPayload || {}, {
+      from: 'upload',
+      reportId,
+      sourceSchemaId,
+      cardId,
+      returnRoute: actionRoute,
+      blockedFields: decisionSource.blockedFields || (openMaicDecisionBridge.shareRelayPayload && openMaicDecisionBridge.shareRelayPayload.blockedFields) || ['original_question', 'full_answer', 'score', 'ranking']
+    });
     return {
       title: sourceSchemaId === 'talent_assessment'
         ? '测评已进入家长报告'
@@ -361,7 +390,11 @@ Page({
       reportId,
       cardId,
       importedCardIds: Array.isArray(options.importedCardIds) ? options.importedCardIds : [],
-      blockedFields: decisionSource.blockedFields || ['original_question', 'full_answer', 'score', 'ranking']
+      blockedFields: safeRelayPayload.blockedFields,
+      openMaicTaskPlanAudit: openMaicInspiredPlan.evaluateOpenMaicInspiredTaskPlan(openMaicTaskPlan),
+      openMaicDecisionBridge,
+      safeRelayPayload,
+      returnRoute: actionRoute
     };
   },
 

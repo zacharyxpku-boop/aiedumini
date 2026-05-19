@@ -88,7 +88,11 @@ Page({
       cardId: context.cardId || '',
       title: context.title || '来自刚上传的资料',
       line: context.line || '这轮轻练习优先使用刚上传材料生成的卡。',
-      blockedFields: Array.isArray(context.blockedFields) ? context.blockedFields : []
+      blockedFields: Array.isArray(context.blockedFields) ? context.blockedFields : [],
+      openMaicBridgeStatus: context.openMaicDecisionBridge && context.openMaicDecisionBridge.qualityGate
+        ? context.openMaicDecisionBridge.qualityGate.status
+        : '',
+      returnRoute: context.returnRoute || context.actionRoute || ''
     };
   },
 
@@ -136,7 +140,9 @@ Page({
       cardId: first.cardId || first.id || context.cardId,
       firstQuestion: first.question || first.prompt || '',
       matchedCount,
-      blockedFields: context.blockedFields || []
+      blockedFields: context.blockedFields || [],
+      openMaicBridgeStatus: context.openMaicBridgeStatus || '',
+      returnRoute: context.returnRoute || ''
     };
   },
 

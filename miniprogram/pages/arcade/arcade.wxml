@@ -46,6 +46,8 @@
         <view class="story-mission-rule">来源：{{reportSourcePanel.sourceSchemaId}} / {{reportSourcePanel.reportId}} / {{reportSourcePanel.cardId}}</view>
         <view class="story-mission-rule" wx:if="{{reportSourcePanel.firstQuestion}}">本局先练：{{reportSourcePanel.firstQuestion}}</view>
         <view class="story-mission-rule">来源卡：{{reportSourcePanel.matchedCount}} 张；禁传字段：{{reportSourcePanel.blockedFields}}</view>
+        <view class="story-mission-rule" wx:if="{{reportSourcePanel.openMaicBridgeStatus}}">OpenMAIC 任务门：{{reportSourcePanel.openMaicBridgeStatus}}</view>
+        <view class="story-mission-rule" wx:if="{{reportSourcePanel.returnRoute}}">练后回流：{{reportSourcePanel.returnRoute}}</view>
       </view>
       <view class="challenge-brief-top">
         <view>

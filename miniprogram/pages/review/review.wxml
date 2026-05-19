@@ -52,6 +52,8 @@
           </view>
           <view class="repair-contract-parent">{{reportSourcePanel.line}}</view>
           <view class="repair-contract-boundary">禁传字段：{{reportSourcePanel.blockedFields}}</view>
+          <view class="repair-contract-boundary" wx:if="{{reportSourcePanel.openMaicBridgeStatus}}">OpenMAIC 任务门：{{reportSourcePanel.openMaicBridgeStatus}}</view>
+          <view class="repair-contract-boundary" wx:if="{{reportSourcePanel.returnRoute}}">回流动作：{{reportSourcePanel.returnRoute}}</view>
         </view>
         <view class="repair-contract-card" wx:if="{{reviewViewModel.repairContract}}">
           <view class="repair-contract-head">
