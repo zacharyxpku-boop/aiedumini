@@ -1,6 +1,7 @@
 const storage = require('../../utils/storage');
 const navigation = require('../../utils/navigation');
 const reviewCards = require('../../utils/review-cards');
+const gameLogic = require('../../utils/game-logic');
 const learningModules = require('../../utils/learning-modules');
 const arcadeEngine = require('../../utils/arcade-engine');
 const api = require('../../utils/api');
@@ -105,6 +106,7 @@ Page({
     surfaceDepthPack: null,
     capabilityMaturityQueue: null,
     unifiedNextAction: null,
+    dailyMemoryTask: null,
     sevenSubjectMasterySprint: null,
     learningLoopCards: [
       {
@@ -487,6 +489,68 @@ Page({
     };
   },
 
+  buildDailyMemoryTaskCard(reviewSummary = {}, todayFocus = null) {
+    const cards = reviewCards.sessionCards ? reviewCards.sessionCards('smart', 3) : [];
+    const profile = storage.loadGameProfile ? storage.loadGameProfile() : {};
+    const events = storage.loadReviewEvents ? storage.loadReviewEvents() : [];
+    const weakKey = (todayFocus && (todayFocus.issueType || todayFocus.title || todayFocus.systemSuggestedStep))
+      || (cards[0] && (cards[0].wrongCauseLabel || cards[0].weakPoint || cards[0].subject))
+      || '第一步';
+    const questSet = gameLogic.buildDailyQuestSet
+      ? gameLogic.buildDailyQuestSet(profile, cards, events, { now: new Date() })
+      : {};
+    const retentionLoop = gameLogic.buildGameRetentionLoop
+      ? gameLogic.buildGameRetentionLoop(profile, {}, { targetAccuracy: 80 }, questSet, { weakKey })
+      : {};
+    const loop = gameLogic.buildHighFrequencyPracticeLoop
+      ? gameLogic.buildHighFrequencyPracticeLoop(profile, cards, events, {}, { targetAccuracy: 80 }, questSet, {
+        weakKey,
+        retentionLoop
+      })
+      : {};
+    const primary = loop.dailyPrimaryRecallAction || {};
+    const prescription = loop.dailyMemoryPrescription || {};
+    const contract = loop.dailyReturnContract || {};
+    const season = loop.dailyMemorySeasonPlan || {};
+    const sprint = loop.dailyMemorySprintDeck || {};
+    const taskCards = (cards.length ? cards : (loop.recallCards || [])).slice(0, 3).map((card, index) => ({
+      id: card.id || `daily_memory_${index + 1}`,
+      label: `第 ${index + 1} 张`,
+      title: card.question || card.front || card.prompt || `${weakKey} 的第一步`,
+      action: card.checkpoint || card.nextAction || card.firstStep || '遮住答案，先说出第一步。'
+    }));
+    while (taskCards.length < 3) {
+      const order = taskCards.length + 1;
+      taskCards.push({
+        id: `daily_memory_fallback_${order}`,
+        label: `第 ${order} 张`,
+        title: `${weakKey} 的主动回忆`,
+        action: '遮住答案，先说第一步和最容易错的检查点。'
+      });
+    }
+    const nextEvidence = contract.nextDayReturnEvidence || {};
+    const xpRule = (prescription.releaseQueue || []).find((item) => item.id === 'xp_release');
+    return {
+      id: 'home_daily_90s_memory_task',
+      title: '今日 90 秒记忆任务',
+      subtitle: primary.action || `只做 3 张主动回忆卡，围绕「${weakKey}」说第一步，不刷题量。`,
+      cardCount: taskCards.length,
+      dueCount: Number((reviewSummary && reviewSummary.due) || 0),
+      route: primary.route || '/pages/review/review?from=home_daily_memory_task',
+      arcadeRoute: '/pages/arcade/arcade?from=home_daily_memory_task',
+      reviewRoute: '/pages/review/review?from=home_daily_memory_task',
+      taskCards,
+      tomorrowLine: nextEvidence.dueAt
+        ? `明天已锁定回访：${String(nextEvidence.dueAt).slice(5, 10)}`
+        : '明天回访已进入规则：没有次日回访，不更新长期画像。',
+      xpRule: xpRule && xpRule.rule ? xpRule.rule : 'XP 只奖励主动回忆、错因修复和次日回访，不奖励速度、分数或排名。',
+      shareLine: season.sharePayload && season.sharePayload.receiverRule
+        ? season.sharePayload.receiverRule
+        : '可分享 90 秒回忆接力，只带动作和回访时间，不带原题、答案、分数或排名。',
+      continuityLine: sprint.summary || '每天回来只接一件事：3 张卡、90 秒、明天回访。'
+    };
+  },
+
   refresh() {
     const loadedState = storage.loadState();
     const state = loadedState;
@@ -588,6 +652,7 @@ Page({
       surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('home') : null,
       capabilityMaturityQueue: storage.buildCapabilityMaturityQueue ? storage.buildCapabilityMaturityQueue() : null,
       unifiedNextAction: storage.buildUnifiedNextActionController ? storage.buildUnifiedNextActionController({ surface: 'home' }) : null,
+      dailyMemoryTask: this.buildDailyMemoryTaskCard(reviewSummary, todayFocus),
       sevenSubjectMasterySprint: storage.buildSevenSubjectMasterySprint ? storage.buildSevenSubjectMasterySprint() : null,
       todayFocus,
       tonightPlan,

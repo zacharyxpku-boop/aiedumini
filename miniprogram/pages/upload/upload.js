@@ -8,6 +8,37 @@ const importIntake = require('../../utils/import-intake');
 const openMaicInspiredPlan = require('../../utils/openmaic-inspired-plan');
 
 const WRONG_QUESTION_RE = /错题|订正|错因|卡住|不会|总错|做错|漏|粗心|单位|条件|等量关系|建模|符号|公式|审题/;
+const MATERIAL_TYPE_ALLOWLIST = [
+  'parent_report',
+  'talent_assessment',
+  'school_material',
+  'wrong_question_paper',
+  'wrong_question_photo',
+  'class_notes',
+  'wechat_article',
+  'web_article',
+  'pdf_excerpt',
+  'manual_notes',
+  'ppt',
+  'video',
+  'handwriting'
+];
+
+function safeQueryText(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return '';
+  try {
+    return decodeURIComponent(raw);
+  } catch (error) {
+    return raw;
+  }
+}
+
+function normalizeMaterialType(query = {}, fallback = 'class_notes') {
+  const raw = safeQueryText(query.type || query.materialType || query.sourceSchemaId || query.source || '');
+  const normalized = raw.replace(/^material_/, '');
+  return MATERIAL_TYPE_ALLOWLIST.includes(normalized) ? normalized : fallback;
+}
 
 Page({
   data: {
@@ -49,14 +80,20 @@ Page({
     const profile = storage.loadProfile();
     const draft = storage.get ? storage.get(storage.KEYS.taskDraft, null) : null;
     const homeworkText = draft && draft.text ? draft.text : this.data.homeworkText;
+    const routeMaterialType = normalizeMaterialType(query, this.data.materialType);
+    const routeMaterialText = safeQueryText(query.materialText || query.text || '');
+    const shouldOpenMaterialPanel = !!(query.type || query.materialType || query.sourceSchemaId || routeMaterialText);
     this.setData({
       minutes: (state.homework_plan && state.homework_plan.minutes_available) || profile.minutes || 35,
       homeworkText,
+      materialType: routeMaterialType,
+      materialText: routeMaterialText,
+      showMaterialPanel: shouldOpenMaterialPanel || this.data.showMaterialPanel,
       surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('upload') : null,
       unifiedNextAction: storage.buildUnifiedNextActionController ? storage.buildUnifiedNextActionController({ surface: 'upload' }) : null
     });
     this.updatePreview(homeworkText, (state.homework_plan && state.homework_plan.minutes_available) || profile.minutes || 35);
-    this.updateMaterialPreview('', this.data.materialType);
+    this.updateMaterialPreview(routeMaterialText, routeMaterialType);
   },
 
   buildUploadPlaybook(plan, state, minutes) {
@@ -621,6 +658,9 @@ Page({
       icon: 'success'
     });
     this.updateMaterialPreview(text, this.data.materialType);
+    setTimeout(() => {
+      navigation.navigateLearningRoute((latestReportCta && latestReportCta.route) || '/pages/profile/profile?from=upload_material_ready');
+    }, 500);
   },
 
   onMinutes(event) {

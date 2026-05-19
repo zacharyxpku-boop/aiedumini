@@ -120,6 +120,29 @@
           <view class="friend-primary-cta">{{item.id === 'focus' && !focusEntryReady ? '先确认第一步' : item.cta}}</view>
         </view>
       </view>
+      <view class="surface-depth-card daily-memory-task-card" wx:if="{{dailyMemoryTask}}">
+        <view class="surface-depth-head">
+          <view>
+            <view class="surface-depth-title">{{dailyMemoryTask.title}}</view>
+            <view class="surface-depth-subtitle">{{dailyMemoryTask.subtitle}}</view>
+          </view>
+          <view class="surface-depth-score">{{dailyMemoryTask.cardCount}} 张</view>
+        </view>
+        <view class="surface-depth-grid">
+          <view class="surface-depth-chip ready" wx:for="{{dailyMemoryTask.taskCards}}" wx:key="id">
+            <text class="surface-depth-chip-title">{{item.label}}｜{{item.title}}</text>
+            <text class="surface-depth-chip-line">{{item.action}}</text>
+          </view>
+        </view>
+        <view class="surface-depth-note">{{dailyMemoryTask.tomorrowLine}}</view>
+        <view class="surface-depth-note">{{dailyMemoryTask.xpRule}}</view>
+        <view class="surface-depth-note">{{dailyMemoryTask.shareLine}}</view>
+        <view class="profile-action-row">
+          <button class="profile-small-primary" data-route="{{dailyMemoryTask.reviewRoute}}" data-dimension-id="home_daily_memory_review" data-label="今日90秒记忆任务" bindtap="runSurfaceDepthAction">先做 3 张回忆卡</button>
+          <button class="profile-small-secondary" data-route="{{dailyMemoryTask.arcadeRoute}}" data-dimension-id="home_daily_memory_arcade" data-label="90秒回忆接力" bindtap="runSurfaceDepthAction">发起 90 秒接力</button>
+        </view>
+        <view class="surface-depth-note">{{dailyMemoryTask.continuityLine}}</view>
+      </view>
       </view>
       <view class="weak-verdict-actions-shell" wx:if="{{showWeakVerdict}}">
         <button class="weak-verdict-primary" data-action="{{weaknessVerdict.primaryAction}}" bindtap="runTodayAction">{{weaknessVerdict.primaryLabel}}</button>
