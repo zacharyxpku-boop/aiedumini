@@ -88,6 +88,7 @@
               <button class="socratic-feedback-button" data-status="still_blocked" bindtap="recordSocraticEffectivenessFeedback">还卡住</button>
             </view>
             <view class="socratic-feedback-state" wx:if="{{socraticFeedbackStatus}}">已记录：{{socraticFeedbackStatus}}</view>
+            <view class="socratic-feedback-next" wx:if="{{socraticFeedbackNextAction}}">下一轮：{{socraticFeedbackNextAction}}</view>
           </view>
           <view class="receipt-diagnostic" wx:if="{{thinkingReceipt.diagnostic_probe}}">
             <view class="receipt-diagnostic-title">这轮怎么追问</view>

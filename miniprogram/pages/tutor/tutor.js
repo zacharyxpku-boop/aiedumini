@@ -400,6 +400,33 @@ function buildSocraticEffectivenessEvent(status, receipt = {}, turnState = {}) {
   };
 }
 
+function buildSocraticFeedbackAdjustment(item, turnState = {}) {
+  const currentLevel = Math.max(1, Math.min(5, Number((item && item.hintLevel) || turnState.hintLevel || 1)));
+  if (item && item.status === 'first_step_spoken') {
+    return {
+      status: item.status,
+      nextHintLevel: 5,
+      activeStep: 'method_summary',
+      coachStepLabel: '提示 5/5',
+      nextAction: '把第一步收成一句复盘，再生成明天回访。',
+      nextQuestion: '你用一句话说：这类题下次第一步先看哪里？',
+      shouldUseTwoChoice: false,
+      releaseLine: '孩子已经能说第一步，下一轮转复盘和轻回访，不继续加提示。'
+    };
+  }
+  const nextHintLevel = Math.max(4, Math.min(5, currentLevel + 1));
+  return {
+    status: 'still_blocked',
+    nextHintLevel,
+    activeStep: 'micro_choice',
+    coachStepLabel: `提示 ${nextHintLevel}/5`,
+    nextAction: '下一轮只给二选一：先圈条件，还是先判断题目问什么。',
+    nextQuestion: '你现在只选一个：先圈条件，还是先看题目问什么？',
+    shouldUseTwoChoice: true,
+    releaseLine: '孩子还卡住，下一轮降到二选一和小黑板，不继续抽象追问。'
+  };
+}
+
 function normalizeTags(tags) {
   if (!Array.isArray(tags)) return [];
   return tags.map((item) => {
@@ -608,6 +635,7 @@ Page({
     thinkingReceipt: null,
     socraticFeedbackStatus: '',
     socraticFeedbackRecordedAt: '',
+    socraticFeedbackNextAction: '',
     surfaceDepthPack: null,
     unifiedNextAction: null,
     showTutorDetails: false
@@ -655,6 +683,7 @@ Page({
       thinkingReceipt: receipt,
       socraticFeedbackStatus: '',
       socraticFeedbackRecordedAt: '',
+      socraticFeedbackNextAction: '',
       tutorTurnState,
       surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('tutor') : null,
       unifiedNextAction: storage.buildUnifiedNextActionController ? storage.buildUnifiedNextActionController({ surface: 'tutor' }) : null
@@ -989,7 +1018,8 @@ Page({
       coachConsole: coachConsole(this.data.selected, this.data.misconceptionTags, masterySignal, pasteRisk, coachStep),
       thinkingReceipt: diagnosticReceipt,
       socraticFeedbackStatus: '',
-      socraticFeedbackRecordedAt: ''
+      socraticFeedbackRecordedAt: '',
+      socraticFeedbackNextAction: ''
     });
     this.syncTutorSignal(masterySignal, coachStep);
   },
@@ -1007,9 +1037,23 @@ Page({
     if (storage.appendSyncMutation) {
       storage.appendSyncMutation('socratic_effectiveness_feedback', item);
     }
+    const adjustment = buildSocraticFeedbackAdjustment(item, turnState);
+    const adjustedTurnState = Object.assign({}, turnState, {
+      hintLevel: adjustment.nextHintLevel,
+      feedbackStatus: item.status,
+      nextQuestion: adjustment.nextQuestion,
+      shouldUseTwoChoice: adjustment.shouldUseTwoChoice,
+      evidenceLine: adjustment.releaseLine
+    });
     this.setData({
       socraticFeedbackStatus: item.status,
-      socraticFeedbackRecordedAt: item.createdAt
+      socraticFeedbackRecordedAt: item.createdAt,
+      socraticFeedbackNextAction: adjustment.nextAction,
+      currentHintLevel: adjustment.nextHintLevel,
+      activeStep: adjustment.activeStep,
+      coachStepLabel: adjustment.coachStepLabel,
+      nextAction: adjustment.nextAction,
+      tutorTurnState: adjustedTurnState
     });
     if (typeof wx !== 'undefined' && wx.showToast) {
       wx.showToast({
@@ -1036,7 +1080,8 @@ Page({
         fallbackId: `clear_${messages.length}_${Date.now()}`
       }),
       socraticFeedbackStatus: '',
-      socraticFeedbackRecordedAt: ''
+      socraticFeedbackRecordedAt: '',
+      socraticFeedbackNextAction: ''
     });
   },
 

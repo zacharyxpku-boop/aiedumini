@@ -635,11 +635,19 @@ page {
   border-color: #1B4332;
 }
 
-.socratic-feedback-state {
+.socratic-feedback-state,
+.socratic-feedback-next {
   color: #667A6C;
   font-size: 20rpx;
   font-weight: 800;
   line-height: 1.35;
+}
+
+.socratic-feedback-next {
+  padding: 12rpx 14rpx;
+  color: #1B4332;
+  background: rgba(27, 67, 50, 0.08);
+  border-radius: 16rpx;
 }
 
 .receipt-diagnostic {

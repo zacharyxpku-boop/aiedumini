@@ -71,10 +71,26 @@
           <view class="blackboard-title">{{reviewViewModel.blackboard.title}}</view>
           <view class="blackboard-body">{{reviewViewModel.blackboard.body}}</view>
           <view class="blackboard-structure">{{reviewViewModel.blackboard.structure}}</view>
+          <view class="blackboard-layer-board" wx:if="{{reviewViewModel.blackboard.layers.length}}">
+            <view class="blackboard-layer" wx:for="{{reviewViewModel.blackboard.layers}}" wx:key="id">
+              <view class="blackboard-layer-index">{{item.order}}</view>
+              <view class="blackboard-layer-copy">
+                <view class="blackboard-layer-title">{{item.label}}</view>
+                <view class="blackboard-layer-action">{{item.drawAction}}</view>
+                <view class="blackboard-layer-evidence">{{item.evidence}}</view>
+                <view class="blackboard-layer-question">家长问：{{item.parentQuestion}}</view>
+              </view>
+            </view>
+          </view>
+          <view class="blackboard-first-step" wx:if="{{reviewViewModel.blackboard.firstStrokeLine}}">{{reviewViewModel.blackboard.firstStrokeLine}}</view>
+          <view class="blackboard-avoid" wx:if="{{reviewViewModel.blackboard.stopRuleLine}}">{{reviewViewModel.blackboard.stopRuleLine}}</view>
+          <view class="blackboard-child-prompt" wx:if="{{reviewViewModel.blackboard.nextRevisitLine}}">{{reviewViewModel.blackboard.nextRevisitLine}}</view>
           <view class="blackboard-first-step" wx:if="{{reviewViewModel.blackboard.firstMove}}">{{reviewViewModel.blackboard.firstMove}}</view>
           <view class="blackboard-child-prompt" wx:if="{{reviewViewModel.blackboard.childPrompt}}">{{reviewViewModel.blackboard.childPrompt}}</view>
           <view class="blackboard-parent-prompt" wx:if="{{reviewViewModel.blackboard.parentPrompt}}">家长只问：{{reviewViewModel.blackboard.parentPrompt}}</view>
           <view class="blackboard-avoid" wx:if="{{reviewViewModel.blackboard.avoid}}">{{reviewViewModel.blackboard.avoid}}</view>
+          <view class="blackboard-boundary" wx:if="{{reviewViewModel.blackboard.boundaryLine}}">{{reviewViewModel.blackboard.boundaryLine}}</view>
+          <view class="blackboard-boundary" wx:if="{{reviewViewModel.blackboard.localAiSplitLine}}">{{reviewViewModel.blackboard.localAiSplitLine}}</view>
         </view>
         <view class="surface-depth-card review-unified-next" wx:if="{{unifiedNextAction}}">
           <view class="surface-depth-title">{{unifiedNextAction.title}}</view>
