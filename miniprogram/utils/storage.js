@@ -5631,8 +5631,14 @@ function recordGameSessionResult(result = {}, context = {}) {
   const previousCorrectToday = sameGameDay
     ? Number(current.correct_today || current.correctToday || 0)
     : 0;
+  const previousEvidenceReturnToday = sameGameDay
+    ? Number(current.evidence_return_count || current.evidenceReturnCount || 0)
+    : 0;
   const nextReviewedToday = previousReviewedToday + reviewedToday;
   const nextCorrectToday = previousCorrectToday + Math.max(0, correct);
+  const activeRecallEvidenceComplete = !!result.activeRecallEvidenceComplete
+    || (Array.isArray(result.recallEvidence) && result.recallEvidence.some((item) => item && item.student_first_step && item.next_day_revisit_locked));
+  const nextEvidenceReturnToday = previousEvidenceReturnToday + (activeRecallEvidenceComplete ? 1 : 0);
   const streaked = gameLogic.updateStreak(current, {
     reviewedToday,
     threshold: 1,
@@ -5646,8 +5652,10 @@ function recordGameSessionResult(result = {}, context = {}) {
     correct_count: Number(streaked.correct_count || 0) + correct,
     reviewed_today: nextReviewedToday,
     correct_today: nextCorrectToday,
+    evidence_return_count: nextEvidenceReturnToday,
     reviewedToday: nextReviewedToday,
     correctToday: nextCorrectToday,
+    evidenceReturnCount: nextEvidenceReturnToday,
     last_game_day: today,
     recent_quiz_accuracy: recentQuiz,
     achievements: streaked.achievements || []
@@ -5665,6 +5673,8 @@ function recordGameSessionResult(result = {}, context = {}) {
     accuracy,
     reviewed_today: nextReviewedToday,
     correct_today: nextCorrectToday,
+    evidence_return_count: nextEvidenceReturnToday,
+    active_recall_evidence_complete: activeRecallEvidenceComplete,
     streak: Number(saved.streak || 0),
     achievements: saved.achievements || [],
     newly_unlocked: achievementResult.newlyUnlocked.map((item) => item.id),
@@ -8047,6 +8057,8 @@ function buildPressureSampleEvidence(sample = {}, unit = {}, type = 'active_reca
     sourceSampleId: sample.id,
     sourceId: sample.sourceId || '',
     sourceType: sample.sourceType || '',
+    provenanceKind: sample.provenanceKind || 'rewritten_public_pattern',
+    originalTextIncluded: false,
     gradeBand: sample.gradeBand || unit.gradeBand || '',
     taskType: sample.taskType || unit.taskType || '',
     sampleStem: sample.stem || '',
@@ -8072,7 +8084,7 @@ function buildPressureSampleEvidence(sample = {}, unit = {}, type = 'active_reca
         'parent_check_line',
         'near_transfer_variant'
       ],
-      blockedFields: ['original_question', 'full_answer', 'score', 'ranking', 'full_dialogue'],
+      blockedFields: ['original_question', 'source_original_text', 'source_question', 'source_answer', 'full_answer', 'answer_key', 'score', 'ranking', 'full_dialogue'],
       aiRole: 'socratic_wording_only',
       localCodeOwns: ['sample_match', 'release_gate', 'share_boundary', 'portrait_writeback']
     }
@@ -8104,6 +8116,27 @@ function pickOerResourceForUnit(unit = {}, type = 'active_recall', index = 0) {
     return { resource, resourceIndex, score };
   }).sort((a, b) => b.score - a.score || a.resourceIndex - b.resourceIndex);
   return scored.length ? scored[(index % Math.min(scored.length, 6))].resource : null;
+}
+
+function buildRightsBoundaryEnvelope(resource = null, sourceEvidence = null) {
+  const needsLicenseCheck = !resource || !resource.sourceUrl || !resource.licenseSignal || !resource.commercialDecision;
+  const releaseDecision = needsLicenseCheck ? 'needs_license_check' : 'allow_structure_only';
+  return {
+    rightsBoundaryEnvelope: {
+      sourceRegistryId: resource && resource.id ? resource.id : '',
+      sourceUrl: resource && resource.sourceUrl ? resource.sourceUrl : '',
+      licenseSignal: resource && resource.licenseSignal ? resource.licenseSignal : '',
+      licenseCheckedAt: resource && resource.licenseCheckedAt ? resource.licenseCheckedAt : '',
+      releaseDecision,
+      reuseScope: 'structure_signal_only',
+      sourceContentPolicy: 'no_source_text_no_source_image_no_source_answer',
+      answerVisibility: 'first_step_only_no_full_answer',
+      originalTextIncluded: false,
+      sourceSampleId: sourceEvidence && sourceEvidence.sourceSampleId ? sourceEvidence.sourceSampleId : '',
+      allowedDerivedArtifacts: ['first_step_card', 'wrong_cause_probe', 'visual_board_move', 'revisit_window', 'parent_check_line'],
+      mustNotSurface: ['source_original_text', 'source_question', 'source_answer', 'source_image', 'full_solution', 'answer_key', 'brand_claim', 'official_partnership_claim']
+    }
+  };
 }
 
 function buildQuestionSampleCard(unit = {}, type = 'active_recall', index = 0, options = {}) {
@@ -8139,7 +8172,10 @@ function buildQuestionSampleCard(unit = {}, type = 'active_recall', index = 0, o
   const sourceSample = findPressureSampleForUnit(unit, type, index, options.realHomeworkPressureSamples);
   const sourceEvidence = buildPressureSampleEvidence(sourceSample, unit, type);
   const oerResource = pickOerResourceForUnit(unit, type, index);
-  return Object.assign({}, sample, {
+  const rightsBoundaryEnvelope = buildRightsBoundaryEnvelope(oerResource, sourceEvidence);
+  return Object.assign({}, sample, rightsBoundaryEnvelope, {
+    sourceContentPolicy: 'no_source_text_no_source_image_no_source_answer',
+    answerVisibility: 'first_step_only_no_full_answer',
     oerResourceId: oerResource && oerResource.id,
     sourceRegistryId: oerResource && oerResource.id,
     sourceUrl: oerResource && oerResource.sourceUrl,
@@ -10910,6 +10946,7 @@ module.exports = {
   buildProductReadiness,
   buildAcceptanceReport,
   buildRealHomeworkCoverageMatrix,
+  buildRightsBoundaryEnvelope,
   buildReportPressureTruthAudit,
   loadReviewLoop,
   saveReviewLoop,

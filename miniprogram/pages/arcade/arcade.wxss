@@ -1421,6 +1421,42 @@
   font-weight: 780;
 }
 
+.quest-action-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12rpx;
+  margin: 14rpx 0;
+}
+
+.quest-action-btn {
+  min-height: 64rpx;
+  padding: 0 16rpx;
+  border-radius: 14rpx;
+  background: #1B4332;
+  color: #FFFFFF;
+  font-size: 22rpx;
+  font-weight: 850;
+  line-height: 64rpx;
+}
+
+.recall-evidence-strip {
+  display: grid;
+  gap: 10rpx;
+  margin: 16rpx 0;
+  padding: 16rpx;
+  border-radius: 16rpx;
+  background: #ECFDF5;
+  color: #14532D;
+  font-size: 22rpx;
+  font-weight: 850;
+}
+
+.reveal-btn.light {
+  background: #FFFFFF;
+  color: #166534;
+  border: 1rpx solid rgba(22, 101, 52, 0.24);
+}
+
 .surface-depth-card {
   display: grid;
   gap: 12rpx;

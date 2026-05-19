@@ -48,6 +48,17 @@
         <view class="challenge-brief-pill">{{challengeBrief.roundSize}} 题 · {{challengeBrief.targetAccuracy}}%</view>
       </view>
       <view class="challenge-brief-line">{{challengeBrief.questTitle}} · {{challengeBrief.questProgress}}</view>
+      <view class="quest-action-row" wx:if="{{challengeBrief.questActions.length}}">
+        <button
+          class="quest-action-btn"
+          wx:for="{{challengeBrief.questActions}}"
+          wx:key="id"
+          data-route="{{item.route}}"
+          data-quest-id="{{item.id}}"
+          data-label="{{item.label}}"
+          bindtap="goQuestRoute"
+        >{{item.label}} {{item.progressText}}</button>
+      </view>
       <view class="challenge-brief-sub">{{challengeBrief.bossLine}}</view>
       <view class="challenge-brief-sub">{{challengeBrief.rewardLine}}</view>
       <view class="story-mission" wx:if="{{challengeBrief.storyTitle}}">
@@ -246,6 +257,10 @@
         </view>
         <view class="quest-question">{{currentQuestion.question}}</view>
         <view class="quest-hint" wx:if="{{currentQuestion.hint}}">{{currentQuestion.hint}}</view>
+        <view class="recall-evidence-strip" wx:if="{{!revealed}}">
+          <text>{{quizRecallEvidence.student_first_step ? '已记录第一步' : '先遮住答案，说出第一步'}}</text>
+          <button class="reveal-btn light" bindtap="captureQuizFirstStep">我已说出第一步</button>
+        </view>
         <button class="reveal-btn" wx:if="{{!revealed}}" bindtap="revealAnswer">我想好了，核对思路</button>
         <view class="quest-answer" wx:if="{{revealed}}">
           <view class="answer-review-title">参考思路</view>

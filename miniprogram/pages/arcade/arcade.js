@@ -20,6 +20,7 @@ Page({
     currentIndex: 0,
     currentQuestion: null,
     revealed: false,
+    quizRecallEvidence: null,
     snakeTrack: null,
     snakeTiles: [],
     snakeNextOrder: 0,
@@ -380,6 +381,32 @@ Page({
           ? '先清一组待回访卡'
           : '先说清今晚第一步',
       questProgress: `${Number(activeQuest.progress || 0)} / ${Number(activeQuest.target || 1)}`,
+      activeQuestId: activeQuest.id || '',
+      activeQuestRoute: activeQuest.route || '',
+      activeQuestLabel: activeQuest.id === 'quest_boss_gap'
+        ? '先修这个 boss'
+        : activeQuest.id === 'quest_repair_due_cards'
+          ? '去修这组卡'
+          : activeQuest.id === 'quest_focus_round'
+            ? '去做 90 秒回流'
+            : activeQuest.id === 'quest_arcade_precision'
+              ? '去做一局精准练习'
+              : '去完成这个 quest',
+      questActions: quests.slice(0, 4).map((item) => ({
+        id: item.id,
+        label: item.id === 'quest_boss_gap'
+          ? '先修 boss'
+          : item.id === 'quest_repair_due_cards'
+            ? '去修卡'
+            : item.id === 'quest_focus_round'
+              ? '去回流'
+              : item.id === 'quest_arcade_precision'
+                ? '去冲准确率'
+                : '去完成',
+        route: item.route || '/pages/tutor/tutor',
+        evidenceRequired: Array.isArray(item.evidenceRequired) ? item.evidenceRequired : [],
+        progressText: `${Number(item.progress || 0)} / ${Number(item.target || 1)}`
+      })),
       rewardLine: activeQuest.rewardXp ? `完成后写入 ${activeQuest.rewardXp} 点学习记录` : '完成后写入学习记录',
       bossLine: adaptiveChallenge.bossCard
         ? `本局重点：${adaptiveChallenge.bossCard.nextAction || adaptiveChallenge.bossCard.key}`
@@ -473,6 +500,25 @@ Page({
         ? sevenSubjectMasterySprint.subjects.slice(0, 3)
         : []
     };
+  },
+
+  goQuestRoute(event) {
+    const route = event.currentTarget.dataset.route || '/pages/tutor/tutor';
+    if (storage.recordSurfaceDepthAction) {
+      storage.recordSurfaceDepthAction({
+        surface: 'arcade',
+        dimensionId: event.currentTarget.dataset.questId || 'daily_quest',
+        label: event.currentTarget.dataset.label || 'daily quest',
+        route,
+        readiness: 'quest_entry'
+      });
+    }
+    const cleanPath = route.split('?')[0];
+    if (['/pages/home/home', '/pages/review/review', '/pages/focus/focus', '/pages/tools/tools', '/pages/profile/profile', '/pages/arcade/arcade'].indexOf(cleanPath) >= 0) {
+      wx.switchTab({ url: cleanPath });
+      return;
+    }
+    wx.navigateTo({ url: route });
   },
 
   openingHint(gameId) {
@@ -575,6 +621,7 @@ Page({
       currentIndex: 0,
       currentQuestion: this.firstQuestionForRound(round, gameId),
       revealed: false,
+      quizRecallEvidence: null,
       snakeTrack: gameId === 'snake' ? this.firstQuestionForRound(round, gameId) : null,
       snakeTiles: gameId === 'snake' && round.tracks && round.tracks[0] ? round.tracks[0].tiles : [],
       snakeNextOrder: 0,
@@ -718,9 +765,35 @@ Page({
   revealAnswer() {
     if (!this.canPlayGameAction('reveal_answer')) return;
     if (!this.data.currentQuestion || this.data.result) return;
+    const evidence = this.data.quizRecallEvidence || {};
+    if (!evidence.student_first_step) {
+      this.setData({ feedbackText: '先遮住答案，说出第一步，再核对思路。' });
+      return;
+    }
     this.setData({
       revealed: true,
+      quizRecallEvidence: Object.assign({}, evidence, {
+        answer_hidden: true,
+        reveal_after_first_step: true
+      }),
       feedbackText: '核对思路后，按真实掌握程度选择。'
+    });
+  },
+
+  captureQuizFirstStep() {
+    if (!this.canPlayGameAction('capture_quiz_first_step')) return;
+    if (!this.data.currentQuestion || this.data.result || this.data.revealed) return;
+    const current = this.data.currentQuestion || {};
+    this.setData({
+      quizRecallEvidence: {
+        answer_hidden: true,
+        student_first_step: true,
+        wrong_cause_named: false,
+        next_day_revisit_locked: false,
+        cardId: current.cardId || current.id || '',
+        evidenceMode: 'local_active_recall_before_reveal'
+      },
+      feedbackText: '已记录：先说第一步。现在可以核对思路。'
     });
   },
 
@@ -740,7 +813,11 @@ Page({
       selected: rating === 'easy' ? '记得' : rating === 'good' ? '模糊' : '忘记',
       answer: current.answer,
       rating,
-      gameType: 'quiz'
+      gameType: 'quiz',
+      recallEvidence: Object.assign({}, this.data.quizRecallEvidence || {}, {
+        wrong_cause_named: !correct,
+        next_day_revisit_locked: true
+      })
     }]);
     const xpAccepted = this.recordCardResult(current.cardId, correct, rating, 'quiz');
     const nextIndex = this.data.currentIndex + 1;
@@ -753,6 +830,7 @@ Page({
       currentIndex: nextIndex,
       currentQuestion: nextQuestion,
       revealed: false,
+      quizRecallEvidence: null,
       lives,
       combo,
       bestCombo,
@@ -946,7 +1024,14 @@ Page({
     });
     const profile = storage.loadGameProfile ? storage.loadGameProfile() : {};
     const xpGained = Math.max(0, Number(profile.xp || 0) - Number(this.data.startXp || 0));
-    const savedResult = Object.assign({}, result, { xp: xpGained });
+    const recallEvidence = answers
+      .map((item) => item && item.recallEvidence)
+      .filter(Boolean);
+    const savedResult = Object.assign({}, result, {
+      xp: xpGained,
+      recallEvidence,
+      activeRecallEvidenceComplete: recallEvidence.some((item) => item.student_first_step && item.next_day_revisit_locked)
+    });
     const wrongAnswers = arcade.uniqueWrongAnswers(answers);
     const repairFocus = wrongAnswers.length ? arcade.buildRepairFocus(wrongAnswers[0], this.data.cards) : null;
     const gameRetention = storage.recordGameSessionResult
@@ -1197,6 +1282,8 @@ Page({
           dailyQuestIds: this.data.dailyQuestSet && Array.isArray(this.data.dailyQuestSet.quests)
             ? this.data.dailyQuestSet.quests.map((item) => item.id)
             : [],
+          activeRecallEvidenceComplete: !!savedResult.activeRecallEvidenceComplete,
+          activeRecallEvidence: Array.isArray(savedResult.recallEvidence) ? savedResult.recallEvidence : [],
           completed: true,
           streak: gameRetention && gameRetention.profile ? Number(gameRetention.profile.streak || 0) : 0,
           newlyUnlocked: gameRetention && gameRetention.newlyUnlocked ? gameRetention.newlyUnlocked.map((item) => item.id) : [],
@@ -1444,6 +1531,7 @@ Page({
       currentIndex: 0,
       currentQuestion: next,
       revealed: false,
+      quizRecallEvidence: null,
       snakeTrack: this.data.selectedGame === 'snake' ? next : null,
       snakeTiles: this.data.selectedGame === 'snake' && next ? next.tiles : [],
       snakeNextOrder: 0,

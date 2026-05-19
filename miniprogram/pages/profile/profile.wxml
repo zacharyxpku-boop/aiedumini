@@ -94,6 +94,8 @@
               <text wx:if="{{profileSafeSummary.sevenNightSummary}}">{{profileSafeSummary.sevenNightSummary}}</text>
               <text wx:if="{{profileSafeSummary.weeklySummary}}">{{profileSafeSummary.weeklySummary}}</text>
             </view>
+            <view class="parent-brief-reason" wx:if="{{learningReportSummary.reportEvidenceTopLine}}">报告一口径：{{learningReportSummary.reportEvidenceTopLine}}</view>
+            <view class="parent-brief-reason" wx:if="{{learningReportSummary.nextEvidenceTopLine}}">下一证据：{{learningReportSummary.nextEvidenceTopLine}}</view>
             <view class="parent-brief-reason">{{learningReportSummary.familyDecisionHomepageLocalAiSplitLine}}</view>
             <view class="parent-brief-reason" wx:if="{{learningReportSummary.familyDecisionHomepageShareBoundary}}">{{learningReportSummary.familyDecisionHomepageShareBoundary}}</view>
             <view class="parent-brief-reason">{{profileSafeSummary.evidenceBoundaryLine}}</view>
@@ -691,6 +693,8 @@
           <text wx:if="{{learningReportSummary.familyDecisionHomepageChildLine}}">孩子只做：{{learningReportSummary.familyDecisionHomepageChildLine}}</text>
           <text wx:if="{{learningReportSummary.familyDecisionHomepageTomorrow}}">明天回访：{{learningReportSummary.familyDecisionHomepageTomorrow}}</text>
           <text wx:if="{{learningReportSummary.familyDecisionHomepageSourceLine}}">来源判断：{{learningReportSummary.familyDecisionHomepageSourceLine}}</text>
+          <text wx:if="{{learningReportSummary.reportEvidenceTopLine}}">报告一口径：{{learningReportSummary.reportEvidenceTopLine}}</text>
+          <text wx:if="{{learningReportSummary.nextEvidenceTopLine}}">下一证据：{{learningReportSummary.nextEvidenceTopLine}}</text>
           <text>{{learningReportSummary.familyDecisionHomepageLocalAiSplitLine}}</text>
           <text wx:if="{{learningReportSummary.familyDecisionHomepageHomeSchoolLine}}">家校交接：{{learningReportSummary.familyDecisionHomepageHomeSchoolLine}}</text>
           <text wx:for="{{learningReportSummary.familyDecisionHomepageDoList}}" wx:key="*this">今晚做：{{item}}</text>
@@ -1039,6 +1043,8 @@
           <text wx:if="{{learningReportSummary.reportEvidenceReleaseGateTitle}}">{{learningReportSummary.reportEvidenceReleaseGateTitle}}</text>
           <text>报告放行：{{learningReportSummary.reportEvidenceReleaseDecision}}</text>
           <text>{{learningReportSummary.reportEvidenceReleaseSummary}}</text>
+          <text wx:if="{{learningReportSummary.reportEvidenceTopLine}}">{{learningReportSummary.reportEvidenceTopLine}}</text>
+          <text wx:if="{{learningReportSummary.nextEvidenceTopLine}}">下一证据：{{learningReportSummary.nextEvidenceTopLine}}</text>
           <text wx:if="{{learningReportSummary.reportEvidenceSingleSampleLock}}">单题锁：{{learningReportSummary.reportEvidenceSingleSampleLock.rule}}</text>
           <text wx:if="{{learningReportSummary.reportEvidenceDay7Gate}}">第7天闸：{{learningReportSummary.reportEvidenceDay7Gate.status}}｜{{learningReportSummary.reportEvidenceDay7Gate.rule}}</text>
           <text wx:if="{{learningReportSummary.reportEvidenceTwoWeekGate}}">两周稳定闸：{{learningReportSummary.reportEvidenceTwoWeekGate.status}}｜{{learningReportSummary.reportEvidenceTwoWeekGate.rule}}</text>
@@ -1151,6 +1157,7 @@
         <view class="parent-brief-block">
           <text class="parent-brief-label">下一步方案</text>
           <text>{{learningReportSummary.planLine}}</text>
+          <text wx:if="{{learningReportSummary.howToLearnBetter}}">怎么学更好：{{learningReportSummary.howToLearnBetter}}</text>
           <text>{{learningReportSummary.ctaReason}}</text>
         </view>
         <view class="parent-brief-block">

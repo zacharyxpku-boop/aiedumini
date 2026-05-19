@@ -1086,6 +1086,28 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
   const nextEvidence = Array.isArray(solutionMap.nextEvidenceRequired) && solutionMap.nextEvidenceRequired.length
     ? solutionMap.nextEvidenceRequired
     : ['child_first_step', 'focus_or_review_record', 'next_day_revisit'];
+  const reportEvidenceTopLine = (() => {
+    const decision = reportEvidenceReleaseGate.releaseDecision || 'collect_more_evidence';
+    const required = Array.isArray(reportEvidenceReleaseGate.evidenceRequired)
+      ? reportEvidenceReleaseGate.evidenceRequired
+      : [];
+    const next = reportEvidenceReleaseGate.portraitNextEvidenceAction
+      || (sourceEvidenceLedger.nextEvidenceLine || '')
+      || required.slice(0, 2).join(' / ')
+      || nextEvidence.slice(0, 2).join(' / ');
+    const locked = reportEvidenceReleaseGate.homeSchoolSafeHandoff && reportEvidenceReleaseGate.homeSchoolSafeHandoff.status !== 'ready';
+    return locked
+      ? `报告还不能当长期结论：${decision}；下一证据：${next}`
+      : `报告可进入家校安全交接：${decision}；下一证据：${next}`;
+  })();
+  const nextActionRoute = (solutionMap.appHandoff && solutionMap.appHandoff.route)
+    || (plan.cta && plan.cta.path)
+    || '/pages/tutor/tutor?from=learning_report';
+  const howToLearnBetter = [
+    plan.parentLine || '',
+    solutionMap.childScript || '',
+    parentDecisionBook.oneSentenceDecision || ''
+  ].filter(Boolean).slice(0, 3).join(' / ') || '先让孩子说出第一步，再用错因和隔天回访确认方法是否真的稳定。';
   const sevenDayActionBoard = {
     title: '7天行动板',
     ready: sevenDayPlan.length >= 3,
@@ -1466,6 +1488,10 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     reportEvidenceReleaseGateTitle: reportEvidenceReleaseGate.title || '',
     reportEvidenceReleaseDecision: reportEvidenceReleaseGate.releaseDecision || '',
     reportEvidenceReleaseSummary: reportEvidenceReleaseGate.summary || '',
+    reportEvidenceTopLine,
+    nextEvidenceTopLine: reportEvidenceReleaseGate.portraitNextEvidenceAction || (sourceEvidenceLedger.nextEvidenceLine || '') || nextEvidence.slice(0, 2).join(' / '),
+    nextActionRoute,
+    howToLearnBetter,
     reportEvidenceSingleSampleLock: reportEvidenceReleaseGate.singleSampleLock || null,
     reportEvidenceDay7Gate: reportEvidenceReleaseGate.day7Gate || null,
     reportEvidenceTwoWeekGate: reportEvidenceReleaseGate.twoWeekStabilityGate || null,
@@ -2526,6 +2552,10 @@ Page({
   onAssessmentInput(event) {
     const scoreInput = event.detail.value;
     const analysis = learningAssessment.buildLearningAssessment(scoreInput);
+    const reportInputPatch = analysis && analysis.reportInputPatch ? analysis.reportInputPatch : {};
+    const nextReportInput = Object.assign({}, this.data.learningReportInput || {}, reportInputPatch, {
+      sourceText: scoreInput
+    });
     this.setData({
       'learningAssessment.scoreInput': scoreInput,
       'learningAssessment.talentLine': analysis.summaryLine,
@@ -2533,9 +2563,9 @@ Page({
       'learningAssessment.nextQuestion': analysis.nextQuestion,
       'learningAssessment.capability': analysis.capability,
       'learningAssessment.subject': analysis.subject,
-      'learningReportInput.sourceText': scoreInput
+      learningReportInput: nextReportInput
     });
-    this.syncLearningReportFromInput({ sourceText: scoreInput });
+    this.syncLearningReportFromInput(nextReportInput);
   },
 
   applyLearningReportRecognition(rawDraft = {}) {
@@ -2686,9 +2716,7 @@ Page({
 
   goLearningReportCta() {
     const summary = this.data.learningReportSummary || {};
-    const path = summary.ctaPath
-      ? summary.ctaPath
-      : '/pages/tutor/tutor?from=learning_report';
+    const path = summary.nextActionRoute || summary.ctaPath || '/pages/tutor/tutor?from=learning_report';
     if (storage.recordSurfaceDepthAction) {
       storage.recordSurfaceDepthAction({
         surface: 'profile',
