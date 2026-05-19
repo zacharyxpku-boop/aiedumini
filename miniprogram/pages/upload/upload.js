@@ -590,6 +590,15 @@ Page({
     this.updateMaterialPreview(this.data.materialText, materialType);
   },
 
+  openMaterialReportPanel(event) {
+    const materialType = normalizeMaterialType(event.currentTarget.dataset.type || 'parent_report');
+    this.setData({
+      showMaterialPanel: true,
+      materialType
+    });
+    this.updateMaterialPreview(this.data.materialText, materialType);
+  },
+
   importMaterialPack() {
     const text = String(this.data.materialText || '').trim();
     if (!text) {

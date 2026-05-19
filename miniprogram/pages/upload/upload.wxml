@@ -262,6 +262,18 @@
       </view>
       <view class="photo-hint" wx:if="{{imagePaths.length}}">照片先保存在本机；请在上方补一句“错因/卡住点”，咕点再整理成可回访的错题卡。</view>
 
+      <view class="material-report-hero">
+        <view class="material-report-kicker">家长资料入口</view>
+        <view class="material-report-title">上传测评 / 错题试卷 / 学校反馈，先生成家庭决策报告</view>
+        <view class="material-report-desc">只做方法候选、错因修复和下一证据；不贴天赋标签，不自动判分，不输出整卷答案。</view>
+        <view class="material-report-actions">
+          <button class="material-report-chip" data-type="talent_assessment" bindtap="openMaterialReportPanel">天赋测评</button>
+          <button class="material-report-chip" data-type="wrong_question_paper" bindtap="openMaterialReportPanel">错题试卷</button>
+          <button class="material-report-chip" data-type="school_material" bindtap="openMaterialReportPanel">学校反馈</button>
+          <button class="material-report-chip" data-type="parent_report" bindtap="openMaterialReportPanel">家长观察</button>
+        </view>
+      </view>
+
       <view class="material-toggle">
         <view>
           <view class="material-title">已有材料要变成复习卡？</view>
