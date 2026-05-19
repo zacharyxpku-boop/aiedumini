@@ -906,6 +906,65 @@ function buildCourseUnitDecisionBoard(courseUnitMap = null) {
   };
 }
 
+function buildFamilyDecisionHomepage(input = {}) {
+  const familyDecisionMemo = input.familyDecisionMemo || {};
+  const tonightDecisionBrief = input.tonightDecisionBrief || {};
+  const reportEvidenceReleaseGate = input.reportEvidenceReleaseGate || {};
+  const sourceEvidenceLedger = input.sourceEvidenceLedger || {};
+  const reportDailyActionQueue = input.reportDailyActionQueue || {};
+  const familyDecisionActionBridge = input.familyDecisionActionBridge || {};
+  const homeSchoolCollaborationDigest = input.homeSchoolCollaborationDigest || {};
+  const active = reportDailyActionQueue.active || {};
+  const sourceLanes = Array.isArray(sourceEvidenceLedger.lanes) ? sourceEvidenceLedger.lanes : [];
+  const primarySource = sourceLanes.find((item) => item && item.status === 'hit') || sourceLanes[0] || {};
+  const doList = Array.isArray(tonightDecisionBrief.tonightDo) && tonightDecisionBrief.tonightDo.length
+    ? tonightDecisionBrief.tonightDo.slice(0, 3)
+    : [familyDecisionMemo.tonightDecision || active.task || '今晚只做一个第一步动作'];
+  const dontList = Array.isArray(tonightDecisionBrief.tonightDoNot) && tonightDecisionBrief.tonightDoNot.length
+    ? tonightDecisionBrief.tonightDoNot.slice(0, 3)
+    : (Array.isArray(familyDecisionMemo.doNotDo) ? familyDecisionMemo.doNotDo.slice(0, 3) : []);
+  const evidenceList = Array.isArray(tonightDecisionBrief.evidenceChecklist) && tonightDecisionBrief.evidenceChecklist.length
+    ? tonightDecisionBrief.evidenceChecklist.slice(0, 4)
+    : (Array.isArray(familyDecisionMemo.evidenceChecklist) ? familyDecisionMemo.evidenceChecklist.slice(0, 4) : []);
+  const blocked = reportEvidenceReleaseGate.homeSchoolSafeHandoff && Array.isArray(reportEvidenceReleaseGate.homeSchoolSafeHandoff.blockedFields)
+    ? reportEvidenceReleaseGate.homeSchoolSafeHandoff.blockedFields
+    : ['original_question', 'full_answer', 'score', 'ranking'];
+  const allowed = reportEvidenceReleaseGate.homeSchoolSafeHandoff && Array.isArray(reportEvidenceReleaseGate.homeSchoolSafeHandoff.allowedFields)
+    ? reportEvidenceReleaseGate.homeSchoolSafeHandoff.allowedFields
+    : ['tonight_action', 'first_step_observation', 'parent_question'];
+  const releaseDecision = reportEvidenceReleaseGate.releaseDecision || 'collect_more_evidence';
+  const portraitStatus = releaseDecision === 'home_school_safe_handoff'
+    ? '可安全交接'
+    : releaseDecision === 'tonight_action_only'
+      ? '只放行今晚动作'
+      : '继续收证据';
+  return {
+    id: 'family_decision_homepage',
+    title: '家庭决策书首页',
+    headline: tonightDecisionBrief.headline || familyDecisionMemo.tonightDecision || active.task || '今晚先把一个第一步做稳',
+    status: portraitStatus,
+    statusLevel: releaseDecision === 'home_school_safe_handoff' ? 'ready' : releaseDecision === 'tonight_action_only' ? 'action' : 'locked',
+    primaryAction: active.task || familyDecisionActionBridge.summary || familyDecisionMemo.tonightDecision || '',
+    parentQuestion: tonightDecisionBrief.parentScript || homeSchoolCollaborationDigest.parentQuestion || familyDecisionActionBridge.parentPrompt || '',
+    childLine: tonightDecisionBrief.childScript || '我先说出第一步，不直接要答案。',
+    tomorrow: tonightDecisionBrief.tomorrowRevisit || active.checkpoint || '',
+    sourceLine: primarySource.label
+      ? `${primarySource.label}：${primarySource.canProduce || primarySource.status || '只进入证据账本'}`
+      : '来源还不足，先补孩子第一步或错因文字。',
+    localAiSplitLine: '本地代码决定来源、放行、画像、分享字段；AI 只改写追问和家长解释。',
+    homeSchoolLine: homeSchoolCollaborationDigest.suggestedMessage || reportEvidenceReleaseGate.summary || '',
+    shareBoundary: tonightDecisionBrief.shareLine || familyDecisionMemo.shareLine || '分享只带行动和证据，不带原题、答案、分数、排名或完整对话。',
+    doList,
+    dontList,
+    evidenceList,
+    allowedFields: allowed.slice(0, 6),
+    blockedFields: blocked.slice(0, 8),
+    route: active.route || familyDecisionActionBridge.primaryRoute || '/pages/tutor/tutor?from=family_decision_homepage',
+    ctaLabel: active.task ? '去完成今日动作' : '先补第一步证据',
+    ready: !!(doList.length && evidenceList.length)
+  };
+}
+
 function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, subjectSkillDepth, curriculumSpine, visualSocraticMatrix, courseUnitMap, latestThinkingReceipt = null) {
   const globalEvidenceBrief = storage.buildGlobalEvidenceBrief ? storage.buildGlobalEvidenceBrief() : null;
   const capabilityLedger = capabilityEvidenceLedger || (storage.buildCapabilityEvidenceLedger ? storage.buildCapabilityEvidenceLedger({ globalEvidenceBrief }) : null);
@@ -1051,6 +1110,15 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
       socraticPromptQualityJudge
     )
     : null);
+  const familyDecisionHomepage = buildFamilyDecisionHomepage({
+    familyDecisionMemo,
+    tonightDecisionBrief,
+    reportEvidenceReleaseGate,
+    sourceEvidenceLedger,
+    reportDailyActionQueue,
+    familyDecisionActionBridge,
+    homeSchoolCollaborationDigest
+  });
   const realHomeworkCoverageMatrix = storage.buildRealHomeworkCoverageMatrix
     ? storage.buildRealHomeworkCoverageMatrix({
       subject: subjectSkillDepth && subjectSkillDepth.subject ? subjectSkillDepth.subject : ''
@@ -1514,6 +1582,25 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     fallbackRecoveryEvidence: fallbackRecoveryReportBridge && Array.isArray(fallbackRecoveryReportBridge.evidenceRequired)
       ? fallbackRecoveryReportBridge.evidenceRequired
       : [],
+    familyDecisionHomepage,
+    familyDecisionHomepageTitle: familyDecisionHomepage.title,
+    familyDecisionHomepageHeadline: familyDecisionHomepage.headline,
+    familyDecisionHomepageStatus: familyDecisionHomepage.status,
+    familyDecisionHomepagePrimaryAction: familyDecisionHomepage.primaryAction,
+    familyDecisionHomepageParentQuestion: familyDecisionHomepage.parentQuestion,
+    familyDecisionHomepageChildLine: familyDecisionHomepage.childLine,
+    familyDecisionHomepageTomorrow: familyDecisionHomepage.tomorrow,
+    familyDecisionHomepageSourceLine: familyDecisionHomepage.sourceLine,
+    familyDecisionHomepageLocalAiSplitLine: familyDecisionHomepage.localAiSplitLine,
+    familyDecisionHomepageHomeSchoolLine: familyDecisionHomepage.homeSchoolLine,
+    familyDecisionHomepageShareBoundary: familyDecisionHomepage.shareBoundary,
+    familyDecisionHomepageDoList: familyDecisionHomepage.doList,
+    familyDecisionHomepageDontList: familyDecisionHomepage.dontList,
+    familyDecisionHomepageEvidenceList: familyDecisionHomepage.evidenceList,
+    familyDecisionHomepageAllowedFields: familyDecisionHomepage.allowedFields,
+    familyDecisionHomepageBlockedFields: familyDecisionHomepage.blockedFields,
+    familyDecisionHomepageRoute: familyDecisionHomepage.route,
+    familyDecisionHomepageCtaLabel: familyDecisionHomepage.ctaLabel,
     familyDecisionTitle: familyDecisionMemo.title || '',
     familyDecisionTonight: familyDecisionMemo.tonightDecision || '',
     familyDecisionDoNotDo: Array.isArray(familyDecisionMemo.doNotDo) ? familyDecisionMemo.doNotDo : [],

@@ -31,12 +31,18 @@
         </view>
 
         <view class="family-summary-card rc14-main-card friend-profile-core">
-          <view class="family-summary-title">5 秒行动卡：听一句、问一句、明天回访</view>
+          <view class="family-summary-title">今晚决策首页：5 秒行动卡，听一句、问一句、明天回访</view>
           <view class="family-summary-body family-readable">
             <view class="profile-empty-state" wx:if="{{profileSafeSummary.isEmpty}}">再用两晚后，咕点会帮你看见模式。</view>
+            <view class="parent-brief-block" wx:if="{{learningReportSummary.familyDecisionHomepage}}">
+              <text class="parent-brief-label">今晚结论</text>
+              <text>{{learningReportSummary.familyDecisionHomepageHeadline}}</text>
+              <text>状态：{{learningReportSummary.familyDecisionHomepageStatus}}</text>
+              <text wx:if="{{learningReportSummary.familyDecisionHomepageSourceLine}}">依据：{{learningReportSummary.familyDecisionHomepageSourceLine}}</text>
+            </view>
             <view class="parent-action-snapshot">
               <view class="parent-action-head">
-                <text>家长今晚怎么做</text>
+                <text>今晚做 / 不做 / 明天验收</text>
                 <text>{{profileSafeSummary.confidenceLabel}}</text>
               </view>
               <view class="parent-action-grid">
@@ -45,6 +51,14 @@
                   <text class="parent-action-text">{{item.text}}</text>
                 </view>
               </view>
+            </view>
+            <view class="parent-brief-block" wx:if="{{learningReportSummary.familyDecisionHomepageDoList.length}}">
+              <text class="parent-brief-label">今晚做</text>
+              <text wx:for="{{learningReportSummary.familyDecisionHomepageDoList}}" wx:key="*this">{{item}}</text>
+            </view>
+            <view class="parent-brief-block" wx:if="{{learningReportSummary.familyDecisionHomepageDontList.length}}">
+              <text class="parent-brief-label">今晚不做</text>
+              <text wx:for="{{learningReportSummary.familyDecisionHomepageDontList}}" wx:key="*this">{{item}}</text>
             </view>
             <view class="parent-brief-block">
               <text class="parent-brief-label">今晚卡住</text>
@@ -61,7 +75,11 @@
             </view>
             <view class="parent-brief-block">
               <text class="parent-brief-label">明天回访</text>
-              <text>{{profileSafeSummary.tomorrowRevisit}}</text>
+              <text>{{learningReportSummary.familyDecisionHomepageTomorrow || profileSafeSummary.tomorrowRevisit}}</text>
+            </view>
+            <view class="parent-brief-block" wx:if="{{learningReportSummary.familyDecisionHomepageEvidenceList.length}}">
+              <text class="parent-brief-label">证据来自</text>
+              <text wx:for="{{learningReportSummary.familyDecisionHomepageEvidenceList}}" wx:key="*this">{{item}}</text>
             </view>
             <view class="parent-brief-block">
               <text class="parent-brief-label">最近小结</text>
@@ -70,6 +88,8 @@
               <text wx:if="{{profileSafeSummary.sevenNightSummary}}">{{profileSafeSummary.sevenNightSummary}}</text>
               <text wx:if="{{profileSafeSummary.weeklySummary}}">{{profileSafeSummary.weeklySummary}}</text>
             </view>
+            <view class="parent-brief-reason">{{learningReportSummary.familyDecisionHomepageLocalAiSplitLine}}</view>
+            <view class="parent-brief-reason" wx:if="{{learningReportSummary.familyDecisionHomepageShareBoundary}}">{{learningReportSummary.familyDecisionHomepageShareBoundary}}</view>
             <view class="parent-brief-reason">{{profileSafeSummary.evidenceBoundaryLine}}</view>
           </view>
         </view>
@@ -655,6 +675,25 @@
         <view class="parent-brief-block">
           <text class="parent-brief-label">资料完整度</text>
           <text>{{learningReportSummary.modeLabel}} · {{learningReportSummary.statusLabel}}</text>
+        </view>
+        <view class="parent-brief-block" wx:if="{{learningReportSummary.familyDecisionHomepage}}">
+          <text class="parent-brief-label">{{learningReportSummary.familyDecisionHomepageTitle}}</text>
+          <text>{{learningReportSummary.familyDecisionHomepageHeadline}}</text>
+          <text>状态：{{learningReportSummary.familyDecisionHomepageStatus}}</text>
+          <text wx:if="{{learningReportSummary.familyDecisionHomepagePrimaryAction}}">今日动作：{{learningReportSummary.familyDecisionHomepagePrimaryAction}}</text>
+          <text wx:if="{{learningReportSummary.familyDecisionHomepageParentQuestion}}">家长只问：{{learningReportSummary.familyDecisionHomepageParentQuestion}}</text>
+          <text wx:if="{{learningReportSummary.familyDecisionHomepageChildLine}}">孩子只做：{{learningReportSummary.familyDecisionHomepageChildLine}}</text>
+          <text wx:if="{{learningReportSummary.familyDecisionHomepageTomorrow}}">明天回访：{{learningReportSummary.familyDecisionHomepageTomorrow}}</text>
+          <text wx:if="{{learningReportSummary.familyDecisionHomepageSourceLine}}">来源判断：{{learningReportSummary.familyDecisionHomepageSourceLine}}</text>
+          <text>{{learningReportSummary.familyDecisionHomepageLocalAiSplitLine}}</text>
+          <text wx:if="{{learningReportSummary.familyDecisionHomepageHomeSchoolLine}}">家校交接：{{learningReportSummary.familyDecisionHomepageHomeSchoolLine}}</text>
+          <text wx:for="{{learningReportSummary.familyDecisionHomepageDoList}}" wx:key="*this">今晚做：{{item}}</text>
+          <text wx:for="{{learningReportSummary.familyDecisionHomepageDontList}}" wx:key="*this">今晚不做：{{item}}</text>
+          <text wx:for="{{learningReportSummary.familyDecisionHomepageEvidenceList}}" wx:key="*this">证据：{{item}}</text>
+          <text wx:for="{{learningReportSummary.familyDecisionHomepageAllowedFields}}" wx:key="*this">可分享：{{item}}</text>
+          <text wx:for="{{learningReportSummary.familyDecisionHomepageBlockedFields}}" wx:key="*this">不分享：{{item}}</text>
+          <text>{{learningReportSummary.familyDecisionHomepageShareBoundary}}</text>
+          <button bindtap="goLearningReportCta">{{learningReportSummary.familyDecisionHomepageCtaLabel}}</button>
         </view>
         <view class="parent-brief-block">
           <text class="parent-brief-label">画像总览</text>
