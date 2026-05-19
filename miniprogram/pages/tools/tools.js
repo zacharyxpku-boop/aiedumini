@@ -255,6 +255,7 @@ Page({
     ],
     factoryStudioStatus: '粘贴课堂笔记、PPT 提纲、视频字幕或卡点总结。',
     surfaceDepthPack: null,
+    publicK12ContentOps: null,
     showAdvancedTools: false
   },
 
@@ -297,6 +298,9 @@ Page({
     const gameModes = this.coreGameModes(recommendedGames);
     const setupGameModes = this.setupGameModes(recommendedGames);
     const playgroundGames = this.buildPlaygroundGames(recommendedGames);
+    const realHomeworkCoverageMatrix = storage.buildRealHomeworkCoverageMatrix
+      ? storage.buildRealHomeworkCoverageMatrix()
+      : null;
     this.setData({
       modules: all,
       visibleModules,
@@ -325,6 +329,7 @@ Page({
       packLoop: this.buildPackLoop(reviewSummary, factoryStudioPlan, factorySummary),
       challengeHub: this.buildChallengeHub(reviewSummary, arcadeCards, gameModes),
       surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('tools') : null,
+      publicK12ContentOps: this.buildPublicK12ContentOps(realHomeworkCoverageMatrix, reviewSummary, factorySummary),
       gameModes,
       setupGameModes,
       playgroundGames,
@@ -346,6 +351,52 @@ Page({
         focusHistory
       })
     });
+  },
+
+  buildPublicK12ContentOps(coverageMatrix, reviewSummary, factorySummary) {
+    const matrix = coverageMatrix || {};
+    const triage = matrix.publicResourceTriageBoard || {};
+    const lanes = Array.isArray(triage.lanes) ? triage.lanes : [];
+    const resources = Array.isArray(matrix.publicK12OpenSourceResourceLedger)
+      ? matrix.publicK12OpenSourceResourceLedger
+      : [];
+    const challenges = Array.isArray(matrix.publicK12IntakeChallengeDeck)
+      ? matrix.publicK12IntakeChallengeDeck
+      : [];
+    const implementationRows = Array.isArray(matrix.implementationDecisionMatrix)
+      ? matrix.implementationDecisionMatrix
+      : [];
+    const factoryImported = Number((factorySummary && factorySummary.imported) || 0);
+    const dueCards = Number((reviewSummary && reviewSummary.due) || 0);
+    const firstLocalLane = lanes.find((item) => item.id === 'local_code_better') || lanes[0] || {};
+    const aiLane = lanes.find((item) => item.id === 'ai_better') || {};
+    const rejectLane = lanes.find((item) => item.id === 'must_reject') || {};
+    return {
+      title: 'K12公开资料处理台',
+      summary: `已接入 ${resources.length} 类公开/OER/官方结构，先转成本地题型、错因、小黑板和复习规则，再让 AI 改写追问语气。`,
+      evidenceLine: matrix.openSourceResourceLine || '',
+      sourceLine: matrix.publicSourceBlockedLine || '不复制原题、答案、教材段落或外部交互，不承诺拍题出答案。',
+      localLine: firstLocalLane.use || '本地代码负责题型、错因、回访窗口、XP、解锁、报告放行和分享字段。',
+      aiLine: aiLane.use || 'AI 负责把已通过本地门槛的追问、解释和家长话术说清楚。',
+      rejectLine: rejectLane.use || '拒绝标准答案库、排名晒分、未授权题库导入和全科动态板书承诺。',
+      actionLine: factoryImported || dueCards
+        ? '已有材料或到期卡，先做一轮90秒回忆，再决定是否扩内容。'
+        : '先贴一段自己的作业卡点，系统只生成第一步挑战，不生成答案库。',
+      metrics: [
+        { id: 'resource', label: '可借鉴来源', value: resources.length },
+        { id: 'challenge', label: '公开形态挑战', value: challenges.length },
+        { id: 'decision', label: 'AI/本地决策', value: implementationRows.length },
+        { id: 'due', label: '当前回访', value: dueCards }
+      ],
+      lanes: [
+        { id: 'local', label: '本地代码更好', body: firstLocalLane.use || '规则、门槛、奖励、分享字段都用本地代码。' },
+        { id: 'ai', label: 'AI更好', body: aiLane.use || '苏格拉底追问、解释改写、家长可读话术交给 AI。' },
+        { id: 'reject', label: '必须拒绝', body: rejectLane.use || '不做原题答案库、拍照识题承诺、排名晒分。' }
+      ],
+      challengeSeeds: challenges.slice(0, 4),
+      primaryRoute: '/pages/upload/upload',
+      secondaryRoute: '/pages/arcade/arcade?from=public_k12_intake'
+    };
   },
 
   buildRouteStrip(active, tonightPlan) {
@@ -1130,6 +1181,13 @@ Page({
         readiness: pack.surfaceReadiness || ''
       });
     }
+    navigation.navigateLearningRoute(route);
+  },
+
+  runPublicK12ContentOps(event) {
+    const dataset = event.currentTarget.dataset || {};
+    const panel = this.data.publicK12ContentOps || {};
+    const route = dataset.route || panel.primaryRoute || '/pages/upload/upload';
     navigation.navigateLearningRoute(route);
   },
 

@@ -64,6 +64,40 @@
       <view class="global-depth-note">{{surfaceDepthPack.familyLine}}</view>
     </view>
 
+    <view class="public-k12-ops-card" wx:if="{{publicK12ContentOps}}">
+      <view class="public-k12-head">
+        <view>
+          <view class="public-k12-title">{{publicK12ContentOps.title}}</view>
+          <view class="public-k12-summary">{{publicK12ContentOps.summary}}</view>
+        </view>
+        <view class="public-k12-badge">来源先过门槛</view>
+      </view>
+      <view class="public-k12-metrics">
+        <view class="public-k12-metric" wx:for="{{publicK12ContentOps.metrics}}" wx:key="id">
+          <text>{{item.value}}</text>
+          <text>{{item.label}}</text>
+        </view>
+      </view>
+      <view class="public-k12-lanes">
+        <view class="public-k12-lane" wx:for="{{publicK12ContentOps.lanes}}" wx:key="id">
+          <view class="public-k12-lane-label">{{item.label}}</view>
+          <view class="public-k12-lane-body">{{item.body}}</view>
+        </view>
+      </view>
+      <view class="public-k12-seeds" wx:if="{{publicK12ContentOps.challengeSeeds.length}}">
+        <view class="public-k12-seed" wx:for="{{publicK12ContentOps.challengeSeeds}}" wx:key="id">
+          <text>{{item.subject}}｜{{item.firstStepPrompt}}</text>
+          <text>{{item.answerBoundary}}</text>
+        </view>
+      </view>
+      <view class="public-k12-boundary">{{publicK12ContentOps.sourceLine}}</view>
+      <view class="public-k12-action-row">
+        <button class="public-k12-primary" data-route="{{publicK12ContentOps.primaryRoute}}" bindtap="runPublicK12ContentOps">贴自己的材料</button>
+        <button class="public-k12-secondary" data-route="{{publicK12ContentOps.secondaryRoute}}" bindtap="runPublicK12ContentOps">玩第一步挑战</button>
+      </view>
+      <view class="public-k12-next">{{publicK12ContentOps.actionLine}}</view>
+    </view>
+
     <view class="route-next-lite tools-next-lite" wx:if="{{toolsViewModel.nextStep}}" bindtap="goProfile">
       <text>{{toolsViewModel.nextStep.text}}</text>
       <text class="route-next-link">{{toolsViewModel.nextStep.cta}}</text>
