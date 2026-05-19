@@ -1145,6 +1145,34 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
   });
   const todaySession = storage.getTodaySession ? storage.getTodaySession() : {};
   const gameEvidence = todaySession && todaySession.gameEvidence ? todaySession.gameEvidence : {};
+  const highFrequencyLoopForReport = gameEvidence.highFrequencyPracticeLoop || reportState.highFrequencyPracticeLoop || draft.highFrequencyPracticeLoop || {};
+  const dailyReturnContractForReport = reportState.dailyReturnContract
+    || draft.dailyReturnContract
+    || gameEvidence.dailyReturnContract
+    || highFrequencyLoopForReport.dailyReturnContract
+    || null;
+  const reviewReturnSeedForReport = reportState.reviewReturnSeed
+    || draft.reviewReturnSeed
+    || gameEvidence.reviewReturnSeed
+    || highFrequencyLoopForReport.reviewReturnSeed
+    || null;
+  const spacedRecallPolicyForReport = reportState.spacedRecallPolicy
+    || draft.spacedRecallPolicy
+    || gameEvidence.spacedRecallPolicy
+    || highFrequencyLoopForReport.spacedRecallPolicy
+    || (reviewReturnSeedForReport && reviewReturnSeedForReport.spacedRecallPolicy)
+    || null;
+  const gameReturnEvidence = reportState.gameReturnEvidence
+    || draft.gameReturnEvidence
+    || (learningReport.buildGameReturnEvidence
+      ? learningReport.buildGameReturnEvidence({
+        dailyReturnContract: dailyReturnContractForReport,
+        reviewReturnSeed: reviewReturnSeedForReport,
+        spacedRecallPolicy: spacedRecallPolicyForReport,
+        gameEvidence,
+        highFrequencyPracticeLoop: highFrequencyLoopForReport
+      })
+      : null);
   const memoryRiskReleaseModel = gameEvidence.highFrequencyPracticeLoop && gameEvidence.highFrequencyPracticeLoop.memoryRiskReleaseModel
     ? gameEvidence.highFrequencyPracticeLoop.memoryRiskReleaseModel
     : (draft.memoryRiskReleaseModel || null);
@@ -1505,6 +1533,31 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     reportEvidenceConfidenceFloor: reportEvidenceReleaseGate.confidenceFloor || null,
     reportEvidenceAiBoundary: reportEvidenceReleaseGate.aiBoundary || '',
     reportEvidenceRequired: Array.isArray(reportEvidenceReleaseGate.evidenceRequired) ? reportEvidenceReleaseGate.evidenceRequired : [],
+    gameReturnEvidence,
+    gameReturnEvidenceTitle: gameReturnEvidence ? '游戏回流证据' : '',
+    gameReturnEvidenceStatus: gameReturnEvidence ? gameReturnEvidence.status : '',
+    gameReturnEvidenceNextRoute: gameReturnEvidence ? gameReturnEvidence.nextRoute : '',
+    gameReturnEvidenceReleaseGate: gameReturnEvidence ? gameReturnEvidence.releaseGate : '',
+    gameReturnEvidenceDay7Requirement: gameReturnEvidence ? gameReturnEvidence.day7Requirement : '',
+    gameReturnEvidenceWeakKey: gameReturnEvidence ? gameReturnEvidence.weakKey : '',
+    gameReturnEvidenceNextDayCardIds: gameReturnEvidence && Array.isArray(gameReturnEvidence.nextDayCardIds)
+      ? gameReturnEvidence.nextDayCardIds
+      : [],
+    gameReturnEvidenceBlockedFields: gameReturnEvidence && Array.isArray(gameReturnEvidence.blockedFields)
+      ? gameReturnEvidence.blockedFields
+      : [],
+    gameReturnEvidenceAllowedFields: gameReturnEvidence && Array.isArray(gameReturnEvidence.allowedFields)
+      ? gameReturnEvidence.allowedFields
+      : [],
+    gameReturnEvidenceLocalCodeOwns: gameReturnEvidence && Array.isArray(gameReturnEvidence.localCodeOwns)
+      ? gameReturnEvidence.localCodeOwns
+      : [],
+    gameReturnEvidenceAiMayRewrite: gameReturnEvidence && Array.isArray(gameReturnEvidence.aiMayRewrite)
+      ? gameReturnEvidence.aiMayRewrite
+      : [],
+    gameReturnEvidenceRequired: gameReturnEvidence && Array.isArray(gameReturnEvidence.evidenceRequired)
+      ? gameReturnEvidence.evidenceRequired
+      : [],
     sourceEvidenceLedgerTitle: sourceEvidenceLedger.title || '',
     sourceEvidenceLedgerSummary: sourceEvidenceLedger.summary || '',
     sourceEvidenceLedgerLocalRule: sourceEvidenceLedger.localRule || '',
@@ -1601,6 +1654,33 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
       : [],
     questionBankRecallReportEvidence: questionBankRecallReportBridge && Array.isArray(questionBankRecallReportBridge.evidenceRequired)
       ? questionBankRecallReportBridge.evidenceRequired
+      : [],
+    gameReturnEvidence,
+    gameReturnEvidenceStatus: gameReturnEvidence ? gameReturnEvidence.status : '',
+    gameReturnEvidenceWeakKey: gameReturnEvidence ? gameReturnEvidence.weakKey : '',
+    gameReturnEvidenceNextRoute: gameReturnEvidence ? gameReturnEvidence.nextRoute : '',
+    gameReturnEvidenceReleaseGate: gameReturnEvidence ? gameReturnEvidence.releaseGate : '',
+    gameReturnEvidenceDay7Requirement: gameReturnEvidence ? gameReturnEvidence.day7Requirement : '',
+    gameReturnEvidenceReturnWindows: gameReturnEvidence && Array.isArray(gameReturnEvidence.returnWindows)
+      ? gameReturnEvidence.returnWindows
+      : [],
+    gameReturnEvidenceNextDayCardIds: gameReturnEvidence && Array.isArray(gameReturnEvidence.nextDayCardIds)
+      ? gameReturnEvidence.nextDayCardIds
+      : [],
+    gameReturnEvidenceBlockedFields: gameReturnEvidence && Array.isArray(gameReturnEvidence.blockedFields)
+      ? gameReturnEvidence.blockedFields
+      : [],
+    gameReturnEvidenceAllowedFields: gameReturnEvidence && Array.isArray(gameReturnEvidence.allowedFields)
+      ? gameReturnEvidence.allowedFields
+      : [],
+    gameReturnEvidenceLocalCodeOwns: gameReturnEvidence && Array.isArray(gameReturnEvidence.localCodeOwns)
+      ? gameReturnEvidence.localCodeOwns
+      : [],
+    gameReturnEvidenceAiMayRewrite: gameReturnEvidence && Array.isArray(gameReturnEvidence.aiMayRewrite)
+      ? gameReturnEvidence.aiMayRewrite
+      : [],
+    gameReturnEvidenceRequired: gameReturnEvidence && Array.isArray(gameReturnEvidence.evidenceRequired)
+      ? gameReturnEvidence.evidenceRequired
       : [],
     memoryRiskReleaseModel,
     memoryRiskReleaseTitle: memoryRiskReleaseModel ? memoryRiskReleaseModel.title : '',

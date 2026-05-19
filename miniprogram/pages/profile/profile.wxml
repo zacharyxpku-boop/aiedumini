@@ -1055,6 +1055,20 @@
           <text wx:if="{{learningReportSummary.reportEvidenceAiBoundary}}">AI 边界：{{learningReportSummary.reportEvidenceAiBoundary}}</text>
           <text wx:for="{{learningReportSummary.reportEvidenceRequired}}" wx:key="*this">审计证据：{{item}}</text>
         </view>
+        <view class="parent-brief-block" wx:if="{{learningReportSummary.gameReturnEvidence}}">
+          <text class="parent-brief-label">{{learningReportSummary.gameReturnEvidenceTitle}}</text>
+          <text>状态：{{learningReportSummary.gameReturnEvidenceStatus}}</text>
+          <text wx:if="{{learningReportSummary.gameReturnEvidenceWeakKey}}">回流弱点：{{learningReportSummary.gameReturnEvidenceWeakKey}}</text>
+          <text wx:if="{{learningReportSummary.gameReturnEvidenceNextRoute}}">下一路由：{{learningReportSummary.gameReturnEvidenceNextRoute}}</text>
+          <text wx:if="{{learningReportSummary.gameReturnEvidenceReleaseGate}}">放行门槛：{{learningReportSummary.gameReturnEvidenceReleaseGate}}</text>
+          <text wx:if="{{learningReportSummary.gameReturnEvidenceDay7Requirement}}">第7天要求：{{learningReportSummary.gameReturnEvidenceDay7Requirement}}</text>
+          <text wx:for="{{learningReportSummary.gameReturnEvidenceNextDayCardIds}}" wx:key="*this">次日回访卡：{{item}}</text>
+          <text wx:for="{{learningReportSummary.gameReturnEvidenceAllowedFields}}" wx:key="*this">可分享字段：{{item}}</text>
+          <text wx:for="{{learningReportSummary.gameReturnEvidenceBlockedFields}}" wx:key="*this">禁传字段：{{item}}</text>
+          <text wx:for="{{learningReportSummary.gameReturnEvidenceLocalCodeOwns}}" wx:key="*this">本地代码负责：{{item}}</text>
+          <text wx:for="{{learningReportSummary.gameReturnEvidenceAiMayRewrite}}" wx:key="*this">AI 可改写：{{item}}</text>
+          <text wx:for="{{learningReportSummary.gameReturnEvidenceRequired}}" wx:key="*this">审计证据：{{item}}</text>
+        </view>
         <view class="parent-brief-block" wx:if="{{learningReportSummary.sourceEvidenceLedger}}">
           <text class="parent-brief-label">{{learningReportSummary.sourceEvidenceLedgerTitle}}</text>
           <text>{{learningReportSummary.sourceEvidenceLedgerSummary}}</text>
