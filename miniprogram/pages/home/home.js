@@ -178,6 +178,9 @@ Page({
         relay_blocked_fields: safeDecodeShareParam(query.relay_blocked_fields),
         relay_completion_signal: safeDecodeShareParam(query.relay_completion_signal),
         relay_return_path: safeDecodeShareParam(query.relay_return_path),
+        relay_ladder: safeDecodeShareParam(query.relay_ladder),
+        relay_attraction_hook: safeDecodeShareParam(query.relay_attraction_hook),
+        relay_local_gate: safeDecodeShareParam(query.relay_local_gate),
         course_unit_label: safeDecodeShareParam(query.course_unit_label),
         course_unit_subject: safeDecodeShareParam(query.course_unit_subject),
         course_unit_tier: safeDecodeShareParam(query.course_unit_tier),
@@ -236,6 +239,9 @@ Page({
         relay_blocked_fields: safeDecodeShareParam(query.relay_blocked_fields),
         relay_completion_signal: safeDecodeShareParam(query.relay_completion_signal),
         relay_return_path: safeDecodeShareParam(query.relay_return_path),
+        relay_ladder: safeDecodeShareParam(query.relay_ladder),
+        relay_attraction_hook: safeDecodeShareParam(query.relay_attraction_hook),
+        relay_local_gate: safeDecodeShareParam(query.relay_local_gate),
         course_unit_label: safeDecodeShareParam(query.course_unit_label),
         course_unit_subject: safeDecodeShareParam(query.course_unit_subject),
         course_unit_tier: safeDecodeShareParam(query.course_unit_tier),
@@ -884,6 +890,11 @@ Page({
       reasonLine: incoming.relay_spread_reason || '',
       requiredEvidence: incoming.relay_spread_required || ''
     } : null;
+    const peerRelayLadder = incoming.relay_ladder ? {
+      stageLine: incoming.relay_ladder,
+      attractionHook: incoming.relay_attraction_hook || '',
+      localGate: incoming.relay_local_gate || ''
+    } : null;
     const safeRelayPacket = incoming.relay_id ? {
       relayId: incoming.relay_id,
       receiverAction: incoming.relay_receiver_action || actionDetail,
@@ -944,6 +955,10 @@ Page({
       spreadReadinessLine: spreadReadinessGate ? `传播门槛：${spreadReadinessGate.shareModeLine || spreadReadinessGate.status}` : '',
       spreadFallbackLine: spreadReadinessGate ? `不足时：${spreadReadinessGate.fallbackLine}` : '',
       spreadEvidenceLine: spreadReadinessGate ? `需要证据：${spreadReadinessGate.requiredEvidence}` : '',
+      peerRelayLadder,
+      peerRelayLadderLine: peerRelayLadder ? `同伴接力阶梯：${peerRelayLadder.stageLine}` : '',
+      peerRelayAttractionLine: peerRelayLadder && peerRelayLadder.attractionHook ? `可复制挑战：${peerRelayLadder.attractionHook}` : '',
+      peerRelayLocalGateLine: peerRelayLadder && peerRelayLadder.localGate ? `本地放行门禁：${peerRelayLadder.localGate}` : '',
       safeRelayPacket,
       receiverActionLine: safeRelayPacket && safeRelayPacket.receiverAction,
       parentCheckLine: safeRelayPacket && safeRelayPacket.parentCheck,

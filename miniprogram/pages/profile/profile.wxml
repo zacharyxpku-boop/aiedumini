@@ -1305,6 +1305,14 @@
           <view wx:if="{{communityShareRelayBoard.spreadReadinessGate}}">
             传播状态：{{communityShareRelayBoard.spreadReadinessGate.status}}｜{{communityShareRelayBoard.spreadReadinessGate.shareModeLine}}
           </view>
+          <view wx:if="{{communityShareRelayBoard.peerRelayChallengeLadder}}">
+            同伴接力：{{communityShareRelayBoard.peerRelayChallengeLadder.title}}｜{{communityShareRelayBoard.peerRelayChallengeLadder.boundary}}
+          </view>
+          <view wx:for="{{communityShareRelayBoard.peerRelayChallengeLadder.stages}}" wx:key="id">接力阶梯：{{item.label}}｜{{item.visibleLine}}｜{{item.receiverAction}}｜证据 {{item.proofRequired}}</view>
+          <view wx:for="{{communityShareRelayBoard.copyableChallengeTemplates}}" wx:key="id">可复制挑战：{{item.title}}｜{{item.copy}}｜证据 {{item.proofRequired}}</view>
+          <view wx:if="{{communityShareRelayBoard.localSpreadReleaseGate}}">
+            本地放行门禁：{{communityShareRelayBoard.localSpreadReleaseGate.status}}｜{{communityShareRelayBoard.localSpreadReleaseGate.rule}}
+          </view>
           <view wx:for="{{communityShareRelayBoard.lanes}}" wx:key="id">{{item.label}}：{{item.action}}｜{{item.evidence}}</view>
           <view wx:for="{{communityShareRelayBoard.visualRelayProtocol}}" wx:key="id">小黑板接力协议：{{item.label}}｜{{item.action}}｜证据 {{item.evidence}}｜禁止 {{item.blocked}}</view>
           <view wx:for="{{communityShareRelayBoard.visualRelayProofChecklist}}" wx:key="*this">小黑板证据清单：{{item}}</view>

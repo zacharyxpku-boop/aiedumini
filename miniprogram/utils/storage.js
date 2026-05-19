@@ -4646,6 +4646,103 @@ function buildSafeRelayChallengePacket(input = {}) {
   };
 }
 
+function buildPeerRelayChallengeLadder(input = {}) {
+  const firstStep = input.firstStep || '先说清第一步';
+  const route = input.route || '/pages/arcade/arcade';
+  const reviewLine = input.reviewLine || '明天回访同一张错因卡，第 7 天再做一个小变式。';
+  const blockedFields = ['original_question', 'original_photo', 'full_answer', 'score', 'ranking', 'full_dialogue', 'private_comment'];
+  const stages = [
+    {
+      id: 'understand_no_answer_card',
+      label: '看懂这不是答案卡',
+      visibleLine: '这张卡只接力一个学习动作，不展示原题和完整答案。',
+      receiverAction: '先确认自己要复刻的是“第一步”，不是抄对方的题。',
+      proofRequired: '接收者说出：我只用自己的材料做同类第一步。',
+      route,
+      localReleaseGate: 'share_privacy_and_return',
+      blockedFields
+    },
+    {
+      id: 'own_material_first_step',
+      label: '用自己的材料说第一步',
+      visibleLine: `90 秒内只说第一步：${firstStep}`,
+      receiverAction: '打开自己的作业或错题，复刻同一类第一步。',
+      proofRequired: '留下孩子自己的第一步句子，不留下原题答案。',
+      route,
+      localReleaseGate: 'child_first_step',
+      blockedFields
+    },
+    {
+      id: 'wrong_cause_echo',
+      label: '复述错因',
+      visibleLine: '说清刚才为什么卡住，只说错因，不贴标签。',
+      receiverAction: '从条件漏看、单位错配、图像误读、题干关键词里选一个错因。',
+      proofRequired: '留下一个错因标签和一句家长检查句。',
+      route: '/pages/review/review?from=peer_relay_ladder',
+      localReleaseGate: 'wrong_cause_return',
+      blockedFields
+    },
+    {
+      id: 'day7_transfer_return',
+      label: '明天/第7天回访',
+      visibleLine: reviewLine,
+      receiverAction: '明天先回访同一错因，第 7 天再用小变式确认迁移。',
+      proofRequired: '留下明天回访预约和第 7 天迁移检查。',
+      route,
+      localReleaseGate: 'next_day_and_day7_revisit',
+      blockedFields
+    }
+  ];
+  const copyableChallengeTemplates = [
+    {
+      id: 'ninety_second_first_step',
+      title: '90 秒只说第一步',
+      copy: `不用看答案，只用自己的题说第一步：${firstStep}`,
+      receiverPrompt: '你也用自己的材料试一次，只说第一步。',
+      proofRequired: '孩子自己的第一步句子'
+    },
+    {
+      id: 'same_wrong_cause_no_question',
+      title: '同类错因不晒题',
+      copy: '我不发原题，只发一个同类错因，你用自己的题接一下。',
+      receiverPrompt: '找出你自己题里的同类错因。',
+      proofRequired: '错因标签和家长检查句'
+    },
+    {
+      id: 'day7_still_counts',
+      title: '第 7 天还会才算稳',
+      copy: '今晚会不算结束，第 7 天还能说出来才算稳。',
+      receiverPrompt: '接力后预约一个第 7 天小变式。',
+      proofRequired: '第 7 天迁移检查'
+    },
+    {
+      id: 'parent_one_question',
+      title: '家长只问一句',
+      copy: `家长只问一句：${firstStep}`,
+      receiverPrompt: '家长不讲答案，只听孩子说第一步。',
+      proofRequired: '家长检查句'
+    }
+  ];
+  const localSpreadReleaseGate = {
+    id: 'peer_ladder_release_gate',
+    localDeterministic: true,
+    status: stages.every((item) => item.visibleLine && item.receiverAction && item.proofRequired && item.blockedFields.includes('full_answer'))
+      ? 'peer_ladder_ready'
+      : 'parent_only',
+    requiredEvidence: stages.map((item) => item.localReleaseGate),
+    blockedFields,
+    rule: '只有第一步、错因、回访和隐私字段全部通过本地门禁，才允许同伴接力；AI 只能改写表达，不能决定放行。'
+  };
+  return {
+    id: 'peer_relay_challenge_ladder',
+    title: '同伴接力挑战阶梯',
+    stages,
+    copyableChallengeTemplates,
+    localSpreadReleaseGate,
+    boundary: '接力的是学习动作，不是原题、答案、分数、排名或完整对话。'
+  };
+}
+
 function buildShareChallengePlan(input = {}) {
   const focus = input.focus || loadTodayFocus() || {};
   const capability = input.capability || {};
@@ -4793,6 +4890,11 @@ function buildShareChallengePlan(input = {}) {
     day2: '明天只回访最不稳的 1 张卡。',
     day7: '第 7 天用小变式确认迁移。'
   };
+  const peerRelayChallengeLadder = buildPeerRelayChallengeLadder({
+    firstStep,
+    route,
+    reviewLine: sevenDayReviewPayload.day7
+  });
   const shareRelayActions = [
     { id: 'repair', label: '修卡点', route: wrongCauseReplayPayload.entry, evidence: 'wrong_cause_relay' },
     { id: 'challenge', label: '做轻挑战', route, evidence: 'active_recall_relay' },
@@ -4861,6 +4963,9 @@ function buildShareChallengePlan(input = {}) {
     communityRipplePlan,
     receiverOnboardingDeck,
     viralProofLedger,
+    peerRelayChallengeLadder,
+    copyableChallengeTemplates: peerRelayChallengeLadder.copyableChallengeTemplates,
+    localSpreadReleaseGate: peerRelayChallengeLadder.localSpreadReleaseGate,
     returnPathContract,
     privacyBoundary,
     peerSafeLine,
@@ -4907,7 +5012,10 @@ function buildShareChallengePlan(input = {}) {
       relay_spread_line: spreadReadinessGate.shareModeLine,
       relay_spread_fallback: spreadReadinessGate.fallbackLine,
       relay_spread_reason: spreadReadinessGate.reasons.join(' / '),
-      relay_spread_required: spreadReadinessGate.requiredEvidence.join(',')
+      relay_spread_required: spreadReadinessGate.requiredEvidence.join(','),
+      relay_ladder: peerRelayChallengeLadder.stages.map((item) => item.id).join(','),
+      relay_attraction_hook: peerRelayChallengeLadder.copyableChallengeTemplates.map((item) => item.title).join(' / '),
+      relay_local_gate: peerRelayChallengeLadder.localSpreadReleaseGate.status
     }
   };
 }
@@ -5070,6 +5178,12 @@ function buildCommunityShareRelayBoard(input = {}) {
       route: plan.route
     }),
     communityRipplePlan: plan.communityRipplePlan || {},
+    peerRelayChallengeLadder: plan.peerRelayChallengeLadder || buildPeerRelayChallengeLadder({
+      firstStep: plan.safeRelayChallengePacket && plan.safeRelayChallengePacket.starterAction,
+      route: plan.route
+    }),
+    copyableChallengeTemplates: plan.copyableChallengeTemplates || [],
+    localSpreadReleaseGate: plan.localSpreadReleaseGate || {},
     visualRelayProtocol,
     visualRelayProofChecklist,
     visualRelayBoundary: '社区小黑板接力只传第一步、复刻动作、家长检查和回访安排；不传原题、答案、分数、排名或完整对话。',
