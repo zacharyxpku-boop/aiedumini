@@ -2162,6 +2162,7 @@ function buildProfileReadinessSnapshot(input = {}) {
   const surface = input.surfaceDepthPack || {};
   const aiMatrix = acceptance.aiUsageDecisionMatrix || {};
   const finalTargetGapMeter = acceptance.finalTargetGapMeter || {};
+  const competitiveMoatBoard = acceptance.competitiveMoatBoard || {};
   const aiRows = Array.isArray(aiMatrix.rows) ? aiMatrix.rows : [];
   const findAiRow = (id) => aiRows.find((item) => item && item.id === id) || {};
   const socraticAi = findAiRow('socratic_hint_generation');
@@ -2210,6 +2211,16 @@ function buildProfileReadinessSnapshot(input = {}) {
       nextAction: item.nextAction || ''
     }))
     : [];
+  const competitiveMoatRows = Array.isArray(competitiveMoatBoard.rows)
+    ? competitiveMoatBoard.rows.map((item) => ({
+      id: item.id,
+      label: item.label,
+      status: item.status === 'ready' ? '已成型' : '继续加厚',
+      progress: Number(item.progress || 0),
+      route: item.route || '/pages/profile/profile',
+      nextAction: item.nextAction || ''
+    }))
+    : [];
   return {
     title: '今晚闭环状态',
     conclusion,
@@ -2230,7 +2241,16 @@ function buildProfileReadinessSnapshot(input = {}) {
     finalTargetCadence: finalTargetGapMeter.reportingCadence || '每轮加厚后汇报还差多少。',
     finalTargetStopRule: finalTargetGapMeter.marginalStopRule || '边际收益低时停止堆静态资料，转向真机和真实家庭试用。',
     readyCount: depth.readyCount || compass.readyCount || 0,
-    totalCount: depth.totalCount || compass.totalCount || 0
+    totalCount: depth.totalCount || compass.totalCount || 0,
+    competitiveMoatBoardTitle: competitiveMoatBoard.title || '竞品护城河推进板',
+    competitiveMoatBoardSummary: competitiveMoatBoard.summary || '',
+    competitiveMoatBoardScore: Number(competitiveMoatBoard.score || 0),
+    competitiveMoatBoardDistanceLine: competitiveMoatBoard.distanceLine || '',
+    competitiveMoatBoardNextAction: competitiveMoatBoard.nextAction || '',
+    competitiveMoatBoardCadence: competitiveMoatBoard.reportingCadence || '',
+    competitiveMoatBoardStopRule: competitiveMoatBoard.marginalStopRule || '',
+    competitiveMoatBoardRows: competitiveMoatRows,
+    competitiveMoatBoardRoute: competitiveMoatBoard.nextRoute || ''
   };
 }
 

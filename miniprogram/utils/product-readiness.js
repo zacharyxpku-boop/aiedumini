@@ -613,6 +613,84 @@ function buildFinalTargetGapMeter(readiness = {}, acceptanceBits = {}) {
   };
 }
 
+function buildCompetitiveMoatBoard(readiness = {}, finalTargetGapMeter = {}) {
+  const rows = Array.isArray(finalTargetGapMeter.rows) ? finalTargetGapMeter.rows : [];
+  const rowMap = mapById(rows);
+  const picks = [
+    {
+      id: 'k12_content_system_scale',
+      fallbackTargetId: 'curriculum_question_bank',
+      label: '学科内容深度',
+      route: '/pages/upload/upload?from=competitive_moat_board&type=school_material',
+      owner: '本地代码 + 公开资料结构化',
+      nextAction: '继续把 7 科公开资料沉淀成题型、错因、第一步、小黑板和回访卡，不搬运原题答案。'
+    },
+    {
+      id: 'ai_socratic_quality_eval',
+      fallbackTargetId: 'socratic_tutor_depth',
+      label: 'AI 点拨质量',
+      route: '/pages/tutor/tutor?from=competitive_moat_board',
+      owner: 'AI 追问 + 本地门禁',
+      nextAction: '继续压测三轮苏格拉底追问、儿童表达适配和失败兜底，AI 只改写表达，不决定答案。'
+    },
+    {
+      id: 'gizmo_level_daily_play',
+      fallbackTargetId: 'active_recall_loop',
+      label: '游戏可玩性',
+      route: '/pages/arcade/arcade?from=competitive_moat_board',
+      owner: '本地游戏规则',
+      nextAction: '继续把 XP、主动回忆、错因修复、次日回访压成每日可重复的学习循环。'
+    },
+    {
+      id: 'parent_talent_decision_report',
+      fallbackTargetId: 'parent_longitudinal_portrait',
+      label: '家长决策书',
+      route: '/pages/profile/profile?from=competitive_moat_board&type=parent_report',
+      owner: '证据账本 + 报告层',
+      nextAction: '继续把天赋测评、错题试卷、学校反馈和家长观察收束成方法候选与下一步决策。'
+    },
+    {
+      id: 'community_safe_share_relay',
+      fallbackTargetId: 'wechat_safe_share_relay',
+      label: '安全分享接力',
+      route: '/pages/profile/profile?from=competitive_moat_board&type=share',
+      owner: '本地分享字段',
+      nextAction: '继续只分享行动、错因和回访，不分享原题、答案、分数、排名和完整对话。'
+    }
+  ];
+  const boardRows = picks.map((item) => {
+    const related = rowMap[item.id] || rowMap[item.fallbackTargetId] || {};
+    const progress = Math.max(0, Math.min(100, Number(related.progress || 0)));
+    return {
+      id: item.id,
+      label: item.label,
+      owner: item.owner,
+      status: related.status || (progress >= 100 ? 'ready' : 'local_gap'),
+      progress,
+      route: related.route || item.route,
+      nextAction: related.nextAction || item.nextAction
+    };
+  });
+  const readyCount = boardRows.filter((item) => item.status === 'ready').length;
+  const score = Math.round(boardRows.reduce((sum, item) => sum + item.progress, 0) / Math.max(1, boardRows.length));
+  const next = boardRows.find((item) => item.status !== 'ready') || boardRows[0] || null;
+  return {
+    id: 'competitive_moat_board',
+    title: '竞品护城河推进板',
+    summary: '把内容深度、AI 点拨、游戏留存、家长决策和安全分享放在同一张推进板里。',
+    score,
+    readyCount,
+    totalCount: boardRows.length,
+    remainingCount: Math.max(0, boardRows.length - readyCount),
+    rows: boardRows,
+    nextAction: next ? next.nextAction : '继续把最薄的一条链先补厚。',
+    nextRoute: next ? next.route : '/pages/profile/profile',
+    reportingCadence: '每轮验证后汇报五条线还差多少；边际收益低时停止只堆静态资料。',
+    marginalStopRule: '如果某条线只是重复加文案、加卡片、加说明，而没有新证据、新回访或新路由，就停下来。',
+    distanceLine: `五条线已有 ${readyCount}/${boardRows.length} 条成型，剩余 ${Math.max(0, boardRows.length - readyCount)} 条继续加厚。`
+  };
+}
+
 function readinessStatus(ready) {
   return ready ? 'ready' : 'gap';
 }
@@ -830,6 +908,7 @@ function buildAcceptanceReport(readiness = {}) {
     externalBlockers
   );
   const finalTargetGapMeter = buildFinalTargetGapMeter(readiness, { moduleFlowMap });
+  const competitiveMoatBoard = buildCompetitiveMoatBoard(readiness, finalTargetGapMeter);
   const iterationBoundary = buildIterationBoundary(
     readinessGateChecklist,
     moduleFlowMap,
@@ -906,6 +985,7 @@ function buildAcceptanceReport(readiness = {}) {
     readinessGateChecklist,
     iterationBoundary,
     finalTargetGapMeter,
+    competitiveMoatBoard,
     aiUsageDecisionMatrix,
     workflowBreakpoints,
     technicalBreakpoints,
@@ -1203,5 +1283,6 @@ module.exports = {
   buildProductReadiness,
   buildAcceptanceReport,
   buildAiUsageDecisionMatrix,
-  buildFinalTargetGapMeter
+  buildFinalTargetGapMeter,
+  buildCompetitiveMoatBoard
 };

@@ -182,6 +182,22 @@
           </view>
         </view>
 
+        <view class="family-summary-card profile-subtle-card" wx:if="{{profileReadinessSnapshot.competitiveMoatBoardRows.length}}">
+          <view class="family-summary-title">{{profileReadinessSnapshot.competitiveMoatBoardTitle}} · {{profileReadinessSnapshot.competitiveMoatBoardScore}}%</view>
+          <view class="family-summary-body family-readable">
+            <view class="parent-brief-block">
+              <text class="parent-brief-label">推进判断</text>
+              <text>{{profileReadinessSnapshot.competitiveMoatBoardSummary}}</text>
+              <text>{{profileReadinessSnapshot.competitiveMoatBoardDistanceLine}}</text>
+            </view>
+            <view class="module-flow-mini-grid">
+              <view class="module-flow-mini-chip" wx:for="{{profileReadinessSnapshot.competitiveMoatBoardRows}}" wx:key="id" data-id="{{item.id}}" data-route="{{item.route}}" bindtap="runFinalTargetAction">{{item.label}} {{item.progress}}%</view>
+            </view>
+            <view class="parent-brief-reason">下一步：{{profileReadinessSnapshot.competitiveMoatBoardNextAction}}</view>
+            <view class="parent-brief-reason">{{profileReadinessSnapshot.competitiveMoatBoardStopRule}}</view>
+          </view>
+        </view>
+
         <view class="family-summary-card capability-ledger-card" wx:if="{{capabilityEvidenceLedger}}">
           <view class="family-summary-title">{{capabilityEvidenceLedger.title}}</view>
           <view class="family-summary-body family-readable">
