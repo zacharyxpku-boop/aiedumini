@@ -477,6 +477,9 @@ const SENSITIVE_OUTPUT_REPLACEMENTS = [
   ['排名', '名次']
 ];
 
+const AI_UNSAFE_REPLY_RE = /(?:答案|结果|最终|结论|所以|因此|等于|=|选)\s*(?:是|为|:|：)?\s*[A-D0-9一二三四五六七八九十百千万.+\-*/%√π]|(?:完整|详细|一步步).{0,8}(解法|过程|证明|答案)|(?:正确率|分数|排名|超过.{0,8}同学|已经掌握|完全掌握|奖励|发到家长群|发到老师群|原题照片|完整对话)/i;
+const AI_REQUIRED_HINT_RE = /第一步|先|条件|题目|入口|圈|画|说|检查|二选一|A|B/;
+
 function sanitizeBoundaryText(value) {
   if (typeof value === 'string') {
     return SENSITIVE_OUTPUT_REPLACEMENTS.reduce(
@@ -588,6 +591,55 @@ function buildSocraticAiLocalBoundaryContract(taskType, signal = {}, options = {
   };
 }
 
+function extractReplyText(reply) {
+  if (typeof reply === 'string') return reply;
+  if (reply && typeof reply.reply === 'string') return reply.reply;
+  if (reply && typeof reply.text === 'string') return reply.text;
+  return '';
+}
+
+function guardAiTutorReply(reply, contract = {}, context = {}) {
+  const text = extractReplyText(reply).trim();
+  const localFallback = buildTutorReply(context.userText || context.inputText || '', {
+    messages: context.messages || [],
+    currentHintLevel: context.currentHintLevel || 1,
+    selected: context.selected || {}
+  });
+  const unsafeReasons = [];
+  if (!text) unsafeReasons.push('empty_reply');
+  if (AI_UNSAFE_REPLY_RE.test(text)) unsafeReasons.push('unsafe_answer_or_private_claim');
+  if (isAnswerRequest(text)) unsafeReasons.push('answer_request_language');
+  if (!AI_REQUIRED_HINT_RE.test(text)) unsafeReasons.push('missing_first_step_prompt');
+  const requiredLocal = contract && contract.localDeterministic !== false;
+  if (requiredLocal && contract.aiMustNotDecide && contract.aiMustNotDecide.some((item) => /final_answer|reward_release|mastery_claim|report_conclusion|share_fields/.test(item)) && AI_UNSAFE_REPLY_RE.test(text)) {
+    unsafeReasons.push('violates_ai_local_contract');
+  }
+  if (unsafeReasons.length) {
+    return Object.assign({}, localFallback, {
+      ai_guard: {
+        status: 'replaced_with_local_socratic_reply',
+        reasons: unsafeReasons,
+        localOwns: contract.localOwns || [],
+        aiMayRewrite: contract.aiMayRewrite || []
+      }
+    });
+  }
+  const safeText = sanitizeBoundaryText(text);
+  return Object.assign({}, localFallback, reply && typeof reply === 'object' ? reply : {}, {
+    reply: safeText,
+    hint_level: context.currentHintLevel || localFallback.hint_level,
+    hint_label: `提示 ${context.currentHintLevel || localFallback.hint_level}/5`,
+    mastery_signal: localFallback.mastery_signal,
+    socratic_ai_local_boundary_contract: contract || localFallback.socratic_ai_local_boundary_contract,
+    ai_guard: {
+      status: 'accepted_ai_rewrite',
+      reasons: [],
+      localOwns: contract.localOwns || [],
+      aiMayRewrite: contract.aiMayRewrite || []
+    }
+  });
+}
+
 function buildTutorReply(text, options = {}) {
   const messages = options.messages || [];
   const currentHintLevel = options.currentHintLevel || 1;
@@ -697,6 +749,7 @@ module.exports = {
   buildSocraticPromptQualityJudge,
   buildThreeRoundSocraticProtocol,
   buildSocraticAiLocalBoundaryContract,
+  guardAiTutorReply,
   buildTutorReply,
   simulateThreeRoundSocratic,
   MISCONCEPTION_MAP

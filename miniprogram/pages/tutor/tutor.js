@@ -726,11 +726,16 @@ Page({
           homework_plan: state.homework_plan || null
         }
       }).then((res) => {
-        const guarded = res && res.reply && !tutorLadder.isAnswerRequest(input)
-          ? Object.assign({
-            hint_level: localHintLevel,
-            hint_label: `提示 ${localHintLevel}/5`
-          }, res)
+        const localContract = tutorLadder.buildSocraticAiLocalBoundaryContract
+          ? tutorLadder.buildSocraticAiLocalBoundaryContract(tutorLadder.detectTaskType ? tutorLadder.detectTaskType(input, selected) : 'unknown', {})
+          : null;
+        const guarded = res && res.reply && !tutorLadder.isAnswerRequest(input) && tutorLadder.guardAiTutorReply
+          ? tutorLadder.guardAiTutorReply(res, localContract, {
+            userText: input,
+            messages: this.data.messages,
+            currentHintLevel: localHintLevel,
+            selected
+          })
           : fallbackReply(input, selected, step, misconceptionText);
         this.appendAssistant(guarded);
         return null;
