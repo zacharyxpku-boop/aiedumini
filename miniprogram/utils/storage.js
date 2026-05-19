@@ -4743,6 +4743,81 @@ function buildPeerRelayChallengeLadder(input = {}) {
   };
 }
 
+function buildPeerRelaySeasonArc(input = {}) {
+  const firstStep = input.firstStep || '先说清第一步';
+  const route = input.route || '/pages/arcade/arcade';
+  const readiness = input.spreadReadinessGate || {};
+  const ladder = input.peerRelayChallengeLadder || {};
+  const safePacket = input.safeRelayChallengePacket || {};
+  const blockedFields = safePacket.blockedFields || ['original_question', 'original_answer', 'original_photo', 'score', 'ranking', 'full_dialogue'];
+  const ready = readiness.status === 'peer_relay_ready'
+    || (ladder.localSpreadReleaseGate && ladder.localSpreadReleaseGate.status === 'peer_ladder_ready');
+  const milestones = [
+    {
+      id: 'season_d0_first_step',
+      day: 'D0',
+      title: '90 秒第一步',
+      action: `只说第一步：${firstStep}`,
+      evidence: 'receiver_first_step',
+      reward: '只记录行动勋章，不发排名。'
+    },
+    {
+      id: 'season_d1_wrong_cause',
+      day: 'D1',
+      title: '明天错因回放',
+      action: '接收者用自己的材料复述同类错因。',
+      evidence: 'wrong_cause_echo',
+      reward: '错因说清后，才允许继续接力。'
+    },
+    {
+      id: 'season_d3_near_transfer',
+      day: 'D3',
+      title: '小变式接力',
+      action: '只换条件或图像，不换成刷题量。',
+      evidence: 'near_transfer_with_own_material',
+      reward: '通过后解锁下一张同类动作卡。'
+    },
+    {
+      id: 'season_d7_return_gate',
+      day: 'D7',
+      title: '第 7 天回看',
+      action: '第 7 天仍能说第一步，才写入长期画像候选。',
+      evidence: 'day7_transfer_check',
+      reward: '只释放家庭复盘徽章，不显示分数排行。'
+    }
+  ];
+  const badgeRules = [
+    { id: 'first_step_badge', open: true, rule: '孩子自己说出第一步才点亮。' },
+    { id: 'wrong_cause_badge', open: ready, rule: '错因回到卡片后才点亮。' },
+    { id: 'relay_badge', open: ready, rule: '接收者必须用自己的材料完成，不能复制原题。' },
+    { id: 'day7_badge', open: false, rule: '第 7 天回看前保持锁定。' }
+  ];
+  return {
+    id: 'peer_relay_season_arc',
+    title: '7 天安全接力赛季',
+    localDeterministic: true,
+    status: ready ? 'season_ready' : 'parent_only_until_evidence',
+    route,
+    headline: '把分享做成 7 天动作接力，不做答案传播。',
+    seasonLine: ready
+      ? '可以开放给同伴：只接力第一步、错因和回访，不接力原题答案。'
+      : '证据不足时只给家长复盘，不开放同伴传播。',
+    milestones,
+    badgeRules,
+    localReleaseGate: {
+      id: 'peer_relay_season_local_gate',
+      status: ready ? 'open_safe_relay' : 'hold_parent_only',
+      requiredEvidence: milestones.map((item) => item.evidence),
+      rule: '本地规则决定赛季、徽章、接力和第 7 天画像放行；AI 只允许改写邀请话术。'
+    },
+    safeSharePayload: {
+      allowedFields: ['season_id', 'first_step', 'wrong_cause_label', 'receiver_action', 'return_window', 'parent_check'],
+      blockedFields
+    },
+    aiBoundary: 'AI may rewrite the invitation copy; local code decides season status, rewards, share fields, day-7 release, and privacy blocks.'
+  };
+}
+
 function buildWrongCauseViralChallengePack(input = {}) {
   const firstStep = input.firstStep || '先说清第一步';
   const wrongCause = input.wrongCause || (input.capability && input.capability.label) || (input.focus && input.focus.title) || '同类错因';
@@ -5005,6 +5080,13 @@ function buildShareChallengePlan(input = {}) {
     reviewCadence,
     route
   });
+  const peerRelaySeasonArc = buildPeerRelaySeasonArc({
+    firstStep,
+    route,
+    spreadReadinessGate,
+    peerRelayChallengeLadder,
+    safeRelayChallengePacket
+  });
   const familyRelayGrowthProtocol = {
     id: 'family_relay_growth_protocol',
     localDeterministic: true,
@@ -5048,6 +5130,7 @@ function buildShareChallengePlan(input = {}) {
     receiverOnboardingDeck,
     viralProofLedger,
     peerRelayChallengeLadder,
+    peerRelaySeasonArc,
     copyableChallengeTemplates: peerRelayChallengeLadder.copyableChallengeTemplates,
     localSpreadReleaseGate: peerRelayChallengeLadder.localSpreadReleaseGate,
     returnPathContract,
@@ -5100,6 +5183,11 @@ function buildShareChallengePlan(input = {}) {
       relay_ladder: peerRelayChallengeLadder.stages.map((item) => item.id).join(','),
       relay_attraction_hook: peerRelayChallengeLadder.copyableChallengeTemplates.map((item) => item.title).join(' / '),
       relay_local_gate: peerRelayChallengeLadder.localSpreadReleaseGate.status,
+      relay_season: peerRelaySeasonArc.id,
+      relay_season_status: peerRelaySeasonArc.status,
+      relay_season_line: peerRelaySeasonArc.seasonLine,
+      relay_season_days: peerRelaySeasonArc.milestones.map((item) => item.day).join(','),
+      relay_season_gate: peerRelaySeasonArc.localReleaseGate.status,
       wrong_cause_pack: wrongCauseViralChallengePack.query.wrong_cause_pack,
       wrong_cause_label: wrongCauseViralChallengePack.query.wrong_cause_label,
       wrong_cause_first_step: wrongCauseViralChallengePack.query.wrong_cause_first_step,
@@ -5277,6 +5365,7 @@ function buildCommunityShareRelayBoard(input = {}) {
       firstStep: plan.safeRelayChallengePacket && plan.safeRelayChallengePacket.starterAction,
       route: plan.route
     }),
+    peerRelaySeasonArc: plan.peerRelaySeasonArc || {},
     copyableChallengeTemplates: plan.copyableChallengeTemplates || [],
     localSpreadReleaseGate: plan.localSpreadReleaseGate || {},
     visualRelayProtocol,

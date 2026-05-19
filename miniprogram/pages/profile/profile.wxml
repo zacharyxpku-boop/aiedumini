@@ -1264,6 +1264,11 @@
           <view wx:if="{{dailyShareCard.shareChallengePlan.spreadReadinessGate}}">
             降级规则：{{dailyShareCard.shareChallengePlan.spreadReadinessGate.fallbackLine}}
           </view>
+          <view wx:if="{{dailyShareCard.shareChallengePlan.peerRelaySeasonArc}}">
+            7天接力赛季：{{dailyShareCard.shareChallengePlan.peerRelaySeasonArc.seasonLine}}
+          </view>
+          <view wx:for="{{dailyShareCard.shareChallengePlan.peerRelaySeasonArc.milestones}}" wx:key="id">赛季节点：{{item.day}}｜{{item.title}}｜{{item.action}}｜证据 {{item.evidence}}</view>
+          <view wx:for="{{dailyShareCard.shareChallengePlan.peerRelaySeasonArc.badgeRules}}" wx:key="id">徽章门槛：{{item.rule}}</view>
           <view wx:if="{{dailyShareCard.shareChallengePlan.safeRelayChallengePacket}}">
             {{dailyShareCard.shareChallengePlan.safeRelayChallengePacket.title}}：{{dailyShareCard.shareChallengePlan.safeRelayChallengePacket.evidenceContract}}
           </view>
@@ -1337,6 +1342,10 @@
           <view wx:if="{{communityShareRelayBoard.peerRelayChallengeLadder}}">
             同伴接力：{{communityShareRelayBoard.peerRelayChallengeLadder.title}}｜{{communityShareRelayBoard.peerRelayChallengeLadder.boundary}}
           </view>
+          <view wx:if="{{communityShareRelayBoard.peerRelaySeasonArc}}">
+            赛季接力：{{communityShareRelayBoard.peerRelaySeasonArc.title}}｜{{communityShareRelayBoard.peerRelaySeasonArc.seasonLine}}
+          </view>
+          <view wx:for="{{communityShareRelayBoard.peerRelaySeasonArc.milestones}}" wx:key="id">赛季节点：{{item.day}}｜{{item.title}}｜{{item.evidence}}</view>
           <view wx:for="{{communityShareRelayBoard.peerRelayChallengeLadder.stages}}" wx:key="id">接力阶梯：{{item.label}}｜{{item.visibleLine}}｜{{item.receiverAction}}｜证据 {{item.proofRequired}}</view>
           <view wx:for="{{communityShareRelayBoard.copyableChallengeTemplates}}" wx:key="id">可复制挑战：{{item.title}}｜{{item.copy}}｜证据 {{item.proofRequired}}</view>
           <view wx:if="{{communityShareRelayBoard.localSpreadReleaseGate}}">

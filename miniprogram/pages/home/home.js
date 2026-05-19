@@ -895,6 +895,13 @@ Page({
       attractionHook: incoming.relay_attraction_hook || '',
       localGate: incoming.relay_local_gate || ''
     } : null;
+    const peerRelaySeasonArc = incoming.relay_season ? {
+      id: incoming.relay_season,
+      status: incoming.relay_season_status || '',
+      seasonLine: incoming.relay_season_line || '',
+      days: incoming.relay_season_days || '',
+      localGate: incoming.relay_season_gate || ''
+    } : null;
     const safeRelayPacket = incoming.relay_id ? {
       relayId: incoming.relay_id,
       receiverAction: incoming.relay_receiver_action || actionDetail,
@@ -959,6 +966,10 @@ Page({
       peerRelayLadderLine: peerRelayLadder ? `同伴接力阶梯：${peerRelayLadder.stageLine}` : '',
       peerRelayAttractionLine: peerRelayLadder && peerRelayLadder.attractionHook ? `可复制挑战：${peerRelayLadder.attractionHook}` : '',
       peerRelayLocalGateLine: peerRelayLadder && peerRelayLadder.localGate ? `本地放行门禁：${peerRelayLadder.localGate}` : '',
+      peerRelaySeasonArc,
+      peerRelaySeasonLine: peerRelaySeasonArc ? `7天接力赛季：${peerRelaySeasonArc.seasonLine || peerRelaySeasonArc.status}` : '',
+      peerRelaySeasonDayLine: peerRelaySeasonArc ? `赛季节点：${peerRelaySeasonArc.days}` : '',
+      peerRelaySeasonGateLine: peerRelaySeasonArc ? `赛季门禁：${peerRelaySeasonArc.localGate}` : '',
       safeRelayPacket,
       receiverActionLine: safeRelayPacket && safeRelayPacket.receiverAction,
       parentCheckLine: safeRelayPacket && safeRelayPacket.parentCheck,

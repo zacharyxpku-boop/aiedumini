@@ -404,6 +404,9 @@
         <view class="share-relay-evidence" wx:if="{{incomingShareRelay.peerRelayLadderLine}}">{{incomingShareRelay.peerRelayLadderLine}}</view>
         <view class="share-relay-evidence" wx:if="{{incomingShareRelay.peerRelayAttractionLine}}">{{incomingShareRelay.peerRelayAttractionLine}}</view>
         <view class="share-relay-evidence" wx:if="{{incomingShareRelay.peerRelayLocalGateLine}}">{{incomingShareRelay.peerRelayLocalGateLine}}</view>
+        <view class="share-relay-evidence" wx:if="{{incomingShareRelay.peerRelaySeasonLine}}">{{incomingShareRelay.peerRelaySeasonLine}}</view>
+        <view class="share-relay-evidence" wx:if="{{incomingShareRelay.peerRelaySeasonDayLine}}">{{incomingShareRelay.peerRelaySeasonDayLine}}</view>
+        <view class="share-relay-evidence" wx:if="{{incomingShareRelay.peerRelaySeasonGateLine}}">{{incomingShareRelay.peerRelaySeasonGateLine}}</view>
         <view class="share-relay-evidence" wx:if="{{incomingShareRelay.receiverActionLine}}">接收动作：{{incomingShareRelay.receiverActionLine}}</view>
         <view class="share-relay-evidence" wx:if="{{incomingShareRelay.parentCheckLine}}">{{incomingShareRelay.parentCheckLine}}</view>
         <view class="share-relay-evidence" wx:if="{{incomingShareRelay.nextDayRevisitLine}}">{{incomingShareRelay.nextDayRevisitLine}}</view>
