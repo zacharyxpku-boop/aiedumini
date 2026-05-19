@@ -1450,6 +1450,96 @@ function buildRealTrialPressureCandidateBoard(options = {}) {
   };
 }
 
+function buildRealTrialSocraticStressAudit(options = {}) {
+  const candidateBoard = options.candidateBoard || buildRealTrialPressureCandidateBoard({
+    samples: options.samples,
+    limit: options.limit || 8
+  });
+  const candidates = Array.isArray(candidateBoard.cards) ? candidateBoard.cards : [];
+  const genericFirstSteps = ['先读题', '认真审题', '看关键词', '按步骤做', '先理解题意', '先说出第一步'];
+  const genericWrongCauses = ['不会做', '粗心', '没理解', '待确认错因', '知识点不熟'];
+  const visualSignals = ['画', '圈', '标', '线', '表', '箭头', '模型', '对照', '拆成', '流程'];
+  const rows = candidates.map((item, index) => {
+    const firstStep = String(item.firstStep || '');
+    const wrongCause = String(item.wrongCause || '');
+    const boardUse = String(item.boardUse || '');
+    const parentCheck = String(item.parentCheck || '');
+    const revisitPlan = String(item.revisitPlan || '');
+    const risks = []
+      .concat(firstStep.length < 10 || genericFirstSteps.some((token) => firstStep.includes(token)) ? ['first_step_generic'] : [])
+      .concat(wrongCause.length < 8 || genericWrongCauses.some((token) => wrongCause.includes(token)) ? ['wrong_cause_generic'] : [])
+      .concat(!visualSignals.some((token) => boardUse.includes(token)) ? ['blackboard_not_actionable'] : [])
+      .concat(parentCheck.length < 10 || !/[？?]/.test(parentCheck) ? ['parent_check_not_question'] : [])
+      .concat(revisitPlan.length < 10 || !/(明天|第 2 天|第2天|回访|复查|换一道|同类)/.test(revisitPlan) ? ['revisit_missing'] : []);
+    const score = Math.max(0, 100 - risks.length * 18);
+    return {
+      id: `${item.id}_socratic_stress`,
+      order: index + 1,
+      sourceTrialId: item.sourceTrialId,
+      subject: item.subject,
+      taskType: item.taskType,
+      score,
+      status: risks.length ? 'needs_repair_before_release' : 'stress_ready',
+      risks,
+      socraticProbe: risks.includes('first_step_generic')
+        ? '不要问“你会了吗”，改问：你第一眼先圈哪一个量？'
+        : `追问孩子复述第一步：${firstStep}`,
+      reportProbe: risks.includes('wrong_cause_generic')
+        ? '报告暂不写掌握结论，只写待查错因和下一次证据。'
+        : `报告只记录错因：${wrongCause}`,
+      blackboardProbe: risks.includes('blackboard_not_actionable')
+        ? '小黑板补一个可画动作：圈量、画线、列表或箭头。'
+        : `小黑板动作：${boardUse}`,
+      revisitProbe: risks.includes('revisit_missing')
+        ? '补明天同类小题回访，不把今晚一次表现当长期画像。'
+        : `回访：${revisitPlan}`,
+      localRepair: risks.length
+        ? '先由本地规则补第一步、错因、小黑板和回访，再允许 AI 改写语气。'
+        : '可进入苏格拉底、报告、回访和游戏的下一轮压测。',
+      tutorRoute: item.tutorRoute,
+      reviewRoute: item.reviewRoute,
+      arcadeRoute: item.arcadeRoute,
+      allowedFields: item.allowedFields,
+      blockedFields: item.blockedFields
+    };
+  });
+  const riskCounter = rows.reduce((acc, row) => {
+    row.risks.forEach((risk) => { acc[risk] = (acc[risk] || 0) + 1; });
+    return acc;
+  }, {});
+  const topRisks = Object.keys(riskCounter)
+    .sort((a, b) => riskCounter[b] - riskCounter[a])
+    .map((risk) => ({
+      id: risk,
+      label: risk,
+      count: riskCounter[risk],
+      repair: {
+        first_step_generic: '补成孩子能开口的第一步，不要泛泛审题。',
+        wrong_cause_generic: '错因必须绑定题型和卡住位置。',
+        blackboard_not_actionable: '小黑板必须有可画动作。',
+        parent_check_not_question: '家长检查必须是一句今晚能问的问题。',
+        revisit_missing: '必须补明天同类回访。'
+      }[risk] || '补齐证据后再放行。'
+    }));
+  const passCount = rows.filter((row) => row.status === 'stress_ready').length;
+  return {
+    id: 'real_trial_socratic_stress_audit',
+    title: '真实试用苏格拉底压测',
+    ready: rows.length > 0,
+    total: rows.length,
+    passCount,
+    repairCount: Math.max(0, rows.length - passCount),
+    rows,
+    topRisks,
+    reportLine: rows.length
+      ? `真实试用压测：${passCount}/${rows.length} 个候选可放行，${rows.length - passCount} 个先修第一步/错因/小黑板/回访。`
+      : '还没有可压测的真实试用候选；下一步先回收家庭卡住样本。',
+    localRuleLine: '本地代码先判定“厚而不准”的位置：第一步、错因、小黑板、家长检查、回访；AI 只在通过后改写追问语气。',
+    releaseGate: '没有通过压测的候选不能进入长期画像、分享传播或掌握结论。',
+    stopRule: '若新增公开资料不能提高压测通过率，就停止扩表，转向真实家庭样本。'
+  };
+}
+
 function buildRealTrialRecoveryLoop(options = {}) {
   const samples = loadRealTrialSamples().map(normalizeRealTrialSample);
   const pressureMatrix = options.realHomeworkCoverageMatrix || buildRealHomeworkCoverageMatrix();
@@ -1464,6 +1554,10 @@ function buildRealTrialRecoveryLoop(options = {}) {
   });
   const pressureCandidateBoard = buildRealTrialPressureCandidateBoard({
     samples,
+    limit: options.pressureCandidateLimit || 8
+  });
+  const socraticStressAudit = buildRealTrialSocraticStressAudit({
+    candidateBoard: pressureCandidateBoard,
     limit: options.pressureCandidateLimit || 8
   });
   const riskCounter = {};
@@ -1519,6 +1613,9 @@ function buildRealTrialRecoveryLoop(options = {}) {
     pressureCandidateBoard,
     pressureCandidateLine: pressureCandidateBoard.reportLine,
     pressureCandidateCards: pressureCandidateBoard.cards,
+    socraticStressAudit,
+    socraticStressLine: socraticStressAudit.reportLine,
+    socraticStressRows: socraticStressAudit.rows,
     gameChallengeBridge: realTrialGameChallengeBridge,
     gameChallengeLine: realTrialGameChallengeBridge.reportLine,
     gameChallengeCards: realTrialGameChallengeBridge.challengeCards,
@@ -9671,6 +9768,7 @@ module.exports = {
   appendRealTrialSample,
   buildRealTrialGameChallengeBridge,
   buildRealTrialPressureCandidateBoard,
+  buildRealTrialSocraticStressAudit,
   buildRealTrialRecoveryLoop,
   loadFactoryEvents,
   appendFactoryEvent,

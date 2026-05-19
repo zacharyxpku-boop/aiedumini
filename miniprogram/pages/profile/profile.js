@@ -1102,6 +1102,10 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     realTrialPressureCandidateCards: realTrialRecoveryLoop && Array.isArray(realTrialRecoveryLoop.pressureCandidateCards)
       ? realTrialRecoveryLoop.pressureCandidateCards
       : [],
+    realTrialSocraticStressLine: realTrialRecoveryLoop ? realTrialRecoveryLoop.socraticStressLine : '',
+    realTrialSocraticStressRows: realTrialRecoveryLoop && Array.isArray(realTrialRecoveryLoop.socraticStressRows)
+      ? realTrialRecoveryLoop.socraticStressRows
+      : [],
     realTrialRecoveryRisks: realTrialRecoveryLoop && Array.isArray(realTrialRecoveryLoop.topRisks)
       ? realTrialRecoveryLoop.topRisks
       : [],
