@@ -1058,7 +1058,7 @@
         <view class="parent-brief-block" wx:if="{{learningReportSummary.gameReturnEvidence}}">
           <text class="parent-brief-label">{{learningReportSummary.gameReturnEvidenceTitle}}</text>
           <text>状态：{{learningReportSummary.gameReturnEvidenceStatus}}</text>
-          <text wx:if="{{learningReportSummary.gameReturnEvidenceWeakKey}}">回流弱点：{{learningReportSummary.gameReturnEvidenceWeakKey}}</text>
+          <text wx:if="{{learningReportSummary.gameReturnEvidenceWeakKey}}">回流卡点：{{learningReportSummary.gameReturnEvidenceWeakKey}}</text>
           <text wx:if="{{learningReportSummary.gameReturnEvidenceNextRoute}}">下一路由：{{learningReportSummary.gameReturnEvidenceNextRoute}}</text>
           <text wx:if="{{learningReportSummary.gameReturnEvidenceReleaseGate}}">放行门槛：{{learningReportSummary.gameReturnEvidenceReleaseGate}}</text>
           <text wx:if="{{learningReportSummary.gameReturnEvidenceDay7Requirement}}">第7天要求：{{learningReportSummary.gameReturnEvidenceDay7Requirement}}</text>
