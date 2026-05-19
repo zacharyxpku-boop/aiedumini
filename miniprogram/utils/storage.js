@@ -1319,6 +1319,51 @@ function ensureRealTrialReviewCard(record = {}) {
   return card;
 }
 
+function buildRealTrialGameChallengeBridge(options = {}) {
+  const cards = (options.reviewCards || loadReviewCards())
+    .filter((card) => card && card.type === 'real_trial_revisit')
+    .slice(0, Number(options.limit || 6));
+  const challengeCards = cards.map((card, index) => ({
+    id: `${card.id}_game_bridge`,
+    order: index + 1,
+    title: `${card.subject || '真实作业'}卡点复练`,
+    prompt: card.question || card.front || '下次遇到同类题，第一步先做什么？',
+    firstStep: card.childArticulatedStep || card.checkpoint || '先说出第一步',
+    wrongCause: card.wrongCauseLabel || card.weakPoint || '待确认错因',
+    parentCheck: card.parentPrompt || (card.nextPracticePlan && card.nextPracticePlan.parentPrompt) || '家长只问第一步',
+    sourceTrialId: card.sourceTrialId || '',
+    route: `/pages/arcade/arcade?from=real_trial_revisit&trial_id=${encodeURIComponent(card.sourceTrialId || card.id)}`,
+    reviewRoute: '/pages/review/review?from=real_trial_revisit',
+    gameRule: '90 秒内只说第一步和错因，不看最终答案，不比较速度。',
+    shareHook: '把这次真实卡点变成同类第一步挑战，对方必须用自己的材料复刻。',
+    allowedFields: ['subject', 'task_type', 'first_step', 'wrong_cause', 'parent_check', 'revisit_route'],
+    blockedFields: ['original_question', 'full_answer', 'photo', 'score', 'ranking', 'full_dialogue']
+  }));
+  return {
+    id: 'real_trial_game_challenge_bridge',
+    title: '真实试用游戏接力',
+    ready: challengeCards.length > 0,
+    count: challengeCards.length,
+    reportLine: challengeCards.length
+      ? `已把 ${challengeCards.length} 张真实试用回访卡接到轻挑战：只练第一步、错因和明天回访。`
+      : '真实试用回访卡生成后，会自动接到轻挑战和安全分享接力。',
+    gameMode: 'first_step_revisit',
+    localRuleLine: '本地代码决定哪些真实试用卡能进入游戏、分享和回访；AI 只负责把追问改得更自然。',
+    shareBoundary: '分享只带第一步、错因、家长检查和回访路线；不带原题、答案、照片、分数、排名和完整对话。',
+    challengeCards,
+    firstChallenge: challengeCards[0] || null,
+    query: challengeCards[0] ? {
+      real_trial_challenge: challengeCards[0].id,
+      real_trial_first_step: challengeCards[0].firstStep,
+      real_trial_wrong_cause: challengeCards[0].wrongCause,
+      real_trial_parent_check: challengeCards[0].parentCheck,
+      real_trial_route: challengeCards[0].route,
+      real_trial_blocked: challengeCards[0].blockedFields.join(','),
+      real_trial_allowed: challengeCards[0].allowedFields.join(',')
+    } : {}
+  };
+}
+
 function appendRealTrialSample(item) {
   const record = normalizeRealTrialSample(item || {});
   const next = [record].concat(loadRealTrialSamples()).slice(0, 160);
@@ -1351,6 +1396,10 @@ function buildRealTrialRecoveryLoop(options = {}) {
   const zeroHelp = samples.filter((item) => item.zeroHelp).length;
   const shouldPromote = samples.filter((item) => item.shouldBecomePressureSample);
   const realTrialReviewCards = loadReviewCards().filter((card) => card && card.type === 'real_trial_revisit');
+  const realTrialGameChallengeBridge = buildRealTrialGameChallengeBridge({
+    reviewCards: realTrialReviewCards,
+    limit: options.gameChallengeLimit || 6
+  });
   const riskCounter = {};
   const subjectCounter = {};
   samples.forEach((item) => {
@@ -1401,6 +1450,9 @@ function buildRealTrialRecoveryLoop(options = {}) {
     zeroHelpRate: total ? Math.round((zeroHelp / total) * 100) : 0,
     shouldPromoteCount: shouldPromote.length,
     reviewCardCount: realTrialReviewCards.length,
+    gameChallengeBridge: realTrialGameChallengeBridge,
+    gameChallengeLine: realTrialGameChallengeBridge.reportLine,
+    gameChallengeCards: realTrialGameChallengeBridge.challengeCards,
     topRisks,
     nextPressureQueue: nextQueue,
     latest: samples.slice(0, 3),
@@ -5149,6 +5201,9 @@ function buildWrongCauseViralChallengePack(input = {}) {
 function buildShareChallengePlan(input = {}) {
   const focus = input.focus || loadTodayFocus() || {};
   const capability = input.capability || {};
+  const realTrialGameChallengeBridge = input.realTrialGameChallengeBridge || buildRealTrialGameChallengeBridge({
+    limit: 3
+  });
   const subjectDepth = input.subjectSkillDepth || null;
   const actionLabel = input.actionLabel || capability.nextAction || parentNextActionLabel(input.parentNextAction || '');
   const subjectLabel = subjectDepth && subjectDepth.label ? subjectDepth.label : (focus.title ? '当前卡点' : '第一步');
@@ -5396,6 +5451,7 @@ function buildShareChallengePlan(input = {}) {
     naturalSpreadTriggers,
     naturalSpreadLoop,
     familyRelayGrowthProtocol,
+    realTrialGameChallengeBridge,
     sourceBackedChallengeDeck,
     wrongCauseViralChallengePack,
     communityRipplePlan,
@@ -5455,6 +5511,13 @@ function buildShareChallengePlan(input = {}) {
       relay_spread_status: spreadReadinessGate.status,
       relay_growth_protocol: familyRelayGrowthProtocol.id,
       relay_growth_gate: familyRelayGrowthProtocol.peerRelayGate.status,
+      real_trial_challenge: realTrialGameChallengeBridge.query.real_trial_challenge || '',
+      real_trial_first_step: realTrialGameChallengeBridge.query.real_trial_first_step || '',
+      real_trial_wrong_cause: realTrialGameChallengeBridge.query.real_trial_wrong_cause || '',
+      real_trial_parent_check: realTrialGameChallengeBridge.query.real_trial_parent_check || '',
+      real_trial_route: realTrialGameChallengeBridge.query.real_trial_route || '',
+      real_trial_allowed: realTrialGameChallengeBridge.query.real_trial_allowed || '',
+      real_trial_blocked: realTrialGameChallengeBridge.query.real_trial_blocked || '',
       relay_spread_score: String(spreadReadinessGate.score),
       relay_spread_line: spreadReadinessGate.shareModeLine,
       relay_spread_fallback: spreadReadinessGate.fallbackLine,
@@ -5554,6 +5617,9 @@ function buildShareSpreadReadinessGate(input = {}) {
 
 function buildCommunityShareRelayBoard(input = {}) {
   const plan = input.shareChallengePlan || buildShareChallengePlan(input);
+  const realTrialGameChallengeBridge = plan.realTrialGameChallengeBridge || buildRealTrialGameChallengeBridge({
+    limit: 3
+  });
   const publicK12IntakeChallengeDeck = realHomeworkCoverage && typeof realHomeworkCoverage.buildPublicK12IntakeChallengeDeck === 'function'
     ? realHomeworkCoverage.buildPublicK12IntakeChallengeDeck({ limit: 6 })
     : [];
@@ -5631,6 +5697,9 @@ function buildCommunityShareRelayBoard(input = {}) {
     privacyBoundary: plan.privacyBoundary,
     peerSafeLine: plan.peerSafeLine,
     safeRelayChallengePacket: plan.safeRelayChallengePacket,
+    realTrialGameChallengeBridge,
+    realTrialGameChallengeCards: realTrialGameChallengeBridge.challengeCards || [],
+    realTrialGameChallengeLine: realTrialGameChallengeBridge.reportLine || '',
     shareHookDeck: plan.shareHookDeck || [],
     sourceBackedChallengeDeck: plan.sourceBackedChallengeDeck || [],
     publicK12IntakeChallengeDeck,
@@ -9516,6 +9585,7 @@ module.exports = {
   pilotRunSummary,
   loadRealTrialSamples,
   appendRealTrialSample,
+  buildRealTrialGameChallengeBridge,
   buildRealTrialRecoveryLoop,
   loadFactoryEvents,
   appendFactoryEvent,

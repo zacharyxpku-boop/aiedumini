@@ -1074,6 +1074,10 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
       : [],
     realTrialRecoveryLoop,
     realTrialRecoveryLine: realTrialRecoveryLoop ? realTrialRecoveryLoop.reportLine : '',
+    realTrialGameChallengeLine: realTrialRecoveryLoop ? realTrialRecoveryLoop.gameChallengeLine : '',
+    realTrialGameChallengeCards: realTrialRecoveryLoop && Array.isArray(realTrialRecoveryLoop.gameChallengeCards)
+      ? realTrialRecoveryLoop.gameChallengeCards
+      : [],
     realTrialRecoveryRisks: realTrialRecoveryLoop && Array.isArray(realTrialRecoveryLoop.topRisks)
       ? realTrialRecoveryLoop.topRisks
       : [],

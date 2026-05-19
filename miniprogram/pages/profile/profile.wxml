@@ -709,6 +709,8 @@
           <text>{{learningReportSummary.realTrialRecoveryLoop.summary}}</text>
           <text>{{learningReportSummary.realTrialRecoveryLine}}</text>
           <text>{{learningReportSummary.realTrialRecoveryLoop.reviewQueueLine}}</text>
+          <text>{{learningReportSummary.realTrialGameChallengeLine}}</text>
+          <text wx:for="{{learningReportSummary.realTrialGameChallengeCards}}" wx:key="id">真实试用挑战：{{item.title}}｜{{item.gameRule}}｜{{item.shareHook}}</text>
           <text>本地规则：{{learningReportSummary.realTrialRecoveryLoop.localRuleLine}}</text>
           <text>AI 边界：{{learningReportSummary.realTrialRecoveryLoop.aiUseLine}}</text>
           <text>分享边界：{{learningReportSummary.realTrialRecoveryLoop.shareBoundary}}</text>
