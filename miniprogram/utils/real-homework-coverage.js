@@ -770,6 +770,84 @@ const PUBLIC_K12_IMPLEMENTATION_PLAYBOOK = [
   }
 ];
 
+function buildK12PublicResourceTriageBoard(options = {}) {
+  const resources = options.resources || PUBLIC_K12_OPEN_SOURCE_RESOURCE_LEDGER;
+  const playbook = options.playbook || PUBLIC_K12_IMPLEMENTATION_PLAYBOOK;
+  const lanes = [
+    {
+      id: 'direct_use',
+      label: '直接可用',
+      owner: 'local_rule',
+      use: ['学科分类', '能力标签', '来源分级', '减负与隐私边界'],
+      gate: ['source_url_present', 'license_signal_visible', 'no_content_copy']
+    },
+    {
+      id: 'local_code_better',
+      label: '本地代码更好',
+      owner: 'local_rule',
+      use: ['题型路由', '错因命中', '第一步小黑板', '回访间隔', 'XP 解锁', '报告放行', '分享字段'],
+      gate: ['deterministic_gate', 'privacy_blocklist', 'sample_specific_output']
+    },
+    {
+      id: 'ai_better',
+      label: 'AI 只管表达',
+      owner: 'ai_wording_only',
+      use: ['苏格拉底追问语气', '同一第一步的多种说法', '家长报告解释', '降阶鼓励'],
+      gate: ['axis_already_selected', 'no_final_answer', 'local_release_gate_passed']
+    },
+    {
+      id: 'must_reject',
+      label: '必须拒绝',
+      owner: 'local_blocklist',
+      use: ['原题全文搬运', '标准答案库', '拍照搜题承诺', '全科动态板书承诺', '分数排名传播'],
+      gate: ['negative_sample_block', 'share_blocklist', 'no_fake_partner_claim']
+    }
+  ];
+  const resourceCards = resources.map((item, index) => ({
+    id: `triage_${item.id || index}`,
+    sourceId: item.id,
+    label: item.label,
+    sourceUrl: item.sourceUrl,
+    licenseSignal: item.licenseSignal,
+    decision: item.commercialDecision,
+    directUse: item.directUse,
+    localCodeUse: item.localizeAsCode,
+    aiUse: item.aiBetterFor,
+    rejectedUse: item.mustNotUse,
+    miniappLanding: item.miniappLanding,
+    route: (item.miniappLanding && item.miniappLanding[0]) || '/pages/profile/profile',
+    readiness: item.sourceUrl && item.licenseSignal && item.commercialDecision ? 'source_triaged' : 'needs_source_check',
+    localRule: '本地代码决定题型、错因、小黑板、回访、奖励、报告放行和分享字段。',
+    aiRule: 'AI 只把已经确定的提示改写成更自然的中文，不决定答案、掌握度、排行或隐私字段。',
+    blockedRule: '不复制原文、不导入答案、不嵌入未授权交互、不宣称外部合作或全科动态板书能力。'
+  }));
+  const sourceBackedChallengeSeeds = resourceCards.slice(0, 8).map((item, index) => ({
+    id: `oer_triage_challenge_${item.sourceId || index}`,
+    title: `${item.label} · 第一步挑战`,
+    prompt: `借这个来源的结构，用孩子自己的作业材料说第一步。`,
+    localCodeUse: item.localCodeUse && item.localCodeUse[0],
+    aiUse: item.aiUse && item.aiUse[0],
+    blockedUse: item.rejectedUse && item.rejectedUse[0],
+    route: '/pages/arcade/arcade?from=oer_triage',
+    acceptanceGate: ['receiver_own_material', 'first_step_only', 'no_original_answer', 'next_day_revisit']
+  }));
+  return {
+    id: 'k12_public_resource_triage_board',
+    title: '公开资料使用决策板',
+    summary: `已把 ${resources.length} 类公开/OER 资料拆成直接可用、本地代码更好、AI 只管表达、必须拒绝四类。`,
+    resourceCount: resources.length,
+    playbookCount: playbook.length,
+    lanes,
+    resourceCards,
+    sourceBackedChallengeSeeds,
+    localCodeWins: ['routing', 'wrong_cause', 'blackboard', 'review_cadence', 'xp_unlock', 'report_release', 'share_fields'],
+    aiWins: ['tone', 'socratic_wording', 'parent_explanation', 'encouragement'],
+    mustReject: ['copied_question', 'full_answer_bank', 'photo_search_claim', 'score_ranking_growth', 'fake_partner_claim'],
+    reportLine: `公开资料不直接变题库；先进入本地规则，再产出第一步、小黑板、回访、游戏和安全分享。`,
+    marginalRule: '如果新资料不能增加真实样本、题型簇、错因命中或回访证据，就停止扩表，转向真实家庭压测。'
+  };
+}
+
 const K12_PUBLIC_IMPLEMENTATION_DECISION_MATRIX = [
   {
     id: 'homework_archetype_pressure',
@@ -1314,6 +1392,7 @@ function buildRealHomeworkCoverageMatrix(options = {}) {
   const active = subjectRows.find((item) => item.id === activeSubject || item.label === activeSubject) || subjectRows[0] || SUBJECT_COUNTS[0];
   const totalSamples = subjectRows.reduce((sum, item) => sum + item.count, 0);
   const totalTypes = typeRows.length;
+  const publicResourceTriageBoard = buildK12PublicResourceTriageBoard();
   return {
     id: 'real_homework_coverage_matrix',
     title: '真实作业压力覆盖矩阵',
@@ -1334,6 +1413,7 @@ function buildRealHomeworkCoverageMatrix(options = {}) {
     publicK12UseWorkbench: PUBLIC_K12_USE_WORKBENCH,
     publicK12HomeworkIntakeQueue: PUBLIC_K12_HOMEWORK_INTAKE_QUEUE,
     publicK12IntakeChallengeDeck: buildPublicK12IntakeChallengeDeck(),
+    publicResourceTriageBoard,
     implementationDecisionMatrix: K12_PUBLIC_IMPLEMENTATION_DECISION_MATRIX,
     antiFakeThicknessGates: PUBLIC_K12_ANTI_FAKE_THICKNESS_GATES,
     implementationPlaybook: PUBLIC_K12_IMPLEMENTATION_PLAYBOOK,
@@ -1394,5 +1474,6 @@ module.exports = {
   LONGITUDINAL_PRESSURE_SCENARIO_LEDGER,
   getRealHomeworkPressureSamples,
   buildPublicK12IntakeChallengeDeck,
+  buildK12PublicResourceTriageBoard,
   buildRealHomeworkCoverageMatrix
 };

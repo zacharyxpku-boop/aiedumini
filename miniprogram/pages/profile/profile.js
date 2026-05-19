@@ -1049,6 +1049,16 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     realHomeworkOpenSourceResources: realHomeworkCoverageMatrix && Array.isArray(realHomeworkCoverageMatrix.publicK12OpenSourceResourceLedger)
       ? realHomeworkCoverageMatrix.publicK12OpenSourceResourceLedger
       : [],
+    realHomeworkPublicResourceTriageBoard: realHomeworkCoverageMatrix ? realHomeworkCoverageMatrix.publicResourceTriageBoard : null,
+    realHomeworkPublicResourceTriageLanes: realHomeworkCoverageMatrix && realHomeworkCoverageMatrix.publicResourceTriageBoard && Array.isArray(realHomeworkCoverageMatrix.publicResourceTriageBoard.lanes)
+      ? realHomeworkCoverageMatrix.publicResourceTriageBoard.lanes
+      : [],
+    realHomeworkPublicResourceTriageCards: realHomeworkCoverageMatrix && realHomeworkCoverageMatrix.publicResourceTriageBoard && Array.isArray(realHomeworkCoverageMatrix.publicResourceTriageBoard.resourceCards)
+      ? realHomeworkCoverageMatrix.publicResourceTriageBoard.resourceCards
+      : [],
+    realHomeworkPublicResourceChallengeSeeds: realHomeworkCoverageMatrix && realHomeworkCoverageMatrix.publicResourceTriageBoard && Array.isArray(realHomeworkCoverageMatrix.publicResourceTriageBoard.sourceBackedChallengeSeeds)
+      ? realHomeworkCoverageMatrix.publicResourceTriageBoard.sourceBackedChallengeSeeds
+      : [],
     realHomeworkIntakeQueue: realHomeworkCoverageMatrix && Array.isArray(realHomeworkCoverageMatrix.publicK12HomeworkIntakeQueue)
       ? realHomeworkCoverageMatrix.publicK12HomeworkIntakeQueue
       : [],
