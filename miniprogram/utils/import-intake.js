@@ -5,6 +5,65 @@ const IMPORT_CHIPS = [
   { id: 'similar_practice', label: '我想做同类题', text: '我想做同类题：' }
 ];
 
+const INTAKE_SOURCE_SCHEMAS = [
+  {
+    id: 'parent_report',
+    label: '家长报告',
+    match: /家长|家庭|复盘|观察|情绪|拖拉|沟通|作业习惯|专注|睡眠|兴趣/,
+    localFields: ['home_observation', 'parent_goal', 'homework_context', 'next_action'],
+    evidenceGap: ['孩子自己的第一步', '明天回访结果'],
+    reportUse: '进入家庭决策书：先判断今晚怎么问、明天怎么回访。',
+    aiAllowed: ['家长可读摘要', '低压沟通话术'],
+    aiBlocked: ['亲子关系定性', '孩子能力定性', '家长责任归因']
+  },
+  {
+    id: 'talent_assessment',
+    label: '天赋/学习偏好测评',
+    match: /天赋|测评|学习类型|学习风格|视觉型|听觉型|动觉型|优势|性格|MBTI|多元智能|注意力/,
+    localFields: ['preference_candidate', 'method_hypothesis', 'cross_check_gate', 'review_window'],
+    evidenceGap: ['真实作业卡点', '两次以上回访证据', '第 7 天小变式'],
+    reportUse: '进入方法候选：只建议先看图、先复述、先动笔或先拆步，不给天赋定论。',
+    aiAllowed: ['儿童可听懂解释', '家长方法建议改写'],
+    aiBlocked: ['天赋定性', '升学结论', '人格标签']
+  },
+  {
+    id: 'school_material',
+    label: '学校/老师材料',
+    match: /老师|学校|课堂|评语|批注|作业反馈|家校|班主任|错题本|试卷讲评/,
+    localFields: ['teacher_observation', 'classroom_signal', 'home_school_question', 'safe_handoff'],
+    evidenceGap: ['家庭观察记录', '孩子复述证据'],
+    reportUse: '进入家校摘要：只生成观察问题和安全交接字段。',
+    aiAllowed: ['老师沟通摘要', '家校措辞润色'],
+    aiBlocked: ['替老师判断', '公开排名', '原题照片转发']
+  },
+  {
+    id: 'wrong_question_paper',
+    label: '错题/试卷',
+    match: /错题|试卷|周测|单元测|期中|期末|扣分|列式|阅读理解|计算|证明|实验|方程|应用题/,
+    localFields: ['question_type', 'wrong_cause', 'first_step', 'next_day_revisit', 'day7_variant'],
+    evidenceGap: ['孩子原想法', '卡住的第一步'],
+    reportUse: '进入错因报告：抽题型、错因、第一步和回访窗口。',
+    aiAllowed: ['苏格拉底追问', '小黑板话术', '同错因小变式表达'],
+    aiBlocked: ['完整答案', '自动判分', '分数排名解释']
+  }
+];
+
+function detectIntakeSourceSchema(text = '', materialType = '') {
+  const value = `${materialType || ''}\n${String(text || '')}`;
+  const explicit = INTAKE_SOURCE_SCHEMAS.find((schema) => schema.id === materialType);
+  if (explicit) return explicit;
+  if (/school|teacher|feedback/.test(String(materialType || ''))) {
+    return INTAKE_SOURCE_SCHEMAS.find((schema) => schema.id === 'school_material');
+  }
+  if (/talent|assessment|preference/.test(String(materialType || ''))) {
+    return INTAKE_SOURCE_SCHEMAS.find((schema) => schema.id === 'talent_assessment');
+  }
+  if (/wrong|paper|exam|question/.test(String(materialType || ''))) {
+    return INTAKE_SOURCE_SCHEMAS.find((schema) => schema.id === 'wrong_question_paper');
+  }
+  return INTAKE_SOURCE_SCHEMAS.find((schema) => schema.match.test(value)) || INTAKE_SOURCE_SCHEMAS[3];
+}
+
 function looksLikeReviewRequest(text = '') {
   return /复习|回访|再练|巩固|记住|记不牢|背|同类题|变式|练这个/.test(String(text || ''));
 }
@@ -159,6 +218,7 @@ function buildUploadIntakePacket(text = '', imagePaths = [], materialType = '') 
   const value = String(text || '').trim();
   const images = Array.isArray(imagePaths) ? imagePaths.filter(Boolean).slice(0, 4) : [];
   const classified = classifyImportInput(value);
+  const intakeSourceSchema = detectIntakeSourceSchema(value, materialType);
   const materialSource = detectMaterialSource(value)
     || (materialType ? { type: materialType, label: materialType, hasUrl: false, url: '' } : null);
   const hasOnlyLink = /^https?:\/\/\S+$/i.test(value);
@@ -197,7 +257,11 @@ function buildUploadIntakePacket(text = '', imagePaths = [], materialType = '') 
     type: images.length ? 'photo_plus_text_intake' : 'text_intake',
     label: materialSource ? materialSource.label : (kind === 'photo_evidence_needs_text' ? '照片留档' : '作业/错题文字'),
     confidence: value ? (images.length ? 0.72 : 0.64) : 0.28,
-    status: value ? '可进入今晚闭环' : '需要补一句错因或卡点'
+    status: value ? '可进入今晚闭环' : '需要补一句错因或卡点',
+    sourceSchemaId: intakeSourceSchema.id,
+    sourceSchemaLabel: intakeSourceSchema.label,
+    reportUse: intakeSourceSchema.reportUse,
+    evidenceGap: intakeSourceSchema.evidenceGap
   };
   const nextActionQueue = buildNextActionQueue(kind, classified, materialSource || classified.sourceMeta || null, images);
   return {
@@ -214,6 +278,8 @@ function buildUploadIntakePacket(text = '', imagePaths = [], materialType = '') 
       ? '照片只做本地留档。请补一句错因或卡住点，系统才会整理成回忆卡。'
       : classified.feedback,
     evidence,
+    intakeSourceSchema,
+    intakeSourceSchemas: INTAKE_SOURCE_SCHEMAS,
     nextActionQueue,
     blockedFields,
     reviewSeed,
@@ -224,10 +290,12 @@ function buildUploadIntakePacket(text = '', imagePaths = [], materialType = '') 
 
 module.exports = {
   IMPORT_CHIPS,
+  INTAKE_SOURCE_SCHEMAS,
   buildUploadIntakePacket,
   buildNextActionQueue,
   classifyImportInput,
   detectMaterialSource,
+  detectIntakeSourceSchema,
   looksLikeMaterialExcerpt,
   looksLikeQuestion,
   looksLikeReviewRequest,

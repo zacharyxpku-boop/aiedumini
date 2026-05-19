@@ -1004,6 +1004,15 @@
           <text wx:if="{{learningReportSummary.reportEvidenceAiBoundary}}">AI 边界：{{learningReportSummary.reportEvidenceAiBoundary}}</text>
           <text wx:for="{{learningReportSummary.reportEvidenceRequired}}" wx:key="*this">审计证据：{{item}}</text>
         </view>
+        <view class="parent-brief-block" wx:if="{{learningReportSummary.sourceEvidenceLedger}}">
+          <text class="parent-brief-label">{{learningReportSummary.sourceEvidenceLedgerTitle}}</text>
+          <text>{{learningReportSummary.sourceEvidenceLedgerSummary}}</text>
+          <text>下一步：{{learningReportSummary.sourceEvidenceSafestNextAction}}</text>
+          <text>{{learningReportSummary.sourceEvidenceLedgerLocalRule}}</text>
+          <text>AI 边界：{{learningReportSummary.sourceEvidenceLedgerAiBoundary}}</text>
+          <text wx:for="{{learningReportSummary.sourceEvidenceLanes}}" wx:key="id">资料链路：{{item.label}}｜{{item.status}}｜可生成：{{item.canProduce}}｜还缺：{{item.evidenceMissing[0]}}｜禁用：{{item.aiBlocked}}</text>
+          <text wx:for="{{learningReportSummary.sourceEvidenceRequired}}" wx:key="*this">报告证据：{{item}}</text>
+        </view>
         <view class="parent-brief-block" wx:if="{{learningReportSummary.questionBankShareRelayDeck}}">
           <text class="parent-brief-label">{{learningReportSummary.questionBankShareRelayTitle}}</text>
           <text>{{learningReportSummary.questionBankShareRelayLine}}</text>

@@ -1686,6 +1686,102 @@ function buildReportEvidenceReleaseGate(input = {}, portraitDecisionReleaseSyste
   };
 }
 
+function sourceTextHas(source = {}, pattern) {
+  return pattern.test([
+    source.id,
+    source.type,
+    source.label,
+    source.text,
+    source.status
+  ].filter(Boolean).join('\n'));
+}
+
+function buildSourceEvidenceLedger(input = {}, parts = {}, familyDecisionMemo = {}, reportEvidenceReleaseGate = {}) {
+  const sources = Array.isArray(parts.reportSources) ? parts.reportSources : [];
+  const allText = [
+    input.sourceText || '',
+    input.scoreText || '',
+    input.materialType || '',
+    input.sourceType || ''
+  ].concat(sources.map((source) => `${source.type || ''}\n${source.label || ''}\n${source.text || ''}`)).join('\n');
+  const lanes = [
+    {
+      id: 'parent_report',
+      label: '家长报告',
+      pattern: /家长|家庭|复盘|观察|情绪|拖拉|沟通|作业习惯|专注|睡眠|兴趣/,
+      localFields: ['家庭观察', '家长期望', '今晚动作', '明天回访'],
+      canProduce: '家庭决策书、今晚一句话、7 天行动板',
+      missing: ['孩子自己的第一步', '明天回访结果'],
+      nextAction: '先用一处真实作业验证家长观察。',
+      aiAllowed: '改写成低压沟通话术',
+      aiBlocked: '亲子关系定性、孩子能力定性'
+    },
+    {
+      id: 'talent_assessment',
+      label: '天赋/学习偏好测评',
+      pattern: /天赋|测评|学习类型|学习风格|视觉型|听觉型|动觉型|优势|性格|MBTI|多元智能|注意力/,
+      localFields: ['学习偏好候选', '方法假设', '交叉验证闸', '回访窗口'],
+      canProduce: '方法建议候选：先看图、先复述、先动笔或先拆步',
+      missing: ['真实作业卡点', '两次以上回访证据', '第 7 天小变式'],
+      nextAction: '只把测评当候选，用错题和回访确认。',
+      aiAllowed: '把测评摘要翻译成孩子听得懂的方法建议',
+      aiBlocked: '天赋定性、升学结论、人格标签'
+    },
+    {
+      id: 'school_material',
+      label: '学校/老师材料',
+      pattern: /老师|学校|课堂|评语|批注|作业反馈|家校|班主任|错题本|试卷讲评/,
+      localFields: ['老师观察', '课堂信号', '家校问题', '安全交接'],
+      canProduce: '家校沟通摘要、老师观察问题、家庭配合动作',
+      missing: ['家庭观察记录', '孩子复述证据'],
+      nextAction: '只带观察问题给老师，不带原题照片和排名。',
+      aiAllowed: '润色家校沟通摘要',
+      aiBlocked: '替老师判断、公开排名、原题照片转发'
+    },
+    {
+      id: 'wrong_question_paper',
+      label: '错题/试卷',
+      pattern: /错题|试卷|周测|单元测|期中|期末|扣分|列式|阅读理解|计算|证明|实验|方程|应用题/,
+      localFields: ['题型', '错因', '第一步', '明天回访', '第 7 天小变式'],
+      canProduce: '错因报告、第一步小黑板、轻练习和间隔回访',
+      missing: ['孩子原想法', '卡住的第一步'],
+      nextAction: '抽一题做第一步，不做整张卷自动答案。',
+      aiAllowed: '苏格拉底追问、小黑板话术、同错因变式表达',
+      aiBlocked: '完整答案、自动判分、分数排名解释'
+    }
+  ].map((lane) => {
+    const sourceHit = sources.some((source) => sourceTextHas(source, lane.pattern));
+    const textHit = lane.pattern.test(allText);
+    const collected = sourceHit || textHit;
+    return Object.assign({}, lane, {
+      collected,
+      status: collected ? '已采集' : '待补充',
+      release: collected ? '今晚行动可用，长期画像仍需回访验证' : '不生成该类结论',
+      evidenceMissing: lane.missing,
+      blockedFields: reportEvidenceReleaseGate.homeSchoolSafeHandoff
+        ? reportEvidenceReleaseGate.homeSchoolSafeHandoff.blockedFields
+        : ['original_question', 'photo', 'full_answer', 'score', 'ranking']
+    });
+  });
+  const collectedCount = lanes.filter((lane) => lane.collected).length;
+  const safestLane = lanes.find((lane) => lane.collected && lane.id === 'wrong_question_paper')
+    || lanes.find((lane) => lane.collected)
+    || lanes[3];
+  return {
+    id: 'source_evidence_ledger',
+    title: '资料到详细报告账本',
+    summary: `已采集 ${collectedCount}/${lanes.length} 类资料；先生成今晚行动，长期画像必须等回访证据。`,
+    collectedCount,
+    totalCount: lanes.length,
+    lanes,
+    safestNextAction: safestLane.nextAction,
+    familyDecisionRoute: familyDecisionMemo.route || '/pages/tutor/tutor?from=source_evidence_ledger',
+    localRule: '来源分类、证据缺口、报告放行、分享字段和家校交接全部由本地代码决定。',
+    aiBoundary: 'AI 只做摘要、追问和表达改写；不做天赋定性、掌握结论、分数排名或完整答案。',
+    evidenceRequired: ['source_type', 'child_first_step', 'wrong_cause', 'next_day_revisit', 'day7_variant_result', 'safe_handoff_fields']
+  };
+}
+
 function buildLearningReportDraft(input = {}) {
   const sources = normalizeReportSources(input);
   const allText = [input.sourceText || '', input.scoreText || ''].concat(sources.map((source) => source.text || '')).join('\n');
@@ -1743,6 +1839,7 @@ function buildLearningReportDraft(input = {}) {
   const homeSchoolCollaborationDigest = buildHomeSchoolCollaborationDigest(parts, diagnosisMatrix, classroomDecisionBoard, familyDecisionMemo, crossWeekTrendBoard);
   const homeSchoolConferenceKit = buildHomeSchoolConferenceKit(parts, diagnosisMatrix, homeSchoolCollaborationDigest, crossWeekTrendBoard, parentDecisionTrustSystem);
   const reportEvidenceReleaseGate = buildReportEvidenceReleaseGate(input, portraitDecisionReleaseSystem, crossWeekTrendBoard, homeSchoolCollaborationDigest, homeSchoolConferenceKit, portraitConfidenceSystem, portraitEvidenceMaturitySystem);
+  const sourceEvidenceLedger = buildSourceEvidenceLedger(input, parts, familyDecisionMemo, reportEvidenceReleaseGate);
   const tonightDecisionBrief = buildTonightDecisionBrief(parts, diagnosisMatrix, familyDecisionMemo, parentDecisionTrustSystem, questionBankRecallReportBridge, input.socraticPromptQualityJudge || null);
   const missing = missingItems(parts);
   const reportDraft = {
@@ -1785,6 +1882,7 @@ function buildLearningReportDraft(input = {}) {
     homeSchoolCollaborationDigest,
     homeSchoolConferenceKit,
     reportEvidenceReleaseGate,
+    sourceEvidenceLedger,
     homeworkPressureContext,
     tonightDecisionBrief,
     generatedAt: nowIso(input.now),
@@ -1830,6 +1928,7 @@ function buildLearningReportDraft(input = {}) {
     homeSchoolCollaborationDigest,
     homeSchoolConferenceKit,
     reportEvidenceReleaseGate,
+    sourceEvidenceLedger,
     homeworkPressureContext,
     tonightDecisionBrief,
     reportCompleteness: completeness,
@@ -1866,6 +1965,7 @@ module.exports = {
   buildQuestionBankRecallReportBridge,
   buildPortraitDecisionReleaseSystem,
   buildReportEvidenceReleaseGate,
+  buildSourceEvidenceLedger,
   buildCrossWeekTrendBoard,
   buildHomeSchoolCollaborationDigest,
   buildHomeSchoolConferenceKit,

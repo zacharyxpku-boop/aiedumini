@@ -856,6 +856,7 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
   const homeSchoolCollaborationDigest = reportState.homeSchoolCollaborationDigest || draft.homeSchoolCollaborationDigest || {};
   const homeSchoolConferenceKit = reportState.homeSchoolConferenceKit || draft.homeSchoolConferenceKit || {};
   const reportEvidenceReleaseGate = reportState.reportEvidenceReleaseGate || draft.reportEvidenceReleaseGate || {};
+  const sourceEvidenceLedger = reportState.sourceEvidenceLedger || draft.sourceEvidenceLedger || {};
   const matrix = Array.isArray(draft.diagnosisMatrix) ? draft.diagnosisMatrix : [];
   const tendencies = Array.isArray(draft.capabilityTendencies) ? draft.capabilityTendencies : [];
   const effectiveCourseUnitMap = courseUnitMap || (storage.buildCourseUnitMap ? storage.buildCourseUnitMap({}) : null);
@@ -1231,6 +1232,7 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     homeSchoolCollaborationDigest,
     homeSchoolConferenceKit,
     reportEvidenceReleaseGate,
+    sourceEvidenceLedger,
     longitudinalPortraitTimelineTitle: longitudinalPortraitTimeline.title || '',
     longitudinalPortraitTimelineStatus: longitudinalPortraitTimeline.status || '',
     longitudinalPortraitTimelineSummary: longitudinalPortraitTimeline.summary || '',
@@ -1294,6 +1296,13 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     reportEvidenceConfidenceFloor: reportEvidenceReleaseGate.confidenceFloor || null,
     reportEvidenceAiBoundary: reportEvidenceReleaseGate.aiBoundary || '',
     reportEvidenceRequired: Array.isArray(reportEvidenceReleaseGate.evidenceRequired) ? reportEvidenceReleaseGate.evidenceRequired : [],
+    sourceEvidenceLedgerTitle: sourceEvidenceLedger.title || '',
+    sourceEvidenceLedgerSummary: sourceEvidenceLedger.summary || '',
+    sourceEvidenceLedgerLocalRule: sourceEvidenceLedger.localRule || '',
+    sourceEvidenceLedgerAiBoundary: sourceEvidenceLedger.aiBoundary || '',
+    sourceEvidenceSafestNextAction: sourceEvidenceLedger.safestNextAction || '',
+    sourceEvidenceLanes: Array.isArray(sourceEvidenceLedger.lanes) ? sourceEvidenceLedger.lanes : [],
+    sourceEvidenceRequired: Array.isArray(sourceEvidenceLedger.evidenceRequired) ? sourceEvidenceLedger.evidenceRequired : [],
     portraitConfidenceTitle: portraitConfidenceSystem.title || '',
     portraitConfidenceLevel: portraitConfidenceSystem.confidenceLevel || '',
     portraitConfidenceScore: Number(portraitConfidenceSystem.evidenceScore || 0),
