@@ -1634,6 +1634,167 @@ function buildRealTrialStressRepairQueue(options = {}) {
   };
 }
 
+function buildRealTrialRuleWritebackPlan(options = {}) {
+  const repairQueue = options.repairQueue || buildRealTrialStressRepairQueue({
+    audit: options.audit,
+    candidateBoard: options.candidateBoard,
+    samples: options.samples,
+    limit: options.limit || 12
+  });
+  const repairCards = Array.isArray(repairQueue.cards) ? repairQueue.cards : [];
+  const laneByRisk = {
+    first_step_generic: {
+      id: 'first_step_rule_patch',
+      label: '第一步规则回写',
+      localTarget: 'firstStepTemplatesForTaskType / suggestedStepForTaskType',
+      retest: '同一题型换一个家庭作业材料，只检查孩子是否能开口说第一步。'
+    },
+    wrong_cause_generic: {
+      id: 'wrong_cause_rule_patch',
+      label: '错因规则回写',
+      localTarget: 'wrongCauseFromFirstStep / report wrong-cause labels',
+      retest: '同一错因换一道小变式，检查是否仍能命中卡住位置。'
+    },
+    blackboard_not_actionable: {
+      id: 'blackboard_rule_patch',
+      label: '小黑板规则回写',
+      localTarget: 'buildBlackboardHint / buildFirstStepBlackboardBlueprint',
+      retest: '小黑板必须能画出圈、线、表、箭头或对照图。'
+    },
+    parent_check_not_question: {
+      id: 'parent_check_rule_patch',
+      label: '家长检查规则回写',
+      localTarget: 'parentQuestionFromFirstStep / parent report lines',
+      retest: '家长只用一句话检查第一步，不追完整答案。'
+    },
+    revisit_missing: {
+      id: 'revisit_rule_patch',
+      label: '回访规则回写',
+      localTarget: 'generateReviewCard / nextPracticePlan / review cadence',
+      retest: '明天同类小题和第 7 天小变式都必须有入口。'
+    },
+    stress_ready: {
+      id: 'variant_retest_patch',
+      label: '变式复测',
+      localTarget: 'transferPracticeSet / arcade challenge',
+      retest: '不写掌握结论，先进入下一轮真实变式验证。'
+    }
+  };
+  const patches = repairCards.map((card, index) => {
+    const lane = laneByRisk[card.risk] || laneByRisk.stress_ready;
+    return {
+      id: `${card.id}_rule_writeback`,
+      order: index + 1,
+      sourceRepairId: card.id,
+      sourceTrialId: card.sourceTrialId,
+      subject: card.subject,
+      taskType: card.taskType,
+      risk: card.risk,
+      laneId: lane.id,
+      laneLabel: lane.label,
+      localTarget: lane.localTarget,
+      localPatch: card.repairAction,
+      retestScenario: lane.retest,
+      socraticProbe: card.socraticProbe,
+      reportGate: card.status === 'needs_local_repair'
+        ? '修复并复测前，报告只写待修动作，不写掌握结论。'
+        : '只允许进入下一轮变式复测，不直接写长期画像。',
+      nextRoutes: {
+        tutor: card.tutorRoute,
+        review: card.reviewRoute,
+        arcade: card.arcadeRoute
+      },
+      localOwner: 'local_rule',
+      aiOwner: 'ai_wording_only',
+      allowedFields: ['subject', 'task_type', 'risk', 'local_patch', 'retest_scenario', 'report_gate'],
+      blockedFields: ['original_question', 'full_answer', 'photo', 'score', 'ranking', 'full_dialogue']
+    };
+  }).slice(0, Number(options.limit || 12));
+  const laneMap = patches.reduce((acc, patch) => {
+    acc[patch.laneId] = acc[patch.laneId] || {
+      id: patch.laneId,
+      label: patch.laneLabel,
+      localTarget: patch.localTarget,
+      count: 0,
+      firstRetest: patch.retestScenario
+    };
+    acc[patch.laneId].count += 1;
+    return acc;
+  }, {});
+  const lanes = Object.keys(laneMap).map((key) => laneMap[key]);
+  return {
+    id: 'real_trial_rule_writeback_plan',
+    title: '真实试用规则回写计划',
+    ready: patches.length > 0,
+    total: patches.length,
+    laneCount: lanes.length,
+    lanes,
+    patches,
+    firstPatch: patches[0] || null,
+    reportLine: patches.length
+      ? `规则回写：${patches.length} 条修复动作已映射到 ${lanes.length} 类本地规则，下一轮按复测场景验证。`
+      : '暂无可回写规则；先继续收集真实试用失败样本。',
+    localRuleLine: '本地规则负责回写题型、错因、小黑板、家长检查、回访和报告放行；AI 只润色已确定的追问。',
+    releaseGate: '未完成回写与复测前，不进入长期画像、分享传播、掌握结论或题库扩张。',
+    marginalRule: '若回写计划没有新增本地规则命中率，只停止加资料，转向真机家庭试用。'
+  };
+}
+
+function buildRealTrialRuleRetestDeck(options = {}) {
+  const writebackPlan = options.writebackPlan || buildRealTrialRuleWritebackPlan({
+    repairQueue: options.repairQueue,
+    audit: options.audit,
+    candidateBoard: options.candidateBoard,
+    samples: options.samples,
+    limit: options.limit || 12
+  });
+  const patches = Array.isArray(writebackPlan.patches) ? writebackPlan.patches : [];
+  const cards = patches.slice(0, Number(options.limit || 12)).map((patch, index) => ({
+    id: `${patch.id}_retest_card`,
+    order: index + 1,
+    sourcePatchId: patch.id,
+    sourceTrialId: patch.sourceTrialId,
+    subject: patch.subject,
+    taskType: patch.taskType,
+    risk: patch.risk,
+    title: `${patch.laneLabel}复测卡`,
+    prompt: patch.socraticProbe || '换一道同类小题，只说第一步。',
+    retestScenario: patch.retestScenario,
+    localPatch: patch.localPatch,
+    cadence: [
+      { id: 'tonight', label: '今晚', action: '只复测第一步和错因，不看答案。' },
+      { id: 'tomorrow', label: '明天', action: '换一道同类材料，确认还能开口。' },
+      { id: 'day7', label: '第 7 天', action: '用小变式确认是否迁移，仍不写长期掌握结论。' }
+    ],
+    gameMode: 'active_recall_no_rank',
+    xpRule: '只奖励复述第一步、说清错因和完成回访，不奖励速度、分数或排名。',
+    reportGate: patch.reportGate,
+    releaseGate: '今晚、明天、第 7 天三段证据齐之前，不进入长期画像和分享传播。',
+    tutorRoute: patch.nextRoutes && patch.nextRoutes.tutor ? `${patch.nextRoutes.tutor}&retest=1` : '/pages/tutor/tutor?from=rule_retest',
+    reviewRoute: patch.nextRoutes && patch.nextRoutes.review ? `${patch.nextRoutes.review}&retest=1` : '/pages/review/review?from=rule_retest',
+    arcadeRoute: patch.nextRoutes && patch.nextRoutes.arcade ? `${patch.nextRoutes.arcade}&retest=1` : '/pages/arcade/arcade?from=rule_retest',
+    localOwner: 'local_rule',
+    aiOwner: 'ai_wording_only',
+    allowedFields: ['subject', 'task_type', 'risk', 'prompt', 'cadence', 'report_gate'],
+    blockedFields: ['original_question', 'full_answer', 'photo', 'score', 'ranking', 'full_dialogue']
+  }));
+  return {
+    id: 'real_trial_rule_retest_deck',
+    title: '真实试用规则复测卡组',
+    ready: cards.length > 0,
+    total: cards.length,
+    cards,
+    firstCard: cards[0] || null,
+    reportLine: cards.length
+      ? `规则复测：${cards.length} 张卡进入今晚/明天/第 7 天节奏，只奖励第一步、错因和回访。`
+      : '暂无复测卡；先生成规则回写计划。',
+    gizmoLine: '高频记忆只做主动回忆和间隔回访，不做排行榜、晒分或速度刺激。',
+    khanmigoLine: '长期画像必须等三段复测证据齐，再写稳定模式。',
+    localRuleLine: '本地代码决定复测节奏、奖励、报告放行和分享边界；AI 只润色提示语。',
+    releaseGate: '复测卡未完成前，不进入掌握结论、长期画像、自然裂变或平台题库扩张。'
+  };
+}
+
 function buildRealTrialRecoveryLoop(options = {}) {
   const samples = loadRealTrialSamples().map(normalizeRealTrialSample);
   const pressureMatrix = options.realHomeworkCoverageMatrix || buildRealHomeworkCoverageMatrix();
@@ -1657,6 +1818,14 @@ function buildRealTrialRecoveryLoop(options = {}) {
   const stressRepairQueue = buildRealTrialStressRepairQueue({
     audit: socraticStressAudit,
     limit: options.stressRepairLimit || 12
+  });
+  const ruleWritebackPlan = buildRealTrialRuleWritebackPlan({
+    repairQueue: stressRepairQueue,
+    limit: options.ruleWritebackLimit || 12
+  });
+  const ruleRetestDeck = buildRealTrialRuleRetestDeck({
+    writebackPlan: ruleWritebackPlan,
+    limit: options.ruleRetestLimit || 12
   });
   const riskCounter = {};
   const subjectCounter = {};
@@ -1717,6 +1886,13 @@ function buildRealTrialRecoveryLoop(options = {}) {
     stressRepairQueue,
     stressRepairLine: stressRepairQueue.reportLine,
     stressRepairCards: stressRepairQueue.cards,
+    ruleWritebackPlan,
+    ruleWritebackLine: ruleWritebackPlan.reportLine,
+    ruleWritebackPatches: ruleWritebackPlan.patches,
+    ruleWritebackLanes: ruleWritebackPlan.lanes,
+    ruleRetestDeck,
+    ruleRetestLine: ruleRetestDeck.reportLine,
+    ruleRetestCards: ruleRetestDeck.cards,
     gameChallengeBridge: realTrialGameChallengeBridge,
     gameChallengeLine: realTrialGameChallengeBridge.reportLine,
     gameChallengeCards: realTrialGameChallengeBridge.challengeCards,
@@ -9871,6 +10047,8 @@ module.exports = {
   buildRealTrialPressureCandidateBoard,
   buildRealTrialSocraticStressAudit,
   buildRealTrialStressRepairQueue,
+  buildRealTrialRuleWritebackPlan,
+  buildRealTrialRuleRetestDeck,
   buildRealTrialRecoveryLoop,
   loadFactoryEvents,
   appendFactoryEvent,

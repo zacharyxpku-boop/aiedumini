@@ -724,6 +724,11 @@
           <text wx:for="{{learningReportSummary.realTrialSocraticStressRows}}" wx:key="id">压测结果：{{item.subject}}｜{{item.status}}｜待修：{{item.risks[0]}}｜{{item.localRepair}}</text>
           <text>{{learningReportSummary.realTrialStressRepairLine}}</text>
           <text wx:for="{{learningReportSummary.realTrialStressRepairCards}}" wx:key="id">修复队列：{{item.label}}｜{{item.repairAction}}｜追问：{{item.socraticProbe}}</text>
+          <text>{{learningReportSummary.realTrialRuleWritebackLine}}</text>
+          <text wx:for="{{learningReportSummary.realTrialRuleWritebackLanes}}" wx:key="id">规则回写：{{item.label}}｜{{item.localTarget}}｜{{item.count}} 条</text>
+          <text wx:for="{{learningReportSummary.realTrialRuleWritebackPatches}}" wx:key="id">复测计划：{{item.laneLabel}}｜{{item.retestScenario}}｜{{item.reportGate}}</text>
+          <text>{{learningReportSummary.realTrialRuleRetestLine}}</text>
+          <text wx:for="{{learningReportSummary.realTrialRuleRetestCards}}" wx:key="id">复测卡：{{item.title}}｜{{item.prompt}}｜{{item.xpRule}}</text>
           <text>{{learningReportSummary.realTrialRecoveryLoop.reviewQueueLine}}</text>
           <text>{{learningReportSummary.realTrialGameChallengeLine}}</text>
           <text wx:for="{{learningReportSummary.realTrialGameChallengeCards}}" wx:key="id">真实试用挑战：{{item.title}}｜{{item.gameRule}}｜{{item.shareHook}}</text>
