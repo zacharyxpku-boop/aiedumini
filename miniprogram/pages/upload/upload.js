@@ -251,6 +251,29 @@ Page({
     return focus;
   },
 
+  buildDecisionSource(uploadIntakePacket, text, wrongbook = {}, reportSeed = {}) {
+    const packet = uploadIntakePacket || {};
+    const seed = reportSeed || {};
+    const imported = !!wrongbook.imported;
+    return {
+      sourceSchemaId: seed.sourceSchemaId || (imported ? 'wrong_question_paper' : 'parent_report'),
+      sourceSchemaLabel: seed.sourceSchemaLabel || (imported ? '错题/试卷' : '家长观察'),
+      inputChannel: packet.kind || 'upload_text',
+      hasText: !!String(text || '').trim(),
+      imageCount: Number(packet.imageCount || (this.data.imagePaths || []).length || 0),
+      confidence: Number(seed.confidence || (imported ? 0.78 : 0.58)),
+      requiresParentConfirmation: true,
+      releaseScope: seed.releaseScope || (imported ? 'tonight_action_first' : 'observation_only'),
+      portraitConfidenceWeight: Number(seed.portraitConfidenceWeight || (imported ? 1 : 0)),
+      evidenceGap: Array.isArray(seed.evidenceGap) ? seed.evidenceGap : [],
+      requiredNextEvidence: Array.isArray(seed.requiredNextEvidence) ? seed.requiredNextEvidence : [],
+      nextEvidenceUnlockPlan: seed.nextEvidenceUnlockPlan || '',
+      blockedFields: Array.isArray(packet.blockedFields)
+        ? packet.blockedFields
+        : ['original_answer', 'full_solution', 'score', 'ranking']
+    };
+  },
+
   afterPrioritySaved(text, state, plan, mode) {
     const wrongbook = this.importWrongQuestionsToReview(text, state, plan);
     this.saveFocusFromUploadText(text, state, plan);
@@ -259,7 +282,8 @@ Page({
       const uploadIntakePacket = this.data.uploadIntakePacket
         || importIntake.buildUploadIntakePacket(text, this.data.imagePaths, this.data.materialType);
       const reportSeed = (uploadIntakePacket && uploadIntakePacket.reportSeed) || {};
-      const decisionSource = {
+      const decisionSource = this.buildDecisionSource(uploadIntakePacket, text, wrongbook, reportSeed);
+      const _legacyDecisionSource = {
         sourceSchemaId: reportSeed.sourceSchemaId || (wrongbook.imported ? 'wrong_question_paper' : 'parent_report'),
         sourceSchemaLabel: reportSeed.sourceSchemaLabel || (wrongbook.imported ? '错题/试卷' : '家长观察'),
         inputChannel: uploadIntakePacket && uploadIntakePacket.kind ? uploadIntakePacket.kind : 'upload_text',
@@ -395,12 +419,21 @@ Page({
       wx.showToast({ title: '先粘贴学习材料', icon: 'none' });
       return;
     }
+    const uploadIntakePacket = importIntake.buildUploadIntakePacket(text, this.data.imagePaths, this.data.materialType);
+    const decisionSource = this.buildDecisionSource(uploadIntakePacket, text, { imported: false }, (uploadIntakePacket && uploadIntakePacket.reportSeed) || {});
     const profile = storage.loadProfile();
     const result = reviewCards.importTextToDeck(text, {
       subject: profile.subject || '',
       weakPoint: this.data.materialType,
       calibrationKey: `material:${this.data.materialType}`,
-      source: `material_${this.data.materialType}`
+      source: `material_${this.data.materialType}:${decisionSource.sourceSchemaId}`,
+      sourceSchemaId: decisionSource.sourceSchemaId,
+      releaseScope: decisionSource.releaseScope,
+      requiredNextEvidence: decisionSource.requiredNextEvidence
+    });
+    this.setData({
+      uploadIntakePacket,
+      lastDecisionSource: decisionSource
     });
     wx.showToast({
       title: result.imported ? `已导入 ${result.imported} 张` : '已在复习库中',

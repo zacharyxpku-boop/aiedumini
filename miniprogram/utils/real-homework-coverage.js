@@ -1635,6 +1635,158 @@ function buildPublicK12IntakeChallengeDeck(options = {}) {
   }));
 }
 
+const UNIFIED_K12_SOURCE_BLOCKLIST = [
+  'source_original_text',
+  'source_question',
+  'source_answer',
+  'source_image',
+  'full_solution',
+  'answer_key',
+  'official_partnership_claim',
+  'photo_search_claim'
+];
+
+const UNIFIED_K12_ALLOWED_DERIVED_ARTIFACTS = [
+  'capability_axis',
+  'first_step_card',
+  'wrong_cause_card',
+  'visual_board_move',
+  'next_day_revisit',
+  'parent_check_line',
+  'share_safe_prompt'
+];
+
+function normalizeUnifiedK12SourceRegistryEntry(entry = {}, index = 0, defaults = {}) {
+  const sourceRegistryId = entry.sourceRegistryId || entry.id || `k12_source_${index + 1}`;
+  const mustNotSurface = Array.from(new Set([]
+    .concat(UNIFIED_K12_SOURCE_BLOCKLIST)
+    .concat(entry.mustNotSurface || entry.mustNotUse || defaults.mustNotSurface || [])));
+  const allowedDerivedArtifacts = Array.from(new Set([]
+    .concat(entry.allowedDerivedArtifacts || defaults.allowedDerivedArtifacts || UNIFIED_K12_ALLOWED_DERIVED_ARTIFACTS)
+    .filter((item) => item !== 'full_solution' && item !== 'answer_key')));
+  return {
+    sourceRegistryId,
+    label: entry.label || sourceRegistryId,
+    sourceKind: entry.sourceKind || entry.sourceType || defaults.sourceKind || 'public_k12_structure',
+    sourceUrl: entry.sourceUrl || defaults.sourceUrl || '',
+    licenseSignal: entry.licenseSignal || defaults.licenseSignal || 'license_check_required_before_distribution',
+    licenseCheckedAt: entry.licenseCheckedAt || defaults.licenseCheckedAt || '2026-05-20',
+    releaseDecision: entry.releaseDecision || defaults.releaseDecision || 'allow_structure_only_no_source_content',
+    reuseScope: entry.reuseScope || entry.reuseLevel || defaults.reuseScope || 'structure_only',
+    distributionPolicy: entry.distributionPolicy || defaults.distributionPolicy || 'derived_cards_only_no_original_content',
+    commercialDecision: entry.commercialDecision || defaults.commercialDecision || 'Use only as structure and teaching-design reference; do not redistribute original content or answers.',
+    allowedDerivedArtifacts,
+    mustNotSurface,
+    aiBetterFor: entry.aiBetterFor || entry.aiFit || defaults.aiBetterFor || ['socratic_wording', 'parent_friendly_explanation'],
+    localCodeFit: entry.localCodeFit || entry.localizeAsCode || defaults.localCodeFit || ['release_gate', 'answer_boundary', 'review_interval', 'share_blocklist'],
+    answerVisibility: entry.answerVisibility || defaults.answerVisibility || 'first_step_only_no_full_answer',
+    attributionRequired: entry.attributionRequired !== undefined ? !!entry.attributionRequired : true,
+    userRightsRequired: entry.userRightsRequired !== undefined ? !!entry.userRightsRequired : false,
+    originalTextIncluded: false,
+    fakeCapabilityBlocked: true
+  };
+}
+
+function buildUnifiedK12SourceRegistry(options = {}) {
+  const oerRows = (options.resources || PUBLIC_K12_OPEN_SOURCE_RESOURCE_LEDGER).map((item, index) => normalizeUnifiedK12SourceRegistryEntry(item, index, {
+    sourceKind: 'oer_or_public_reference',
+    releaseDecision: 'allow_structure_only_after_license_check',
+    reuseScope: item.reuseLevel || 'structure_only',
+    distributionPolicy: 'do_not_copy_or_embed_external_content'
+  }));
+  const structuralRows = [
+    {
+      sourceRegistryId: 'china_textbook_index_structure',
+      label: 'ChinaTextbook structure index',
+      sourceKind: 'textbook_structure_index_only',
+      sourceUrl: 'src/curriculum/textbook-index.json',
+      licenseSignal: 'local_index_metadata_not_distribution_license',
+      releaseDecision: 'allow_chapter_structure_only_block_original_text',
+      reuseScope: 'chapter_title_and_structure_only',
+      distributionPolicy: 'never_ship_pdf_or_extracted_text_to_miniapp',
+      commercialDecision: 'Use textbook catalog shape to route grade/chapter capability; do not copy textbook text, images, exercises, or answers.',
+      localCodeFit: ['grade_chapter_route', 'capability_axis', 'course_unit_spine', 'source_registry_gate'],
+      aiBetterFor: ['rewrite_catalog_hint_into_parent_friendly_prompt']
+    },
+    {
+      sourceRegistryId: 'learning_asset_index_structure',
+      label: 'Learning asset chapter index',
+      sourceKind: 'chapter_structure_index_only',
+      sourceUrl: 'src/curriculum/learning-asset-index.json',
+      licenseSignal: 'derived_index_requires_per_asset_license_check',
+      releaseDecision: 'allow_summary_structure_only_block_passage_copy',
+      reuseScope: 'knowledge_node_and_chapter_summary_only',
+      distributionPolicy: 'miniapp_receives_tags_not_original_passages',
+      commercialDecision: 'Use chapter-level metadata for coverage planning and prerequisite ladders; do not surface original passages or copied exercises.',
+      localCodeFit: ['prerequisite_ladder', 'coverage_gap_queue', 'report_dimension', 'question_type_backlog'],
+      aiBetterFor: ['turn_known_prerequisite_into_child_friendly_question']
+    },
+    {
+      sourceRegistryId: 'generated_question_bank_structure',
+      label: 'Generated question-bank structure',
+      sourceKind: 'generated_structure_human_review_required',
+      sourceUrl: 'src/curriculum/seed-questions-generated.json',
+      licenseSignal: 'generated_content_needs_review_and_source_boundary',
+      releaseDecision: 'allow_reviewed_first_step_only_block_answer_key',
+      reuseScope: 'reviewed_pattern_and_first_step_only',
+      distributionPolicy: 'answers_remain_hidden_until_local_evidence_gate',
+      commercialDecision: 'Generated cards can drive local practice only after review; never present generated answers as official standard answers.',
+      localCodeFit: ['human_review_gate', 'first_step_gate', 'near_transfer_gate', 'answer_visibility_gate'],
+      aiBetterFor: ['create_alternate_socratic_wording_after_local_gate']
+    },
+    {
+      sourceRegistryId: 'first_party_family_upload',
+      label: 'Family uploaded talent report / wrong paper',
+      sourceKind: 'first_party_user_provided_material',
+      sourceUrl: 'miniapp_upload_input',
+      licenseSignal: 'user_provided_for_private_family_report_only',
+      releaseDecision: 'allow_private_report_only_no_public_distribution',
+      reuseScope: 'private_family_decision_memo',
+      distributionPolicy: 'never_share_raw_child_material_or_private_report',
+      commercialDecision: 'Use only for the family decision book, talent-learning fit, wrong-cause evidence, and next action; do not train public cards from private uploads.',
+      localCodeFit: ['privacy_gate', 'report_release_gate', 'required_next_evidence', 'share_safe_redaction'],
+      aiBetterFor: ['parent_friendly_summary_after_redaction'],
+      userRightsRequired: true
+    }
+  ].map((item, index) => normalizeUnifiedK12SourceRegistryEntry(item, oerRows.length + index));
+  return oerRows.concat(structuralRows);
+}
+
+function buildCurriculumAssetSourceAudit(options = {}) {
+  const registry = options.registry || buildUnifiedK12SourceRegistry(options);
+  const riskyRows = registry.filter((item) => {
+    const blocked = Array.isArray(item.mustNotSurface) ? item.mustNotSurface : [];
+    const allowed = Array.isArray(item.allowedDerivedArtifacts) ? item.allowedDerivedArtifacts : [];
+    return !item.sourceRegistryId
+      || !item.releaseDecision
+      || !item.reuseScope
+      || !item.distributionPolicy
+      || UNIFIED_K12_SOURCE_BLOCKLIST.some((field) => !blocked.includes(field))
+      || allowed.includes('full_solution')
+      || allowed.includes('answer_key')
+      || item.originalTextIncluded !== false;
+  });
+  const rowsByKind = registry.reduce((acc, item) => {
+    const key = item.sourceKind || 'unknown';
+    acc[key] = Number(acc[key] || 0) + 1;
+    return acc;
+  }, {});
+  return {
+    id: 'curriculum_asset_source_audit',
+    ok: riskyRows.length === 0,
+    totalRows: registry.length,
+    readyCount: registry.length - riskyRows.length,
+    riskyRows: riskyRows.map((item) => item.sourceRegistryId),
+    rowsByKind,
+    blockedFields: UNIFIED_K12_SOURCE_BLOCKLIST,
+    requiredFields: ['sourceRegistryId', 'licenseSignal', 'releaseDecision', 'reuseScope', 'distributionPolicy', 'allowedDerivedArtifacts', 'mustNotSurface'],
+    releaseLine: `Unified source registry covers ${registry.length} K12/OER/textbook/upload sources with structure-only, no-answer, no-original-content gates.`,
+    localCodeOwns: ['source_registry_gate', 'answer_visibility_gate', 'privacy_gate', 'share_safe_redaction', 'release_decision'],
+    aiOwns: ['socratic_wording', 'parent_friendly_summary', 'alternate_first_step_phrasing'],
+    stopRule: 'If a source cannot prove rights or structure-only reuse, keep it out of public miniapp cards.'
+  };
+}
+
 function buildRealHomeworkCoverageMatrix(options = {}) {
   const activeSubject = String(options.subject || '').trim();
   const subjectRows = countRowsFromSamples(REAL_HOMEWORK_PRESSURE_SAMPLES, 'subject', SUBJECT_COUNTS);
@@ -1644,6 +1796,8 @@ function buildRealHomeworkCoverageMatrix(options = {}) {
   const totalTypes = typeRows.length;
   const publicResourceTriageBoard = buildK12PublicResourceTriageBoard();
   const pressureFailureTypeAudit = buildPressureSampleFailureTypeAudit();
+  const unifiedK12SourceRegistry = buildUnifiedK12SourceRegistry();
+  const curriculumAssetSourceAudit = buildCurriculumAssetSourceAudit({ registry: unifiedK12SourceRegistry });
   return {
     id: 'real_homework_coverage_matrix',
     title: '真实作业压力覆盖矩阵',
@@ -1665,6 +1819,8 @@ function buildRealHomeworkCoverageMatrix(options = {}) {
     publicK12HomeworkIntakeQueue: PUBLIC_K12_HOMEWORK_INTAKE_QUEUE,
     publicK12IntakeChallengeDeck: buildPublicK12IntakeChallengeDeck(),
     publicK12AssetBoundaryAudit: buildPublicK12AssetBoundaryAudit(),
+    unifiedK12SourceRegistry,
+    curriculumAssetSourceAudit,
     publicResourceTriageBoard,
     pressureFailureTypeAudit,
     implementationDecisionMatrix: K12_PUBLIC_IMPLEMENTATION_DECISION_MATRIX,
@@ -1690,6 +1846,8 @@ function buildRealHomeworkCoverageMatrix(options = {}) {
     totalPublicAssetPipelines: PUBLIC_K12_ASSET_PIPELINE.length,
     totalPublicCandidateAssets: PUBLIC_K12_CANDIDATE_POOL.length,
     totalOpenSourceResources: PUBLIC_K12_OPEN_SOURCE_RESOURCE_LEDGER.length,
+    totalUnifiedSourceRegistryRows: unifiedK12SourceRegistry.length,
+    totalCurriculumAssetSourceReady: curriculumAssetSourceAudit.readyCount,
     totalPressureWeakSamples: pressureFailureTypeAudit.weakSampleCount,
     totalHomeworkIntakeQueue: PUBLIC_K12_HOMEWORK_INTAKE_QUEUE.length,
     totalIntakeChallengeCards: PUBLIC_K12_HOMEWORK_INTAKE_QUEUE.length,
@@ -1729,6 +1887,9 @@ module.exports = {
   getRealHomeworkPressureSamples,
   buildPublicK12IntakeChallengeDeck,
   buildK12PublicResourceTriageBoard,
+  normalizeUnifiedK12SourceRegistryEntry,
+  buildUnifiedK12SourceRegistry,
+  buildCurriculumAssetSourceAudit,
   buildPublicK12AssetBoundaryAudit,
   validatePublicK12AssetBoundary,
   buildPressureSampleFailureTypeAudit,
