@@ -4743,6 +4743,81 @@ function buildPeerRelayChallengeLadder(input = {}) {
   };
 }
 
+function buildWrongCauseViralChallengePack(input = {}) {
+  const firstStep = input.firstStep || '先说清第一步';
+  const wrongCause = input.wrongCause || (input.capability && input.capability.label) || (input.focus && input.focus.title) || '同类错因';
+  const parentCheck = input.parentCheck || input.actionLabel || (input.capability && input.capability.nextAction) || `家长只问：这一步为什么会卡在「${wrongCause}」？`;
+  const route = input.route || (input.capability && input.capability.route) || '/pages/arcade/arcade';
+  const blockedFields = ['original_question', 'original_answer', 'original_photo', 'full_dialogue', 'score', 'ranking', 'private_comment'];
+  const allowedFields = ['wrong_cause_label', 'first_step', 'parent_check', 'receiver_action', 'next_day_revisit', 'return_path'];
+  const hooks = [
+    {
+      id: 'same_mistake_no_question',
+      title: '同错因，不同题',
+      copy: `我不发原题，只发一个错因挑战：${wrongCause}。你用自己的题说出第一步：${firstStep}`,
+      whyItSpreads: '朋友可以用自己的作业复刻，不需要看到原题和答案。',
+      proof: 'receiver_own_first_step'
+    },
+    {
+      id: 'ninety_second_wrong_cause',
+      title: '90 秒错因接力',
+      copy: `90 秒内只做一件事：说清「${wrongCause}」这类题第一步，不比谁做得快。`,
+      whyItSpreads: '低门槛、可复制、无排名压力。',
+      proof: 'wrong_cause_echo'
+    },
+    {
+      id: 'day7_truth_check',
+      title: '第 7 天才算稳',
+      copy: '今晚会不算结束，第 7 天还能迁移才算稳。',
+      whyItSpreads: '把一次分享变成一次回访，而不是一次性邀请。',
+      proof: 'day7_transfer_check'
+    }
+  ];
+  const receiverSteps = [
+    { id: 'accept_boundary', label: '先确认边界', action: '不用看发起者原题，用自己的材料做同类第一步。', evidence: 'no_original_question_needed' },
+    { id: 'say_first_step', label: '说第一步', action: firstStep, evidence: 'receiver_first_step' },
+    { id: 'echo_wrong_cause', label: '复述错因', action: `说出自己是否也卡在「${wrongCause}」。`, evidence: 'receiver_wrong_cause_echo' },
+    { id: 'book_revisit', label: '约回访', action: '明天回访同一错因，第 7 天做一个小变式。', evidence: 'receiver_revisit_window' }
+  ];
+  const localReleaseGate = {
+    id: 'wrong_cause_viral_release_gate',
+    localDeterministic: true,
+    status: firstStep && wrongCause && parentCheck ? 'wrong_cause_relay_ready' : 'parent_only',
+    requiredEvidence: ['wrong_cause_label', 'child_first_step', 'parent_check', 'next_day_revisit'],
+    blockedFields,
+    rule: '只有错因、第一步、家长检查句和回访窗口都存在时，才允许做同伴传播；AI 只可改写文案，不决定放行。'
+  };
+  return {
+    id: 'wrong_cause_viral_challenge_pack',
+    title: '错因挑战传播包',
+    wrongCause,
+    firstStep,
+    parentCheck,
+    receiverAction: `用自己的材料复刻这个错因的第一步：${firstStep}`,
+    nextDayRevisit: '明天只回访同一错因，第 7 天再做小变式。',
+    hooks,
+    receiverSteps,
+    allowedFields,
+    blockedFields,
+    localReleaseGate,
+    noRankingLine: '不排行、不晒分、不比较速度，只看有没有说清第一步和错因。',
+    privacyBoundary: '不传原题、原答案、照片、完整对话、分数、排名或隐私评价。',
+    returnPath: route,
+    query: {
+      wrong_cause_pack: '1',
+      wrong_cause_label: wrongCause,
+      wrong_cause_first_step: firstStep,
+      wrong_cause_parent_check: parentCheck,
+      wrong_cause_receiver_action: `用自己的材料复刻：${firstStep}`,
+      wrong_cause_next_revisit: 'next_day_same_wrong_cause',
+      wrong_cause_allowed_fields: allowedFields.join(','),
+      wrong_cause_blocked_fields: blockedFields.join(','),
+      wrong_cause_return_path: route,
+      wrong_cause_gate: localReleaseGate.status
+    }
+  };
+}
+
 function buildShareChallengePlan(input = {}) {
   const focus = input.focus || loadTodayFocus() || {};
   const capability = input.capability || {};
@@ -4895,6 +4970,14 @@ function buildShareChallengePlan(input = {}) {
     route,
     reviewLine: sevenDayReviewPayload.day7
   });
+  const wrongCauseViralChallengePack = buildWrongCauseViralChallengePack({
+    focus,
+    capability,
+    firstStep,
+    wrongCause: capability.label || focus.title || actionLabel,
+    parentCheck: actionLabel,
+    route
+  });
   const shareRelayActions = [
     { id: 'repair', label: '修卡点', route: wrongCauseReplayPayload.entry, evidence: 'wrong_cause_relay' },
     { id: 'challenge', label: '做轻挑战', route, evidence: 'active_recall_relay' },
@@ -4960,6 +5043,7 @@ function buildShareChallengePlan(input = {}) {
     naturalSpreadTriggers,
     naturalSpreadLoop,
     familyRelayGrowthProtocol,
+    wrongCauseViralChallengePack,
     communityRipplePlan,
     receiverOnboardingDeck,
     viralProofLedger,
@@ -5015,7 +5099,17 @@ function buildShareChallengePlan(input = {}) {
       relay_spread_required: spreadReadinessGate.requiredEvidence.join(','),
       relay_ladder: peerRelayChallengeLadder.stages.map((item) => item.id).join(','),
       relay_attraction_hook: peerRelayChallengeLadder.copyableChallengeTemplates.map((item) => item.title).join(' / '),
-      relay_local_gate: peerRelayChallengeLadder.localSpreadReleaseGate.status
+      relay_local_gate: peerRelayChallengeLadder.localSpreadReleaseGate.status,
+      wrong_cause_pack: wrongCauseViralChallengePack.query.wrong_cause_pack,
+      wrong_cause_label: wrongCauseViralChallengePack.query.wrong_cause_label,
+      wrong_cause_first_step: wrongCauseViralChallengePack.query.wrong_cause_first_step,
+      wrong_cause_parent_check: wrongCauseViralChallengePack.query.wrong_cause_parent_check,
+      wrong_cause_receiver_action: wrongCauseViralChallengePack.query.wrong_cause_receiver_action,
+      wrong_cause_next_revisit: wrongCauseViralChallengePack.query.wrong_cause_next_revisit,
+      wrong_cause_allowed_fields: wrongCauseViralChallengePack.query.wrong_cause_allowed_fields,
+      wrong_cause_blocked_fields: wrongCauseViralChallengePack.query.wrong_cause_blocked_fields,
+      wrong_cause_return_path: wrongCauseViralChallengePack.query.wrong_cause_return_path,
+      wrong_cause_gate: wrongCauseViralChallengePack.query.wrong_cause_gate
     }
   };
 }
@@ -5178,6 +5272,7 @@ function buildCommunityShareRelayBoard(input = {}) {
       route: plan.route
     }),
     communityRipplePlan: plan.communityRipplePlan || {},
+    wrongCauseViralChallengePack: plan.wrongCauseViralChallengePack || {},
     peerRelayChallengeLadder: plan.peerRelayChallengeLadder || buildPeerRelayChallengeLadder({
       firstStep: plan.safeRelayChallengePacket && plan.safeRelayChallengePacket.starterAction,
       route: plan.route
@@ -9088,6 +9183,7 @@ module.exports = {
   buildSafeRelayChallengePacket,
   buildShareSpreadReadinessGate,
   buildShareChallengePlan,
+  buildWrongCauseViralChallengePack,
   buildCommunityShareRelayBoard,
   buildQuestionBankShareRelayDeck,
   buildQuestionBankVisualShareRelayDeck,

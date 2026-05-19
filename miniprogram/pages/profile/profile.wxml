@@ -1273,6 +1273,23 @@
           <view wx:if="{{dailyShareCard.shareChallengePlan.safeRelayChallengePacket}}">
             {{dailyShareCard.shareChallengePlan.safeRelayChallengePacket.noRankingRule}}
           </view>
+          <view wx:if="{{dailyShareCard.shareChallengePlan.wrongCauseViralChallengePack}}">
+            {{dailyShareCard.shareChallengePlan.wrongCauseViralChallengePack.title}}：{{dailyShareCard.shareChallengePlan.wrongCauseViralChallengePack.wrongCause}}
+          </view>
+          <view wx:if="{{dailyShareCard.shareChallengePlan.wrongCauseViralChallengePack}}">
+            错因第一步：{{dailyShareCard.shareChallengePlan.wrongCauseViralChallengePack.firstStep}}
+          </view>
+          <view wx:if="{{dailyShareCard.shareChallengePlan.wrongCauseViralChallengePack}}">
+            接收动作：{{dailyShareCard.shareChallengePlan.wrongCauseViralChallengePack.receiverAction}}
+          </view>
+          <view wx:for="{{dailyShareCard.shareChallengePlan.wrongCauseViralChallengePack.hooks}}" wx:key="id">错因挑战钩子：{{item.label}}｜{{item.line}}</view>
+          <view wx:for="{{dailyShareCard.shareChallengePlan.wrongCauseViralChallengePack.receiverSteps}}" wx:key="id">接收步骤：{{item.label}}｜{{item.action}}｜证据 {{item.evidence}}</view>
+          <view wx:if="{{dailyShareCard.shareChallengePlan.wrongCauseViralChallengePack}}">
+            本地门禁：{{dailyShareCard.shareChallengePlan.wrongCauseViralChallengePack.localReleaseGate.status}}｜{{dailyShareCard.shareChallengePlan.wrongCauseViralChallengePack.localReleaseGate.rule}}
+          </view>
+          <view wx:if="{{dailyShareCard.shareChallengePlan.wrongCauseViralChallengePack}}">
+            隐私边界：{{dailyShareCard.shareChallengePlan.wrongCauseViralChallengePack.privacyBoundary}}
+          </view>
         </view>
         <view class="share-conversation-card" wx:if="{{dailyShareCard.socraticMemoryRelay}}">
           <view class="share-conversation-title">{{dailyShareCard.socraticMemoryRelay.title}}</view>
@@ -1337,6 +1354,14 @@
           </view>
           <view wx:if="{{communityShareRelayBoard.safeRelayChallengePacket}}">
             不带字段：{{communityShareRelayBoard.safeRelayChallengePacket.blockedFields}}
+          </view>
+          <view wx:if="{{communityShareRelayBoard.wrongCauseViralChallengePack}}">
+            错因挑战传播包：{{communityShareRelayBoard.wrongCauseViralChallengePack.wrongCause}}｜{{communityShareRelayBoard.wrongCauseViralChallengePack.receiverAction}}
+          </view>
+          <view wx:for="{{communityShareRelayBoard.wrongCauseViralChallengePack.hooks}}" wx:key="id">错因传播钩子：{{item.label}}｜{{item.line}}</view>
+          <view wx:for="{{communityShareRelayBoard.wrongCauseViralChallengePack.receiverSteps}}" wx:key="id">错因接收步骤：{{item.label}}｜{{item.action}}</view>
+          <view wx:if="{{communityShareRelayBoard.wrongCauseViralChallengePack}}">
+            错因传播边界：{{communityShareRelayBoard.wrongCauseViralChallengePack.blockedFields}}
           </view>
         </view>
         <view class="share-conversation-card" wx:if="{{learningReportSummary.weeklyEvidenceFlywheel}}">
