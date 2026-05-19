@@ -491,6 +491,19 @@
           <view class="retention-loop-step">{{highFrequencyPracticeLoop.ninetySecondRecallComboEngine.parentEvidenceLine}}</view>
           <view class="retention-loop-step">{{highFrequencyPracticeLoop.ninetySecondRecallComboEngine.shareBoundary}}</view>
         </view>
+        <view class="high-frequency-section" wx:if="{{highFrequencyPracticeLoop.realHomeworkPressureMemoryPrescription}}">
+          <view class="high-frequency-label">{{highFrequencyPracticeLoop.realHomeworkPressureMemoryPrescription.title}}</view>
+          <view class="retention-loop-step">真实样本：{{highFrequencyPracticeLoop.realHomeworkPressureMemoryPrescription.totalSamples}} 个｜本轮队列 {{highFrequencyPracticeLoop.realHomeworkPressureMemoryPrescription.reviewQueue.length}} 张｜{{highFrequencyPracticeLoop.realHomeworkPressureMemoryPrescription.xpReleaseGate}}</view>
+          <view class="high-frequency-item" wx:for="{{highFrequencyPracticeLoop.realHomeworkPressureMemoryPrescription.reviewQueue}}" wx:key="id">
+            <text>{{item.subject}}｜{{item.taskType}}｜{{item.dueWindow}}</text>
+            <text>第一步：{{item.firstStep}}</text>
+            <text>错因：{{item.wrongCause}}</text>
+            <text>家长只问：{{item.parentCheck}}</text>
+          </view>
+          <view class="retention-loop-step" wx:for="{{highFrequencyPracticeLoop.realHomeworkPressureMemoryPrescription.scheduleWindows}}" wx:key="id">回访窗口：{{item.label}}｜{{item.releaseGate}}</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.realHomeworkPressureMemoryPrescription.parentLine}}</view>
+          <view class="retention-loop-step">分享边界：不带原题、答案、分数、同伴比较、照片和完整对话。</view>
+        </view>
         <view class="high-frequency-section" wx:if="{{highFrequencyPracticeLoop.dailyMemorySprintDeck}}">
           <view class="high-frequency-label">{{highFrequencyPracticeLoop.dailyMemorySprintDeck.title}}</view>
           <view class="retention-loop-step">{{highFrequencyPracticeLoop.dailyMemorySprintDeck.summary}}</view>

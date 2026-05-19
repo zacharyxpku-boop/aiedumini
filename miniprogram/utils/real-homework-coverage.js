@@ -138,6 +138,121 @@ const SAMPLE_CLUSTERS = [
   }
 ];
 
+const FALLBACK_PRESSURE_SAMPLE_ATLAS = [
+  {
+    id: 'runtime_math_word_problem_quantity_relation',
+    subject: '数学',
+    taskType: 'math_word_problem',
+    stem: '应用题先判断总量、已知量、变化基准，再决定列式入口。',
+    expectedFirstStep: '先圈出总量、已知量和要求量，说明它们之间是什么关系。',
+    expectedWrongCause: '数量关系没有说清就急着算。',
+    expectedBoardMove: '小黑板只画总量-部分量-要求量关系，不写最终答案。',
+    parentCheck: '家长只问：这三个量分别是谁？先求哪一个关系？',
+    nearTransfer: '明天换数字和情境，只复述数量关系入口。'
+  },
+  {
+    id: 'runtime_equation_setup_unknown_relation',
+    subject: '数学',
+    taskType: 'equation_setup',
+    stem: '方程题先设未知数，再写等量或不等量关系。',
+    expectedFirstStep: '先设未知数，并用一句话写清等量关系。',
+    expectedWrongCause: '未知数和等量关系没有对应。',
+    expectedBoardMove: '小黑板只写设 x 和等量关系，不解方程。',
+    parentCheck: '家长只问：x 表示谁？等号两边表示同一件事吗？',
+    nearTransfer: '明天换条件，只检查设元和等量关系。'
+  },
+  {
+    id: 'runtime_physics_diagram_decision_quantity',
+    subject: '物理',
+    taskType: 'physics_diagram',
+    stem: '物理图示题先定对象、方向、单位和决定量。',
+    expectedFirstStep: '先圈对象，再标方向、单位和决定量。',
+    expectedWrongCause: '只看现象，没有先定决定量。',
+    expectedBoardMove: '小黑板只画对象和决定量箭头，不写最终数值。',
+    parentCheck: '家长只问：你先比较哪一个量？方向和单位定了吗？',
+    nearTransfer: '明天换图，仍先复述对象、方向和决定量。'
+  },
+  {
+    id: 'runtime_chemistry_experiment_evidence_chain',
+    subject: '化学',
+    taskType: 'chemistry_experiment',
+    stem: '化学实验题先连物质、现象、证据和体系边界。',
+    expectedFirstStep: '先列反应前后物质和观察到的现象证据。',
+    expectedWrongCause: '会背现象，但没有连到物质变化和体系边界。',
+    expectedBoardMove: '小黑板只画物质 -> 现象 -> 证据，不写完整方程式答案。',
+    parentCheck: '家长只问：这个现象对应哪种物质变化？有没有物质跑出体系？',
+    nearTransfer: '明天换一种试剂，只找体系和证据。'
+  },
+  {
+    id: 'runtime_english_sentence_signal_word',
+    subject: '英语',
+    taskType: 'english_sentence',
+    stem: '英语句法题先找信号词、主语、时间和上下文线索。',
+    expectedFirstStep: '先圈时间词、真正主语和前后文信号。',
+    expectedWrongCause: '只看空格所在句，没有找支撑信号。',
+    expectedBoardMove: '小黑板只写信号词 -> 结构，不直接填答案。',
+    parentCheck: '家长只问：这个形式由哪个词或哪一句支持？',
+    nearTransfer: '明天换一个信号词，仍先圈证据再填。'
+  },
+  {
+    id: 'runtime_reading_question_evidence_sentence',
+    subject: '语文',
+    taskType: 'reading_question',
+    stem: '阅读题先判断题型，再回原文找证据句。',
+    expectedFirstStep: '先判断题型，并定位一处原文证据。',
+    expectedWrongCause: '凭感觉回答，没有回文找证据。',
+    expectedBoardMove: '小黑板只画题型 -> 证据句 -> 作用，不写完整答案。',
+    parentCheck: '家长只问：原文哪一句支持你？',
+    nearTransfer: '明天换短文，只检查证据定位。'
+  },
+  {
+    id: 'runtime_writing_process_one_visible_detail',
+    subject: '语文',
+    taskType: 'writing_process',
+    stem: '写作题先写一个事实、中心句或可见细节。',
+    expectedFirstStep: '先写一句事实或一个可见动作细节。',
+    expectedWrongCause: '想一次写完整文章，导致没有可修改入口。',
+    expectedBoardMove: '小黑板只写中心句 -> 例子或动作/语言/神态。',
+    parentCheck: '家长只问：这一段只说明哪一个意思？有没有一个看得见的细节？',
+    nearTransfer: '明天换题，只补一个中心句和一个细节。'
+  },
+  {
+    id: 'runtime_biology_process_four_slots',
+    subject: '生物',
+    taskType: 'biology_process',
+    stem: '生物过程题先拆结构、条件、过程和结果。',
+    expectedFirstStep: '先分清结构、条件、过程和结果四格。',
+    expectedWrongCause: '把结构、功能、条件和结果混在一起。',
+    expectedBoardMove: '小黑板只画四格过程箭头，不写完整结论。',
+    parentCheck: '家长只问：这是结构、条件、过程还是结果？',
+    nearTransfer: '明天换一个过程，仍先填四格。'
+  },
+  {
+    id: 'runtime_geography_map_rule_first',
+    subject: '地理',
+    taskType: 'geography_map',
+    stem: '地理图示题先看图例、方向、经纬度和空间规则。',
+    expectedFirstStep: '先看图例、方向和经纬度，再判断空间关系。',
+    expectedWrongCause: '只看地图上下左右，没有先定空间规则。',
+    expectedBoardMove: '小黑板只画方向箭头、图例和高低/纬度标记。',
+    parentCheck: '家长只问：这个方向规则或图示规则是什么？',
+    nearTransfer: '明天换一张图，先复述规则再判断。'
+  }
+];
+
+function getRealHomeworkPressureSamples(options = {}) {
+  const taskType = String(options.taskType || '').trim();
+  const subject = String(options.subject || '').trim();
+  const source = Array.isArray(REAL_HOMEWORK_PRESSURE_SAMPLES) && REAL_HOMEWORK_PRESSURE_SAMPLES.length
+    ? REAL_HOMEWORK_PRESSURE_SAMPLES
+    : FALLBACK_PRESSURE_SAMPLE_ATLAS;
+  const matched = source.filter((sample) => {
+    return (!taskType || sample.taskType === taskType)
+      || (!subject || sample.subject === subject);
+  });
+  return matched.length ? matched.concat(source.filter((sample) => !matched.includes(sample))) : source;
+}
+
 const PUBLIC_K12_SOURCE_LEDGER = [
   {
     id: 'moe_curriculum_standard',
@@ -909,6 +1024,7 @@ function buildRealHomeworkCoverageMatrix(options = {}) {
     subjectRows,
     typeRows,
     sampleClusters: SAMPLE_CLUSTERS,
+    runtimePressureSampleAtlas: FALLBACK_PRESSURE_SAMPLE_ATLAS,
     questionTypeClusterRunway: QUESTION_TYPE_CLUSTER_RUNWAY,
     publicSourceLedger: PUBLIC_K12_SOURCE_LEDGER,
     publicSourcePolicy: PUBLIC_K12_USE_POLICY,
@@ -957,6 +1073,7 @@ module.exports = {
   SUBJECT_COUNTS,
   TYPE_COUNTS,
   SAMPLE_CLUSTERS,
+  FALLBACK_PRESSURE_SAMPLE_ATLAS,
   QUESTION_TYPE_CLUSTER_RUNWAY,
   PUBLIC_K12_SOURCE_LEDGER,
   PUBLIC_K12_USE_POLICY,
@@ -968,5 +1085,6 @@ module.exports = {
   PUBLIC_K12_IMPLEMENTATION_PLAYBOOK,
   K12_PUBLIC_IMPLEMENTATION_DECISION_MATRIX,
   LONGITUDINAL_PRESSURE_SCENARIO_LEDGER,
+  getRealHomeworkPressureSamples,
   buildRealHomeworkCoverageMatrix
 };

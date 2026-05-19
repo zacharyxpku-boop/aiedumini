@@ -5,6 +5,7 @@ const storage = require('../../utils/storage');
 const navigation = require('../../utils/navigation');
 const api = require('../../utils/api');
 const tutorLadder = require('../../utils/tutor-ladder');
+const realHomeworkCoverage = require('../../utils/real-homework-coverage');
 
 Page({
   data: {
@@ -893,7 +894,10 @@ Page({
           weakKey: repairFocus && repairFocus.title ? repairFocus.title : '',
           taskType: this.data.recentTaskType || 'unknown',
           socraticQualityEvaluationSuite,
-          courseUnitQuestionBank: this.data.courseUnitQuestionBank
+          courseUnitQuestionBank: this.data.courseUnitQuestionBank,
+          realHomeworkPressureSamples: realHomeworkCoverage.getRealHomeworkPressureSamples
+            ? realHomeworkCoverage.getRealHomeworkPressureSamples({ taskType: this.data.recentTaskType || 'unknown' })
+            : []
         }
       )
       : null;
@@ -914,6 +918,9 @@ Page({
       : null;
     const memoryRiskReleaseModel = highFrequencyPracticeLoop && highFrequencyPracticeLoop.memoryRiskReleaseModel
       ? highFrequencyPracticeLoop.memoryRiskReleaseModel
+      : null;
+    const realHomeworkPressureMemoryPrescription = highFrequencyPracticeLoop && highFrequencyPracticeLoop.realHomeworkPressureMemoryPrescription
+      ? highFrequencyPracticeLoop.realHomeworkPressureMemoryPrescription
       : null;
     const questArcSignal = storage.recordQuestArcGameSignal
       ? storage.recordQuestArcGameSignal({
@@ -1064,6 +1071,18 @@ Page({
       ninety_second_combo_rewards: highFrequencyPracticeLoop && highFrequencyPracticeLoop.ninetySecondRecallComboEngine
         ? highFrequencyPracticeLoop.ninetySecondRecallComboEngine.rewardLadder.length
         : 0,
+      real_homework_pressure_samples: realHomeworkPressureMemoryPrescription
+        ? realHomeworkPressureMemoryPrescription.totalSamples
+        : 0,
+      real_homework_pressure_queue: realHomeworkPressureMemoryPrescription && Array.isArray(realHomeworkPressureMemoryPrescription.reviewQueue)
+        ? realHomeworkPressureMemoryPrescription.reviewQueue.length
+        : 0,
+      real_homework_pressure_sample_specific: realHomeworkPressureMemoryPrescription
+        ? realHomeworkPressureMemoryPrescription.sampleSpecificReady
+        : false,
+      real_homework_pressure_share_boundary: realHomeworkPressureMemoryPrescription && realHomeworkPressureMemoryPrescription.sharePayload
+        ? realHomeworkPressureMemoryPrescription.sharePayload.blockedFields.join(',')
+        : '',
       share_code: incomingShare && incomingShare.share_code ? incomingShare.share_code : ''
     });
     if (storage.saveTodaySession) {
@@ -1257,6 +1276,18 @@ Page({
         ninety_second_combo_rewards: highFrequencyPracticeLoop && highFrequencyPracticeLoop.ninetySecondRecallComboEngine
           ? highFrequencyPracticeLoop.ninetySecondRecallComboEngine.rewardLadder.length
           : 0,
+        real_homework_pressure_samples: realHomeworkPressureMemoryPrescription
+          ? realHomeworkPressureMemoryPrescription.totalSamples
+          : 0,
+        real_homework_pressure_queue: realHomeworkPressureMemoryPrescription && Array.isArray(realHomeworkPressureMemoryPrescription.reviewQueue)
+          ? realHomeworkPressureMemoryPrescription.reviewQueue.length
+          : 0,
+        real_homework_pressure_sample_specific: realHomeworkPressureMemoryPrescription
+          ? realHomeworkPressureMemoryPrescription.sampleSpecificReady
+          : false,
+        real_homework_pressure_share_boundary: realHomeworkPressureMemoryPrescription && realHomeworkPressureMemoryPrescription.sharePayload
+          ? realHomeworkPressureMemoryPrescription.sharePayload.blockedFields.join(',')
+          : '',
         boss_gap: this.data.adaptiveChallenge && this.data.adaptiveChallenge.bossCard
           ? this.data.adaptiveChallenge.bossCard.key
           : '',
