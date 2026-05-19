@@ -1121,6 +1121,13 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     realTrialRuleRetestCards: realTrialRecoveryLoop && Array.isArray(realTrialRecoveryLoop.ruleRetestCards)
       ? realTrialRecoveryLoop.ruleRetestCards
       : [],
+    realTrialRuleRetestReviewLine: realTrialRecoveryLoop ? realTrialRecoveryLoop.ruleRetestReviewLine : '',
+    realTrialRuleRetestReviewCards: realTrialRecoveryLoop && Array.isArray(realTrialRecoveryLoop.ruleRetestReviewCards)
+      ? realTrialRecoveryLoop.ruleRetestReviewCards
+      : [],
+    realTrialRuleRetestChallengeCards: realTrialRecoveryLoop && Array.isArray(realTrialRecoveryLoop.ruleRetestChallengeCards)
+      ? realTrialRecoveryLoop.ruleRetestChallengeCards
+      : [],
     realTrialRecoveryRisks: realTrialRecoveryLoop && Array.isArray(realTrialRecoveryLoop.topRisks)
       ? realTrialRecoveryLoop.topRisks
       : [],

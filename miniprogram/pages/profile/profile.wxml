@@ -729,6 +729,9 @@
           <text wx:for="{{learningReportSummary.realTrialRuleWritebackPatches}}" wx:key="id">复测计划：{{item.laneLabel}}｜{{item.retestScenario}}｜{{item.reportGate}}</text>
           <text>{{learningReportSummary.realTrialRuleRetestLine}}</text>
           <text wx:for="{{learningReportSummary.realTrialRuleRetestCards}}" wx:key="id">复测卡：{{item.title}}｜{{item.prompt}}｜{{item.xpRule}}</text>
+          <text>{{learningReportSummary.realTrialRuleRetestReviewLine}}</text>
+          <text wx:for="{{learningReportSummary.realTrialRuleRetestReviewCards}}" wx:key="id">复测入队：{{item.title}}｜{{item.question}}｜{{item.parentPrompt}}</text>
+          <text wx:for="{{learningReportSummary.realTrialRuleRetestChallengeCards}}" wx:key="id">复测挑战：{{item.title}}｜{{item.gameRule}}｜{{item.shareHook}}</text>
           <text>{{learningReportSummary.realTrialRecoveryLoop.reviewQueueLine}}</text>
           <text>{{learningReportSummary.realTrialGameChallengeLine}}</text>
           <text wx:for="{{learningReportSummary.realTrialGameChallengeCards}}" wx:key="id">真实试用挑战：{{item.title}}｜{{item.gameRule}}｜{{item.shareHook}}</text>

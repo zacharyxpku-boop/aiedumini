@@ -1369,6 +1369,10 @@ function appendRealTrialSample(item) {
   const next = [record].concat(loadRealTrialSamples()).slice(0, 160);
   set(KEYS.realTrialSamples, next);
   const reviewCard = ensureRealTrialReviewCard(record);
+  const ruleRetestReviewBridge = ensureRealTrialRuleRetestReviewCards({
+    samples: next,
+    limit: 6
+  });
   appendFeedback({
     rating: record.zeroHelp ? 'accurate' : 'off',
     calibration_key: record.riskTags[0] || record.taskType,
@@ -1383,7 +1387,8 @@ function appendRealTrialSample(item) {
     riskTags: record.riskTags,
     shouldBecomePressureSample: record.shouldBecomePressureSample,
     blockedFields: record.blockedFields,
-    reviewCardId: reviewCard && reviewCard.id ? reviewCard.id : ''
+    reviewCardId: reviewCard && reviewCard.id ? reviewCard.id : '',
+    ruleRetestReviewCreated: ruleRetestReviewBridge && ruleRetestReviewBridge.createdCount ? ruleRetestReviewBridge.createdCount : 0
   });
   return next;
 }
@@ -1795,6 +1800,138 @@ function buildRealTrialRuleRetestDeck(options = {}) {
   };
 }
 
+function buildRealTrialRuleRetestReviewCard(card = {}, index = 0) {
+  const now = new Date();
+  const due = addDaysIso(index === 0 ? 0 : 1, now);
+  const title = card.title || `${card.subject || '家庭作业'}复测卡`;
+  const prompt = card.prompt || card.retestScenario || '换一道同类小题，只说第一步和错因，不写答案。';
+  const firstStep = card.localPatch || card.retestScenario || prompt;
+  const wrongCause = card.risk || '待复测错因';
+  return {
+    id: `real_trial_rule_retest_${card.id || card.sourcePatchId || index}`,
+    type: 'real_trial_rule_retest',
+    source: 'real_trial_rule_retest',
+    sourceRetestId: card.id || '',
+    sourcePatchId: card.sourcePatchId || '',
+    sourceTrialId: card.sourceTrialId || '',
+    subject: card.subject || '家庭作业',
+    taskType: card.taskType || 'unknown',
+    front: prompt,
+    question: prompt,
+    answer: '只说第一步、错因和下一次检查点，不写最终答案。',
+    note: title,
+    prompt,
+    title,
+    childArticulatedStep: firstStep,
+    wrongCauseBucket: wrongCause,
+    wrongCauseLabel: wrongCause,
+    weakPoint: wrongCause,
+    checkpoint: card.reportGate || '先确认孩子能不能自己说出第一步。',
+    parentPrompt: '家长只问：这次第一步是什么？为什么先做这一步？',
+    blackboardHint: card.retestScenario || '小黑板只画第一步关系，不画完整解法。',
+    due,
+    dueDate: due,
+    intervalLevel: 1,
+    status: 'new',
+    isRevisited: false,
+    suspended: false,
+    leech: false,
+    gameMode: card.gameMode || 'active_recall_no_rank',
+    xpRule: card.xpRule || '奖励说清第一步、错因和回访，不奖励速度、分数或排名。',
+    nextPracticePlan: {
+      appRoute: '/pages/review/review?from=rule_retest',
+      arcadeRoute: card.arcadeRoute || '/pages/arcade/arcade?from=rule_retest',
+      tutorRoute: card.tutorRoute || '/pages/tutor/tutor?from=rule_retest',
+      parentPrompt: '今晚只复测第一步；明天换材料；第 7 天再看迁移。',
+      transferPracticeSet: buildTransferPracticeSet({
+        taskType: card.taskType,
+        subject: card.subject,
+        stuckPointText: prompt,
+        childArticulatedStep: firstStep,
+        wrongCauseBucket: wrongCause
+      })
+    },
+    realTrialRuleRetest: {
+      sourceRetestId: card.id || '',
+      sourcePatchId: card.sourcePatchId || '',
+      sourceTrialId: card.sourceTrialId || '',
+      cadence: card.cadence || [],
+      reportGate: card.reportGate || '',
+      releaseGate: card.releaseGate || '',
+      localOwner: card.localOwner || 'local_rule',
+      aiOwner: card.aiOwner || 'ai_wording_only'
+    },
+    allowedFields: card.allowedFields || ['subject', 'task_type', 'prompt', 'cadence', 'report_gate'],
+    blockedFields: card.blockedFields || ['original_question', 'full_answer', 'photo', 'score', 'ranking', 'full_dialogue'],
+    created_at: now.toISOString(),
+    updated_at: now.toISOString()
+  };
+}
+
+function buildRealTrialRuleRetestReviewBridge(options = {}) {
+  const retestDeck = options.retestDeck || buildRealTrialRuleRetestDeck(options);
+  const retestCards = Array.isArray(retestDeck.cards) ? retestDeck.cards : [];
+  const existingCards = options.reviewCards || loadReviewCards();
+  const existingIds = {};
+  (Array.isArray(existingCards) ? existingCards : []).forEach((card) => {
+    if (!card) return;
+    if (card.sourceRetestId) existingIds[card.sourceRetestId] = true;
+    if (card.id) existingIds[card.id] = true;
+  });
+  const reviewCards = retestCards.slice(0, Number(options.limit || 12)).map(buildRealTrialRuleRetestReviewCard);
+  const newCards = reviewCards.filter((card) => card && !existingIds[card.sourceRetestId] && !existingIds[card.id]);
+  const challengeCards = reviewCards.map((card, index) => ({
+    id: `${card.id}_challenge`,
+    order: index + 1,
+    title: `${card.subject || '家庭作业'}复测挑战`,
+    prompt: card.prompt,
+    firstStep: card.childArticulatedStep,
+    wrongCause: card.wrongCauseLabel,
+    parentCheck: card.parentPrompt,
+    sourceRetestId: card.sourceRetestId,
+    sourceTrialId: card.sourceTrialId,
+    route: card.nextPracticePlan.arcadeRoute,
+    reviewRoute: card.nextPracticePlan.appRoute,
+    gameRule: '只做主动回忆：说第一步、错因和下一次检查点，不比速度、不晒分。',
+    shareHook: '把这张复测卡分享出去，对方只能接力第一步，不能看到原题或答案。',
+    allowedFields: card.allowedFields,
+    blockedFields: card.blockedFields
+  }));
+  return {
+    id: 'real_trial_rule_retest_review_bridge',
+    title: '规则复测入队',
+    ready: reviewCards.length > 0,
+    total: reviewCards.length,
+    createdCount: newCards.length,
+    existingCount: reviewCards.length - newCards.length,
+    reviewCards,
+    newCards,
+    challengeCards,
+    firstReviewCard: reviewCards[0] || null,
+    reportLine: reviewCards.length
+      ? `复测入队：${reviewCards.length} 张规则复测卡已可进入轻回访，其中 ${newCards.length} 张等待写入。`
+      : '复测入队：暂无可执行复测卡，先回到真实试用失败样本。' ,
+    releaseGate: '复测卡没有进入轻回访和挑战前，不写长期画像、不扩题库、不做分享传播。',
+    localRuleLine: '本地代码负责入队、去重、节奏、XP、报告放行和分享边界；AI 只润色追问语气。'
+  };
+}
+
+function ensureRealTrialRuleRetestReviewCards(options = {}) {
+  const bridge = buildRealTrialRuleRetestReviewBridge(options);
+  if (!bridge.ready || !bridge.newCards.length) return bridge;
+  const existing = loadReviewCards();
+  saveReviewCards(bridge.newCards.concat(existing).slice(0, 260));
+  appendReviewEvent({
+    type: 'real_trial_rule_retest_cards_created',
+    count: bridge.newCards.length,
+    source: 'real_trial_rule_retest'
+  });
+  return Object.assign({}, bridge, {
+    persisted: true,
+    reportLine: `复测入队：已写入 ${bridge.newCards.length} 张规则复测卡到轻回访。`
+  });
+}
+
 function buildRealTrialRecoveryLoop(options = {}) {
   const samples = loadRealTrialSamples().map(normalizeRealTrialSample);
   const pressureMatrix = options.realHomeworkCoverageMatrix || buildRealHomeworkCoverageMatrix();
@@ -1825,6 +1962,11 @@ function buildRealTrialRecoveryLoop(options = {}) {
   });
   const ruleRetestDeck = buildRealTrialRuleRetestDeck({
     writebackPlan: ruleWritebackPlan,
+    limit: options.ruleRetestLimit || 12
+  });
+  const ruleRetestReviewBridge = buildRealTrialRuleRetestReviewBridge({
+    retestDeck: ruleRetestDeck,
+    reviewCards: loadReviewCards(),
     limit: options.ruleRetestLimit || 12
   });
   const riskCounter = {};
@@ -1893,6 +2035,10 @@ function buildRealTrialRecoveryLoop(options = {}) {
     ruleRetestDeck,
     ruleRetestLine: ruleRetestDeck.reportLine,
     ruleRetestCards: ruleRetestDeck.cards,
+    ruleRetestReviewBridge,
+    ruleRetestReviewLine: ruleRetestReviewBridge.reportLine,
+    ruleRetestReviewCards: ruleRetestReviewBridge.reviewCards,
+    ruleRetestChallengeCards: ruleRetestReviewBridge.challengeCards,
     gameChallengeBridge: realTrialGameChallengeBridge,
     gameChallengeLine: realTrialGameChallengeBridge.reportLine,
     gameChallengeCards: realTrialGameChallengeBridge.challengeCards,
@@ -10049,6 +10195,8 @@ module.exports = {
   buildRealTrialStressRepairQueue,
   buildRealTrialRuleWritebackPlan,
   buildRealTrialRuleRetestDeck,
+  buildRealTrialRuleRetestReviewBridge,
+  ensureRealTrialRuleRetestReviewCards,
   buildRealTrialRecoveryLoop,
   loadFactoryEvents,
   appendFactoryEvent,
