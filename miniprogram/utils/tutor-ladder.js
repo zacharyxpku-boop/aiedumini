@@ -644,6 +644,8 @@ function extractReplyText(reply) {
 
 function guardAiTutorReply(reply, contract = {}, context = {}) {
   const text = extractReplyText(reply).trim();
+  const taskType = detectTaskType(context.userText || context.inputText || '', context.selected || {});
+  const pressureSignal = context.pressureSignal || inferHomeworkPressureSignal(`${context.userText || context.inputText || ''} ${context.selected && context.selected.text ? context.selected.text : ''}`, taskType);
   const localFallback = buildTutorReply(context.userText || context.inputText || '', {
     messages: context.messages || [],
     currentHintLevel: context.currentHintLevel || 1,
@@ -674,7 +676,10 @@ function guardAiTutorReply(reply, contract = {}, context = {}) {
     hint_level: context.currentHintLevel || localFallback.hint_level,
     hint_label: `提示 ${context.currentHintLevel || localFallback.hint_level}/5`,
     mastery_signal: localFallback.mastery_signal,
+    real_homework_pressure_signal: pressureSignal,
     socratic_ai_local_boundary_contract: contract || localFallback.socratic_ai_local_boundary_contract,
+    runtime_socratic_state: localFallback.runtime_socratic_state,
+    runtimeSocraticState: localFallback.runtimeSocraticState,
     ai_guard: {
       status: 'accepted_ai_rewrite',
       reasons: [],
@@ -726,6 +731,52 @@ function buildAnswerBoundaryEvidence(text, signal = {}, options = {}) {
   });
 }
 
+function childFriendlyLine(turnState = {}, signal = {}, fallbackPlan = {}) {
+  const firstStep = signal.firstStep || turnState.nextQuestion || '先说第一步';
+  if (turnState.fallbackBranch === 'answer_request') {
+    return `我不能直接替你写答案。我们只保留一个小动作：${firstStep}`;
+  }
+  if (turnState.fallbackBranch === 'parent_handoff') {
+    return `先停在这里，不继续追问完整题了。你只选 A 或 B：A 圈一个条件，B 说题目问什么；相似例子只用来明天回访。`;
+  }
+  if (turnState.fallbackBranch === 'two_choice_micro_choice') {
+    const choices = Array.isArray(fallbackPlan.microChoices) ? fallbackPlan.microChoices : [];
+    const labels = choices.map((item) => `${item.label} ${item.text}`).join('，');
+    return `${labels || 'A 圈条件，B 说问题'}。你只回一个字母也可以。`;
+  }
+  return `${signal.parentCheck || turnState.nextQuestion || '你先说第一步是什么？'} 只要一句话，不用算完。`;
+}
+
+function buildRuntimeSocraticReply(turnState = {}, item = {}, signal = {}, flags = {}) {
+  const fallbackPlan = buildSocraticFallbackPlan(turnState.taskType || signal.taskType, Object.assign({ level: turnState.hintLevel || item.level }, signal), null, {
+    answerBlocked: !!flags.answerRequest
+  });
+  const prefix = turnState.roundLabel ? `${turnState.roundLabel}。` : '';
+  const childLine = childFriendlyLine(turnState, signal, fallbackPlan);
+  if (turnState.shouldHandoff) {
+    return {
+      text: `${prefix}${childLine} 小黑板只画：${signal.boardMove || turnState.blackboardMove || '入口关系'}。${turnState.parentHandoffLine || ''}`,
+      fallbackPlan,
+      runtimeState: {
+        status: 'handoff_or_micro_choice',
+        branch: turnState.fallbackBranch,
+        childFriendlyLine: childLine,
+        releaseRule: '三轮后仍卡住，只允许家长检查句和明日回访，不继续加解释。'
+      }
+    };
+  }
+  return {
+    text: `${prefix}${childLine}`,
+    fallbackPlan,
+    runtimeState: {
+      status: 'normal_step_probe',
+      branch: turnState.fallbackBranch,
+      childFriendlyLine: childLine,
+      releaseRule: '这一轮只问一步，不给整题结论。'
+    }
+  };
+}
+
 function buildTutorReply(text, options = {}) {
   const messages = options.messages || [];
   const currentHintLevel = options.currentHintLevel || 1;
@@ -738,9 +789,8 @@ function buildTutorReply(text, options = {}) {
   const answerRequest = isAnswerRequest(text);
   const level = answerRequest ? 1 : classifyHintLevel(text, messages, currentHintLevel);
   const item = ladderItem(level);
-  const reply = answerRequest
-    ? `我不能直接替你写答案。先做第一步：${pressureSignal.firstStep} 小黑板：${pressureSignal.boardMove}`
-    : `${pressureSignal.parentCheck || item.reply} ${level >= 4 ? '如果还卡住，只做 A 圈条件 / B 说问题，再看一个相似例子。' : ''}`;
+  const runtimeReply = buildRuntimeSocraticReply(turnState, item, pressureSignal, { answerRequest });
+  const reply = runtimeReply.text;
   const masteryStatus = answerRequest ? 'blocked_answer_request' : level >= 5 ? 'method_summary_ready' : 'needs_student_step';
   const qualitySuite = buildSocraticQualityEvaluationSuite(taskType, pressureSignal);
   const promptJudge = buildSocraticPromptQualityJudge(taskType, qualitySuite, pressureSignal);
@@ -774,9 +824,11 @@ function buildTutorReply(text, options = {}) {
     homework_boundary: true,
     real_homework_pressure_signal: pressureSignal,
     socratic_contract: buildSocraticContract(taskType, pressureSignal),
-    socratic_fallback_plan: buildSocraticFallbackPlan(taskType, Object.assign({ level }, pressureSignal), null, { answerBlocked: answerRequest }),
+    socratic_fallback_plan: runtimeReply.fallbackPlan,
     visual_socratic_recovery: buildVisualSocraticRecoveryProtocol(taskType, Object.assign({ level }, pressureSignal), null, null, { answerBlocked: answerRequest }),
     fallback_recovery_bridge: buildFallbackRecoveryBridge(taskType, pressureSignal),
+    runtime_socratic_state: runtimeReply.runtimeState,
+    runtimeSocraticState: runtimeReply.runtimeState,
     question_type_socratic_path: buildQuestionTypeSocraticPath(taskType, pressureSignal),
     question_bank_visual_board_bridge: buildQuestionBankVisualBoardBridge(taskType, pressureSignal),
     questionTypeCoverageAtlas: buildQuestionTypeCoverageAtlas(taskType),
@@ -840,6 +892,8 @@ module.exports = {
   buildThreeRoundSocraticProtocol,
   buildSocraticAiLocalBoundaryContract,
   buildAnswerBoundaryEvidence,
+  buildRuntimeSocraticReply,
+  childFriendlyLine,
   nextTutorTurnState,
   guardAiTutorReply,
   buildTutorReply,

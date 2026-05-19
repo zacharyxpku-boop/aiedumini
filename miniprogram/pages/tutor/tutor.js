@@ -736,15 +736,20 @@ Page({
           homework_plan: state.homework_plan || null
         }
         }).then((res) => {
+        const localTaskType = tutorLadder.detectTaskType ? tutorLadder.detectTaskType(input, selected) : 'unknown';
+        const localPressureSignal = tutorLadder.inferHomeworkPressureSignal
+          ? tutorLadder.inferHomeworkPressureSignal(`${input || ''} ${selected && selected.text ? selected.text : ''}`, localTaskType)
+          : {};
         const localContract = tutorLadder.buildSocraticAiLocalBoundaryContract
-          ? tutorLadder.buildSocraticAiLocalBoundaryContract(tutorLadder.detectTaskType ? tutorLadder.detectTaskType(input, selected) : 'unknown', {})
+          ? tutorLadder.buildSocraticAiLocalBoundaryContract(localTaskType, localPressureSignal)
           : null;
         const guarded = res && res.reply && !tutorLadder.isAnswerRequest(input) && tutorLadder.guardAiTutorReply
           ? tutorLadder.guardAiTutorReply(res, localContract, {
             userText: input,
             messages: this.data.messages,
             currentHintLevel: localHintLevel,
-            selected
+            selected,
+            pressureSignal: localPressureSignal
           })
           : fallbackReply(input, selected, step, misconceptionText);
         this.appendAssistant(guarded, turnState);
