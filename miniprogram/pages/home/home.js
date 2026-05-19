@@ -991,6 +991,11 @@ Page({
       completionSignal: incoming.relay_completion_signal || 'active_recall_next_revisit',
       returnPath: incoming.relay_return_path || challengeRoute
     } : null;
+    const shareRuns = storage.loadShareRuns ? storage.loadShareRuns() : [];
+    const reviewEvents = storage.loadReviewEvents ? storage.loadReviewEvents() : [];
+    const receiverCompletion = shareRuns.find((item) => item && item.share_code === incoming.share_code && item.type === 'share_relay_receiver_completion')
+      || reviewEvents.find((item) => item && item.share_code === incoming.share_code && item.type === 'share_relay_receiver_completion')
+      || null;
     const unitLine = incoming.course_unit_label
       ? `${incoming.course_unit_subject || '当前学科'} · ${incoming.course_unit_label}`
       : '';
@@ -1071,6 +1076,9 @@ Page({
       safeFieldLine: safeRelayPacket ? `只带：${safeRelayPacket.allowedFields}` : '',
       blockedFieldLine: safeRelayPacket ? `不带：${safeRelayPacket.blockedFields}` : '',
       completionSignalLine: safeRelayPacket ? `完成信号：${safeRelayPacket.completionSignal}` : '',
+      receiverCompletionLine: receiverCompletion
+        ? `receiver evidence: ${(receiverCompletion.payload && receiverCompletion.payload.first_step) || receiverCompletion.firstStep || 'receiver_own_first_step_required'} / ${(receiverCompletion.payload && receiverCompletion.payload.wrong_cause) || receiverCompletion.wrongCause || 'receiver_own_wrong_cause_required'} / ${(receiverCompletion.payload && receiverCompletion.payload.next_revisit) || receiverCompletion.nextRevisit || 'receiver_next_revisit_required'}`
+        : 'receiver evidence required: first step / wrong cause / revisit',
       unitLine,
       unitDecisionLine: incoming.course_unit_parent_decision || '',
       unitReportLine: incoming.course_unit_report_contract || '',

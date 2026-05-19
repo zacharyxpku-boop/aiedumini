@@ -48,6 +48,8 @@ Page({
     resultAdvice: null,
     gameRetentionLoop: null,
     highFrequencyPracticeLoop: null,
+    publicK12IntakeChallengeDeck: [],
+    publicK12IntakeExecutableCards: [],
     dailyReturnMission: null,
     dailyReturnContract: null,
     reviewReturnSeed: null,
@@ -121,7 +123,13 @@ Page({
         rescueMode: !!(todaySession && todaySession.gamePlayed)
       })
       : [];
-    const loopBoundCards = this.loopBoundCards(dueCards.concat(fallbackCards).concat(questionBankPlayableCards), taskBoundCards, loopFocus);
+    const publicK12IntakeChallengeDeck = realHomeworkCoverage.buildPublicK12IntakeChallengeDeck
+      ? realHomeworkCoverage.buildPublicK12IntakeChallengeDeck({ limit: 21 })
+      : [];
+    const publicK12IntakeExecutableCards = gameLogic.buildPublicK12IntakeExecutableCards
+      ? gameLogic.buildPublicK12IntakeExecutableCards(publicK12IntakeChallengeDeck, { maxCards: 21 })
+      : [];
+    const loopBoundCards = this.loopBoundCards(dueCards.concat(fallbackCards).concat(questionBankPlayableCards).concat(publicK12IntakeExecutableCards), taskBoundCards, loopFocus);
     const cards = loopBoundCards.length ? loopBoundCards : (dueCards.length ? dueCards : (fallbackCards.length ? fallbackCards : taskBoundCards));
     const ruleRetestCards = cards.filter((card) => card && card.type === 'real_trial_rule_retest');
     const profile = storage.loadGameProfile ? storage.loadGameProfile() : {};
@@ -197,7 +205,7 @@ Page({
       dailyQuestSet,
       adaptiveChallenge,
       questArcMission,
-      challengeBrief: this.buildChallengeBrief(dailyQuestSet, adaptiveChallenge, questArcMission, evidenceBias, subjectSkillDepth, curriculumSpine, courseUnitMap, courseUnitMasteryTrajectory, courseUnitQuestionBank, commercialDepthRunway, sevenSubjectMasterySprint, questionBankPlayableCards, ruleRetestCards),
+      challengeBrief: this.buildChallengeBrief(dailyQuestSet, adaptiveChallenge, questArcMission, evidenceBias, subjectSkillDepth, curriculumSpine, courseUnitMap, courseUnitMasteryTrajectory, courseUnitQuestionBank, commercialDepthRunway, sevenSubjectMasterySprint, questionBankPlayableCards, ruleRetestCards, publicK12IntakeChallengeDeck, publicK12IntakeExecutableCards),
       surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('arcade') : null,
       subjectSkillDepth,
       curriculumSpine,
@@ -210,6 +218,8 @@ Page({
       resultAdvice: null,
       gameRetentionLoop: null,
       highFrequencyPracticeLoop: previewHighFrequencyPracticeLoop,
+      publicK12IntakeChallengeDeck,
+      publicK12IntakeExecutableCards,
       dailyReturnMission: previewHighFrequencyPracticeLoop && previewHighFrequencyPracticeLoop.dailyReturnMission
         ? previewHighFrequencyPracticeLoop.dailyReturnMission
         : null,
@@ -346,7 +356,7 @@ Page({
     return arcade.buildWhackRound(cards, { limit: size });
   },
 
-  buildChallengeBrief(dailyQuestSet = {}, adaptiveChallenge = {}, questArcMission = null, evidenceBias = null, subjectSkillDepth = null, curriculumSpine = null, courseUnitMap = null, courseUnitMasteryTrajectory = null, courseUnitQuestionBank = null, commercialDepthRunway = null, sevenSubjectMasterySprint = null, questionBankPlayableCards = [], ruleRetestCards = []) {
+  buildChallengeBrief(dailyQuestSet = {}, adaptiveChallenge = {}, questArcMission = null, evidenceBias = null, subjectSkillDepth = null, curriculumSpine = null, courseUnitMap = null, courseUnitMasteryTrajectory = null, courseUnitQuestionBank = null, commercialDepthRunway = null, sevenSubjectMasterySprint = null, questionBankPlayableCards = [], ruleRetestCards = [], publicK12IntakeChallengeDeck = [], publicK12IntakeExecutableCards = []) {
     const quests = Array.isArray(dailyQuestSet.quests) ? dailyQuestSet.quests : [];
     const activeQuest = quests.find((item) => item && item.progress < item.target) || quests[0] || {};
     const mode = adaptiveChallenge.mode || 'balanced';
@@ -381,6 +391,33 @@ Page({
         releaseGate: card.realTrialRuleRetest && card.realTrialRuleRetest.releaseGate
           ? card.realTrialRuleRetest.releaseGate
           : '三段复测证据齐之前，不写长期掌握结论。'
+      }))
+    } : null;
+    const publicK12IntakeChallenge = Array.isArray(publicK12IntakeChallengeDeck) && publicK12IntakeChallengeDeck.length ? {
+      id: 'public_k12_homework_intake_executable_loop',
+      title: 'Public K12 homework intake challenge loop',
+      challengeCount: publicK12IntakeChallengeDeck.length,
+      executableCardCount: Array.isArray(publicK12IntakeExecutableCards) ? publicK12IntakeExecutableCards.length : 0,
+      route: publicK12IntakeChallengeDeck[0].route || '/pages/arcade/arcade?from=public_k12_intake',
+      reviewRoute: publicK12IntakeChallengeDeck[0].reviewRoute || '/pages/review/review?from=public_k12_intake',
+      observableFirstMove: publicK12IntakeChallengeDeck[0].observableFirstMove || '',
+      fallbackIfNoChildInput: publicK12IntakeChallengeDeck[0].fallbackIfNoChildInput || '',
+      receiverMustUseOwnMaterial: publicK12IntakeChallengeDeck[0].receiverMustUseOwnMaterial !== false,
+      shareSafeFields: Array.isArray(publicK12IntakeChallengeDeck[0].shareSafeFields) ? publicK12IntakeChallengeDeck[0].shareSafeFields : [],
+      blockedFields: Array.isArray(publicK12IntakeChallengeDeck[0].blockedFields) ? publicK12IntakeChallengeDeck[0].blockedFields : [],
+      localCodeOwns: Array.isArray(publicK12IntakeChallengeDeck[0].localCodeOwns) ? publicK12IntakeChallengeDeck[0].localCodeOwns : [],
+      aiBetterFor: Array.isArray(publicK12IntakeChallengeDeck[0].aiBetterFor) ? publicK12IntakeChallengeDeck[0].aiBetterFor : [],
+      aiMustNotOwn: Array.isArray(publicK12IntakeChallengeDeck[0].aiMustNotOwn) ? publicK12IntakeChallengeDeck[0].aiMustNotOwn : [],
+      cards: publicK12IntakeChallengeDeck.slice(0, 3).map((card) => ({
+        id: card.id,
+        subject: card.subject,
+        taskType: card.taskType,
+        route: card.route,
+        reviewRoute: card.reviewRoute,
+        observableFirstMove: card.observableFirstMove,
+        fallbackIfNoChildInput: card.fallbackIfNoChildInput,
+        receiverMustUseOwnMaterial: card.receiverMustUseOwnMaterial !== false,
+        blockedFields: Array.isArray(card.blockedFields) ? card.blockedFields : []
       }))
     } : null;
     return {
@@ -430,6 +467,9 @@ Page({
       storyEvidence: questArcMission && Array.isArray(questArcMission.evidenceRequired)
         ? questArcMission.evidenceRequired.join(' / ')
         : '',
+      publicK12IntakeChallenge,
+      publicK12IntakeChallengeCount: publicK12IntakeChallenge ? publicK12IntakeChallenge.challengeCount : 0,
+      publicK12IntakeExecutableCardCount: publicK12IntakeChallenge ? publicK12IntakeChallenge.executableCardCount : 0,
       evidenceBiasSource: evidenceBias && evidenceBias.source ? evidenceBias.source : '',
       evidenceBiasLine: evidenceBias && evidenceBias.reasonLine ? evidenceBias.reasonLine : '',
       subjectDepthLabel: subjectSkillDepth && subjectSkillDepth.label ? subjectSkillDepth.label : '',

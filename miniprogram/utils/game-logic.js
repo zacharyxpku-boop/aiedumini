@@ -897,6 +897,70 @@ function buildCourseUnitQuestionBankPlayableCards(courseUnitQuestionBank = {}, o
   });
 }
 
+function buildPublicK12IntakeExecutableCards(challengeDeck = [], options = {}) {
+  const maxCards = Math.max(1, Number(options.maxCards || 21));
+  const deck = Array.isArray(challengeDeck) ? challengeDeck : [];
+  return deck.slice(0, maxCards).map((card, index) => {
+    const blockedFields = Array.from(new Set([]
+      .concat(Array.isArray(card.blockedFields) ? card.blockedFields : [])
+      .concat(['original_question', 'original_answer', 'full_solution', 'full_dialogue', 'score', 'ranking'])));
+    const shareSafeFields = Array.isArray(card.shareSafeFields) ? card.shareSafeFields.slice() : [];
+    const observableFirstMove = card.observableFirstMove || card.firstStepPrompt || card.localTransform || card.prompt || 'Name the first move before any answer.';
+    const fallbackIfNoChildInput = card.fallbackIfNoChildInput || 'Offer one A/B first-step hint and keep the full answer hidden.';
+    const route = card.route || `/pages/arcade/arcade?from=public_k12_intake&challenge_id=${encodeURIComponent(card.id || index + 1)}`;
+    const reviewRoute = card.reviewRoute || (card.nextPracticePlan && card.nextPracticePlan.appRoute) || `/pages/review/review?from=public_k12_intake&challenge_id=${encodeURIComponent(card.id || index + 1)}`;
+    return {
+      id: `playable_${card.id || index + 1}`,
+      type: 'public_k12_homework_intake',
+      source: 'public_k12_homework_intake_queue',
+      sourceChallengeId: card.id || '',
+      sourceId: card.sourceId || '',
+      subject: card.subject || '',
+      taskType: card.taskType || 'unknown',
+      question: card.prompt || card.gameUse || 'Use your own homework material and say the first move.',
+      answer: observableFirstMove,
+      hint: fallbackIfNoChildInput,
+      weakPoint: card.localTransform || card.taskType || 'first_move',
+      wrongCauseBucket: card.taskType || 'public_k12_homework_intake',
+      wrongCauseLabel: card.localTransform || card.gameUse || 'public_k12_homework_intake',
+      checkpoint: observableFirstMove,
+      parentPrompt: card.shareHook || fallbackIfNoChildInput,
+      next_practice: card.gameUse || 'Repeat tomorrow with a nearby problem from the receiver own material.',
+      route,
+      reviewRoute,
+      due: true,
+      dueReason: 'public_k12_homework_intake',
+      receiverMustUseOwnMaterial: card.receiverMustUseOwnMaterial !== false,
+      observableFirstMove,
+      fallbackIfNoChildInput,
+      shareSafeFields,
+      blockedFields,
+      localCodeOwns: Array.isArray(card.localCodeOwns) ? card.localCodeOwns.slice() : ['queue_order', 'release_gate', 'share_fields'],
+      aiBetterFor: Array.isArray(card.aiBetterFor) ? card.aiBetterFor.slice() : ['socratic_wording'],
+      aiMustNotOwn: Array.isArray(card.aiMustNotOwn) ? card.aiMustNotOwn.slice() : ['final_answer', 'share_release_decision'],
+      answerBoundary: card.answerBoundary || 'first_step_only_no_full_answer',
+      nextPracticePlan: Object.assign({}, card.nextPracticePlan || {}, {
+        appRoute: reviewRoute,
+        arcadeRoute: route,
+        wrongCauseBucket: card.taskType || 'public_k12_homework_intake',
+        wrongCauseLabel: card.localTransform || card.gameUse || 'public_k12_homework_intake',
+        checkpoint: observableFirstMove,
+        parentPrompt: card.shareHook || fallbackIfNoChildInput,
+        nextPracticeText: card.gameUse || 'Repeat tomorrow with the receiver own material.',
+        receiverMustUseOwnMaterial: card.receiverMustUseOwnMaterial !== false,
+        blockedFields
+      }),
+      executableSurfaces: {
+        arcade: route,
+        review: reviewRoute
+      },
+      evidenceRequired: Array.from(new Set([]
+        .concat(Array.isArray(card.evidenceRequired) ? card.evidenceRequired : [])
+        .concat(['receiver_own_material', 'observable_first_move', 'fallback_without_full_solution', 'safe_share_fields'])))
+    };
+  });
+}
+
 function buildQuestionBankMemoryBridge(courseUnitQuestionBank = {}, result = {}, retention = {}, options = {}) {
   const activeCards = Array.isArray(courseUnitQuestionBank.activeCards) ? courseUnitQuestionBank.activeCards : [];
   const allCards = Array.isArray(courseUnitQuestionBank.cards) ? courseUnitQuestionBank.cards : [];
@@ -2240,6 +2304,7 @@ module.exports = {
   buildGameRetentionLoop,
   buildGizmoLikeMemoryProtocol,
   buildHighFrequencyPracticeLoop,
+  buildPublicK12IntakeExecutableCards,
   buildReviewReturnSeed,
   buildDailyMemoryPrescription,
   buildPeerMemoryRelayLeague,

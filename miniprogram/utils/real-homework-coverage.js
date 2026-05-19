@@ -1606,7 +1606,7 @@ function buildPublicK12AssetBoundaryAudit(options = {}) {
   };
 }
 
-function buildPublicK12IntakeChallengeDeck(options = {}) {
+function buildPublicK12IntakeChallengeDeckLegacy(options = {}) {
   const limit = Number(options.limit || PUBLIC_K12_HOMEWORK_INTAKE_QUEUE.length);
   return PUBLIC_K12_HOMEWORK_INTAKE_QUEUE.slice(0, limit).map((item, index) => ({
     id: `public_k12_intake_${item.id || index + 1}`,
@@ -1643,6 +1643,125 @@ function buildPublicK12IntakeChallengeDeck(options = {}) {
     localOwner: 'local_rule',
     aiOwner: 'ai_wording_only'
   }));
+}
+
+function buildPublicK12IntakeChallengeDeck(options = {}) {
+  const limit = Number(options.limit || PUBLIC_K12_HOMEWORK_INTAKE_QUEUE.length);
+  const blockedFields = [
+    'source_original_text',
+    'original_question',
+    'original_answer',
+    'original_photo',
+    'full_solution',
+    'full_dialogue',
+    'score',
+    'ranking',
+    'private_comment'
+  ];
+  const shareSafeFields = [
+    'deck_id',
+    'source_id',
+    'subject',
+    'task_type',
+    'observable_first_move',
+    'fallback_if_no_child_input',
+    'receiver_must_use_own_material',
+    'next_route'
+  ];
+  const localCodeOwns = [
+    'source_route',
+    'task_type_route',
+    'observable_first_move_gate',
+    'fallback_gate',
+    'review_card_material_policy',
+    'share_safe_fields',
+    'blocked_fields',
+    'xp_and_unlock_gate'
+  ];
+  const aiBetterFor = [
+    'socratic_prompt_wording',
+    'parent_friendly_explanation',
+    'encouraging_hint_variants'
+  ];
+  const aiMustNotOwn = [
+    'final_answer',
+    'source_rights_decision',
+    'receiver_material_decision',
+    'share_release_decision',
+    'score_or_ranking_claim',
+    'mastery_claim_without_revisit'
+  ];
+  return PUBLIC_K12_HOMEWORK_INTAKE_QUEUE.slice(0, limit).map((item, index) => {
+    const cardId = `public_k12_intake_${item.id || index + 1}`;
+    const taskType = item.taskType || 'unknown';
+    const route = `/pages/arcade/arcade?from=public_k12_intake&task_type=${encodeURIComponent(taskType)}&challenge_id=${encodeURIComponent(cardId)}`;
+    const reviewRoute = `/pages/review/review?from=public_k12_intake&task_type=${encodeURIComponent(taskType)}&challenge_id=${encodeURIComponent(cardId)}`;
+    const observableFirstMove = item.socraticProbe || item.localPressureTransform || item.observedHomeworkShape;
+    const fallbackIfNoChildInput = 'Offer only an A/B first-step hint, then ask the child to use their own homework material; do not explain the full solution.';
+    return {
+      id: cardId,
+      sourceId: item.sourceId,
+      sourceUrl: item.sourceUrl,
+      subject: item.subject,
+      taskType,
+      title: `${item.subject} - ${displayLabel(taskType)} - 90s first-move challenge`,
+      prompt: item.observedHomeworkShape,
+      firstStepPrompt: observableFirstMove,
+      localTransform: item.localPressureTransform,
+      reportUse: item.reportUse,
+      gameUse: item.gameUse,
+      shareHook: item.shareHook,
+      observableFirstMove,
+      microRubric: [
+        'child_names_first_move_before_answer',
+        'child_names_one_wrong_cause',
+        'next_day_revisit_locked_without_full_solution'
+      ],
+      fallbackIfNoChildInput,
+      receiverMustUseOwnMaterial: true,
+      shareSafeFields: shareSafeFields.slice(),
+      blockedFields: blockedFields.slice(),
+      route,
+      reviewRoute,
+      nextPracticePlan: {
+        appRoute: reviewRoute,
+        arcadeRoute: route,
+        wrongCauseBucket: taskType,
+        wrongCauseLabel: item.localPressureTransform,
+        checkpoint: observableFirstMove,
+        parentPrompt: item.shareHook,
+        nextPracticeText: item.gameUse,
+        receiverMustUseOwnMaterial: true,
+        blockedFields: blockedFields.slice()
+      },
+      reviewCard: {
+        id: `${cardId}_review`,
+        type: 'public_k12_homework_intake',
+        sourceChallengeId: cardId,
+        route: reviewRoute,
+        arcadeRoute: route,
+        prompt: item.observedHomeworkShape,
+        answer: observableFirstMove,
+        blockedFields: blockedFields.slice()
+      },
+      answerBoundary: 'Practice only first move, wrong cause, and revisit. Do not show source question, full answer, score, ranking, photo, or full dialogue. 不展示原题',
+      evidenceRequired: item.proofRequired,
+      blockedUse: item.blockedUse,
+      releaseGate: [
+        'receiver_uses_own_material',
+        'observable_first_move_before_answer',
+        'fallback_does_not_give_solution',
+        'parent_check_present',
+        'next_day_revisit_scheduled',
+        'share_payload_uses_allowlist'
+      ],
+      localCodeOwns: localCodeOwns.slice(),
+      aiBetterFor: aiBetterFor.slice(),
+      aiMustNotOwn: aiMustNotOwn.slice(),
+      localOwner: 'local_rule',
+      aiOwner: 'ai_wording_only'
+    };
+  });
 }
 
 const UNIFIED_K12_SOURCE_BLOCKLIST = [

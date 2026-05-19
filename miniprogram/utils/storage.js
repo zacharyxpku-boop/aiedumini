@@ -5724,6 +5724,45 @@ function parentNextActionDetail(action = '') {
   return '用自己的作业或错题生成一张卡，再完成一次 5 分钟轻回访。';
 }
 
+const SHARE_RELAY_ALLOWED_FIELDS = [
+  'share_code',
+  'relay_id',
+  'receiver_material',
+  'first_step',
+  'wrong_cause',
+  'receiver_action',
+  'parent_check',
+  'next_revisit',
+  'review_evidence',
+  'event_evidence',
+  'sync_evidence'
+];
+
+const SHARE_RELAY_BLOCKED_FIELDS = [
+  'original_question',
+  'original_answer',
+  'full_answer',
+  'photo',
+  'original_photo',
+  'full_dialogue',
+  'score',
+  'ranking',
+  'private_comment'
+];
+
+function relayBlockedFieldLine(value = '') {
+  const incoming = String(value || '')
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean);
+  return Array.from(new Set(incoming.concat(SHARE_RELAY_BLOCKED_FIELDS))).join(',');
+}
+
+function relayOwnMaterialValue(value, fallback) {
+  const text = String(value || '').trim();
+  return text || fallback;
+}
+
 function buildSafeRelayChallengePacket(input = {}) {
   const focus = input.focus || loadTodayFocus() || {};
   const capability = input.capability || {};
@@ -6748,7 +6787,7 @@ function saveIncomingShare(share = {}) {
     relay_parent_check: share.relay_parent_check || '',
     relay_next_revisit: share.relay_next_revisit || '',
     relay_allowed_fields: share.relay_allowed_fields || '',
-    relay_blocked_fields: share.relay_blocked_fields || '',
+    relay_blocked_fields: relayBlockedFieldLine(share.relay_blocked_fields),
     relay_completion_signal: share.relay_completion_signal || '',
     relay_return_path: share.relay_return_path || '',
     relay_ladder: share.relay_ladder || '',
@@ -6812,9 +6851,14 @@ function saveIncomingShare(share = {}) {
     wrong_cause_receiver_action: share.wrong_cause_receiver_action || '',
     wrong_cause_next_revisit: share.wrong_cause_next_revisit || '',
     wrong_cause_allowed_fields: share.wrong_cause_allowed_fields || '',
-    wrong_cause_blocked_fields: share.wrong_cause_blocked_fields || '',
+    wrong_cause_blocked_fields: relayBlockedFieldLine(share.wrong_cause_blocked_fields),
     wrong_cause_return_path: share.wrong_cause_return_path || '',
     wrong_cause_gate: share.wrong_cause_gate || '',
+    receiver_material_required: share.receiver_material_required || 'receiver_own_material',
+    receiver_first_step_required: share.receiver_first_step_required || 'receiver_own_first_step',
+    receiver_wrong_cause_required: share.receiver_wrong_cause_required || 'receiver_own_wrong_cause',
+    receiver_revisit_required: share.receiver_revisit_required || 'receiver_next_revisit_evidence',
+    receiver_evidence_contract: share.receiver_evidence_contract || 'own_material_first_step_wrong_cause_revisit',
     created_at: share.created_at || new Date().toISOString()
   };
   set(KEYS.incomingShare, record);
@@ -6855,31 +6899,50 @@ function recordShareRelayCompletion(input = {}) {
   const incoming = input.incomingShare || loadIncomingShare() || {};
   const shareCode = input.share_code || incoming.share_code || incoming.code || '';
   if (!shareCode) return null;
-  const firstStep = input.firstStep
-    || input.childFirstStep
-    || incoming.relay_first_step
-    || incoming.question_bank_relay_first_step
-    || incoming.wrong_cause_first_step
-    || incoming.visual_board_relay_student_line
-    || 'receiver_own_first_step';
-  const wrongCause = input.wrongCause || incoming.wrong_cause_label || incoming.capability_gap || '';
+  const senderFirstSteps = [
+    incoming.relay_first_step,
+    incoming.question_bank_relay_first_step,
+    incoming.wrong_cause_first_step,
+    incoming.visual_board_relay_student_line
+  ].filter(Boolean);
+  const rawFirstStep = input.receiverFirstStep || input.childFirstStep || input.firstStep || '';
+  const firstStep = senderFirstSteps.includes(rawFirstStep)
+    ? 'receiver_own_first_step_required'
+    : relayOwnMaterialValue(rawFirstStep, 'receiver_own_first_step_required');
+  const wrongCause = relayOwnMaterialValue(input.receiverWrongCause || input.wrongCause, incoming.wrong_cause_label || incoming.capability_gap || 'receiver_own_wrong_cause_required');
+  const receiverMaterial = relayOwnMaterialValue(input.receiverMaterial || input.materialEvidence, 'receiver_own_material_required');
+  const nextRevisit = relayOwnMaterialValue(input.nextRevisit || input.revisitEvidence, incoming.relay_next_revisit || incoming.wrong_cause_next_revisit || 'receiver_next_revisit_required');
   const route = input.route || incoming.relay_return_path || incoming.question_bank_relay_route || incoming.wrong_cause_return_path || '/pages/review/review';
+  const blockedFields = relayBlockedFieldLine(incoming.relay_blocked_fields || incoming.wrong_cause_blocked_fields);
+  const evidenceContract = {
+    required: ['receiver_material', 'first_step', 'wrong_cause', 'next_revisit'],
+    receiver_material: receiverMaterial,
+    first_step: firstStep,
+    wrong_cause: wrongCause,
+    next_revisit: nextRevisit,
+    review_evidence: 'share_relay_receiver_completion',
+    event_evidence: 'share_relay_receiver_completion',
+    sync_evidence: 'share_run_and_review_event_mutations'
+  };
   const record = {
     share_code: shareCode,
     type: 'share_relay_receiver_completion',
-    title: input.title || '接收者完成同类第一步',
+    title: input.title || 'receiver completed own-material first step',
     path: route,
     share_intent: 'receiver_own_material_first_step',
     payload: {
       role: 'receiver',
       relay_id: input.relayId || incoming.relay_id || '',
+      receiver_material: receiverMaterial,
       first_step: firstStep,
       wrong_cause: wrongCause,
       receiver_action: input.receiverAction || incoming.relay_receiver_action || incoming.wrong_cause_receiver_action || '',
       parent_check: input.parentCheck || incoming.relay_parent_check || incoming.wrong_cause_parent_check || '',
-      next_revisit: input.nextRevisit || incoming.relay_next_revisit || incoming.wrong_cause_next_revisit || '',
-      evidence: input.evidence || 'receiver_own_first_step',
-      blocked_fields: incoming.relay_blocked_fields || incoming.wrong_cause_blocked_fields || 'original_question,full_answer,score,ranking,full_dialogue',
+      next_revisit: nextRevisit,
+      evidence: input.evidence || 'receiver_own_material_first_step_wrong_cause_revisit',
+      evidence_contract: evidenceContract,
+      allowed_fields: SHARE_RELAY_ALLOWED_FIELDS,
+      blocked_fields: blockedFields,
       source: 'incoming_share_completion'
     }
   };
@@ -6894,7 +6957,10 @@ function recordShareRelayCompletion(input = {}) {
     firstStep,
     wrongCause,
     route,
-    share_code: shareCode
+    share_code: shareCode,
+    receiverMaterial,
+    nextRevisit,
+    evidenceContract
   });
   return loadShareRuns()[0];
 }
