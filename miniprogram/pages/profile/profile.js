@@ -920,6 +920,7 @@ function buildFamilyDecisionHomepage(input = {}) {
   const reportDailyActionQueue = input.reportDailyActionQueue || {};
   const familyDecisionActionBridge = input.familyDecisionActionBridge || {};
   const homeSchoolCollaborationDigest = input.homeSchoolCollaborationDigest || {};
+  const parentDecisionBook = input.parentDecisionBook || {};
   const active = reportDailyActionQueue.active || {};
   const sourceLanes = Array.isArray(sourceEvidenceLedger.lanes) ? sourceEvidenceLedger.lanes : [];
   const primarySource = sourceLanes.find((item) => item && item.status === 'hit') || sourceLanes[0] || {};
@@ -944,12 +945,48 @@ function buildFamilyDecisionHomepage(input = {}) {
     : releaseDecision === 'tonight_action_only'
       ? '只放行今晚动作'
       : '继续收证据';
+  const actualLongitudinalEvidence = reportEvidenceReleaseGate.actualLongitudinalEvidence || {};
+  const statusSteps = [
+    {
+      id: 'tonight_action',
+      label: '今晚动作',
+      status: doList.length ? 'ready' : 'missing',
+      line: doList[0] || '先补一个第一步动作'
+    },
+    {
+      id: 'next_day_revisit',
+      label: '明天回访',
+      status: actualLongitudinalEvidence.nextDayRevisitCount > 0 ? 'ready' : 'pending',
+      line: actualLongitudinalEvidence.nextDayRevisitCount > 0 ? `已有 ${actualLongitudinalEvidence.nextDayRevisitCount} 次回访证据` : '还需要明天换一题回访'
+    },
+    {
+      id: 'day7_variant',
+      label: '第7天变式',
+      status: actualLongitudinalEvidence.day7VariantReady ? 'ready' : 'locked',
+      line: actualLongitudinalEvidence.day7VariantReady ? '第7天迁移证据已就绪' : '未到第7天前不写长期画像'
+    },
+    {
+      id: 'safe_share',
+      label: '安全分享',
+      status: allowed.length && blocked.length ? 'ready' : 'locked',
+      line: '只带动作、证据缺口和回访时间'
+    }
+  ];
+  const missingSteps = statusSteps.filter((step) => step.status !== 'ready');
   return {
     id: 'family_decision_homepage',
     title: '家庭决策书首页',
     headline: tonightDecisionBrief.headline || familyDecisionMemo.tonightDecision || active.task || '今晚先把一个第一步做稳',
     status: portraitStatus,
     statusLevel: releaseDecision === 'home_school_safe_handoff' ? 'ready' : releaseDecision === 'tonight_action_only' ? 'action' : 'locked',
+    statusSteps,
+    primaryBlocker: missingSteps[0] ? missingSteps[0].line : '',
+    evidenceMissingCount: missingSteps.length,
+    nextLocalAction: parentDecisionBook.tomorrowCheck || active.checkpoint || '明天换一题回访同一第一步。',
+    safeShareBadges: [
+      `可带 ${allowed.slice(0, 3).join('/')}`,
+      `不带 ${blocked.slice(0, 3).join('/')}`
+    ],
     primaryAction: active.task || familyDecisionActionBridge.summary || familyDecisionMemo.tonightDecision || '',
     parentQuestion: tonightDecisionBrief.parentScript || homeSchoolCollaborationDigest.parentQuestion || familyDecisionActionBridge.parentPrompt || '',
     childLine: tonightDecisionBrief.childScript || '我先说出第一步，不直接要答案。',
@@ -992,6 +1029,7 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
   const homeSchoolConferenceKit = reportState.homeSchoolConferenceKit || draft.homeSchoolConferenceKit || {};
   const reportEvidenceReleaseGate = reportState.reportEvidenceReleaseGate || draft.reportEvidenceReleaseGate || {};
   const sourceEvidenceLedger = reportState.sourceEvidenceLedger || draft.sourceEvidenceLedger || {};
+  const parentDecisionBook = reportState.parentDecisionBook || draft.parentDecisionBook || {};
   const matrix = Array.isArray(draft.diagnosisMatrix) ? draft.diagnosisMatrix : [];
   const tendencies = Array.isArray(draft.capabilityTendencies) ? draft.capabilityTendencies : [];
   const effectiveCourseUnitMap = courseUnitMap || (storage.buildCourseUnitMap ? storage.buildCourseUnitMap({}) : null);
@@ -1121,6 +1159,7 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     tonightDecisionBrief,
     reportEvidenceReleaseGate,
     sourceEvidenceLedger,
+    parentDecisionBook,
     reportDailyActionQueue,
     familyDecisionActionBridge,
     homeSchoolCollaborationDigest
@@ -1603,6 +1642,11 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     familyDecisionHomepageDoList: familyDecisionHomepage.doList,
     familyDecisionHomepageDontList: familyDecisionHomepage.dontList,
     familyDecisionHomepageEvidenceList: familyDecisionHomepage.evidenceList,
+    familyDecisionHomepageStatusSteps: familyDecisionHomepage.statusSteps,
+    familyDecisionHomepagePrimaryBlocker: familyDecisionHomepage.primaryBlocker,
+    familyDecisionHomepageEvidenceMissingCount: familyDecisionHomepage.evidenceMissingCount,
+    familyDecisionHomepageNextLocalAction: familyDecisionHomepage.nextLocalAction,
+    familyDecisionHomepageSafeShareBadges: familyDecisionHomepage.safeShareBadges,
     familyDecisionHomepageAllowedFields: familyDecisionHomepage.allowedFields,
     familyDecisionHomepageBlockedFields: familyDecisionHomepage.blockedFields,
     familyDecisionHomepageRoute: familyDecisionHomepage.route,
@@ -1637,6 +1681,17 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     tonightDecisionReleaseGate: tonightDecisionBrief ? tonightDecisionBrief.releaseGate : '',
     tonightDecisionShareLine: tonightDecisionBrief ? tonightDecisionBrief.shareLine : '',
     tonightDecisionSharePayload: tonightDecisionBrief ? tonightDecisionBrief.sharePayload : null,
+    parentDecisionBook,
+    parentDecisionBookTitle: parentDecisionBook.title || '',
+    parentDecisionBookDecision: parentDecisionBook.oneSentenceDecision || '',
+    parentDecisionBookWhyNow: parentDecisionBook.whyNow || '',
+    parentDecisionBookTomorrowCheck: parentDecisionBook.tomorrowCheck || '',
+    parentDecisionBookReleaseGates: Array.isArray(parentDecisionBook.releaseGates) ? parentDecisionBook.releaseGates : [],
+    parentDecisionBookRouteActions: Array.isArray(parentDecisionBook.routeActions) ? parentDecisionBook.routeActions : [],
+    parentDecisionBookEvidenceRequired: Array.isArray(parentDecisionBook.evidenceRequired) ? parentDecisionBook.evidenceRequired : [],
+    portraitStageLabel: reportEvidenceReleaseGate.portraitStageLabel || portraitConfidenceSystem.portraitStageLabel || '',
+    portraitStageReason: portraitConfidenceSystem.portraitStageReason || '',
+    portraitNextEvidenceAction: reportEvidenceReleaseGate.portraitNextEvidenceAction || portraitConfidenceSystem.portraitNextEvidenceAction || '',
     familyDecisionActionBridge,
     parentScript: solutionMap.parentScript || plan.parentLine || '家长先问一句：这一步你准备先看哪里？',
     childScript: solutionMap.childScript || plan.childLine || '我先说出第一步。',

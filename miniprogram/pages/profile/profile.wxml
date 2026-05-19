@@ -38,7 +38,13 @@
               <text class="parent-brief-label">今晚结论</text>
               <text>{{learningReportSummary.familyDecisionHomepageHeadline}}</text>
               <text>状态：{{learningReportSummary.familyDecisionHomepageStatus}}</text>
+              <text wx:if="{{learningReportSummary.familyDecisionHomepagePrimaryBlocker}}">当前缺口：{{learningReportSummary.familyDecisionHomepagePrimaryBlocker}}</text>
+              <text wx:if="{{learningReportSummary.familyDecisionHomepageNextLocalAction}}">下一步：{{learningReportSummary.familyDecisionHomepageNextLocalAction}}</text>
               <text wx:if="{{learningReportSummary.familyDecisionHomepageSourceLine}}">依据：{{learningReportSummary.familyDecisionHomepageSourceLine}}</text>
+            </view>
+            <view class="parent-brief-block" wx:if="{{learningReportSummary.familyDecisionHomepageStatusSteps.length}}">
+              <text class="parent-brief-label">证据状态条</text>
+              <text wx:for="{{learningReportSummary.familyDecisionHomepageStatusSteps}}" wx:key="id">{{item.label}}：{{item.status}} · {{item.line}}</text>
             </view>
             <view class="parent-action-snapshot">
               <view class="parent-action-head">

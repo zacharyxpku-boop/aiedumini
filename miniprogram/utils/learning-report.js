@@ -979,10 +979,19 @@ function buildPortraitConfidenceSystem(parts = {}, matrix = [], portrait = {}, c
   const sourceCount = Array.isArray(parts.reportSources) ? parts.reportSources.length : 0;
   const behaviorCount = parts.behaviorSignals ? Object.keys(parts.behaviorSignals).length : 0;
   const emotionCount = parts.emotionSignals ? Object.keys(parts.emotionSignals).length : 0;
+  const behaviorSignals = parts.behaviorSignals || {};
+  const nextDayRevisitCount = Number(behaviorSignals.nextDayRevisitCount || (behaviorSignals.nextDayRevisit ? 1 : 0) || 0);
+  const sameWrongCauseRecurrence = Number(behaviorSignals.sameWrongCauseRecurrence || 0);
+  const day7VariantReady = !!(behaviorSignals.day7VariantResult || behaviorSignals.day7VariantStatus === 'passed' || behaviorSignals.day7VariantReady);
+  const twoWeekStabilityReady = !!(behaviorSignals.twoWeekStabilityCheck || behaviorSignals.twoWeekStabilityStatus === 'stable');
   const methodCandidateIsolation = buildMethodCandidateIsolation(parts);
   const assessmentEvidenceScore = methodCandidateIsolation.methodCandidateOnly ? 0 : Math.min(assessmentCount, 15) * 3;
   const sourceEvidenceScore = methodCandidateIsolation.methodCandidateOnly ? 0 : sourceCount * 8;
-  const evidenceScore = subjects.length * 10 + assessmentEvidenceScore + sourceEvidenceScore + behaviorCount * 5 + emotionCount * 4;
+  const longitudinalEvidenceScore = nextDayRevisitCount * 8
+    + sameWrongCauseRecurrence * 6
+    + (day7VariantReady ? 18 : 0)
+    + (twoWeekStabilityReady ? 22 : 0);
+  const evidenceScore = subjects.length * 10 + assessmentEvidenceScore + sourceEvidenceScore + behaviorCount * 5 + emotionCount * 4 + longitudinalEvidenceScore;
   const confidenceLevel = evidenceScore >= 120 ? 'high' : evidenceScore >= 70 ? 'medium' : 'low';
   const primary = diagnosis.find((item) => String(item.status || '').indexOf('\u652f\u6301') >= 0) || diagnosis[0] || {};
   const subject = primary.subject || '\u5f53\u524d\u5b66\u79d1';
@@ -992,13 +1001,43 @@ function buildPortraitConfidenceSystem(parts = {}, matrix = [], portrait = {}, c
     { id: 'score_or_task', label: '\u6210\u7ee9/\u4efb\u52a1\u8bc1\u636e', status: subjects.length >= 3 ? 'ready' : 'weak', proof: subjects.length ? `${subjects.length} \u4e2a\u5b66\u79d1\u5df2\u8bb0\u5f55` : '\u7f3a\u5c11\u53ef\u786e\u8ba4\u5b66\u79d1\u8bb0\u5f55' },
     { id: 'assessment', label: '\u753b\u50cf\u95ee\u5377', status: methodCandidateIsolation.methodCandidateOnly ? 'candidate_only' : assessmentCount >= 8 ? 'ready' : 'weak', proof: methodCandidateIsolation.methodCandidateOnly ? '仅作为学习方法候选，等待真实作业和回访验证' : `${assessmentCount}/15 \u4e2a\u95ee\u9898\u5df2\u8bb0\u5f55` },
     { id: 'behavior', label: '\u505a\u9898\u8fc7\u7a0b', status: behaviorCount >= 2 ? 'ready' : 'weak', proof: behaviorCount ? `${behaviorCount} \u7c7b\u884c\u4e3a\u4fe1\u53f7` : '\u7f3a\u5c11\u771f\u5b9e\u505a\u9898\u8fc7\u7a0b' },
-    { id: 'next_day', label: '\u9694\u5929\u56de\u8bbf', status: portrait.nextReviewCadence ? 'pending' : 'missing', proof: portrait.nextReviewCadence || '\u9700\u8981\u660e\u5929\u56de\u8bbf\u9a8c\u8bc1' }
+    { id: 'next_day', label: '\u9694\u5929\u56de\u8bbf', status: nextDayRevisitCount > 0 ? 'ready' : portrait.nextReviewCadence ? 'pending' : 'missing', proof: nextDayRevisitCount > 0 ? `${nextDayRevisitCount} 次隔天回访证据` : portrait.nextReviewCadence || '\u9700\u8981\u660e\u5929\u56de\u8bbf\u9a8c\u8bc1' },
+    { id: 'day7_variant', label: '第 7 天变式', status: day7VariantReady ? 'ready' : 'locked', proof: day7VariantReady ? '第 7 天小变式已有结果' : '还不能用单次表现写长期画像' },
+    { id: 'two_week_stability', label: '两周稳定性', status: twoWeekStabilityReady ? 'ready' : 'locked', proof: twoWeekStabilityReady ? '两周稳定性检查已通过' : '还需要跨周稳定证据' }
   ];
+  const portraitStage = twoWeekStabilityReady && day7VariantReady
+    ? 'weekly_portrait_candidate'
+    : nextDayRevisitCount > 0
+      ? 'method_candidate'
+      : 'tonight_action_only';
   return {
     id: 'portrait_confidence_system',
     title: '\u957f\u671f\u753b\u50cf\u53ef\u4fe1\u5ea6\u8d26\u672c',
     confidenceLevel,
     evidenceScore,
+    portraitStage,
+    portraitStageLabel: portraitStage === 'weekly_portrait_candidate'
+      ? '可进入周画像候选'
+      : portraitStage === 'method_candidate'
+        ? '方法候选，继续回访'
+        : '只支持今晚行动',
+    portraitStageReason: portraitStage === 'weekly_portrait_candidate'
+      ? '已有隔天、第 7 天和两周稳定性证据，仍按候选处理，不贴天赋标签。'
+      : portraitStage === 'method_candidate'
+        ? '已有回访证据，但第 7 天或两周稳定性不足，只能推荐学习方法。'
+        : '证据不足以形成画像，只能给今晚第一步和家长一问。',
+    portraitNextEvidenceAction: portraitStage === 'weekly_portrait_candidate'
+      ? '下次只复核同一错因是否迁移，不增加题量。'
+      : portraitStage === 'method_candidate'
+        ? '补第 7 天小变式和两周稳定性检查。'
+        : '先补孩子第一步、错因猜测和明天回访。',
+    longitudinalEvidence: {
+      nextDayRevisitCount,
+      sameWrongCauseRecurrence,
+      day7VariantReady,
+      twoWeekStabilityReady,
+      releaseRule: '长期画像必须由本地规则读取回访证据后放行，AI 只负责改写解释。'
+    },
     methodCandidateIsolation,
     summary: confidenceLevel === 'high'
       ? '\u5f53\u524d\u8bc1\u636e\u8db3\u591f\u5f62\u6210\u9636\u6bb5\u5224\u65ad\uff0c\u4f46\u4ecd\u6309 7 \u5929\u56de\u8bbf\u66f4\u65b0\uff0c\u4e0d\u6309\u5355\u6b21\u5206\u6570\u5b9a\u6027\u3002'
@@ -1710,11 +1749,50 @@ function buildReportEvidenceReleaseGate(input = {}, portraitDecisionReleaseSyste
   ];
   const day7Released = day7Lane.status === 'candidate' || day7Lane.status === 'released';
   const tomorrowReleased = tomorrowLane.status === 'released';
-  const twoWeekReady = String(twoWeekRow.decision || '').indexOf('更新长期画像候选') >= 0
+  const behaviorSignals = input.behaviorSignals || {};
+  const spacedReviewEvidenceLedger = input.spacedReviewEvidenceLedger || {};
+  const ledgerEvidence = spacedReviewEvidenceLedger.evidence || spacedReviewEvidenceLedger.actualLongitudinalEvidence || {};
+  const portraitLongitudinalEvidence = portraitConfidence.longitudinalEvidence || {};
+  const actualLongitudinalEvidence = {
+    nextDayRevisitCount: Number(
+      behaviorSignals.nextDayRevisitCount
+      || ledgerEvidence.nextDayRevisitCount
+      || portraitLongitudinalEvidence.nextDayRevisitCount
+      || (behaviorSignals.nextDayRevisit || ledgerEvidence.next_day_revisit_status === 'passed' ? 1 : 0)
+      || 0
+    ),
+    day7VariantReady: !!(
+      behaviorSignals.day7VariantReady
+      || behaviorSignals.day7VariantResult
+      || behaviorSignals.day7VariantStatus === 'passed'
+      || ledgerEvidence.day7VariantReady
+      || ledgerEvidence.day7_variant_status === 'passed'
+      || portraitLongitudinalEvidence.day7VariantReady
+    ),
+    twoWeekStabilityReady: !!(
+      behaviorSignals.twoWeekStabilityReady
+      || behaviorSignals.twoWeekStabilityCheck
+      || behaviorSignals.twoWeekStabilityStatus === 'stable'
+      || ledgerEvidence.twoWeekStabilityReady
+      || ledgerEvidence.two_week_stability_status === 'stable'
+      || portraitLongitudinalEvidence.twoWeekStabilityReady
+    ),
+    sameWrongCauseRecurrence: Number(
+      behaviorSignals.sameWrongCauseRecurrence
+      || ledgerEvidence.sameWrongCauseRecurrence
+      || portraitLongitudinalEvidence.sameWrongCauseRecurrence
+      || 0
+    ),
+    source: spacedReviewEvidenceLedger.id || 'behavior_signals_and_portrait_confidence'
+  };
+  const day7ReleasedByActualEvidence = day7Released || actualLongitudinalEvidence.day7VariantReady;
+  const tomorrowReleasedByActualEvidence = tomorrowReleased || actualLongitudinalEvidence.nextDayRevisitCount > 0;
+  const twoWeekReady = actualLongitudinalEvidence.twoWeekStabilityReady
+    || String(twoWeekRow.decision || '').indexOf('更新长期画像候选') >= 0
     || String(twoWeekRow.confidence || '').indexOf('可进入周画像') >= 0;
-  const releaseDecision = day7Released && twoWeekReady
+  const releaseDecision = day7ReleasedByActualEvidence && twoWeekReady
     ? 'home_school_safe_handoff'
-    : tomorrowReleased
+    : tomorrowReleasedByActualEvidence
       ? 'tonight_action_only'
       : 'collect_more_evidence';
   return {
@@ -1734,10 +1812,10 @@ function buildReportEvidenceReleaseGate(input = {}, portraitDecisionReleaseSyste
       allowedRelease: ['tonight_action', 'first_step_prompt', 'parent_observation']
     },
     day7Gate: {
-      status: day7Released ? 'candidate' : 'blocked',
+      status: day7ReleasedByActualEvidence ? 'candidate' : 'blocked',
       rule: '第 7 天小变式仍能迁移，才允许进入长期画像候选。',
       requiredEvidence: ['next_day_revisit', 'day7_variant_result', 'long_term_portrait_gate'],
-      currentEvidence: day7Lane.evidence || ''
+      currentEvidence: day7Lane.evidence || (actualLongitudinalEvidence.day7VariantReady ? 'behaviorSignals.day7VariantResult' : '')
     },
     twoWeekStabilityGate: {
       status: twoWeekReady ? 'candidate' : 'blocked',
@@ -1759,6 +1837,10 @@ function buildReportEvidenceReleaseGate(input = {}, portraitDecisionReleaseSyste
       releaseScore: Number(portraitDecisionReleaseSystem.releaseScore || 0),
       rule: '分数只决定是否继续观察，不替代家长、老师和孩子的真实反馈。'
     },
+    actualLongitudinalEvidence,
+    portraitStage: portraitConfidence.portraitStage || '',
+    portraitStageLabel: portraitConfidence.portraitStageLabel || '',
+    portraitNextEvidenceAction: portraitConfidence.portraitNextEvidenceAction || '',
     aiBoundary: 'AI 只能改写解释和家校措辞；单题锁、7 天门槛、两周稳定、分享字段和家校放行全部由本地代码决定。',
     evidenceRequired: ['single_sample_lock', 'next_day_revisit', 'day7_variant_result', 'two_week_stability_check', 'safe_handoff_allowed_fields', 'unsafe_handoff_blocked_fields', 'ai_expression_only']
   };
@@ -1904,6 +1986,79 @@ function buildSourceEvidenceLedger(input = {}, parts = {}, familyDecisionMemo = 
   };
 }
 
+function buildParentDecisionBook(input = {}) {
+  const familyDecisionMemo = input.familyDecisionMemo || {};
+  const tonightDecisionBrief = input.tonightDecisionBrief || {};
+  const parentDecisionTrustSystem = input.parentDecisionTrustSystem || {};
+  const reportEvidenceReleaseGate = input.reportEvidenceReleaseGate || {};
+  const sourceEvidenceLedger = input.sourceEvidenceLedger || {};
+  const portraitConfidenceSystem = input.portraitConfidenceSystem || {};
+  const releaseDecision = reportEvidenceReleaseGate.releaseDecision || 'collect_more_evidence';
+  const safeHandoff = reportEvidenceReleaseGate.homeSchoolSafeHandoff || {};
+  const nextEvidenceQueue = Array.isArray(sourceEvidenceLedger.nextEvidenceQueue) ? sourceEvidenceLedger.nextEvidenceQueue : [];
+  const evidenceRequired = Array.from(new Set([
+    'child_first_step',
+    'wrong_cause_card',
+    'next_day_revisit',
+    'day7_variant_result',
+    'two_week_stability_check'
+  ].concat(
+    Array.isArray(reportEvidenceReleaseGate.evidenceRequired) ? reportEvidenceReleaseGate.evidenceRequired : [],
+    Array.isArray(sourceEvidenceLedger.evidenceRequired) ? sourceEvidenceLedger.evidenceRequired : []
+  ))).slice(0, 10);
+  const releaseGates = [
+    reportEvidenceReleaseGate.singleSampleLock,
+    reportEvidenceReleaseGate.day7Gate,
+    reportEvidenceReleaseGate.twoWeekStabilityGate,
+    safeHandoff
+  ].filter(Boolean).map((gate, index) => ({
+    id: gate.id || ['single_sample', 'day7', 'two_week', 'safe_handoff'][index] || `gate_${index + 1}`,
+    status: gate.status || 'locked',
+    rule: gate.rule || gate.handoffRule || '',
+    requiredEvidence: gate.requiredEvidence || []
+  }));
+  const tonightDo = Array.isArray(tonightDecisionBrief.tonightDo) && tonightDecisionBrief.tonightDo.length
+    ? tonightDecisionBrief.tonightDo.slice(0, 3)
+    : [familyDecisionMemo.tonightDecision || '今晚只做一个第一步动作，不加题量。'];
+  const tonightDoNot = Array.isArray(tonightDecisionBrief.tonightDoNot) && tonightDecisionBrief.tonightDoNot.length
+    ? tonightDecisionBrief.tonightDoNot.slice(0, 3)
+    : (Array.isArray(familyDecisionMemo.doNotDo) ? familyDecisionMemo.doNotDo.slice(0, 3) : ['不讲完整答案', '不按单次表现贴标签', '不分享原题和分数排名']);
+  return {
+    id: 'parent_decision_book',
+    title: '家长决策书',
+    status: releaseDecision,
+    oneSentenceDecision: tonightDecisionBrief.headline
+      || familyDecisionMemo.tonightDecision
+      || parentDecisionTrustSystem.decisionLine
+      || '今晚先收一条真实证据，只做一个低压动作。',
+    whyNow: parentDecisionTrustSystem.decisionLine
+      || (portraitConfidenceSystem.portraitStageReason || '当前证据只够支持今晚行动，不够给孩子定性。'),
+    tonightDo,
+    tonightDoNot,
+    tomorrowCheck: tonightDecisionBrief.tomorrowRevisit || '明天换一题回访同一第一步。',
+    releaseGates,
+    sharePolicy: {
+      allowedFields: Array.isArray(safeHandoff.allowedFields) ? safeHandoff.allowedFields.slice(0, 8) : ['tonight_action', 'parent_question', 'next_day_revisit_status'],
+      blockedFields: Array.isArray(safeHandoff.blockedFields) ? safeHandoff.blockedFields.slice(0, 10) : ['original_question', 'full_answer', 'score', 'ranking', 'full_dialogue'],
+      line: tonightDecisionBrief.shareLine || familyDecisionMemo.shareLine || '只分享行动、证据缺口和回访时间，不分享原题、答案、分数、排名或完整对话。'
+    },
+    routeActions: [
+      { id: 'ask_first_step', label: '先问第一步', route: '/pages/tutor/tutor?from=parent_decision_book', evidence: 'child_first_step' },
+      { id: 'repair_wrong_cause', label: '修错因卡', route: '/pages/review/review?from=parent_decision_book', evidence: 'wrong_cause_card' },
+      { id: 'collect_more', label: '补资料证据', route: '/pages/upload/upload?from=parent_decision_book', evidence: nextEvidenceQueue[0] ? nextEvidenceQueue[0].id : 'next_day_revisit' }
+    ],
+    aiLocalBoundary: {
+      localCodeOwns: ['证据是否足够', '画像是否放行', '分享字段', '家校交接字段', '是否加题量'],
+      aiBetterFor: ['苏格拉底追问', '小黑板解释文案', '家长低压话术', '老师沟通摘要'],
+      aiBlocked: ['完整答案', '天赋定性', '长期掌握结论', '分数排名刺激', '老师替代判断']
+    },
+    evidenceRequired,
+    nextEvidenceQueue: nextEvidenceQueue.slice(0, 5),
+    portraitStageLabel: portraitConfidenceSystem.portraitStageLabel || '',
+    portraitNextEvidenceAction: portraitConfidenceSystem.portraitNextEvidenceAction || ''
+  };
+}
+
 function buildLearningReportDraft(input = {}) {
   const sources = normalizeReportSources(input);
   const allText = [input.sourceText || '', input.scoreText || ''].concat(sources.map((source) => source.text || '')).join('\n');
@@ -1965,6 +2120,14 @@ function buildLearningReportDraft(input = {}) {
   const reportEvidenceReleaseGate = buildReportEvidenceReleaseGate(input, portraitDecisionReleaseSystem, crossWeekTrendBoard, homeSchoolCollaborationDigest, homeSchoolConferenceKit, portraitConfidenceSystem, portraitEvidenceMaturitySystem);
   const sourceEvidenceLedger = buildSourceEvidenceLedger(input, parts, familyDecisionMemo, reportEvidenceReleaseGate);
   const tonightDecisionBrief = buildTonightDecisionBrief(parts, diagnosisMatrix, familyDecisionMemo, parentDecisionTrustSystem, questionBankRecallReportBridge, input.socraticPromptQualityJudge || null);
+  const parentDecisionBook = buildParentDecisionBook({
+    familyDecisionMemo,
+    tonightDecisionBrief,
+    parentDecisionTrustSystem,
+    reportEvidenceReleaseGate,
+    sourceEvidenceLedger,
+    portraitConfidenceSystem
+  });
   const missing = missingItems(parts);
   const reportDraft = {
     id: input.id || `learning_report_${String(nowIso(input.now)).slice(0, 10).replace(/-/g, '')}`,
@@ -2009,6 +2172,7 @@ function buildLearningReportDraft(input = {}) {
     sourceEvidenceLedger,
     homeworkPressureContext,
     tonightDecisionBrief,
+    parentDecisionBook,
     generatedAt: nowIso(input.now),
     missingItems: missing,
     sourceIntegrity: {
@@ -2059,6 +2223,7 @@ function buildLearningReportDraft(input = {}) {
     sourceEvidenceLedger,
     homeworkPressureContext,
     tonightDecisionBrief,
+    parentDecisionBook,
     reportCompleteness: completeness,
     reportStatus: {
       state: completeness >= 30 ? 'ready' : 'draft',
@@ -2094,6 +2259,7 @@ module.exports = {
   buildPortraitDecisionReleaseSystem,
   buildReportEvidenceReleaseGate,
   buildSourceEvidenceLedger,
+  buildParentDecisionBook,
   buildCrossWeekTrendBoard,
   buildHomeSchoolCollaborationDigest,
   buildHomeSchoolConferenceKit,

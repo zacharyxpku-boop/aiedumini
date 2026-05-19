@@ -1046,7 +1046,9 @@ function saveLearningReportState(nextState = {}, options = {}) {
   const nowInput = options.now || new Date();
   const normalized = normalizeLearningReportState(nextState, nowInput);
   if (learningReport && learningReport.buildLearningReportDraft && !options.skipBuild) {
-    const built = learningReport.buildLearningReportDraft(Object.assign({}, normalized, options.input || {}));
+    const built = learningReport.buildLearningReportDraft(Object.assign({}, normalized, options.input || {}, {
+      spacedReviewEvidenceLedger: buildSpacedReviewEvidenceLedger()
+    }));
     Object.assign(normalized, built);
     normalized.reportDraft = built.reportDraft || normalized.reportDraft;
   }
@@ -1095,7 +1097,9 @@ function buildLearningReportFromInput(input = {}, options = {}) {
   if (!learningReport || !learningReport.buildLearningReportDraft) {
     return normalizeLearningReportState(input, options.now || new Date());
   }
-  return learningReport.buildLearningReportDraft(Object.assign({}, loadLearningReportState(), input || {}));
+  return learningReport.buildLearningReportDraft(Object.assign({}, loadLearningReportState(), input || {}, {
+    spacedReviewEvidenceLedger: buildSpacedReviewEvidenceLedger()
+  }));
 }
 
 function loadFeedback() {
@@ -4711,13 +4715,109 @@ function buildTodayFocusReviewCard(focus = {}) {
   };
 }
 
+function buildSpacedCadenceReviewCards(focus = {}) {
+  if (!focus || !focus.id) return [];
+  const now = new Date();
+  const focusId = focus.id;
+  const baseTitle = formatInternalLabel(focus.title || focus.sourceText || focus.issueType || '', '今晚修过的卡点');
+  const base = {
+    deckId: 'ydzx-core',
+    template: 'active_recall',
+    source: 'today_focus_cadence',
+    sourceFocusId: focusId,
+    subject: focus.subject || '',
+    issueType: focus.issueType || '思路卡点',
+    weakPoint: focus.title || focus.issueType || '今晚修过的卡点',
+    wrongCauseBucket: focus.issueType || focus.wrongCause || '第一步不清',
+    quality: 80,
+    difficulty: 5,
+    reps: 0,
+    lapses: 0,
+    state: 'new',
+    suspended: false,
+    leech: false,
+    created_at: now.toISOString(),
+    updated_at: now.toISOString()
+  };
+  return [
+    {
+      id: `focus_cadence_next_day_${focusId}`,
+      type: 'spaced_cadence_review',
+      cadenceMarker: 'next_day_revisit',
+      evidenceTag: 'next_day_revisit',
+      front: `明天回访「${baseTitle}」：不看答案，先说第一步。`,
+      backPrompt: '能说出第一步就停，不加题量。',
+      due: addDaysIso(1, now),
+      dueDate: addDaysIso(1, now),
+      interval: 1,
+      intervalLevel: 1,
+      status: 'new'
+    },
+    {
+      id: `focus_cadence_day7_${focusId}`,
+      type: 'spaced_cadence_review',
+      cadenceMarker: 'day7_variant',
+      evidenceTag: 'day7_variant_result',
+      front: `第7天小变式「${baseTitle}」：只换一个条件，看第一步能否迁移。`,
+      backPrompt: '能迁移才进入画像候选，不能迁移就回小黑板。',
+      due: addDaysIso(7, now),
+      dueDate: addDaysIso(7, now),
+      interval: 7,
+      intervalLevel: 3,
+      status: 'locked_until_due'
+    },
+    {
+      id: `focus_cadence_two_week_${focusId}`,
+      type: 'spaced_cadence_review',
+      cadenceMarker: 'two_week_stability_check',
+      evidenceTag: 'two_week_stability_check',
+      front: `两周稳定检查「${baseTitle}」：同一方法是否还有效？`,
+      backPrompt: '两周稳定才升级策略，不稳定就继续观察。',
+      due: addDaysIso(14, now),
+      dueDate: addDaysIso(14, now),
+      interval: 14,
+      intervalLevel: 4,
+      status: 'locked_until_due'
+    }
+  ].map((item) => Object.assign({}, base, item, {
+    noteId: `note_${item.id}`,
+    question: item.front,
+    answer: item.backPrompt,
+    stability: 0,
+    retrievability: 0,
+    elapsed_days: 0
+  }));
+}
+
+function ensureSpacedCadenceReviewCards(focus = {}) {
+  if (!focus || !focus.id || focus.repairStatus !== 'completed' || !focus.hasMiniActionDone) return [];
+  const cards = loadReviewCards();
+  const nextCards = buildSpacedCadenceReviewCards(focus);
+  const missing = nextCards.filter((card) => !cards.some((item) => item && item.id === card.id));
+  if (!missing.length) return cards.filter((card) => card && card.sourceFocusId === focus.id && card.source === 'today_focus_cadence');
+  saveReviewCards(missing.concat(cards).slice(0, 260));
+  missing.forEach((card) => appendReviewEvent({
+    type: 'spaced_cadence_review_card_created',
+    cardId: card.id,
+    sourceFocusId: focus.id,
+    cadence_marker: card.cadenceMarker,
+    evidence: card.evidenceTag,
+    rating: 'created'
+  }));
+  return missing;
+}
+
 function ensureTodayFocusReviewCard(focus = {}) {
   if (!focus || !focus.id || focus.repairStatus !== 'completed' || !focus.hasMiniActionDone) return null;
   const cards = loadReviewCards();
   const existing = cards.find((card) => card && (card.sourceFocusId === focus.id || card.id === `focus_review_${focus.id}`));
-  if (existing) return existing;
+  if (existing) {
+    ensureSpacedCadenceReviewCards(focus);
+    return existing;
+  }
   const card = buildTodayFocusReviewCard(focus);
   saveReviewCards([card].concat(cards).slice(0, 260));
+  ensureSpacedCadenceReviewCards(focus);
   appendReviewEvent({
     type: 'today_focus_review_card_created',
     cardId: card.id,
@@ -5317,6 +5417,65 @@ function appendReviewEvent(item) {
   set(KEYS.reviewEvents, next);
   appendSyncMutation('review_event', record);
   return next;
+}
+
+function buildSpacedReviewEvidenceLedger(options = {}) {
+  const cards = Array.isArray(options.reviewCards) ? options.reviewCards : loadReviewCards();
+  const events = Array.isArray(options.reviewEvents) ? options.reviewEvents : loadReviewEvents();
+  const markerOf = (item = {}) => item.cadenceMarker || item.cadence_marker || item.evidenceTag || item.evidence_tag || item.type || item.event || '';
+  const hasMarker = (marker) => cards.some((card) => markerOf(card) === marker)
+    || events.some((event) => markerOf(event) === marker || event.evidence === marker || event.releaseEvidence === marker);
+  const nextDayEvents = events.filter((event) => markerOf(event) === 'next_day_revisit' || event.evidence === 'next_day_revisit');
+  const day7Ready = hasMarker('day7_variant') || events.some((event) => event.day7VariantStatus === 'passed' || event.transfer_result === 'passed');
+  const twoWeekReady = hasMarker('two_week_stability_check') || events.some((event) => event.twoWeekStabilityStatus === 'stable' || event.method_transfer_success === true);
+  const wrongCauseBuckets = {};
+  cards.concat(events).forEach((item) => {
+    const key = item.wrongCauseBucket || item.wrongCause || item.issueType || item.weakPoint || '';
+    if (!key) return;
+    wrongCauseBuckets[key] = (wrongCauseBuckets[key] || 0) + 1;
+  });
+  const sameWrongCauseRecurrence = Object.keys(wrongCauseBuckets).reduce((max, key) => Math.max(max, wrongCauseBuckets[key]), 0);
+  const rows = [
+    {
+      id: 'next_day_revisit',
+      label: '明天回访',
+      status: nextDayEvents.length || hasMarker('next_day_revisit') ? 'ready' : 'missing',
+      evidence: 'next_day_revisit',
+      blockedReason: nextDayEvents.length || hasMarker('next_day_revisit') ? '' : '还没有隔天回访证据'
+    },
+    {
+      id: 'day7_variant',
+      label: '第7天小变式',
+      status: day7Ready ? 'ready' : 'locked',
+      evidence: 'day7_variant_result',
+      blockedReason: day7Ready ? '' : '没有第7天迁移证据，不写长期画像'
+    },
+    {
+      id: 'two_week_stability_check',
+      label: '两周稳定',
+      status: twoWeekReady ? 'ready' : 'locked',
+      evidence: 'two_week_stability_check',
+      blockedReason: twoWeekReady ? '' : '没有两周稳定证据，不升级学习策略'
+    }
+  ];
+  return {
+    id: 'spaced_review_evidence_ledger',
+    title: '间隔复习证据账本',
+    evidenceWindow: 'tonight_next_day_day7_two_week',
+    rows,
+    evidence: {
+      nextDayRevisitCount: Math.max(nextDayEvents.length, hasMarker('next_day_revisit') ? 1 : 0),
+      day7VariantReady: day7Ready,
+      twoWeekStabilityReady: twoWeekReady,
+      sameWrongCauseRecurrence,
+      next_day_revisit_status: rows[0].status === 'ready' ? 'passed' : 'missing',
+      day7_variant_status: rows[1].status === 'ready' ? 'passed' : 'locked',
+      two_week_stability_status: rows[2].status === 'ready' ? 'stable' : 'locked'
+    },
+    releaseGate: day7Ready && twoWeekReady ? 'portrait_candidate' : hasMarker('next_day_revisit') ? 'tonight_action_only' : 'collect_more_evidence',
+    blockedReason: rows.filter((row) => row.status !== 'ready').map((row) => row.blockedReason).filter(Boolean).join(' / '),
+    localRule: '本地复习事件决定 day7/two-week 放行；AI 只改写回访提示。'
+  };
 }
 
 function recordAnswerBoundaryEvidence(evidence = {}, context = {}) {
@@ -7982,6 +8141,15 @@ function buildQuestionSampleCard(unit = {}, type = 'active_recall', index = 0, o
   const oerResource = pickOerResourceForUnit(unit, type, index);
   return Object.assign({}, sample, {
     oerResourceId: oerResource && oerResource.id,
+    sourceRegistryId: oerResource && oerResource.id,
+    sourceUrl: oerResource && oerResource.sourceUrl,
+    licenseSignal: oerResource && oerResource.licenseSignal,
+    commercialDecision: oerResource && oerResource.commercialDecision,
+    distributionPolicy: 'structure_index_only_no_source_content_distribution',
+    licenseCheckedAt: oerResource && oerResource.licenseCheckedAt,
+    rightsBoundary: '只使用公开资料的结构信号、能力轴和教学活动形态，不复制原文、图片、题目、答案或品牌素材。',
+    allowedDerivedArtifacts: ['first_step_card', 'wrong_cause_probe', 'visual_board_move', 'revisit_window', 'parent_check_line'],
+    mustNotSurface: ['source_original_text', 'source_question', 'source_answer', 'source_image', 'brand_claim', 'official_partnership_claim'],
     oerReuseLevel: oerResource && (oerResource.reuseLevel || 'structure_only'),
     oerDerivedArtifact: oerResource && (oerResource.derivedArtifact || 'localized_question_type_action_card'),
     oerAttributionRequired: !!(oerResource && oerResource.attributionRequired),
@@ -10652,6 +10820,9 @@ module.exports = {
   applyLocalScenarioLoopCase,
   buildBlackboardHint,
   ensureTodayFocusReviewCard,
+  buildSpacedCadenceReviewCards,
+  ensureSpacedCadenceReviewCards,
+  buildSpacedReviewEvidenceLedger,
   loadTonightPlan,
   saveTonightPlan,
   createTonightPlanFromInput,

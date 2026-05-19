@@ -59,11 +59,92 @@ function recommendCapability(text) {
   };
 }
 
+function collectAssessmentSignals(text) {
+  const value = String(text || '');
+  const rules = [
+    { id: 'wrong_question', label: '错题/试卷', pattern: /错题|试卷|周测|单元测|期中|期末|扣分|总错|反复错|计算错|列式/i, evidence: 'wrong_question_paper' },
+    { id: 'first_step_stuck', label: '第一步卡住', pattern: /没思路|不会下手|不知道怎么开始|不会列式|看不懂题|读不懂题|先写什么/i, evidence: 'child_first_step' },
+    { id: 'focus_drop', label: '启动和专注困难', pattern: /坐不住|拖拉|磨蹭|不想学|注意力|写一会儿就停|抗拒/i, evidence: 'focus_observation' },
+    { id: 'talent_assessment', label: '天赋/学习偏好材料', pattern: /天赋|测评|学习风格|视觉型|听觉型|动觉型|优势|多元智能|MBTI|性格/i, evidence: 'method_candidate_only' },
+    { id: 'school_feedback', label: '老师/学校反馈', pattern: /老师|学校|课堂|评语|批注|家校|班主任|作业反馈/i, evidence: 'teacher_observation_request' },
+    { id: 'next_revisit', label: '回访/复习线索', pattern: /复习|回访|第\s*7\s*天|两周|变式|迁移|巩固/i, evidence: 'next_day_revisit' }
+  ];
+  return rules
+    .filter((rule) => rule.pattern.test(value))
+    .map((rule) => ({
+      id: rule.id,
+      label: rule.label,
+      evidence: rule.evidence
+    }));
+}
+
+function scoreEvidenceConfidence(subject, struggle, signals) {
+  const count = Array.isArray(signals) ? signals.length : 0;
+  return {
+    subjectConfidence: subject === '未知' ? 0.28 : Math.min(0.92, 0.48 + count * 0.09),
+    struggleConfidence: struggle === '说明学习状态' ? Math.min(0.42, 0.22 + count * 0.06) : Math.min(0.9, 0.45 + count * 0.1)
+  };
+}
+
+function buildAssessmentEvidenceSeed(text, options = {}) {
+  const source = String(text || '').trim();
+  const subject = detectSubject(source);
+  const struggle = detectStruggle(source);
+  const capability = recommendCapability(source);
+  const matchedSignals = collectAssessmentSignals(source);
+  const confidence = scoreEvidenceConfidence(subject, struggle, matchedSignals);
+  const sourceType = options.sourceType || (matchedSignals.some((item) => item.id === 'talent_assessment')
+    ? 'talent_assessment'
+    : matchedSignals.some((item) => item.id === 'wrong_question')
+      ? 'wrong_question_paper'
+      : 'parent_observation');
+  const nextEvidenceRequired = Array.from(new Set([
+    'child_first_step',
+    'wrong_cause_card',
+    'next_day_revisit'
+  ].concat(matchedSignals.map((item) => item.evidence)))).filter((item) => item !== 'method_candidate_only').slice(0, 6);
+
+  return {
+    id: 'assessment_evidence_seed',
+    sourceText: source,
+    sourceType,
+    subject,
+    struggle,
+    capabilityId: capability.id,
+    capabilityLabel: capability.label,
+    matchedSignals,
+    subjectConfidence: confidence.subjectConfidence,
+    struggleConfidence: confidence.struggleConfidence,
+    nextEvidenceRequired,
+    reportInputPatch: {
+      sourceText: source,
+      sourceType,
+      materialType: sourceType,
+      profileBasics: subject === '未知' ? {} : { subject },
+      behaviorSignals: {
+        wrongCause: struggle === '说明学习状态' ? '' : struggle,
+        firstStep: matchedSignals.some((item) => item.id === 'first_step_stuck') ? '待孩子说出第一步' : '',
+        sourceSchemaId: 'assessment_evidence_seed',
+        requiredNextEvidence: nextEvidenceRequired
+      }
+    },
+    blockedClaims: [
+      '不凭测评给孩子贴天赋标签',
+      '不凭单次输入生成长期掌握结论',
+      '不输出完整答案、排名或升学判断'
+    ],
+    localCodeOwns: ['来源分类', '证据缺口', '放行门槛', '分享字段'],
+    aiBetterFor: ['苏格拉底追问改写', '家长低压话术', '小黑板解释文案'],
+    localBetterFor: ['是否放行画像', '是否增加题量', '是否允许家校分享']
+  };
+}
+
 function buildLearningAssessment(text) {
   const source = String(text || '').trim();
   const subject = detectSubject(source);
   const struggle = detectStruggle(source);
   const capability = recommendCapability(source);
+  const evidenceSeed = buildAssessmentEvidenceSeed(source);
   const nextQuestion = subject === '数学'
     ? '你先能圈出题干里的已知条件吗？'
     : subject === '英语'
@@ -83,6 +164,10 @@ function buildLearningAssessment(text) {
     subject,
     struggle,
     capability,
+    evidenceSeed,
+    reportInputPatch: evidenceSeed.reportInputPatch,
+    nextEvidenceRequired: evidenceSeed.nextEvidenceRequired,
+    blockedClaims: evidenceSeed.blockedClaims,
     nextQuestion,
     methodHint,
     summaryLine: source
@@ -93,7 +178,9 @@ function buildLearningAssessment(text) {
 
 module.exports = {
   buildLearningAssessment,
+  buildAssessmentEvidenceSeed,
   detectSubject,
   detectStruggle,
-  recommendCapability
+  recommendCapability,
+  collectAssessmentSignals
 };
