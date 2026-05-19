@@ -441,6 +441,11 @@ function buildSocraticPromptQualityJudge(taskType, suite, signalInput) {
 }
 
 function buildThreeRoundSocraticProtocol(taskType, signal) {
+  const firstStep = signal.firstStep || TASK_TYPE_PROMPTS[taskType] || TASK_TYPE_PROMPTS.unknown;
+  const wrongCause = signal.wrongCause || '入口证据不够';
+  const boardMove = signal.boardMove || '画入口关系';
+  const parentCheck = signal.parentCheck || '家长只问检查句';
+  const reviewMove = signal.reviewMove || '换数复查入口';
   return {
     id: 'three_round_socratic_protocol',
     status: 'ready',
@@ -448,19 +453,19 @@ function buildThreeRoundSocraticProtocol(taskType, signal) {
     title: '三轮苏格拉底协议',
     parentLine: '最多三轮，仍卡住就降级给家长检查句。',
     rounds: [
-      { id: 'round_1_axis_probe', label: '第 1 轮', coachMove: signal.firstStep || TASK_TYPE_PROMPTS[taskType] || TASK_TYPE_PROMPTS.unknown, blackboardMove: signal.boardMove || '画入口关系', passEvidence: '孩子说出第一步' },
-      { id: 'round_2_micro_choice', label: '第 2 轮', coachMove: '二选一微动作', blackboardMove: '只留一个空位', passEvidence: 'child_micro_choice' },
-      { id: 'round_3_parent_handoff', label: '第 3 轮', coachMove: signal.parentCheck || '家长只问检查句', blackboardMove: '停止加提示', passEvidence: 'next_day_revisit' }
+      { id: 'round_1_axis_probe', label: '第 1 轮', coachMove: firstStep, blackboardMove: boardMove, passEvidence: '孩子说出第一步' },
+      { id: 'round_2_wrong_cause_micro_choice', label: '第 2 轮', coachMove: `二选一：先修「${wrongCause}」，还是先把「${firstStep}」说完整？`, blackboardMove: `只留一个错因空位：${wrongCause}`, passEvidence: 'child_micro_choice_with_wrong_cause' },
+      { id: 'round_3_parent_handoff', label: '第 3 轮', coachMove: parentCheck, blackboardMove: `停止加提示，转成回访：${reviewMove}`, passEvidence: 'next_day_revisit' }
     ],
     fallbackBranches: [
       { id: 'safe_share_boundary', trigger: '分享', move: SAFE_BOUNDARY_TEXT },
-      { id: 'answer_request', trigger: '要答案', move: '拒绝捷径，回到第一步' },
-      { id: 'silent_child', trigger: '沉默', move: '二选一微动作' },
-      { id: 'transfer_fail', trigger: '迁移失败', move: signal.reviewMove || '换数复查入口' }
+      { id: 'answer_request', trigger: '要答案', move: `拒绝捷径，回到第一步：${firstStep}` },
+      { id: 'silent_child', trigger: '沉默', move: `二选一微动作：${wrongCause}` },
+      { id: 'transfer_fail', trigger: '迁移失败', move: reviewMove }
     ],
     exitCriteria: ['说出第一步', '说明一个条件', '能完成近迁移入口'],
     evidenceRequired: ['round_1_axis_probe', 'round_2_micro_choice', 'round_3_parent_handoff', 'safe_share_boundary'],
-    reportLine: signal.wrongCause || '报告记录错因证据。',
+    reportLine: wrongCause,
     shareBoundary: `${SAFE_BOUNDARY_TEXT} 不展示完整答案。`
   };
 }
