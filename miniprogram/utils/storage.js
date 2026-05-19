@@ -6276,6 +6276,7 @@ function buildCommunityShareRelayBoard(input = {}) {
   const incoming = loadIncomingShare();
   const recentRuns = shareRuns.slice(0, 5);
   const relayEvidenceCount = recentRuns.filter((item) => item && (item.share_intent || item.type || item.payload)).length;
+  const receiverCompletionCount = shareRuns.filter((item) => item && item.type === 'share_relay_receiver_completion').length;
   const lanes = [
     {
       id: 'sender',
@@ -6653,6 +6654,54 @@ function appendShareRun(event = {}) {
     created_at: record.created_at
   });
   return next;
+}
+
+function recordShareRelayCompletion(input = {}) {
+  const incoming = input.incomingShare || loadIncomingShare() || {};
+  const shareCode = input.share_code || incoming.share_code || incoming.code || '';
+  if (!shareCode) return null;
+  const firstStep = input.firstStep
+    || input.childFirstStep
+    || incoming.relay_first_step
+    || incoming.question_bank_relay_first_step
+    || incoming.wrong_cause_first_step
+    || incoming.visual_board_relay_student_line
+    || 'receiver_own_first_step';
+  const wrongCause = input.wrongCause || incoming.wrong_cause_label || incoming.capability_gap || '';
+  const route = input.route || incoming.relay_return_path || incoming.question_bank_relay_route || incoming.wrong_cause_return_path || '/pages/review/review';
+  const record = {
+    share_code: shareCode,
+    type: 'share_relay_receiver_completion',
+    title: input.title || '接收者完成同类第一步',
+    path: route,
+    share_intent: 'receiver_own_material_first_step',
+    payload: {
+      role: 'receiver',
+      relay_id: input.relayId || incoming.relay_id || '',
+      first_step: firstStep,
+      wrong_cause: wrongCause,
+      receiver_action: input.receiverAction || incoming.relay_receiver_action || incoming.wrong_cause_receiver_action || '',
+      parent_check: input.parentCheck || incoming.relay_parent_check || incoming.wrong_cause_parent_check || '',
+      next_revisit: input.nextRevisit || incoming.relay_next_revisit || incoming.wrong_cause_next_revisit || '',
+      evidence: input.evidence || 'receiver_own_first_step',
+      blocked_fields: incoming.relay_blocked_fields || incoming.wrong_cause_blocked_fields || 'original_question,full_answer,score,ranking,full_dialogue',
+      source: 'incoming_share_completion'
+    }
+  };
+  appendShareRun(record);
+  appendReviewEvent({
+    type: 'share_relay_receiver_completion',
+    event: 'share_relay_receiver_completion',
+    result: 'completed',
+    rating: 'good',
+    card_id: `share_relay_${shareCode}`,
+    weakPoint: wrongCause || firstStep,
+    firstStep,
+    wrongCause,
+    route,
+    share_code: shareCode
+  });
+  return loadShareRuns()[0];
 }
 
 function randomPart() {
