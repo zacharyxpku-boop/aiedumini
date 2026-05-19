@@ -114,6 +114,11 @@
             <view class="parent-brief-block">
               <text class="parent-brief-label">怎么学更好</text>
               <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierHowToLearnBetter}}" wx:key="id">{{item.label}}：{{item.method}}｜验证：{{item.verifyWith}}</text>
+              <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierWrongPaperDiagnosisCards}}" wx:key="id">错题修复：{{item.label}}｜{{item.nextAction}}</text>
+            </view>
+            <view class="parent-brief-block" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierDetailedSections.length}}">
+              <text class="parent-brief-label">详细报告章节</text>
+              <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierDetailedSections}}" wx:key="id">{{item.label}}｜{{item.status}}｜{{item.body}}</text>
             </view>
             <view class="parent-brief-block">
               <text class="parent-brief-label">资料入口</text>
@@ -1142,6 +1147,8 @@
           <text>{{learningReportSummary.uploadedMaterialDecisionDossierChildStrengthLine}}</text>
           <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierMaterialLanes}}" wx:key="id">上传链路：{{item.label}}｜{{item.collected ? '已接入' : '待补充'}}｜可说：{{item.canSay}}｜不可说：{{item.cannotSay}}｜产出：{{item.output}}</text>
           <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierHowToLearnBetter}}" wx:key="id">怎么学候选：{{item.label}}｜证据：{{item.evidence}}｜验证：{{item.verifyWith}}</text>
+          <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierWrongPaperDiagnosisCards}}" wx:key="id">错题诊断：{{item.label}}｜{{item.rule}}｜{{item.nextAction}}</text>
+          <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierDetailedSections}}" wx:key="id">详细章节：{{item.label}}｜{{item.status}}｜{{item.body}}</text>
           <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierParentDecisionSections}}" wx:key="id">报告章节：{{item.label}}｜{{item.body}}</text>
           <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierAiLocalSplit}}" wx:key="id">AI/本地分工：{{item.label}}｜{{item.owns}}</text>
           <text wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierReleaseGate}}">放行门槛：{{learningReportSummary.uploadedMaterialDecisionDossierReleaseGate.status}}</text>

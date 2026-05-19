@@ -837,13 +837,18 @@ function buildCourseUnitQuestionBankPlayableCards(courseUnitQuestionBank = {}, o
   let sourceCards = focusCards.slice(0, maxCards);
   if (!options.rescueMode && allCards.length) {
     const seen = {};
+    sourceCards.forEach((card) => {
+      if (card && card.id && !seen[card.id]) {
+        seen[card.id] = true;
+      }
+    });
     const bySubject = allCards.reduce((acc, card) => {
       const key = card.subjectId || card.subjectLabel || 'unknown';
       if (!acc[key]) acc[key] = [];
       acc[key].push(card);
       return acc;
     }, {});
-    const balanced = [];
+    const balanced = sourceCards.slice();
     Object.keys(bySubject).forEach((subjectKey) => {
       bySubject[subjectKey].slice(0, 3).forEach((card) => {
         if (balanced.length < maxCards && !seen[card.id]) {
@@ -852,11 +857,36 @@ function buildCourseUnitQuestionBankPlayableCards(courseUnitQuestionBank = {}, o
         }
       });
     });
-    sourceCards.forEach((card) => {
-      if (balanced.length < maxCards && !seen[card.id]) {
-        balanced.push(card);
-        seen[card.id] = true;
+    const subjectOf = (card) => card && (card.subjectId || card.subjectLabel || card.subject || 'unknown');
+    const activeIdSet = activeCards.reduce((acc, card) => {
+      if (card && card.id) acc[card.id] = true;
+      return acc;
+    }, {});
+    const represented = {};
+    balanced.forEach((card) => {
+      represented[subjectOf(card)] = true;
+    });
+    Object.keys(bySubject).forEach((subjectKey) => {
+      if (represented[subjectKey]) return;
+      const candidate = bySubject[subjectKey].find((card) => card && card.id && !seen[card.id]);
+      if (!candidate) return;
+      if (balanced.length < maxCards) {
+        balanced.push(candidate);
+      } else {
+        let replaceIndex = -1;
+        for (let index = balanced.length - 1; index > 0; index -= 1) {
+          const card = balanced[index];
+          const cardSubject = subjectOf(card);
+          const duplicateSubject = balanced.filter((item) => subjectOf(item) === cardSubject).length > 1;
+          if (duplicateSubject && !activeIdSet[card && card.id]) {
+            replaceIndex = index;
+            break;
+          }
+        }
+        if (replaceIndex > 0) balanced[replaceIndex] = candidate;
       }
+      seen[candidate.id] = true;
+      represented[subjectKey] = true;
     });
     sourceCards = balanced;
   }
@@ -868,6 +898,10 @@ function buildCourseUnitQuestionBankPlayableCards(courseUnitQuestionBank = {}, o
     const checkpoint = card.visualMove || card.blackboardMove || progression.parentEvidence || firstStep;
     return {
       id: `playable_${card.id || index + 1}`,
+      unitId: card.unitId || '',
+      sourceUnitId: card.unitId || '',
+      sourceCardId: card.id || '',
+      sourceSampleId: card.sourceSampleId || '',
       question: card.sampleStem || card.prompt || `用自己的题复述「${weakKey}」的第一步`,
       answer: firstStep,
       hint: `${firstStep}。不写完整答案，只留下第一步证据。`,

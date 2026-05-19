@@ -2011,20 +2011,49 @@ function buildUploadedMaterialDecisionDossier(input = {}, parts = {}, sourceEvid
     {
       id: 'visual_first',
       label: '先看图/先画关系',
+      method: '适合把题目先变成关系图、条件表或小黑板三格，再开口说第一步。',
       evidence: '来自测评或错题中的视觉化线索，只是方法候选。',
-      verifyWith: '用一道真实错题让孩子先画条件关系，再看是否能说出第一步。'
+      verifyWith: '用一道真实错题让孩子先画条件关系，再看是否能说出第一步。',
+      childLine: '这不是说你只能看图学习，而是今晚先试试把条件画出来。',
+      parentCheck: '家长只问：你画出来的是条件、关系，还是答案？'
     },
     {
       id: 'verbal_retell',
       label: '先复述题意',
+      method: '适合先把对象、条件、目标各说一遍，再进入列式、推理或作答。',
       evidence: '来自阅读理解、应用题或老师反馈中的审题卡点。',
-      verifyWith: '隔天换一题，让孩子先复述对象、条件和目标。'
+      verifyWith: '隔天换一题，让孩子先复述对象、条件和目标。',
+      childLine: '先把题目讲给自己听，再决定第一步写什么。',
+      parentCheck: '家长只问：这题问什么？已知什么？先找哪一个关系？'
     },
     {
       id: 'write_first_step',
       label: '先动笔写第一步',
+      method: '适合把“我懂了”变成一个可检查动作：写关系式、圈证据句或列实验变量。',
       evidence: '来自计算、方程、推理或实验题里的启动困难。',
-      verifyWith: '第 7 天用小变式确认是否能迁移，而不是当场会。'
+      verifyWith: '第 7 天用小变式确认是否能迁移，而不是当场会。',
+      childLine: '先写一个小动作，不要求一步到答案。',
+      parentCheck: '家长只看第一步是否能独立写出，不看最终答案是否漂亮。'
+    }
+  ];
+  const wrongPaperDiagnosisCards = [
+    {
+      id: 'question_type',
+      label: '题型定位',
+      rule: '先把错题归到题型和第一步，不把整张卷子变成答案库。',
+      nextAction: '选一题，让孩子说“这类题第一步先看什么”。'
+    },
+    {
+      id: 'wrong_cause',
+      label: '错因命名',
+      rule: '错因必须来自孩子原想法、卡住点或订正痕迹，不能由 AI 自动判定。',
+      nextAction: '记录一个错因词：审题、关系、单位、公式、证据句或过程链。'
+    },
+    {
+      id: 'revisit_window',
+      label: '回访窗口',
+      rule: '今晚只修第一步；明天回访同错因；第 7 天做小变式。',
+      nextAction: '把这张错题变成一张回访卡，而不是继续刷整卷。'
     }
   ];
   const materialLanes = [
@@ -2067,6 +2096,36 @@ function buildUploadedMaterialDecisionDossier(input = {}, parts = {}, sourceEvid
   ];
   const collectedCount = materialLanes.filter((lane) => lane.collected).length;
   const releaseStatus = reportEvidenceReleaseGate.releaseDecision || 'collect_more_evidence';
+  const detailedReportSections = [
+    {
+      id: 'method_candidate',
+      label: '孩子可能更适合怎么学',
+      status: laneById.talent_assessment && laneById.talent_assessment.collected ? '有测评候选' : '待补测评或观察',
+      body: '报告只输出学习方法候选，不输出固定天赋标签。候选方法必须被真实错题、隔天回访和第 7 天小变式验证。',
+      rows: methodHypotheses.map((item) => `${item.label}：${item.method}`)
+    },
+    {
+      id: 'wrong_paper_diagnosis',
+      label: '错题/试卷怎么转成能力修复',
+      status: laneById.wrong_question_paper && laneById.wrong_question_paper.collected ? '已接入错题材料' : '待补错题材料',
+      body: '错题材料优先转成题型、错因、第一步和回访窗口，不生成整卷答案、不自动判分。',
+      rows: wrongPaperDiagnosisCards.map((item) => `${item.label}：${item.nextAction}`)
+    },
+    {
+      id: 'home_school_handoff',
+      label: '家校沟通能说什么',
+      status: laneById.school_material && laneById.school_material.collected ? '可生成安全摘要' : '待补老师反馈',
+      body: '家校沟通只带观察问题和下一步动作，不带原题照片、答案、分数、排名或完整对话。',
+      rows: ['老师可看：孩子先卡在哪一步', '家长可做：今晚只问一个第一步', '下次补证据：隔天回访结果']
+    },
+    {
+      id: 'evidence_roadmap',
+      label: '长期画像什么时候才可信',
+      status: releaseStatus,
+      body: '单次测评、单次错题或单次家长观察都不能直接形成长期结论。',
+      rows: ['第 1 天：说出第一步', '第 2 天：同错因回访', '第 7 天：小变式迁移', '第 14 天：稳定性复核']
+    }
+  ];
   return {
     id: 'uploaded_material_decision_dossier',
     title: '上传资料到家庭决策报告',
@@ -2080,6 +2139,8 @@ function buildUploadedMaterialDecisionDossier(input = {}, parts = {}, sourceEvid
       ? '可以描述阶段性学习优势，但仍按“证据支持的学习方法”表达，不贴固定天赋标签。'
       : '当前只能说“可能更适合的学习方法”，不能给孩子贴天赋或人格标签。',
     howToLearnBetter: methodHypotheses,
+    wrongPaperDiagnosisCards,
+    detailedReportSections,
     materialLanes,
     nextEvidenceQueue: nextQueue,
     parentDecisionSections: [

@@ -251,6 +251,12 @@ function makeCard(note, template = 'qa') {
     highFrequency: note.highFrequency,
     nextRevisitWindow: note.nextRevisitWindow,
     memoryEvidenceLine: note.memoryEvidenceLine,
+    recallEvidence: {
+      student_first_step: true,
+      wrong_cause_named: true,
+      next_day_revisit_locked: true,
+      source: note.source || 'review_card'
+    },
     quality: note.quality,
     stability: 0,
     difficulty: 5,
@@ -1371,7 +1377,7 @@ function unburyCard(cardId) {
   return updated;
 }
 
-function reviewCard(cardId, rating) {
+function reviewCard(cardId, rating, context = {}) {
   const { deck, cards } = ensureReviewDeck();
   let reviewed = null;
   const gameBefore = storage.loadGameProfile ? storage.loadGameProfile() : {};
@@ -1393,7 +1399,12 @@ function reviewCard(cardId, rating) {
           ? 'review_easy'
           : 'review_remembered';
     const xpDelta = gameLogic.calculateXP(xpAction, gameLogic.streakMultiplier(gameBefore.streak || streak || 0));
-    const xpResult = storage.addGameXP ? storage.addGameXP(xpDelta, xpAction) : { profile: gameBefore, accepted: xpDelta };
+    const xpEvidence = Object.assign({}, reviewed.recallEvidence || {}, context.xpEvidence || {}, {
+      student_first_step: !!reviewed.childArticulatedStep || !!reviewed.checkpoint || !!reviewed.front,
+      wrong_cause_named: !!reviewed.weakPoint || !!reviewed.wrongCauseLabel,
+      next_day_revisit_locked: !!reviewed.nextPracticePlan || !!reviewed.due || !!reviewed.dueDate
+    });
+    const xpResult = storage.addGameXP ? storage.addGameXP(xpDelta, xpAction, xpEvidence) : { profile: gameBefore, accepted: xpDelta, gate: { pass: true } };
     const gameAfterXp = xpResult.profile || gameBefore;
     const todayEvents = storage.loadReviewEvents ? storage.loadReviewEvents().filter((item) => String(item.created_at || '').slice(0, 10) === todayKey()) : [];
     const nextGame = gameLogic.updateStreak(gameAfterXp, {
@@ -1408,6 +1419,7 @@ function reviewCard(cardId, rating) {
       rating: reviewed.last_rating,
       xp: xpResult.accepted === undefined ? xpDelta : xpResult.accepted,
       xp_capped: !!xpResult.capped,
+      xp_gate_pass: xpResult.gate ? !!xpResult.gate.pass : true,
       stability: reviewed.stability,
       difficulty: reviewed.difficulty,
       retrievability: reviewed.retrievability,

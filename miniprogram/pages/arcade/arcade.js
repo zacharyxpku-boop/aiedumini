@@ -105,6 +105,21 @@ Page({
     return matched.concat(rest);
   },
 
+  prioritizeActiveUnitCards(cards = [], courseUnitMap = null) {
+    const activeUnitIds = courseUnitMap && Array.isArray(courseUnitMap.activeUnitIds)
+      ? courseUnitMap.activeUnitIds
+      : [];
+    if (!activeUnitIds.length) return cards;
+    const active = [];
+    const rest = [];
+    (cards || []).forEach((card) => {
+      const unitId = card && (card.unitId || card.sourceUnitId || card.courseUnitId);
+      const hit = card && card.source === 'course_unit_question_bank' && activeUnitIds.includes(unitId);
+      (hit ? active : rest).push(card);
+    });
+    return active.concat(rest);
+  },
+
   buildReportSourcePanel(context = null, cards = []) {
     if (!context) return null;
     const matchedCount = cards.filter((card) => (
@@ -188,10 +203,10 @@ Page({
       : [];
     const reportSourceContext = this.data.reportSourceContext || this.buildReportSourceContext();
     const loopBoundCards = this.loopBoundCards(dueCards.concat(fallbackCards).concat(questionBankPlayableCards).concat(publicK12IntakeExecutableCards), taskBoundCards, loopFocus);
-    const cards = this.prioritizeReportSourceCards(
+    const cards = this.prioritizeActiveUnitCards(this.prioritizeReportSourceCards(
       loopBoundCards.length ? loopBoundCards : (dueCards.length ? dueCards : (fallbackCards.length ? fallbackCards : taskBoundCards)),
       reportSourceContext
-    );
+    ), courseUnitMap);
     const ruleRetestCards = cards.filter((card) => card && card.type === 'real_trial_rule_retest');
     const profile = storage.loadGameProfile ? storage.loadGameProfile() : {};
     const reviewEvents = storage.loadReviewEvents ? storage.loadReviewEvents() : [];
@@ -273,6 +288,7 @@ Page({
       subjectSkillDepth,
       curriculumSpine,
       courseUnitMap,
+      activeUnitFirstCard: cards[0] && cards[0].source === 'course_unit_question_bank' ? cards[0] : null,
       courseUnitMasteryTrajectory,
       courseUnitQuestionBank,
       commercialDepthRunway,
@@ -1097,6 +1113,18 @@ Page({
     });
   },
 
+  xpEvidenceForCard(cardId, correct, gameType) {
+    const card = (this.data.cards || []).find((item) => item && (item.id === cardId || item.cardId === cardId)) || {};
+    const quizEvidence = this.data.quizRecallEvidence || {};
+    return Object.assign({}, quizEvidence, {
+      student_first_step: !!(quizEvidence.student_first_step || card.checkpoint || card.answer || card.childArticulatedStep),
+      wrong_cause_named: !!(quizEvidence.wrong_cause_named || card.wrongCauseLabel || card.weakPoint || !correct),
+      next_day_revisit_locked: !!(quizEvidence.next_day_revisit_locked || card.nextPracticePlan || card.next_practice || card.revisitWindow),
+      card_id: cardId,
+      game_type: gameType || this.data.selectedGame || 'whack'
+    });
+  },
+
   recordCardResult(cardId, correct, rating, gameType) {
     if (!this.canPlayGameAction('record_card_result')) return 0;
     if (!cardId) return 0;
@@ -1114,7 +1142,8 @@ Page({
     }
     const reviewRating = rating || (correct ? 'good' : 'again');
     const before = storage.loadGameProfile ? storage.loadGameProfile() : {};
-    reviewCards.reviewCard(cardId, reviewRating);
+    const xpEvidence = this.xpEvidenceForCard(cardId, correct, gameType);
+    reviewCards.reviewCard(cardId, reviewRating, { xpEvidence });
     const after = storage.loadGameProfile ? storage.loadGameProfile() : before;
     const xpAccepted = Math.max(0, Number(after.xp || 0) - Number(before.xp || 0));
     storage.appendReviewEvent({
@@ -1123,7 +1152,8 @@ Page({
       card_id: cardId,
       review_rating: reviewRating,
       result: correct ? 'correct' : 'wrong',
-      xp: xpAccepted
+      xp: xpAccepted,
+      xp_evidence_gate: xpEvidence
     });
     this.setData({
       reviewedCardIds: Object.assign({}, reviewedCardIds, {

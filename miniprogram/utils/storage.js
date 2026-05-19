@@ -4559,7 +4559,8 @@ function applyLocalScenarioLoopCase(caseId) {
   saveChildArticulatedStep(selected.childFirstStep, {
     repairStatus: 'in_progress',
     progress: 78,
-    source: 'local_scenario_loop'
+    source: 'local_scenario_loop',
+    skipNextDaySeed: true
   });
   const repairedFocus = updateTodayFocusRepair({
     repairStatus: 'completed',
@@ -4845,7 +4846,7 @@ function ensureSpacedCadenceReviewCards(focus = {}) {
 function ensureTodayFocusReviewCard(focus = {}) {
   if (!focus || !focus.id || focus.repairStatus !== 'completed' || !focus.hasMiniActionDone) return null;
   const cards = loadReviewCards();
-  const existing = cards.find((card) => card && (card.sourceFocusId === focus.id || card.id === `focus_review_${focus.id}`));
+  const existing = cards.find((card) => card && ((card.source === 'today_focus' && card.sourceFocusId === focus.id) || card.id === `focus_review_${focus.id}`));
   if (existing) {
     ensureSpacedCadenceReviewCards(focus);
     return existing;
@@ -4858,6 +4859,72 @@ function ensureTodayFocusReviewCard(focus = {}) {
     cardId: card.id,
     sourceFocusId: focus.id,
     rating: 'created'
+  });
+  return card;
+}
+
+function ensureFirstStepNextDaySeed(focus = {}) {
+  if (!focus || !focus.id || !focus.hasMiniActionDone) return null;
+  const cards = loadReviewCards();
+  const id = `first_step_next_day_${focus.id}`;
+  const existing = cards.find((card) => card && card.id === id);
+  if (existing) return existing;
+  const now = new Date();
+  const firstStep = focus.childArticulatedStep || focus.childStepSentence || focus.miniActionText || focus.systemSuggestedStep || '先说出第一步';
+  const card = {
+    id,
+    noteId: `note_${id}`,
+    deckId: 'ydzx-core',
+    template: 'active_recall',
+    type: 'first_step_next_day_seed',
+    source: 'tutor_first_step',
+    sourceFocusId: focus.id,
+    subject: focus.subject || '',
+    taskType: focus.taskType || '',
+    weakPoint: focus.title || focus.issueType || '第一步回访',
+    wrongCauseBucket: focus.issueType || focus.taskType || 'first_step',
+    wrongCauseLabel: focus.wrongCause || focus.issueType || '第一步不稳定',
+    childArticulatedStep: firstStep,
+    checkpoint: firstStep,
+    front: `明天只回这一张：${firstStep}`,
+    question: `不看答案，先说这类题第一步：${firstStep}`,
+    answer: firstStep,
+    backPrompt: '能说出第一步就停，不加题量；说不出就回小黑板。',
+    nextPracticePlan: {
+      wrongCauseBucket: focus.issueType || focus.taskType || 'first_step',
+      wrongCauseLabel: focus.wrongCause || focus.issueType || '第一步不稳定',
+      checkpoint: firstStep,
+      parentPrompt: '家长只问：这类题明天第一步先看哪里？',
+      nextPracticeText: '明天换一题，只验证第一步能不能迁移。'
+    },
+    due: addDaysIso(1, now),
+    dueDate: addDaysIso(1, now),
+    interval: 1,
+    intervalLevel: 1,
+    quality: 80,
+    difficulty: 5,
+    reps: 0,
+    lapses: 0,
+    state: 'new',
+    status: 'new',
+    suspended: false,
+    leech: false,
+    recallEvidence: {
+      student_first_step: true,
+      wrong_cause_named: true,
+      next_day_revisit_locked: true,
+      source: 'tutor_first_step'
+    },
+    created_at: now.toISOString(),
+    updated_at: now.toISOString()
+  };
+  saveReviewCards([card].concat(cards).slice(0, 260));
+  appendReviewEvent({
+    type: 'first_step_next_day_seed_created',
+    cardId: card.id,
+    sourceFocusId: focus.id,
+    taskType: focus.taskType,
+    dueDate: card.dueDate
   });
   return card;
 }
@@ -4982,7 +5049,7 @@ function saveChildArticulatedStep(text = '', patch = {}) {
       recordDailyLearningQuestSignal({ firstStepConfirmed: true });
     }
   }
-  return saveTodayFocus(Object.assign({}, current, patch || {}, {
+  const saved = saveTodayFocus(Object.assign({}, current, patch || {}, {
     childArticulatedStep: childStepSentence,
     childStepSentence,
     childStepQuality: quality,
@@ -4993,6 +5060,10 @@ function saveChildArticulatedStep(text = '', patch = {}) {
     miniActionAt: hasConcreteStep ? new Date().toISOString() : current.miniActionAt || '',
     updatedAt: new Date().toISOString()
   }));
+  if (hasConcreteStep && !patch.skipNextDaySeed) {
+    ensureFirstStepNextDaySeed(saved);
+  }
+  return saved;
 }
 
 function updateTodayFocusRepair(patch = {}) {
@@ -5628,11 +5699,37 @@ function recordDailyLearningQuestSignal(signal = {}, options = {}) {
   return saved;
 }
 
-function addGameXP(amount, reason = '') {
+function normalizeXpEvidenceGate(evidence = {}) {
+  const safe = evidence && typeof evidence === 'object' ? evidence : {};
+  const hasFirstStep = !!(safe.student_first_step || safe.first_step_recall || safe.child_first_step || safe.childArticulatedStep);
+  const hasWrongCause = !!(safe.wrong_cause_named || safe.wrong_cause_replay || safe.wrongCauseLabel || safe.wrongCause);
+  const hasRevisit = !!(safe.next_day_revisit_locked || safe.next_day_revisit || safe.revisit_locked || safe.revisitWindow);
+  const pass = !!safe.allowUnsafeLegacyXp || (hasFirstStep && hasWrongCause && hasRevisit);
+  return {
+    pass,
+    hasFirstStep,
+    hasWrongCause,
+    hasRevisit,
+    reason: pass ? 'evidence_ready' : 'first_step_wrong_cause_revisit_required'
+  };
+}
+
+function addGameXP(amount, reason = '', evidence = {}) {
   const current = loadGameProfile();
   const today = new Date().toISOString().slice(0, 10);
   const daily = Object.assign({}, current.daily_xp || {});
   const delta = Math.max(0, Number(amount || 0));
+  const gate = normalizeXpEvidenceGate(evidence);
+  if (delta > 0 && !gate.pass) {
+    appendReviewEvent({
+      kind: 'game_xp_blocked_by_evidence_gate',
+      reason,
+      requested_xp: delta,
+      xp: 0,
+      gate
+    });
+    return { profile: current, accepted: 0, capped: false, blocked: true, gate };
+  }
   const nextDaily = Number(daily[today] || 0) + delta;
   daily[today] = Math.min(500, nextDaily);
   const accepted = Math.max(0, daily[today] - Number((current.daily_xp || {})[today] || 0));
@@ -5644,11 +5741,12 @@ function addGameXP(amount, reason = '') {
     appendSyncMutation('game_xp', {
       xp: accepted,
       reason,
+      evidence_gate: gate,
       daily_total: daily[today],
       created_at: new Date().toISOString()
     });
   }
-  return { profile: saved, accepted, capped: accepted < delta };
+  return { profile: saved, accepted, capped: accepted < delta, gate };
 }
 
 function recordGameSessionResult(result = {}, context = {}) {
