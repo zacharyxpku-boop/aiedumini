@@ -256,16 +256,43 @@ Page({
     this.saveFocusFromUploadText(text, state, plan);
     if (storage.buildLearningReportFromInput && storage.saveLearningReportState) {
       const profile = storage.loadProfile ? storage.loadProfile() : {};
+      const uploadIntakePacket = this.data.uploadIntakePacket
+        || importIntake.buildUploadIntakePacket(text, this.data.imagePaths, this.data.materialType);
+      const reportSeed = (uploadIntakePacket && uploadIntakePacket.reportSeed) || {};
+      const decisionSource = {
+        sourceSchemaId: reportSeed.sourceSchemaId || (wrongbook.imported ? 'wrong_question_paper' : 'parent_report'),
+        sourceSchemaLabel: reportSeed.sourceSchemaLabel || (wrongbook.imported ? '错题/试卷' : '家长观察'),
+        inputChannel: uploadIntakePacket && uploadIntakePacket.kind ? uploadIntakePacket.kind : 'upload_text',
+        hasText: !!String(text || '').trim(),
+        imageCount: uploadIntakePacket ? Number(uploadIntakePacket.imageCount || 0) : (this.data.imagePaths || []).length,
+        confidence: Number(reportSeed.confidence || (wrongbook.imported ? 0.78 : 0.58)),
+        requiresParentConfirmation: true,
+        releaseScope: reportSeed.releaseScope || (wrongbook.imported ? 'tonight_action_first' : 'observation_only'),
+        portraitConfidenceWeight: Number(reportSeed.portraitConfidenceWeight || (wrongbook.imported ? 1 : 0)),
+        evidenceGap: reportSeed.evidenceGap || [],
+        blockedFields: uploadIntakePacket && Array.isArray(uploadIntakePacket.blockedFields)
+          ? uploadIntakePacket.blockedFields
+          : ['original_answer', 'full_solution', 'score', 'ranking']
+      };
       const reportState = storage.buildLearningReportFromInput({
         mode: wrongbook.imported ? 'full' : 'fast',
         sourceText: text,
         reportSources: [{
-          type: wrongbook.imported ? 'wrong_question_text' : 'homework_text',
-          label: wrongbook.imported ? '错题/订正资料' : '作业与学习状态',
+          type: decisionSource.sourceSchemaId,
+          label: decisionSource.sourceSchemaLabel,
           text,
-          confidence: wrongbook.imported ? 0.78 : 0.58,
-          status: '待家长确认'
+          confidence: decisionSource.confidence,
+          status: reportSeed.status || '待家长确认',
+          sourceSchemaId: decisionSource.sourceSchemaId,
+          sourceSchemaLabel: decisionSource.sourceSchemaLabel,
+          inputChannel: decisionSource.inputChannel,
+          imageCount: decisionSource.imageCount,
+          releaseScope: decisionSource.releaseScope,
+          portraitConfidenceWeight: decisionSource.portraitConfidenceWeight,
+          evidenceGap: decisionSource.evidenceGap,
+          blockedFields: decisionSource.blockedFields
         }],
+        decisionSource,
         profileBasics: {
           grade: profile.grade || state.grade || '',
           age: '',

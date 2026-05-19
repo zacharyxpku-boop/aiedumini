@@ -7557,6 +7557,118 @@ function buildCourseUnitMap(options = {}) {
   };
 }
 
+function buildGradeChapterTeachingStrategyMap(options = {}) {
+  const courseUnitMap = options.courseUnitMap || buildCourseUnitMap(options);
+  const subjects = courseUnitMap && Array.isArray(courseUnitMap.subjects) ? courseUnitMap.subjects : [];
+  const units = subjects.reduce((list, subject) => list.concat(Array.isArray(subject.units) ? subject.units : []), []);
+  const strategyModes = [
+    {
+      id: 'recognize',
+      label: '识别题型',
+      evidence: 'question_type_recognized',
+      localGate: '孩子能说出这题属于哪一类，才进入下一步。',
+      aiRole: '把题型入口改写成孩子能听懂的一句话。'
+    },
+    {
+      id: 'repair',
+      label: '修错因',
+      evidence: 'wrong_cause_named',
+      localGate: '错因没有命名时，不加题量，只回到小黑板。',
+      aiRole: '把错因解释得更温和，但不替孩子下结论。'
+    },
+    {
+      id: 'transfer',
+      label: '近迁移',
+      evidence: 'near_transfer_attempted',
+      localGate: '没有隔天回访和小变式证据，不写入长期画像。',
+      aiRole: '把同错因小变式换一种表述，不生成完整答案。'
+    }
+  ];
+  const strategies = units.reduce((list, unit) => {
+    const rows = strategyModes.map((mode, index) => ({
+      id: `${unit.id}_${mode.id}_strategy`,
+      subjectId: unit.subjectId,
+      subjectLabel: unit.subjectLabel,
+      gradeBand: unit.gradeBand || '当前年级段',
+      tier: unit.tier || '',
+      chapterLabel: unit.unitLabel,
+      taskType: unit.taskType,
+      strategyMode: mode.id,
+      strategyLabel: mode.label,
+      skillVerb: mode.id === 'recognize' ? '识别' : mode.id === 'repair' ? '解释' : '迁移',
+      knowledgePoint: `${unit.subjectLabel}/${unit.unitLabel}`,
+      firstStepPrompt: index === 0
+        ? (unit.practiceLoop && unit.practiceLoop.recall) || unit.parentAction
+        : index === 1
+          ? (unit.diagnosticProbes && unit.diagnosticProbes[0]) || unit.parentAction
+          : (unit.practiceLoop && unit.practiceLoop.transfer) || unit.shareContract,
+      misconceptionCode: `${unit.subjectId}.${String(unit.taskType || 'unknown').replace(/[^a-z0-9_]/gi, '_')}.${mode.id}`,
+      wrongCauseLabel: (unit.wrongCauseAtlas && unit.wrongCauseAtlas[index]) || `${unit.unitLabel}证据不足`,
+      boardMove: index === 0
+        ? unit.blackboardBlueprint && unit.blackboardBlueprint.firstStroke
+        : index === 1
+          ? unit.blackboardBlueprint && unit.blackboardBlueprint.visualPrompt
+          : unit.blackboardBlueprint && unit.blackboardBlueprint.stopRule,
+      parentCheckPrompt: index === 0
+        ? unit.parentAction
+        : index === 1
+          ? `家长只问：这次错因是不是「${(unit.wrongCauseAtlas && unit.wrongCauseAtlas[index]) || unit.unitLabel}」？`
+          : `家长只问：换一道题时，第一步有没有搬过去？`,
+      nearTransferRule: (unit.practiceLoop && unit.practiceLoop.transfer) || `换一个条件，仍然先说 ${unit.unitLabel} 的第一步。`,
+      answerPolicy: 'first_step_only_no_full_answer',
+      evidenceRequired: [mode.evidence, 'child_first_step', 'next_day_revisit'],
+      localGate: mode.localGate,
+      aiRole: mode.aiRole,
+      releaseGate: '本地代码决定题型、错因、回访、画像和分享放行；AI 只负责话术。',
+      shareBoundary: '不带原题、完整答案、完整对话、分数、排名或隐私评价。',
+      route: unit.route || '/pages/tutor/tutor'
+    }));
+    return list.concat(rows);
+  }, []);
+  const bySubject = strategies.reduce((acc, item) => {
+    if (!acc[item.subjectId]) {
+      acc[item.subjectId] = {
+        id: item.subjectId,
+        label: item.subjectLabel,
+        strategyCount: 0,
+        gradeBands: {},
+        taskTypes: {}
+      };
+    }
+    acc[item.subjectId].strategyCount += 1;
+    acc[item.subjectId].gradeBands[item.gradeBand] = true;
+    acc[item.subjectId].taskTypes[item.taskType] = true;
+    return acc;
+  }, {});
+  const subjectRows = Object.keys(bySubject).map((key) => {
+    const row = bySubject[key];
+    return Object.assign({}, row, {
+      gradeBandCount: Object.keys(row.gradeBands).length,
+      taskTypeCount: Object.keys(row.taskTypes).length,
+      gradeBands: Object.keys(row.gradeBands),
+      taskTypes: Object.keys(row.taskTypes)
+    });
+  });
+  return {
+    id: 'grade_chapter_teaching_strategy_map',
+    title: '年级章节题型教学策略图',
+    summary: `已把 ${subjects.length} 科、${units.length} 个课程单元扩展为 ${strategies.length} 条“识别题型-修错因-近迁移”教学策略。`,
+    boundary: '这是本地课程策略，不是外部题库、原题答案库或全科自动讲题承诺。',
+    subjectCount: subjects.length,
+    unitCount: units.length,
+    strategyCount: strategies.length,
+    subjectRows,
+    strategies,
+    localCodeOwns: ['grade_band', 'chapter_label', 'task_type', 'wrong_cause', 'board_move', 'release_gate', 'share_boundary'],
+    aiOwns: ['socratic_wording', 'parent_explanation', 'encouragement_copy'],
+    mustReject: ['copied_original_question', 'standard_answer_bank', 'score_ranking_claim', 'fake_full_blackboard'],
+    reportLine: `报告可按年级段、章节、题型和错因定位下一证据；不靠一次分数或排名更新画像。`,
+    gameLine: '游戏抽卡按教学策略走：先识别题型，再修错因，最后做近迁移。',
+    parentLine: '家长只看一个章节的一条策略是否有证据，不把整科一次性铺开。',
+    shareLine: '分享只带策略名、第一步、小黑板和回访窗口。'
+  };
+}
+
 function buildCourseUnitMasteryTrajectory(options = {}) {
   const courseUnitMap = options.courseUnitMap || buildCourseUnitMap(options);
   const active = courseUnitMap && courseUnitMap.active ? courseUnitMap.active : null;
@@ -7619,7 +7731,121 @@ function buildCourseUnitMasteryTrajectory(options = {}) {
   };
 }
 
-function buildQuestionSampleCard(unit = {}, type = 'active_recall', index = 0) {
+function getRealHomeworkPressureSamplePool() {
+  if (realHomeworkCoverage && typeof realHomeworkCoverage.getRealHomeworkPressureSamples === 'function') {
+    const samples = realHomeworkCoverage.getRealHomeworkPressureSamples();
+    return Array.isArray(samples) ? samples : [];
+  }
+  return [];
+}
+
+function normalizeCourseSampleText(value = '') {
+  return String(value || '').replace(/\s+/g, '').toLowerCase();
+}
+
+let pressureSampleIndexCache = null;
+
+function buildPressureSampleIndex(samples = []) {
+  const signature = `${samples.length}:${samples[0] && samples[0].id || ''}:${samples[samples.length - 1] && samples[samples.length - 1].id || ''}`;
+  if (pressureSampleIndexCache && pressureSampleIndexCache.signature === signature) return pressureSampleIndexCache;
+  const bySubject = {};
+  const bySubjectTask = {};
+  samples.forEach((sample) => {
+    if (!sample) return;
+    const subjectKey = sample.subject || '';
+    const taskKey = sample.taskType || '';
+    if (subjectKey) {
+      if (!bySubject[subjectKey]) bySubject[subjectKey] = [];
+      bySubject[subjectKey].push(sample);
+    }
+    if (subjectKey && taskKey) {
+      const key = `${subjectKey}::${taskKey}`;
+      if (!bySubjectTask[key]) bySubjectTask[key] = [];
+      bySubjectTask[key].push(sample);
+    }
+  });
+  pressureSampleIndexCache = { signature, bySubject, bySubjectTask, all: samples };
+  return pressureSampleIndexCache;
+}
+
+function scorePressureSampleForUnit(sample = {}, unit = {}, type = 'active_recall') {
+  const subjectHit = sample.subject && unit.subjectLabel && sample.subject === unit.subjectLabel ? 40 : 0;
+  const taskHit = sample.taskType && unit.taskType && sample.taskType === unit.taskType ? 35 : 0;
+  const gradeHit = sample.gradeBand && unit.gradeBand && normalizeCourseSampleText(sample.gradeBand) === normalizeCourseSampleText(unit.gradeBand) ? 12 : 0;
+  const unitText = normalizeCourseSampleText(`${unit.unitLabel || ''} ${(unit.reusableQuestionTypes || []).join(' ')}`);
+  const sampleText = normalizeCourseSampleText(`${sample.stem || ''} ${sample.expectedWrongCause || ''} ${sample.expectedFirstStep || ''}`);
+  const unitHit = unitText && sampleText && unitText.split('').some((char) => char && sampleText.indexOf(char) >= 0) ? 6 : 0;
+  const typeBias = type === 'wrong_cause'
+    ? (sample.expectedWrongCause ? 4 : 0)
+    : type === 'near_transfer'
+      ? (sample.nearTransfer ? 4 : 0)
+      : (sample.expectedFirstStep ? 4 : 0);
+  return subjectHit + taskHit + gradeHit + unitHit + typeBias;
+}
+
+function findPressureSampleForUnit(unit = {}, type = 'active_recall', index = 0, samplesInput) {
+  const samples = Array.isArray(samplesInput) ? samplesInput : getRealHomeworkPressureSamplePool();
+  if (!samples.length) return null;
+  const sampleIndex = buildPressureSampleIndex(samples);
+  const subjectTaskKey = `${unit.subjectLabel || ''}::${unit.taskType || ''}`;
+  const candidatePool = sampleIndex.bySubjectTask[subjectTaskKey]
+    || sampleIndex.bySubject[unit.subjectLabel || '']
+    || samples;
+  const ranked = candidatePool
+    .map((sample, sampleIndex) => ({
+      sample,
+      sampleIndex,
+      score: scorePressureSampleForUnit(sample, unit, type)
+    }))
+    .filter((item) => item.score >= 35)
+    .sort((a, b) => b.score - a.score || a.sampleIndex - b.sampleIndex);
+  if (ranked.length) {
+    return ranked[(index + (type === 'wrong_cause' ? 1 : type === 'near_transfer' ? 2 : 0)) % ranked.length].sample;
+  }
+  const subjectMatches = samples.filter((sample) => sample.subject && unit.subjectLabel && sample.subject === unit.subjectLabel);
+  if (subjectMatches.length) return subjectMatches[index % subjectMatches.length];
+  return samples[index % samples.length];
+}
+
+function buildPressureSampleEvidence(sample = {}, unit = {}, type = 'active_recall') {
+  if (!sample || !sample.id) return null;
+  return {
+    sourceSampleId: sample.id,
+    sourceId: sample.sourceId || '',
+    sourceType: sample.sourceType || '',
+    gradeBand: sample.gradeBand || unit.gradeBand || '',
+    taskType: sample.taskType || unit.taskType || '',
+    sampleStem: sample.stem || '',
+    firstStepHint: sample.expectedFirstStep || '',
+    wrongCauseProbe: sample.expectedWrongCause || '',
+    blackboardMove: sample.expectedBoardMove || '',
+    parentCheck: sample.parentCheck || '',
+    nearTransferStem: sample.nearTransfer || '',
+    sampleBackedEvidence: {
+      id: `${sample.id}_${type}_course_evidence`,
+      sourceSampleId: sample.id,
+      unitId: unit.id || '',
+      subjectLabel: sample.subject || unit.subjectLabel || '',
+      gradeBand: sample.gradeBand || unit.gradeBand || '',
+      taskType: sample.taskType || unit.taskType || '',
+      releaseScope: 'course_unit_first_step_only',
+      localGate: 'local_rule_requires_first_step_wrong_cause_board_parent_check_revisit',
+      answerPolicy: 'first_step_only_no_full_answer',
+      evidenceRequired: [
+        'sample_specific_first_step',
+        'sample_specific_wrong_cause',
+        'visual_board_move',
+        'parent_check_line',
+        'near_transfer_variant'
+      ],
+      blockedFields: ['original_question', 'full_answer', 'score', 'ranking', 'full_dialogue'],
+      aiRole: 'socratic_wording_only',
+      localCodeOwns: ['sample_match', 'release_gate', 'share_boundary', 'portrait_writeback']
+    }
+  };
+}
+
+function buildQuestionSampleCard(unit = {}, type = 'active_recall', index = 0, options = {}) {
   const subject = unit.subjectLabel || '学科';
   const label = unit.unitLabel || '当前单元';
   const samples = {
@@ -7649,7 +7875,27 @@ function buildQuestionSampleCard(unit = {}, type = 'active_recall', index = 0) {
     }
   };
   const sample = samples[type] || samples.active_recall;
+  const sourceSample = findPressureSampleForUnit(unit, type, index, options.realHomeworkPressureSamples);
+  const sourceEvidence = buildPressureSampleEvidence(sourceSample, unit, type);
   return Object.assign({}, sample, {
+    sourceBacked: !!sourceEvidence,
+    sourceSampleId: sourceEvidence && sourceEvidence.sourceSampleId,
+    sourceId: sourceEvidence && sourceEvidence.sourceId,
+    sourceType: sourceEvidence && sourceEvidence.sourceType,
+    gradeBand: sourceEvidence && sourceEvidence.gradeBand ? sourceEvidence.gradeBand : unit.gradeBand,
+    sourceSampleStem: sourceEvidence && sourceEvidence.sampleStem,
+    sourceSampleFirstStep: sourceEvidence && sourceEvidence.firstStepHint,
+    sourceSampleWrongCause: sourceEvidence && sourceEvidence.wrongCauseProbe,
+    sourceSampleBoardMove: sourceEvidence && sourceEvidence.blackboardMove,
+    sourceSampleParentCheck: sourceEvidence && sourceEvidence.parentCheck,
+    sourceSampleNearTransfer: sourceEvidence && sourceEvidence.nearTransferStem,
+    sampleBackedEvidence: sourceEvidence && sourceEvidence.sampleBackedEvidence,
+    sampleStem: sourceEvidence && sourceEvidence.sampleStem ? sourceEvidence.sampleStem : sample.sampleStem,
+    firstStepHint: sourceEvidence && sourceEvidence.firstStepHint ? sourceEvidence.firstStepHint : sample.firstStepHint,
+    blackboardMove: sourceEvidence && sourceEvidence.blackboardMove ? sourceEvidence.blackboardMove : sample.blackboardMove,
+    wrongCauseProbe: sourceEvidence && sourceEvidence.wrongCauseProbe ? sourceEvidence.wrongCauseProbe : sample.wrongCauseProbe,
+    nearTransferStem: sourceEvidence && sourceEvidence.nearTransferStem ? sourceEvidence.nearTransferStem : sample.nearTransferStem,
+    parentCheck: sourceEvidence && sourceEvidence.parentCheck ? sourceEvidence.parentCheck : sample.parentCheck,
     sampleId: `${unit.id || 'unit'}_${type}_sample_${index + 1}`,
     classroomUse: '适合晚间作业 3 分钟低压练习，不作为考试押题。',
     evidenceRubric: [
@@ -7664,8 +7910,8 @@ function buildQuestionSampleCard(unit = {}, type = 'active_recall', index = 0) {
 function buildQuestionProgressionCard(unit = {}, card = {}, index = 0) {
   const subject = unit.subjectLabel || card.subjectLabel || '学科';
   const label = unit.unitLabel || '当前单元';
-  const visualMove = card.visualMove || (unit.blackboardBlueprint && unit.blackboardBlueprint.firstStroke) || `小黑板只写 ${label} 的第一步`;
-  const wrongCause = card.wrongCause || (unit.wrongCauseAtlas && unit.wrongCauseAtlas[0]) || `${label} 的错因还没有命名`;
+  const visualMove = card.sourceSampleBoardMove || card.blackboardMove || card.visualMove || (unit.blackboardBlueprint && unit.blackboardBlueprint.firstStroke) || `小黑板只写 ${label} 的第一步`;
+  const wrongCause = card.sourceSampleWrongCause || card.wrongCauseProbe || card.wrongCause || (unit.wrongCauseAtlas && unit.wrongCauseAtlas[0]) || `${label} 的错因还没有命名`;
   const evidence = card.evidenceRequired || 'child_first_step';
   const typeText = {
     active_recall: '主动回忆',
@@ -7779,6 +8025,9 @@ function buildCourseUnitQuestionBank(options = {}) {
   const subjects = courseUnitMap && Array.isArray(courseUnitMap.subjects) ? courseUnitMap.subjects : [];
   const units = subjects.reduce((list, subject) => list.concat(Array.isArray(subject.units) ? subject.units : []), []);
   const activeUnits = active && Array.isArray(active.units) ? active.units : [];
+  const realHomeworkPressureSamples = Array.isArray(options.realHomeworkPressureSamples)
+    ? options.realHomeworkPressureSamples
+    : getRealHomeworkPressureSamplePool();
   const questionCards = units.reduce((list, unit) => {
     const base = `${unit.subjectLabel}/${unit.unitLabel}`;
     const cards = [
@@ -7823,9 +8072,10 @@ function buildCourseUnitQuestionBank(options = {}) {
       }
     ];
     return list.concat(cards.map((card, cardIndex) => {
-      const sample = buildQuestionSampleCard(unit, card.type, cardIndex);
-      return Object.assign({}, card, sample, {
-        progression: buildQuestionProgressionCard(unit, card, cardIndex)
+      const sample = buildQuestionSampleCard(unit, card.type, cardIndex, { realHomeworkPressureSamples });
+      const mergedCard = Object.assign({}, card, sample);
+      return Object.assign({}, mergedCard, {
+        progression: buildQuestionProgressionCard(unit, mergedCard, cardIndex)
       });
     }));
   }, []);
@@ -7852,6 +8102,10 @@ function buildCourseUnitQuestionBank(options = {}) {
     unitCount: units.length,
     subjectCount: subjects.length,
     questionCount: questionCards.length,
+    sourceBackedCount: questionCards.filter((card) => card.sourceBacked && card.sourceSampleId && card.sampleBackedEvidence).length,
+    sourceBackedSubjectCount: new Set(questionCards.filter((card) => card.sourceBacked).map((card) => card.subjectLabel)).size,
+    sourceBackedGradeBandCount: new Set(questionCards.filter((card) => card.sourceBacked).map((card) => card.gradeBand).filter(Boolean)).size,
+    sourceBackedTaskTypeCount: new Set(questionCards.filter((card) => card.sourceBacked).map((card) => card.sampleBackedEvidence && card.sampleBackedEvidence.taskType || card.taskType).filter(Boolean)).size,
     sampleCount: questionCards.filter((card) => card.sampleStem && card.firstStepHint && card.nearTransferStem).length,
     progressionCount: questionCards.filter((card) => card.progression && card.progression.entryTask && card.progression.masteryGate).length,
     progressionStageCount: questionCards.reduce((sum, card) => sum + Number(card.progression && card.progression.stageCount || 0), 0),
@@ -7886,14 +8140,16 @@ function buildCourseUnitDepthExpansionAtlas(options = {}) {
     const unitCards = cardsByUnit[unit.id] || [];
     const archetypes = (unit.reusableQuestionTypes || []).map((questionType, index) => {
       const card = unitCards[index] || unitCards[0] || {};
-      const wrongCause = (unit.wrongCauseAtlas || [])[index] || card.wrongCause || `${unit.unitLabel}错因未命名`;
-      const probe = (unit.diagnosticProbes || [])[index] || card.firstStepHint || `先说 ${unit.unitLabel} 的第一步`;
+      const wrongCause = card.sourceSampleWrongCause || card.wrongCauseProbe || (unit.wrongCauseAtlas || [])[index] || card.wrongCause || `${unit.unitLabel}错因未命名`;
+      const probe = card.sourceSampleFirstStep || (unit.diagnosticProbes || [])[index] || card.firstStepHint || `先说 ${unit.unitLabel} 的第一步`;
       const boardMove = index === 0
         ? (unit.blackboardBlueprint && unit.blackboardBlueprint.firstStroke)
         : index === 1
           ? (unit.blackboardBlueprint && unit.blackboardBlueprint.visualPrompt)
           : (unit.blackboardBlueprint && unit.blackboardBlueprint.stopRule);
-      const sampleStem = card.sampleStem || `${unit.subjectLabel}：围绕 ${unit.unitLabel} 做一题小练习。`;
+      const sampleStem = card.sourceSampleStem || card.sampleStem || `${unit.subjectLabel}：围绕 ${unit.unitLabel} 做一题小练习。`;
+      const sampleWrongCause = card.sourceSampleWrongCause || wrongCause;
+      const sampleTransfer = card.sourceSampleNearTransfer || card.nearTransferStem || `${unit.unitLabel}换一个条件后，仍然先复述第一步。`;
       return {
         id: `${unit.id}_depth_archetype_${index + 1}`,
         unitId: unit.id,
@@ -7902,15 +8158,19 @@ function buildCourseUnitDepthExpansionAtlas(options = {}) {
         unitLabel: unit.unitLabel,
         label: questionType,
         sampleStem,
+        sourceBacked: !!card.sourceBacked,
+        sourceSampleId: card.sourceSampleId || '',
+        sourceId: card.sourceId || '',
+        sampleBackedEvidence: card.sampleBackedEvidence || null,
         diagnosticProbe: probe,
         misconceptionVariants: [
-          wrongCause,
+          sampleWrongCause,
           `${unit.unitLabel}只记住题面词，没说出第一步依据。`,
-          `${unit.unitLabel}换一个条件后，仍然沿用原题动作。`
+          sampleTransfer
         ],
         visualBoardTemplate: {
           title: `${unit.subjectLabel}/${unit.unitLabel} 第一笔小黑板`,
-          opening: boardMove || `只画 ${unit.unitLabel} 的第一步关系。`,
+          opening: card.sourceSampleBoardMove || card.blackboardMove || boardMove || `只画 ${unit.unitLabel} 的第一步关系。`,
           drawSteps: [
             `圈出目标：${unit.unitLabel}`,
             `标一条证据：${probe}`,
@@ -7964,6 +8224,7 @@ function buildCourseUnitDepthExpansionAtlas(options = {}) {
     boundary: '这是题型级内容厚度，不是全科拍题讲完整答案。',
     unitCount: unitAtlases.length,
     archetypeCount: unitAtlases.reduce((sum, item) => sum + item.archetypeCount, 0),
+    sourceBackedArchetypeCount: unitAtlases.reduce((sum, item) => sum + (item.archetypes || []).filter((archetype) => archetype.sourceBacked && archetype.sourceSampleId).length, 0),
     misconceptionVariantCount: unitAtlases.reduce((sum, item) => sum + item.misconceptionCount, 0),
     visualBoardMoveCount: unitAtlases.reduce((sum, item) => sum + item.boardMoveCount, 0),
     parentCheckScriptCount: unitAtlases.reduce((sum, item) => sum + item.parentCheckCount, 0),
@@ -7982,6 +8243,7 @@ function buildCommercialDepthRunway(options = {}) {
   const courseUnitMap = options.courseUnitMap || buildCourseUnitMap(options);
   const courseUnitQuestionBank = options.courseUnitQuestionBank || buildCourseUnitQuestionBank({ courseUnitMap });
   const courseUnitDepthExpansionAtlas = options.courseUnitDepthExpansionAtlas || buildCourseUnitDepthExpansionAtlas({ courseUnitMap, courseUnitQuestionBank });
+  const gradeChapterTeachingStrategyMap = options.gradeChapterTeachingStrategyMap || buildGradeChapterTeachingStrategyMap({ courseUnitMap });
   const courseUnitMasteryTrajectory = options.courseUnitMasteryTrajectory || buildCourseUnitMasteryTrajectory({ courseUnitMap });
   const subjectSkillDepth = options.subjectSkillDepth || buildSubjectSkillDepth(options);
   const activeUnit = courseUnitMap && courseUnitMap.active && Array.isArray(courseUnitMap.active.units)
@@ -7992,6 +8254,14 @@ function buildCommercialDepthRunway(options = {}) {
     ? courseUnitMasteryTrajectory.weakest
     : null;
   const lanes = [
+    {
+      id: 'grade_chapter_strategy',
+      label: '年级章节教学策略',
+      route: '/pages/module/module',
+      evidenceLine: `已沉淀 ${gradeChapterTeachingStrategyMap.strategyCount || 0} 条年级/章节/题型策略，覆盖识别题型、修错因和近迁移。`,
+      nextAction: '今晚只选一条策略落到第一步小黑板。',
+      proof: ['年级段', '章节', '题型', '错因', '本地放行']
+    },
     {
       id: 'question_type_depth',
       label: '题型级内容深度',
@@ -8025,9 +8295,10 @@ function buildCommercialDepthRunway(options = {}) {
   return {
     id: 'commercial_depth_runway',
     title: '三线加厚作战板',
-    summary: `题型、记忆、家长决策 ${readyCount}/${lanes.length} 条线已有可执行证据。`,
+    summary: `策略、题型、记忆、家长决策 ${readyCount}/${lanes.length} 条线已有可执行证据。`,
     boundary: '只做第一步小黑板、错因图解、近迁移和家长行动判断；不承诺全科拍题自动板书或直接答案。',
     lanes,
+    gradeChapterTeachingStrategyMap,
     visualBoardMoves: [
       activeUnit && activeUnit.blackboardBlueprint ? activeUnit.blackboardBlueprint.firstStroke : subjectSkillDepth.firstStep,
       activeUnit && activeUnit.blackboardBlueprint ? activeUnit.blackboardBlueprint.visualPrompt : subjectSkillDepth.parentQuestion,
@@ -10221,6 +10492,7 @@ module.exports = {
   buildLightEntrySeedBank,
   buildSubjectSeedLibrary,
   buildCourseUnitMap,
+  buildGradeChapterTeachingStrategyMap,
   buildCourseUnitMasteryTrajectory,
   buildCourseUnitQuestionBank,
   buildCourseUnitDepthExpansionAtlas,
