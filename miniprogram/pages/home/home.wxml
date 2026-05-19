@@ -393,6 +393,22 @@
       <view class="share-relay-board" wx:if="{{incomingShareRelay}}">
         <view class="share-relay-title">{{incomingShareRelay.title}}</view>
         <view class="share-relay-summary">{{incomingShareRelay.summary}}</view>
+        <view class="share-relay-pack" wx:if="{{incomingShareRelay.relayPackReady}}">
+          <view class="share-relay-pack-head">
+            <text>{{incomingShareRelay.relayPackTitle}}</text>
+            <text>{{incomingShareRelay.relayPackSummary}}</text>
+          </view>
+          <view
+            class="share-relay-pack-card"
+            wx:for="{{incomingShareRelay.relayPackCards}}"
+            wx:key="id"
+          >
+            <view class="share-relay-pack-title">{{item.title}}</view>
+            <view class="share-relay-pack-line">{{item.line}}</view>
+            <view class="share-relay-pack-evidence">{{item.evidence}}</view>
+          </view>
+          <view class="share-relay-pack-safe">{{incomingShareRelay.relayPackBlockedLine}}</view>
+        </view>
         <view class="share-relay-evidence">{{incomingShareRelay.firstStepLine}}</view>
         <view class="share-relay-evidence">{{incomingShareRelay.privacyLine}}</view>
         <view class="share-relay-evidence">{{incomingShareRelay.reviewLine}}</view>

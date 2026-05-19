@@ -1043,10 +1043,43 @@ Page({
       ? `这张卡带回一份今晚决策书：${incoming.tonight_decision || '先做一个最小动作'}`
       : '';
     const socraticReportEvidence = incoming.tonight_decision || incoming.socratic_report_decision || incoming.socratic_report_action || '';
+    const primaryReceiverAction = (safeRelayPacket && safeRelayPacket.receiverAction) || (wrongCauseViralPack && wrongCauseViralPack.receiverAction) || actionDetail;
+    const primaryParentCheck = (safeRelayPacket && safeRelayPacket.parentCheck) || incoming.question_bank_relay_parent_check || incoming.visual_board_relay_parent_line || incoming.tonight_parent_question || '家长只问孩子第一步怎么想，不看完整答案。';
+    const primaryNextRevisit = (safeRelayPacket && safeRelayPacket.nextDayRevisit) || incoming.tonight_tomorrow || (wrongCauseViralPack && wrongCauseViralPack.nextRevisit) || reviewLine;
+    const relayPackBlockedFields = (safeRelayPacket && safeRelayPacket.blockedFields) || (wrongCauseViralPack && wrongCauseViralPack.blockedFields) || 'original_question,full_answer,photo,score,ranking,full_dialogue';
+    const relayPackCards = [
+      {
+        id: 'tonight_action',
+        title: '今晚动作',
+        line: incoming.tonight_decision || primaryReceiverAction || '用自己的材料完成一个 5 分钟第一步动作。',
+        evidence: incoming.tonight_release_gate || '完成后留下自己的第一步和错因证据。',
+        route: challengeRoute
+      },
+      {
+        id: 'first_step',
+        title: '第一步/错因',
+        line: incoming.question_bank_relay_first_step || incoming.wrong_cause_first_step || firstStep,
+        evidence: incoming.wrong_cause_label ? `错因：${incoming.wrong_cause_label}` : '只复用思路，不复制原题和答案。',
+        route: wrongCauseRoute
+      },
+      {
+        id: 'tomorrow_revisit',
+        title: '明天回访',
+        line: primaryNextRevisit,
+        evidence: primaryParentCheck,
+        route: '/pages/profile/profile?from=share_relay_pack'
+      }
+    ];
     return {
       title: '回流接力板',
       summary: tonightDecisionSummary || socraticReportSummary || (unitLine ? `这张卡带回一个单元动作：${unitLine}。先复用第一步，不看排名。` : '朋友分享的不是排名，是一个可复用的小动作。先选一条路，按点会留下接力证据。'),
       evidenceLine: socraticReportEvidence || incoming.course_unit_share_contract || incoming.capability_label || incoming.challenge_goal || actionLabel,
+      relayPackTitle: '先接这三件事',
+      relayPackSummary: '接收页先给行动，不堆信息：今晚做什么、第一步怎么想、明天怎么回访。',
+      relayPackReady: relayPackCards.length === 3,
+      relayPackBlockedFields,
+      relayPackBlockedLine: `三卡不带：${relayPackBlockedFields}`,
+      relayPackCards,
       firstStepLine: `先做第一步：${firstStep}`,
       privacyLine,
       reviewLine,
