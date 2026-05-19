@@ -905,6 +905,21 @@
           <text wx:if="{{learningReportSummary.portraitDecisionReleaseShareBoundary}}">分享边界：{{learningReportSummary.portraitDecisionReleaseShareBoundary}}</text>
           <text wx:for="{{learningReportSummary.portraitDecisionReleaseEvidence}}" wx:key="*this">放行证据：{{item}}</text>
         </view>
+        <view class="parent-brief-block" wx:if="{{learningReportSummary.reportEvidenceReleaseGate}}">
+          <text class="parent-brief-label">报告证据放行闸</text>
+          <text wx:if="{{learningReportSummary.reportEvidenceReleaseGateTitle}}">{{learningReportSummary.reportEvidenceReleaseGateTitle}}</text>
+          <text>报告放行：{{learningReportSummary.reportEvidenceReleaseDecision}}</text>
+          <text>{{learningReportSummary.reportEvidenceReleaseSummary}}</text>
+          <text wx:if="{{learningReportSummary.reportEvidenceSingleSampleLock}}">单题锁：{{learningReportSummary.reportEvidenceSingleSampleLock.rule}}</text>
+          <text wx:if="{{learningReportSummary.reportEvidenceDay7Gate}}">第7天闸：{{learningReportSummary.reportEvidenceDay7Gate.status}}｜{{learningReportSummary.reportEvidenceDay7Gate.rule}}</text>
+          <text wx:if="{{learningReportSummary.reportEvidenceTwoWeekGate}}">两周稳定闸：{{learningReportSummary.reportEvidenceTwoWeekGate.status}}｜{{learningReportSummary.reportEvidenceTwoWeekGate.rule}}</text>
+          <text wx:if="{{learningReportSummary.reportEvidenceSafeHandoff}}">家校交接：{{learningReportSummary.reportEvidenceSafeHandoff.status}}｜{{learningReportSummary.reportEvidenceSafeHandoff.handoffRule}}</text>
+          <text wx:for="{{learningReportSummary.reportEvidenceAllowedFields}}" wx:key="*this">可传字段：{{item}}</text>
+          <text wx:for="{{learningReportSummary.reportEvidenceBlockedFields}}" wx:key="*this">禁传字段：{{item}}</text>
+          <text wx:if="{{learningReportSummary.reportEvidenceConfidenceFloor}}">证据底线：{{learningReportSummary.reportEvidenceConfidenceFloor.rule}}</text>
+          <text wx:if="{{learningReportSummary.reportEvidenceAiBoundary}}">AI 边界：{{learningReportSummary.reportEvidenceAiBoundary}}</text>
+          <text wx:for="{{learningReportSummary.reportEvidenceRequired}}" wx:key="*this">审计证据：{{item}}</text>
+        </view>
         <view class="parent-brief-block" wx:if="{{learningReportSummary.questionBankShareRelayDeck}}">
           <text class="parent-brief-label">{{learningReportSummary.questionBankShareRelayTitle}}</text>
           <text>{{learningReportSummary.questionBankShareRelayLine}}</text>

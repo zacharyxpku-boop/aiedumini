@@ -812,6 +812,7 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
   const crossWeekTrendBoard = reportState.crossWeekTrendBoard || draft.crossWeekTrendBoard || {};
   const homeSchoolCollaborationDigest = reportState.homeSchoolCollaborationDigest || draft.homeSchoolCollaborationDigest || {};
   const homeSchoolConferenceKit = reportState.homeSchoolConferenceKit || draft.homeSchoolConferenceKit || {};
+  const reportEvidenceReleaseGate = reportState.reportEvidenceReleaseGate || draft.reportEvidenceReleaseGate || {};
   const matrix = Array.isArray(draft.diagnosisMatrix) ? draft.diagnosisMatrix : [];
   const tendencies = Array.isArray(draft.capabilityTendencies) ? draft.capabilityTendencies : [];
   const effectiveCourseUnitMap = courseUnitMap || (storage.buildCourseUnitMap ? storage.buildCourseUnitMap({}) : null);
@@ -1109,6 +1110,7 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     crossWeekTrendBoard,
     homeSchoolCollaborationDigest,
     homeSchoolConferenceKit,
+    reportEvidenceReleaseGate,
     longitudinalPortraitTimelineTitle: longitudinalPortraitTimeline.title || '',
     longitudinalPortraitTimelineStatus: longitudinalPortraitTimeline.status || '',
     longitudinalPortraitTimelineSummary: longitudinalPortraitTimeline.summary || '',
@@ -1156,6 +1158,22 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
       : [],
     homeSchoolConferenceShareBoundary: homeSchoolConferenceKit.shareBoundary || '',
     homeSchoolConferenceAiBoundary: homeSchoolConferenceKit.aiBoundary || '',
+    reportEvidenceReleaseGateTitle: reportEvidenceReleaseGate.title || '',
+    reportEvidenceReleaseDecision: reportEvidenceReleaseGate.releaseDecision || '',
+    reportEvidenceReleaseSummary: reportEvidenceReleaseGate.summary || '',
+    reportEvidenceSingleSampleLock: reportEvidenceReleaseGate.singleSampleLock || null,
+    reportEvidenceDay7Gate: reportEvidenceReleaseGate.day7Gate || null,
+    reportEvidenceTwoWeekGate: reportEvidenceReleaseGate.twoWeekStabilityGate || null,
+    reportEvidenceSafeHandoff: reportEvidenceReleaseGate.homeSchoolSafeHandoff || null,
+    reportEvidenceAllowedFields: reportEvidenceReleaseGate.homeSchoolSafeHandoff && Array.isArray(reportEvidenceReleaseGate.homeSchoolSafeHandoff.allowedFields)
+      ? reportEvidenceReleaseGate.homeSchoolSafeHandoff.allowedFields
+      : [],
+    reportEvidenceBlockedFields: reportEvidenceReleaseGate.homeSchoolSafeHandoff && Array.isArray(reportEvidenceReleaseGate.homeSchoolSafeHandoff.blockedFields)
+      ? reportEvidenceReleaseGate.homeSchoolSafeHandoff.blockedFields
+      : [],
+    reportEvidenceConfidenceFloor: reportEvidenceReleaseGate.confidenceFloor || null,
+    reportEvidenceAiBoundary: reportEvidenceReleaseGate.aiBoundary || '',
+    reportEvidenceRequired: Array.isArray(reportEvidenceReleaseGate.evidenceRequired) ? reportEvidenceReleaseGate.evidenceRequired : [],
     portraitConfidenceTitle: portraitConfidenceSystem.title || '',
     portraitConfidenceLevel: portraitConfidenceSystem.confidenceLevel || '',
     portraitConfidenceScore: Number(portraitConfidenceSystem.evidenceScore || 0),

@@ -1559,6 +1559,92 @@ function buildPortraitDecisionReleaseSystem(input = {}, parentDecisionTrust = {}
   };
 }
 
+function buildReportEvidenceReleaseGate(input = {}, portraitDecisionReleaseSystem = {}, crossWeekTrendBoard = {}, homeSchoolCollaborationDigest = {}, homeSchoolConferenceKit = {}, portraitConfidence = {}, portraitEvidenceMaturity = {}) {
+  const releaseLanes = Array.isArray(portraitDecisionReleaseSystem.releaseLanes) ? portraitDecisionReleaseSystem.releaseLanes : [];
+  const day7Lane = releaseLanes.find((item) => item.id === 'day7_portrait') || {};
+  const tomorrowLane = releaseLanes.find((item) => item.id === 'tomorrow_revisit') || {};
+  const trendRows = Array.isArray(crossWeekTrendBoard.trendRows) ? crossWeekTrendBoard.trendRows : [];
+  const twoWeekRow = trendRows.find((item) => item.id === 'week_2') || {};
+  const blockedFields = Array.from(new Set([
+    'original_question',
+    'photo',
+    'full_answer',
+    'full_dialogue',
+    'score',
+    'ranking',
+    'private_comment',
+    'classmate_comparison'
+  ].concat(
+    Array.isArray(homeSchoolConferenceKit.localReleaseGate && homeSchoolConferenceKit.localReleaseGate.blockedFields)
+      ? homeSchoolConferenceKit.localReleaseGate.blockedFields
+      : []
+  )));
+  const allowedFields = [
+    'subject',
+    'wrong_cause_label',
+    'first_step_observation',
+    'next_day_revisit_status',
+    'day7_variant_status',
+    'two_week_stability_status',
+    'parent_question',
+    'teacher_observation_request'
+  ];
+  const day7Released = day7Lane.status === 'candidate' || day7Lane.status === 'released';
+  const tomorrowReleased = tomorrowLane.status === 'released';
+  const twoWeekReady = String(twoWeekRow.decision || '').indexOf('更新长期画像候选') >= 0
+    || String(twoWeekRow.confidence || '').indexOf('可进入周画像') >= 0;
+  const releaseDecision = day7Released && twoWeekReady
+    ? 'home_school_safe_handoff'
+    : tomorrowReleased
+      ? 'tonight_action_only'
+      : 'collect_more_evidence';
+  return {
+    id: 'report_evidence_release_gate',
+    title: '报告证据放行闸',
+    localDeterministic: true,
+    releaseDecision,
+    summary: releaseDecision === 'home_school_safe_handoff'
+      ? '证据可以进入家校安全交接，但仍只传观察问题和行动线索，不传原题答案。'
+      : releaseDecision === 'tonight_action_only'
+        ? '证据只支持今晚行动和明天回访，不能生成长期画像结论。'
+        : '证据不足，报告只保留观察记录，不给能力定性。',
+    singleSampleLock: {
+      status: 'locked',
+      rule: '单次题目、单次正确或单次卡住，都不能放行长期画像、跨周趋势或老师结论。',
+      blockedRelease: ['long_term_portrait', 'cross_week_trend', 'teacher_handoff'],
+      allowedRelease: ['tonight_action', 'first_step_prompt', 'parent_observation']
+    },
+    day7Gate: {
+      status: day7Released ? 'candidate' : 'blocked',
+      rule: '第 7 天小变式仍能迁移，才允许进入长期画像候选。',
+      requiredEvidence: ['next_day_revisit', 'day7_variant_result', 'long_term_portrait_gate'],
+      currentEvidence: day7Lane.evidence || ''
+    },
+    twoWeekStabilityGate: {
+      status: twoWeekReady ? 'candidate' : 'blocked',
+      rule: '连续两周同一方法有效，才允许把候选画像升级为稳定策略。',
+      requiredEvidence: ['two_week_stability_check', 'same_wrong_cause_recurrence', 'method_transfer_success'],
+      currentDecision: twoWeekRow.decision || ''
+    },
+    homeSchoolSafeHandoff: {
+      status: releaseDecision === 'home_school_safe_handoff' ? 'ready' : 'locked',
+      allowedFields,
+      blockedFields,
+      teacherQuestion: homeSchoolCollaborationDigest.teacherQuestion || '',
+      parentQuestion: homeSchoolCollaborationDigest.parentQuestion || '',
+      handoffRule: '家校交接只传证据类型、观察问题和下一步动作，不传原题、答案、照片、分数、排名或完整对话。'
+    },
+    confidenceFloor: {
+      portraitConfidenceScore: Number(portraitConfidence.evidenceScore || 0),
+      maturityScore: Number(portraitEvidenceMaturity.maturityScore || 0),
+      releaseScore: Number(portraitDecisionReleaseSystem.releaseScore || 0),
+      rule: '分数只决定是否继续观察，不替代家长、老师和孩子的真实反馈。'
+    },
+    aiBoundary: 'AI 只能改写解释和家校措辞；单题锁、7 天门槛、两周稳定、分享字段和家校放行全部由本地代码决定。',
+    evidenceRequired: ['single_sample_lock', 'next_day_revisit', 'day7_variant_result', 'two_week_stability_check', 'safe_handoff_allowed_fields', 'unsafe_handoff_blocked_fields', 'ai_expression_only']
+  };
+}
+
 function buildLearningReportDraft(input = {}) {
   const sources = normalizeReportSources(input);
   const allText = [input.sourceText || '', input.scoreText || ''].concat(sources.map((source) => source.text || '')).join('\n');
@@ -1615,6 +1701,7 @@ function buildLearningReportDraft(input = {}) {
   const crossWeekTrendBoard = buildCrossWeekTrendBoard(parts, diagnosisMatrix, longitudinalPortraitTimeline, portraitEvidenceMaturitySystem, questionBankRecallReportBridge);
   const homeSchoolCollaborationDigest = buildHomeSchoolCollaborationDigest(parts, diagnosisMatrix, classroomDecisionBoard, familyDecisionMemo, crossWeekTrendBoard);
   const homeSchoolConferenceKit = buildHomeSchoolConferenceKit(parts, diagnosisMatrix, homeSchoolCollaborationDigest, crossWeekTrendBoard, parentDecisionTrustSystem);
+  const reportEvidenceReleaseGate = buildReportEvidenceReleaseGate(input, portraitDecisionReleaseSystem, crossWeekTrendBoard, homeSchoolCollaborationDigest, homeSchoolConferenceKit, portraitConfidenceSystem, portraitEvidenceMaturitySystem);
   const tonightDecisionBrief = buildTonightDecisionBrief(parts, diagnosisMatrix, familyDecisionMemo, parentDecisionTrustSystem, questionBankRecallReportBridge, input.socraticPromptQualityJudge || null);
   const missing = missingItems(parts);
   const reportDraft = {
@@ -1656,6 +1743,7 @@ function buildLearningReportDraft(input = {}) {
     crossWeekTrendBoard,
     homeSchoolCollaborationDigest,
     homeSchoolConferenceKit,
+    reportEvidenceReleaseGate,
     homeworkPressureContext,
     tonightDecisionBrief,
     generatedAt: nowIso(input.now),
@@ -1700,6 +1788,7 @@ function buildLearningReportDraft(input = {}) {
     crossWeekTrendBoard,
     homeSchoolCollaborationDigest,
     homeSchoolConferenceKit,
+    reportEvidenceReleaseGate,
     homeworkPressureContext,
     tonightDecisionBrief,
     reportCompleteness: completeness,
@@ -1735,6 +1824,7 @@ module.exports = {
   buildQuestionBankDecisionBridge,
   buildQuestionBankRecallReportBridge,
   buildPortraitDecisionReleaseSystem,
+  buildReportEvidenceReleaseGate,
   buildCrossWeekTrendBoard,
   buildHomeSchoolCollaborationDigest,
   buildHomeSchoolConferenceKit,
