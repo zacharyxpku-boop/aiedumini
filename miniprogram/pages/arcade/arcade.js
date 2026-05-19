@@ -61,11 +61,67 @@ Page({
     expandedMatrix: false,
     recentTaskType: 'unknown',
     learningBoundLine: '',
-    gameBlocked: false
+    gameBlocked: false,
+    reportSourceContext: null,
+    reportSourcePanel: null
+  },
+
+  onLoad(query = {}) {
+    this.setData({
+      reportSourceContext: this.buildReportSourceContext(query)
+    });
   },
 
   onShow() {
     this.refresh();
+  },
+
+  buildReportSourceContext(query = {}) {
+    const handoff = storage.get ? storage.get('upload.report.handoff.v1', null) : null;
+    const context = Object.assign({}, handoff || {}, query || {});
+    const fromUpload = context.from === 'upload_report_ready' || (handoff && handoff.status === 'ready');
+    if (!fromUpload && !context.cardId && !context.sourceSchemaId) return null;
+    return {
+      reportId: context.reportId || '',
+      sourceSchemaId: context.sourceSchemaId || '',
+      cardId: context.cardId || '',
+      title: context.title || '来自刚上传的资料',
+      line: context.line || '这轮轻练习优先使用刚上传材料生成的卡。',
+      blockedFields: Array.isArray(context.blockedFields) ? context.blockedFields : []
+    };
+  },
+
+  prioritizeReportSourceCards(cards = [], context = null) {
+    if (!context) return cards;
+    const matched = [];
+    const rest = [];
+    cards.forEach((card) => {
+      const hit = (context.cardId && (card.id === context.cardId || card.cardId === context.cardId))
+        || (context.sourceSchemaId && card.sourceSchemaId === context.sourceSchemaId)
+        || (context.sourceSchemaId && String(card.source || '').includes(context.sourceSchemaId));
+      (hit ? matched : rest).push(card);
+    });
+    return matched.concat(rest);
+  },
+
+  buildReportSourcePanel(context = null, cards = []) {
+    if (!context) return null;
+    const matchedCount = cards.filter((card) => (
+      (context.cardId && (card.id === context.cardId || card.cardId === context.cardId))
+      || (context.sourceSchemaId && card.sourceSchemaId === context.sourceSchemaId)
+      || (context.sourceSchemaId && String(card.source || '').includes(context.sourceSchemaId))
+    )).length;
+    const first = cards[0] || {};
+    return {
+      title: context.title || '来自刚上传的资料',
+      line: context.line || '先把这份材料对应的卡做成轻练习，再回到普通复习。',
+      sourceSchemaId: context.sourceSchemaId || '',
+      reportId: context.reportId || '',
+      cardId: first.cardId || first.id || context.cardId,
+      firstQuestion: first.question || first.prompt || '',
+      matchedCount,
+      blockedFields: context.blockedFields || []
+    };
   },
 
   refresh() {
@@ -129,8 +185,12 @@ Page({
     const publicK12IntakeExecutableCards = gameLogic.buildPublicK12IntakeExecutableCards
       ? gameLogic.buildPublicK12IntakeExecutableCards(publicK12IntakeChallengeDeck, { maxCards: 21 })
       : [];
+    const reportSourceContext = this.data.reportSourceContext || this.buildReportSourceContext();
     const loopBoundCards = this.loopBoundCards(dueCards.concat(fallbackCards).concat(questionBankPlayableCards).concat(publicK12IntakeExecutableCards), taskBoundCards, loopFocus);
-    const cards = loopBoundCards.length ? loopBoundCards : (dueCards.length ? dueCards : (fallbackCards.length ? fallbackCards : taskBoundCards));
+    const cards = this.prioritizeReportSourceCards(
+      loopBoundCards.length ? loopBoundCards : (dueCards.length ? dueCards : (fallbackCards.length ? fallbackCards : taskBoundCards)),
+      reportSourceContext
+    );
     const ruleRetestCards = cards.filter((card) => card && card.type === 'real_trial_rule_retest');
     const profile = storage.loadGameProfile ? storage.loadGameProfile() : {};
     const reviewEvents = storage.loadReviewEvents ? storage.loadReviewEvents() : [];
@@ -175,6 +235,8 @@ Page({
     this.setData({
       summary,
       cards,
+      reportSourceContext,
+      reportSourcePanel: this.buildReportSourcePanel(reportSourceContext, cards),
       startXp: Number(profile.xp || 0),
       classifications: arcade.classifyCards(cards),
       recommendations,

@@ -203,6 +203,11 @@ function makeNote(id, type, source, fields, meta = {}) {
     nextPracticePlan: meta.nextPracticePlan || fields.nextPracticePlan || practicePlan,
     checkpoint: meta.checkpoint || fields.checkpoint || practicePlan.checkpoint,
     parentPrompt: meta.parentPrompt || fields.parentPrompt || practicePlan.parentPrompt,
+    reportId: meta.reportId || fields.reportId || '',
+    sourceSchemaId: meta.sourceSchemaId || fields.sourceSchemaId || '',
+    reportSourceId: meta.reportSourceId || fields.reportSourceId || '',
+    uploadMaterialType: meta.uploadMaterialType || fields.uploadMaterialType || '',
+    requiredNextEvidence: meta.requiredNextEvidence || fields.requiredNextEvidence || [],
     sourceMaterialType: meta.sourceMaterialType || memoryMeta.sourceMaterialType,
     highFrequency: meta.highFrequency || memoryMeta.highFrequency,
     nextRevisitWindow: meta.nextRevisitWindow || memoryMeta.nextRevisitWindow,
@@ -237,6 +242,11 @@ function makeCard(note, template = 'qa') {
     nextPracticePlan: note.nextPracticePlan,
     checkpoint: note.checkpoint,
     parentPrompt: note.parentPrompt,
+    reportId: note.reportId,
+    sourceSchemaId: note.sourceSchemaId,
+    reportSourceId: note.reportSourceId,
+    uploadMaterialType: note.uploadMaterialType,
+    requiredNextEvidence: note.requiredNextEvidence,
     sourceMaterialType: note.sourceMaterialType,
     highFrequency: note.highFrequency,
     nextRevisitWindow: note.nextRevisitWindow,
@@ -1029,11 +1039,17 @@ function importTextToDeck(rawText, options = {}) {
       subject: item.subject || subject,
       weakPoint: item.weakPoint || options.weakPoint || '',
       calibrationKey: item.calibrationKey || options.calibrationKey || '',
-      wrongCauseBucket: item.wrongCauseBucket || options.wrongCauseBucket || ''
+      wrongCauseBucket: item.wrongCauseBucket || options.wrongCauseBucket || '',
+      reportId: options.reportId || '',
+      sourceSchemaId: options.sourceSchemaId || '',
+      reportSourceId: options.reportSourceId || '',
+      uploadMaterialType: options.uploadMaterialType || options.materialType || '',
+      requiredNextEvidence: options.requiredNextEvidence || []
     }
   ));
   const notes = mergeById(current.notes, extraNotes).slice(0, 200);
-  const cards = mergeById(current.cards, cardsFromNotes(extraNotes, 260)).slice(0, 260);
+  const extraCards = cardsFromNotes(extraNotes, 260);
+  const cards = mergeById(current.cards, extraCards).slice(0, 260);
   persistReviewState(current.deck, notes, cards);
   storage.appendReviewEvent({
     kind: 'review_import',
@@ -1052,7 +1068,9 @@ function importTextToDeck(rawText, options = {}) {
     notes,
     cards,
     imported: extraNotes.length,
-    skipped: imported.length - extraNotes.length
+    skipped: imported.length - extraNotes.length,
+    importedCardIds: extraCards.map((card) => card.id),
+    firstCardId: extraCards[0] ? extraCards[0].id : ''
   };
 }
 
@@ -1082,7 +1100,12 @@ function importGeneratedCards(imported, options = {}) {
       subject: item.subject || subject,
       weakPoint: item.weakPoint || options.weakPoint || '',
       calibrationKey: item.calibrationKey || options.calibrationKey || '',
-      wrongCauseBucket: item.wrongCauseBucket || options.wrongCauseBucket || ''
+      wrongCauseBucket: item.wrongCauseBucket || options.wrongCauseBucket || '',
+      reportId: options.reportId || '',
+      sourceSchemaId: options.sourceSchemaId || '',
+      reportSourceId: options.reportSourceId || '',
+      uploadMaterialType: options.uploadMaterialType || options.materialType || '',
+      requiredNextEvidence: options.requiredNextEvidence || []
     }
   ));
   const notes = mergeById(current.notes, extraNotes).slice(0, 200);

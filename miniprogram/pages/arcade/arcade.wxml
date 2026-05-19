@@ -40,6 +40,13 @@
     </view>
 
     <view class="challenge-brief-card" wx:if="{{challengeBrief}}">
+      <view class="story-mission" wx:if="{{reportSourcePanel}}">
+        <view class="story-mission-title">{{reportSourcePanel.title}}</view>
+        <view class="story-mission-line">{{reportSourcePanel.line}}</view>
+        <view class="story-mission-rule">来源：{{reportSourcePanel.sourceSchemaId}} / {{reportSourcePanel.reportId}} / {{reportSourcePanel.cardId}}</view>
+        <view class="story-mission-rule" wx:if="{{reportSourcePanel.firstQuestion}}">本局先练：{{reportSourcePanel.firstQuestion}}</view>
+        <view class="story-mission-rule">来源卡：{{reportSourcePanel.matchedCount}} 张；禁传字段：{{reportSourcePanel.blockedFields}}</view>
+      </view>
       <view class="challenge-brief-top">
         <view>
           <view class="challenge-brief-kicker">本局目标</view>

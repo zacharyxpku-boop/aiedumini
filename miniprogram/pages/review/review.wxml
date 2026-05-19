@@ -37,6 +37,22 @@
             <view class="focus-text">{{item.text}}</view>
           </view>
         </view>
+        <view class="repair-contract-card" wx:if="{{reportSourcePanel}}">
+          <view class="repair-contract-head">
+            <view class="repair-contract-title">{{reportSourcePanel.title}}</view>
+            <view class="repair-contract-status">{{reportSourcePanel.matchedCount}} 张来源卡</view>
+          </view>
+          <view class="repair-contract-row">
+            <text class="repair-contract-label">来源</text>
+            <text class="repair-contract-text">{{reportSourcePanel.sourceSchemaId}} / {{reportSourcePanel.reportId}} / {{reportSourcePanel.cardId}}</text>
+          </view>
+          <view class="repair-contract-row" wx:if="{{reportSourcePanel.currentQuestion}}">
+            <text class="repair-contract-label">当前卡</text>
+            <text class="repair-contract-text">{{reportSourcePanel.currentQuestion}}</text>
+          </view>
+          <view class="repair-contract-parent">{{reportSourcePanel.line}}</view>
+          <view class="repair-contract-boundary">禁传字段：{{reportSourcePanel.blockedFields}}</view>
+        </view>
         <view class="repair-contract-card" wx:if="{{reviewViewModel.repairContract}}">
           <view class="repair-contract-head">
             <view class="repair-contract-title">{{reviewViewModel.repairContract.title}}</view>

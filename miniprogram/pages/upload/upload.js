@@ -336,9 +336,12 @@ Page({
   buildReportCta(decisionSource = {}, reportState = {}, options = {}) {
     const sourceSchemaId = decisionSource.sourceSchemaId || 'parent_report';
     const importedCards = Number(options.importedCards || 0);
+    const cardId = options.cardId || '';
+    const reportId = reportState && reportState.reportDraft ? reportState.reportDraft.id : '';
+    const query = `reportId=${encodeURIComponent(reportId)}&sourceSchemaId=${encodeURIComponent(sourceSchemaId)}${cardId ? `&cardId=${encodeURIComponent(cardId)}` : ''}`;
     const actionRoute = sourceSchemaId === 'wrong_question_paper'
-      ? '/pages/review/review?from=upload_report_ready'
-      : '/pages/tutor/tutor?from=upload_report_ready';
+      ? `/pages/review/review?from=upload_report_ready&${query}`
+      : `/pages/tutor/tutor?from=upload_report_ready&${query}`;
     return {
       title: sourceSchemaId === 'talent_assessment'
         ? '测评已进入家长报告'
@@ -350,13 +353,24 @@ Page({
         : sourceSchemaId === 'wrong_question_paper'
           ? `已生成报告证据${importedCards ? `，并整理 ${importedCards} 张错题卡` : ''}；先看家长决策，再去修那一张卡。`
           : '已生成资料证据卷宗；先看本次材料怎么用，再决定是否进入点拨或回访。',
-      route: '/pages/profile/profile?from=upload_report_ready',
+      route: `/pages/profile/profile?from=upload_report_ready&${query}`,
       actionRoute,
+      gameRoute: `/pages/arcade/arcade?from=upload_report_ready&${query}`,
       actionLabel: sourceSchemaId === 'wrong_question_paper' ? '去修这批错题' : '去问第一步',
       sourceSchemaId,
-      reportId: reportState && reportState.reportDraft ? reportState.reportDraft.id : '',
+      reportId,
+      cardId,
+      importedCardIds: Array.isArray(options.importedCardIds) ? options.importedCardIds : [],
       blockedFields: decisionSource.blockedFields || ['original_question', 'full_answer', 'score', 'ranking']
     };
+  },
+
+  saveReportHandoff(cta = {}) {
+    if (!storage.set || !cta) return;
+    storage.set('upload.report.handoff.v1', Object.assign({}, cta, {
+      createdAt: new Date().toISOString(),
+      status: 'ready'
+    }));
   },
 
   afterPrioritySaved(text, state, plan, mode) {
@@ -439,7 +453,12 @@ Page({
         assessmentAnswers: []
       });
       storage.saveLearningReportState(reportState, { skipBuild: true });
-      latestReportCta = this.buildReportCta(decisionSource, reportState, { importedCards: wrongbook.imported });
+      latestReportCta = this.buildReportCta(decisionSource, reportState, {
+        importedCards: wrongbook.imported,
+        cardId: wrongbook.firstCardId || '',
+        importedCardIds: wrongbook.importedCardIds || []
+      });
+      this.saveReportHandoff(latestReportCta);
     }
     this.setData({ lastReportCta: latestReportCta });
     const toastTitle = wrongbook.imported
@@ -519,6 +538,9 @@ Page({
         calibrationKey: `material:${this.data.materialType}`,
         source: `material_${this.data.materialType}:${decisionSource.sourceSchemaId}`,
         sourceSchemaId: decisionSource.sourceSchemaId,
+        reportId: decisionSource.reportId || '',
+        reportSourceId: decisionSource.sourceSchemaId,
+        uploadMaterialType: this.data.materialType,
         releaseScope: decisionSource.releaseScope,
         requiredNextEvidence: decisionSource.requiredNextEvidence
       })
@@ -547,7 +569,12 @@ Page({
         }, structuredEvidenceSignals)
       });
       storage.saveLearningReportState(reportState, { skipBuild: true });
-      latestReportCta = this.buildReportCta(decisionSource, reportState, { importedCards: result.imported });
+      latestReportCta = this.buildReportCta(decisionSource, reportState, {
+        importedCards: result.imported,
+        cardId: result.firstCardId || '',
+        importedCardIds: result.importedCardIds || []
+      });
+      this.saveReportHandoff(latestReportCta);
     }
     this.setData({
       uploadIntakePacket,
@@ -665,7 +692,14 @@ Page({
 
   runReportFollowupAction() {
     const cta = this.data.lastReportCta || {};
+    this.saveReportHandoff(cta);
     navigation.navigateLearningRoute(cta.actionRoute || '/pages/tutor/tutor?from=upload_report_ready');
+  },
+
+  runReportGameAction() {
+    const cta = this.data.lastReportCta || {};
+    this.saveReportHandoff(cta);
+    navigation.navigateLearningRoute(cta.gameRoute || '/pages/arcade/arcade?from=upload_report_ready');
   },
 
   runSurfaceDepthAction(event) {

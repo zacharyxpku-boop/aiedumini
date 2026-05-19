@@ -195,6 +195,7 @@
         <view class="upload-flow-actions">
           <button bindtap="viewLatestReport">查看家长报告</button>
           <button bindtap="runReportFollowupAction">{{lastReportCta.actionLabel}}</button>
+          <button bindtap="runReportGameAction">去轻练习</button>
         </view>
       </view>
 
