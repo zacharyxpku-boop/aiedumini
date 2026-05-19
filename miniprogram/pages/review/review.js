@@ -361,6 +361,44 @@ Page({
       action: card.answer ? `遮住答案，先说：${String(card.answer).slice(0, 28)}` : '遮住答案，先说第一步和错因',
       source: card.source || card.taskType || '本地复习卡'
     }));
+    const activeRecallProtocol = {
+      title: '主动回忆处方',
+      localRule: '本地代码只按到期、错因、材料来源和负荷上限排队；AI 只能改写追问，不决定掌握度。',
+      todayMustCards: recallCards.map((card, index) => ({
+        id: `today_must_${card.id || index}`,
+        label: `今日第 ${index + 1} 张`,
+        cardLabel: card.label,
+        prompt: card.question,
+        action: '先遮答案，说出第一步和错因，再点核对。',
+        ratingRule: '忘了=again，模糊=hard，记得=good，轻松=easy'
+      })),
+      ratingScale: [
+        { id: 'again', label: '忘了', rule: '明天必须回访，先回点拨拆第一步。' },
+        { id: 'hard', label: '模糊', rule: '缩短间隔，保留同一错因小题。' },
+        { id: 'good', label: '记得', rule: '进入正常间隔，明天只查关键第一步。' },
+        { id: 'easy', label: '轻松', rule: '拉长间隔，但第 7 天仍要做小变式。' }
+      ],
+      tomorrowReturnCard: recallCards[0]
+        ? {
+          id: `tomorrow_${recallCards[0].id}`,
+          label: '明日回访',
+          prompt: recallCards[0].question,
+          action: '换一个数字、条件或材料，只问第一步，不追完整答案。'
+        }
+        : null,
+      day7VariantCard: recallCards[1] || recallCards[0]
+        ? {
+          id: `day7_${(recallCards[1] || recallCards[0]).id}`,
+          label: '第 7 天小变式',
+          prompt: (recallCards[1] || recallCards[0]).question,
+          action: '同一错因换题型入口，验证能不能迁移。'
+        }
+        : null,
+      releaseGateLine: recallCards.length >= 3
+        ? '今日只放 3 张必修卡；完成主动回忆和明日回访前，不继续扩新卡。'
+        : '卡片不足 3 张时，先补真实错题或上传材料，不用假题充数。',
+      shareBoundary: '分享只带错因、第一步、回访窗口和下一证据，不带原题、答案、照片、分数、排名或完整对话。'
+    };
     const reviewWindows = (loop.spacedReviewPlan || [
       { id: 'tomorrow', label: '明天', action: '只回访同一张卡的第一步' },
       { id: 'day3', label: '第 3 天', action: '换一个同类小变式' },
@@ -387,6 +425,7 @@ Page({
       doseLine: `今日剂量：${recallCards.length || 0} 张主动回忆卡，${daily.dailyCap && daily.dailyCap.maxMinutes ? daily.dailyCap.maxMinutes : 5} 分钟内收口。`,
       weakKey,
       recallCards,
+      activeRecallProtocol,
       mustDo,
       reviewWindows,
       releaseQueue,

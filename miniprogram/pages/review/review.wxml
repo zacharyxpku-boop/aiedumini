@@ -115,6 +115,16 @@
               <view class="memory-prescription-action">{{item.action}}</view>
             </view>
           </view>
+          <view class="memory-prescription-section" wx:if="{{memoryPrescriptionPanel.activeRecallProtocol}}">
+            <view class="memory-prescription-section-title">{{memoryPrescriptionPanel.activeRecallProtocol.title}}</view>
+            <view class="memory-prescription-line">{{memoryPrescriptionPanel.activeRecallProtocol.localRule}}</view>
+            <view class="memory-prescription-line" wx:for="{{memoryPrescriptionPanel.activeRecallProtocol.todayMustCards}}" wx:key="id">{{item.label}}：{{item.action}}｜{{item.ratingRule}}</view>
+            <view class="memory-prescription-line" wx:if="{{memoryPrescriptionPanel.activeRecallProtocol.tomorrowReturnCard}}">{{memoryPrescriptionPanel.activeRecallProtocol.tomorrowReturnCard.label}}：{{memoryPrescriptionPanel.activeRecallProtocol.tomorrowReturnCard.action}}</view>
+            <view class="memory-prescription-line" wx:if="{{memoryPrescriptionPanel.activeRecallProtocol.day7VariantCard}}">{{memoryPrescriptionPanel.activeRecallProtocol.day7VariantCard.label}}：{{memoryPrescriptionPanel.activeRecallProtocol.day7VariantCard.action}}</view>
+            <view class="memory-prescription-line" wx:for="{{memoryPrescriptionPanel.activeRecallProtocol.ratingScale}}" wx:key="id">{{item.label}}：{{item.rule}}</view>
+            <view class="memory-prescription-line">{{memoryPrescriptionPanel.activeRecallProtocol.releaseGateLine}}</view>
+            <view class="memory-prescription-line">{{memoryPrescriptionPanel.activeRecallProtocol.shareBoundary}}</view>
+          </view>
           <view class="memory-prescription-section" wx:if="{{memoryPrescriptionPanel.mustDo.length}}">
             <view class="memory-prescription-section-title">今天必须做</view>
             <view class="memory-prescription-line" wx:for="{{memoryPrescriptionPanel.mustDo}}" wx:key="id">{{item.label}}：{{item.action}}</view>

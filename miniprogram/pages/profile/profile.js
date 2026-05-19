@@ -9,6 +9,35 @@ const learningAssessment = require('../../utils/learning-assessment');
 const learningReport = require('../../utils/learning-report');
 const learningReportRecognition = require('../../utils/learning-report-recognition');
 const openMaicInspiredPlan = require('../../utils/openmaic-inspired-plan');
+function createShareRelaySchemaFallback() {
+  const denylist = ['original_question', 'original_answer', 'photo', 'raw_text', 'full_answer', 'full_solution', 'full_dialogue', 'score', 'ranking', 'private_comment', 'classmate_comparison', 'teacher_private_comment', 'complete_transcript'];
+  function isDenied(key) {
+    return denylist.indexOf(key) >= 0 || /answer|solution|photo|score|rank|transcript/i.test(String(key || ''));
+  }
+  function toText(value) {
+    return String(value == null ? '' : value).trim();
+  }
+  function buildSafeSharePayload(card = {}, intent = 'peer_challenge', extra = {}) {
+    const source = Object.assign({}, card.payload || {}, extra || {});
+    const safe = { share_intent: intent, from: 'profile', mode: 'safe_relay' };
+    Object.keys(source).forEach((key) => {
+      if (!isDenied(key)) safe[key] = toText(source[key]);
+    });
+    return safe;
+  }
+  return { buildSafeSharePayload };
+}
+
+let shareRelaySchema = null;
+try {
+  shareRelaySchema = require('../../utils/share-relay-schema');
+} catch (error) {
+  try {
+    shareRelaySchema = require('../../utils/share-relay-schema.cjs');
+  } catch (fallbackError) {
+    shareRelaySchema = createShareRelaySchemaFallback();
+  }
+}
 
 function sendMiniEvent(payload) {
   api.submitEvent(payload).catch(() => {});
@@ -747,6 +776,7 @@ function resolveShareIntent(card, intent) {
 }
 
 function buildSafeSharePayload(card = {}, intent = 'peer_challenge', extra = {}) {
+  return shareRelaySchema.buildSafeSharePayload(card, intent, extra);
   const source = Object.assign({}, card.payload || {}, extra || {});
   const allowlist = [
     'share_intent',
@@ -1290,6 +1320,65 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
   const realTrialRecoveryLoop = storage.buildRealTrialRecoveryLoop
     ? storage.buildRealTrialRecoveryLoop({ realHomeworkCoverageMatrix })
     : null;
+  const openMaicDecisionBridge = reportState.openMaicInspiredDecisionBridge
+    || draft.openMaicInspiredDecisionBridge
+    || null;
+  const publicK12Resources = realHomeworkCoverageMatrix && Array.isArray(realHomeworkCoverageMatrix.publicK12OpenSourceResourceLedger)
+    ? realHomeworkCoverageMatrix.publicK12OpenSourceResourceLedger
+    : [];
+  const publicK12Workbench = realHomeworkCoverageMatrix && Array.isArray(realHomeworkCoverageMatrix.publicK12UseWorkbench)
+    ? realHomeworkCoverageMatrix.publicK12UseWorkbench
+    : [];
+  const publicK12ChallengeDeck = realHomeworkCoverageMatrix && Array.isArray(realHomeworkCoverageMatrix.publicK12IntakeChallengeDeck)
+    ? realHomeworkCoverageMatrix.publicK12IntakeChallengeDeck
+    : [];
+  const openMaicBorrowWorkbench = {
+    id: 'openmaic_k12_borrow_workbench',
+    title: 'OpenMAIC / K12 借力工作台',
+    summary: `只借公开资料的结构、场景流和质量门；本地代码负责门禁、回流、奖励、隐私和报告放行，AI 只负责追问与表达。`,
+    statusLine: `已接 ${publicK12Resources.length} 类公开资料线索、${publicK12Workbench.length} 条使用工作台、${publicK12ChallengeDeck.length} 张可玩采集卡。`,
+    sourcePolicyLine: openMaicDecisionBridge && openMaicDecisionBridge.sourcePolicy
+      ? `OpenMAIC：${openMaicDecisionBridge.sourcePolicy.decision || 'reference_workflow_only'}，不复制 AGPL 代码、不承诺完整 AI 课堂。`
+      : 'OpenMAIC：只参考两阶段生成、事件流和质量门，不复制代码、不照搬提示词、不部署 AGPL 服务端。',
+    releaseLine: '放行规则：没有孩子第一步、错因回放、次日回访和家长确认，不写长期画像，不发奖励，不生成可分享结论。',
+    lanes: [
+      {
+        id: 'source',
+        label: '公开资料',
+        owner: '本地代码 + 人工校验',
+        action: '抽取课程结构、题型簇、常见错因和可玩挑战，不复制原题、答案或受限内容。',
+        route: '/pages/upload/upload?from=openmaic_k12_workbench&type=school_material'
+      },
+      {
+        id: 'ai',
+        label: 'AI 更适合',
+        owner: 'AI 追问',
+        action: '生成苏格拉底追问、儿童化解释、家长摘要和小黑板话术，但不能决定答案、掌握度、天赋标签。',
+        route: '/pages/tutor/tutor?from=openmaic_k12_workbench'
+      },
+      {
+        id: 'local',
+        label: '本地代码更适合',
+        owner: '确定性规则',
+        action: '负责题型路由、XP 门禁、间隔复习、分享字段、报告放行和隐私拒绝清单。',
+        route: '/pages/arcade/arcade?from=openmaic_k12_workbench'
+      },
+      {
+        id: 'report',
+        label: '家长报告',
+        owner: '证据账本',
+        action: '天赋测评只做学习方法候选；错题/试卷进入错因与回访；学校材料生成家校沟通摘要。',
+        route: '/pages/upload/upload?from=openmaic_k12_workbench&type=talent_assessment'
+      }
+    ],
+    blockedClaims: ['完整答案', '拍照自动解题', '天赋定性', '分数排名外传', '复制开源题库原文'],
+    nextRoutes: [
+      { id: 'upload_wrong_paper', label: '上传错题/试卷', route: '/pages/upload/upload?from=openmaic_k12_workbench&type=wrong_question_paper' },
+      { id: 'upload_talent', label: '录入天赋/学习偏好测评', route: '/pages/upload/upload?from=openmaic_k12_workbench&type=talent_assessment' },
+      { id: 'socratic', label: '去问第一步', route: '/pages/tutor/tutor?from=openmaic_k12_workbench' },
+      { id: 'review', label: '做一次回访', route: '/pages/review/review?from=openmaic_k12_workbench' }
+    ]
+  };
   return {
     title: draft.title || '学习画像',
     modeLabel: reportState.reportProgress && reportState.reportProgress.label ? reportState.reportProgress.label : '0% · 快速版',
@@ -1414,6 +1503,11 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     realHomeworkImplementationDecisions: realHomeworkCoverageMatrix && Array.isArray(realHomeworkCoverageMatrix.implementationDecisionMatrix)
       ? realHomeworkCoverageMatrix.implementationDecisionMatrix
       : [],
+    openMaicDecisionBridge,
+    openMaicBorrowWorkbench,
+    openMaicBorrowWorkbenchLanes: openMaicBorrowWorkbench.lanes,
+    openMaicBorrowWorkbenchBlockedClaims: openMaicBorrowWorkbench.blockedClaims,
+    openMaicBorrowWorkbenchNextRoutes: openMaicBorrowWorkbench.nextRoutes,
     reportPressureTruthAudit,
     reportPressureTruthLine: reportPressureTruthAudit ? reportPressureTruthAudit.sampleLine : '',
     reportPressureTruthRows: reportPressureTruthAudit && Array.isArray(reportPressureTruthAudit.pressureRows)
@@ -2943,6 +3037,31 @@ Page({
       return;
     }
     wx.navigateTo({ url: path });
+  },
+
+  runBorrowWorkbenchAction(event) {
+    const dataset = event.currentTarget.dataset || {};
+    const route = dataset.route || '/pages/upload/upload?from=openmaic_k12_workbench';
+    if (storage.recordUnifiedNextAction) {
+      storage.recordUnifiedNextAction({
+        source: 'openmaic_k12_borrow_workbench',
+        sourceLabel: 'OpenMAIC/K12 借力工作台',
+        actionId: dataset.id || 'borrow_workbench',
+        actionLabel: dataset.label || '继续补证据',
+        route,
+        reasonLine: '公开资料只做结构借鉴；AI 负责表达，本地代码负责门禁和回流。'
+      });
+    }
+    if (storage.recordSurfaceDepthAction) {
+      storage.recordSurfaceDepthAction({
+        surface: 'profile',
+        dimensionId: dataset.id || 'openmaic_k12_borrow_workbench',
+        label: dataset.label || 'OpenMAIC/K12 借力工作台',
+        route,
+        readiness: 'borrow_workbench_visible'
+      });
+    }
+    navigation.navigateLearningRoute(route);
   },
 
   runUploadedMaterialDossierAction(event) {

@@ -1,4 +1,39 @@
 const priority = require('./learning-priority');
+function createShareRelaySchemaFallback() {
+  const denylist = ['original_question', 'original_answer', 'photo', 'raw_text', 'full_answer', 'full_solution', 'full_dialogue', 'score', 'ranking', 'private_comment', 'classmate_comparison', 'teacher_private_comment', 'complete_transcript'];
+  function isDenied(key) {
+    return denylist.indexOf(key) >= 0 || /answer|solution|photo|score|rank|transcript/i.test(String(key || ''));
+  }
+  function toText(value) {
+    return String(value == null ? '' : value).trim();
+  }
+  function parseShareRelayQuery(query = {}) {
+    const safe = {};
+    Object.keys(query || {}).forEach((key) => {
+      if (!isDenied(key)) safe[key] = toText(query[key]);
+    });
+    return safe;
+  }
+  function buildSafeSharePayload(card = {}, intent = 'peer_challenge', extra = {}) {
+    return Object.assign({
+      share_intent: intent,
+      from: 'profile',
+      mode: 'safe_relay'
+    }, parseShareRelayQuery(Object.assign({}, card.payload || {}, extra || {})));
+  }
+  return { buildSafeSharePayload, parseShareRelayQuery };
+}
+
+let shareRelaySchema = null;
+try {
+  shareRelaySchema = require('./share-relay-schema');
+} catch (error) {
+  try {
+    shareRelaySchema = require('./share-relay-schema.cjs');
+  } catch (fallbackError) {
+    shareRelaySchema = createShareRelaySchemaFallback();
+  }
+}
 let learningReport = null;
 
 try {
@@ -6753,120 +6788,121 @@ function buildQuestionBankVisualShareRelayDeck(options = {}) {
 }
 
 function saveIncomingShare(share = {}) {
-  const code = share.share_code || share.code || '';
+  const normalized = shareRelaySchema.parseShareRelayQuery ? shareRelaySchema.parseShareRelayQuery(share) : share;
+  const code = normalized.share_code || normalized.code || '';
   if (!code) return null;
-  const parentNextAction = share.parent_next_action || share.action || '';
+  const parentNextAction = normalized.parent_next_action || normalized.action || '';
   const record = {
     code,
     share_code: code,
-    from: share.from || '',
-    challenge: share.challenge || '',
-    mode: share.mode || '',
-    identity_tag: share.identity_tag || share.identity || '',
+    from: normalized.from || '',
+    challenge: normalized.challenge || '',
+    mode: normalized.mode || '',
+    identity_tag: normalized.identity_tag || normalized.identity || '',
     parent_next_action: parentNextAction,
-    action_label: share.action_label || parentNextActionLabel(parentNextAction),
-    action_detail: share.action_detail || parentNextActionDetail(parentNextAction),
-    capability_gap: share.capability_gap || '',
-    capability_label: share.capability_label || '',
-    capability_next_action: share.capability_next_action || '',
-    capability_route: share.capability_route || '',
-    challenge_goal: share.challenge_goal || '',
-    challenge_rule: share.challenge_rule || '',
-    challenge_route: share.challenge_route || '',
-    relay_privacy: share.relay_privacy || '',
-    relay_review: share.relay_review || '',
-    relay_first_step: share.relay_first_step || '',
-    relay_invite_line: share.relay_invite_line || '',
-    relay_receiver_prompt: share.relay_receiver_prompt || '',
-    relay_parent_reassurance: share.relay_parent_reassurance || '',
-    relay_day7_return: share.relay_day7_return || '',
-    relay_proof_signal: share.relay_proof_signal || '',
-    relay_guardrail: share.relay_guardrail || '',
-    relay_id: share.relay_id || '',
-    relay_receiver_action: share.relay_receiver_action || '',
-    relay_parent_check: share.relay_parent_check || '',
-    relay_next_revisit: share.relay_next_revisit || '',
-    relay_allowed_fields: share.relay_allowed_fields || '',
-    relay_blocked_fields: relayBlockedFieldLine(share.relay_blocked_fields),
-    relay_completion_signal: share.relay_completion_signal || '',
-    relay_return_path: share.relay_return_path || '',
-    relay_ladder: share.relay_ladder || '',
-    relay_attraction_hook: share.relay_attraction_hook || '',
-    relay_local_gate: share.relay_local_gate || '',
-    relay_spread_status: share.relay_spread_status || '',
-    relay_spread_score: share.relay_spread_score || '',
-    relay_spread_line: share.relay_spread_line || '',
-    relay_spread_fallback: share.relay_spread_fallback || '',
-    relay_spread_reason: share.relay_spread_reason || '',
-    relay_spread_required: share.relay_spread_required || '',
-    relay_season: share.relay_season || '',
-    relay_season_status: share.relay_season_status || '',
-    relay_season_line: share.relay_season_line || '',
-    relay_season_days: share.relay_season_days || '',
-    relay_season_gate: share.relay_season_gate || '',
-    course_unit_label: share.course_unit_label || '',
-    course_unit_subject: share.course_unit_subject || '',
-    course_unit_tier: share.course_unit_tier || '',
-    course_unit_parent_decision: share.course_unit_parent_decision || '',
-    course_unit_report_contract: share.course_unit_report_contract || '',
-    course_unit_share_contract: share.course_unit_share_contract || '',
-    course_unit_blackboard: share.course_unit_blackboard || '',
-    course_unit_recall_route: share.course_unit_recall_route || '',
-    course_unit_game_route: share.course_unit_game_route || '',
-    question_bank_relay_label: share.question_bank_relay_label || '',
-    question_bank_relay_first_step: share.question_bank_relay_first_step || '',
-    question_bank_relay_parent_check: share.question_bank_relay_parent_check || '',
-    question_bank_relay_route: share.question_bank_relay_route || '',
-    question_bank_relay_boundary: share.question_bank_relay_boundary || '',
-    visual_board_relay_title: share.visual_board_relay_title || '',
-    visual_board_relay_layer: share.visual_board_relay_layer || '',
-    visual_board_relay_student_line: share.visual_board_relay_student_line || '',
-    visual_board_relay_parent_line: share.visual_board_relay_parent_line || '',
-    visual_board_relay_exit: share.visual_board_relay_exit || '',
-    visual_board_relay_route: share.visual_board_relay_route || '',
-    visual_board_relay_boundary: share.visual_board_relay_boundary || '',
-    socratic_report_status: share.socratic_report_status || '',
-    socratic_report_action: share.socratic_report_action || '',
-    socratic_report_decision: share.socratic_report_decision || '',
-    socratic_report_no_increase: share.socratic_report_no_increase || '',
-    socratic_report_parent_proof: share.socratic_report_parent_proof || '',
-    socratic_report_boundary: share.socratic_report_boundary || '',
-    tonight_decision: share.tonight_decision || '',
-    tonight_parent_question: share.tonight_parent_question || '',
-    tonight_tomorrow: share.tonight_tomorrow || '',
-    tonight_release_gate: share.tonight_release_gate || '',
-    tonight_share_boundary: share.tonight_share_boundary || '',
-    source_challenge_count: share.source_challenge_count || '',
-    source_challenge_first: share.source_challenge_first || '',
-    source_challenge_prompt: share.source_challenge_prompt || '',
-    source_challenge_license: share.source_challenge_license || '',
-    source_challenge_decision: share.source_challenge_decision || '',
-    source_challenge_local_rule: share.source_challenge_local_rule || '',
-    source_challenge_blocked: share.source_challenge_blocked || '',
-    source_challenge_route: share.source_challenge_route || '',
-    wrong_cause_pack: share.wrong_cause_pack || '',
-    wrong_cause_label: share.wrong_cause_label || '',
-    wrong_cause_first_step: share.wrong_cause_first_step || '',
-    wrong_cause_parent_check: share.wrong_cause_parent_check || '',
-    wrong_cause_receiver_action: share.wrong_cause_receiver_action || '',
-    wrong_cause_next_revisit: share.wrong_cause_next_revisit || '',
-    wrong_cause_allowed_fields: share.wrong_cause_allowed_fields || '',
-    wrong_cause_blocked_fields: relayBlockedFieldLine(share.wrong_cause_blocked_fields),
-    wrong_cause_return_path: share.wrong_cause_return_path || '',
-    wrong_cause_gate: share.wrong_cause_gate || '',
-    openmaic_bridge_status: share.openmaic_bridge_status || '',
-    openmaic_next_action: share.openmaic_next_action || '',
-    openmaic_share_boundary: share.openmaic_share_boundary || '',
-    openmaic_game_gate: share.openmaic_game_gate || '',
-    openmaic_blocked_fields: relayBlockedFieldLine(share.openmaic_blocked_fields),
-    openmaic_evidence: share.openmaic_evidence || '',
-    openmaic_return_path: share.openmaic_return_path || '',
-    receiver_material_required: share.receiver_material_required || 'receiver_own_material',
-    receiver_first_step_required: share.receiver_first_step_required || 'receiver_own_first_step',
-    receiver_wrong_cause_required: share.receiver_wrong_cause_required || 'receiver_own_wrong_cause',
-    receiver_revisit_required: share.receiver_revisit_required || 'receiver_next_revisit_evidence',
-    receiver_evidence_contract: share.receiver_evidence_contract || 'own_material_first_step_wrong_cause_revisit',
-    created_at: share.created_at || new Date().toISOString()
+    action_label: normalized.action_label || parentNextActionLabel(parentNextAction),
+    action_detail: normalized.action_detail || parentNextActionDetail(parentNextAction),
+    capability_gap: normalized.capability_gap || '',
+    capability_label: normalized.capability_label || '',
+    capability_next_action: normalized.capability_next_action || '',
+    capability_route: normalized.capability_route || '',
+    challenge_goal: normalized.challenge_goal || '',
+    challenge_rule: normalized.challenge_rule || '',
+    challenge_route: normalized.challenge_route || '',
+    relay_privacy: normalized.relay_privacy || '',
+    relay_review: normalized.relay_review || '',
+    relay_first_step: normalized.relay_first_step || '',
+    relay_invite_line: normalized.relay_invite_line || '',
+    relay_receiver_prompt: normalized.relay_receiver_prompt || '',
+    relay_parent_reassurance: normalized.relay_parent_reassurance || '',
+    relay_day7_return: normalized.relay_day7_return || '',
+    relay_proof_signal: normalized.relay_proof_signal || '',
+    relay_guardrail: normalized.relay_guardrail || '',
+    relay_id: normalized.relay_id || '',
+    relay_receiver_action: normalized.relay_receiver_action || '',
+    relay_parent_check: normalized.relay_parent_check || '',
+    relay_next_revisit: normalized.relay_next_revisit || '',
+    relay_allowed_fields: normalized.relay_allowed_fields || '',
+    relay_blocked_fields: relayBlockedFieldLine(normalized.relay_blocked_fields),
+    relay_completion_signal: normalized.relay_completion_signal || '',
+    relay_return_path: normalized.relay_return_path || '',
+    relay_ladder: normalized.relay_ladder || '',
+    relay_attraction_hook: normalized.relay_attraction_hook || '',
+    relay_local_gate: normalized.relay_local_gate || '',
+    relay_spread_status: normalized.relay_spread_status || '',
+    relay_spread_score: normalized.relay_spread_score || '',
+    relay_spread_line: normalized.relay_spread_line || '',
+    relay_spread_fallback: normalized.relay_spread_fallback || '',
+    relay_spread_reason: normalized.relay_spread_reason || '',
+    relay_spread_required: normalized.relay_spread_required || '',
+    relay_season: normalized.relay_season || '',
+    relay_season_status: normalized.relay_season_status || '',
+    relay_season_line: normalized.relay_season_line || '',
+    relay_season_days: normalized.relay_season_days || '',
+    relay_season_gate: normalized.relay_season_gate || '',
+    course_unit_label: normalized.course_unit_label || '',
+    course_unit_subject: normalized.course_unit_subject || '',
+    course_unit_tier: normalized.course_unit_tier || '',
+    course_unit_parent_decision: normalized.course_unit_parent_decision || '',
+    course_unit_report_contract: normalized.course_unit_report_contract || '',
+    course_unit_share_contract: normalized.course_unit_share_contract || '',
+    course_unit_blackboard: normalized.course_unit_blackboard || '',
+    course_unit_recall_route: normalized.course_unit_recall_route || '',
+    course_unit_game_route: normalized.course_unit_game_route || '',
+    question_bank_relay_label: normalized.question_bank_relay_label || '',
+    question_bank_relay_first_step: normalized.question_bank_relay_first_step || '',
+    question_bank_relay_parent_check: normalized.question_bank_relay_parent_check || '',
+    question_bank_relay_route: normalized.question_bank_relay_route || '',
+    question_bank_relay_boundary: normalized.question_bank_relay_boundary || '',
+    visual_board_relay_title: normalized.visual_board_relay_title || '',
+    visual_board_relay_layer: normalized.visual_board_relay_layer || '',
+    visual_board_relay_student_line: normalized.visual_board_relay_student_line || '',
+    visual_board_relay_parent_line: normalized.visual_board_relay_parent_line || '',
+    visual_board_relay_exit: normalized.visual_board_relay_exit || '',
+    visual_board_relay_route: normalized.visual_board_relay_route || '',
+    visual_board_relay_boundary: normalized.visual_board_relay_boundary || '',
+    socratic_report_status: normalized.socratic_report_status || '',
+    socratic_report_action: normalized.socratic_report_action || '',
+    socratic_report_decision: normalized.socratic_report_decision || '',
+    socratic_report_no_increase: normalized.socratic_report_no_increase || '',
+    socratic_report_parent_proof: normalized.socratic_report_parent_proof || '',
+    socratic_report_boundary: normalized.socratic_report_boundary || '',
+    tonight_decision: normalized.tonight_decision || '',
+    tonight_parent_question: normalized.tonight_parent_question || '',
+    tonight_tomorrow: normalized.tonight_tomorrow || '',
+    tonight_release_gate: normalized.tonight_release_gate || '',
+    tonight_share_boundary: normalized.tonight_share_boundary || '',
+    source_challenge_count: normalized.source_challenge_count || '',
+    source_challenge_first: normalized.source_challenge_first || '',
+    source_challenge_prompt: normalized.source_challenge_prompt || '',
+    source_challenge_license: normalized.source_challenge_license || '',
+    source_challenge_decision: normalized.source_challenge_decision || '',
+    source_challenge_local_rule: normalized.source_challenge_local_rule || '',
+    source_challenge_blocked: normalized.source_challenge_blocked || '',
+    source_challenge_route: normalized.source_challenge_route || '',
+    wrong_cause_pack: normalized.wrong_cause_pack || '',
+    wrong_cause_label: normalized.wrong_cause_label || '',
+    wrong_cause_first_step: normalized.wrong_cause_first_step || '',
+    wrong_cause_parent_check: normalized.wrong_cause_parent_check || '',
+    wrong_cause_receiver_action: normalized.wrong_cause_receiver_action || '',
+    wrong_cause_next_revisit: normalized.wrong_cause_next_revisit || '',
+    wrong_cause_allowed_fields: normalized.wrong_cause_allowed_fields || '',
+    wrong_cause_blocked_fields: relayBlockedFieldLine(normalized.wrong_cause_blocked_fields),
+    wrong_cause_return_path: normalized.wrong_cause_return_path || '',
+    wrong_cause_gate: normalized.wrong_cause_gate || '',
+    openmaic_bridge_status: normalized.openmaic_bridge_status || '',
+    openmaic_next_action: normalized.openmaic_next_action || '',
+    openmaic_share_boundary: normalized.openmaic_share_boundary || '',
+    openmaic_game_gate: normalized.openmaic_game_gate || '',
+    openmaic_blocked_fields: relayBlockedFieldLine(normalized.openmaic_blocked_fields),
+    openmaic_evidence: normalized.openmaic_evidence || '',
+    openmaic_return_path: normalized.openmaic_return_path || '',
+    receiver_material_required: normalized.receiver_material_required || 'receiver_own_material',
+    receiver_first_step_required: normalized.receiver_first_step_required || 'receiver_own_first_step',
+    receiver_wrong_cause_required: normalized.receiver_wrong_cause_required || 'receiver_own_wrong_cause',
+    receiver_revisit_required: normalized.receiver_revisit_required || 'receiver_next_revisit_evidence',
+    receiver_evidence_contract: normalized.receiver_evidence_contract || 'own_material_first_step_wrong_cause_revisit',
+    created_at: normalized.created_at || new Date().toISOString()
   };
   set(KEYS.incomingShare, record);
   return record;

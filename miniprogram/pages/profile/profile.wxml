@@ -705,6 +705,25 @@
           <text>{{learningReportSummary.familyDecisionHomepageShareBoundary}}</text>
           <button bindtap="goLearningReportCta">{{learningReportSummary.familyDecisionHomepageCtaLabel}}</button>
         </view>
+        <view class="parent-brief-block borrow-workbench-card" wx:if="{{learningReportSummary.openMaicBorrowWorkbench}}">
+          <text class="parent-brief-label">{{learningReportSummary.openMaicBorrowWorkbench.title}}</text>
+          <text>{{learningReportSummary.openMaicBorrowWorkbench.summary}}</text>
+          <text>{{learningReportSummary.openMaicBorrowWorkbench.statusLine}}</text>
+          <text>{{learningReportSummary.openMaicBorrowWorkbench.sourcePolicyLine}}</text>
+          <view class="borrow-workbench-grid">
+            <view class="borrow-workbench-lane" wx:for="{{learningReportSummary.openMaicBorrowWorkbenchLanes}}" wx:key="id" data-route="{{item.route}}" data-id="{{item.id}}" data-label="{{item.label}}" bindtap="runBorrowWorkbenchAction">
+              <text class="borrow-workbench-label">{{item.label}} · {{item.owner}}</text>
+              <text>{{item.action}}</text>
+            </view>
+          </view>
+          <text>{{learningReportSummary.openMaicBorrowWorkbench.releaseLine}}</text>
+          <view class="borrow-workbench-blocked">
+            <text wx:for="{{learningReportSummary.openMaicBorrowWorkbenchBlockedClaims}}" wx:key="*this">禁用：{{item}}</text>
+          </view>
+          <view class="borrow-workbench-actions">
+            <button wx:for="{{learningReportSummary.openMaicBorrowWorkbenchNextRoutes}}" wx:key="id" data-route="{{item.route}}" data-id="{{item.id}}" data-label="{{item.label}}" bindtap="runBorrowWorkbenchAction">{{item.label}}</button>
+          </view>
+        </view>
         <view class="parent-brief-block">
           <text class="parent-brief-label">画像总览</text>
           <text>{{learningReportSummary.overviewLine}}</text>
