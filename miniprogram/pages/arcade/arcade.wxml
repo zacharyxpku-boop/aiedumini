@@ -115,6 +115,29 @@
       <view class="challenge-brief-sub" wx:if="{{challengeBrief.evidenceBiasLine}}">为什么开这局：{{challengeBrief.evidenceBiasLine}}</view>
     </view>
 
+    <view class="daily-return-card" wx:if="{{dailyReturnMission}}">
+      <view class="daily-return-top">
+        <view>
+          <view class="daily-return-kicker">每日回流</view>
+          <view class="daily-return-title">{{dailyReturnMission.title}}</view>
+        </view>
+        <view class="daily-return-pill">{{dailyReturnMission.totalSeconds}} 秒</view>
+      </view>
+      <view class="daily-return-line">{{dailyReturnMission.promiseLine}}</view>
+      <view class="daily-return-steps">
+        <view class="daily-return-step" wx:for="{{dailyReturnMission.visibleSteps}}" wx:key="id">
+          <view class="daily-return-step-order">{{item.order}}</view>
+          <view class="daily-return-step-body">
+            <view class="daily-return-step-action">{{item.action}}</view>
+            <view class="daily-return-step-proof">{{item.seconds}} 秒 · 证据 {{item.proof}}</view>
+          </view>
+        </view>
+      </view>
+      <view class="daily-return-rule">{{dailyReturnMission.xpGate}}</view>
+      <view class="daily-return-rule">{{dailyReturnMission.parentLine}}</view>
+      <view class="daily-return-rule">{{dailyReturnMission.shareLine}}</view>
+    </view>
+
     <view class="surface-depth-card arcade-surface-depth" wx:if="{{surfaceDepthPack}}">
       <view class="surface-depth-title">{{surfaceDepthPack.title}}</view>
       <view class="surface-depth-subtitle">{{surfaceDepthPack.summary}}</view>

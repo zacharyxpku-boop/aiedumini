@@ -1856,6 +1856,14 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
       targetAccuracy: challenge.targetAccuracy || 80
     }
   );
+  const dailyReturnMission = buildDailyReturnMission({
+    dailyMemoryPrescription,
+    memoryComebackLoop,
+    microRecallPrescriptionEngine,
+    ninetySecondRecallComboEngine,
+    realHomeworkPressureMemoryPrescription,
+    peerMemoryRelayLeague
+  }, result, { weakKey });
   return {
     title: needsRepair ? '高频修复循环' : '高频巩固循环',
     mode: needsRepair ? 'repair_recall' : 'mastery_recall',
@@ -1884,14 +1892,62 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
     microRecallPrescriptionEngine,
     ninetySecondRecallComboEngine,
     realHomeworkPressureMemoryPrescription,
+    dailyReturnMission,
     xpRule: 'XP 只奖励主动回忆、错因修复和次日回访，不奖励盲刷题量。',
     leechRule: needsRepair
       ? `同一错因连续 2 次错，会降到第一步小黑板。`
       : '连续 2 次说清第一步，才进入变式练习。',
     parentShareLine: `家长复盘只看：孩子能否自己说出「${weakKey}」的第一步。`,
     nextRoute: needsRepair ? '/pages/review/review' : '/pages/tutor/tutor',
-    evidenceRequired: ['active_recall_cards', 'spaced_review_plan', 'wrong_cause_return', 'quest_cadence', 'memory_feedback_controller', 'recall_intensity_plan', 'wrong_cause_replay_deck', 'xp_feedback_policy', 'quest_arc_runway', 'gizmo_like_memory_protocol', 'socratic_quality_memory_bridge', 'question_bank_memory_bridge', 'question_bank_recall_workout', 'daily_memory_sprint_deck', 'adaptive_recall_scheduler', 'memory_risk_release_model', 'memory_comeback_loop', 'daily_memory_prescription', 'question_type_cluster_memory_protocol', 'peer_memory_relay_league', 'micro_recall_prescription_engine', 'ninety_second_recall_combo_engine', 'real_homework_pressure_memory_prescription', 'parent_share_line'],
+    evidenceRequired: ['active_recall_cards', 'spaced_review_plan', 'wrong_cause_return', 'quest_cadence', 'memory_feedback_controller', 'recall_intensity_plan', 'wrong_cause_replay_deck', 'xp_feedback_policy', 'quest_arc_runway', 'gizmo_like_memory_protocol', 'socratic_quality_memory_bridge', 'question_bank_memory_bridge', 'question_bank_recall_workout', 'daily_memory_sprint_deck', 'adaptive_recall_scheduler', 'memory_risk_release_model', 'memory_comeback_loop', 'daily_memory_prescription', 'question_type_cluster_memory_protocol', 'peer_memory_relay_league', 'micro_recall_prescription_engine', 'ninety_second_recall_combo_engine', 'real_homework_pressure_memory_prescription', 'daily_return_mission', 'parent_share_line'],
     weakKey
+  };
+}
+
+function buildDailyReturnMission(highFrequency = {}, result = {}, options = {}) {
+  const prescription = highFrequency.dailyMemoryPrescription || {};
+  const comeback = highFrequency.memoryComebackLoop || {};
+  const micro = highFrequency.microRecallPrescriptionEngine || {};
+  const combo = highFrequency.ninetySecondRecallComboEngine || {};
+  const pressure = highFrequency.realHomeworkPressureMemoryPrescription || {};
+  const peer = highFrequency.peerMemoryRelayLeague || {};
+  const weakKey = options.weakKey || combo.weakKey || micro.weakKey || prescription.weakKey || '第一步';
+  const comboSteps = Array.isArray(combo.comboSteps) ? combo.comboSteps : [];
+  const mustDo = Array.isArray(prescription.mustDo) ? prescription.mustDo : [];
+  const blockedFields = Array.from(new Set([]
+    .concat(Array.isArray(combo.blockedFields) ? combo.blockedFields : [])
+    .concat(Array.isArray(peer.blockedFields) ? peer.blockedFields : [])
+    .concat(pressure.sharePayload && Array.isArray(pressure.sharePayload.blockedFields) ? pressure.sharePayload.blockedFields : [])));
+  const totalSeconds = Number(combo.totalSeconds || comboSteps.reduce((sum, item) => sum + Number(item.seconds || 0), 0) || 90);
+  const rescue = combo.mode === 'rescue_combo' || prescription.mode === 'rescue' || Number(result.wrong || 0) >= 2;
+  return {
+    id: 'daily_return_mission',
+    title: rescue ? '今日 90 秒回流：先救一个错因' : '今日 90 秒回流',
+    mode: rescue ? 'rescue_return' : 'steady_return',
+    weakKey,
+    totalSeconds,
+    promiseLine: `今天只抢回「${weakKey}」这一类第一步，不开新题海。`,
+    visibleSteps: comboSteps.slice(0, 4).map((step, index) => ({
+      id: step.id || `return_step_${index + 1}`,
+      order: index + 1,
+      seconds: Number(step.seconds || 0),
+      action: step.action || (mustDo[index] && mustDo[index].action) || '遮住答案，说出第一步。',
+      proof: step.proof || (mustDo[index] && mustDo[index].evidence) || 'student_first_step',
+      fallback: step.fallback || '说不出就降到二选一提示，不给完整答案。'
+    })),
+    mustDo: mustDo.slice(0, 3),
+    comebackRoute: prescription.comebackRoute || comeback.resumeRoute || '/pages/review/review?from=daily_return_mission',
+    xpGate: combo.xpGate || prescription.antiCramRule || 'XP 只奖励主动回忆、错因修复和次日回访，不奖励刷题数量。',
+    parentLine: combo.parentEvidenceLine || prescription.parentLine || '家长只看第一步、错因和明天回访，不看分数排名。',
+    shareLine: combo.shareBoundary || prescription.shareLine || '分享只带动作和回访窗口，不带原题、答案、分数、排名或完整对话。',
+    blockedFields,
+    localAiSplit: {
+      local: ['daily_dose', 'xp_gate', 'share_fields', 'return_window', 'release_rule'],
+      ai: ['child_friendly_wording', 'parent_copy_rewrite', 'blackboard_prompt_variants'],
+      blocked: ['final_answer', 'score_ranking', 'mastery_claim_without_revisit']
+    },
+    pressureReady: !!pressure.sampleSpecificReady,
+    evidenceRequired: ['daily_90s_return', 'student_first_step', 'wrong_cause_named', 'next_day_revisit_locked', 'local_xp_gate', 'safe_share_boundary']
   };
 }
 
@@ -1910,6 +1966,7 @@ module.exports = {
   buildPeerMemoryRelayLeague,
   buildMicroRecallPrescriptionEngine,
   buildNinetySecondRecallComboEngine,
+  buildDailyReturnMission,
   buildQuestionTypeClusterMemoryProtocol,
   buildRealHomeworkPressureMemoryPrescription,
   buildMemoryFeedbackController,

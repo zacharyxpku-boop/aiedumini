@@ -47,6 +47,7 @@ Page({
     resultAdvice: null,
     gameRetentionLoop: null,
     highFrequencyPracticeLoop: null,
+    dailyReturnMission: null,
     arcadeResultActionBridge: null,
     emptyGuide: null,
     feedbackText: '',
@@ -123,6 +124,35 @@ Page({
     const evidenceBias = storage.buildEvidenceRouteBias ? storage.buildEvidenceRouteBias() : null;
     const dailyQuestSet = gameLogic.buildDailyQuestSet(profile, cards, reviewEvents, { now: new Date(), evidenceBias });
     const adaptiveChallenge = gameLogic.buildAdaptiveChallenge(cards, reviewEvents, profile, { now: new Date(), evidenceBias });
+    const socraticQualityEvaluationSuite = tutorLadder.buildSocraticQualityEvaluationSuite
+      ? tutorLadder.buildSocraticQualityEvaluationSuite(recentTaskType || 'unknown')
+      : null;
+    const previewRetentionLoop = gameLogic.buildGameRetentionLoop
+      ? gameLogic.buildGameRetentionLoop(profile, {}, adaptiveChallenge, dailyQuestSet, {
+        weakKey: this.wrongCauseForLoop(loopFocus).wrongCauseLabel
+      })
+      : null;
+    const previewHighFrequencyPracticeLoop = gameLogic.buildHighFrequencyPracticeLoop
+      ? gameLogic.buildHighFrequencyPracticeLoop(
+        profile,
+        cards,
+        reviewEvents,
+        {},
+        adaptiveChallenge,
+        dailyQuestSet,
+        {
+          retentionLoop: previewRetentionLoop,
+          weakKey: this.wrongCauseForLoop(loopFocus).wrongCauseLabel,
+          taskType: recentTaskType || 'unknown',
+          subject: loopFocus && loopFocus.subject,
+          socraticQualityEvaluationSuite,
+          courseUnitQuestionBank,
+          realHomeworkPressureSamples: realHomeworkCoverage.getRealHomeworkPressureSamples
+            ? realHomeworkCoverage.getRealHomeworkPressureSamples({ taskType: recentTaskType || 'unknown' })
+            : []
+        }
+      )
+      : null;
     const questArcMission = storage.buildQuestArcGameBridge
       ? storage.buildQuestArcGameBridge({ dailyQuestSet, adaptiveChallenge, evidenceBias })
       : null;
@@ -174,6 +204,10 @@ Page({
       result: null,
       resultAdvice: null,
       gameRetentionLoop: null,
+      highFrequencyPracticeLoop: previewHighFrequencyPracticeLoop,
+      dailyReturnMission: previewHighFrequencyPracticeLoop && previewHighFrequencyPracticeLoop.dailyReturnMission
+        ? previewHighFrequencyPracticeLoop.dailyReturnMission
+        : null,
       emptyGuide: this.emptyGuide(selectedGame, round),
       feedbackText: (round.questions || round.tracks || round.pairs || []).length ? this.openingHint(selectedGame) : '还没有适合游戏化的真实学习卡。'
       ,
@@ -1337,6 +1371,9 @@ Page({
       resultAdvice: arcade.buildRoundAdvice(savedResult, savedResult.gameType),
       gameRetentionLoop,
       highFrequencyPracticeLoop,
+      dailyReturnMission: highFrequencyPracticeLoop && highFrequencyPracticeLoop.dailyReturnMission
+        ? highFrequencyPracticeLoop.dailyReturnMission
+        : this.data.dailyReturnMission,
       questionProgressionSignal,
       arcadeResultActionBridge,
       challengeBrief: Object.assign({}, this.data.challengeBrief || {}, {
@@ -1383,6 +1420,7 @@ Page({
       resultAdvice: null,
       arcadeResultActionBridge: null,
       highFrequencyPracticeLoop: null,
+      dailyReturnMission: null,
       emptyGuide: this.emptyGuide(this.data.selectedGame, round),
       feedbackText: '新一局开始。'
     });
