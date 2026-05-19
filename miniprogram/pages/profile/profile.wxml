@@ -708,6 +708,7 @@
           <text class="parent-brief-label">{{learningReportSummary.realTrialRecoveryLoop.title}}</text>
           <text>{{learningReportSummary.realTrialRecoveryLoop.summary}}</text>
           <text>{{learningReportSummary.realTrialRecoveryLine}}</text>
+          <text>{{learningReportSummary.realTrialRecoveryLoop.reviewQueueLine}}</text>
           <text>本地规则：{{learningReportSummary.realTrialRecoveryLoop.localRuleLine}}</text>
           <text>AI 边界：{{learningReportSummary.realTrialRecoveryLoop.aiUseLine}}</text>
           <text>分享边界：{{learningReportSummary.realTrialRecoveryLoop.shareBoundary}}</text>

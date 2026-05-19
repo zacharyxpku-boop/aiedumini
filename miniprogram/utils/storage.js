@@ -1234,10 +1234,96 @@ function loadRealTrialSamples() {
   return Array.isArray(list) ? list : [];
 }
 
+function buildRealTrialReviewCard(record = {}) {
+  const now = new Date(record.created_at || Date.now());
+  const due = addDaysIso(1, now);
+  const id = `real_trial_review_${record.id || `${now.getTime()}_${randomPart()}`}`;
+  const firstStep = record.firstStep || '先说出第一步';
+  const wrongCause = record.wrongCause || record.confusedStep || '待确认错因';
+  const parentCheck = record.parentCheck || '家长只问：你第一步先看哪里？';
+  return {
+    id,
+    noteId: `note_${id}`,
+    deckId: 'ydzx-real-trial',
+    template: 'active_recall',
+    type: 'real_trial_revisit',
+    source: 'real_trial_sample',
+    sourceTrialId: record.id,
+    subject: record.subject,
+    taskType: record.taskType,
+    weakPoint: wrongCause,
+    wrongCauseBucket: record.taskType,
+    wrongCauseLabel: wrongCause,
+    childArticulatedStep: firstStep,
+    checkpoint: firstStep,
+    parentPrompt: parentCheck,
+    front: `回看这次真实卡点：${firstStep}`,
+    backPrompt: `${parentCheck}｜错因：${wrongCause}`,
+    question: `下次遇到同类题，第一步先做什么？${firstStep}`,
+    answer: firstStep,
+    sourceText: record.childTask,
+    blackboardHint: {
+      title: '真实试用小黑板',
+      hint: record.boardUse || '只画第一步，不写最终答案。',
+      parentPrompt: parentCheck
+    },
+    nextPracticePlan: {
+      wrongCauseBucket: record.taskType,
+      wrongCauseLabel: wrongCause,
+      checkpoint: firstStep,
+      parentPrompt: parentCheck,
+      nextPracticeText: record.revisitPlan || '明天换一道同类小题，只检查第一步。',
+      appRoute: '/pages/review/review',
+      transferPracticeSet: buildTransferPracticeSet({
+        taskType: record.taskType,
+        childArticulatedStep: firstStep,
+        wrongCauseBucket: record.taskType,
+        wrongCauseLabel: wrongCause,
+        stuckPointText: record.childTask
+      })
+    },
+    repairPlan: record.revisitPlan || '明天换一道同类小题，只检查第一步。',
+    parentRecapLine: `真实试用回收：${parentCheck}`,
+    due,
+    dueDate: due,
+    intervalLevel: 1,
+    status: 'new',
+    isRevisited: false,
+    suspended: false,
+    leech: false,
+    realTrialRecovery: {
+      shouldBecomePressureSample: record.shouldBecomePressureSample,
+      riskTags: record.riskTags,
+      blockedFields: record.blockedFields,
+      localOwner: record.localOwner,
+      aiOwner: record.aiOwner
+    },
+    created_at: now.toISOString(),
+    updated_at: new Date().toISOString()
+  };
+}
+
+function ensureRealTrialReviewCard(record = {}) {
+  if (!record || !record.evidenceReady) return null;
+  const cards = loadReviewCards();
+  const existing = cards.find((card) => card && card.sourceTrialId === record.id);
+  if (existing) return existing;
+  const card = buildRealTrialReviewCard(record);
+  saveReviewCards([card].concat(cards).slice(0, 260));
+  appendReviewEvent({
+    type: 'real_trial_review_card_created',
+    cardId: card.id,
+    sourceTrialId: record.id,
+    rating: record.zeroHelp ? 'zero_help' : 'needs_revisit'
+  });
+  return card;
+}
+
 function appendRealTrialSample(item) {
   const record = normalizeRealTrialSample(item || {});
   const next = [record].concat(loadRealTrialSamples()).slice(0, 160);
   set(KEYS.realTrialSamples, next);
+  const reviewCard = ensureRealTrialReviewCard(record);
   appendFeedback({
     rating: record.zeroHelp ? 'accurate' : 'off',
     calibration_key: record.riskTags[0] || record.taskType,
@@ -1251,7 +1337,8 @@ function appendRealTrialSample(item) {
     taskType: record.taskType,
     riskTags: record.riskTags,
     shouldBecomePressureSample: record.shouldBecomePressureSample,
-    blockedFields: record.blockedFields
+    blockedFields: record.blockedFields,
+    reviewCardId: reviewCard && reviewCard.id ? reviewCard.id : ''
   });
   return next;
 }
@@ -1263,6 +1350,7 @@ function buildRealTrialRecoveryLoop(options = {}) {
   const evidenceReady = samples.filter((item) => item.evidenceReady).length;
   const zeroHelp = samples.filter((item) => item.zeroHelp).length;
   const shouldPromote = samples.filter((item) => item.shouldBecomePressureSample);
+  const realTrialReviewCards = loadReviewCards().filter((card) => card && card.type === 'real_trial_revisit');
   const riskCounter = {};
   const subjectCounter = {};
   samples.forEach((item) => {
@@ -1312,6 +1400,7 @@ function buildRealTrialRecoveryLoop(options = {}) {
     zeroHelp,
     zeroHelpRate: total ? Math.round((zeroHelp / total) * 100) : 0,
     shouldPromoteCount: shouldPromote.length,
+    reviewCardCount: realTrialReviewCards.length,
     topRisks,
     nextPressureQueue: nextQueue,
     latest: samples.slice(0, 3),
@@ -1320,8 +1409,11 @@ function buildRealTrialRecoveryLoop(options = {}) {
     localRuleLine: '本地代码负责样本清洗、风险打标、是否进入压力库、报告放行、分享字段和回访节奏。',
     aiUseLine: '苏格拉底问答可用 AI 改写语气和解释角度，但不能让模型临场决定答案、排名、隐私字段或掌握结论。',
     reportLine: total
-      ? `真实试用：${evidenceReady}/${total} 条证据完整，零帮助率 ${total ? Math.round((zeroHelp / total) * 100) : 0}%，待转压力样本 ${shouldPromote.length} 条。`
+      ? `真实试用：${evidenceReady}/${total} 条证据完整，零帮助率 ${total ? Math.round((zeroHelp / total) * 100) : 0}%，待转压力样本 ${shouldPromote.length} 条，已生成 ${realTrialReviewCards.length} 张回访卡。`
       : '真实试用：待回收 12 个家庭夜间作业样本后，才放行更强的长期画像和传播判断。',
+    reviewQueueLine: realTrialReviewCards.length
+      ? `已把 ${realTrialReviewCards.length} 次真实试用接入轻回访，下一轮只检查第一步、错因和迁移。`
+      : '真实试用记录完整后会自动生成轻回访卡，避免只写报告不复练。',
     shareBoundary: '分享只带第一步、错因、家长检查和回访动作；不带原题、照片、完整答案、完整对话和排行。',
     marginalRule: '若连续两轮只增加静态资料、没有新增真实试用样本或失败样本，停止加厚并汇报差距。',
     targetGap
