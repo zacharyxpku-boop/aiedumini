@@ -263,6 +263,50 @@ function isDueCard(card = {}, now = new Date()) {
   return !Number.isFinite(due) || due <= now.getTime();
 }
 
+function getEventCardId(event = {}) {
+  return event.card_id || event.cardId || event.reviewCardId || event.card_id_str || (event.card && event.card.id) || '';
+}
+
+function buildReviewEventPressure(events = []) {
+  return (Array.isArray(events) ? events : []).reduce((acc, event, index) => {
+    const cardId = getEventCardId(event);
+    if (!cardId) return acc;
+    const text = [
+      event.type,
+      event.event,
+      event.name,
+      event.result,
+      event.rating,
+      event.status
+    ].filter(Boolean).join(' ').toLowerCase();
+    const wrong = /wrong|again|hard|lapse|leech|repair|fail|stuck/.test(text);
+    const right = /correct|good|easy|pass|master/.test(text);
+    const current = acc[cardId] || { cardId, wrong: 0, right: 0, lastIndex: -1, pressure: 0 };
+    current.wrong += wrong ? 1 : 0;
+    current.right += right ? 1 : 0;
+    current.lastIndex = Math.max(current.lastIndex, index);
+    current.pressure = current.wrong * 3 - current.right;
+    acc[cardId] = current;
+    return acc;
+  }, {});
+}
+
+function rankCardsByReviewPressure(cards = [], eventPressure = {}, now = new Date()) {
+  const nowTime = now.getTime();
+  return (Array.isArray(cards) ? cards : []).slice().sort((a, b) => {
+    const aPressure = eventPressure[a.id] || {};
+    const bPressure = eventPressure[b.id] || {};
+    const aDue = new Date(a.next_review || a.due || a.dueDate || 0).getTime();
+    const bDue = new Date(b.next_review || b.due || b.dueDate || 0).getTime();
+    const aOverdue = Number.isFinite(aDue) ? Math.max(0, nowTime - aDue) : 0;
+    const bOverdue = Number.isFinite(bDue) ? Math.max(0, nowTime - bDue) : 0;
+    const aScore = Number(aPressure.pressure || 0) * 1000 + Math.min(999, Math.floor(aOverdue / 86400000));
+    const bScore = Number(bPressure.pressure || 0) * 1000 + Math.min(999, Math.floor(bOverdue / 86400000));
+    if (bScore !== aScore) return bScore - aScore;
+    return Number(bPressure.lastIndex || 0) - Number(aPressure.lastIndex || 0);
+  });
+}
+
 function normalizeEvidenceBias(input = {}) {
   const allowedRoutes = [
     '/pages/tutor/tutor',
@@ -1755,11 +1799,14 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
   const now = options.now || new Date();
   const retention = options.retentionLoop || buildGameRetentionLoop(profile, result, challenge, questSet, options);
   const gaps = buildKnowledgeGap(safeEvents, safeCards);
-  const dueCards = safeCards
-    .filter((card) => isDueCard(card, now))
-    .slice(0, 6);
+  const reviewEventPressure = buildReviewEventPressure(safeEvents);
+  const dueCards = rankCardsByReviewPressure(
+    safeCards.filter((card) => isDueCard(card, now)),
+    reviewEventPressure,
+    now
+  ).slice(0, 6);
   const weakKey = retention.weakKey || (gaps[0] && gaps[0].key) || questSet.weakKey || '第一步';
-  const sourceCards = dueCards.length ? dueCards : safeCards.slice(0, 6);
+  const sourceCards = dueCards.length ? dueCards : rankCardsByReviewPressure(safeCards, reviewEventPressure, now).slice(0, 6);
   const recallCards = sourceCards.slice(0, 3).map((card, index) => ({
     id: card.id || `recall_${index + 1}`,
     order: index + 1,
@@ -1919,6 +1966,7 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
       : `本轮先沉淀掌握证据，再用间隔回访防止遗忘。`,
     recallCards,
     spacedReviewPlan,
+    reviewEventPressure,
     questCadence,
     memoryFeedbackController,
     recallIntensityPlan,

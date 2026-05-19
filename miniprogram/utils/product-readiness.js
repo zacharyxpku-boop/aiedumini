@@ -444,6 +444,69 @@ const FINAL_TARGET_REQUIREMENTS = [
   }
 ];
 
+const HIGH_LEVERAGE_LOCAL_STRETCH_BACKLOG = [
+  {
+    id: 'k12_content_system_scale',
+    label: '7 科内容规模与课程题型体系',
+    currentPercent: 72,
+    targetPercent: 100,
+    owner: 'local_code_with_public_source_boundary',
+    benchmark: 'Gizmo 的材料转练习效率 + Khan Academy 的课程骨架',
+    action: '继续把公开 K12 结构沉淀成 grade/subject/unit/taskType/firstStep/wrongCause/boardMove/revisit，不复制原题和答案。',
+    stopWhen: '7 科高频题型都有样本、第一步、小黑板、错因、迁移、复习与分享证据。'
+  },
+  {
+    id: 'ai_socratic_quality_eval',
+    label: 'AI 点拨质量与失败兜底压测',
+    currentPercent: 68,
+    targetPercent: 100,
+    owner: 'local_eval_plus_ai_wording',
+    benchmark: 'Khanmigo 的引导式 tutor，但不泄露完整答案',
+    action: '本地代码继续扩题型、错因轴、停止条件、负例样本和三轮追问评测；AI 只负责儿童表达和家长解释。',
+    stopWhen: '每类题型都有 answer-request、沉默、错轴、迁移失败四类兜底，并通过本地负例测试。'
+  },
+  {
+    id: 'gizmo_level_daily_play',
+    label: 'Gizmo 级每日主动回忆与游戏留存',
+    currentPercent: 64,
+    targetPercent: 100,
+    owner: 'local_game_rules',
+    benchmark: 'active recall、spaced repetition、daily quest、study game',
+    action: '继续把 Review 和 Arcade 压成每日 90 秒回看、错因 replay、XP gate、streak rescue 和次日回访同一条链。',
+    stopWhen: '用户每天打开时只有一个主回忆动作，错卡必回流，XP 不奖励盲刷题量。'
+  },
+  {
+    id: 'parent_talent_decision_report',
+    label: '家长天赋/错题/试卷决策报告',
+    currentPercent: 76,
+    targetPercent: 100,
+    owner: 'local_release_gate_with_ai_summary',
+    benchmark: 'Khanmigo 家长/教师证据视角，但聚焦家庭今晚行动',
+    action: '继续把天赋测评、错题试卷、老师反馈和孩子作业过程统一成证据账本、两周稳定门槛和家校沟通摘要。',
+    stopWhen: '报告能明确说今晚怎么学、什么不能判断、还缺什么证据、何时才更新长期画像。'
+  },
+  {
+    id: 'visual_first_step_blackboard',
+    label: '第一步小黑板与视觉解释',
+    currentPercent: 70,
+    targetPercent: 100,
+    owner: 'local_visual_schema_plus_ai_copy',
+    benchmark: '千问式板书方向，但只承诺第一步图解',
+    action: '继续沉淀对象、条件、方向、证据句、变量、结构骨架等视觉 schema，不做拍题全答案和假动态板书。',
+    stopWhen: '7 科核心题型都有可视化第一步 schema、失败分支和退出标准。'
+  },
+  {
+    id: 'community_safe_share_relay',
+    label: '社区化安全分享与接力',
+    currentPercent: 74,
+    targetPercent: 100,
+    owner: 'local_privacy_and_return_route',
+    benchmark: '微信生态传播，但不做排行晒分',
+    action: '继续让分享卡只带第一步、错因、回访和接收者动作，禁止原题、答案、分数、排名和完整对话。',
+    stopWhen: '分享接收者能用自己的材料复刻同类第一步，并回流 Review/Arcade/Profile。'
+  }
+];
+
 function buildAiUsageDecisionMatrix() {
   const rows = AI_USAGE_DECISION_MATRIX.map((item) => Object.assign({}, item, {
     needsAI: item.decision === 'ai_required_with_local_guardrail',
@@ -675,20 +738,48 @@ function buildReadinessGateChecklist(localReady, moduleFlowMap, userTrialSimulat
   ];
 }
 
-function buildIterationBoundary(gateChecklist, moduleFlowMap, pseudoFunctionScan, externalBlockers) {
+function buildLocalStretchBacklog(finalTargetGapMeter = {}) {
+  const rows = Array.isArray(finalTargetGapMeter.rows) ? finalTargetGapMeter.rows : [];
+  const rowMap = mapById(rows);
+  return HIGH_LEVERAGE_LOCAL_STRETCH_BACKLOG.map((item) => {
+    const related = rowMap[item.id]
+      || (item.id === 'k12_content_system_scale' ? rowMap.curriculum_question_bank : null)
+      || (item.id === 'ai_socratic_quality_eval' ? rowMap.socratic_tutor_depth : null)
+      || (item.id === 'gizmo_level_daily_play' ? rowMap.active_recall_loop : null)
+      || (item.id === 'parent_talent_decision_report' ? rowMap.parent_longitudinal_portrait : null)
+      || (item.id === 'visual_first_step_blackboard' ? rowMap.visual_first_step_board : null)
+      || (item.id === 'community_safe_share_relay' ? rowMap.wechat_safe_share_relay : null);
+    const measuredPercent = Number((related && related.progress) || item.currentPercent || 0);
+    const benchmarkPercent = Number(item.currentPercent || measuredPercent || 0);
+    const currentPercent = Math.max(0, Math.min(100, Math.min(measuredPercent, benchmarkPercent)));
+    return Object.assign({}, item, {
+      currentPercent,
+      remainingPercent: Math.max(0, Number(item.targetPercent || 100) - currentPercent),
+      relatedTargetId: related ? related.id : '',
+      relatedStatus: related ? related.status : 'stretch_not_measured',
+      marginalValue: currentPercent >= 88 ? 'medium' : 'high'
+    });
+  }).filter((item) => item.remainingPercent > 0 && item.marginalValue !== 'low');
+}
+
+function buildIterationBoundary(gateChecklist, moduleFlowMap, pseudoFunctionScan, externalBlockers, finalTargetGapMeter = {}) {
   const localGateFailures = gateChecklist.filter((item) => !item.passed && item.id !== 'external_launch_config_clear');
   const brokenFlows = moduleFlowMap.filter((item) => item.status !== 'closed');
   const pseudoFunctions = pseudoFunctionScan.localPseudoFunctions || [];
   const externalLaunchBlockers = externalBlockers.filter((item) => item.blockingLaunch);
+  const localStretchBacklog = buildLocalStretchBacklog(finalTargetGapMeter);
+  const highValueStretchActions = localStretchBacklog.filter((item) => item.marginalValue !== 'low').map((item) => item.id);
   const localActions = localGateFailures.map((item) => item.id)
     .concat(brokenFlows.map((item) => item.id))
-    .concat(pseudoFunctions.map((item) => item.id));
+    .concat(pseudoFunctions.map((item) => item.id))
+    .concat(highValueStretchActions);
   return {
     canContinueLocally: localActions.length > 0,
     localActions,
     stopReason: localActions.length
-      ? 'local_acceptance_gaps_remain'
+      ? (localGateFailures.length || brokenFlows.length || pseudoFunctions.length ? 'local_acceptance_gaps_remain' : 'high_leverage_local_stretch_until_external_boundary')
       : (externalLaunchBlockers.length ? 'local_acceptance_exhausted_external_config_required' : 'all_acceptance_gates_passed'),
+    localStretchBacklog,
     externalBlockerIds: externalLaunchBlockers.map((item) => item.id)
   };
 }
@@ -738,13 +829,14 @@ function buildAcceptanceReport(readiness = {}) {
     dimensions,
     externalBlockers
   );
+  const finalTargetGapMeter = buildFinalTargetGapMeter(readiness, { moduleFlowMap });
   const iterationBoundary = buildIterationBoundary(
     readinessGateChecklist,
     moduleFlowMap,
     pseudoFunctionScan,
-    externalBlockers
+    externalBlockers,
+    finalTargetGapMeter
   );
-  const finalTargetGapMeter = buildFinalTargetGapMeter(readiness, { moduleFlowMap });
 
   const workflowBreakpoints = dimensions.map((item) => ({
     id: item.id,

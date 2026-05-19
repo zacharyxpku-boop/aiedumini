@@ -270,6 +270,8 @@ Page({
         releaseScope: reportSeed.releaseScope || (wrongbook.imported ? 'tonight_action_first' : 'observation_only'),
         portraitConfidenceWeight: Number(reportSeed.portraitConfidenceWeight || (wrongbook.imported ? 1 : 0)),
         evidenceGap: reportSeed.evidenceGap || [],
+        requiredNextEvidence: Array.isArray(reportSeed.requiredNextEvidence) ? reportSeed.requiredNextEvidence : [],
+        nextEvidenceUnlockPlan: reportSeed.nextEvidenceUnlockPlan || '',
         blockedFields: uploadIntakePacket && Array.isArray(uploadIntakePacket.blockedFields)
           ? uploadIntakePacket.blockedFields
           : ['original_answer', 'full_solution', 'score', 'ranking']
@@ -290,6 +292,8 @@ Page({
           releaseScope: decisionSource.releaseScope,
           portraitConfidenceWeight: decisionSource.portraitConfidenceWeight,
           evidenceGap: decisionSource.evidenceGap,
+          requiredNextEvidence: decisionSource.requiredNextEvidence,
+          nextEvidenceUnlockPlan: decisionSource.nextEvidenceUnlockPlan,
           blockedFields: decisionSource.blockedFields
         }],
         decisionSource,

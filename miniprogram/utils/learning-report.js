@@ -288,7 +288,9 @@ function normalizeReportSources(input = {}) {
     text: safeText(source.text || source.rawText || source.content),
     confidence: clamp(source.confidence === undefined ? 0.72 : source.confidence, 0.2, 0.98),
     status: source.status || '待家长确认',
-    createdAt: source.createdAt || nowIso()
+    createdAt: source.createdAt || nowIso(),
+    requiredNextEvidence: Array.isArray(source.requiredNextEvidence) ? source.requiredNextEvidence : [],
+    nextEvidenceUnlockPlan: source.nextEvidenceUnlockPlan || ''
   })).filter((source) => source.text || source.type);
 
   if (sourceText) {
@@ -1768,8 +1770,30 @@ function sourceTextHas(source = {}, pattern) {
     source.type,
     source.label,
     source.text,
-    source.status
+    source.status,
+    source.nextEvidenceUnlockPlan
   ].filter(Boolean).join('\n'));
+}
+
+function buildLaneRequiredNextEvidence(lane = {}, source = {}) {
+  const explicit = Array.isArray(source.requiredNextEvidence) ? source.requiredNextEvidence.filter(Boolean) : [];
+  const sourceId = source.id || lane.id || 'source_evidence';
+  if (explicit.length) {
+    return explicit.slice(0, 4).map((item, index) => ({
+      id: item.id || `${sourceId}_next_${index + 1}`,
+      label: item.label || item.title || item.id || `next_evidence_${index + 1}`,
+      reason: item.reason || item.unlocks || lane.nextAction || '',
+      unlocks: item.unlocks || item.reason || lane.canProduce || '',
+      route: item.route || '/pages/upload/upload'
+    }));
+  }
+  return (Array.isArray(lane.missing) ? lane.missing : []).slice(0, 3).map((label, index) => ({
+    id: `${lane.id || 'lane'}_missing_${index + 1}`,
+    label,
+    reason: lane.nextAction || '',
+    unlocks: lane.canProduce || '',
+    route: '/pages/upload/upload'
+  }));
 }
 
 function buildSourceEvidenceLedger(input = {}, parts = {}, familyDecisionMemo = {}, reportEvidenceReleaseGate = {}) {
@@ -1829,9 +1853,11 @@ function buildSourceEvidenceLedger(input = {}, parts = {}, familyDecisionMemo = 
       aiBlocked: '完整答案、自动判分、分数排名解释'
     }
   ].map((lane) => {
-    const sourceHit = sources.some((source) => sourceTextHas(source, lane.pattern));
+    const matchedSource = sources.find((source) => sourceTextHas(source, lane.pattern));
+    const sourceHit = !!matchedSource;
     const textHit = lane.pattern.test(allText);
     const collected = sourceHit || textHit;
+    const requiredNextEvidence = buildLaneRequiredNextEvidence(lane, matchedSource || {});
     return Object.assign({}, lane, {
       collected,
       status: collected ? '已采集' : '待补充',
@@ -1839,12 +1865,23 @@ function buildSourceEvidenceLedger(input = {}, parts = {}, familyDecisionMemo = 
         ? '只放行学习方法候选，不进入长期画像、分数排名或天赋定性'
         : collected ? '今晚行动可用，长期画像仍需回访验证' : '不生成该类结论',
       evidenceMissing: lane.missing,
+      matchedSourceId: matchedSource ? matchedSource.id : '',
+      nextEvidenceUnlockPlan: matchedSource ? (matchedSource.nextEvidenceUnlockPlan || '') : '',
+      requiredNextEvidence,
       blockedFields: reportEvidenceReleaseGate.homeSchoolSafeHandoff
         ? reportEvidenceReleaseGate.homeSchoolSafeHandoff.blockedFields
         : ['original_question', 'photo', 'full_answer', 'score', 'ranking']
     });
   });
   const collectedCount = lanes.filter((lane) => lane.collected).length;
+  const nextEvidenceQueue = lanes
+    .filter((lane) => !lane.collected || lane.releaseScope === 'method_candidate_only' || (Array.isArray(lane.requiredNextEvidence) && lane.requiredNextEvidence.length))
+    .reduce((acc, lane) => acc.concat((lane.requiredNextEvidence || []).map((item) => Object.assign({
+      laneId: lane.id,
+      laneLabel: lane.label,
+      collected: lane.collected
+    }, item))), [])
+    .slice(0, 8);
   const safestLane = lanes.find((lane) => lane.collected && lane.id === 'wrong_question_paper')
     || lanes.find((lane) => lane.collected)
     || lanes[3];
@@ -1855,6 +1892,10 @@ function buildSourceEvidenceLedger(input = {}, parts = {}, familyDecisionMemo = 
     collectedCount,
     totalCount: lanes.length,
     lanes,
+    nextEvidenceQueue,
+    nextEvidenceLine: nextEvidenceQueue.length
+      ? nextEvidenceQueue.map((item) => `${item.laneId}:${item.id}`).join(' -> ')
+      : '',
     safestNextAction: safestLane.nextAction,
     familyDecisionRoute: familyDecisionMemo.route || '/pages/tutor/tutor?from=source_evidence_ledger',
     localRule: '来源分类、证据缺口、报告放行、分享字段和家校交接全部由本地代码决定。',

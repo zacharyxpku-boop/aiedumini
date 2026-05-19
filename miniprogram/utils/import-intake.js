@@ -224,6 +224,41 @@ function buildNextActionQueue(kind, classified = {}, materialSource = null, imag
   ];
 }
 
+function buildRequiredNextEvidence(schema = {}, kind = '') {
+  const base = Array.isArray(schema.evidenceGap) ? schema.evidenceGap.slice(0, 4) : [];
+  const actionMap = {
+    talent_assessment: [
+      { id: 'real_homework_stuck_point', label: base[0] || '真实作业卡点', route: '/pages/upload/upload', owner: 'local_rule', unlocks: 'method_cross_check' },
+      { id: 'two_revisit_records', label: base[1] || '两次以上回访证据', route: '/pages/review/review', owner: 'local_rule', unlocks: 'portrait_candidate' },
+      { id: 'day7_variant_result', label: base[2] || '第 7 天小变式', route: '/pages/arcade/arcade', owner: 'local_rule', unlocks: 'weekly_method_signal' }
+    ],
+    wrong_question_paper: [
+      { id: 'child_original_thought', label: base[0] || '孩子原想法', route: '/pages/tutor/tutor?from=wrong_question_evidence', owner: 'ai_with_local_guardrail', unlocks: 'socratic_first_step' },
+      { id: 'stuck_first_step', label: base[1] || '卡住的第一步', route: '/pages/tutor/tutor?from=wrong_question_evidence', owner: 'local_rule', unlocks: 'wrong_cause_card' },
+      { id: 'next_day_revisit', label: '明天回访结果', route: '/pages/review/review', owner: 'local_rule', unlocks: 'portrait_confidence_plus_one' }
+    ],
+    school_material: [
+      { id: 'home_observation_log', label: base[0] || '家庭观察记录', route: '/pages/profile/profile', owner: 'local_rule', unlocks: 'home_school_digest' },
+      { id: 'child_retell_evidence', label: base[1] || '孩子复述证据', route: '/pages/review/review', owner: 'local_rule', unlocks: 'teacher_safe_handoff' }
+    ],
+    parent_report: [
+      { id: 'child_first_step', label: base[0] || '孩子自己的第一步', route: '/pages/tutor/tutor?from=parent_report_evidence', owner: 'ai_with_local_guardrail', unlocks: 'family_decision_homepage' },
+      { id: 'tomorrow_revisit_result', label: base[1] || '明天回访结果', route: '/pages/review/review', owner: 'local_rule', unlocks: 'weekly_parent_decision' }
+    ]
+  };
+  const rows = actionMap[schema.id] || base.map((label, index) => ({
+    id: `evidence_${index + 1}`,
+    label,
+    route: '/pages/upload/upload',
+    owner: 'local_rule',
+    unlocks: 'tonight_action'
+  }));
+  return rows.map((item) => Object.assign({}, item, {
+    required: true,
+    status: kind === 'photo_evidence_needs_text' || kind === 'link_excerpt_needs_text' ? 'blocked_until_text' : 'next'
+  }));
+}
+
 function buildUploadIntakePacket(text = '', imagePaths = [], materialType = '') {
   const value = String(text || '').trim();
   const images = Array.isArray(imagePaths) ? imagePaths.filter(Boolean).slice(0, 4) : [];
@@ -265,6 +300,7 @@ function buildUploadIntakePacket(text = '', imagePaths = [], materialType = '') 
     shouldImport: kind === 'material_source' || kind === 'review_request' || /wrong|review|material|question/.test(kind),
     boundary: '只把用户提供的文字拆成回忆卡，不抓链接、不解析文件、不生成完整答案。'
   };
+  const requiredNextEvidence = buildRequiredNextEvidence(intakeSourceSchema, kind);
   const reportSeed = {
     type: images.length ? 'photo_plus_text_intake' : 'text_intake',
     label: materialSource ? materialSource.label : (kind === 'photo_evidence_needs_text' ? '照片留档' : '作业/错题文字'),
@@ -274,6 +310,8 @@ function buildUploadIntakePacket(text = '', imagePaths = [], materialType = '') 
     sourceSchemaLabel: intakeSourceSchema.label,
     reportUse: intakeSourceSchema.reportUse,
     evidenceGap: intakeSourceSchema.evidenceGap,
+    requiredNextEvidence,
+    nextEvidenceUnlockPlan: requiredNextEvidence.map((item) => `${item.id}:${item.unlocks}`).join(' -> '),
     releaseScope: intakeSourceSchema.id === 'talent_assessment' ? 'method_candidate_only' : 'tonight_action_first',
     portraitConfidenceWeight: intakeSourceSchema.id === 'talent_assessment' ? 0 : 1,
     scoreRankingPolicy: intakeSourceSchema.id === 'talent_assessment'
