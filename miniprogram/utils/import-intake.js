@@ -21,6 +21,35 @@ function looksLikeQuestion(text = '') {
   return value.length >= 36 && /[。；，,]/.test(value);
 }
 
+function detectMaterialSource(text = '') {
+  const value = String(text || '').trim();
+  const urlMatch = value.match(/https?:\/\/[^\s，。；]+/i);
+  const hasUrl = !!urlMatch;
+  if (/公众号|微信文章|原文链接|微信读书/.test(value)) {
+    return { type: 'wechat_article', label: '公众号摘录', hasUrl, url: urlMatch ? urlMatch[0] : '' };
+  }
+  if (/PDF|pdf|讲义|教材|试卷解析|资料页|节选/.test(value)) {
+    return { type: 'pdf_excerpt', label: 'PDF 摘录', hasUrl, url: urlMatch ? urlMatch[0] : '' };
+  }
+  if (hasUrl || /网页|网站|链接|文章摘录|知乎|百科|博客/.test(value)) {
+    return { type: 'web_article', label: '网页摘录', hasUrl, url: urlMatch ? urlMatch[0] : '' };
+  }
+  if (/课堂笔记|读书笔记|整理|摘录|材料|知识点|要点/.test(value)) {
+    return { type: 'manual_notes', label: '手动整理', hasUrl, url: '' };
+  }
+  return null;
+}
+
+function looksLikeMaterialExcerpt(text = '') {
+  const value = String(text || '').trim();
+  if (!value) return false;
+  const source = detectMaterialSource(value);
+  if (!source) return false;
+  const hasEnoughContent = value.length >= 28 || value.split(/\n+/).filter(Boolean).length >= 2;
+  const isOnlyLink = /^https?:\/\/\S+$/i.test(value);
+  return hasEnoughContent && !isOnlyLink;
+}
+
 function classifyImportInput(text = '') {
   const value = String(text || '').trim();
   if (!value) {
@@ -29,6 +58,17 @@ function classifyImportInput(text = '') {
       route: 'none',
       shouldCreateFocus: false,
       feedback: '粘贴题目，或只说你卡在哪一步。'
+    };
+  }
+  if (looksLikeMaterialExcerpt(value)) {
+    const sourceMeta = detectMaterialSource(value) || { type: 'manual_notes', label: '手动整理', hasUrl: false, url: '' };
+    return {
+      kind: 'material_source',
+      route: 'review',
+      inputType: sourceMeta.type,
+      shouldCreateFocus: false,
+      sourceMeta,
+      feedback: `收到${sourceMeta.label}。只处理你粘贴的摘录，先导入轻回访；不自动抓取链接、不解析文件、不直接给答案。`
     };
   }
   if (looksLikeReviewRequest(value)) {
@@ -66,6 +106,8 @@ function classifyImportInput(text = '') {
 module.exports = {
   IMPORT_CHIPS,
   classifyImportInput,
+  detectMaterialSource,
+  looksLikeMaterialExcerpt,
   looksLikeQuestion,
   looksLikeReviewRequest,
   looksLikeStuckPoint

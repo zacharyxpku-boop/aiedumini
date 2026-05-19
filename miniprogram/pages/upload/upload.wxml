@@ -206,11 +206,19 @@
       <view class="material-card" wx:if="{{showMaterialPanel && materialPreview}}">
         <view class="material-title">学习包</view>
         <view class="material-desc">{{materialPreview.nextAction}}</view>
+        <view class="material-source-tabs">
+          <button class="material-source-chip {{materialType === 'wechat_article' ? 'active' : ''}}" data-type="wechat_article" bindtap="setMaterialType">公众号摘录</button>
+          <button class="material-source-chip {{materialType === 'web_article' ? 'active' : ''}}" data-type="web_article" bindtap="setMaterialType">网页摘录</button>
+          <button class="material-source-chip {{materialType === 'pdf_excerpt' ? 'active' : ''}}" data-type="pdf_excerpt" bindtap="setMaterialType">PDF 摘录</button>
+          <button class="material-source-chip {{materialType === 'class_notes' ? 'active' : ''}}" data-type="class_notes" bindtap="setMaterialType">课堂笔记</button>
+        </view>
+        <view class="material-source-line">{{materialPreview.sourceLine}}</view>
+        <view class="material-boundary">{{materialPreview.importBoundary}}</view>
         <textarea
           class="material-textarea"
           value="{{materialText}}"
           bindinput="onMaterialInput"
-          placeholder="也可以粘贴课堂笔记、错题解释或 PPT 要点，生成复习卡。"
+          placeholder="粘贴公众号/网页摘录、PDF 摘录、课堂笔记或 PPT 要点；这里只处理你粘贴的内容，不自动抓取链接。"
         />
         <button class="material-import" bindtap="importMaterialPack">导入轻回访</button>
       </view>

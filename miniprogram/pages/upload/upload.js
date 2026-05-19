@@ -95,16 +95,24 @@ Page({
       class_notes: '课堂笔记',
       ppt: 'PPT 要点',
       video: '视频笔记',
-      handwriting: '手写整理'
+      handwriting: '手写整理',
+      wechat_article: '公众号摘录',
+      web_article: '网页摘录',
+      pdf_excerpt: 'PDF 摘录',
+      manual_notes: '手动整理'
     };
+    const sourceLine = `来源：${labels[type] || '课堂笔记'}`;
+    const importBoundary = '只处理你粘贴的文字摘录，不自动抓取链接、不解析 PDF 文件，也不生成现成答案。';
     if (!value) {
       return {
         title: '学习材料变复习卡',
-        label: '先粘贴课堂笔记、PPT 要点、视频文字或手写整理，预览能不能变成可复习的知识卡。',
+        label: '先粘贴公众号/网页摘录、PDF 摘录、课堂笔记或 PPT 要点，预览能不能变成可复习的知识卡。',
         type: labels[type] || '课堂笔记',
+        sourceLine,
+        importBoundary,
         cards: [],
         readiness: 0,
-        nextAction: '粘贴一段材料，咕点会先生成概念卡、步骤卡、陷阱卡和填空卡。'
+        nextAction: '粘贴一段真实摘录，咕点会先生成概念卡、步骤卡、陷阱卡和填空卡。'
       };
     }
     const profile = storage.loadProfile();
@@ -118,6 +126,8 @@ Page({
       title: '材料预览',
       label: '把零散材料拆成概念、步骤、陷阱和填空卡，先形成一套本地可用的复习包。',
       type: labels[type] || '课堂笔记',
+      sourceLine,
+      importBoundary,
       cards,
       readiness: Math.min(100, Math.round((covered / coreTypes.length) * 80) + Math.min(20, cards.length * 3)),
       nextAction: cards.length

@@ -765,6 +765,46 @@ page {
   line-height: 1.48;
 }
 
+.material-source-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12rpx;
+  margin-top: 18rpx;
+}
+
+.material-source-chip {
+  min-height: 64rpx;
+  padding: 0 14rpx;
+  color: #554F45;
+  background: #F7F4EA;
+  border: 1rpx solid #E9DFC9;
+  border-radius: 18rpx;
+  font-size: 22rpx;
+  font-weight: 850;
+}
+
+.material-source-chip.active {
+  color: #FFFFFF;
+  background: #2A5C45;
+  border-color: #2A5C45;
+}
+
+.material-source-line,
+.material-boundary {
+  margin-top: 12rpx;
+  color: #6E685E;
+  font-size: 22rpx;
+  font-weight: 720;
+  line-height: 1.45;
+}
+
+.material-boundary {
+  color: #8A6141;
+  background: #FFF8EA;
+  border-radius: 18rpx;
+  padding: 14rpx 16rpx;
+}
+
 .material-textarea {
   width: 100%;
   min-height: 180rpx;
