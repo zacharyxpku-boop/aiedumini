@@ -1556,6 +1556,23 @@ page {
   border-color: rgba(40, 148, 109, 0.18);
 }
 
+.profile-material-decision-snapshot {
+  margin-top: 18rpx;
+  background: #FFFDF4;
+  border-color: rgba(189, 147, 42, 0.18);
+}
+
+.profile-material-decision-snapshot .parent-brief-block {
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.profile-material-decision-snapshot .parent-brief-reason {
+  padding: 14rpx 16rpx;
+  border-radius: 18rpx;
+  background: rgba(247, 208, 104, 0.16);
+  color: #5C4A16;
+}
+
 .profile-readiness-snapshot .parent-brief-reason {
   padding: 14rpx 16rpx;
   border-radius: 18rpx;

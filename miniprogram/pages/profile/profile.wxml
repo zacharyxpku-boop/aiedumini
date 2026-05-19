@@ -103,6 +103,31 @@
           </view>
         </view>
 
+        <view class="family-summary-card profile-material-decision-snapshot" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossier}}">
+          <view class="family-summary-title">测评/错题资料决策卡</view>
+          <view class="family-summary-body family-readable">
+            <view class="parent-brief-block">
+              <text class="parent-brief-label">{{learningReportSummary.uploadedMaterialDecisionDossierTitle}}</text>
+              <text>{{learningReportSummary.uploadedMaterialDecisionDossierSummary}}</text>
+              <text>{{learningReportSummary.uploadedMaterialDecisionDossierChildStrengthLine}}</text>
+            </view>
+            <view class="parent-brief-block">
+              <text class="parent-brief-label">怎么学更好</text>
+              <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierHowToLearnBetter}}" wx:key="id">{{item.label}}：{{item.method}}｜验证：{{item.verifyWith}}</text>
+            </view>
+            <view class="parent-brief-block">
+              <text class="parent-brief-label">资料入口</text>
+              <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierMaterialLanes}}" wx:key="id">{{item.label}}：{{item.collected ? '已接入' : '待补充'}}｜{{item.output}}</text>
+            </view>
+            <view class="parent-brief-reason">{{learningReportSummary.uploadedMaterialDecisionDossierTalentRule}}</view>
+            <view class="parent-brief-reason">{{learningReportSummary.uploadedMaterialDecisionDossierWrongPaperRule}}</view>
+            <view class="parent-brief-reason" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierReleaseGate}}">放行门槛：{{learningReportSummary.uploadedMaterialDecisionDossierReleaseGate.status}}</view>
+            <view class="profile-action-row" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierRouteActions.length}}">
+              <button class="profile-small-primary" wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierRouteActions}}" wx:key="id" data-id="{{item.id}}" data-label="{{item.label}}" data-route="{{item.route}}" data-reason="{{item.reason}}" bindtap="runUploadedMaterialDossierAction">{{item.label}}</button>
+            </view>
+          </view>
+        </view>
+
         <view class="family-summary-card profile-readiness-snapshot" wx:if="{{profileReadinessSnapshot}}">
           <view class="family-summary-title">{{profileReadinessSnapshot.title}}</view>
           <view class="family-summary-body family-readable">
