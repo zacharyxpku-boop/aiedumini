@@ -7832,9 +7832,125 @@ function buildSubjectSeedLibrary(options = {}) {
   };
 }
 
+function normalizeCourseBindingText(value = '') {
+  return String(value || '').toLowerCase().replace(/\s+/g, '');
+}
+
+function collectCourseBindingText(options = {}) {
+  const parts = [
+    options.subject,
+    options.issueType,
+    options.taskType,
+    options.title,
+    options.text,
+    options.sourceText,
+    options.stuckPointText,
+    options.thought,
+    options.childArticulatedStep,
+    options.childStepSentence,
+    options.systemSuggestedStep,
+    options.suggestedFirstStep,
+    options.firstStep,
+    options.wrongCause,
+    options.wrongCauseBucket,
+    options.expectedWrongCause,
+    options.expectedFirstStep,
+    options.expectedBoardMove,
+    options.parentCheck,
+    options.nearTransfer
+  ];
+  const nested = [
+    options.selected,
+    options.selectedHomework,
+    options.activeSample,
+    options.pressureSample,
+    options.todayFocus,
+    options.loopFocus
+  ];
+  nested.forEach((item) => {
+    if (!item || typeof item !== 'object') return;
+    [
+      'id',
+      'subject',
+      'taskType',
+      'title',
+      'text',
+      'stem',
+      'sourceText',
+      'stuckPointText',
+      'thought',
+      'expectedWrongCause',
+      'expectedFirstStep',
+      'expectedBoardMove',
+      'parentCheck',
+      'nearTransfer'
+    ].forEach((key) => {
+      if (item[key]) parts.push(item[key]);
+    });
+  });
+  return parts.filter(Boolean).join(' ');
+}
+
+function scoreCourseUnitBinding(unit = {}, bindingText = '', activeTaskType = '', options = {}) {
+  const raw = collectCourseBindingText(Object.assign({}, options, { text: bindingText }));
+  const text = normalizeCourseBindingText(raw);
+  const unitText = normalizeCourseBindingText([
+    unit.id,
+    unit.subjectId,
+    unit.subjectLabel,
+    unit.unitLabel,
+    unit.taskType,
+    unit.parentAction,
+    unit.blackboardBlueprint && unit.blackboardBlueprint.firstStroke,
+    unit.blackboardBlueprint && unit.blackboardBlueprint.visualPrompt,
+    unit.practiceLoop && unit.practiceLoop.recall,
+    unit.practiceLoop && unit.practiceLoop.repair,
+    unit.practiceLoop && unit.practiceLoop.transfer,
+    (unit.reusableQuestionTypes || []).join(' '),
+    (unit.wrongCauseAtlas || []).join(' '),
+    (unit.evidenceRequired || []).join(' ')
+  ].filter(Boolean).join(' '));
+  let score = 0;
+  if (options.activeUnitId && unit.id === options.activeUnitId) score += 160;
+  if (options.courseUnitId && unit.id === options.courseUnitId) score += 160;
+  if (activeTaskType && unit.taskType === activeTaskType) score += 80;
+  if (options.subject && (unit.subjectId === options.subject || unit.subjectLabel === options.subject)) score += 40;
+  if (text && unitText) {
+    [
+      '读题', '问题句', '条件', '单位', '建模', '关系', '等量', '方程', '未知数', '求解', '复核',
+      '证据', '原文', '主旨', '推断', '句子', '时态', '词汇', '搭配',
+      '对象', '状态', '受力', '电路', '光路', '规律', '物质', '现象', '方程式',
+      '结构', '过程', '变量', '对照', '地图', '图例', '因果', '空间'
+    ].forEach((token) => {
+      if (text.includes(token) && unitText.includes(token)) score += 18;
+    });
+  }
+  const taskHints = {
+    equation_setup: ['方程', '未知数', '等量', '关系', '设x', '设未知数'],
+    math_word_problem: ['问题句', '已知', '单位', '数量关系', '建模', '关系'],
+    reading_question: ['原文', '证据', '主旨', '细节', '推断', '原因'],
+    english_sentence: ['主语', '谓语', '时态', '词汇', '搭配', '从句'],
+    physics_diagram: ['对象', '状态', '受力', '电路', '光路', '方向', '规律'],
+    chemistry_experiment: ['物质', '状态', '现象', '气体', '沉淀', '方程式', '守恒'],
+    biology_process: ['结构', '功能', '过程', '变量', '对照', '生态'],
+    geography_map: ['地图', '图例', '方向', '位置', '因果', '空间', '地形']
+  };
+  (taskHints[activeTaskType] || []).forEach((token) => {
+    if (text.includes(token) && unitText.includes(token)) score += 30;
+  });
+  return score;
+}
+
 function buildCourseUnitMap(options = {}) {
   const subjectLibrary = options.subjectSeedLibrary || buildSubjectSeedLibrary(options);
   const activeSubject = options.subject ? String(options.subject) : '';
+  const bindingText = collectCourseBindingText(options);
+  const detectedTaskType = detectTaskType(bindingText, `${options.subject || ''} ${options.issueType || ''}`);
+  const activeTaskType = options.taskType
+    || (detectedTaskType !== 'unknown' ? detectedTaskType : '')
+    || taskTypeForSubject(activeSubject)
+    || (subjectLibrary.active && subjectLibrary.active.taskType)
+    || 'unknown';
   const subjects = (subjectLibrary.subjects || []).map((subject) => {
     const units = (subject.seeds || []).map((seed, index) => ({
       id: `${subject.id}_unit_${seed.id}`,
@@ -7890,9 +8006,40 @@ function buildCourseUnitMap(options = {}) {
       units
     };
   });
-  const active = subjects.find((item) => item.id === activeSubject || item.label === activeSubject)
+  const activeBase = subjects.find((item) => item.id === activeSubject || item.label === activeSubject)
+    || subjects.find((item) => item.taskType === activeTaskType)
     || (subjectLibrary.active && subjects.find((item) => item.id === subjectLibrary.active.id))
     || subjects[0];
+  const candidateUnits = activeBase && Array.isArray(activeBase.units) ? activeBase.units : [];
+  const scoredUnits = candidateUnits
+    .map((unit) => Object.assign({}, unit, {
+      activeBindingScore: scoreCourseUnitBinding(unit, bindingText, activeTaskType, options)
+    }))
+    .sort((a, b) => b.activeBindingScore - a.activeBindingScore || a.order - b.order);
+  const positiveUnits = scoredUnits.filter((unit) => unit.activeBindingScore > 0);
+  const taskMatchedUnits = scoredUnits.filter((unit) => unit.taskType === activeTaskType);
+  const activeUnits = (positiveUnits.length ? positiveUnits : taskMatchedUnits.length ? taskMatchedUnits : scoredUnits).slice(0, 3);
+  const activeUnitIds = activeUnits.map((unit) => unit.id);
+  const activeBindingEvidence = activeUnits.map((unit) => ({
+    unitId: unit.id,
+    unitLabel: unit.unitLabel,
+    subjectLabel: unit.subjectLabel,
+    taskType: unit.taskType,
+    score: unit.activeBindingScore || 0,
+    route: unit.route,
+    gameRoute: unit.gameRoute,
+    recallRoute: unit.recallRoute
+  }));
+  const active = activeBase ? Object.assign({}, activeBase, {
+    units: activeUnits,
+    activeUnitCount: activeUnits.length,
+    activeTaskType,
+    activeUnitIds,
+    activeBindingEvidence,
+    activeBindingLine: activeUnits[0]
+      ? `当前作业卡点已绑定到 ${activeUnits[0].subjectLabel}/${activeUnits[0].unitLabel}，题库和游戏优先出这条主线。`
+      : '当前作业卡点暂未命中具体单元，先用本学科第一步卡兜底。'
+  }) : null;
   const totalUnits = subjects.reduce((sum, subject) => sum + subject.unitCount, 0);
   const totalQuestionTypes = subjects.reduce((sum, subject) => sum + subject.units.reduce((unitSum, unit) => unitSum + unit.reusableQuestionTypes.length, 0), 0);
   return {
@@ -7902,6 +8049,10 @@ function buildCourseUnitMap(options = {}) {
     boundary: '这是课程能力地图，不承诺拍题自动板书讲完整答案。',
     subjects,
     active,
+    activeTaskType,
+    activeUnitIds,
+    activeBindingEvidence,
+    activeBindingLine: active && active.activeBindingLine ? active.activeBindingLine : '',
     subjectCount: subjects.length,
     unitCount: totalUnits,
     reusableQuestionTypeCount: totalQuestionTypes,
