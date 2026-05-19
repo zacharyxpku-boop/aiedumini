@@ -133,6 +133,21 @@
       <view class="challenge-brief-sub" wx:if="{{challengeBrief.evidenceBiasLine}}">为什么开这局：{{challengeBrief.evidenceBiasLine}}</view>
     </view>
 
+    <view class="daily-return-card primary-recall-card" wx:if="{{dailyPrimaryRecallAction}}">
+      <view class="daily-return-top">
+        <view>
+          <view class="daily-return-kicker">今日主回忆</view>
+          <view class="daily-return-title">{{dailyPrimaryRecallAction.title}}</view>
+        </view>
+        <view class="daily-return-pill">只做这一件</view>
+      </view>
+      <view class="daily-return-line">{{dailyPrimaryRecallAction.oneActionLine}}</view>
+      <view class="daily-return-rule">{{dailyPrimaryRecallAction.xpGate}}</view>
+      <view class="daily-return-rule">明天回访：{{dailyPrimaryRecallAction.nextReturnWindow}}｜{{dailyPrimaryRecallAction.parentLine}}</view>
+      <view class="daily-return-rule">{{dailyPrimaryRecallAction.shareBoundary}}</view>
+      <button class="daily-return-button" bindtap="runDailyPrimaryRecallAction">开始主回忆</button>
+    </view>
+
     <view class="daily-return-card" wx:if="{{dailyReturnMission}}">
       <view class="daily-return-top">
         <view>

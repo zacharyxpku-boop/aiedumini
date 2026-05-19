@@ -99,6 +99,7 @@
             <view class="parent-brief-reason">{{learningReportSummary.familyDecisionHomepageLocalAiSplitLine}}</view>
             <view class="parent-brief-reason" wx:if="{{learningReportSummary.familyDecisionHomepageShareBoundary}}">{{learningReportSummary.familyDecisionHomepageShareBoundary}}</view>
             <view class="parent-brief-reason">{{profileSafeSummary.evidenceBoundaryLine}}</view>
+            <button class="copy-action family-decision-primary" wx:if="{{learningReportSummary.familyDecisionHomepageRoute}}" bindtap="runFamilyDecisionHomepageAction">{{learningReportSummary.familyDecisionHomepageCtaLabel}}</button>
           </view>
         </view>
 

@@ -3039,6 +3039,27 @@ Page({
     wx.navigateTo({ url: path });
   },
 
+  runFamilyDecisionHomepageAction() {
+    const summary = this.data.learningReportSummary || {};
+    const route = summary.familyDecisionHomepageRoute || summary.nextActionRoute || '/pages/tutor/tutor?from=family_decision_homepage';
+    if (storage.recordUnifiedNextAction) {
+      storage.recordUnifiedNextAction({
+        source: 'family_decision_homepage',
+        sourceLabel: '家长决策首页',
+        actionId: 'family_decision_homepage_cta',
+        actionLabel: summary.familyDecisionHomepageCtaLabel || '去看家长决策书',
+        route,
+        reasonLine: summary.familyDecisionHomepageHeadline || '',
+        evidenceLine: summary.familyDecisionHomepageSourceLine || ''
+      });
+    }
+    if (route.indexOf('/pages/profile/profile') >= 0 || route.indexOf('/pages/home/home') >= 0 || route.indexOf('/pages/review/review') >= 0 || route.indexOf('/pages/tools/tools') >= 0 || route.indexOf('/pages/focus/focus') >= 0) {
+      wx.switchTab({ url: route.split('?')[0] });
+      return;
+    }
+    wx.navigateTo({ url: route });
+  },
+
   runBorrowWorkbenchAction(event) {
     const dataset = event.currentTarget.dataset || {};
     const route = dataset.route || '/pages/upload/upload?from=openmaic_k12_workbench';

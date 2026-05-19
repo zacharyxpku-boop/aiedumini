@@ -52,6 +52,7 @@ Page({
     publicK12IntakeExecutableCards: [],
     dailyReturnMission: null,
     dailyReturnContract: null,
+    dailyPrimaryRecallAction: null,
     reviewReturnSeed: null,
     nextDayReturnEvidence: null,
     spacedRecallPolicy: null,
@@ -287,6 +288,9 @@ Page({
         : null,
       dailyReturnContract: previewHighFrequencyPracticeLoop && previewHighFrequencyPracticeLoop.dailyReturnContract
         ? previewHighFrequencyPracticeLoop.dailyReturnContract
+        : null,
+      dailyPrimaryRecallAction: previewHighFrequencyPracticeLoop && previewHighFrequencyPracticeLoop.dailyPrimaryRecallAction
+        ? previewHighFrequencyPracticeLoop.dailyPrimaryRecallAction
         : null,
       reviewReturnSeed: previewHighFrequencyPracticeLoop && previewHighFrequencyPracticeLoop.reviewReturnSeed
         ? previewHighFrequencyPracticeLoop.reviewReturnSeed
@@ -1713,6 +1717,9 @@ Page({
       dailyReturnContract: highFrequencyPracticeLoop && highFrequencyPracticeLoop.dailyReturnContract
         ? highFrequencyPracticeLoop.dailyReturnContract
         : this.data.dailyReturnContract,
+      dailyPrimaryRecallAction: highFrequencyPracticeLoop && highFrequencyPracticeLoop.dailyPrimaryRecallAction
+        ? highFrequencyPracticeLoop.dailyPrimaryRecallAction
+        : this.data.dailyPrimaryRecallAction,
       reviewReturnSeed: highFrequencyPracticeLoop && highFrequencyPracticeLoop.reviewReturnSeed
         ? highFrequencyPracticeLoop.reviewReturnSeed
         : this.data.reviewReturnSeed,
@@ -1772,6 +1779,7 @@ Page({
       highFrequencyPracticeLoop: null,
       dailyReturnMission: null,
       dailyReturnContract: null,
+      dailyPrimaryRecallAction: null,
       reviewReturnSeed: null,
       nextDayReturnEvidence: null,
       spacedRecallPolicy: null,
@@ -1870,6 +1878,22 @@ Page({
 
   goReview() {
     wx.switchTab({ url: '/pages/review/review' });
+  },
+
+  runDailyPrimaryRecallAction() {
+    const action = this.data.dailyPrimaryRecallAction || {};
+    if (storage.recordUnifiedNextAction) {
+      storage.recordUnifiedNextAction({
+        source: 'daily_primary_recall_action',
+        sourceLabel: '每日主回忆动作',
+        actionId: action.id || 'daily_primary_recall_action',
+        actionLabel: action.title || '今天只做一个主回忆动作',
+        route: action.route || '/pages/review/review?mode=recall_return',
+        reasonLine: action.oneActionLine || '',
+        evidenceLine: action.xpGate || ''
+      });
+    }
+    navigation.navigateLearningRoute(action.route || '/pages/review/review?mode=recall_return');
   },
 
   runResultSecondary() {

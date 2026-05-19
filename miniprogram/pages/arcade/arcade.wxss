@@ -1227,6 +1227,23 @@
   line-height: 1.55;
 }
 
+.primary-recall-card {
+  border-color: rgba(27, 67, 50, 0.18);
+  background: linear-gradient(180deg, rgba(248, 252, 246, 1) 0%, rgba(255, 255, 255, 1) 100%);
+}
+
+.daily-return-button {
+  margin-top: 16rpx;
+  width: 100%;
+  border-radius: 18rpx;
+  background: #1B4332;
+  color: #FFFFFF;
+  font-size: 26rpx;
+  font-weight: 900;
+  text-align: center;
+  line-height: 1;
+}
+
 .daily-return-steps {
   margin-top: 18rpx;
   display: grid;
