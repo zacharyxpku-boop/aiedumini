@@ -147,8 +147,49 @@ function scoreQuality(fields) {
   return Math.max(0, Math.min(100, score));
 }
 
+function normalizeSourceMaterialType(source = '') {
+  const value = String(source || '').toLowerCase();
+  if (/wechat|公众号/.test(value)) return 'wechat_article';
+  if (/web|url|link|网页|链接/.test(value)) return 'web_article';
+  if (/pdf|讲义|教材/.test(value)) return 'pdf_excerpt';
+  if (/wrong|错题|wrongbook/.test(value)) return 'wrong_question';
+  if (/photo|image|照片/.test(value)) return 'photo_note';
+  if (/manual|note|摘录|笔记/.test(value)) return 'manual_notes';
+  return value || 'manual_notes';
+}
+
+function buildImportMemoryMetadata(source, fields = {}, meta = {}) {
+  const sourceMaterialType = meta.sourceMaterialType || normalizeSourceMaterialType(source || meta.source || '');
+  const cause = meta.wrongCauseBucket || fields.wrongCauseBucket || buildNextPracticePlan(Object.assign({}, fields, meta)).wrongCauseBucket;
+  const isTrapOrWrong = /wrong|trap|错|卡|弱|不会|易错/.test([
+    sourceMaterialType,
+    fields.question,
+    fields.answer,
+    fields.weakPoint,
+    fields.calibrationKey,
+    cause
+  ].join(' '));
+  const nextRevisitWindow = isTrapOrWrong
+    ? '今晚 90 秒主动回忆，明天换条件回访，第 7 天只查同一错因。'
+    : '今晚说出第一步，明天回访一张同源卡，第 7 天做一次迁移。';
+  return {
+    sourceMaterialType,
+    wrongCauseBucket: cause,
+    highFrequency: {
+      mode: isTrapOrWrong ? 'wrong_cause_replay' : 'active_recall',
+      dailyCap: isTrapOrWrong ? 3 : 2,
+      releaseGate: '先说第一步，再看答案；不奖励速度、分数或排名。',
+      reviewRoute: '/pages/review/review?from=material_memory',
+      arcadeRoute: '/pages/arcade/arcade?from=material_memory'
+    },
+    nextRevisitWindow,
+    memoryEvidenceLine: `${sourceMaterialType} -> 第一步 -> 错因 -> 主动回忆 -> 明天回访`
+  };
+}
+
 function makeNote(id, type, source, fields, meta = {}) {
   const practicePlan = buildNextPracticePlan(Object.assign({}, fields || {}, meta || {}, { type, source }));
+  const memoryMeta = buildImportMemoryMetadata(source, fields, Object.assign({}, meta, { wrongCauseBucket: meta.wrongCauseBucket || fields.wrongCauseBucket || practicePlan.wrongCauseBucket }));
   const note = {
     id,
     type,
@@ -162,6 +203,10 @@ function makeNote(id, type, source, fields, meta = {}) {
     nextPracticePlan: meta.nextPracticePlan || fields.nextPracticePlan || practicePlan,
     checkpoint: meta.checkpoint || fields.checkpoint || practicePlan.checkpoint,
     parentPrompt: meta.parentPrompt || fields.parentPrompt || practicePlan.parentPrompt,
+    sourceMaterialType: meta.sourceMaterialType || memoryMeta.sourceMaterialType,
+    highFrequency: meta.highFrequency || memoryMeta.highFrequency,
+    nextRevisitWindow: meta.nextRevisitWindow || memoryMeta.nextRevisitWindow,
+    memoryEvidenceLine: meta.memoryEvidenceLine || memoryMeta.memoryEvidenceLine,
     fields: {
       question: fields.question || '',
       answer: fields.answer || '',
@@ -192,6 +237,10 @@ function makeCard(note, template = 'qa') {
     nextPracticePlan: note.nextPracticePlan,
     checkpoint: note.checkpoint,
     parentPrompt: note.parentPrompt,
+    sourceMaterialType: note.sourceMaterialType,
+    highFrequency: note.highFrequency,
+    nextRevisitWindow: note.nextRevisitWindow,
+    memoryEvidenceLine: note.memoryEvidenceLine,
     quality: note.quality,
     stability: 0,
     difficulty: 5,
@@ -2376,6 +2425,41 @@ function wrongCauseBreakdown(cards = [], notes = []) {
   };
 }
 
+function materialMemoryBridge(cards = [], notes = [], events = []) {
+  const materialCards = (cards || []).filter((card) => card && card.sourceMaterialType);
+  const byType = {};
+  materialCards.forEach((card) => {
+    const key = card.sourceMaterialType || 'manual_notes';
+    if (!byType[key]) {
+      byType[key] = { sourceMaterialType: key, total: 0, due: 0, leech: 0, replay: 0 };
+    }
+    byType[key].total += 1;
+    if (!card.suspended && (!card.due || new Date(card.due).getTime() <= Date.now())) byType[key].due += 1;
+    if (card.leech || Number(card.lapses || 0) >= 2) byType[key].leech += 1;
+    if (card.highFrequency && card.highFrequency.mode === 'wrong_cause_replay') byType[key].replay += 1;
+  });
+  const sourceRows = Object.keys(byType).map((key) => byType[key]).sort((a, b) => b.total - a.total);
+  const importedEvents = (events || []).filter((event) => event && event.kind === 'review_import');
+  const nextCard = materialCards.find((card) => card.highFrequency && card.highFrequency.mode === 'wrong_cause_replay')
+    || materialCards.find((card) => !card.suspended)
+    || null;
+  return {
+    id: 'material_memory_bridge',
+    title: '材料到记忆闭环',
+    importedCardCount: materialCards.length,
+    importedEventCount: importedEvents.length,
+    sourceRows,
+    nextCardId: nextCard ? nextCard.id : '',
+    nextAction: nextCard
+      ? `先回忆：${normalizeText(nextCard.question || nextCard.answer, 32)}`
+      : '先粘贴一段自己的材料，生成第一张回访卡。',
+    nextRevisitWindow: nextCard ? nextCard.nextRevisitWindow : '今晚导入，明天回访，第 7 天看是否能迁移。',
+    evidenceLine: nextCard ? (nextCard.memoryEvidenceLine || '材料 -> 第一步 -> 主动回忆 -> 回访') : '还没有材料记忆证据。',
+    releaseGate: '只使用用户粘贴或自有材料；不抓链接、不解析文件、不生成原题答案库。',
+    shareBoundary: '分享只带下一步和错因，不带原题、答案、照片、分数或排名。'
+  };
+}
+
 function deckMaintenancePlan(summary) {
   const safe = summary || {};
   const queue = safe.queue || {};
@@ -3275,6 +3359,7 @@ function reviewSummary() {
     quizLoop,
     deckLibrary: deckLibrary(notes, cards, { limit: 6 }),
     wrongCause: wrongCauseBreakdown(cards, notes),
+    materialMemoryBridge: materialMemoryBridge(cards, notes, events),
     sources: sourceBreakdown(cards, events),
     types,
     templates,
