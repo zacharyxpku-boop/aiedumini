@@ -1042,6 +1042,15 @@ Page({
       peer_memory_relay_blocked_fields: highFrequencyPracticeLoop && highFrequencyPracticeLoop.peerMemoryRelayLeague
         ? highFrequencyPracticeLoop.peerMemoryRelayLeague.blockedFields.length
         : 0,
+      ninety_second_combo_mode: highFrequencyPracticeLoop && highFrequencyPracticeLoop.ninetySecondRecallComboEngine
+        ? highFrequencyPracticeLoop.ninetySecondRecallComboEngine.mode
+        : '',
+      ninety_second_combo_steps: highFrequencyPracticeLoop && highFrequencyPracticeLoop.ninetySecondRecallComboEngine
+        ? highFrequencyPracticeLoop.ninetySecondRecallComboEngine.comboSteps.length
+        : 0,
+      ninety_second_combo_rewards: highFrequencyPracticeLoop && highFrequencyPracticeLoop.ninetySecondRecallComboEngine
+        ? highFrequencyPracticeLoop.ninetySecondRecallComboEngine.rewardLadder.length
+        : 0,
       share_code: incomingShare && incomingShare.share_code ? incomingShare.share_code : ''
     });
     if (storage.saveTodaySession) {
@@ -1225,6 +1234,15 @@ Page({
           : 0,
         peer_memory_relay_blocked_fields: highFrequencyPracticeLoop && highFrequencyPracticeLoop.peerMemoryRelayLeague
           ? highFrequencyPracticeLoop.peerMemoryRelayLeague.blockedFields.length
+          : 0,
+        ninety_second_combo_mode: highFrequencyPracticeLoop && highFrequencyPracticeLoop.ninetySecondRecallComboEngine
+          ? highFrequencyPracticeLoop.ninetySecondRecallComboEngine.mode
+          : '',
+        ninety_second_combo_steps: highFrequencyPracticeLoop && highFrequencyPracticeLoop.ninetySecondRecallComboEngine
+          ? highFrequencyPracticeLoop.ninetySecondRecallComboEngine.comboSteps.length
+          : 0,
+        ninety_second_combo_rewards: highFrequencyPracticeLoop && highFrequencyPracticeLoop.ninetySecondRecallComboEngine
+          ? highFrequencyPracticeLoop.ninetySecondRecallComboEngine.rewardLadder.length
           : 0,
         boss_gap: this.data.adaptiveChallenge && this.data.adaptiveChallenge.bossCard
           ? this.data.adaptiveChallenge.bossCard.key

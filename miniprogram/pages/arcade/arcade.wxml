@@ -475,6 +475,20 @@
           <view class="retention-loop-step">{{highFrequencyPracticeLoop.dailyMemoryPrescription.parentLine}}</view>
           <view class="retention-loop-step">{{highFrequencyPracticeLoop.dailyMemoryPrescription.shareLine}}</view>
         </view>
+        <view class="high-frequency-section" wx:if="{{highFrequencyPracticeLoop.ninetySecondRecallComboEngine}}">
+          <view class="high-frequency-label">{{highFrequencyPracticeLoop.ninetySecondRecallComboEngine.title}}</view>
+          <view class="retention-loop-step">总时长：{{highFrequencyPracticeLoop.ninetySecondRecallComboEngine.totalSeconds}} 秒｜{{highFrequencyPracticeLoop.ninetySecondRecallComboEngine.xpGate}}</view>
+          <view class="high-frequency-item" wx:for="{{highFrequencyPracticeLoop.ninetySecondRecallComboEngine.comboSteps}}" wx:key="id">
+            <text>{{item.seconds}} 秒：{{item.action}}</text>
+            <text>证据：{{item.proof}}｜卡住：{{item.fallback}}</text>
+          </view>
+          <view class="high-frequency-item" wx:for="{{highFrequencyPracticeLoop.ninetySecondRecallComboEngine.rewardLadder}}" wx:key="id">
+            <text>{{item.reward}}</text>
+            <text>门槛 {{item.threshold}}｜{{item.release ? '已放行' : '待证据'}}</text>
+          </view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.ninetySecondRecallComboEngine.parentEvidenceLine}}</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.ninetySecondRecallComboEngine.shareBoundary}}</view>
+        </view>
         <view class="high-frequency-section" wx:if="{{highFrequencyPracticeLoop.dailyMemorySprintDeck}}">
           <view class="high-frequency-label">{{highFrequencyPracticeLoop.dailyMemorySprintDeck.title}}</view>
           <view class="retention-loop-step">{{highFrequencyPracticeLoop.dailyMemorySprintDeck.summary}}</view>
