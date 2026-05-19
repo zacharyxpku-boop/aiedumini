@@ -96,6 +96,11 @@ Page({
   buildMaterialPreview(text, type) {
     const value = String(text || '').trim();
     const labels = {
+      parent_report: '家长观察',
+      talent_assessment: '天赋/学习偏好测评',
+      school_material: '学校/老师材料',
+      wrong_question_paper: '错题/试卷',
+      wrong_question_photo: '错题照片留档',
       class_notes: '课堂笔记',
       ppt: 'PPT 要点',
       video: '视频笔记',
@@ -108,17 +113,23 @@ Page({
     const sourceLine = `来源：${labels[type] || '课堂笔记'}`;
     const importBoundary = '只处理你粘贴的文字摘录，不自动抓取链接、不解析 PDF 文件，也不生成现成答案。';
     if (!value) {
+      const methodMode = type === 'talent_assessment' || type === 'school_material' || type === 'wrong_question_paper' || type === 'parent_report';
       return {
         title: '学习材料变复习卡',
-        label: '先粘贴公众号/网页摘录、PDF 摘录、课堂笔记或 PPT 要点，预览能不能变成可复习的知识卡。',
+        label: methodMode
+          ? '可以粘贴天赋/学习偏好测评、老师反馈、错题试卷或家长观察；系统先做证据分流，不贴标签、不出完整答案。'
+          : '先粘贴公众号/网页摘录、PDF 摘录、课堂笔记或 PPT 要点，预览能不能变成可复习的知识卡。',
         type: labels[type] || '课堂笔记',
         sourceLine,
         importBoundary,
         cards: [],
         readiness: 0,
-        nextAction: '粘贴一段真实摘录，咕点会先生成概念卡、步骤卡、陷阱卡和填空卡。'
+        nextAction: methodMode
+          ? '粘贴一段真实材料后，会生成来源账本、下一证据、家长报告入口和 AI/本地分工。'
+          : '粘贴一段真实摘录，咕点会先生成概念卡、步骤卡、陷阱卡和填空卡。'
       };
     }
+    const intakePacket = importIntake.buildUploadIntakePacket(value, this.data.imagePaths, type);
     const profile = storage.loadProfile();
     const cards = reviewCards.previewImport(value, {
       subject: profile.subject || '',
@@ -134,6 +145,7 @@ Page({
       importBoundary,
       cards,
       readiness: Math.min(100, Math.round((covered / coreTypes.length) * 80) + Math.min(20, cards.length * 3)),
+      sourceReadinessBoard: intakePacket.sourceReadinessBoard || null,
       nextAction: cards.length
         ? `已预览 ${cards.length} 张卡，可以导入长期复习。`
         : '再补一点具体步骤、易错陷阱或例题，卡片会更有用。'
@@ -274,6 +286,52 @@ Page({
     };
   },
 
+  buildStructuredEvidenceSignals(uploadIntakePacket = {}, text = '') {
+    const schema = uploadIntakePacket.intakeSourceSchema || {};
+    const prompts = Array.isArray(uploadIntakePacket.structuredCapturePrompts)
+      ? uploadIntakePacket.structuredCapturePrompts
+      : [];
+    const value = String(text || '');
+    const pickLine = (patterns) => {
+      const lines = value.split(/\n+/).map((line) => line.trim()).filter(Boolean);
+      return lines.find((line) => patterns.some((pattern) => pattern.test(line))) || '';
+    };
+    const questionType = pickLine([/题型|类型|阅读|应用题|实验|方程|证明|语法|地图|过程/]);
+    const childOriginalThought = pickLine([/原想法|当时想|孩子说|第一反应|我以为|我觉得/]);
+    const stuckFirstStep = pickLine([/第一步|卡住|不会下手|先看|先找|先画|先列/]);
+    const wrongCauseGuess = pickLine([/错因|错在|扣分|粗心|单位|条件|关系|概念|审题/]);
+    const structuredCapture = {
+      sourceSchemaId: schema.id || uploadIntakePacket.sourceSchemaId || '',
+      sourceSchemaLabel: schema.label || uploadIntakePacket.sourceSchemaLabel || '',
+      questionType: questionType || schema.label || '',
+      childOriginalThought,
+      stuckFirstStep,
+      wrongCauseGuess,
+      missing: prompts
+        .map((prompt) => prompt.label || prompt.id)
+        .filter((label) => {
+          if (/题型|类型/.test(label)) return !questionType;
+          if (/原想法|想法/.test(label)) return !childOriginalThought;
+          if (/第一步|卡住/.test(label)) return !stuckFirstStep;
+          if (/错因/.test(label)) return !wrongCauseGuess;
+          return false;
+        })
+    };
+    return {
+      structuredCapture,
+      questionType: questionType || schema.label || '',
+      childOriginalThought,
+      firstStep: stuckFirstStep || '',
+      stuckFirstStep: stuckFirstStep || '',
+      wrongCause: wrongCauseGuess || '',
+      wrongCauseGuess,
+      sourceSchemaId: schema.id || '',
+      sourceSchemaLabel: schema.label || '',
+      structuredCaptureMissing: structuredCapture.missing,
+      structuredCapturePrompts: prompts
+    };
+  },
+
   afterPrioritySaved(text, state, plan, mode) {
     const wrongbook = this.importWrongQuestionsToReview(text, state, plan);
     this.saveFocusFromUploadText(text, state, plan);
@@ -283,6 +341,7 @@ Page({
         || importIntake.buildUploadIntakePacket(text, this.data.imagePaths, this.data.materialType);
       const reportSeed = (uploadIntakePacket && uploadIntakePacket.reportSeed) || {};
       const decisionSource = this.buildDecisionSource(uploadIntakePacket, text, wrongbook, reportSeed);
+      const structuredEvidenceSignals = this.buildStructuredEvidenceSignals(uploadIntakePacket, text);
       const _legacyDecisionSource = {
         sourceSchemaId: reportSeed.sourceSchemaId || (wrongbook.imported ? 'wrong_question_paper' : 'parent_report'),
         sourceSchemaLabel: reportSeed.sourceSchemaLabel || (wrongbook.imported ? '错题/试卷' : '家长观察'),
@@ -331,8 +390,11 @@ Page({
         behaviorSignals: {
           studyMinutes: Number(this.data.minutes || 0) || '',
           homeworkMinutes: Number(this.data.minutes || 0) || '',
-          wrongCause: reportSeed.wrongCause || (wrongbook.imported ? 'wrong_question_imported_needs_first_step_check' : ''),
-          firstStep: reportSeed.firstStep || (uploadIntakePacket && uploadIntakePacket.requiredTextFields ? 'requires_structured_first_step_capture' : ''),
+          wrongCause: structuredEvidenceSignals.wrongCause || reportSeed.wrongCause || (wrongbook.imported ? 'wrong_question_imported_needs_first_step_check' : ''),
+          firstStep: structuredEvidenceSignals.firstStep || reportSeed.firstStep || '',
+          childOriginalThought: structuredEvidenceSignals.childOriginalThought || '',
+          questionType: structuredEvidenceSignals.questionType || '',
+          structuredCapture: structuredEvidenceSignals.structuredCapture,
           parentQuestion: '今晚只问：这题第一步你先看哪里？',
           nextDayRevisit: '明天遮住答案，只回看一张最不稳的卡',
           sourceSchemaId: decisionSource.sourceSchemaId,
@@ -421,6 +483,7 @@ Page({
     }
     const uploadIntakePacket = importIntake.buildUploadIntakePacket(text, this.data.imagePaths, this.data.materialType);
     const decisionSource = this.buildDecisionSource(uploadIntakePacket, text, { imported: false }, (uploadIntakePacket && uploadIntakePacket.reportSeed) || {});
+    const structuredEvidenceSignals = this.buildStructuredEvidenceSignals(uploadIntakePacket, text);
     const profile = storage.loadProfile();
     const result = reviewCards.importTextToDeck(text, {
       subject: profile.subject || '',
@@ -431,6 +494,30 @@ Page({
       releaseScope: decisionSource.releaseScope,
       requiredNextEvidence: decisionSource.requiredNextEvidence
     });
+    if (storage.buildLearningReportFromInput && storage.saveLearningReportState) {
+      const reportState = storage.buildLearningReportFromInput({
+        mode: decisionSource.sourceSchemaId === 'wrong_question_paper' ? 'full' : 'standard',
+        sourceText: text,
+        reportSources: [{
+          type: decisionSource.sourceSchemaId,
+          label: decisionSource.sourceSchemaLabel,
+          text,
+          confidence: decisionSource.confidence,
+          status: '待家长确认',
+          requiredNextEvidence: decisionSource.requiredNextEvidence,
+          nextEvidenceUnlockPlan: decisionSource.nextEvidenceUnlockPlan,
+          blockedFields: decisionSource.blockedFields
+        }],
+        decisionSource,
+        behaviorSignals: Object.assign({
+          parentQuestion: '今晚只问：这题第一步你先看哪里？',
+          nextDayRevisit: '明天遮住答案，只回访同一第一步。',
+          sourceSchemaId: decisionSource.sourceSchemaId,
+          requiredNextEvidence: decisionSource.requiredNextEvidence
+        }, structuredEvidenceSignals)
+      });
+      storage.saveLearningReportState(reportState, { skipBuild: true });
+    }
     this.setData({
       uploadIntakePacket,
       lastDecisionSource: decisionSource

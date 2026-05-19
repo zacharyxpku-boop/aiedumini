@@ -1832,6 +1832,19 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
     { id: 'next_day', label: '明天', action: `只回访最不稳的 1 张卡：${weakKey}。`, route: '/pages/review/review' },
     { id: 'day_7', label: '第 7 天', action: '用一题小变式确认能不能迁移。', route: '/pages/tutor/tutor' }
   ];
+  const reviewReturnSeed = buildReviewReturnSeed({
+    weakKey,
+    dueCards,
+    recallCards,
+    spacedReviewPlan,
+    reviewEventPressure,
+    result,
+    needsRepair,
+    activeSampleId: options.activeSampleId || '',
+    courseUnitId: options.courseUnitId || challenge.courseUnitId || '',
+    questionTypeClusterId: options.questionTypeClusterId || challenge.questionTypeClusterId || options.taskType || challenge.taskType || ''
+  });
+  const spacedRecallPolicy = reviewReturnSeed.spacedRecallPolicy;
   const questCadence = [
     { id: 'recall', label: '主动回忆', target: 3, done: Math.min(3, Number(result.correct || 0)), reward: '说出第一步才给 XP' },
     { id: 'repair', label: '错因修复', target: needsRepair ? 1 : 0, done: needsRepair ? 0 : 1, reward: '错因回到复习队列' },
@@ -1973,6 +1986,8 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
       : `本轮先沉淀掌握证据，再用间隔回访防止遗忘。`,
     recallCards,
     spacedReviewPlan,
+    reviewReturnSeed,
+    spacedRecallPolicy,
     reviewEventPressure,
     questCadence,
     memoryFeedbackController,
@@ -2002,8 +2017,54 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
       : '连续 2 次说清第一步，才进入变式练习。',
     parentShareLine: `家长复盘只看：孩子能否自己说出「${weakKey}」的第一步。`,
     nextRoute: needsRepair ? '/pages/review/review' : '/pages/tutor/tutor',
-    evidenceRequired: ['active_recall_cards', 'spaced_review_plan', 'wrong_cause_return', 'quest_cadence', 'memory_feedback_controller', 'recall_intensity_plan', 'wrong_cause_replay_deck', 'xp_feedback_policy', 'quest_arc_runway', 'gizmo_like_memory_protocol', 'socratic_quality_memory_bridge', 'question_bank_memory_bridge', 'question_bank_recall_workout', 'daily_memory_sprint_deck', 'adaptive_recall_scheduler', 'memory_risk_release_model', 'memory_comeback_loop', 'daily_memory_prescription', 'question_type_cluster_memory_protocol', 'peer_memory_relay_league', 'micro_recall_prescription_engine', 'ninety_second_recall_combo_engine', 'real_homework_pressure_memory_prescription', 'daily_return_mission', 'daily_return_contract', 'parent_share_line'],
+    evidenceRequired: ['active_recall_cards', 'spaced_review_plan', 'review_return_seed', 'spaced_recall_policy', 'wrong_cause_return', 'quest_cadence', 'memory_feedback_controller', 'recall_intensity_plan', 'wrong_cause_replay_deck', 'xp_feedback_policy', 'quest_arc_runway', 'gizmo_like_memory_protocol', 'socratic_quality_memory_bridge', 'question_bank_memory_bridge', 'question_bank_recall_workout', 'daily_memory_sprint_deck', 'adaptive_recall_scheduler', 'memory_risk_release_model', 'memory_comeback_loop', 'daily_memory_prescription', 'question_type_cluster_memory_protocol', 'peer_memory_relay_league', 'micro_recall_prescription_engine', 'ninety_second_recall_combo_engine', 'real_homework_pressure_memory_prescription', 'daily_return_mission', 'daily_return_contract', 'parent_share_line'],
     weakKey
+  };
+}
+
+function buildReviewReturnSeed(input = {}) {
+  const weakKey = input.weakKey || 'first_step';
+  const dueCards = Array.isArray(input.dueCards) ? input.dueCards : [];
+  const recallCards = Array.isArray(input.recallCards) ? input.recallCards : [];
+  const spacedReviewPlan = Array.isArray(input.spacedReviewPlan) ? input.spacedReviewPlan : [];
+  const pressure = input.reviewEventPressure || {};
+  const result = input.result || {};
+  const wrongCardIds = Object.keys(pressure).filter((id) => pressure[id] && Number(pressure[id].wrong || 0) > 0);
+  const dueCardIds = dueCards.map((card) => card && card.id).filter(Boolean).slice(0, 6);
+  const recallCardIds = recallCards.map((card) => card && card.id).filter(Boolean).slice(0, 3);
+  const repairMode = Boolean(input.needsRepair || Number(result.wrong || 0) > 0 || Number(result.accuracy || 0) < 80);
+  const windows = spacedReviewPlan.map((item, index) => ({
+    id: item.id || `window_${index + 1}`,
+    route: item.route || '/pages/review/review',
+    gate: index === 0 ? 'first_step_recall' : index === 1 ? 'next_day_recall' : 'transfer_check'
+  }));
+  const nextRoute = repairMode ? '/pages/review/review?mode=recall_return' : '/pages/arcade/arcade?mode=recall_return';
+  return {
+    id: 'review_return_seed',
+    mode: repairMode ? 'repair_return' : 'steady_return',
+    weakKey,
+    questionTypeClusterId: input.questionTypeClusterId || '',
+    courseUnitId: input.courseUnitId || '',
+    activeSampleId: input.activeSampleId || '',
+    wrongCardIds,
+    dueCardIds,
+    recallCardIds,
+    nextRoute,
+    source: 'local_code_scheduler',
+    aiMayRewrite: ['prompt_copy', 'parent_line', 'encouragement'],
+    localCodeOwns: ['queue_order', 'xp_gate', 'share_fields', 'report_release', 'review_windows'],
+    blockedFields: ['full_solution', 'original_stem_photo', 'score', 'ranking', 'full_dialogue'],
+    spacedRecallPolicy: {
+      id: 'spaced_recall_policy',
+      cadence: windows,
+      sameDayCardIds: recallCardIds.slice(0, 3),
+      nextDayCardIds: wrongCardIds.length ? wrongCardIds.slice(0, 2) : dueCardIds.slice(0, 2),
+      day7Check: {
+        route: '/pages/tutor/tutor',
+        requirement: 'near_transfer_without_full_solution'
+      },
+      releaseGate: 'first_step_and_wrong_cause_before_xp_or_share'
+    }
   };
 }
 
@@ -2147,6 +2208,7 @@ module.exports = {
   buildGameRetentionLoop,
   buildGizmoLikeMemoryProtocol,
   buildHighFrequencyPracticeLoop,
+  buildReviewReturnSeed,
   buildDailyMemoryPrescription,
   buildPeerMemoryRelayLeague,
   buildMicroRecallPrescriptionEngine,

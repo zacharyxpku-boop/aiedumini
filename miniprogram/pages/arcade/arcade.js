@@ -50,6 +50,8 @@ Page({
     highFrequencyPracticeLoop: null,
     dailyReturnMission: null,
     dailyReturnContract: null,
+    reviewReturnSeed: null,
+    spacedRecallPolicy: null,
     arcadeResultActionBridge: null,
     emptyGuide: null,
     feedbackText: '',
@@ -1097,6 +1099,12 @@ Page({
     const dailyReturnContract = highFrequencyPracticeLoop && highFrequencyPracticeLoop.dailyReturnContract
       ? highFrequencyPracticeLoop.dailyReturnContract
       : null;
+    const reviewReturnSeed = highFrequencyPracticeLoop && highFrequencyPracticeLoop.reviewReturnSeed
+      ? highFrequencyPracticeLoop.reviewReturnSeed
+      : null;
+    const spacedRecallPolicy = highFrequencyPracticeLoop && highFrequencyPracticeLoop.spacedRecallPolicy
+      ? highFrequencyPracticeLoop.spacedRecallPolicy
+      : null;
     const questArcSignal = storage.recordQuestArcGameSignal
       ? storage.recordQuestArcGameSignal({
         mission: this.data.questArcMission,
@@ -1265,6 +1273,15 @@ Page({
       daily_return_contract_blocked_fields: dailyReturnContract && dailyReturnContract.shareCard
         ? dailyReturnContract.shareCard.blockedFields.join(',')
         : '',
+      review_return_seed_mode: reviewReturnSeed ? reviewReturnSeed.mode : '',
+      review_return_seed_next_route: reviewReturnSeed ? reviewReturnSeed.nextRoute : '',
+      review_return_seed_wrong_cards: reviewReturnSeed && Array.isArray(reviewReturnSeed.wrongCardIds)
+        ? reviewReturnSeed.wrongCardIds.join(',')
+        : '',
+      spaced_recall_policy_gate: spacedRecallPolicy ? spacedRecallPolicy.releaseGate : '',
+      spaced_recall_next_day_cards: spacedRecallPolicy && Array.isArray(spacedRecallPolicy.nextDayCardIds)
+        ? spacedRecallPolicy.nextDayCardIds.join(',')
+        : '',
       share_code: incomingShare && incomingShare.share_code ? incomingShare.share_code : ''
     });
     if (storage.saveTodaySession) {
@@ -1303,7 +1320,9 @@ Page({
           newlyUnlocked: gameRetention && gameRetention.newlyUnlocked ? gameRetention.newlyUnlocked.map((item) => item.id) : [],
           rewardLine,
           gameRetentionLoop,
-          highFrequencyPracticeLoop
+          highFrequencyPracticeLoop,
+          reviewReturnSeed,
+          spacedRecallPolicy
         }
       });
     }
@@ -1529,6 +1548,12 @@ Page({
       dailyReturnContract: highFrequencyPracticeLoop && highFrequencyPracticeLoop.dailyReturnContract
         ? highFrequencyPracticeLoop.dailyReturnContract
         : this.data.dailyReturnContract,
+      reviewReturnSeed: highFrequencyPracticeLoop && highFrequencyPracticeLoop.reviewReturnSeed
+        ? highFrequencyPracticeLoop.reviewReturnSeed
+        : this.data.reviewReturnSeed,
+      spacedRecallPolicy: highFrequencyPracticeLoop && highFrequencyPracticeLoop.spacedRecallPolicy
+        ? highFrequencyPracticeLoop.spacedRecallPolicy
+        : this.data.spacedRecallPolicy,
       questionProgressionSignal,
       arcadeResultActionBridge,
       challengeBrief: Object.assign({}, this.data.challengeBrief || {}, {
@@ -1579,6 +1604,8 @@ Page({
       highFrequencyPracticeLoop: null,
       dailyReturnMission: null,
       dailyReturnContract: null,
+      reviewReturnSeed: null,
+      spacedRecallPolicy: null,
       emptyGuide: this.emptyGuide(this.data.selectedGame, round),
       feedbackText: '新一局开始。'
     });

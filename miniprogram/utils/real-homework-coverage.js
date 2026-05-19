@@ -1,8 +1,16 @@
 let REAL_HOMEWORK_PRESSURE_SAMPLES = [];
+let REAL_HOMEWORK_PRESSURE_FIXTURE_LOADED = false;
 try {
   REAL_HOMEWORK_PRESSURE_SAMPLES = require('../../scripts/fixtures/real-homework-pressure-samples.cjs').REAL_HOMEWORK_PRESSURE_SAMPLES || [];
+  REAL_HOMEWORK_PRESSURE_FIXTURE_LOADED = Array.isArray(REAL_HOMEWORK_PRESSURE_SAMPLES) && REAL_HOMEWORK_PRESSURE_SAMPLES.length > 0;
 } catch (error) {
-  REAL_HOMEWORK_PRESSURE_SAMPLES = [];
+  try {
+    REAL_HOMEWORK_PRESSURE_SAMPLES = require('./scripts/fixtures/real-homework-pressure-samples.cjs').REAL_HOMEWORK_PRESSURE_SAMPLES || [];
+    REAL_HOMEWORK_PRESSURE_FIXTURE_LOADED = Array.isArray(REAL_HOMEWORK_PRESSURE_SAMPLES) && REAL_HOMEWORK_PRESSURE_SAMPLES.length > 0;
+  } catch (nestedError) {
+    REAL_HOMEWORK_PRESSURE_SAMPLES = [];
+    REAL_HOMEWORK_PRESSURE_FIXTURE_LOADED = false;
+  }
 }
 
 function displayLabel(value = '') {
@@ -246,11 +254,13 @@ function getRealHomeworkPressureSamples(options = {}) {
   const source = Array.isArray(REAL_HOMEWORK_PRESSURE_SAMPLES) && REAL_HOMEWORK_PRESSURE_SAMPLES.length
     ? REAL_HOMEWORK_PRESSURE_SAMPLES
     : FALLBACK_PRESSURE_SAMPLE_ATLAS;
+  if (!taskType && !subject) return source;
   const matched = source.filter((sample) => {
-    return (!taskType || sample.taskType === taskType)
-      || (!subject || sample.subject === subject);
+    const taskMatched = !taskType || sample.taskType === taskType;
+    const subjectMatched = !subject || sample.subject === subject;
+    return taskMatched && subjectMatched;
   });
-  return matched.length ? matched.concat(source.filter((sample) => !matched.includes(sample))) : source;
+  return matched;
 }
 
 const PUBLIC_K12_SOURCE_LEDGER = [
@@ -1789,11 +1799,19 @@ function buildCurriculumAssetSourceAudit(options = {}) {
 
 function buildRealHomeworkCoverageMatrix(options = {}) {
   const activeSubject = String(options.subject || '').trim();
-  const subjectRows = countRowsFromSamples(REAL_HOMEWORK_PRESSURE_SAMPLES, 'subject', SUBJECT_COUNTS);
-  const typeRows = countRowsFromSamples(REAL_HOMEWORK_PRESSURE_SAMPLES, 'taskType', TYPE_COUNTS);
+  const fixtureLoaded = Boolean(REAL_HOMEWORK_PRESSURE_FIXTURE_LOADED);
+  const loadedSampleCount = Array.isArray(REAL_HOMEWORK_PRESSURE_SAMPLES) ? REAL_HOMEWORK_PRESSURE_SAMPLES.length : 0;
+  const matrixSamples = fixtureLoaded ? REAL_HOMEWORK_PRESSURE_SAMPLES : [];
+  const subjectRows = countRowsFromSamples(matrixSamples, 'subject', SUBJECT_COUNTS);
+  const typeRows = countRowsFromSamples(matrixSamples, 'taskType', TYPE_COUNTS);
   const active = subjectRows.find((item) => item.id === activeSubject || item.label === activeSubject) || subjectRows[0] || SUBJECT_COUNTS[0];
   const totalSamples = subjectRows.reduce((sum, item) => sum + item.count, 0);
   const totalTypes = typeRows.length;
+  const coverageConfidence = fixtureLoaded ? 'fixture_verified' : 'fallback_static_counts_only';
+  const sampleSourceStatus = fixtureLoaded ? 'fixture_loaded' : 'fallback_static_atlas';
+  const readinessReason = fixtureLoaded
+    ? 'real_homework_pressure_fixture_loaded'
+    : 'collect_more_samples_before_claiming_runtime_coverage';
   const publicResourceTriageBoard = buildK12PublicResourceTriageBoard();
   const pressureFailureTypeAudit = buildPressureSampleFailureTypeAudit();
   const unifiedK12SourceRegistry = buildUnifiedK12SourceRegistry();
@@ -1805,6 +1823,11 @@ function buildRealHomeworkCoverageMatrix(options = {}) {
     boundary: '样本只用于第一步、错因、小黑板、回访和家长判断；不做拍题答案库，不展示原题答案。',
     sourceLine: '来源按公开课标、国家中小学智慧教育平台作业风格和公开考试常见题型方向转写。',
     activeSubject: active,
+    fixtureLoaded,
+    sampleSourceStatus,
+    loadedSampleCount,
+    coverageConfidence,
+    readinessReason,
     subjectRows,
     typeRows,
     sampleClusters: SAMPLE_CLUSTERS,

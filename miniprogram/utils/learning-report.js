@@ -2059,6 +2059,45 @@ function buildParentDecisionBook(input = {}) {
   };
 }
 
+function buildGameReturnEvidence(input = {}) {
+  const dailyReturnContract = input.dailyReturnContract || null;
+  const reviewReturnSeed = input.reviewReturnSeed || null;
+  const spacedRecallPolicy = input.spacedRecallPolicy || null;
+  const loop = input.highFrequencyPracticeLoop || {};
+  const blockedFields = Array.from(new Set([]
+    .concat(dailyReturnContract && dailyReturnContract.shareCard && Array.isArray(dailyReturnContract.shareCard.blockedFields) ? dailyReturnContract.shareCard.blockedFields : [])
+    .concat(reviewReturnSeed && Array.isArray(reviewReturnSeed.blockedFields) ? reviewReturnSeed.blockedFields : [])
+    .concat(['original_question', 'original_stem_photo', 'full_solution', 'full_dialogue', 'score', 'ranking'])));
+  const returnWindows = []
+    .concat(dailyReturnContract && Array.isArray(dailyReturnContract.loop) ? dailyReturnContract.loop.map((item) => item.id || item.label).filter(Boolean) : [])
+    .concat(spacedRecallPolicy && Array.isArray(spacedRecallPolicy.cadence) ? spacedRecallPolicy.cadence.map((item) => item.id).filter(Boolean) : []);
+  const nextDayCardIds = spacedRecallPolicy && Array.isArray(spacedRecallPolicy.nextDayCardIds)
+    ? spacedRecallPolicy.nextDayCardIds
+    : [];
+  return {
+    id: 'game_return_evidence',
+    status: dailyReturnContract || reviewReturnSeed || spacedRecallPolicy ? 'ready' : 'missing',
+    source: 'arcade_review_local_loop',
+    weakKey: reviewReturnSeed && reviewReturnSeed.weakKey || dailyReturnContract && dailyReturnContract.weakKey || loop.weakKey || '',
+    nextRoute: reviewReturnSeed && reviewReturnSeed.nextRoute || '',
+    returnWindows: Array.from(new Set(returnWindows)).slice(0, 8),
+    wrongCardIds: reviewReturnSeed && Array.isArray(reviewReturnSeed.wrongCardIds) ? reviewReturnSeed.wrongCardIds.slice(0, 8) : [],
+    dueCardIds: reviewReturnSeed && Array.isArray(reviewReturnSeed.dueCardIds) ? reviewReturnSeed.dueCardIds.slice(0, 8) : [],
+    nextDayCardIds: nextDayCardIds.slice(0, 8),
+    day7Requirement: spacedRecallPolicy && spacedRecallPolicy.day7Check ? spacedRecallPolicy.day7Check.requirement : 'near_transfer_gate_passed',
+    releaseGate: spacedRecallPolicy && spacedRecallPolicy.releaseGate || 'first_step_and_wrong_cause_before_xp_or_share',
+    allowedFields: ['weak_key', 'first_step_action', 'wrong_cause_label', 'return_window', 'next_day_revisit_status', 'parent_question'],
+    blockedFields,
+    localCodeOwns: reviewReturnSeed && Array.isArray(reviewReturnSeed.localCodeOwns)
+      ? reviewReturnSeed.localCodeOwns
+      : ['queue_order', 'xp_gate', 'share_fields', 'report_release', 'review_windows'],
+    aiMayRewrite: reviewReturnSeed && Array.isArray(reviewReturnSeed.aiMayRewrite)
+      ? reviewReturnSeed.aiMayRewrite
+      : ['prompt_copy', 'parent_line'],
+    evidenceRequired: ['review_return_seed', 'spaced_recall_policy', 'daily_return_contract', 'safe_share_blocklist']
+  };
+}
+
 function buildLearningReportDraft(input = {}) {
   const sources = normalizeReportSources(input);
   const allText = [input.sourceText || '', input.scoreText || ''].concat(sources.map((source) => source.text || '')).join('\n');
@@ -2123,6 +2162,18 @@ function buildLearningReportDraft(input = {}) {
   const reportGameEvidence = input.gameEvidence || {};
   const reportHighFrequencyLoop = input.highFrequencyPracticeLoop || reportGameEvidence.highFrequencyPracticeLoop || {};
   const dailyReturnContract = input.dailyReturnContract || reportHighFrequencyLoop.dailyReturnContract || null;
+  const reviewReturnSeed = input.reviewReturnSeed || reportHighFrequencyLoop.reviewReturnSeed || reportGameEvidence.reviewReturnSeed || null;
+  const spacedRecallPolicy = input.spacedRecallPolicy
+    || reportHighFrequencyLoop.spacedRecallPolicy
+    || (reviewReturnSeed && reviewReturnSeed.spacedRecallPolicy)
+    || null;
+  const gameReturnEvidence = buildGameReturnEvidence({
+    dailyReturnContract,
+    reviewReturnSeed,
+    spacedRecallPolicy,
+    gameEvidence: reportGameEvidence,
+    highFrequencyPracticeLoop: reportHighFrequencyLoop
+  });
   const parentDecisionBook = buildParentDecisionBook({
     familyDecisionMemo,
     tonightDecisionBrief,
@@ -2177,6 +2228,9 @@ function buildLearningReportDraft(input = {}) {
     homeworkPressureContext,
     tonightDecisionBrief,
     dailyReturnContract,
+    reviewReturnSeed,
+    spacedRecallPolicy,
+    gameReturnEvidence,
     parentDecisionBook,
     generatedAt: nowIso(input.now),
     missingItems: missing,
@@ -2230,6 +2284,9 @@ function buildLearningReportDraft(input = {}) {
     homeworkPressureContext,
     tonightDecisionBrief,
     dailyReturnContract,
+    reviewReturnSeed,
+    spacedRecallPolicy,
+    gameReturnEvidence,
     parentDecisionBook,
     reportCompleteness: completeness,
     reportStatus: {
@@ -2267,6 +2324,7 @@ module.exports = {
   buildReportEvidenceReleaseGate,
   buildSourceEvidenceLedger,
   buildParentDecisionBook,
+  buildGameReturnEvidence,
   buildCrossWeekTrendBoard,
   buildHomeSchoolCollaborationDigest,
   buildHomeSchoolConferenceKit,

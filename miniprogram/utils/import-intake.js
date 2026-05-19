@@ -48,6 +48,22 @@ const INTAKE_SOURCE_SCHEMAS = [
   }
 ];
 
+const MATERIAL_TYPE_LABELS = {
+  parent_report: '家长观察',
+  talent_assessment: '天赋/学习偏好测评',
+  school_material: '学校/老师材料',
+  wrong_question_paper: '错题/试卷',
+  wrong_question_photo: '错题照片留档',
+  class_notes: '课堂笔记',
+  wechat_article: '公众号摘录',
+  web_article: '网页摘录',
+  pdf_excerpt: 'PDF 摘录',
+  manual_notes: '手动整理',
+  ppt: 'PPT 要点',
+  video: '视频笔记',
+  handwriting: '手写整理'
+};
+
 function detectIntakeSourceSchema(text = '', materialType = '') {
   const value = `${materialType || ''}\n${String(text || '')}`;
   const explicit = INTAKE_SOURCE_SCHEMAS.find((schema) => schema.id === materialType);
@@ -62,6 +78,60 @@ function detectIntakeSourceSchema(text = '', materialType = '') {
     return INTAKE_SOURCE_SCHEMAS.find((schema) => schema.id === 'wrong_question_paper');
   }
   return INTAKE_SOURCE_SCHEMAS.find((schema) => schema.match.test(value)) || INTAKE_SOURCE_SCHEMAS[3];
+}
+
+function buildSourceReadinessBoard(schema = {}, kind = '', materialSource = null, images = []) {
+  const sourceLabel = schema.label || (materialSource && materialSource.label) || '用户材料';
+  const photoOnly = kind === 'photo_evidence_needs_text';
+  const linkOnly = kind === 'link_excerpt_needs_text';
+  const methodCandidateOnly = schema.id === 'talent_assessment';
+  const localCodeBetter = [
+    '来源分类',
+    '证据缺口',
+    '报告放行',
+    '画像置信度',
+    '分享字段',
+    '家校交接边界'
+  ];
+  const aiBetter = [
+    '苏格拉底追问语气',
+    '孩子能听懂的解释',
+    '家长可读摘要',
+    '同一第一步的不同说法'
+  ];
+  const mustNotDo = [
+    '完整答案',
+    '天赋定性',
+    '分数排名刺激',
+    '拍照 OCR 承诺',
+    '自动抓链接或解析 PDF',
+    '替老师或家长做最终判断'
+  ];
+  return {
+    id: 'upload_source_readiness_board',
+    title: `${sourceLabel}怎么进入报告`,
+    sourceSchemaId: schema.id || 'unknown',
+    sourceSchemaLabel: sourceLabel,
+    sourceType: materialSource ? materialSource.type : '',
+    status: photoOnly || linkOnly ? 'needs_text_before_release' : methodCandidateOnly ? 'method_candidate_only' : 'tonight_action_ready',
+    readyForReport: !(photoOnly || linkOnly),
+    localCodeBetter,
+    aiBetter,
+    mustNotDo,
+    localCodeBetterLine: localCodeBetter.join(' / '),
+    aiBetterLine: aiBetter.join(' / '),
+    mustNotDoLine: mustNotDo.join(' / '),
+    reportUse: schema.reportUse || '只进入今晚行动和证据缺口，不直接生成长期结论。',
+    releaseRule: methodCandidateOnly
+      ? '天赋/学习偏好只放行学习方法候选；必须用真实错题、隔天回访和第 7 天小变式验证。'
+      : photoOnly
+        ? '照片只做本地留档；补一句错因或卡点后才进入点拨、报告和复习。'
+        : linkOnly
+          ? '链接只做来源线索；必须粘贴摘录或卡点文字，不自动抓取。'
+          : '可进入今晚行动；长期画像仍等隔天回访、第 7 天迁移和多源证据。',
+    nextEvidence: Array.isArray(schema.evidenceGap) ? schema.evidenceGap.slice(0, 4) : [],
+    imageCount: Array.isArray(images) ? images.length : 0
+  };
 }
 
 function looksLikeReviewRequest(text = '') {
@@ -265,7 +335,7 @@ function buildUploadIntakePacket(text = '', imagePaths = [], materialType = '') 
   const classified = classifyImportInput(value);
   const intakeSourceSchema = detectIntakeSourceSchema(value, materialType);
   const materialSource = detectMaterialSource(value)
-    || (materialType ? { type: materialType, label: materialType, hasUrl: false, url: '' } : null);
+    || (materialType ? { type: materialType, label: MATERIAL_TYPE_LABELS[materialType] || intakeSourceSchema.label || materialType, hasUrl: false, url: '' } : null);
   const hasOnlyLink = /^https?:\/\/\S+$/i.test(value);
   const kind = images.length && !value
     ? 'photo_evidence_needs_text'
@@ -336,6 +406,7 @@ function buildUploadIntakePacket(text = '', imagePaths = [], materialType = '') 
     photoEvidencePolicy
   };
   const nextActionQueue = buildNextActionQueue(kind, classified, materialSource || classified.sourceMeta || null, images);
+  const sourceReadinessBoard = buildSourceReadinessBoard(intakeSourceSchema, kind, materialSource || classified.sourceMeta || null, images);
   return {
     id: `upload_intake_${Date.now ? Date.now() : 0}`,
     kind,
@@ -352,6 +423,7 @@ function buildUploadIntakePacket(text = '', imagePaths = [], materialType = '') 
     evidence,
     intakeSourceSchema,
     intakeSourceSchemas: INTAKE_SOURCE_SCHEMAS,
+    sourceReadinessBoard,
     nextActionQueue,
     blockedFields,
     requiredTextFields,
@@ -368,6 +440,7 @@ module.exports = {
   INTAKE_SOURCE_SCHEMAS,
   buildUploadIntakePacket,
   buildNextActionQueue,
+  buildSourceReadinessBoard,
   classifyImportInput,
   detectMaterialSource,
   detectIntakeSourceSchema,
