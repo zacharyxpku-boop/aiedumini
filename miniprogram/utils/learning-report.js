@@ -1583,6 +1583,18 @@ function buildLearningReportDraft(input = {}) {
   const parts = Object.assign({}, seedParts, {
     reportCompleteness: completeness
   });
+  const homeworkPressureContext = {
+    id: 'homework_pressure_context',
+    subject: profileBasics.subject || profileBasics.currentSubject || (allText.match(/(数学|语文|英语|物理|化学|生物|地理)/) || [])[1] || '当前学科',
+    gradeBand: profileBasics.grade || profileBasics.gradeBand || '当前年级',
+    wrongCause: behaviorSignals.homeworkDelay || behaviorSignals.wrongCause || behaviorSignals.weakPoint || '',
+    firstStep: behaviorSignals.firstStep || behaviorSignals.childFirstStep || '',
+    parentQuestion: behaviorSignals.parentQuestion || '',
+    evidenceLine: behaviorSignals.homeworkDelay || behaviorSignals.firstStep
+      ? `本次报告绑定真实作业卡点：${behaviorSignals.homeworkDelay || '错因待确认'}；第一步：${behaviorSignals.firstStep || '待孩子说出第一步'}。`
+      : '',
+    localRule: '真实作业压测字段只作为报告证据和家庭行动入口，不直接生成完整答案或长期定性。'
+  };
   const mode = input.mode || (completeness >= 80 ? 'full' : completeness >= 45 ? 'standard' : 'fast');
   const capabilityTendencies = buildTendencies(parts);
   const diagnosisMatrix = buildDiagnosisMatrix(parts);
@@ -1644,6 +1656,7 @@ function buildLearningReportDraft(input = {}) {
     crossWeekTrendBoard,
     homeSchoolCollaborationDigest,
     homeSchoolConferenceKit,
+    homeworkPressureContext,
     tonightDecisionBrief,
     generatedAt: nowIso(input.now),
     missingItems: missing,
@@ -1687,6 +1700,7 @@ function buildLearningReportDraft(input = {}) {
     crossWeekTrendBoard,
     homeSchoolCollaborationDigest,
     homeSchoolConferenceKit,
+    homeworkPressureContext,
     tonightDecisionBrief,
     reportCompleteness: completeness,
     reportStatus: {
