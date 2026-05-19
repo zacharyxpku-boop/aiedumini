@@ -941,7 +941,8 @@ function buildPublicK12IntakeExecutableCards(challengeDeck = [], options = {}) {
     const shareSafeFields = Array.isArray(card.shareSafeFields) ? card.shareSafeFields.slice() : [];
     const observableFirstMove = card.observableFirstMove || card.firstStepPrompt || card.localTransform || card.prompt || 'Name the first move before any answer.';
     const fallbackIfNoChildInput = card.fallbackIfNoChildInput || 'Offer one A/B first-step hint and keep the full answer hidden.';
-    const route = card.route || `/pages/arcade/arcade?from=public_k12_intake&challenge_id=${encodeURIComponent(card.id || index + 1)}`;
+    const route = card.route || `/pages/tutor/tutor?from=public_k12_intake&challenge_id=${encodeURIComponent(card.id || index + 1)}`;
+    const arcadeRoute = card.arcadeRoute || `/pages/arcade/arcade?from=public_k12_intake&challenge_id=${encodeURIComponent(card.id || index + 1)}`;
     const reviewRoute = card.reviewRoute || (card.nextPracticePlan && card.nextPracticePlan.appRoute) || `/pages/review/review?from=public_k12_intake&challenge_id=${encodeURIComponent(card.id || index + 1)}`;
     return {
       id: `playable_${card.id || index + 1}`,
@@ -975,7 +976,7 @@ function buildPublicK12IntakeExecutableCards(challengeDeck = [], options = {}) {
       answerBoundary: card.answerBoundary || 'first_step_only_no_full_answer',
       nextPracticePlan: Object.assign({}, card.nextPracticePlan || {}, {
         appRoute: reviewRoute,
-        arcadeRoute: route,
+        arcadeRoute,
         wrongCauseBucket: card.taskType || 'public_k12_homework_intake',
         wrongCauseLabel: card.localTransform || card.gameUse || 'public_k12_homework_intake',
         checkpoint: observableFirstMove,
@@ -985,7 +986,8 @@ function buildPublicK12IntakeExecutableCards(challengeDeck = [], options = {}) {
         blockedFields
       }),
       executableSurfaces: {
-        arcade: route,
+        tutor: route,
+        arcade: arcadeRoute,
         review: reviewRoute
       },
       evidenceRequired: Array.from(new Set([]

@@ -68,6 +68,19 @@
           bindtap="goQuestRoute"
         >{{item.label}} {{item.progressText}}</button>
       </view>
+      <view class="story-mission public-k12-challenge-mission" wx:if="{{challengeBrief.publicK12IntakeChallenge}}">
+        <view class="story-mission-title">{{challengeBrief.publicK12IntakeChallenge.title}}</view>
+        <view class="story-mission-line">公开 K12 挑战卡 {{challengeBrief.publicK12IntakeChallenge.challengeCount}} 张，可执行 {{challengeBrief.publicK12IntakeChallenge.executableCardCount}} 张；必须用自己的作业材料说第一步。</view>
+        <view class="story-mission-rule">第一步：{{challengeBrief.publicK12IntakeChallenge.observableFirstMove}}</view>
+        <view class="story-mission-rule">不会说时：{{challengeBrief.publicK12IntakeChallenge.fallbackIfNoChildInput}}</view>
+        <view class="story-mission-rule">安全分享字段：{{challengeBrief.publicK12IntakeChallenge.shareSafeFields}}</view>
+        <view class="story-mission-rule">禁止字段：{{challengeBrief.publicK12IntakeChallenge.blockedFields}}</view>
+        <view class="quest-action-row">
+          <button class="quest-action-btn" data-route="{{challengeBrief.publicK12IntakeChallenge.route}}" data-quest-id="public_k12_arcade" data-label="开始挑战" bindtap="goQuestRoute">开始挑战</button>
+          <button class="quest-action-btn" data-route="{{challengeBrief.publicK12IntakeChallenge.reviewRoute}}" data-quest-id="public_k12_review" data-label="明天回访" bindtap="goQuestRoute">明天回访</button>
+        </view>
+        <view class="story-mission-rule" wx:for="{{challengeBrief.publicK12IntakeChallenge.cards}}" wx:key="id">{{item.subject}} · {{item.taskType}}：{{item.observableFirstMove}}</view>
+      </view>
       <view class="challenge-brief-sub">{{challengeBrief.bossLine}}</view>
       <view class="challenge-brief-sub">{{challengeBrief.rewardLine}}</view>
       <view class="story-mission" wx:if="{{challengeBrief.storyTitle}}">

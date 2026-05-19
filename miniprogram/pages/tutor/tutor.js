@@ -3,6 +3,7 @@ const storage = require('../../utils/storage');
 const navigation = require('../../utils/navigation');
 const tutorLadder = require('../../utils/tutor-ladder');
 const openMaicPlan = require('../../utils/openmaic-inspired-plan');
+const realHomeworkCoverage = require('../../utils/real-homework-coverage');
 
 const SOCRATIC_EFFECTIVENESS_BLOCKED_FIELDS = [
   'original_question',
@@ -400,6 +401,77 @@ function buildSocraticEffectivenessEvent(status, receipt = {}, turnState = {}) {
   };
 }
 
+function currentRouteOptions() {
+  try {
+    if (typeof getCurrentPages !== 'function') return {};
+    const pages = getCurrentPages();
+    const current = pages && pages.length ? pages[pages.length - 1] : null;
+    return current && current.options ? current.options : {};
+  } catch (error) {
+    return {};
+  }
+}
+
+function findPublicK12Challenge(options = {}) {
+  const from = String(options.from || '');
+  const challengeId = String(options.challenge_id || options.challengeId || '');
+  const taskType = String(options.task_type || options.taskType || '');
+  if (from !== 'public_k12_intake' && !challengeId && !taskType) return null;
+  const deck = realHomeworkCoverage && realHomeworkCoverage.buildPublicK12IntakeChallengeDeck
+    ? realHomeworkCoverage.buildPublicK12IntakeChallengeDeck({ limit: 21 })
+    : [];
+  if (!Array.isArray(deck) || !deck.length) return null;
+  return deck.find((item) => item.id === challengeId)
+    || deck.find((item) => item.taskType === taskType)
+    || deck[0];
+}
+
+function buildPublicK12SelectedHomework(challenge = {}) {
+  const taskType = challenge.taskType || 'unknown';
+  const firstMove = challenge.observableFirstMove || challenge.firstStepPrompt || '先说出第一步，不要写完整答案。';
+  const wrongCause = challenge.localTransform || challenge.gameUse || taskType;
+  return {
+    id: `public_k12_tutor_${challenge.id || taskType}`,
+    text: challenge.prompt || challenge.title || `公开 K12 挑战：${challenge.subject || '当前学科'} · ${taskType}`,
+    subject: challenge.subject || '',
+    taskType,
+    source: 'public_k12_intake',
+    evidence: {
+      source: 'public_k12_intake',
+      public_k12_challenge_id: challenge.id || '',
+      source_id: challenge.sourceId || '',
+      task_type: taskType,
+      first_step_prompt: firstMove,
+      wrong_cause: wrongCause,
+      parent_check: challenge.shareHook || challenge.fallbackIfNoChildInput || '家长只问第一步和错因，不看完整答案。',
+      misconception_tags: [
+        { label: wrongCause, axis: taskType, hint: firstMove }
+      ],
+      blocked_fields: Array.isArray(challenge.blockedFields) ? challenge.blockedFields.slice() : [],
+      share_safe_fields: Array.isArray(challenge.shareSafeFields) ? challenge.shareSafeFields.slice() : [],
+      answer_boundary: challenge.answerBoundary || 'first_step_only_no_full_answer'
+    },
+    publicK12IntakeChallenge: {
+      id: challenge.id || '',
+      sourceId: challenge.sourceId || '',
+      taskType,
+      observableFirstMove: firstMove,
+      fallbackIfNoChildInput: challenge.fallbackIfNoChildInput || '',
+      receiverMustUseOwnMaterial: challenge.receiverMustUseOwnMaterial !== false,
+      route: challenge.route || '',
+      reviewRoute: challenge.reviewRoute || '',
+      arcadeRoute: challenge.arcadeRoute || ''
+    }
+  };
+}
+
+function publicK12TutorIntro(challenge = {}, selected = {}) {
+  const subject = challenge.subject || selected.subject || '当前学科';
+  const taskType = challenge.taskType || selected.taskType || 'unknown';
+  const firstMove = challenge.observableFirstMove || selected.evidence && selected.evidence.first_step_prompt || '先说第一步。';
+  return `已进入公开 K12 第一挑战：${subject} · ${taskType}。请贴你自己的作业材料或用一句话复述题目，我只追问第一步：${firstMove} 不给完整答案，不外传原题/照片/分数。`;
+}
+
 function buildSocraticFeedbackAdjustment(item, turnState = {}) {
   const currentLevel = Math.max(1, Math.min(5, Number((item && item.hintLevel) || turnState.hintLevel || 1)));
   if (item && item.status === 'first_step_spoken') {
@@ -645,7 +717,21 @@ Page({
 
   onShow() {
     const state = storage.loadState();
-    let selected = storage.get(storage.KEYS.selectedHomework, null);
+    const routeOptions = currentRouteOptions();
+    const publicK12Challenge = findPublicK12Challenge(routeOptions);
+    const publicK12Selected = publicK12Challenge ? buildPublicK12SelectedHomework(publicK12Challenge) : null;
+    let selected = publicK12Selected || storage.get(storage.KEYS.selectedHomework, null);
+    if (publicK12Selected) {
+      const sourceKey = `public_k12_intake:${publicK12Challenge.id || publicK12Selected.taskType}`;
+      const previousSource = storage.get(storage.KEYS.selectedHomeworkSource, '');
+      storage.set(storage.KEYS.selectedHomework, publicK12Selected);
+      storage.set(storage.KEYS.selectedHomeworkSource, sourceKey);
+      if (previousSource !== sourceKey) {
+        storage.set(storage.KEYS.tutorMessages, [
+          { role: 'assistant', text: publicK12TutorIntro(publicK12Challenge, publicK12Selected) }
+        ]);
+      }
+    }
     if (!selected) {
       selected = ((state.homework_plan || {}).must_do || [])[0] || null;
       if (selected) {
@@ -657,7 +743,9 @@ Page({
     const selectedEvidence = selected && selected.evidence ? selected.evidence : null;
     const misconceptionTags = normalizeTags((selectedEvidence && selectedEvidence.misconception_tags) || []);
     const weakPoints = state.weak_points || [];
-    const intro = selected
+    const intro = publicK12Challenge
+      ? publicK12TutorIntro(publicK12Challenge, selected)
+      : selected
       ? `我已锁定今晚第一项必须做：「${selected.text}」。先说你的第一步，我只处理关键错因。`
       : '我只处理必须做任务和关键错因，不替你写作业。先从首页锁定一项今晚必须做。';
     const messages = storage.get(storage.KEYS.tutorMessages, null) || [

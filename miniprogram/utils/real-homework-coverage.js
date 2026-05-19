@@ -1694,7 +1694,8 @@ function buildPublicK12IntakeChallengeDeck(options = {}) {
   return PUBLIC_K12_HOMEWORK_INTAKE_QUEUE.slice(0, limit).map((item, index) => {
     const cardId = `public_k12_intake_${item.id || index + 1}`;
     const taskType = item.taskType || 'unknown';
-    const route = `/pages/arcade/arcade?from=public_k12_intake&task_type=${encodeURIComponent(taskType)}&challenge_id=${encodeURIComponent(cardId)}`;
+    const route = `/pages/tutor/tutor?from=public_k12_intake&task_type=${encodeURIComponent(taskType)}&challenge_id=${encodeURIComponent(cardId)}&subject=${encodeURIComponent(item.subject || '')}`;
+    const arcadeRoute = `/pages/arcade/arcade?from=public_k12_intake&task_type=${encodeURIComponent(taskType)}&challenge_id=${encodeURIComponent(cardId)}`;
     const reviewRoute = `/pages/review/review?from=public_k12_intake&task_type=${encodeURIComponent(taskType)}&challenge_id=${encodeURIComponent(cardId)}`;
     const observableFirstMove = item.socraticProbe || item.localPressureTransform || item.observedHomeworkShape;
     const fallbackIfNoChildInput = 'Offer only an A/B first-step hint, then ask the child to use their own homework material; do not explain the full solution.';
@@ -1722,10 +1723,11 @@ function buildPublicK12IntakeChallengeDeck(options = {}) {
       shareSafeFields: shareSafeFields.slice(),
       blockedFields: blockedFields.slice(),
       route,
+      arcadeRoute,
       reviewRoute,
       nextPracticePlan: {
         appRoute: reviewRoute,
-        arcadeRoute: route,
+        arcadeRoute,
         wrongCauseBucket: taskType,
         wrongCauseLabel: item.localPressureTransform,
         checkpoint: observableFirstMove,
@@ -1739,7 +1741,7 @@ function buildPublicK12IntakeChallengeDeck(options = {}) {
         type: 'public_k12_homework_intake',
         sourceChallengeId: cardId,
         route: reviewRoute,
-        arcadeRoute: route,
+        arcadeRoute,
         prompt: item.observedHomeworkShape,
         answer: observableFirstMove,
         blockedFields: blockedFields.slice()
