@@ -85,6 +85,19 @@
               </view>
               <view class="ai-boundary-rule">{{profileReadinessSnapshot.aiBoundaryReleaseRule}}</view>
             </view>
+            <view class="final-target-panel" wx:if="{{profileReadinessSnapshot.finalTargetRows}}">
+              <view class="ai-boundary-head">
+                <text>{{profileReadinessSnapshot.finalTargetTitle}} · {{profileReadinessSnapshot.finalTargetScore}}%</text>
+                <text>{{profileReadinessSnapshot.finalTargetLine}}</text>
+              </view>
+              <view class="final-target-row" wx:for="{{profileReadinessSnapshot.finalTargetRows}}" wx:key="id">
+                <text class="ai-boundary-label">{{item.label}}｜{{item.status}}｜{{item.progress}}%</text>
+                <text class="ai-boundary-body">{{item.nextAction}}</text>
+              </view>
+              <view class="ai-boundary-rule">下一步：{{profileReadinessSnapshot.finalTargetNextAction}}</view>
+              <view class="ai-boundary-rule">汇报节奏：{{profileReadinessSnapshot.finalTargetCadence}}</view>
+              <view class="ai-boundary-rule">边际规则：{{profileReadinessSnapshot.finalTargetStopRule}}</view>
+            </view>
           </view>
         </view>
 

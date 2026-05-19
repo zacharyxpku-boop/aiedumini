@@ -1562,6 +1562,7 @@ function buildProfileReadinessSnapshot(input = {}) {
   const evidence = input.globalEvidenceBrief || {};
   const surface = input.surfaceDepthPack || {};
   const aiMatrix = acceptance.aiUsageDecisionMatrix || {};
+  const finalTargetGapMeter = acceptance.finalTargetGapMeter || {};
   const aiRows = Array.isArray(aiMatrix.rows) ? aiMatrix.rows : [];
   const findAiRow = (id) => aiRows.find((item) => item && item.id === id) || {};
   const socraticAi = findAiRow('socratic_hint_generation');
@@ -1600,6 +1601,15 @@ function buildProfileReadinessSnapshot(input = {}) {
     }
   ];
   const aiBoundaryReleaseRule = '即使暂时不用大模型，入口、点拨兜底、错因卡、复习、家长复盘和安全分享也必须能跑。';
+  const finalTargetRows = Array.isArray(finalTargetGapMeter.rows)
+    ? finalTargetGapMeter.rows.slice(0, 4).map((item) => ({
+      id: item.id,
+      label: item.label,
+      status: item.status === 'ready' ? '已成型' : item.status === 'external_blocked' ? '差外部配置' : '还要加厚',
+      progress: Number(item.progress || 0),
+      nextAction: item.nextAction || ''
+    }))
+    : [];
   return {
     title: '今晚闭环状态',
     conclusion,
@@ -1612,6 +1622,13 @@ function buildProfileReadinessSnapshot(input = {}) {
     aiBoundarySummary: aiMatrix.principle || '高不确定解释用智能生成，确定性闭环用本地规则。',
     aiBoundaryRows,
     aiBoundaryReleaseRule,
+    finalTargetTitle: finalTargetGapMeter.title || '距离竞品级商用目标',
+    finalTargetScore: Number(finalTargetGapMeter.score || 0),
+    finalTargetLine: finalTargetGapMeter.distanceLine || '持续按导入、点拨、回忆、画像和分享闭环补证据。',
+    finalTargetRows,
+    finalTargetNextAction: finalTargetGapMeter.nextAction || '继续补齐真实家庭样本和本地闭环证据。',
+    finalTargetCadence: finalTargetGapMeter.reportingCadence || '每轮加厚后汇报还差多少。',
+    finalTargetStopRule: finalTargetGapMeter.marginalStopRule || '边际收益低时停止堆静态资料，转向真机和真实家庭试用。',
     readyCount: depth.readyCount || compass.readyCount || 0,
     totalCount: depth.totalCount || compass.totalCount || 0
   };

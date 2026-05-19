@@ -1573,6 +1573,24 @@ page {
   background: rgba(255, 255, 255, 0.74);
 }
 
+.final-target-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+  padding: 16rpx;
+  border: 1rpx solid rgba(92, 88, 203, 0.12);
+  border-radius: 20rpx;
+  background: rgba(247, 247, 255, 0.82);
+}
+
+.final-target-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+  padding: 12rpx 0;
+  border-top: 1rpx solid rgba(92, 88, 203, 0.08);
+}
+
 .ai-boundary-head {
   display: flex;
   flex-direction: column;

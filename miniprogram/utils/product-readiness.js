@@ -369,6 +369,73 @@ const AI_USAGE_DECISION_MATRIX = [
   }
 ];
 
+const FINAL_TARGET_REQUIREMENTS = [
+  {
+    id: 'chinese_material_import',
+    label: '中文材料导入',
+    benchmark: '对标 Gizmo 的资料进来就能变成练习，但只承诺粘贴摘录和自有材料。',
+    dimensionIds: ['material_to_review', 'local_resilience'],
+    requiredLocalEvidence: ['upload_to_report_material', 'material_to_review'],
+    nextAction: '继续把公众号摘录、网页摘录、PDF 摘录转成来源包和回访卡，不做自动抓取承诺。'
+  },
+  {
+    id: 'active_recall_loop',
+    label: '高频记忆与主动回忆',
+    benchmark: '对标 Gizmo 的 active recall 和 spaced repetition。',
+    dimensionIds: ['spaced_recall', 'game_retention'],
+    requiredLocalEvidence: ['review_to_recall', 'practice_to_record'],
+    nextAction: '把今日 3 张主动回忆、错因回放、明日回访继续压到 Review 和 Arcade 的同一条链上。'
+  },
+  {
+    id: 'socratic_tutor_depth',
+    label: '苏格拉底点拨深度',
+    benchmark: '对标 Khanmigo 的不代写、不泄答案、追问孩子下一步。',
+    dimensionIds: ['guided_tutor'],
+    requiredLocalEvidence: ['home_to_tutor', 'tutor_to_focus'],
+    nextAction: 'AI 只做追问语气和解释改写，本地继续收紧题型、错因、停止条件和安全回退。'
+  },
+  {
+    id: 'curriculum_question_bank',
+    label: '课程/题型体系',
+    benchmark: '对标 Khan Academy 的课程骨架，但先做中国 K12 课标结构和题型蓝图。',
+    dimensionIds: ['material_to_review', 'guided_tutor', 'spaced_recall'],
+    requiredLocalEvidence: ['module_to_recall_card', 'report_to_plan'],
+    nextAction: '继续把 7 科题型卡沉淀为第一步、小黑板、错因、迁移和掌握门槛，不复制公开原题。'
+  },
+  {
+    id: 'visual_first_step_board',
+    label: '第一步小黑板',
+    benchmark: '借鉴千问板书式讲解，但不追全科动态板书和拍题出答案。',
+    dimensionIds: ['guided_tutor', 'parent_evidence'],
+    requiredLocalEvidence: ['tutor_to_focus', 'focus_to_review_evidence'],
+    nextAction: '只画对象、条件、方向、证据句或空位，继续避免完整答案和假动态板书。'
+  },
+  {
+    id: 'parent_longitudinal_portrait',
+    label: '长期学习画像',
+    benchmark: '对标 Khanmigo 的家长/老师可见证据，但聚焦家庭今晚行动。',
+    dimensionIds: ['parent_evidence', 'weekly_pattern', 'mastery_rubric', 'outcome_review'],
+    requiredLocalEvidence: ['weekly_pattern_to_next_action', 'mastery_to_intervention'],
+    nextAction: '继续把 1/3/7 晚证据、两周稳定门和干预复盘做成家长一句话决策。'
+  },
+  {
+    id: 'wechat_safe_share_relay',
+    label: '微信安全分享接力',
+    benchmark: '借微信生态做接力，不做排行榜、晒分和公共原题传播。',
+    dimensionIds: ['share_return', 'decision_path'],
+    requiredLocalEvidence: ['share_to_landing_next_action'],
+    nextAction: '继续让分享卡带下一步、错因和接收侧动作，不带原题、答案、照片、分数和排名。'
+  },
+  {
+    id: 'commercial_launch_ops',
+    label: '商用发布条件',
+    benchmark: '对标真实可商用小程序，而不是本机 Demo。',
+    dimensionIds: ['local_resilience'],
+    requiredExternalBlockers: ['real_appid', 'production_ai_provider'],
+    nextAction: '本地代码继续保持可跑；公开发布前必须完成真实 AppID、生产模型、内容安全和真机体验。'
+  }
+];
+
 function buildAiUsageDecisionMatrix() {
   const rows = AI_USAGE_DECISION_MATRIX.map((item) => Object.assign({}, item, {
     needsAI: item.decision === 'ai_required_with_local_guardrail',
@@ -400,6 +467,78 @@ function mapById(items = []) {
     if (item && item.id) acc[item.id] = item;
     return acc;
   }, {});
+}
+
+function buildFinalTargetGapMeter(readiness = {}, acceptanceBits = {}) {
+  const dimensions = Array.isArray(readiness.dimensions) ? readiness.dimensions : [];
+  const dimensionMap = mapById(dimensions);
+  const moduleFlowMap = Array.isArray(acceptanceBits.moduleFlowMap) ? acceptanceBits.moduleFlowMap : [];
+  const flowMap = mapById(moduleFlowMap);
+  const externalBlockers = Array.isArray(readiness.externalBlockers) ? readiness.externalBlockers : [];
+  const externalMap = mapById(externalBlockers);
+  const rows = FINAL_TARGET_REQUIREMENTS.map((target) => {
+    const dimensionEvidence = (target.dimensionIds || [])
+      .map((id) => dimensionMap[id])
+      .filter(Boolean);
+    const flowEvidence = (target.requiredLocalEvidence || [])
+      .map((id) => flowMap[id])
+      .filter(Boolean);
+    const externalEvidence = (target.requiredExternalBlockers || [])
+      .map((id) => externalMap[id])
+      .filter(Boolean);
+    const localReady = dimensionEvidence.length === (target.dimensionIds || []).length
+      && dimensionEvidence.every((item) => item.ready)
+      && flowEvidence.length === (target.requiredLocalEvidence || []).length
+      && flowEvidence.every((item) => item.status === 'closed');
+    const externalBlocked = externalEvidence.some((item) => item.blockingLaunch);
+    const status = localReady
+      ? (externalBlocked ? 'external_blocked' : 'ready')
+      : 'local_gap';
+    const progress = Math.round((
+      dimensionEvidence.filter((item) => item.ready).length
+      + flowEvidence.filter((item) => item.status === 'closed').length
+    ) / Math.max(1, (target.dimensionIds || []).length + (target.requiredLocalEvidence || []).length) * 100);
+    return {
+      id: target.id,
+      label: target.label,
+      benchmark: target.benchmark,
+      status,
+      progress,
+      missingDimensionIds: (target.dimensionIds || []).filter((id) => !dimensionMap[id] || !dimensionMap[id].ready),
+      missingFlowIds: (target.requiredLocalEvidence || []).filter((id) => !flowMap[id] || flowMap[id].status !== 'closed'),
+      externalBlockerIds: externalEvidence.filter((item) => item.blockingLaunch).map((item) => item.id),
+      nextAction: target.nextAction
+    };
+  });
+  const readyCount = rows.filter((item) => item.status === 'ready').length;
+  const externalBlockedCount = rows.filter((item) => item.status === 'external_blocked').length;
+  const localGapCount = rows.filter((item) => item.status === 'local_gap').length;
+  const weightedScore = Math.round(rows.reduce((sum, item) => {
+    if (item.status === 'ready') return sum + 100;
+    if (item.status === 'external_blocked') return sum + 88;
+    return sum + item.progress;
+  }, 0) / Math.max(1, rows.length));
+  const nextLocalTarget = rows.find((item) => item.status === 'local_gap') || null;
+  const nextExternalTarget = rows.find((item) => item.status === 'external_blocked') || null;
+  const nextTarget = nextLocalTarget || nextExternalTarget || null;
+  const marginalStopRule = localGapCount === 0
+    ? '本地产品厚度继续堆公开资料的边际收益已低；下一步应转向真机、真实家庭样本、生产服务和留存数据。'
+    : '只做能提高导入、点拨、回忆、画像、分享闭环证据的改动；不能提高这些证据的静态资料继续停止。';
+  return {
+    id: 'final_target_gap_meter',
+    title: '距离竞品级商用目标',
+    score: weightedScore,
+    readyCount,
+    externalBlockedCount,
+    localGapCount,
+    totalCount: rows.length,
+    rows,
+    distanceLine: `当前 ${readyCount}/${rows.length} 项达到目标，${externalBlockedCount} 项只差外部配置，${localGapCount} 项仍需本地加厚。`,
+    nextTargetLabel: nextTarget ? nextTarget.label : '进入真实家庭试用',
+    nextAction: nextTarget ? nextTarget.nextAction : '开始小范围家庭试用，按真实失败样本继续迭代。',
+    reportingCadence: '每完成一轮本地加厚或同步上传后，用本表汇报还差多少；若只剩外部配置和真实试用，就停止堆代码。',
+    marginalStopRule
+  };
 }
 
 function readinessStatus(ready) {
@@ -596,6 +735,7 @@ function buildAcceptanceReport(readiness = {}) {
     pseudoFunctionScan,
     externalBlockers
   );
+  const finalTargetGapMeter = buildFinalTargetGapMeter(readiness, { moduleFlowMap });
 
   const workflowBreakpoints = dimensions.map((item) => ({
     id: item.id,
@@ -664,6 +804,7 @@ function buildAcceptanceReport(readiness = {}) {
     pseudoFunctionScan,
     readinessGateChecklist,
     iterationBoundary,
+    finalTargetGapMeter,
     aiUsageDecisionMatrix,
     workflowBreakpoints,
     technicalBreakpoints,
@@ -960,5 +1101,6 @@ function buildProductReadiness(storage, options = {}) {
 module.exports = {
   buildProductReadiness,
   buildAcceptanceReport,
-  buildAiUsageDecisionMatrix
+  buildAiUsageDecisionMatrix,
+  buildFinalTargetGapMeter
 };
