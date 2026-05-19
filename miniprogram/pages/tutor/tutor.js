@@ -548,6 +548,7 @@ Page({
     coachConsole: null,
     thinkingReceipt: null,
     surfaceDepthPack: null,
+    unifiedNextAction: null,
     showTutorDetails: false
   },
 
@@ -586,7 +587,8 @@ Page({
       pasteRisk,
       coachConsole: coachConsole(selected, misconceptionTags, null, pasteRisk, this.data.activeStep),
       thinkingReceipt: receipt,
-      surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('tutor') : null
+      surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('tutor') : null,
+      unifiedNextAction: storage.buildUnifiedNextActionController ? storage.buildUnifiedNextActionController({ surface: 'tutor' }) : null
     });
     this.trackedMasteryStatus = '';
   },
@@ -988,6 +990,23 @@ Page({
       });
     }
     navigation.navigateLearningRoute(route);
+  },
+
+  runUnifiedNextAction() {
+    const next = this.data.unifiedNextAction || {};
+    if (storage.recordUnifiedNextAction) {
+      storage.recordUnifiedNextAction(Object.assign({}, next, { surface: 'tutor' }));
+    }
+    if (storage.recordSurfaceDepthAction) {
+      storage.recordSurfaceDepthAction({
+        surface: 'tutor',
+        dimensionId: next.source || 'unified_next_action',
+        label: next.actionLabel || '',
+        route: next.route || '',
+        readiness: 'unified_next_action'
+      });
+    }
+    navigation.navigateLearningRoute(next.route || '/pages/tutor/tutor');
   },
 
 });

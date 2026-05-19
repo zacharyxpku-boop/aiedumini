@@ -28,7 +28,8 @@ Page({
       { label: '英语听写', text: '英语听写 20 个单词，需要先过易错词。' }
     ],
     submitting: false,
-    surfaceDepthPack: null
+    surfaceDepthPack: null,
+    unifiedNextAction: null
   },
 
   toggleMaterialPanel() {
@@ -47,7 +48,8 @@ Page({
     this.setData({
       minutes: (state.homework_plan && state.homework_plan.minutes_available) || profile.minutes || 35,
       homeworkText,
-      surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('upload') : null
+      surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('upload') : null,
+      unifiedNextAction: storage.buildUnifiedNextActionController ? storage.buildUnifiedNextActionController({ surface: 'upload' }) : null
     });
     this.updatePreview(homeworkText, (state.homework_plan && state.homework_plan.minutes_available) || profile.minutes || 35);
     this.updateMaterialPreview('', this.data.materialType);
@@ -456,6 +458,23 @@ Page({
       });
     }
     navigation.navigateLearningRoute(route);
+  },
+
+  runUnifiedNextAction() {
+    const next = this.data.unifiedNextAction || {};
+    if (storage.recordUnifiedNextAction) {
+      storage.recordUnifiedNextAction(Object.assign({}, next, { surface: 'upload' }));
+    }
+    if (storage.recordSurfaceDepthAction) {
+      storage.recordSurfaceDepthAction({
+        surface: 'upload',
+        dimensionId: next.source || 'unified_next_action',
+        label: next.actionLabel || '',
+        route: next.route || '',
+        readiness: 'unified_next_action'
+      });
+    }
+    navigation.navigateLearningRoute(next.route || '/pages/tutor/tutor');
   },
 
 });

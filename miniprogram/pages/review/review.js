@@ -73,6 +73,7 @@ Page({
     tonightPlan: null,
     routeStrip: null,
     surfaceDepthPack: null,
+    unifiedNextAction: null,
     transferPractice: null,
     outcomeCheck: null,
     postRepairBridge: null,
@@ -142,6 +143,7 @@ Page({
       tonightPlan,
       routeStrip: this.buildRouteStrip('repair', tonightPlan),
       surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('review') : null,
+      unifiedNextAction: storage.buildUnifiedNextActionController ? storage.buildUnifiedNextActionController({ surface: 'review' }) : null,
       ruleRetestPanel: this.buildRuleRetestPanel(current, cards),
       transferPractice: this.buildTransferPracticePanel(current),
       outcomeCheck: this.buildOutcomeCheckPanel(current),
@@ -1302,6 +1304,23 @@ Page({
       });
     }
     navigation.navigateLearningRoute(route);
+  },
+
+  runUnifiedNextAction() {
+    const next = this.data.unifiedNextAction || {};
+    if (storage.recordUnifiedNextAction) {
+      storage.recordUnifiedNextAction(Object.assign({}, next, { surface: 'review' }));
+    }
+    if (storage.recordSurfaceDepthAction) {
+      storage.recordSurfaceDepthAction({
+        surface: 'review',
+        dimensionId: next.source || 'unified_next_action',
+        label: next.actionLabel || '',
+        route: next.route || '',
+        readiness: 'unified_next_action'
+      });
+    }
+    navigation.navigateLearningRoute(next.route || '/pages/tutor/tutor');
   },
 
 });

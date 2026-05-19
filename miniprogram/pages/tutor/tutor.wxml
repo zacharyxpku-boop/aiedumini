@@ -312,6 +312,19 @@
           </view>
         </view>
 
+        <view class="surface-depth-card tutor-unified-next" wx:if="{{unifiedNextAction}}">
+          <view class="surface-depth-title">{{unifiedNextAction.title}}</view>
+          <view class="surface-depth-subtitle">{{unifiedNextAction.summary}}</view>
+          <view class="surface-depth-next" bindtap="runUnifiedNextAction">{{unifiedNextAction.actionLabel}}</view>
+          <view class="surface-depth-grid">
+            <view class="surface-depth-chip" wx:for="{{unifiedNextAction.candidates}}" wx:key="source">
+              <text class="surface-depth-chip-title">{{item.sourceLabel}}</text>
+              <text class="surface-depth-chip-line">{{item.reasonLine}}</text>
+            </view>
+          </view>
+          <view class="surface-depth-note">{{unifiedNextAction.readinessLine}}</view>
+        </view>
+
         <view class="surface-depth-card tutor-surface-depth" wx:if="{{surfaceDepthPack}}">
           <view class="surface-depth-title">{{surfaceDepthPack.title}}</view>
           <view class="surface-depth-subtitle">{{surfaceDepthPack.summary}}</view>
