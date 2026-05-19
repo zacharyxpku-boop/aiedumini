@@ -640,6 +640,48 @@ function guardAiTutorReply(reply, contract = {}, context = {}) {
   });
 }
 
+function buildAnswerBoundaryEvidence(text, signal = {}, options = {}) {
+  const taskType = options.taskType || signal.taskType || detectTaskType(text, options.selected || {});
+  const firstStep = signal.firstStep || TASK_TYPE_PROMPTS[taskType] || TASK_TYPE_PROMPTS.unknown;
+  const wrongCause = signal.wrongCause || '先把“想要答案”的冲动转成第一步证据，再判断真正卡点。';
+  const parentCheck = signal.parentCheck || '你先说第一步，不用算完，也不用现在要结果。';
+  const reviewMove = signal.reviewMove || '明天换一个数字或材料，只复查第一步入口。';
+  const boardMove = signal.boardMove || '小黑板只画入口关系，留下一个空位让孩子补第一步。';
+  return sanitizeBoundaryText({
+    id: `answer_boundary_${Date.now()}`,
+    eventType: 'answer_request_blocked',
+    status: 'review_seed_ready',
+    taskType,
+    sampleId: signal.id || '',
+    sourceId: signal.sourceId || signal.source || 'local_tutor_guard',
+    firstStepRequired: firstStep,
+    wrongCauseBucket: wrongCause,
+    boardMove,
+    parentLine: `刚才孩子在要答案，今晚只确认：${parentCheck}`,
+    reviewSeed: {
+      title: '先不拿答案，复查第一步',
+      prompt: firstStep,
+      wrongCause,
+      revisit: reviewMove,
+      due: true,
+      dueWindow: '明天 5 分钟',
+      source: 'tutor_answer_boundary'
+    },
+    reportSeed: {
+      line: `出现一次直接要答案倾向，已转成第一步回访：${firstStep}`,
+      evidenceRequired: ['answer_request_blocked', 'first_step_required', 'next_day_revisit']
+    },
+    shareBoundary: `${SAFE_BOUNDARY_TEXT} 分享只带错因和下一步，不带原题、答案或对话全文。`,
+    releaseGate: {
+      localRule: true,
+      aiMayRewrite: '只允许改写追问语气',
+      aiMustNotDecide: ['final_answer', 'mastery_claim', 'reward_release', 'share_fields']
+    },
+    nextRevisitWindow: '明天 5 分钟',
+    nextRoute: '/pages/review/review?from=answer_boundary&focus=first_step'
+  });
+}
+
 function buildTutorReply(text, options = {}) {
   const messages = options.messages || [];
   const currentHintLevel = options.currentHintLevel || 1;
@@ -698,6 +740,7 @@ function buildTutorReply(text, options = {}) {
     three_round_socratic_protocol: buildThreeRoundSocraticProtocol(taskType, pressureSignal),
     socratic_ai_local_boundary_contract: aiLocalBoundaryContract,
     socraticAiLocalBoundaryContract: aiLocalBoundaryContract,
+    answer_boundary_evidence: answerRequest ? buildAnswerBoundaryEvidence(text, pressureSignal, { taskType, selected }) : null,
     allowed_moves: ['ask_student_first_step', '说第一步', '圈一个条件', '画入口关系', level >= 4 ? 'similar_example' : 'micro_choice'].filter(Boolean),
     no_full_answer_boundary: SAFE_BOUNDARY_TEXT
   };
@@ -749,6 +792,7 @@ module.exports = {
   buildSocraticPromptQualityJudge,
   buildThreeRoundSocraticProtocol,
   buildSocraticAiLocalBoundaryContract,
+  buildAnswerBoundaryEvidence,
   guardAiTutorReply,
   buildTutorReply,
   simulateThreeRoundSocratic,

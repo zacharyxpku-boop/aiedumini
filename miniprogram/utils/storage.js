@@ -5309,6 +5309,54 @@ function appendReviewEvent(item) {
   return next;
 }
 
+function recordAnswerBoundaryEvidence(evidence = {}, context = {}) {
+  if (!evidence || evidence.eventType !== 'answer_request_blocked') return null;
+  const now = new Date().toISOString();
+  const reviewSeed = evidence.reviewSeed || {};
+  const card = {
+    id: `answer_boundary_review_${Date.now()}_${randomPart()}`,
+    source: 'tutor_answer_boundary',
+    title: reviewSeed.title || '先不拿答案，复查第一步',
+    prompt: reviewSeed.prompt || evidence.firstStepRequired || '先说第一步',
+    wrongCause: reviewSeed.wrongCause || evidence.wrongCauseBucket || '直接要答案',
+    revisit: reviewSeed.revisit || evidence.nextRevisitWindow || '明天复查第一步',
+    due: reviewSeed.due !== false,
+    dueWindow: reviewSeed.dueWindow || evidence.nextRevisitWindow || '明天 5 分钟',
+    taskType: evidence.taskType || '',
+    sampleId: evidence.sampleId || '',
+    parentLine: evidence.parentLine || '',
+    shareBoundary: evidence.shareBoundary || '',
+    created_at: now
+  };
+  const cards = [card].concat(loadReviewCards()).slice(0, 120);
+  set(KEYS.reviewCards, cards);
+  const event = {
+    type: 'answer_boundary_review_seeded',
+    source: 'tutor',
+    evidenceId: evidence.id || '',
+    cardId: card.id,
+    taskType: evidence.taskType || '',
+    firstStepRequired: evidence.firstStepRequired || '',
+    wrongCauseBucket: evidence.wrongCauseBucket || '',
+    nextRoute: evidence.nextRoute || '/pages/review/review?from=answer_boundary',
+    selected_id: context.selected_id || '',
+    selected_text: context.selected_text || '',
+    created_at: now
+  };
+  appendReviewEvent(event);
+  appendSyncMutation('answer_boundary_evidence', {
+    id: evidence.id || card.id,
+    card_id: card.id,
+    task_type: evidence.taskType || '',
+    first_step_required: evidence.firstStepRequired || '',
+    wrong_cause_bucket: evidence.wrongCauseBucket || '',
+    next_revisit_window: evidence.nextRevisitWindow || '',
+    share_boundary: evidence.shareBoundary || '',
+    created_at: now
+  });
+  return { card, event };
+}
+
 function loadGameProfile() {
   return get(KEYS.gameProfile, {
     xp: 0,
@@ -10262,6 +10310,7 @@ module.exports = {
   saveReviewCards,
   loadReviewEvents,
   appendReviewEvent,
+  recordAnswerBoundaryEvidence,
   loadGameProfile,
   saveGameProfile,
   recordDailyLearningQuestSignal,

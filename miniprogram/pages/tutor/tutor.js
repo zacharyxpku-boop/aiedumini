@@ -771,6 +771,7 @@ Page({
       socratic_prompt_quality_judge: result && result.socratic_prompt_quality_judge ? result.socratic_prompt_quality_judge : receipt.socraticPromptQualityJudge || null,
       socratic_ai_local_boundary_contract: result && result.socratic_ai_local_boundary_contract ? result.socratic_ai_local_boundary_contract : receipt.socraticAiLocalBoundaryContract || null,
       socraticAiLocalBoundaryContract: result && result.socraticAiLocalBoundaryContract ? result.socraticAiLocalBoundaryContract : receipt.socraticAiLocalBoundaryContract || null,
+      answer_boundary_evidence: result && result.answer_boundary_evidence ? result.answer_boundary_evidence : null,
       allowed_moves: result && result.allowed_moves ? result.allowed_moves : [],
       transfer_prompt: result && result.transfer_prompt ? result.transfer_prompt : ''
     });
@@ -782,6 +783,13 @@ Page({
         mastery_status: masterySignal && masterySignal.status,
         risk: pasteRisk.level
       }));
+    }
+    if (storage.recordAnswerBoundaryEvidence && result && result.answer_boundary_evidence) {
+      storage.recordAnswerBoundaryEvidence(result.answer_boundary_evidence, {
+        selected_id: this.data.selected && this.data.selected.id,
+        selected_text: this.data.selected && this.data.selected.text,
+        coach_step: coachStep
+      });
     }
     if (storage.trackTutorEvent && result && result.diagnostic_probe) {
       storage.trackTutorEvent('tutor_diagnostic_probe', {
