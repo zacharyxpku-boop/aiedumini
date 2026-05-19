@@ -8910,7 +8910,7 @@ function buildRealHomeworkCoverageMatrix(options = {}) {
   return {
     id: 'real_homework_coverage_matrix',
     title: '真实作业压力覆盖矩阵',
-    summary: '真实作业压力样本暂不可用，先按第一步、错因、小黑板和家长回访继续收证据。',
+    summary: '真实作业压力样本暂不可用，先按第一步、错因、小黑板和家长回访继续收证据；不可冒充已接入完整样本矩阵。',
     boundary: '不做拍题答案库，不展示原题答案，不分享完整对话、分数或排名。',
     sourceLine: '等待本地样本资产加载后展示覆盖科目和题型。',
     activeSubject: { id: 'math', label: '数学', count: 0, nextGap: '继续补真实题型样本。' },

@@ -1,3 +1,41 @@
+let REAL_HOMEWORK_PRESSURE_SAMPLES = [];
+try {
+  REAL_HOMEWORK_PRESSURE_SAMPLES = require('../../scripts/fixtures/real-homework-pressure-samples.cjs').REAL_HOMEWORK_PRESSURE_SAMPLES || [];
+} catch (error) {
+  REAL_HOMEWORK_PRESSURE_SAMPLES = [];
+}
+
+function displayLabel(value = '') {
+  const labels = {
+    math_word_problem: '数学应用/建模',
+    equation_setup: '方程/不等式建模',
+    physics_diagram: '物理图解',
+    chemistry_experiment: '化学实验/变化',
+    english_sentence: '英语句法/上下文',
+    reading_question: '阅读证据',
+    biology_process: '生物过程',
+    geography_map: '地理图示',
+    writing_process: '写作过程'
+  };
+  return labels[value] || value || '未命名';
+}
+
+function countRowsFromSamples(samples = [], field = 'subject', fallbackRows = []) {
+  if (!Array.isArray(samples) || !samples.length) return fallbackRows;
+  const counts = samples.reduce((acc, sample) => {
+    const key = sample && sample[field] ? sample[field] : 'unknown';
+    acc[key] = Number(acc[key] || 0) + 1;
+    return acc;
+  }, {});
+  return Object.keys(counts).map((key) => ({
+    id: key,
+    label: displayLabel(key),
+    count: counts[key],
+    nextGap: `继续补 ${displayLabel(key)} 的公开题型改写、第一步、小黑板和回访样本。`,
+    firstStep: `先识别 ${displayLabel(key)} 的题型入口，再记录第一步、错因和回访。`
+  }));
+}
+
 const SUBJECT_COUNTS = [
   { id: 'math', label: '数学', count: 73, nextGap: '比例、百分数、几何角、函数图像、二次函数顶点、全等证明、相似面积比、单位量比较、加权平均、统计抽样、概率、不放回样本空间、移项符号、分段收费、年龄同步时间点继续补跨学科词面误判样本。' },
   { id: 'physics', label: '物理', count: 55, nextGap: '受力、光路、电路、串并联电流、浮力密度、压强面积、电路故障、欧姆定律变量控制、杠杆力臂、电功率、热效率、热传递、折射法线、状态变化和图像题继续补真实卡点。' },
@@ -798,9 +836,11 @@ const LONGITUDINAL_PRESSURE_SCENARIO_LEDGER = [
 
 function buildRealHomeworkCoverageMatrix(options = {}) {
   const activeSubject = String(options.subject || '').trim();
-  const active = SUBJECT_COUNTS.find((item) => item.id === activeSubject || item.label === activeSubject) || SUBJECT_COUNTS[0];
-  const totalSamples = SUBJECT_COUNTS.reduce((sum, item) => sum + item.count, 0);
-  const totalTypes = TYPE_COUNTS.length;
+  const subjectRows = countRowsFromSamples(REAL_HOMEWORK_PRESSURE_SAMPLES, 'subject', SUBJECT_COUNTS);
+  const typeRows = countRowsFromSamples(REAL_HOMEWORK_PRESSURE_SAMPLES, 'taskType', TYPE_COUNTS);
+  const active = subjectRows.find((item) => item.id === activeSubject || item.label === activeSubject) || subjectRows[0] || SUBJECT_COUNTS[0];
+  const totalSamples = subjectRows.reduce((sum, item) => sum + item.count, 0);
+  const totalTypes = typeRows.length;
   return {
     id: 'real_homework_coverage_matrix',
     title: '真实作业压力覆盖矩阵',
@@ -808,8 +848,8 @@ function buildRealHomeworkCoverageMatrix(options = {}) {
     boundary: '样本只用于第一步、错因、小黑板、回访和家长判断；不做拍题答案库，不展示原题答案。',
     sourceLine: '来源按公开课标、国家中小学智慧教育平台作业风格和公开考试常见题型方向转写。',
     activeSubject: active,
-    subjectRows: SUBJECT_COUNTS,
-    typeRows: TYPE_COUNTS,
+    subjectRows,
+    typeRows,
     sampleClusters: SAMPLE_CLUSTERS,
     questionTypeClusterRunway: QUESTION_TYPE_CLUSTER_RUNWAY,
     publicSourceLedger: PUBLIC_K12_SOURCE_LEDGER,
@@ -831,7 +871,7 @@ function buildRealHomeworkCoverageMatrix(options = {}) {
     clusterRunwayLine: `已把 ${QUESTION_TYPE_CLUSTER_RUNWAY.length} 个高频题型簇接成“第一步-错因-小黑板-回访-分享”本地闭环。`,
     longitudinalLine: `已把 ${LONGITUDINAL_PRESSURE_SCENARIO_LEDGER.length} 条跨周复发场景接成本地 release gate：先看复发证据，再决定报告、奖励、分享和家校协同能不能释放。`,
     totalSamples,
-    totalSubjects: SUBJECT_COUNTS.length,
+    totalSubjects: subjectRows.length,
     totalTypes,
     totalPublicSources: PUBLIC_K12_SOURCE_LEDGER.length,
     totalPublicAssetPipelines: PUBLIC_K12_ASSET_PIPELINE.length,
