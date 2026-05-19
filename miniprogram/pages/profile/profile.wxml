@@ -704,6 +704,18 @@
           <text>{{learningReportSummary.realHomeworkCoverageMatrix.boundary}}</text>
           <text>{{learningReportSummary.realHomeworkCoverageMatrix.publicSourceBlockedLine}}</text>
         </view>
+        <view class="parent-brief-block" wx:if="{{learningReportSummary.realTrialRecoveryLoop}}">
+          <text class="parent-brief-label">{{learningReportSummary.realTrialRecoveryLoop.title}}</text>
+          <text>{{learningReportSummary.realTrialRecoveryLoop.summary}}</text>
+          <text>{{learningReportSummary.realTrialRecoveryLine}}</text>
+          <text>本地规则：{{learningReportSummary.realTrialRecoveryLoop.localRuleLine}}</text>
+          <text>AI 边界：{{learningReportSummary.realTrialRecoveryLoop.aiUseLine}}</text>
+          <text>分享边界：{{learningReportSummary.realTrialRecoveryLoop.shareBoundary}}</text>
+          <text>边际规则：{{learningReportSummary.realTrialRecoveryLoop.marginalRule}}</text>
+          <text wx:for="{{learningReportSummary.realTrialRecoveryRisks}}" wx:key="id">试用风险：{{item.label}} × {{item.count}}</text>
+          <text wx:for="{{learningReportSummary.realTrialRecoveryQueue}}" wx:key="id">待转压力样本：{{item.subject}}｜{{item.taskType}}｜{{item.localTransform}}</text>
+          <text wx:for="{{learningReportSummary.realTrialRecoveryLatest}}" wx:key="id">最近试用：{{item.subject}}｜第一步：{{item.firstStep}}｜错因：{{item.wrongCause}}</text>
+        </view>
         <view class="parent-brief-block" wx:if="{{learningReportSummary.reportPressureTruthAudit}}">
           <text class="parent-brief-label">{{learningReportSummary.reportPressureTruthAudit.title}}</text>
           <text>{{learningReportSummary.reportPressureTruthAudit.summary}}</text>

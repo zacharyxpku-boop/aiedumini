@@ -951,6 +951,9 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
       subjectSkillDepth
     })
     : null;
+  const realTrialRecoveryLoop = storage.buildRealTrialRecoveryLoop
+    ? storage.buildRealTrialRecoveryLoop({ realHomeworkCoverageMatrix })
+    : null;
   return {
     title: draft.title || '学习画像',
     modeLabel: reportState.reportProgress && reportState.reportProgress.label ? reportState.reportProgress.label : '0% · 快速版',
@@ -1068,6 +1071,17 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
       : [],
     reportPressureSourceDecision: reportPressureTruthAudit && Array.isArray(reportPressureTruthAudit.sourceDecision)
       ? reportPressureTruthAudit.sourceDecision
+      : [],
+    realTrialRecoveryLoop,
+    realTrialRecoveryLine: realTrialRecoveryLoop ? realTrialRecoveryLoop.reportLine : '',
+    realTrialRecoveryRisks: realTrialRecoveryLoop && Array.isArray(realTrialRecoveryLoop.topRisks)
+      ? realTrialRecoveryLoop.topRisks
+      : [],
+    realTrialRecoveryQueue: realTrialRecoveryLoop && Array.isArray(realTrialRecoveryLoop.nextPressureQueue)
+      ? realTrialRecoveryLoop.nextPressureQueue
+      : [],
+    realTrialRecoveryLatest: realTrialRecoveryLoop && Array.isArray(realTrialRecoveryLoop.latest)
+      ? realTrialRecoveryLoop.latest
       : [],
     weeklyEvidenceFlywheel,
     weeklyEvidenceFlywheelLine: weeklyEvidenceFlywheel ? weeklyEvidenceFlywheel.parentTrustLine : '',

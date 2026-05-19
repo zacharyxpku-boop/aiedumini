@@ -62,6 +62,7 @@ const KEYS = {
   moduleFeedback: 'ydzx.module.feedback.v1',
   tutorEvents: 'ydzx.tutor.events.v1',
   pilotRuns: 'ydzx.pilot.runs.v1',
+  realTrialSamples: 'ydzx.real.trial.samples.v1',
   factoryEvents: 'ydzx.factory.events.v1',
   thinkingReceipts: 'ydzx.thinking.receipts.v1',
   reviewDeck: 'ydzx.review.deck.v1',
@@ -349,6 +350,7 @@ function clearLearningData() {
     KEYS.tutorMessages,
     KEYS.session,
     KEYS.feedback,
+    KEYS.realTrialSamples,
     KEYS.moduleEvents,
     KEYS.moduleFeedback,
     KEYS.tutorEvents,
@@ -1164,6 +1166,165 @@ function pilotRunSummary() {
     label: total
       ? `${total} pilot nights logged, ${saved} minutes saved, ${returned} review returns.`
       : 'No pilot evidence logged yet.'
+  };
+}
+
+function normalizeRealTrialSample(item = {}) {
+  const subject = String(item.subject || item.subjectLabel || '未标注学科').trim();
+  const taskType = String(item.taskType || item.task_type || 'unknown_task').trim();
+  const childTask = String(item.childTask || item.task || item.stem || '').trim();
+  const firstStep = String(item.firstStep || item.childFirstStep || item.expectedFirstStep || '').trim();
+  const wrongCause = String(item.wrongCause || item.expectedWrongCause || '').trim();
+  const boardUse = String(item.boardUse || item.boardMove || item.blackboardUse || '').trim();
+  const parentCheck = String(item.parentCheck || item.parentQuestion || '').trim();
+  const revisitPlan = String(item.revisitPlan || item.nextReview || '').trim();
+  const privacyConcern = !!item.privacyConcern;
+  const neededHelp = !!item.neededHelp;
+  const droppedOff = !!item.droppedOff;
+  const confusedStep = String(item.confusedStep || item.confusion || '').trim();
+  const sourceUrl = String(item.sourceUrl || item.source_url || '').trim();
+  const sourceId = String(item.sourceId || item.source_id || 'family_trial').trim();
+  const createdAt = item.createdAt || item.created_at || new Date().toISOString();
+  const answerText = String(item.answer || item.fullAnswer || '').trim();
+  const originalQuestion = String(item.originalQuestion || '').trim();
+  const blockedFields = ['original_question', 'full_answer', 'photo', 'ranking', 'full_dialogue'];
+  const evidenceReady = !!(childTask && firstStep && wrongCause && parentCheck);
+  const shouldBecomePressureSample = evidenceReady && (neededHelp || droppedOff || confusedStep || privacyConcern);
+  const zeroHelp = evidenceReady && !neededHelp && !droppedOff && !privacyConcern;
+  const riskTags = []
+    .concat(!firstStep ? ['missing_first_step'] : [])
+    .concat(!wrongCause ? ['missing_wrong_cause'] : [])
+    .concat(!boardUse ? ['missing_board_use'] : [])
+    .concat(!parentCheck ? ['missing_parent_check'] : [])
+    .concat(neededHelp ? ['needs_human_help'] : [])
+    .concat(droppedOff ? ['dropoff'] : [])
+    .concat(confusedStep ? ['confusing_step'] : [])
+    .concat(privacyConcern ? ['privacy_concern'] : [])
+    .concat(answerText || originalQuestion ? ['private_or_answer_field_blocked'] : []);
+  return {
+    id: item.id || `real_trial_${createdAt.replace(/[^0-9A-Za-z]/g, '').slice(0, 14)}_${Math.floor(Math.random() * 1000)}`,
+    subject,
+    taskType,
+    childTask,
+    firstStep,
+    wrongCause,
+    boardUse,
+    parentCheck,
+    revisitPlan,
+    sourceId,
+    sourceUrl,
+    evidenceReady,
+    zeroHelp,
+    neededHelp,
+    droppedOff,
+    confusedStep,
+    privacyConcern,
+    shouldBecomePressureSample,
+    riskTags,
+    blockedFields,
+    localOwner: 'local_rule',
+    aiOwner: 'ai_wording_only',
+    releaseRule: 'Only release report/share/game actions after first step, wrong cause, parent check, and revisit evidence exist.',
+    created_at: createdAt
+  };
+}
+
+function loadRealTrialSamples() {
+  const list = get(KEYS.realTrialSamples, []);
+  return Array.isArray(list) ? list : [];
+}
+
+function appendRealTrialSample(item) {
+  const record = normalizeRealTrialSample(item || {});
+  const next = [record].concat(loadRealTrialSamples()).slice(0, 160);
+  set(KEYS.realTrialSamples, next);
+  appendFeedback({
+    rating: record.zeroHelp ? 'accurate' : 'off',
+    calibration_key: record.riskTags[0] || record.taskType,
+    subject: record.subject,
+    note: record.confusedStep || record.wrongCause || record.firstStep,
+    source: 'real_trial_sample'
+  });
+  appendSyncMutation('real_trial_sample', {
+    id: record.id,
+    subject: record.subject,
+    taskType: record.taskType,
+    riskTags: record.riskTags,
+    shouldBecomePressureSample: record.shouldBecomePressureSample,
+    blockedFields: record.blockedFields
+  });
+  return next;
+}
+
+function buildRealTrialRecoveryLoop(options = {}) {
+  const samples = loadRealTrialSamples().map(normalizeRealTrialSample);
+  const pressureMatrix = options.realHomeworkCoverageMatrix || buildRealHomeworkCoverageMatrix();
+  const total = samples.length;
+  const evidenceReady = samples.filter((item) => item.evidenceReady).length;
+  const zeroHelp = samples.filter((item) => item.zeroHelp).length;
+  const shouldPromote = samples.filter((item) => item.shouldBecomePressureSample);
+  const riskCounter = {};
+  const subjectCounter = {};
+  samples.forEach((item) => {
+    subjectCounter[item.subject] = (subjectCounter[item.subject] || 0) + 1;
+    item.riskTags.forEach((tag) => {
+      riskCounter[tag] = (riskCounter[tag] || 0) + 1;
+    });
+  });
+  const topRisks = Object.keys(riskCounter)
+    .sort((a, b) => riskCounter[b] - riskCounter[a])
+    .slice(0, 5)
+    .map((tag) => ({ id: tag, label: tag, count: riskCounter[tag] }));
+  const nextQueue = shouldPromote.slice(0, 6).map((item) => ({
+    id: `${item.id}_pressure_seed`,
+    subject: item.subject,
+    taskType: item.taskType,
+    firstStep: item.firstStep || '补孩子自己的第一步',
+    wrongCause: item.wrongCause || item.confusedStep || '补错因',
+    parentCheck: item.parentCheck || '家长只问孩子卡在哪一步',
+    localTransform: '转成不含原题和答案的压力样本，再压测苏格拉底、报告、游戏、分享。',
+    aiUse: 'AI 只改写追问语气，不决定分类、放行和分享字段。',
+    blockedFields: item.blockedFields
+  }));
+  const readiness = total >= 12 && evidenceReady / Math.max(total, 1) >= 0.8 && shouldPromote.length <= Math.ceil(total * 0.35)
+    ? 'real_trial_learning_loop_ready'
+    : total >= 4
+      ? 'needs_more_family_trials'
+      : 'collect_real_family_trials';
+  const subjectCoverage = Object.keys(subjectCounter).length;
+  const pressureSampleCount = Number((pressureMatrix && pressureMatrix.totalSamples) || 0);
+  const targetGap = {
+    familyHomeworkLoop: Math.min(92, 82 + Math.floor(Math.min(total, 20) / 2)),
+    commercialFirstVersion: Math.min(76, 62 + Math.floor(Math.min(evidenceReady, 20) / 2)),
+    gizmoMemoryDepth: Math.min(62, 48 + Math.floor(Math.min(shouldPromote.length, 20) / 3)),
+    khanmigoPortraitDepth: Math.min(60, 46 + Math.floor(Math.min(subjectCoverage * 2, 14))),
+    platformContentScale: Math.min(55, 38 + Math.floor(Math.min(pressureSampleCount, 500) / 40))
+  };
+  return {
+    id: 'real_trial_recovery_loop',
+    title: '真实试用回收闭环',
+    summary: total
+      ? `已回收 ${total} 次家庭试用，${zeroHelp} 次可零帮助完成，${shouldPromote.length} 条需要转成新压力样本。`
+      : '还没有真实家庭试用回收；下一步不是继续堆资料，而是回收孩子真实卡住点。',
+    readiness,
+    total,
+    evidenceReady,
+    zeroHelp,
+    zeroHelpRate: total ? Math.round((zeroHelp / total) * 100) : 0,
+    shouldPromoteCount: shouldPromote.length,
+    topRisks,
+    nextPressureQueue: nextQueue,
+    latest: samples.slice(0, 3),
+    subjectCoverage,
+    pressureSampleCount,
+    localRuleLine: '本地代码负责样本清洗、风险打标、是否进入压力库、报告放行、分享字段和回访节奏。',
+    aiUseLine: '苏格拉底问答可用 AI 改写语气和解释角度，但不能让模型临场决定答案、排名、隐私字段或掌握结论。',
+    reportLine: total
+      ? `真实试用：${evidenceReady}/${total} 条证据完整，零帮助率 ${total ? Math.round((zeroHelp / total) * 100) : 0}%，待转压力样本 ${shouldPromote.length} 条。`
+      : '真实试用：待回收 12 个家庭夜间作业样本后，才放行更强的长期画像和传播判断。',
+    shareBoundary: '分享只带第一步、错因、家长检查和回访动作；不带原题、照片、完整答案、完整对话和排行。',
+    marginalRule: '若连续两轮只增加静态资料、没有新增真实试用样本或失败样本，停止加厚并汇报差距。',
+    targetGap
   };
 }
 
@@ -9261,6 +9422,9 @@ module.exports = {
   loadPilotRuns,
   appendPilotRun,
   pilotRunSummary,
+  loadRealTrialSamples,
+  appendRealTrialSample,
+  buildRealTrialRecoveryLoop,
   loadFactoryEvents,
   appendFactoryEvent,
   factoryEventSummary,
