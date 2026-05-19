@@ -718,6 +718,8 @@
           <text class="parent-brief-label">{{learningReportSummary.realTrialRecoveryLoop.title}}</text>
           <text>{{learningReportSummary.realTrialRecoveryLoop.summary}}</text>
           <text>{{learningReportSummary.realTrialRecoveryLine}}</text>
+          <text>{{learningReportSummary.realTrialPressureCandidateLine}}</text>
+          <text wx:for="{{learningReportSummary.realTrialPressureCandidateCards}}" wx:key="id">压力候选：{{item.subject}}｜{{item.taskType}}｜第一步：{{item.firstStep}}｜待查：{{item.auditReasons[0]}}｜下一步进点拨/回访/挑战</text>
           <text>{{learningReportSummary.realTrialRecoveryLoop.reviewQueueLine}}</text>
           <text>{{learningReportSummary.realTrialGameChallengeLine}}</text>
           <text wx:for="{{learningReportSummary.realTrialGameChallengeCards}}" wx:key="id">真实试用挑战：{{item.title}}｜{{item.gameRule}}｜{{item.shareHook}}</text>

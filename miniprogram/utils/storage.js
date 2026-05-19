@@ -1388,6 +1388,68 @@ function appendRealTrialSample(item) {
   return next;
 }
 
+function buildRealTrialPressureCandidateBoard(options = {}) {
+  const samples = (options.samples || loadRealTrialSamples())
+    .map(normalizeRealTrialSample)
+    .filter((item) => item && (
+      item.shouldBecomePressureSample
+      || item.neededHelp
+      || item.droppedOff
+      || item.confusedStep
+      || item.privacyConcern
+    ));
+  const limit = Number(options.limit || 8);
+  const cards = samples.slice(0, limit).map((item, index) => {
+    const auditReasons = []
+      .concat(item.neededHelp ? ['需要额外提示'] : [])
+      .concat(item.droppedOff ? ['流程中断'] : [])
+      .concat(item.confusedStep ? [`卡在：${item.confusedStep}`] : [])
+      .concat(item.privacyConcern ? ['含隐私顾虑'] : [])
+      .concat(!item.evidenceReady ? ['证据未齐'] : []);
+    return {
+      id: `${item.id}_pressure_candidate`,
+      order: index + 1,
+      title: `${item.subject || '家庭作业'}压力样本候选`,
+      sourceTrialId: item.id,
+      subject: item.subject,
+      taskType: item.taskType,
+      childTask: item.childTask,
+      firstStep: item.firstStep || '先补孩子自己说出的第一步',
+      wrongCause: item.wrongCause || item.confusedStep || '先补错因',
+      boardUse: item.boardUse || '小黑板只画第一步，不写答案',
+      parentCheck: item.parentCheck || '家长只问：第一步先看哪里？',
+      revisitPlan: item.revisitPlan || '明天换一道同类小题复查第一步',
+      auditReasons,
+      status: item.evidenceReady ? 'ready_for_pressure_audit' : 'needs_evidence_before_pressure_audit',
+      localOwner: 'local_rule',
+      aiOwner: 'ai_wording_only',
+      localRule: '本地代码负责清洗、分型、错因命中、小黑板动作、回访节奏、报告放行和分享字段。',
+      aiBoundary: 'AI 只能改写追问语气和解释角度，不能补原题、给答案、决定掌握度或放行分享。',
+      tutorRoute: `/pages/tutor/tutor?from=real_trial_pressure_candidate&trial_id=${encodeURIComponent(item.id)}`,
+      reviewRoute: `/pages/review/review?from=real_trial_pressure_candidate&trial_id=${encodeURIComponent(item.id)}`,
+      arcadeRoute: `/pages/arcade/arcade?from=real_trial_pressure_candidate&trial_id=${encodeURIComponent(item.id)}`,
+      allowedFields: ['subject', 'task_type', 'first_step', 'wrong_cause', 'board_use', 'parent_check', 'revisit_plan'],
+      blockedFields: ['original_question', 'full_answer', 'photo', 'score', 'ranking', 'full_dialogue']
+    };
+  });
+  const readyCount = cards.filter((item) => item.status === 'ready_for_pressure_audit').length;
+  return {
+    id: 'real_trial_pressure_candidate_board',
+    title: '真实试用压力候选板',
+    ready: cards.length > 0,
+    total: cards.length,
+    readyCount,
+    cards,
+    firstCandidate: cards[0] || null,
+    reportLine: cards.length
+      ? `已从真实试用里抓出 ${cards.length} 个压力样本候选，${readyCount} 个证据已齐；下一步压测苏格拉底、报告、回访和游戏。`
+      : '还没有真实试用失败样本；继续堆公开资料的边际效益低，先回收家庭卡住点。',
+    localRuleLine: '候选能否进入压力库由本地规则决定；标准是来源清楚、第一步具体、错因具体、小黑板可画、家长可检查、明天可回访。',
+    aiUseLine: '苏格拉底问答可以用 AI 润色，但候选入库、答案拦截、隐私字段和分享字段必须本地代码控制。',
+    stopRule: '连续两轮没有新增真实试用失败样本时，停止扩充静态资料，转向家长试用和真机观察。'
+  };
+}
+
 function buildRealTrialRecoveryLoop(options = {}) {
   const samples = loadRealTrialSamples().map(normalizeRealTrialSample);
   const pressureMatrix = options.realHomeworkCoverageMatrix || buildRealHomeworkCoverageMatrix();
@@ -1399,6 +1461,10 @@ function buildRealTrialRecoveryLoop(options = {}) {
   const realTrialGameChallengeBridge = buildRealTrialGameChallengeBridge({
     reviewCards: realTrialReviewCards,
     limit: options.gameChallengeLimit || 6
+  });
+  const pressureCandidateBoard = buildRealTrialPressureCandidateBoard({
+    samples,
+    limit: options.pressureCandidateLimit || 8
   });
   const riskCounter = {};
   const subjectCounter = {};
@@ -1450,6 +1516,9 @@ function buildRealTrialRecoveryLoop(options = {}) {
     zeroHelpRate: total ? Math.round((zeroHelp / total) * 100) : 0,
     shouldPromoteCount: shouldPromote.length,
     reviewCardCount: realTrialReviewCards.length,
+    pressureCandidateBoard,
+    pressureCandidateLine: pressureCandidateBoard.reportLine,
+    pressureCandidateCards: pressureCandidateBoard.cards,
     gameChallengeBridge: realTrialGameChallengeBridge,
     gameChallengeLine: realTrialGameChallengeBridge.reportLine,
     gameChallengeCards: realTrialGameChallengeBridge.challengeCards,
@@ -5204,6 +5273,9 @@ function buildShareChallengePlan(input = {}) {
   const realTrialGameChallengeBridge = input.realTrialGameChallengeBridge || buildRealTrialGameChallengeBridge({
     limit: 3
   });
+  const realTrialPressureCandidateBoard = input.realTrialPressureCandidateBoard || buildRealTrialPressureCandidateBoard({
+    limit: 3
+  });
   const subjectDepth = input.subjectSkillDepth || null;
   const actionLabel = input.actionLabel || capability.nextAction || parentNextActionLabel(input.parentNextAction || '');
   const subjectLabel = subjectDepth && subjectDepth.label ? subjectDepth.label : (focus.title ? '当前卡点' : '第一步');
@@ -5452,6 +5524,7 @@ function buildShareChallengePlan(input = {}) {
     naturalSpreadLoop,
     familyRelayGrowthProtocol,
     realTrialGameChallengeBridge,
+    realTrialPressureCandidateBoard,
     sourceBackedChallengeDeck,
     wrongCauseViralChallengePack,
     communityRipplePlan,
@@ -5518,6 +5591,11 @@ function buildShareChallengePlan(input = {}) {
       real_trial_route: realTrialGameChallengeBridge.query.real_trial_route || '',
       real_trial_allowed: realTrialGameChallengeBridge.query.real_trial_allowed || '',
       real_trial_blocked: realTrialGameChallengeBridge.query.real_trial_blocked || '',
+      real_trial_pressure_candidate: realTrialPressureCandidateBoard.firstCandidate ? realTrialPressureCandidateBoard.firstCandidate.id : '',
+      real_trial_pressure_route: realTrialPressureCandidateBoard.firstCandidate ? realTrialPressureCandidateBoard.firstCandidate.tutorRoute : '',
+      real_trial_pressure_review: realTrialPressureCandidateBoard.firstCandidate ? realTrialPressureCandidateBoard.firstCandidate.reviewRoute : '',
+      real_trial_pressure_arcade: realTrialPressureCandidateBoard.firstCandidate ? realTrialPressureCandidateBoard.firstCandidate.arcadeRoute : '',
+      real_trial_pressure_blocked: realTrialPressureCandidateBoard.firstCandidate ? realTrialPressureCandidateBoard.firstCandidate.blockedFields.join(',') : '',
       relay_spread_score: String(spreadReadinessGate.score),
       relay_spread_line: spreadReadinessGate.shareModeLine,
       relay_spread_fallback: spreadReadinessGate.fallbackLine,
@@ -5620,6 +5698,9 @@ function buildCommunityShareRelayBoard(input = {}) {
   const realTrialGameChallengeBridge = plan.realTrialGameChallengeBridge || buildRealTrialGameChallengeBridge({
     limit: 3
   });
+  const realTrialPressureCandidateBoard = plan.realTrialPressureCandidateBoard || buildRealTrialPressureCandidateBoard({
+    limit: 3
+  });
   const publicK12IntakeChallengeDeck = realHomeworkCoverage && typeof realHomeworkCoverage.buildPublicK12IntakeChallengeDeck === 'function'
     ? realHomeworkCoverage.buildPublicK12IntakeChallengeDeck({ limit: 6 })
     : [];
@@ -5700,6 +5781,9 @@ function buildCommunityShareRelayBoard(input = {}) {
     realTrialGameChallengeBridge,
     realTrialGameChallengeCards: realTrialGameChallengeBridge.challengeCards || [],
     realTrialGameChallengeLine: realTrialGameChallengeBridge.reportLine || '',
+    realTrialPressureCandidateBoard,
+    realTrialPressureCandidateCards: realTrialPressureCandidateBoard.cards || [],
+    realTrialPressureCandidateLine: realTrialPressureCandidateBoard.reportLine || '',
     shareHookDeck: plan.shareHookDeck || [],
     sourceBackedChallengeDeck: plan.sourceBackedChallengeDeck || [],
     publicK12IntakeChallengeDeck,
@@ -9586,6 +9670,7 @@ module.exports = {
   loadRealTrialSamples,
   appendRealTrialSample,
   buildRealTrialGameChallengeBridge,
+  buildRealTrialPressureCandidateBoard,
   buildRealTrialRecoveryLoop,
   loadFactoryEvents,
   appendFactoryEvent,

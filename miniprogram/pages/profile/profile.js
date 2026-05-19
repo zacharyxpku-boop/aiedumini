@@ -1098,6 +1098,10 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     realTrialGameChallengeCards: realTrialRecoveryLoop && Array.isArray(realTrialRecoveryLoop.gameChallengeCards)
       ? realTrialRecoveryLoop.gameChallengeCards
       : [],
+    realTrialPressureCandidateLine: realTrialRecoveryLoop ? realTrialRecoveryLoop.pressureCandidateLine : '',
+    realTrialPressureCandidateCards: realTrialRecoveryLoop && Array.isArray(realTrialRecoveryLoop.pressureCandidateCards)
+      ? realTrialRecoveryLoop.pressureCandidateCards
+      : [],
     realTrialRecoveryRisks: realTrialRecoveryLoop && Array.isArray(realTrialRecoveryLoop.topRisks)
       ? realTrialRecoveryLoop.topRisks
       : [],
