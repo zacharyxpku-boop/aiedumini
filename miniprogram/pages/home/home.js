@@ -220,7 +220,17 @@ Page({
         source_challenge_decision: safeDecodeShareParam(query.source_challenge_decision),
         source_challenge_local_rule: safeDecodeShareParam(query.source_challenge_local_rule),
         source_challenge_blocked: safeDecodeShareParam(query.source_challenge_blocked),
-        source_challenge_route: safeDecodeShareParam(query.source_challenge_route)
+        source_challenge_route: safeDecodeShareParam(query.source_challenge_route),
+        wrong_cause_pack: safeDecodeShareParam(query.wrong_cause_pack),
+        wrong_cause_label: safeDecodeShareParam(query.wrong_cause_label),
+        wrong_cause_first_step: safeDecodeShareParam(query.wrong_cause_first_step),
+        wrong_cause_parent_check: safeDecodeShareParam(query.wrong_cause_parent_check),
+        wrong_cause_receiver_action: safeDecodeShareParam(query.wrong_cause_receiver_action),
+        wrong_cause_next_revisit: safeDecodeShareParam(query.wrong_cause_next_revisit),
+        wrong_cause_allowed_fields: safeDecodeShareParam(query.wrong_cause_allowed_fields),
+        wrong_cause_blocked_fields: safeDecodeShareParam(query.wrong_cause_blocked_fields),
+        wrong_cause_return_path: safeDecodeShareParam(query.wrong_cause_return_path),
+        wrong_cause_gate: safeDecodeShareParam(query.wrong_cause_gate)
       }) : {
         code: query.share,
         share_code: query.share,
@@ -290,6 +300,16 @@ Page({
         source_challenge_local_rule: safeDecodeShareParam(query.source_challenge_local_rule),
         source_challenge_blocked: safeDecodeShareParam(query.source_challenge_blocked),
         source_challenge_route: safeDecodeShareParam(query.source_challenge_route),
+        wrong_cause_pack: safeDecodeShareParam(query.wrong_cause_pack),
+        wrong_cause_label: safeDecodeShareParam(query.wrong_cause_label),
+        wrong_cause_first_step: safeDecodeShareParam(query.wrong_cause_first_step),
+        wrong_cause_parent_check: safeDecodeShareParam(query.wrong_cause_parent_check),
+        wrong_cause_receiver_action: safeDecodeShareParam(query.wrong_cause_receiver_action),
+        wrong_cause_next_revisit: safeDecodeShareParam(query.wrong_cause_next_revisit),
+        wrong_cause_allowed_fields: safeDecodeShareParam(query.wrong_cause_allowed_fields),
+        wrong_cause_blocked_fields: safeDecodeShareParam(query.wrong_cause_blocked_fields),
+        wrong_cause_return_path: safeDecodeShareParam(query.wrong_cause_return_path),
+        wrong_cause_gate: safeDecodeShareParam(query.wrong_cause_gate),
         action_label: query.action === 'wrong_cause_revisit'
           ? '明天先回看这张错因卡'
           : query.action === 'due_card_revisit'
@@ -339,7 +359,14 @@ Page({
             socratic_report_boundary: safeDecodeShareParam(query.socratic_report_boundary),
             source_challenge_first: safeDecodeShareParam(query.source_challenge_first),
             source_challenge_prompt: safeDecodeShareParam(query.source_challenge_prompt),
-            source_challenge_decision: safeDecodeShareParam(query.source_challenge_decision)
+            source_challenge_decision: safeDecodeShareParam(query.source_challenge_decision),
+            wrong_cause_pack: safeDecodeShareParam(query.wrong_cause_pack),
+            wrong_cause_label: safeDecodeShareParam(query.wrong_cause_label),
+            wrong_cause_first_step: safeDecodeShareParam(query.wrong_cause_first_step),
+            wrong_cause_parent_check: safeDecodeShareParam(query.wrong_cause_parent_check),
+            wrong_cause_receiver_action: safeDecodeShareParam(query.wrong_cause_receiver_action),
+            wrong_cause_next_revisit: safeDecodeShareParam(query.wrong_cause_next_revisit),
+            wrong_cause_blocked_fields: safeDecodeShareParam(query.wrong_cause_blocked_fields)
           }
         });
       }
@@ -376,7 +403,14 @@ Page({
           socratic_report_boundary: safeDecodeShareParam(query.socratic_report_boundary),
           source_challenge_first: safeDecodeShareParam(query.source_challenge_first),
           source_challenge_prompt: safeDecodeShareParam(query.source_challenge_prompt),
-          source_challenge_decision: safeDecodeShareParam(query.source_challenge_decision)
+          source_challenge_decision: safeDecodeShareParam(query.source_challenge_decision),
+          wrong_cause_pack: safeDecodeShareParam(query.wrong_cause_pack),
+          wrong_cause_label: safeDecodeShareParam(query.wrong_cause_label),
+          wrong_cause_first_step: safeDecodeShareParam(query.wrong_cause_first_step),
+          wrong_cause_parent_check: safeDecodeShareParam(query.wrong_cause_parent_check),
+          wrong_cause_receiver_action: safeDecodeShareParam(query.wrong_cause_receiver_action),
+          wrong_cause_next_revisit: safeDecodeShareParam(query.wrong_cause_next_revisit),
+          wrong_cause_blocked_fields: safeDecodeShareParam(query.wrong_cause_blocked_fields)
         }
       }).catch(() => {});
       this.setData({
@@ -935,6 +969,18 @@ Page({
       blockedFields: incoming.source_challenge_blocked || '',
       route: sourceChallengeRoute
     } : null;
+    const wrongCauseRoute = navigation.normalizeRoute(incoming.wrong_cause_return_path || challengeRoute);
+    const wrongCauseViralPack = incoming.wrong_cause_pack || incoming.wrong_cause_label ? {
+      label: incoming.wrong_cause_label || '同类错因',
+      firstStep: incoming.wrong_cause_first_step || firstStep,
+      parentCheck: incoming.wrong_cause_parent_check || '',
+      receiverAction: incoming.wrong_cause_receiver_action || `用自己的材料复刻：${incoming.wrong_cause_first_step || firstStep}`,
+      nextRevisit: incoming.wrong_cause_next_revisit || '明天回访同一错因',
+      allowedFields: incoming.wrong_cause_allowed_fields || 'wrong_cause_label,first_step,parent_check,receiver_action,next_day_revisit',
+      blockedFields: incoming.wrong_cause_blocked_fields || 'original_question,original_answer,original_photo,full_dialogue,score,ranking,private_comment',
+      localGate: incoming.wrong_cause_gate || 'wrong_cause_relay_ready',
+      route: wrongCauseRoute
+    } : null;
     const safeRelayPacket = incoming.relay_id ? {
       relayId: incoming.relay_id,
       receiverAction: incoming.relay_receiver_action || actionDetail,
@@ -1010,6 +1056,14 @@ Page({
       sourceChallengeLocalRuleLine: sourceChallengeDeck && sourceChallengeDeck.localRule ? sourceChallengeDeck.localRule : '',
       sourceChallengeBlockedLine: sourceChallengeDeck && sourceChallengeDeck.blockedFields ? `禁带字段：${sourceChallengeDeck.blockedFields}` : '',
       sourceChallengeLicenseLine: sourceChallengeDeck && sourceChallengeDeck.licenseSignal ? `许可提醒：${sourceChallengeDeck.licenseSignal}` : '',
+      wrongCauseViralPack,
+      wrongCauseViralLine: wrongCauseViralPack ? `错因接力：${wrongCauseViralPack.label}` : '',
+      wrongCauseFirstStepLine: wrongCauseViralPack ? `错因第一步：${wrongCauseViralPack.firstStep}` : '',
+      wrongCauseReceiverActionLine: wrongCauseViralPack ? `接收者动作：${wrongCauseViralPack.receiverAction}` : '',
+      wrongCauseParentCheckLine: wrongCauseViralPack && wrongCauseViralPack.parentCheck ? `家长检查：${wrongCauseViralPack.parentCheck}` : '',
+      wrongCauseNextRevisitLine: wrongCauseViralPack ? `回访：${wrongCauseViralPack.nextRevisit}` : '',
+      wrongCauseBlockedFieldLine: wrongCauseViralPack ? `错因接力不带：${wrongCauseViralPack.blockedFields}` : '',
+      wrongCauseLocalGateLine: wrongCauseViralPack ? `本地门禁：${wrongCauseViralPack.localGate}` : '',
       safeRelayPacket,
       receiverActionLine: safeRelayPacket && safeRelayPacket.receiverAction,
       parentCheckLine: safeRelayPacket && safeRelayPacket.parentCheck,
@@ -1066,6 +1120,13 @@ Page({
           route: '/pages/profile/profile?from=share_relay',
           reason: incoming.socratic_report_decision || '只看今晚动作、证据和明天复核，不做排行。',
           evidence: '家庭复盘'
+        },
+        {
+          id: 'wrong_cause_viral',
+          label: '接这个错因',
+          route: wrongCauseRoute,
+          reason: wrongCauseViralPack ? wrongCauseViralPack.receiverAction : '用自己的材料复刻同类错因第一步。',
+          evidence: wrongCauseViralPack ? wrongCauseViralPack.label : '错因接力'
         },
         {
           id: 'source_challenge',
@@ -1846,8 +1907,11 @@ Page({
     const visualBoardRelayQuery = incoming.share_code
       ? `&visual_board_relay_title=${encodeURIComponent(incoming.visual_board_relay_title || '')}&visual_board_relay_layer=${encodeURIComponent(incoming.visual_board_relay_layer || '')}&visual_board_relay_student_line=${encodeURIComponent(incoming.visual_board_relay_student_line || '')}&visual_board_relay_parent_line=${encodeURIComponent(incoming.visual_board_relay_parent_line || '')}&visual_board_relay_exit=${encodeURIComponent(incoming.visual_board_relay_exit || '')}&visual_board_relay_route=${encodeURIComponent(incoming.visual_board_relay_route || '')}&visual_board_relay_boundary=${encodeURIComponent(incoming.visual_board_relay_boundary || '')}`
       : '';
+    const wrongCauseRelayQuery = incoming.share_code
+      ? `&wrong_cause_pack=${encodeURIComponent(incoming.wrong_cause_pack || '')}&wrong_cause_label=${encodeURIComponent(incoming.wrong_cause_label || '')}&wrong_cause_first_step=${encodeURIComponent(incoming.wrong_cause_first_step || '')}&wrong_cause_parent_check=${encodeURIComponent(incoming.wrong_cause_parent_check || '')}&wrong_cause_receiver_action=${encodeURIComponent(incoming.wrong_cause_receiver_action || '')}&wrong_cause_next_revisit=${encodeURIComponent(incoming.wrong_cause_next_revisit || '')}&wrong_cause_allowed_fields=${encodeURIComponent(incoming.wrong_cause_allowed_fields || '')}&wrong_cause_blocked_fields=${encodeURIComponent(incoming.wrong_cause_blocked_fields || '')}&wrong_cause_return_path=${encodeURIComponent(incoming.wrong_cause_return_path || '')}&wrong_cause_gate=${encodeURIComponent(incoming.wrong_cause_gate || '')}`
+      : '';
     const query = incoming.share_code && route.indexOf('?') < 0
-      ? `?from=share_relay&share=${incoming.share_code}&mode=${incoming.mode || ''}&identity=${encodeURIComponent(incoming.identity_tag || '')}&action=${incoming.parent_next_action || ''}&capability_gap=${encodeURIComponent(incoming.capability_gap || '')}&capability_label=${encodeURIComponent(incoming.capability_label || '')}&challenge_goal=${encodeURIComponent(incoming.challenge_goal || '')}&challenge_rule=${encodeURIComponent(incoming.challenge_rule || '')}&relay_privacy=${encodeURIComponent(incoming.relay_privacy || '')}&relay_review=${encodeURIComponent(incoming.relay_review || '')}&relay_first_step=${encodeURIComponent(incoming.relay_first_step || '')}&relay_id=${encodeURIComponent(incoming.relay_id || '')}&relay_receiver_action=${encodeURIComponent(incoming.relay_receiver_action || '')}&relay_parent_check=${encodeURIComponent(incoming.relay_parent_check || '')}&relay_next_revisit=${encodeURIComponent(incoming.relay_next_revisit || '')}&relay_allowed_fields=${encodeURIComponent(incoming.relay_allowed_fields || '')}&relay_blocked_fields=${encodeURIComponent(incoming.relay_blocked_fields || '')}&relay_completion_signal=${encodeURIComponent(incoming.relay_completion_signal || '')}&relay_return_path=${encodeURIComponent(incoming.relay_return_path || '')}${socraticReportQuery}${visualBoardRelayQuery}`
+      ? `?from=share_relay&share=${incoming.share_code}&mode=${incoming.mode || ''}&identity=${encodeURIComponent(incoming.identity_tag || '')}&action=${incoming.parent_next_action || ''}&capability_gap=${encodeURIComponent(incoming.capability_gap || '')}&capability_label=${encodeURIComponent(incoming.capability_label || '')}&challenge_goal=${encodeURIComponent(incoming.challenge_goal || '')}&challenge_rule=${encodeURIComponent(incoming.challenge_rule || '')}&relay_privacy=${encodeURIComponent(incoming.relay_privacy || '')}&relay_review=${encodeURIComponent(incoming.relay_review || '')}&relay_first_step=${encodeURIComponent(incoming.relay_first_step || '')}&relay_id=${encodeURIComponent(incoming.relay_id || '')}&relay_receiver_action=${encodeURIComponent(incoming.relay_receiver_action || '')}&relay_parent_check=${encodeURIComponent(incoming.relay_parent_check || '')}&relay_next_revisit=${encodeURIComponent(incoming.relay_next_revisit || '')}&relay_allowed_fields=${encodeURIComponent(incoming.relay_allowed_fields || '')}&relay_blocked_fields=${encodeURIComponent(incoming.relay_blocked_fields || '')}&relay_completion_signal=${encodeURIComponent(incoming.relay_completion_signal || '')}&relay_return_path=${encodeURIComponent(incoming.relay_return_path || '')}${socraticReportQuery}${visualBoardRelayQuery}${wrongCauseRelayQuery}`
       : '';
     const target = `${route}${query}`;
     const action = {
@@ -1885,7 +1949,11 @@ Page({
           socratic_report_status: incoming.socratic_report_status || '',
           socratic_report_action: incoming.socratic_report_action || '',
           socratic_report_decision: incoming.socratic_report_decision || '',
-          socratic_report_no_increase: incoming.socratic_report_no_increase || ''
+          socratic_report_no_increase: incoming.socratic_report_no_increase || '',
+          wrong_cause_label: incoming.wrong_cause_label || '',
+          wrong_cause_first_step: incoming.wrong_cause_first_step || '',
+          wrong_cause_receiver_action: incoming.wrong_cause_receiver_action || '',
+          wrong_cause_blocked_fields: incoming.wrong_cause_blocked_fields || ''
         }
       });
     }
@@ -1897,7 +1965,11 @@ Page({
       socratic_report_status: incoming.socratic_report_status || '',
       socratic_report_action: incoming.socratic_report_action || '',
       socratic_report_decision: incoming.socratic_report_decision || '',
-      socratic_report_no_increase: incoming.socratic_report_no_increase || ''
+      socratic_report_no_increase: incoming.socratic_report_no_increase || '',
+      wrong_cause_label: incoming.wrong_cause_label || '',
+      wrong_cause_first_step: incoming.wrong_cause_first_step || '',
+      wrong_cause_receiver_action: incoming.wrong_cause_receiver_action || '',
+      wrong_cause_blocked_fields: incoming.wrong_cause_blocked_fields || ''
     });
     if (!navigation.navigateLearningRoute(target)) {
       wx.navigateTo({ url: '/pages/arcade/arcade' });

@@ -6609,6 +6609,16 @@ function saveIncomingShare(share = {}) {
     source_challenge_local_rule: share.source_challenge_local_rule || '',
     source_challenge_blocked: share.source_challenge_blocked || '',
     source_challenge_route: share.source_challenge_route || '',
+    wrong_cause_pack: share.wrong_cause_pack || '',
+    wrong_cause_label: share.wrong_cause_label || '',
+    wrong_cause_first_step: share.wrong_cause_first_step || '',
+    wrong_cause_parent_check: share.wrong_cause_parent_check || '',
+    wrong_cause_receiver_action: share.wrong_cause_receiver_action || '',
+    wrong_cause_next_revisit: share.wrong_cause_next_revisit || '',
+    wrong_cause_allowed_fields: share.wrong_cause_allowed_fields || '',
+    wrong_cause_blocked_fields: share.wrong_cause_blocked_fields || '',
+    wrong_cause_return_path: share.wrong_cause_return_path || '',
+    wrong_cause_gate: share.wrong_cause_gate || '',
     created_at: share.created_at || new Date().toISOString()
   };
   set(KEYS.incomingShare, record);

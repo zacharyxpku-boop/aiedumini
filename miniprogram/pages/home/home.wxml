@@ -413,6 +413,13 @@
         <view class="share-relay-evidence" wx:if="{{incomingShareRelay.sourceChallengeLocalRuleLine}}">{{incomingShareRelay.sourceChallengeLocalRuleLine}}</view>
         <view class="share-relay-evidence" wx:if="{{incomingShareRelay.sourceChallengeBlockedLine}}">{{incomingShareRelay.sourceChallengeBlockedLine}}</view>
         <view class="share-relay-evidence" wx:if="{{incomingShareRelay.sourceChallengeLicenseLine}}">{{incomingShareRelay.sourceChallengeLicenseLine}}</view>
+        <view class="share-relay-evidence" wx:if="{{incomingShareRelay.wrongCauseViralLine}}">{{incomingShareRelay.wrongCauseViralLine}}</view>
+        <view class="share-relay-evidence" wx:if="{{incomingShareRelay.wrongCauseFirstStepLine}}">{{incomingShareRelay.wrongCauseFirstStepLine}}</view>
+        <view class="share-relay-evidence" wx:if="{{incomingShareRelay.wrongCauseReceiverActionLine}}">{{incomingShareRelay.wrongCauseReceiverActionLine}}</view>
+        <view class="share-relay-evidence" wx:if="{{incomingShareRelay.wrongCauseParentCheckLine}}">{{incomingShareRelay.wrongCauseParentCheckLine}}</view>
+        <view class="share-relay-evidence" wx:if="{{incomingShareRelay.wrongCauseNextRevisitLine}}">{{incomingShareRelay.wrongCauseNextRevisitLine}}</view>
+        <view class="share-relay-evidence" wx:if="{{incomingShareRelay.wrongCauseBlockedFieldLine}}">{{incomingShareRelay.wrongCauseBlockedFieldLine}}</view>
+        <view class="share-relay-evidence" wx:if="{{incomingShareRelay.wrongCauseLocalGateLine}}">{{incomingShareRelay.wrongCauseLocalGateLine}}</view>
         <view class="share-relay-evidence" wx:if="{{incomingShareRelay.receiverActionLine}}">接收动作：{{incomingShareRelay.receiverActionLine}}</view>
         <view class="share-relay-evidence" wx:if="{{incomingShareRelay.parentCheckLine}}">{{incomingShareRelay.parentCheckLine}}</view>
         <view class="share-relay-evidence" wx:if="{{incomingShareRelay.nextDayRevisitLine}}">{{incomingShareRelay.nextDayRevisitLine}}</view>
