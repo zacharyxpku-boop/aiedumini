@@ -180,7 +180,8 @@ page {
 
 .transfer-practice-card,
 .outcome-check-card,
-.post-repair-bridge-card {
+.post-repair-bridge-card,
+.rule-retest-card {
   margin-top: 22rpx;
   padding: 26rpx;
   border: 1rpx solid #eee4d1;
@@ -201,7 +202,9 @@ page {
 .transfer-safety,
 .outcome-line,
 .transfer-parent,
-.post-repair-line {
+.post-repair-line,
+.rule-retest-line,
+.rule-retest-gate {
   margin-top: 10rpx;
   color: #6d736c;
   font-size: 23rpx;
@@ -283,6 +286,46 @@ page {
   min-width: 0;
   padding: 0 10rpx;
   font-size: 21rpx;
+}
+
+.rule-retest-card {
+  background: #fff9ea;
+  border-color: #ead7a8;
+}
+
+.rule-retest-badge {
+  display: inline-flex;
+  margin-top: 10rpx;
+  padding: 8rpx 14rpx;
+  border-radius: 999rpx;
+  background: rgba(27, 67, 50, 0.08);
+  color: #1b4332;
+  font-size: 21rpx;
+  font-weight: 800;
+}
+
+.rule-retest-cadence {
+  display: grid;
+  gap: 10rpx;
+  margin-top: 14rpx;
+}
+
+.rule-retest-step {
+  padding: 12rpx 14rpx;
+  border-radius: 14rpx;
+  background: rgba(255, 255, 255, 0.76);
+  color: #4e463d;
+  font-size: 22rpx;
+}
+
+.rule-retest-action {
+  margin-top: 16rpx;
+  min-height: 64rpx;
+  border-radius: 18rpx;
+  background: #1b4332;
+  color: #fff;
+  font-size: 24rpx;
+  font-weight: 850;
 }
 
 .hero {

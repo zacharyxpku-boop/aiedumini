@@ -80,6 +80,13 @@
         <view class="story-mission-rule" wx:for="{{challengeBrief.courseUnitQuestionBankCards}}" wx:key="id">题库卡：{{item.label}}｜{{item.prompt}}｜{{item.evidenceRequired}}</view>
         <view class="story-mission-rule" wx:if="{{challengeBrief.questionBankPlayableLine}}">{{challengeBrief.questionBankPlayableLine}}</view>
         <view class="story-mission-rule" wx:for="{{challengeBrief.questionBankPlayableCards}}" wx:key="id">本局卡：{{item.question}}｜第一步：{{item.answer}}｜{{item.revisitWindow}}</view>
+        <view class="story-mission rule-retest-mission" wx:if="{{challengeBrief.ruleRetestChallengeTitle}}">
+          <view class="story-mission-title">{{challengeBrief.ruleRetestChallengeTitle}}</view>
+          <view class="story-mission-line">{{challengeBrief.ruleRetestChallengeLine}}</view>
+          <view class="story-mission-rule">{{challengeBrief.ruleRetestChallengeXpGate}}</view>
+          <view class="story-mission-rule">{{challengeBrief.ruleRetestChallengeParentLine}}</view>
+          <view class="story-mission-rule" wx:for="{{challengeBrief.ruleRetestChallengeCards}}" wx:key="id">复测卡：{{item.title}}｜{{item.prompt}}｜{{item.releaseGate}}</view>
+        </view>
       </view>
         <view class="story-mission-rule" wx:for="{{challengeBrief.courseUnitQuestionBankCards}}" wx:key="id">样例：{{item.sampleStem}}｜第一步：{{item.firstStepHint}}｜近迁移：{{item.nearTransferStem}}</view>
         <view class="story-mission-rule" wx:for="{{challengeBrief.courseUnitQuestionBankCards}}" wx:key="id">进阶路径：{{item.progression.entryTask}}｜明天：{{item.progression.nextDayRevisit}}</view>

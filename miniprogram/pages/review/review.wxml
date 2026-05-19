@@ -214,6 +214,19 @@
           </view>
         </view>
 
+        <view class="rule-retest-card" wx:if="{{ruleRetestPanel}}">
+          <view class="card-label">{{ruleRetestPanel.title}}</view>
+          <view class="rule-retest-badge">{{ruleRetestPanel.badge}}</view>
+          <view class="rule-retest-line">{{ruleRetestPanel.line}}</view>
+          <view class="rule-retest-line">小黑板：{{ruleRetestPanel.blackboardLine}}</view>
+          <view class="rule-retest-line">家长只问：{{ruleRetestPanel.parentLine}}</view>
+          <view class="rule-retest-cadence">
+            <view class="rule-retest-step" wx:for="{{ruleRetestPanel.cadence}}" wx:key="id">{{item.label}}｜{{item.action}}</view>
+          </view>
+          <view class="rule-retest-gate">{{ruleRetestPanel.releaseGate}}</view>
+          <button class="rule-retest-action" bindtap="runRuleRetestAction">去做复测挑战</button>
+        </view>
+
         <view class="transfer-practice-card" wx:if="{{current && transferPractice}}">
           <view class="card-label">{{transferPractice.title}}</view>
           <view class="transfer-status">{{transferPractice.statusLine}}</view>

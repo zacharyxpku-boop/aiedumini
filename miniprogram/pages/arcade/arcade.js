@@ -117,6 +117,7 @@ Page({
       : [];
     const loopBoundCards = this.loopBoundCards(dueCards.concat(fallbackCards).concat(questionBankPlayableCards), taskBoundCards, loopFocus);
     const cards = loopBoundCards.length ? loopBoundCards : (dueCards.length ? dueCards : (fallbackCards.length ? fallbackCards : taskBoundCards));
+    const ruleRetestCards = cards.filter((card) => card && card.type === 'real_trial_rule_retest');
     const profile = storage.loadGameProfile ? storage.loadGameProfile() : {};
     const reviewEvents = storage.loadReviewEvents ? storage.loadReviewEvents() : [];
     const evidenceBias = storage.buildEvidenceRouteBias ? storage.buildEvidenceRouteBias() : null;
@@ -161,7 +162,7 @@ Page({
       dailyQuestSet,
       adaptiveChallenge,
       questArcMission,
-      challengeBrief: this.buildChallengeBrief(dailyQuestSet, adaptiveChallenge, questArcMission, evidenceBias, subjectSkillDepth, curriculumSpine, courseUnitMap, courseUnitMasteryTrajectory, courseUnitQuestionBank, commercialDepthRunway, sevenSubjectMasterySprint, questionBankPlayableCards),
+      challengeBrief: this.buildChallengeBrief(dailyQuestSet, adaptiveChallenge, questArcMission, evidenceBias, subjectSkillDepth, curriculumSpine, courseUnitMap, courseUnitMasteryTrajectory, courseUnitQuestionBank, commercialDepthRunway, sevenSubjectMasterySprint, questionBankPlayableCards, ruleRetestCards),
       surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('arcade') : null,
       subjectSkillDepth,
       curriculumSpine,
@@ -297,7 +298,7 @@ Page({
     return arcade.buildWhackRound(cards, { limit: size });
   },
 
-  buildChallengeBrief(dailyQuestSet = {}, adaptiveChallenge = {}, questArcMission = null, evidenceBias = null, subjectSkillDepth = null, curriculumSpine = null, courseUnitMap = null, courseUnitMasteryTrajectory = null, courseUnitQuestionBank = null, commercialDepthRunway = null, sevenSubjectMasterySprint = null, questionBankPlayableCards = []) {
+  buildChallengeBrief(dailyQuestSet = {}, adaptiveChallenge = {}, questArcMission = null, evidenceBias = null, subjectSkillDepth = null, curriculumSpine = null, courseUnitMap = null, courseUnitMasteryTrajectory = null, courseUnitQuestionBank = null, commercialDepthRunway = null, sevenSubjectMasterySprint = null, questionBankPlayableCards = [], ruleRetestCards = []) {
     const quests = Array.isArray(dailyQuestSet.quests) ? dailyQuestSet.quests : [];
     const activeQuest = quests.find((item) => item && item.progress < item.target) || quests[0] || {};
     const mode = adaptiveChallenge.mode || 'balanced';
@@ -319,6 +320,21 @@ Page({
         subjectSkillDepth
       })
       : null;
+    const ruleRetestChallenge = Array.isArray(ruleRetestCards) && ruleRetestCards.length ? {
+      title: '规则复测挑战',
+      line: `${ruleRetestCards.length} 张复测卡进入本局：只说第一步、错因和回访检查点。`,
+      xpGate: 'XP 只奖励主动回忆和复测完成，不奖励速度、分数或排名。',
+      parentLine: '家长只看三段证据：今晚能说、明天能换题、第 7 天能迁移。',
+      cards: ruleRetestCards.slice(0, 3).map((card) => ({
+        id: card.id,
+        title: card.title || card.note || '复测卡',
+        prompt: card.question || card.prompt,
+        parentPrompt: card.parentPrompt,
+        releaseGate: card.realTrialRuleRetest && card.realTrialRuleRetest.releaseGate
+          ? card.realTrialRuleRetest.releaseGate
+          : '三段复测证据齐之前，不写长期掌握结论。'
+      }))
+    } : null;
     return {
       mode,
       modeLabel: labels[mode] || labels.balanced,
@@ -390,6 +406,11 @@ Page({
         ? `本局已接入 ${questionBankPlayableCards.length} 张题型卡：只练第一步、错因和回访，不新增完整答案。`
         : '',
       questionBankPlayableCards,
+      ruleRetestChallengeTitle: ruleRetestChallenge ? ruleRetestChallenge.title : '',
+      ruleRetestChallengeLine: ruleRetestChallenge ? ruleRetestChallenge.line : '',
+      ruleRetestChallengeXpGate: ruleRetestChallenge ? ruleRetestChallenge.xpGate : '',
+      ruleRetestChallengeParentLine: ruleRetestChallenge ? ruleRetestChallenge.parentLine : '',
+      ruleRetestChallengeCards: ruleRetestChallenge ? ruleRetestChallenge.cards : [],
       questionBankShareRelayDeckTitle: questionBankShareRelayDeck ? questionBankShareRelayDeck.title : '',
       questionBankShareRelayDeckLine: questionBankShareRelayDeck ? questionBankShareRelayDeck.gameRule : '',
       questionBankShareRelayParentLine: questionBankShareRelayDeck ? questionBankShareRelayDeck.parentDecisionLine : '',

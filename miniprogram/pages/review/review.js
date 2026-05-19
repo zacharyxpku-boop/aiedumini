@@ -142,6 +142,7 @@ Page({
       tonightPlan,
       routeStrip: this.buildRouteStrip('repair', tonightPlan),
       surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('review') : null,
+      ruleRetestPanel: this.buildRuleRetestPanel(current, cards),
       transferPractice: this.buildTransferPracticePanel(current),
       outcomeCheck: this.buildOutcomeCheckPanel(current),
       postRepairBridge: this.buildPostRepairBridge(current, {
@@ -266,6 +267,35 @@ Page({
       evidenceLine,
       parentLine: '家长只看三件事：孩子能否自己说第一步、能否换题、明天是否还记得。',
       actions
+    };
+  },
+
+  buildRuleRetestPanel(card, cards = []) {
+    const ruleCards = (Array.isArray(cards) ? cards : []).filter((item) => item && item.type === 'real_trial_rule_retest');
+    const active = card && card.type === 'real_trial_rule_retest' ? card : ruleCards[0];
+    if (!active) return null;
+    const retest = active.realTrialRuleRetest || {};
+    const cadence = Array.isArray(retest.cadence) && retest.cadence.length
+      ? retest.cadence
+      : [
+        { id: 'tonight', label: '今晚', action: '只说第一步和错因' },
+        { id: 'tomorrow', label: '明天', action: '换一道同类材料再说一次' },
+        { id: 'day7', label: '第 7 天', action: '确认能不能迁移' }
+      ];
+    return {
+      id: 'rule_retest_panel',
+      title: '规则复测卡',
+      badge: '不看答案 · 不比速度',
+      line: active.question || active.prompt || '换一道同类小题，只说第一步和错因。',
+      parentLine: active.parentPrompt || '家长只问：这次第一步是什么？为什么先做这一步？',
+      blackboardLine: active.blackboardHint || '小黑板只画第一步关系，不画完整解法。',
+      xpRule: active.xpRule || '奖励说清第一步、错因和回访，不奖励速度、分数或排名。',
+      releaseGate: retest.releaseGate || '三段复测证据齐之前，不写长期掌握结论。',
+      arcadeRoute: active.nextPracticePlan && active.nextPracticePlan.arcadeRoute
+        ? active.nextPracticePlan.arcadeRoute
+        : '/pages/arcade/arcade?from=rule_retest',
+      count: ruleCards.length,
+      cadence
     };
   },
 
@@ -1183,6 +1213,32 @@ Page({
         reason: action.reasonLine
       }
     }).catch(() => {});
+    navigation.navigateLearningRoute(route);
+  },
+
+  runRuleRetestAction() {
+    const panel = this.data.ruleRetestPanel || {};
+    const route = panel.arcadeRoute || '/pages/arcade/arcade?from=rule_retest';
+    if (storage.recordUnifiedNextAction) {
+      storage.recordUnifiedNextAction({
+        surface: 'review',
+        source: 'rule_retest_panel',
+        sourceLabel: '规则复测卡',
+        actionId: 'rule_retest_arcade',
+        actionLabel: '去做复测挑战',
+        route,
+        reasonLine: panel.line || '',
+        evidenceLine: panel.releaseGate || '',
+        shareIntent: panel.parentLine || ''
+      });
+    }
+    if (storage.appendReviewEvent) {
+      storage.appendReviewEvent({
+        kind: 'rule_retest_review_action',
+        route,
+        card_count: panel.count || 0
+      });
+    }
     navigation.navigateLearningRoute(route);
   },
 

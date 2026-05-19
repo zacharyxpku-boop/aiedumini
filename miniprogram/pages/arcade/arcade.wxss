@@ -283,6 +283,11 @@
   color: #756D63;
 }
 
+.rule-retest-mission {
+  border-color: rgba(27, 67, 50, 0.22);
+  background: rgba(27, 67, 50, 0.06);
+}
+
 .answer-review {
   margin-top: 22rpx;
   padding: 18rpx;
