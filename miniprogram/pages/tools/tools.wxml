@@ -40,7 +40,7 @@
         <view class="focus-review-title">{{toolsViewModel.primaryCard.title}}</view>
         <view class="focus-review-body">{{toolsViewModel.primaryCard.body}}</view>
       </view>
-      <view class="focus-review-arrow" bindtap="goArcade">{{toolsViewModel.primaryCta.text}}</view>
+      <view class="focus-review-arrow" bindtap="goFirstStep">{{toolsViewModel.primaryCta.text}}</view>
     </view>
     </view>
     </view>

@@ -31,17 +31,37 @@
         </view>
 
         <view class="family-summary-card rc14-main-card friend-profile-core">
-          <view class="family-summary-title">今晚卡住、只问一句、最近小结</view>
+          <view class="family-summary-title">5 秒行动卡：听一句、问一句、明天回访</view>
           <view class="family-summary-body family-readable">
             <view class="profile-empty-state" wx:if="{{profileSafeSummary.isEmpty}}">再用两晚后，咕点会帮你看见模式。</view>
+            <view class="parent-action-snapshot">
+              <view class="parent-action-head">
+                <text>家长今晚怎么做</text>
+                <text>{{profileSafeSummary.confidenceLabel}}</text>
+              </view>
+              <view class="parent-action-grid">
+                <view class="parent-action-chip" wx:for="{{profileSafeSummary.parentActionChecklist}}" wx:key="id">
+                  <text class="parent-action-label">{{item.label}}</text>
+                  <text class="parent-action-text">{{item.text}}</text>
+                </view>
+              </view>
+            </view>
             <view class="parent-brief-block">
               <text class="parent-brief-label">今晚卡住</text>
               <text>{{profileSafeSummary.stuckLine}}</text>
             </view>
             <view class="parent-brief-block">
+              <text class="parent-brief-label">第一步证据</text>
+              <text>{{profileSafeSummary.firstStepLine}}</text>
+            </view>
+            <view class="parent-brief-block">
               <text class="parent-brief-label">只问一句</text>
               <text>{{profileSafeSummary.parentQuestion}}</text>
               <button class="copy-action" bindtap="copyParentOneQuestion">复制</button>
+            </view>
+            <view class="parent-brief-block">
+              <text class="parent-brief-label">明天回访</text>
+              <text>{{profileSafeSummary.tomorrowRevisit}}</text>
             </view>
             <view class="parent-brief-block">
               <text class="parent-brief-label">最近小结</text>
@@ -50,6 +70,7 @@
               <text wx:if="{{profileSafeSummary.sevenNightSummary}}">{{profileSafeSummary.sevenNightSummary}}</text>
               <text wx:if="{{profileSafeSummary.weeklySummary}}">{{profileSafeSummary.weeklySummary}}</text>
             </view>
+            <view class="parent-brief-reason">{{profileSafeSummary.evidenceBoundaryLine}}</view>
           </view>
         </view>
 

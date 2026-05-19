@@ -1156,6 +1156,10 @@ Page({
     wx.navigateTo({ url: '/pages/arcade/arcade?from=tools' });
   },
 
+  goFirstStep() {
+    wx.navigateTo({ url: '/pages/tutor/tutor?from=tools_empty_revisit' });
+  },
+
   goHome() {
     wx.switchTab({ url: '/pages/home/home' });
   },

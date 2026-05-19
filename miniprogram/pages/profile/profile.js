@@ -735,10 +735,22 @@ function buildProfileSafeSummary(todayFocus, focusHistory = [], profileEmptyGuid
   const todaySession = storage.getTodaySession ? storage.getTodaySession() : null;
   const realSummary = storage.buildRecentLearningSummary ? storage.buildRecentLearningSummary() : null;
   const latestSession = focusHistory[0] || null;
+  const reviewCardsForFocus = storage.loadReviewCards
+    ? storage.loadReviewCards().filter((card) => card && (!todayFocus || card.sourceFocusId === todayFocus.id || card.source === 'today_focus'))
+    : [];
+  const reviewEventsForFocus = storage.loadReviewEvents
+    ? storage.loadReviewEvents().filter((event) => event && (!todayFocus || event.sourceFocusId === todayFocus.id || event.focusId === todayFocus.id || event.source === 'today_focus'))
+    : [];
   const childStep = String(
     (todaySession && todaySession.childArticulatedStep)
     || (todayFocus && (todayFocus.childArticulatedStep || todayFocus.childStepSentence || todayFocus.title))
     || (latestSession && (latestSession.linkedChildArticulatedStep || latestSession.linkedSystemSuggestedStep || latestSession.focusEvidenceText))
+    || ''
+  ).trim();
+  const systemStep = String(
+    (todaySession && todaySession.systemSuggestedStep)
+    || (todayFocus && (todayFocus.systemSuggestedStep || todayFocus.miniActionText || todayFocus.recommendation))
+    || (latestSession && latestSession.linkedSystemSuggestedStep)
     || ''
   ).trim();
   const stuckPoint = String(
@@ -747,6 +759,29 @@ function buildProfileSafeSummary(todayFocus, focusHistory = [], profileEmptyGuid
     || (latestSession && latestSession.linkedStuckPointText)
     || ''
   ).trim();
+  const firstStepLine = childStep
+    ? `孩子已经说出第一步：${childStep}`
+    : systemStep
+      ? `今晚先从这里开始：${systemStep}`
+      : '今晚先让孩子说出“我第一步准备看哪里”。';
+  const nextReviewCard = reviewCardsForFocus[0] || null;
+  const reviewEvidenceCount = reviewEventsForFocus.length;
+  const tomorrowRevisit = nextReviewCard && (nextReviewCard.front || nextReviewCard.title)
+    ? `明天先回看这张卡：${nextReviewCard.front || nextReviewCard.title}`
+    : reviewEvidenceCount
+      ? '明天换一道同类小题，只确认第一步还会不会卡。'
+      : '明天只用 3 分钟回访：让孩子复述今天这一步。';
+  const evidenceBoundaryLine = [
+    childStep ? '孩子原话' : '',
+    systemStep ? '建议第一步' : '',
+    reviewCardsForFocus.length ? '复习卡' : '',
+    reviewEvidenceCount ? '回访记录' : ''
+  ].filter(Boolean).join(' / ') || '本机暂未积累足够证据';
+  const parentActionChecklist = [
+    { id: 'listen', label: '先听', text: stuckPoint || childStep || '孩子今晚卡在哪里' },
+    { id: 'ask', label: '只问', text: storage.parentQuestionFromFirstStep ? storage.parentQuestionFromFirstStep(childStep || systemStep) : '你第一步先做了什么？' },
+    { id: 'revisit', label: '明天', text: tomorrowRevisit }
+  ];
   const days = focusHistory
     .slice(0, 7)
     .map((item) => String(item.completedAt || item.interruptedAt || item.startedAt || '').slice(0, 10))
@@ -756,6 +791,11 @@ function buildProfileSafeSummary(todayFocus, focusHistory = [], profileEmptyGuid
     isEmpty: !(childStep || stuckPoint || uniqueDays),
     stuckLine: stuckPoint || childStep || '今晚还没有记录。先让孩子说出自己的第一步。',
     parentQuestion: storage.parentQuestionFromFirstStep ? storage.parentQuestionFromFirstStep(childStep) : '你第一步先做了什么？',
+    firstStepLine,
+    tomorrowRevisit,
+    evidenceBoundaryLine: `证据来自：${evidenceBoundaryLine}。不展示完整对话，不给答案，不看排名。`,
+    confidenceLabel: uniqueDays >= 7 ? '7 晚较稳' : uniqueDays >= 3 ? '模式形成中' : '只看今晚',
+    parentActionChecklist,
     threeNightSummary: realSummary && realSummary.threeNightText ? realSummary.threeNightText : '',
     sevenNightSummary: realSummary && realSummary.sevenNightText ? realSummary.sevenNightText : '',
     realDays: realSummary && realSummary.latest7 ? realSummary.latest7 : [],
