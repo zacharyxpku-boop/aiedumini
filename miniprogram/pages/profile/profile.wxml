@@ -715,6 +715,10 @@
           <text wx:for="{{learningReportSummary.realTrialRecoveryRisks}}" wx:key="id">试用风险：{{item.label}} × {{item.count}}</text>
           <text wx:for="{{learningReportSummary.realTrialRecoveryQueue}}" wx:key="id">待转压力样本：{{item.subject}}｜{{item.taskType}}｜{{item.localTransform}}</text>
           <text wx:for="{{learningReportSummary.realTrialRecoveryLatest}}" wx:key="id">最近试用：{{item.subject}}｜第一步：{{item.firstStep}}｜错因：{{item.wrongCause}}</text>
+          <view class="real-trial-actions">
+            <button class="profile-small-primary" data-mode="zero_help" bindtap="recordRealTrialSample">记录一次零帮助完成</button>
+            <button class="profile-small-secondary" data-mode="needs_help" bindtap="recordRealTrialSample">记录一次卡住样本</button>
+          </view>
         </view>
         <view class="parent-brief-block" wx:if="{{learningReportSummary.reportPressureTruthAudit}}">
           <text class="parent-brief-label">{{learningReportSummary.reportPressureTruthAudit.title}}</text>

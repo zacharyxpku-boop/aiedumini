@@ -2952,6 +2952,18 @@ page {
   line-height: 1.45;
 }
 
+.real-trial-actions {
+  display: flex;
+  gap: 12rpx;
+  flex-wrap: wrap;
+  margin-top: 14rpx;
+}
+
+.real-trial-actions button {
+  flex: 1 1 260rpx;
+  min-width: 0;
+}
+
 
 @media (max-height: 700px) {
   .profile-page .parent-hero {

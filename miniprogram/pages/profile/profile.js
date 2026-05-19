@@ -2629,6 +2629,55 @@ Page({
     }
   },
 
+  recordRealTrialSample(event) {
+    const dataset = event.currentTarget.dataset || {};
+    const todayFocus = this.data.todayFocus || {};
+    const summary = this.data.learningReportSummary || {};
+    const subjectSkillDepth = this.data.subjectSkillDepth || {};
+    const latest = (summary.realTrialRecoveryLatest || [])[0] || {};
+    const sample = {
+      id: `profile_trial_${Date.now()}`,
+      subject: dataset.subject || subjectSkillDepth.subject || todayFocus.subject || latest.subject || '家庭作业',
+      taskType: dataset.taskType || subjectSkillDepth.taskType || todayFocus.taskType || latest.taskType || 'family_homework_trial',
+      childTask: todayFocus.sourceText || todayFocus.thought || todayFocus.title || summary.diagnosisLine || '今晚真实作业试用',
+      firstStep: todayFocus.childArticulatedStep || todayFocus.systemSuggestedStep || summary.ctaLabel || '先让孩子说出第一步',
+      wrongCause: todayFocus.wrongCause || summary.diagnosisLine || '待确认错因',
+      boardUse: summary.visualBoardLine || '小黑板只画第一步，不写最终答案',
+      parentCheck: summary.planLine || '家长只问：你第一步先看哪里？',
+      revisitPlan: summary.reportTodayActionLine || '明天换一道同类小题回看',
+      neededHelp: dataset.mode === 'needs_help',
+      droppedOff: dataset.mode === 'dropoff',
+      confusedStep: dataset.mode === 'needs_help' ? '孩子需要额外提示才说出第一步' : '',
+      privacyConcern: false,
+      sourceId: 'profile_real_trial_button'
+    };
+    if (storage.appendRealTrialSample) {
+      storage.appendRealTrialSample(sample);
+    }
+    if (storage.recordUnifiedNextAction) {
+      storage.recordUnifiedNextAction({
+        source: 'real_trial_recovery',
+        sourceLabel: '真实试用回收',
+        actionLabel: '把这次卡点转成压力样本',
+        reasonLine: '真实家庭试用比继续堆资料更能发现厚而不准的问题。',
+        evidenceLine: `${sample.subject}｜${sample.taskType}｜${sample.firstStep}`,
+        route: '/pages/profile/profile',
+        surface: 'profile'
+      });
+    }
+    if (storage.recordSurfaceDepthAction) {
+      storage.recordSurfaceDepthAction({
+        surface: 'profile',
+        dimensionId: 'real_trial_recovery_loop',
+        label: '真实试用回收',
+        route: '/pages/profile/profile',
+        readiness: 'real_trial_recovery'
+      });
+    }
+    wx.showToast({ title: '已记录真实试用', icon: 'success' });
+    this.refresh();
+  },
+
   goHome() {
     wx.switchTab({ url: '/pages/home/home' });
   },
