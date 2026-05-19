@@ -1295,6 +1295,15 @@ Page({
       peer_memory_relay_blocked_fields: highFrequencyPracticeLoop && highFrequencyPracticeLoop.peerMemoryRelayLeague
         ? highFrequencyPracticeLoop.peerMemoryRelayLeague.blockedFields.length
         : 0,
+      daily_memory_season_mode: highFrequencyPracticeLoop && highFrequencyPracticeLoop.dailyMemorySeasonPlan
+        ? highFrequencyPracticeLoop.dailyMemorySeasonPlan.mode
+        : '',
+      daily_memory_season_missions: highFrequencyPracticeLoop && highFrequencyPracticeLoop.dailyMemorySeasonPlan
+        ? highFrequencyPracticeLoop.dailyMemorySeasonPlan.missions.length
+        : 0,
+      daily_memory_season_blocked_fields: highFrequencyPracticeLoop && highFrequencyPracticeLoop.dailyMemorySeasonPlan
+        ? highFrequencyPracticeLoop.dailyMemorySeasonPlan.sharePayload.blockedFields.join(',')
+        : '',
       ninety_second_combo_mode: highFrequencyPracticeLoop && highFrequencyPracticeLoop.ninetySecondRecallComboEngine
         ? highFrequencyPracticeLoop.ninetySecondRecallComboEngine.mode
         : '',
@@ -1557,6 +1566,15 @@ Page({
         peer_memory_relay_blocked_fields: highFrequencyPracticeLoop && highFrequencyPracticeLoop.peerMemoryRelayLeague
           ? highFrequencyPracticeLoop.peerMemoryRelayLeague.blockedFields.length
           : 0,
+        daily_memory_season_mode: highFrequencyPracticeLoop && highFrequencyPracticeLoop.dailyMemorySeasonPlan
+          ? highFrequencyPracticeLoop.dailyMemorySeasonPlan.mode
+          : '',
+        daily_memory_season_missions: highFrequencyPracticeLoop && highFrequencyPracticeLoop.dailyMemorySeasonPlan
+          ? highFrequencyPracticeLoop.dailyMemorySeasonPlan.missions.length
+          : 0,
+        daily_memory_season_blocked_fields: highFrequencyPracticeLoop && highFrequencyPracticeLoop.dailyMemorySeasonPlan
+          ? highFrequencyPracticeLoop.dailyMemorySeasonPlan.sharePayload.blockedFields.join(',')
+          : '',
         ninety_second_combo_mode: highFrequencyPracticeLoop && highFrequencyPracticeLoop.ninetySecondRecallComboEngine
           ? highFrequencyPracticeLoop.ninetySecondRecallComboEngine.mode
           : '',

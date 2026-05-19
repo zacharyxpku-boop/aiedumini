@@ -1087,6 +1087,23 @@
           <text wx:for="{{learningReportSummary.sourceEvidenceLanes}}" wx:key="id">资料链路：{{item.label}}｜{{item.status}}｜可生成：{{item.canProduce}}｜还缺：{{item.evidenceMissing[0]}}｜禁用：{{item.aiBlocked}}</text>
           <text wx:for="{{learningReportSummary.sourceEvidenceRequired}}" wx:key="*this">报告证据：{{item}}</text>
         </view>
+        <view class="parent-brief-block" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossier}}">
+          <text class="parent-brief-label">{{learningReportSummary.uploadedMaterialDecisionDossierTitle}}</text>
+          <text>{{learningReportSummary.uploadedMaterialDecisionDossierSummary}}</text>
+          <text>{{learningReportSummary.uploadedMaterialDecisionDossierReportUseRule}}</text>
+          <text>{{learningReportSummary.uploadedMaterialDecisionDossierTalentRule}}</text>
+          <text>{{learningReportSummary.uploadedMaterialDecisionDossierWrongPaperRule}}</text>
+          <text>{{learningReportSummary.uploadedMaterialDecisionDossierSchoolRule}}</text>
+          <text>{{learningReportSummary.uploadedMaterialDecisionDossierChildStrengthLine}}</text>
+          <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierMaterialLanes}}" wx:key="id">上传链路：{{item.label}}｜{{item.collected ? '已接入' : '待补充'}}｜可说：{{item.canSay}}｜不可说：{{item.cannotSay}}｜产出：{{item.output}}</text>
+          <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierHowToLearnBetter}}" wx:key="id">怎么学候选：{{item.label}}｜证据：{{item.evidence}}｜验证：{{item.verifyWith}}</text>
+          <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierParentDecisionSections}}" wx:key="id">报告章节：{{item.label}}｜{{item.body}}</text>
+          <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierAiLocalSplit}}" wx:key="id">AI/本地分工：{{item.label}}｜{{item.owns}}</text>
+          <text wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierReleaseGate}}">放行门槛：{{learningReportSummary.uploadedMaterialDecisionDossierReleaseGate.status}}</text>
+          <text wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierShareSafePayload}}">分享安全：{{learningReportSummary.uploadedMaterialDecisionDossierShareSafePayload.allowedFields}} / 禁传 {{learningReportSummary.uploadedMaterialDecisionDossierShareSafePayload.blockedFields}}</text>
+          <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierNextEvidenceQueue}}" wx:key="id">下一证据：{{item.laneLabel}}｜{{item.label}}｜{{item.reason}}</text>
+          <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierEvidenceRequired}}" wx:key="*this">卷宗证据：{{item}}</text>
+        </view>
         <view class="parent-brief-block" wx:if="{{learningReportSummary.questionBankShareRelayDeck}}">
           <text class="parent-brief-label">{{learningReportSummary.questionBankShareRelayTitle}}</text>
           <text>{{learningReportSummary.questionBankShareRelayLine}}</text>

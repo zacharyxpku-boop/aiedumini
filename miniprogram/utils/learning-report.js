@@ -1993,6 +1993,126 @@ function buildSourceEvidenceLedger(input = {}, parts = {}, familyDecisionMemo = 
   };
 }
 
+function buildUploadedMaterialDecisionDossier(input = {}, parts = {}, sourceEvidenceLedger = {}, reportEvidenceReleaseGate = {}, portraitConfidenceSystem = {}) {
+  const lanes = Array.isArray(sourceEvidenceLedger.lanes) ? sourceEvidenceLedger.lanes : [];
+  const laneById = lanes.reduce((acc, lane) => {
+    acc[lane.id] = lane;
+    return acc;
+  }, {});
+  const safeHandoff = reportEvidenceReleaseGate.homeSchoolSafeHandoff || {};
+  const blockedFields = Array.from(new Set([]
+    .concat(Array.isArray(safeHandoff.blockedFields) ? safeHandoff.blockedFields : [])
+    .concat(['original_question', 'photo', 'full_answer', 'full_dialogue', 'score', 'ranking', 'talent_label', 'personality_label'])));
+  const collectedLanes = lanes.filter((lane) => lane.collected);
+  const nextQueue = Array.isArray(sourceEvidenceLedger.nextEvidenceQueue)
+    ? sourceEvidenceLedger.nextEvidenceQueue.slice(0, 6)
+    : [];
+  const methodHypotheses = [
+    {
+      id: 'visual_first',
+      label: '先看图/先画关系',
+      evidence: '来自测评或错题中的视觉化线索，只是方法候选。',
+      verifyWith: '用一道真实错题让孩子先画条件关系，再看是否能说出第一步。'
+    },
+    {
+      id: 'verbal_retell',
+      label: '先复述题意',
+      evidence: '来自阅读理解、应用题或老师反馈中的审题卡点。',
+      verifyWith: '隔天换一题，让孩子先复述对象、条件和目标。'
+    },
+    {
+      id: 'write_first_step',
+      label: '先动笔写第一步',
+      evidence: '来自计算、方程、推理或实验题里的启动困难。',
+      verifyWith: '第 7 天用小变式确认是否能迁移，而不是当场会。'
+    }
+  ];
+  const materialLanes = [
+    {
+      id: 'talent_assessment',
+      label: '天赋/学习偏好测评',
+      collected: !!(laneById.talent_assessment && laneById.talent_assessment.collected),
+      canSay: '可以说“更适合先试哪种学习方法”。',
+      cannotSay: '不能说“孩子天赋就是某一类”，也不能做升学、人格或长期能力定性。',
+      output: '学习方法候选和验证计划',
+      nextEvidence: '补一条真实错题第一步、一次隔天回访和第 7 天小变式。'
+    },
+    {
+      id: 'wrong_question_paper',
+      label: '错题/试卷',
+      collected: !!(laneById.wrong_question_paper && laneById.wrong_question_paper.collected),
+      canSay: '可以说当前错因、第一步和今晚修复动作。',
+      cannotSay: '不能自动给整卷答案、判分、排名或长期掌握结论。',
+      output: '错因卡、第一步小黑板、轻练习和间隔回访',
+      nextEvidence: '让孩子留下原想法和卡住的第一步。'
+    },
+    {
+      id: 'school_material',
+      label: '学校/老师材料',
+      collected: !!(laneById.school_material && laneById.school_material.collected),
+      canSay: '可以整理家校沟通摘要和观察问题。',
+      cannotSay: '不能替代老师判断，不能外传原题照片、排名或完整对话。',
+      output: '家校安全摘要和家庭配合动作',
+      nextEvidence: '补家庭观察和孩子复述证据。'
+    },
+    {
+      id: 'parent_report',
+      label: '家长观察',
+      collected: !!(laneById.parent_report && laneById.parent_report.collected),
+      canSay: '可以形成今晚低压陪伴动作。',
+      cannotSay: '不能把一次情绪或拖拉直接定性为能力问题。',
+      output: '家长 5 秒复盘和明天验收句',
+      nextEvidence: '补真实作业卡点和明天回访结果。'
+    }
+  ];
+  const collectedCount = materialLanes.filter((lane) => lane.collected).length;
+  const releaseStatus = reportEvidenceReleaseGate.releaseDecision || 'collect_more_evidence';
+  return {
+    id: 'uploaded_material_decision_dossier',
+    title: '上传资料到家庭决策报告',
+    status: collectedCount >= 2 ? 'multi_source_candidate' : 'collect_more_evidence',
+    summary: `已接入 ${collectedCount}/${materialLanes.length} 类资料；先输出方法候选和今晚动作，长期画像等回访证据齐了再放行。`,
+    reportUseRule: '上传材料只进入证据卷宗；本地代码决定证据权重、放行门槛、分享字段和下一步动作。',
+    talentRule: '天赋/学习偏好测评只能生成学习方法候选，必须用错题、第一步、隔天回访和第 7 天小变式验证。',
+    wrongPaperRule: '错题/试卷优先生成错因、第一步小黑板、轻练习和回访，不生成整卷答案或排名刺激。',
+    schoolRule: '学校/老师材料只生成家校安全摘要、观察问题和家庭配合动作，不替代老师判断。',
+    childStrengthLine: portraitConfidenceSystem.confidenceLevel === 'high'
+      ? '可以描述阶段性学习优势，但仍按“证据支持的学习方法”表达，不贴固定天赋标签。'
+      : '当前只能说“可能更适合的学习方法”，不能给孩子贴天赋或人格标签。',
+    howToLearnBetter: methodHypotheses,
+    materialLanes,
+    nextEvidenceQueue: nextQueue,
+    parentDecisionSections: [
+      { id: 'five_second', label: '5 秒结论', body: '今晚只做一个第一步动作，不追加题量。' },
+      { id: 'seven_day', label: '7 天验证', body: '第 1 天第一步，第 2 天回访，第 7 天小变式。' },
+      { id: 'monthly', label: '周/月画像', body: '只有跨周稳定后才更新长期画像和家校沟通摘要。' }
+    ],
+    aiLocalSplit: [
+      { id: 'local', label: '本地代码', owns: '资料分流、证据权重、放行门槛、分享字段、奖励和报告状态。' },
+      { id: 'ai', label: 'AI 更适合', owns: '苏格拉底追问、家长低压话术、小黑板解释、老师沟通摘要改写。' },
+      { id: 'blocked', label: '禁止交给 AI', owns: '天赋定性、人格标签、完整答案、自动判分、排名刺激、长期掌握结论。' }
+    ],
+    releaseGate: {
+      status: releaseStatus,
+      requiredEvidence: ['child_first_step', 'wrong_cause_card', 'next_day_revisit', 'day7_variant_result', 'two_week_stability_check'],
+      blockedFields
+    },
+    shareSafePayload: {
+      allowedFields: Array.isArray(safeHandoff.allowedFields) && safeHandoff.allowedFields.length
+        ? safeHandoff.allowedFields.slice(0, 8)
+        : ['tonight_action', 'method_candidate', 'next_evidence_needed', 'revisit_window'],
+      blockedFields
+    },
+    routeActions: [
+      { id: 'upload_more', label: '补资料', route: '/pages/upload/upload?from=uploaded_material_dossier' },
+      { id: 'ask_first_step', label: '问第一步', route: '/pages/tutor/tutor?from=uploaded_material_dossier' },
+      { id: 'review_revisit', label: '做回访', route: '/pages/review/review?from=uploaded_material_dossier' }
+    ],
+    collectedSourceIds: collectedLanes.map((lane) => lane.id),
+    evidenceRequired: ['source_type', 'method_candidate', 'child_first_step', 'wrong_cause_card', 'next_day_revisit', 'day7_variant_result', 'safe_share_fields']
+  };
+}
+
 function buildParentDecisionBook(input = {}) {
   const familyDecisionMemo = input.familyDecisionMemo || {};
   const tonightDecisionBrief = input.tonightDecisionBrief || {};
@@ -2336,6 +2456,7 @@ function buildLearningReportDraft(input = {}) {
   const homeSchoolConferenceKit = buildHomeSchoolConferenceKit(parts, diagnosisMatrix, homeSchoolCollaborationDigest, crossWeekTrendBoard, parentDecisionTrustSystem);
   const reportEvidenceReleaseGate = buildReportEvidenceReleaseGate(input, portraitDecisionReleaseSystem, crossWeekTrendBoard, homeSchoolCollaborationDigest, homeSchoolConferenceKit, portraitConfidenceSystem, portraitEvidenceMaturitySystem);
   const sourceEvidenceLedger = buildSourceEvidenceLedger(input, parts, familyDecisionMemo, reportEvidenceReleaseGate);
+  const uploadedMaterialDecisionDossier = buildUploadedMaterialDecisionDossier(input, parts, sourceEvidenceLedger, reportEvidenceReleaseGate, portraitConfidenceSystem);
   const tonightDecisionBrief = buildTonightDecisionBrief(parts, diagnosisMatrix, familyDecisionMemo, parentDecisionTrustSystem, questionBankRecallReportBridge, input.socraticPromptQualityJudge || null);
   const reportGameEvidence = input.gameEvidence || {};
   const reportHighFrequencyLoop = input.highFrequencyPracticeLoop || reportGameEvidence.highFrequencyPracticeLoop || {};
@@ -2419,6 +2540,7 @@ function buildLearningReportDraft(input = {}) {
     talentLearningMethodPlan: input.talentLearningMethodPlan || behaviorSignals.talentLearningMethodPlan || null,
     reportEvidenceReleaseGate,
     sourceEvidenceLedger,
+    uploadedMaterialDecisionDossier,
     homeworkPressureContext,
     tonightDecisionBrief,
     dailyReturnContract,
@@ -2477,6 +2599,7 @@ function buildLearningReportDraft(input = {}) {
     talentLearningMethodPlan: input.talentLearningMethodPlan || behaviorSignals.talentLearningMethodPlan || null,
     reportEvidenceReleaseGate,
     sourceEvidenceLedger,
+    uploadedMaterialDecisionDossier,
     homeworkPressureContext,
     tonightDecisionBrief,
     dailyReturnContract,
@@ -2521,6 +2644,7 @@ module.exports = {
   buildPortraitDecisionReleaseSystem,
   buildReportEvidenceReleaseGate,
   buildSourceEvidenceLedger,
+  buildUploadedMaterialDecisionDossier,
   buildParentDecisionBook,
   buildGameReturnEvidence,
   buildOpenMaicInspiredReportDecisionBridge,

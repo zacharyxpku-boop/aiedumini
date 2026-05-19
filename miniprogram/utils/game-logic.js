@@ -1572,6 +1572,69 @@ function buildPeerMemoryRelayLeague(dailyMemoryPrescription = {}, questionTypeCl
   };
 }
 
+function buildDailyMemorySeasonPlan(peerMemoryRelayLeague = {}, dailyMemoryPrescription = {}, adaptiveRecallScheduler = {}, result = {}, options = {}) {
+  const weakKey = options.weakKey || dailyMemoryPrescription.weakKey || peerMemoryRelayLeague.firstStep || 'first_step';
+  const wrong = Math.max(0, Number(result.wrong || 0));
+  const accuracy = Number.isFinite(Number(result.accuracy)) ? Number(result.accuracy) : 0;
+  const rescue = peerMemoryRelayLeague.mode === 'parent_only_until_stable'
+    || dailyMemoryPrescription.mode === 'rescue'
+    || wrong >= 2
+    || (accuracy > 0 && accuracy < 60);
+  const schedulerBoxes = Array.isArray(adaptiveRecallScheduler.schedulerBoxes)
+    ? adaptiveRecallScheduler.schedulerBoxes
+    : [];
+  const relayOpen = peerMemoryRelayLeague.mode === 'peer_relay_ready' && !rescue;
+  const seasonDays = [
+    { id: 'day_1', label: '第 1 天', mission: '遮住答案说第一步', proof: 'child_first_step', route: '/pages/review/review' },
+    { id: 'day_2', label: '第 2 天', mission: '同一错因隔天回访', proof: 'next_day_revisit', route: '/pages/review/review' },
+    { id: 'day_3', label: '第 3 天', mission: '换一个条件做小变式', proof: 'near_transfer_attempt', route: '/pages/tutor/tutor' },
+    { id: 'day_7', label: '第 7 天', mission: '确认是否写入长期画像', proof: 'day7_transfer_gate', route: '/pages/profile/profile' }
+  ];
+  const missions = seasonDays.map((day, index) => ({
+    id: `season_${day.id}`,
+    label: day.label,
+    action: index === 0
+      ? `围绕「${weakKey}」完成 90 秒主动回忆。`
+      : index === 1
+        ? `明天只回访「${weakKey}」最不稳的一张卡。`
+        : index === 2
+          ? rescue ? '错因未稳，先锁住变式。' : `用自己的材料做「${weakKey}」小变式。`
+          : '第 7 天仍能迁移，才进入长期画像。',
+    proof: day.proof,
+    route: day.route,
+    locked: rescue && index >= 2
+  }));
+  const nonRankingBoard = [
+    { id: 'self_streak', label: '自己连续回访', value: `${Number(result.streak || 0)} 天`, rule: '只和自己昨天比，不做同学排名。' },
+    { id: 'first_step_rate', label: '第一步证据', value: Number(result.correct || 0) >= 2 ? '已出现' : '待补', rule: '先看能否开口，不看速度。' },
+    { id: 'wrong_cause_quiet', label: '错因安静', value: wrong ? '待修复' : '暂稳定', rule: '同错因不复燃才解锁变式。' },
+    { id: 'relay_open', label: '安全接力', value: relayOpen ? '可开放' : '家长见证', rule: '接力者必须用自己的材料。' }
+  ];
+  const sharePayload = {
+    allowedFields: ['season_day', 'first_step_action', 'wrong_cause_label', 'return_window', 'parent_question', 'relay_mode'],
+    blockedFields: ['original_question', 'full_answer', 'photo', 'score', 'ranking', 'full_dialogue', 'private_comment'],
+    receiverRule: '接收者只能用自己的作业/错题复刻第一步，不能复制发送者原题或答案。',
+    relayMode: relayOpen ? 'safe_peer_relay' : 'parent_witness_only'
+  };
+  return {
+    id: 'daily_memory_season_plan',
+    title: rescue ? '7 天记忆赛季：先保守修复' : '7 天记忆赛季：可连续回流',
+    mode: rescue ? 'rescue_season' : 'growth_season',
+    currentDay: schedulerBoxes.length ? schedulerBoxes[0].label : '今晚',
+    weakKey,
+    seasonDays,
+    missions,
+    nonRankingBoard,
+    sharePayload,
+    parentLine: rescue
+      ? '家长今晚只见证第一步和错因修复；变式和同伴接力先锁住。'
+      : '家长看连续回访是否兑现；孩子能隔天说出第一步，再开放小变式。',
+    retentionLine: '目标不是刷题数量，而是 7 天内把第一步、错因、隔天回访和小变式连起来。',
+    aiBoundary: 'AI 可改写挑战文案；本地代码决定赛季天数、解锁、XP、分享字段和画像放行。',
+    evidenceRequired: ['daily_memory_season_plan', 'non_ranking_board', 'next_day_revisit', 'day7_transfer_gate', 'safe_share_payload', 'local_unlock_rule']
+  };
+}
+
 function buildMicroRecallPrescriptionEngine(dailyMemoryPrescription = {}, peerMemoryRelayLeague = {}, gizmoLikeMemoryProtocol = {}, result = {}, options = {}) {
   const weakKey = options.weakKey || dailyMemoryPrescription.weakKey || gizmoLikeMemoryProtocol.weakKey || 'first_step';
   const mode = dailyMemoryPrescription.mode || 'steady';
@@ -2001,6 +2064,13 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
     result,
     { weakKey }
   );
+  const dailyMemorySeasonPlan = buildDailyMemorySeasonPlan(
+    peerMemoryRelayLeague,
+    dailyMemoryPrescription,
+    adaptiveRecallScheduler,
+    result,
+    { weakKey }
+  );
   const microRecallPrescriptionEngine = buildMicroRecallPrescriptionEngine(
     dailyMemoryPrescription,
     peerMemoryRelayLeague,
@@ -2071,6 +2141,7 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
     dailyMemoryPrescription,
     questionTypeClusterMemoryProtocol,
     peerMemoryRelayLeague,
+    dailyMemorySeasonPlan,
     microRecallPrescriptionEngine,
     ninetySecondRecallComboEngine,
     realHomeworkPressureMemoryPrescription,
@@ -2083,7 +2154,7 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
       : '连续 2 次说清第一步，才进入变式练习。',
     parentShareLine: `家长复盘只看：孩子能否自己说出「${weakKey}」的第一步。`,
     nextRoute: needsRepair ? '/pages/review/review' : '/pages/tutor/tutor',
-    evidenceRequired: ['active_recall_cards', 'spaced_review_plan', 'review_return_seed', 'spaced_recall_policy', 'wrong_cause_return', 'quest_cadence', 'memory_feedback_controller', 'recall_intensity_plan', 'wrong_cause_replay_deck', 'xp_feedback_policy', 'quest_arc_runway', 'gizmo_like_memory_protocol', 'socratic_quality_memory_bridge', 'question_bank_memory_bridge', 'question_bank_recall_workout', 'daily_memory_sprint_deck', 'adaptive_recall_scheduler', 'memory_risk_release_model', 'memory_comeback_loop', 'daily_memory_prescription', 'question_type_cluster_memory_protocol', 'peer_memory_relay_league', 'micro_recall_prescription_engine', 'ninety_second_recall_combo_engine', 'real_homework_pressure_memory_prescription', 'daily_return_mission', 'daily_return_contract', 'next_day_return_evidence', 'parent_share_line'],
+    evidenceRequired: ['active_recall_cards', 'spaced_review_plan', 'review_return_seed', 'spaced_recall_policy', 'wrong_cause_return', 'quest_cadence', 'memory_feedback_controller', 'recall_intensity_plan', 'wrong_cause_replay_deck', 'xp_feedback_policy', 'quest_arc_runway', 'gizmo_like_memory_protocol', 'socratic_quality_memory_bridge', 'question_bank_memory_bridge', 'question_bank_recall_workout', 'daily_memory_sprint_deck', 'adaptive_recall_scheduler', 'memory_risk_release_model', 'memory_comeback_loop', 'daily_memory_prescription', 'question_type_cluster_memory_protocol', 'peer_memory_relay_league', 'daily_memory_season_plan', 'micro_recall_prescription_engine', 'ninety_second_recall_combo_engine', 'real_homework_pressure_memory_prescription', 'daily_return_mission', 'daily_return_contract', 'next_day_return_evidence', 'parent_share_line'],
     weakKey
   };
 }

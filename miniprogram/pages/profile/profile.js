@@ -1080,6 +1080,7 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
   const homeSchoolConferenceKit = reportState.homeSchoolConferenceKit || draft.homeSchoolConferenceKit || {};
   const reportEvidenceReleaseGate = reportState.reportEvidenceReleaseGate || draft.reportEvidenceReleaseGate || {};
   const sourceEvidenceLedger = reportState.sourceEvidenceLedger || draft.sourceEvidenceLedger || {};
+  const uploadedMaterialDecisionDossier = reportState.uploadedMaterialDecisionDossier || draft.uploadedMaterialDecisionDossier || {};
   const parentDecisionBook = reportState.parentDecisionBook || draft.parentDecisionBook || {};
   const matrix = Array.isArray(draft.diagnosisMatrix) ? draft.diagnosisMatrix : [];
   const tendencies = Array.isArray(draft.capabilityTendencies) ? draft.capabilityTendencies : [];
@@ -1646,6 +1647,23 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     sourceEvidenceSafestNextAction: sourceEvidenceLedger.safestNextAction || '',
     sourceEvidenceLanes: Array.isArray(sourceEvidenceLedger.lanes) ? sourceEvidenceLedger.lanes : [],
     sourceEvidenceRequired: Array.isArray(sourceEvidenceLedger.evidenceRequired) ? sourceEvidenceLedger.evidenceRequired : [],
+    uploadedMaterialDecisionDossier,
+    uploadedMaterialDecisionDossierTitle: uploadedMaterialDecisionDossier.title || '',
+    uploadedMaterialDecisionDossierSummary: uploadedMaterialDecisionDossier.summary || '',
+    uploadedMaterialDecisionDossierReportUseRule: uploadedMaterialDecisionDossier.reportUseRule || '',
+    uploadedMaterialDecisionDossierTalentRule: uploadedMaterialDecisionDossier.talentRule || '',
+    uploadedMaterialDecisionDossierWrongPaperRule: uploadedMaterialDecisionDossier.wrongPaperRule || '',
+    uploadedMaterialDecisionDossierSchoolRule: uploadedMaterialDecisionDossier.schoolRule || '',
+    uploadedMaterialDecisionDossierChildStrengthLine: uploadedMaterialDecisionDossier.childStrengthLine || '',
+    uploadedMaterialDecisionDossierHowToLearnBetter: Array.isArray(uploadedMaterialDecisionDossier.howToLearnBetter) ? uploadedMaterialDecisionDossier.howToLearnBetter : [],
+    uploadedMaterialDecisionDossierMaterialLanes: Array.isArray(uploadedMaterialDecisionDossier.materialLanes) ? uploadedMaterialDecisionDossier.materialLanes : [],
+    uploadedMaterialDecisionDossierNextEvidenceQueue: Array.isArray(uploadedMaterialDecisionDossier.nextEvidenceQueue) ? uploadedMaterialDecisionDossier.nextEvidenceQueue : [],
+    uploadedMaterialDecisionDossierParentDecisionSections: Array.isArray(uploadedMaterialDecisionDossier.parentDecisionSections) ? uploadedMaterialDecisionDossier.parentDecisionSections : [],
+    uploadedMaterialDecisionDossierAiLocalSplit: Array.isArray(uploadedMaterialDecisionDossier.aiLocalSplit) ? uploadedMaterialDecisionDossier.aiLocalSplit : [],
+    uploadedMaterialDecisionDossierReleaseGate: uploadedMaterialDecisionDossier.releaseGate || null,
+    uploadedMaterialDecisionDossierShareSafePayload: uploadedMaterialDecisionDossier.shareSafePayload || null,
+    uploadedMaterialDecisionDossierRouteActions: Array.isArray(uploadedMaterialDecisionDossier.routeActions) ? uploadedMaterialDecisionDossier.routeActions : [],
+    uploadedMaterialDecisionDossierEvidenceRequired: Array.isArray(uploadedMaterialDecisionDossier.evidenceRequired) ? uploadedMaterialDecisionDossier.evidenceRequired : [],
     portraitConfidenceTitle: portraitConfidenceSystem.title || '',
     portraitConfidenceLevel: portraitConfidenceSystem.confidenceLevel || '',
     portraitConfidenceScore: Number(portraitConfidenceSystem.evidenceScore || 0),

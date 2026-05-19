@@ -182,6 +182,22 @@
         <button bindtap="goTools">生成轻练习</button>
       </view>
 
+      <view class="intake-packet-card upload-report-cta" wx:if="{{lastReportCta}}">
+        <view class="intake-packet-head">
+          <view>
+            <view class="intake-packet-kicker">报告已生成</view>
+            <view class="intake-packet-title">{{lastReportCta.title}}</view>
+          </view>
+          <view class="intake-packet-pill">{{lastReportCta.sourceSchemaId}}</view>
+        </view>
+        <view class="intake-packet-feedback">{{lastReportCta.line}}</view>
+        <view class="intake-packet-boundary">禁传字段：{{lastReportCta.blockedFields}}</view>
+        <view class="upload-flow-actions">
+          <button bindtap="viewLatestReport">查看家长报告</button>
+          <button bindtap="runReportFollowupAction">{{lastReportCta.actionLabel}}</button>
+        </view>
+      </view>
+
       <view class="upload-detail-toggle">
         <view>
           <view class="upload-detail-title">咕点会怎么分</view>

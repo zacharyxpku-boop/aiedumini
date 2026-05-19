@@ -22,6 +22,7 @@ Page({
     uploadPlaybook: null,
     inputCoach: null,
     uploadIntakePacket: null,
+    lastReportCta: null,
     submitLabel: '生成今晚作业三分类',
     quickChips: [
       { label: '语文背诵', text: '语文背诵 1 篇，孩子容易卡在开头。' },
@@ -332,9 +333,36 @@ Page({
     };
   },
 
+  buildReportCta(decisionSource = {}, reportState = {}, options = {}) {
+    const sourceSchemaId = decisionSource.sourceSchemaId || 'parent_report';
+    const importedCards = Number(options.importedCards || 0);
+    const actionRoute = sourceSchemaId === 'wrong_question_paper'
+      ? '/pages/review/review?from=upload_report_ready'
+      : '/pages/tutor/tutor?from=upload_report_ready';
+    return {
+      title: sourceSchemaId === 'talent_assessment'
+        ? '测评已进入家长报告'
+        : sourceSchemaId === 'wrong_question_paper'
+          ? '错题已进入家长报告'
+          : '资料已进入家长报告',
+      line: sourceSchemaId === 'talent_assessment'
+        ? '这里只放行学习方法候选，不生成复习卡、不贴天赋标签；下一步用真实错题和回访验证。'
+        : sourceSchemaId === 'wrong_question_paper'
+          ? `已生成报告证据${importedCards ? `，并整理 ${importedCards} 张错题卡` : ''}；先看家长决策，再去修那一张卡。`
+          : '已生成资料证据卷宗；先看本次材料怎么用，再决定是否进入点拨或回访。',
+      route: '/pages/profile/profile?from=upload_report_ready',
+      actionRoute,
+      actionLabel: sourceSchemaId === 'wrong_question_paper' ? '去修这批错题' : '去问第一步',
+      sourceSchemaId,
+      reportId: reportState && reportState.reportDraft ? reportState.reportDraft.id : '',
+      blockedFields: decisionSource.blockedFields || ['original_question', 'full_answer', 'score', 'ranking']
+    };
+  },
+
   afterPrioritySaved(text, state, plan, mode) {
     const wrongbook = this.importWrongQuestionsToReview(text, state, plan);
     this.saveFocusFromUploadText(text, state, plan);
+    let latestReportCta = null;
     if (storage.buildLearningReportFromInput && storage.saveLearningReportState) {
       const profile = storage.loadProfile ? storage.loadProfile() : {};
       const uploadIntakePacket = this.data.uploadIntakePacket
@@ -411,17 +439,15 @@ Page({
         assessmentAnswers: []
       });
       storage.saveLearningReportState(reportState, { skipBuild: true });
+      latestReportCta = this.buildReportCta(decisionSource, reportState, { importedCards: wrongbook.imported });
     }
+    this.setData({ lastReportCta: latestReportCta });
     const toastTitle = wrongbook.imported
       ? `已整理 ${wrongbook.imported} 张错题卡`
       : (mode === 'server' ? '已完成三分类' : '本地完成分类');
     wx.showToast({ title: toastTitle, icon: 'success' });
     setTimeout(() => {
-      if (wrongbook.imported) {
-        wx.switchTab({ url: '/pages/review/review' });
-        return;
-      }
-      wx.navigateTo({ url: '/pages/tutor/tutor?from=upload' });
+      navigation.navigateLearningRoute((latestReportCta && latestReportCta.route) || '/pages/profile/profile?from=upload');
     }, 500);
   },
 
@@ -485,15 +511,19 @@ Page({
     const decisionSource = this.buildDecisionSource(uploadIntakePacket, text, { imported: false }, (uploadIntakePacket && uploadIntakePacket.reportSeed) || {});
     const structuredEvidenceSignals = this.buildStructuredEvidenceSignals(uploadIntakePacket, text);
     const profile = storage.loadProfile();
-    const result = reviewCards.importTextToDeck(text, {
-      subject: profile.subject || '',
-      weakPoint: this.data.materialType,
-      calibrationKey: `material:${this.data.materialType}`,
-      source: `material_${this.data.materialType}:${decisionSource.sourceSchemaId}`,
-      sourceSchemaId: decisionSource.sourceSchemaId,
-      releaseScope: decisionSource.releaseScope,
-      requiredNextEvidence: decisionSource.requiredNextEvidence
-    });
+    const shouldImportCards = decisionSource.sourceSchemaId !== 'talent_assessment';
+    const result = shouldImportCards
+      ? reviewCards.importTextToDeck(text, {
+        subject: profile.subject || '',
+        weakPoint: this.data.materialType,
+        calibrationKey: `material:${this.data.materialType}`,
+        source: `material_${this.data.materialType}:${decisionSource.sourceSchemaId}`,
+        sourceSchemaId: decisionSource.sourceSchemaId,
+        releaseScope: decisionSource.releaseScope,
+        requiredNextEvidence: decisionSource.requiredNextEvidence
+      })
+      : { imported: 0, skipped: 0, methodCandidateOnly: true };
+    let latestReportCta = null;
     if (storage.buildLearningReportFromInput && storage.saveLearningReportState) {
       const reportState = storage.buildLearningReportFromInput({
         mode: decisionSource.sourceSchemaId === 'wrong_question_paper' ? 'full' : 'standard',
@@ -517,13 +547,17 @@ Page({
         }, structuredEvidenceSignals)
       });
       storage.saveLearningReportState(reportState, { skipBuild: true });
+      latestReportCta = this.buildReportCta(decisionSource, reportState, { importedCards: result.imported });
     }
     this.setData({
       uploadIntakePacket,
-      lastDecisionSource: decisionSource
+      lastDecisionSource: decisionSource,
+      lastReportCta: latestReportCta
     });
     wx.showToast({
-      title: result.imported ? `已导入 ${result.imported} 张` : '已在复习库中',
+      title: shouldImportCards
+        ? (result.imported ? `已导入 ${result.imported} 张` : '已在复习库中')
+        : '已进入报告候选',
       icon: 'success'
     });
     this.updateMaterialPreview(text, this.data.materialType);
@@ -613,6 +647,25 @@ Page({
 
   goTools() {
     wx.switchTab({ url: '/pages/tools/tools' });
+  },
+
+  viewLatestReport() {
+    const cta = this.data.lastReportCta || {};
+    if (storage.recordSurfaceDepthAction) {
+      storage.recordSurfaceDepthAction({
+        surface: 'upload',
+        dimensionId: 'upload_to_report_material',
+        label: cta.title || 'upload_report_ready',
+        route: cta.route || '/pages/profile/profile',
+        readiness: cta.sourceSchemaId || 'report_ready'
+      });
+    }
+    navigation.navigateLearningRoute(cta.route || '/pages/profile/profile?from=upload_report_ready');
+  },
+
+  runReportFollowupAction() {
+    const cta = this.data.lastReportCta || {};
+    navigation.navigateLearningRoute(cta.actionRoute || '/pages/tutor/tutor?from=upload_report_ready');
   },
 
   runSurfaceDepthAction(event) {
