@@ -848,6 +848,103 @@ function buildK12PublicResourceTriageBoard(options = {}) {
   };
 }
 
+function buildPressureSampleFailureTypeAudit(options = {}) {
+  const samples = options.samples || getRealHomeworkPressureSamples();
+  const visualTokens = ['画', '圈', '标', '线', '图', '表', '箭头', '坐标', '模型', '流程', '分成', '对照', '列'];
+  const genericTokens = ['认真审题', '先读题', '仔细看题', '先理解题意', '按步骤做', '找关键词'];
+  const riskRows = [
+    { id: 'source_missing', label: '来源缺失', count: 0, localFix: '补 sourceId/sourceType，再进入压力库。' },
+    { id: 'first_step_generic', label: '第一步泛化', count: 0, localFix: '用本地题型路由生成样本专属第一步。' },
+    { id: 'wrong_cause_generic', label: '错因泛化', count: 0, localFix: '错因必须绑定题型和孩子卡住位置。' },
+    { id: 'board_not_visual', label: '小黑板不够可视化', count: 0, localFix: '补画、圈、标、线段、表格、箭头等第一笔动作。' },
+    { id: 'parent_check_weak', label: '家长检查不可执行', count: 0, localFix: '改成家长今晚能问的一句话。' },
+    { id: 'transfer_missing', label: '迁移回访缺失', count: 0, localFix: '补同错因小变式和明日回访窗口。' }
+  ];
+  const riskMap = riskRows.reduce((acc, row) => {
+    acc[row.id] = row;
+    return acc;
+  }, {});
+  const subjectMap = {};
+  const weakSamples = [];
+  samples.forEach((sample) => {
+    const risks = [];
+    const firstStep = String(sample.expectedFirstStep || '');
+    const wrongCause = String(sample.expectedWrongCause || '');
+    const boardMove = String(sample.expectedBoardMove || '');
+    const parentCheck = String(sample.parentCheck || '');
+    const nearTransfer = String(sample.nearTransfer || '');
+    if (!sample.sourceId || !sample.sourceType) risks.push('source_missing');
+    if (firstStep.length < 12 || genericTokens.some((token) => firstStep.includes(token))) risks.push('first_step_generic');
+    if (wrongCause.length < 10 || genericTokens.some((token) => wrongCause.includes(token))) risks.push('wrong_cause_generic');
+    if (!visualTokens.some((token) => boardMove.includes(token))) risks.push('board_not_visual');
+    if (parentCheck.length < 12 || !/[？?]|你|先|哪|为什么|怎么/.test(parentCheck)) risks.push('parent_check_weak');
+    if (nearTransfer.length < 12 || genericTokens.some((token) => nearTransfer.includes(token))) risks.push('transfer_missing');
+    const subject = sample.subject || '未标注';
+    if (!subjectMap[subject]) {
+      subjectMap[subject] = { id: subject, label: subject, total: 0, weak: 0, topRisk: '' };
+    }
+    subjectMap[subject].total += 1;
+    if (risks.length) {
+      subjectMap[subject].weak += 1;
+      risks.forEach((risk) => {
+        if (riskMap[risk]) riskMap[risk].count += 1;
+      });
+      weakSamples.push({
+        id: sample.id,
+        subject,
+        taskType: sample.taskType,
+        stem: sample.stem,
+        risks,
+        firstStep,
+        wrongCause,
+        boardMove,
+        repairRoute: '/pages/tutor/tutor?from=pressure_failure_audit',
+        localFix: risks.map((risk) => riskMap[risk] && riskMap[risk].localFix).filter(Boolean).join(' / ')
+      });
+    }
+  });
+  const subjectRows = Object.keys(subjectMap).map((key) => {
+    const row = subjectMap[key];
+    const subjectWeak = weakSamples.filter((item) => item.subject === key);
+    const topRisk = subjectWeak.length
+      ? subjectWeak.reduce((acc, item) => {
+        item.risks.forEach((risk) => { acc[risk] = (acc[risk] || 0) + 1; });
+        return acc;
+      }, {})
+      : {};
+    const topRiskId = Object.keys(topRisk).sort((a, b) => topRisk[b] - topRisk[a])[0] || 'none';
+    return Object.assign({}, row, {
+      weakRate: row.total ? Math.round(row.weak / row.total * 100) : 0,
+      topRisk: topRiskId,
+      nextAction: topRiskId === 'none' ? '继续收真实家庭样本。' : (riskMap[topRiskId] && riskMap[topRiskId].localFix) || '补样本证据。'
+    });
+  });
+  const topRiskRows = riskRows
+    .slice()
+    .sort((a, b) => b.count - a.count)
+    .filter((item) => item.count > 0);
+  const weakRate = samples.length ? Math.round(weakSamples.length / samples.length * 100) : 0;
+  return {
+    id: 'pressure_sample_failure_type_audit',
+    title: '压力样本反向抽检',
+    totalSamples: samples.length,
+    weakSampleCount: weakSamples.length,
+    weakRate,
+    status: weakSamples.length === 0 ? 'green' : weakRate <= 8 ? 'watch' : 'repair_first',
+    summary: weakSamples.length
+      ? `发现 ${weakSamples.length}/${samples.length} 条样本需要复核，先修本地题型、错因、小黑板、家长检查和回访，不继续堆资料。`
+      : `已反向抽检 ${samples.length} 条压力样本，暂未发现来源、第一步、错因、小黑板、家长检查和迁移回访的结构性待查项。`,
+    topRiskRows,
+    subjectRows,
+    weakSamples: weakSamples.slice(0, 12),
+    localRuleLine: '本地代码负责反向抽检、风险归因和修复优先级；AI 只能改写已经通过本地门槛的追问表达。',
+    stopRule: '若连续两轮待查项为 0 且没有新增真实家庭失败样本，停止静态加厚，转向真机和家庭试用。',
+    nextAction: weakSamples.length
+      ? '先修 topRiskRows 的本地规则，再把弱样本回灌到苏格拉底、报告、游戏和分享。'
+      : '进入真实家庭试用回收，把新失败样本追加到压力库。'
+  };
+}
+
 const K12_PUBLIC_IMPLEMENTATION_DECISION_MATRIX = [
   {
     id: 'homework_archetype_pressure',
@@ -1393,6 +1490,7 @@ function buildRealHomeworkCoverageMatrix(options = {}) {
   const totalSamples = subjectRows.reduce((sum, item) => sum + item.count, 0);
   const totalTypes = typeRows.length;
   const publicResourceTriageBoard = buildK12PublicResourceTriageBoard();
+  const pressureFailureTypeAudit = buildPressureSampleFailureTypeAudit();
   return {
     id: 'real_homework_coverage_matrix',
     title: '真实作业压力覆盖矩阵',
@@ -1414,6 +1512,7 @@ function buildRealHomeworkCoverageMatrix(options = {}) {
     publicK12HomeworkIntakeQueue: PUBLIC_K12_HOMEWORK_INTAKE_QUEUE,
     publicK12IntakeChallengeDeck: buildPublicK12IntakeChallengeDeck(),
     publicResourceTriageBoard,
+    pressureFailureTypeAudit,
     implementationDecisionMatrix: K12_PUBLIC_IMPLEMENTATION_DECISION_MATRIX,
     antiFakeThicknessGates: PUBLIC_K12_ANTI_FAKE_THICKNESS_GATES,
     implementationPlaybook: PUBLIC_K12_IMPLEMENTATION_PLAYBOOK,
@@ -1437,6 +1536,7 @@ function buildRealHomeworkCoverageMatrix(options = {}) {
     totalPublicAssetPipelines: PUBLIC_K12_ASSET_PIPELINE.length,
     totalPublicCandidateAssets: PUBLIC_K12_CANDIDATE_POOL.length,
     totalOpenSourceResources: PUBLIC_K12_OPEN_SOURCE_RESOURCE_LEDGER.length,
+    totalPressureWeakSamples: pressureFailureTypeAudit.weakSampleCount,
     totalHomeworkIntakeQueue: PUBLIC_K12_HOMEWORK_INTAKE_QUEUE.length,
     totalIntakeChallengeCards: PUBLIC_K12_HOMEWORK_INTAKE_QUEUE.length,
     totalQuestionTypeClusters: QUESTION_TYPE_CLUSTER_RUNWAY.length,
@@ -1475,5 +1575,6 @@ module.exports = {
   getRealHomeworkPressureSamples,
   buildPublicK12IntakeChallengeDeck,
   buildK12PublicResourceTriageBoard,
+  buildPressureSampleFailureTypeAudit,
   buildRealHomeworkCoverageMatrix
 };

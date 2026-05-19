@@ -1059,6 +1059,16 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     realHomeworkPublicResourceChallengeSeeds: realHomeworkCoverageMatrix && realHomeworkCoverageMatrix.publicResourceTriageBoard && Array.isArray(realHomeworkCoverageMatrix.publicResourceTriageBoard.sourceBackedChallengeSeeds)
       ? realHomeworkCoverageMatrix.publicResourceTriageBoard.sourceBackedChallengeSeeds
       : [],
+    pressureFailureTypeAudit: realHomeworkCoverageMatrix ? realHomeworkCoverageMatrix.pressureFailureTypeAudit : null,
+    pressureFailureTypeRisks: realHomeworkCoverageMatrix && realHomeworkCoverageMatrix.pressureFailureTypeAudit && Array.isArray(realHomeworkCoverageMatrix.pressureFailureTypeAudit.topRiskRows)
+      ? realHomeworkCoverageMatrix.pressureFailureTypeAudit.topRiskRows
+      : [],
+    pressureFailureTypeSubjects: realHomeworkCoverageMatrix && realHomeworkCoverageMatrix.pressureFailureTypeAudit && Array.isArray(realHomeworkCoverageMatrix.pressureFailureTypeAudit.subjectRows)
+      ? realHomeworkCoverageMatrix.pressureFailureTypeAudit.subjectRows
+      : [],
+    pressureFailureTypeSamples: realHomeworkCoverageMatrix && realHomeworkCoverageMatrix.pressureFailureTypeAudit && Array.isArray(realHomeworkCoverageMatrix.pressureFailureTypeAudit.weakSamples)
+      ? realHomeworkCoverageMatrix.pressureFailureTypeAudit.weakSamples
+      : [],
     realHomeworkIntakeQueue: realHomeworkCoverageMatrix && Array.isArray(realHomeworkCoverageMatrix.publicK12HomeworkIntakeQueue)
       ? realHomeworkCoverageMatrix.publicK12HomeworkIntakeQueue
       : [],
