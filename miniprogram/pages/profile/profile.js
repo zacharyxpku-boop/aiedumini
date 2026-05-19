@@ -1866,6 +1866,13 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     questionBankRecallReportShareBoundary: questionBankRecallReportBridge ? questionBankRecallReportBridge.shareBoundary : '',
     questionBankRecallReportIntensityLine: questionBankRecallReportBridge ? questionBankRecallReportBridge.intensityLine : '',
     questionBankRecallReportReturnWindowLine: questionBankRecallReportBridge ? questionBankRecallReportBridge.returnWindowLine : '',
+    questionBankRecallReportGreenWordLine: questionBankRecallReportBridge ? questionBankRecallReportBridge.greenWordLine : '',
+    questionBankRecallReportGreenWordCards: questionBankRecallReportBridge && Array.isArray(questionBankRecallReportBridge.greenWordCards)
+      ? questionBankRecallReportBridge.greenWordCards
+      : [],
+    questionBankRecallReportGreenWordModes: questionBankRecallReportBridge && Array.isArray(questionBankRecallReportBridge.greenWordModes)
+      ? questionBankRecallReportBridge.greenWordModes
+      : [],
     questionBankRecallReportCards: questionBankRecallReportBridge && Array.isArray(questionBankRecallReportBridge.workoutCards)
       ? questionBankRecallReportBridge.workoutCards
       : [],

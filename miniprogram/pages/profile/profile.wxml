@@ -1073,6 +1073,9 @@
           <text>{{learningReportSummary.questionBankRecallReportParentAction}}</text>
           <text wx:if="{{learningReportSummary.questionBankRecallReportIntensityLine}}">{{learningReportSummary.questionBankRecallReportIntensityLine}}</text>
           <text wx:if="{{learningReportSummary.questionBankRecallReportReturnWindowLine}}">{{learningReportSummary.questionBankRecallReportReturnWindowLine}}</text>
+          <text wx:if="{{learningReportSummary.questionBankRecallReportGreenWordLine}}">绿色考点：{{learningReportSummary.questionBankRecallReportGreenWordLine}}</text>
+          <text wx:for="{{learningReportSummary.questionBankRecallReportGreenWordCards}}" wx:key="id">挖空卡：{{item.label}}｜关键词：{{item.targetKeyword}}｜{{item.clozePrompt}}</text>
+          <text wx:for="{{learningReportSummary.questionBankRecallReportGreenWordModes}}" wx:key="id">渐进测验：{{item.label}}｜{{item.rule}}</text>
           <text>不刷量规则：{{learningReportSummary.questionBankRecallReportNoCramRule}}</text>
           <text>分享边界：{{learningReportSummary.questionBankRecallReportShareBoundary}}</text>
           <text wx:for="{{learningReportSummary.questionBankRecallReportCards}}" wx:key="id">训练卡：{{item.label}}｜{{item.action}}｜证据 {{item.proof}}</text>

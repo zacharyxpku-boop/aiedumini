@@ -8510,7 +8510,12 @@ function buildQuestionSampleCard(unit = {}, type = 'active_recall', index = 0, o
       blackboardMove: unit.blackboardBlueprint && unit.blackboardBlueprint.firstStroke ? unit.blackboardBlueprint.firstStroke : `小黑板只写：${label} -> 第一条已知条件。`,
       wrongCauseProbe: unit.wrongCauseAtlas && unit.wrongCauseAtlas[0] ? unit.wrongCauseAtlas[0] : '没有先说第一步，直接想答案。',
       nearTransferStem: `把数字、材料或语境换一下，仍然先复述${label}的第一步。`,
-      parentCheck: '家长只问：这题第一步你先看哪里？不追完整答案。'
+      parentCheck: '家长只问：这题第一步你先看哪里？不追完整答案。',
+      flashcardFront: `看到 ${label} 时先看哪里？`,
+      flashcardBack: unit.practiceLoop && unit.practiceLoop.recall ? unit.practiceLoop.recall : `先说出${label}的第一步。`,
+      quizPrompt: `把 ${label} 换一个数字或语境，第一步还一样吗？`,
+      spacedReviewWindow: '今晚 / 明天 / 第 7 天',
+      activeRecallPrompt: `不看答案，说出 ${label} 的第一步。`
     },
     wrong_cause: {
       sampleStem: `${subject}错题：孩子说“我会一点但卡住”，先定位卡在${label}的哪一环。`,
@@ -8518,7 +8523,12 @@ function buildQuestionSampleCard(unit = {}, type = 'active_recall', index = 0, o
       blackboardMove: unit.blackboardBlueprint && unit.blackboardBlueprint.visualPrompt ? unit.blackboardBlueprint.visualPrompt : `画出${label}和卡点之间的关系线。`,
       wrongCauseProbe: unit.wrongCauseAtlas && unit.wrongCauseAtlas[1] ? unit.wrongCauseAtlas[1] : `${label}证据不足。`,
       nearTransferStem: '换一道同类错题，只要求说出同一个错因是否还出现。',
-      parentCheck: '家长只听错因名称，不用当场讲解完整过程。'
+      parentCheck: '家长只听错因名称，不用当场讲解完整过程。',
+      flashcardFront: `这类 ${label} 错题卡在哪？`,
+      flashcardBack: unit.diagnosticProbes && unit.diagnosticProbes[0] ? unit.diagnosticProbes[0] : `先命名${label}的卡点。`,
+      quizPrompt: `换一道同类错题，错因还会出现吗？`,
+      spacedReviewWindow: '今晚 / 明天 / 第 7 天',
+      activeRecallPrompt: '先说出这道题卡住的位置。'
     },
     near_transfer: {
       sampleStem: `${subject}小变式：保留${label}的方法，换一个条件，检查孩子能不能迁移。`,
@@ -8526,7 +8536,12 @@ function buildQuestionSampleCard(unit = {}, type = 'active_recall', index = 0, o
       blackboardMove: unit.blackboardBlueprint && unit.blackboardBlueprint.stopRule ? unit.blackboardBlueprint.stopRule : '小黑板画到方法迁移点就停。',
       wrongCauseProbe: unit.wrongCauseAtlas && unit.wrongCauseAtlas[2] ? unit.wrongCauseAtlas[2] : '会做一次，但换题不能复述。',
       nearTransferStem: '同类题只换一个条件，让孩子先说“哪里没变，哪里变了”。',
-      parentCheck: '家长只判断方法能不能搬家，不用看刷题数量。'
+      parentCheck: '家长只判断方法能不能搬家，不用看刷题数量。',
+      flashcardFront: `换条件后，${label} 先看哪里没变？`,
+      flashcardBack: unit.practiceLoop && unit.practiceLoop.transfer ? unit.practiceLoop.transfer : `做一题${label}的小变式。`,
+      quizPrompt: '换一个条件，方法还能搬过去吗？',
+      spacedReviewWindow: '今晚 / 明天 / 第 7 天',
+      activeRecallPrompt: '先说哪里没变，哪里变了。'
     }
   };
   const sample = samples[type] || samples.active_recall;
@@ -8573,6 +8588,12 @@ function buildQuestionSampleCard(unit = {}, type = 'active_recall', index = 0, o
     wrongCauseProbe: sourceEvidence && sourceEvidence.wrongCauseProbe ? sourceEvidence.wrongCauseProbe : sample.wrongCauseProbe,
     nearTransferStem: sourceEvidence && sourceEvidence.nearTransferStem ? sourceEvidence.nearTransferStem : sample.nearTransferStem,
     parentCheck: sourceEvidence && sourceEvidence.parentCheck ? sourceEvidence.parentCheck : sample.parentCheck,
+    flashcardFront: sample.flashcardFront,
+    flashcardBack: sourceEvidence && sourceEvidence.firstStepHint ? sourceEvidence.firstStepHint : sample.flashcardBack,
+    quizPrompt: sample.quizPrompt,
+    spacedReviewWindow: sample.spacedReviewWindow,
+    activeRecallPrompt: sourceEvidence && sourceEvidence.firstStepHint ? `不看答案，说出：${sourceEvidence.firstStepHint}` : sample.activeRecallPrompt,
+    memoryLoopMode: 'flashcard_quiz_active_recall_spaced_review',
     sampleId: `${unit.id || 'unit'}_${type}_sample_${index + 1}`,
     classroomUse: '适合晚间作业 3 分钟低压练习，不作为考试押题。',
     evidenceRubric: [
@@ -8618,6 +8639,10 @@ function buildQuestionProgressionCard(unit = {}, card = {}, index = 0) {
     nextDayRevisit,
     masteryGate,
     parentEvidence,
+    flashcardMode: card.flashcardFront && card.flashcardBack ? `${card.flashcardFront} → ${card.flashcardBack}` : '',
+    quizMode: card.quizPrompt || '',
+    recallMode: card.activeRecallPrompt || entryTask,
+    spacedReviewWindows: card.spacedReviewWindow ? String(card.spacedReviewWindow).split(' / ') : ['今晚', '明天', '第 7 天'],
     visualBoardStep: visualMove,
     safetyBoundary: '只沉淀第一步、错因、近迁移和回访证据；不生成完整答案，不替孩子写过程。',
     classroomBridge: `${subject} 老师可用这张卡观察孩子是否真正会迁移，而不是只看今晚刷了几题。`

@@ -1595,6 +1595,8 @@ function buildQuestionBankRecallReportBridge(input = {}, parentDecisionTrust = {
   const workout = input.questionBankRecallWorkout || highFrequencyLoop.questionBankRecallWorkout || {};
   const workoutCards = Array.isArray(workout.workoutCards) ? workout.workoutCards : [];
   const phases = Array.isArray(workout.phases) ? workout.phases : [];
+  const greenWordClozeProtocol = workout.greenWordClozeProtocol || highFrequencyLoop.greenWordClozeProtocol || gameEvidence.greenWordClozeProtocol || {};
+  const greenWordCards = Array.isArray(greenWordClozeProtocol.clozeCards) ? greenWordClozeProtocol.clozeCards : [];
   const trustScore = Number(parentDecisionTrust.score || 0);
   const confidenceScore = Number(portraitConfidence.evidenceScore || 0);
   const hasWorkout = workoutCards.length >= 3 && phases.length >= 4;
@@ -1615,6 +1617,21 @@ function buildQuestionBankRecallReportBridge(input = {}, parentDecisionTrust = {
     parentActionLine: workout.parentDecisionLine || '家长只看训练阶段、回访窗口和掌握门槛，不看分数排名。',
     noCramRule: workout.noCramRule || '单次正确不升级长期画像；必须有明天回访和第 7 天小变式。',
     shareBoundary: workout.shareBoundary || '分享只带训练主题、第一步和回访时间，不带原题、答案、分数、排名或完整对话。',
+    greenWordClozeProtocol,
+    greenWordLine: greenWordClozeProtocol.status === 'ready'
+      ? `已把 ${greenWordCards.length} 张题型卡改成挖空关键词模式，先补关键词再回忆第一步。`
+      : '暂时还没有足够的挖空题卡，先回到题型卡和第一步点拨。',
+    greenWordModes: Array.isArray(greenWordClozeProtocol.progressiveQuizModes)
+      ? greenWordClozeProtocol.progressiveQuizModes.slice(0, 4)
+      : [],
+    greenWordCards: greenWordCards.slice(0, 4).map((item) => ({
+      id: item.id,
+      label: item.label,
+      targetKeyword: item.targetKeyword,
+      clozePrompt: item.clozePrompt,
+      nextMode: item.nextMode,
+      parentCheck: item.parentCheck
+    })),
     intensityLine: workout.intensityLine || '',
     returnWindowLine: workout.returnWindowLine || '',
     workoutCards: workoutCards.slice(0, 4).map((item) => ({
@@ -1629,7 +1646,7 @@ function buildQuestionBankRecallReportBridge(input = {}, parentDecisionTrust = {
       label: item.label,
       rule: item.rule
     })),
-    evidenceRequired: ['question_bank_recall_workout', 'workout_cards', 'recall_phases', 'parent_decision_trust', 'portrait_confidence'].concat(Array.isArray(workout.evidenceRequired) ? workout.evidenceRequired : []).slice(0, 10)
+    evidenceRequired: ['question_bank_recall_workout', 'green_word_cloze_protocol', 'workout_cards', 'recall_phases', 'parent_decision_trust', 'portrait_confidence'].concat(Array.isArray(workout.evidenceRequired) ? workout.evidenceRequired : []).slice(0, 10)
   };
 }
 
