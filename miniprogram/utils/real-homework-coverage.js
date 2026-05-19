@@ -37,25 +37,25 @@ function countRowsFromSamples(samples = [], field = 'subject', fallbackRows = []
 }
 
 const SUBJECT_COUNTS = [
-  { id: 'math', label: '数学', count: 77, nextGap: '比例、百分数、几何角、函数图像、二次函数顶点、全等证明、相似面积比、单位量比较、加权平均、统计抽样、概率、不放回样本空间、移项符号、分段收费、年龄同步时间点继续补跨学科词面误判样本。' },
-  { id: 'physics', label: '物理', count: 59, nextGap: '受力、光路、电路、串并联电流、浮力密度、压强面积、电路故障、欧姆定律变量控制、杠杆力臂、电功率、热效率、热传递、折射法线、状态变化和图像题继续补真实卡点。' },
-  { id: 'chemistry', label: '化学', count: 61, nextGap: '实验现象、气体验证、溶液质量分数、金属活动性、守恒、微粒观、酸碱指示剂、pH 加液方向、变量控制、开放体系、粗盐提纯、反应速率、溶解度曲线、过滤操作、离子共存和气体检验继续拆错因。' },
-  { id: 'english', label: '英语', count: 62, nextGap: '语法信号、现在完成时、比较级、被动语态、介词范围、主谓一致、定语从句、非谓语目的、状语从句 unless、代词指代、完形上下文、否定推断、标题题和逻辑连词继续扩样。' },
-  { id: 'biology', label: '生物', count: 59, nextGap: '显微镜高低倍、遗传显隐性、生态系统成分、呼吸作用、光合呼吸区分、人体双循环、血糖调节、反射弧、蒸腾作用、生态角色、能量流动和物质循环继续验证小黑板边界。' },
-  { id: 'geography', label: '地理', count: 61, nextGap: '经纬网、等高线河流流向、气候图、气候类型、交通/农业/工业区位、地球自转时差、纬度气温、南北半球季节、季风成因、板块边界、人口迁移继续验证空间和区位误判。' },
-  { id: 'chinese', label: '语文', count: 71, nextGap: '阅读概括、记叙文标题线索、议论文论据作用、词语语境义、古诗意象、修辞赏析、说明方法、说明语言、说明顺序、文言虚词、句式转换、写作起步、段落中心、关键瞬间细节、选材、语段衔接、结尾照应、病句修改继续压测。' }
+  { id: 'math', label: '数学', count: 79, nextGap: '比例、百分数、比例尺、几何角、函数图像、二次函数顶点、利润折扣方程、全等证明、相似面积比、单位量比较、加权平均、统计抽样、概率、不放回样本空间、移项符号、分段收费、年龄同步时间点继续补跨学科词面误判样本。' },
+  { id: 'physics', label: '物理', count: 61, nextGap: '受力、光路、折射法线、电路、串并联电流、浮力密度、压强面积、电路故障、欧姆定律变量控制、杠杆力臂、电功率、热效率、热传递、状态变化和图像题继续补真实卡点。' },
+  { id: 'chemistry', label: '化学', count: 63, nextGap: '实验现象、气体验证、溶液质量分数、金属活动性、守恒、微粒观、酸碱指示剂、pH 加液方向、变量控制、开放体系、粗盐提纯、反应速率、溶解度曲线、过滤操作、离子共存和气体检验继续拆错因。' },
+  { id: 'english', label: '英语', count: 64, nextGap: '语法信号、现在完成时、比较级、被动语态、介词范围、主谓一致、定语从句、非谓语目的、状语从句 unless、代词指代、完形上下文、转折信号、否定推断、标题题和逻辑连词继续扩样。' },
+  { id: 'biology', label: '生物', count: 61, nextGap: '显微镜高低倍、遗传显隐性、生态系统成分、呼吸作用、光合作用变量、人体双循环、血糖调节、反射弧、蒸腾作用、生态角色、能量流动和物质循环继续验证小黑板边界。' },
+  { id: 'geography', label: '地理', count: 63, nextGap: '经纬网、等高线河流流向、气候图、气候类型、交通/农业/工业区位、纬度气温、地球自转时差、南北半球季节、季风成因、板块边界、人口迁移继续验证空间和区位误判。' },
+  { id: 'chinese', label: '语文', count: 73, nextGap: '阅读概括、记叙文标题线索、议论文论据作用、说明方法作用、词语语境义、古诗意象、修辞赏析、说明语言、说明顺序、文言虚词、句式转换、写作起步、段落中心、关键瞬间细节、选材、语段衔接、结尾照应、病句修改继续压测。' }
 ];
 
 const TYPE_COUNTS = [
-  { id: 'math_word_problem', label: '数学应用/建模', count: 58, firstStep: '先翻译数量关系、图形关系、变化基准、统计总量、加权人数、抽样代表性、概率分母、不放回样本空间、比例份数、隐藏单位、单位量、函数坐标、二次函数顶点、全等对应条件或相似维度。' },
-  { id: 'equation_setup', label: '方程/不等式建模', count: 19, firstStep: '先设未知数、写等量或不等量关系，或拆浓度、分段收费边界、不等式负数变号规则、移项符号、年龄同步时间点。' },
-  { id: 'physics_diagram', label: '物理图解', count: 59, firstStep: '先定对象、方向、单位、路径、串并联分支、力臂、受力面积、电表位置、故障位置、控制变量、法线、功率时间、热量方向、热效率输入输出、浮力决定量、状态变化或决定量。' },
-  { id: 'chemistry_experiment', label: '化学实验/变化', count: 61, firstStep: '先列反应物、现象、体系边界、微粒解释、守恒关系、唯一变量、酸碱性质、金属活动性、溶液总质量、pH 起点方向、过滤/提纯条件、同一温度溶解度、离子共存排查和气体检验试剂。' },
-  { id: 'english_sentence', label: '英语句法/上下文', count: 49, firstStep: '先找时态、持续时间信号、真正主语、比较、被动、介词范围、先行词、从句成分、非谓语目的、unless 逻辑、否定题干、代词指代或上下文信号。' },
-  { id: 'reading_question', label: '阅读证据', count: 61, firstStep: '先判断题目类型，再回文定位证据、标题线索、议论文观点、意象、词语语境义、修辞本体喻体、说明方法、说明语言、文言功能、说明顺序、标题中心或推断行为。' },
-  { id: 'biology_process', label: '生物过程', count: 59, firstStep: '先分结构、功能、方向、变量、能量流动、物质循环、生态角色、调节路径、显微镜操作、显隐性基因、表现型基因型、光合呼吸条件、蒸腾路径、生态成分、过程条件或循环路径。' },
-  { id: 'geography_map', label: '地理图示', count: 61, firstStep: '先看图例、方向、经纬、纬度热量、半球季节、地球自转方向、海拔、等高线形态、河流高低流向、太阳高度、气候证据、农业/工业区位条件、水汽来源、板块边界、人口迁移推拉力或成因链。' },
-  { id: 'writing_process', label: '写作过程', count: 23, firstStep: '先写一句朴素事实、段落中心、一个关键瞬间、一个动作语言心理细节、结尾照应、语段顺序、修改成分残缺或选一个核心材料，不追求完整成文。' }
+  { id: 'math_word_problem', label: '数学应用/建模', count: 59, firstStep: '先翻译数量关系、比例尺、图形关系、变化基准、统计总量、加权人数、抽样代表性、概率分母、不放回样本空间、比例份数、隐藏单位、单位量、函数坐标、二次函数顶点、全等对应条件或相似维度。' },
+  { id: 'equation_setup', label: '方程/不等式建模', count: 20, firstStep: '先设未知数、写等量或不等量关系，或拆利润折扣、浓度、分段收费边界、不等式负数变号规则、移项符号、年龄同步时间点。' },
+  { id: 'physics_diagram', label: '物理图解', count: 61, firstStep: '先定对象、方向、单位、路径、串并联分支、力臂、受力面积、电表位置、故障位置、控制变量、法线、功率时间、热量方向、热效率输入输出、浮力决定量、状态变化或决定量。' },
+  { id: 'chemistry_experiment', label: '化学实验/变化', count: 63, firstStep: '先列反应物、现象、体系边界、微粒解释、守恒关系、唯一变量、酸碱性质、金属活动性、溶液总质量、pH 起点方向、过滤/提纯条件、同一温度溶解度、离子共存排查和气体检验试剂。' },
+  { id: 'english_sentence', label: '英语句法/上下文', count: 50, firstStep: '先找时态、持续时间信号、真正主语、比较、被动、介词范围、先行词、从句成分、非谓语目的、unless 逻辑、否定题干、代词指代或上下文信号。' },
+  { id: 'reading_question', label: '阅读证据', count: 63, firstStep: '先判断题目类型，再回文定位证据、标题线索、议论文观点、说明方法作用、意象、词语语境义、修辞本体喻体、说明语言、文言功能、说明顺序、标题中心或推断行为。' },
+  { id: 'biology_process', label: '生物过程', count: 61, firstStep: '先分结构、功能、方向、变量、能量流动、物质循环、生态角色、调节路径、显微镜操作、显隐性基因、表现型基因型、光合呼吸条件、人体循环路径、蒸腾路径、生态成分、过程条件或循环路径。' },
+  { id: 'geography_map', label: '地理图示', count: 63, firstStep: '先看图例、方向、经纬、纬度热量、半球季节、地球自转方向、海拔、等高线形态、河流高低流向、太阳高度、气候证据、农业/工业区位条件、水汽来源、板块边界、人口迁移推拉力或成因链。' },
+  { id: 'writing_process', label: '写作过程', count: 24, firstStep: '先写一句朴素事实、段落中心、一个关键瞬间、一个动作语言心理细节、结尾照应、语段顺序、修改成分残缺或选一个核心材料，不追求完整成文。' }
 ];
 
 const SAMPLE_CLUSTERS = [
@@ -382,6 +382,64 @@ const PUBLIC_K12_CANDIDATE_POOL = [
     sampleSeed: '把“孩子不认真”改写成“卡在审题、第一步、错因复现还是迁移”。',
     miniappLanding: ['/pages/profile/profile', '/pages/review/review'],
     nextAction: '把家校摘要固定成问题清单，不做诊断结论。'
+  }
+];
+
+const PUBLIC_K12_OPEN_SOURCE_RESOURCE_LEDGER = [
+  {
+    id: 'smartedu_official_resource',
+    label: '国家中小学智慧教育平台',
+    sourceType: 'official_public_resource',
+    directUse: ['课程主题', '作业风格', '课堂活动方向', '减负边界'],
+    localizeAsCode: ['subject_lane', 'task_type', 'wrong_cause_seed', 'parent_check_line'],
+    aiBetterFor: ['把课堂语言改写成孩子第一步追问'],
+    mustNotUse: ['搬运原题全文', '输出完整答案', '宣称官方合作或官方题库'],
+    miniappLanding: ['/pages/home/home', '/pages/tutor/tutor', '/pages/profile/profile'],
+    acceptanceGate: ['source_boundary_logged', 'sample_rewritten', 'no_answer_bank']
+  },
+  {
+    id: 'moe_2022_curriculum_standard',
+    label: '教育部 2022 义务教育课标',
+    sourceType: 'official_standard',
+    directUse: ['学段能力框架', '学科核心概念', '学业质量方向'],
+    localizeAsCode: ['capability_axis', 'course_unit_spine', 'mastery_gate', 'report_dimension'],
+    aiBetterFor: ['把能力目标翻译成家长和孩子能听懂的话'],
+    mustNotUse: ['大段复制标准正文', '把课标当题库', '让 AI 判定掌握等级'],
+    miniappLanding: ['/pages/module/module', '/pages/profile/profile'],
+    acceptanceGate: ['capability_tag_exists', 'local_mastery_gate', 'parent_readable_line']
+  },
+  {
+    id: 'phet_simulation_oer',
+    label: 'PhET 互动仿真',
+    sourceType: 'open_education_resource',
+    directUse: ['物理/化学/生物/数学可视化机制参考', '变量控制活动结构', '互动小黑板灵感'],
+    localizeAsCode: ['visual_board_layer', 'variable_control_prompt', 'exit_criteria', 'no_full_solution_boundary'],
+    aiBetterFor: ['解释为什么先看这个变量或先画这一笔'],
+    mustNotUse: ['直接嵌入未适配仿真当作小程序能力', '承诺全科动态板书', '让 AI 生成实验结论'],
+    miniappLanding: ['/pages/tutor/tutor', '/pages/arcade/arcade'],
+    acceptanceGate: ['first_step_visual_only', 'variable_named', 'answer_boundary_visible']
+  },
+  {
+    id: 'ck12_flexbook_practice',
+    label: 'CK-12 FlexBook / Practice',
+    sourceType: 'open_k12_stem_resource',
+    directUse: ['STEM 概念层级参考', '自适应练习机制参考', '题型标签方向'],
+    localizeAsCode: ['question_type_card', 'adaptive_recall_policy', 'mastery_threshold', 'leech_rule'],
+    aiBetterFor: ['把概念解释成中文家庭作业场景下的一句话'],
+    mustNotUse: ['复制练习题和答案', '把外部自适应分数当本地画像', '用英文内容直接前台展示'],
+    miniappLanding: ['/pages/arcade/arcade', '/pages/review/review', '/pages/profile/profile'],
+    acceptanceGate: ['localized_task_type', 'xp_local_rule', 'no_external_score_import']
+  },
+  {
+    id: 'openstax_high_school_reference',
+    label: 'OpenStax 高中/基础 STEM 开放教材',
+    sourceType: 'open_textbook_reference',
+    directUse: ['概念解释结构', '术语层级', '章节脉络参考'],
+    localizeAsCode: ['concept_ladder', 'glossary_guardrail', 'course_unit_backlog'],
+    aiBetterFor: ['把概念解释改写成中文小黑板旁白'],
+    mustNotUse: ['直接搬运教材段落', '复制习题答案', '把大学教材难度下放给小初学生'],
+    miniappLanding: ['/pages/module/module', '/pages/tutor/tutor'],
+    acceptanceGate: ['age_band_adapted', 'no_copied_paragraph', 'first_step_only']
   }
 ];
 
@@ -856,6 +914,7 @@ function buildRealHomeworkCoverageMatrix(options = {}) {
     publicSourcePolicy: PUBLIC_K12_USE_POLICY,
     publicK12AssetPipeline: PUBLIC_K12_ASSET_PIPELINE,
     publicK12CandidatePool: PUBLIC_K12_CANDIDATE_POOL,
+    publicK12OpenSourceResourceLedger: PUBLIC_K12_OPEN_SOURCE_RESOURCE_LEDGER,
     publicK12UseWorkbench: PUBLIC_K12_USE_WORKBENCH,
     implementationDecisionMatrix: K12_PUBLIC_IMPLEMENTATION_DECISION_MATRIX,
     antiFakeThicknessGates: PUBLIC_K12_ANTI_FAKE_THICKNESS_GATES,
@@ -864,6 +923,7 @@ function buildRealHomeworkCoverageMatrix(options = {}) {
     publicWorkbenchLine: `已把 ${PUBLIC_K12_USE_WORKBENCH.length} 类可用资料拆成“可直接用 / 本地代码更好 / AI 更好 / 禁用”四格决策。`,
     publicAssetPipelineLine: `已把 ${PUBLIC_K12_ASSET_PIPELINE.length} 类公开/一方/竞品资料转成采集-本地化-禁用-落地页面流水线。`,
     publicCandidatePoolLine: `已把 ${PUBLIC_K12_CANDIDATE_POOL.length} 条可扩内容候选按 A+/A/B 分级，先过本地化和禁用字段检查再进入样本库。`,
+    openSourceResourceLine: `已把 ${PUBLIC_K12_OPEN_SOURCE_RESOURCE_LEDGER.length} 类开源/OER/官方公开资料拆成“直接可用、需本地化、AI 可改写、必须禁用”的产品账本。`,
     publicSourceLine: `已把 ${PUBLIC_K12_SOURCE_LEDGER.length} 类公开/一方资料沉淀为本地规则资产：题型、错因、第一步、小黑板、回访、报告和分享边界。`,
     publicSourceBlockedLine: '禁止把公开资料变成原题答案库、拍照搜题承诺、排名晒分或全科动态板书承诺。',
     antiFakeThicknessLine: `已把 ${PUBLIC_K12_ANTI_FAKE_THICKNESS_GATES.length} 类“看起来厚但实际不准”的风险做成硬门槛：来源、苏格拉底、小黑板、记忆游戏、报告画像和分享增长都必须有证据再放行。`,
@@ -876,6 +936,7 @@ function buildRealHomeworkCoverageMatrix(options = {}) {
     totalPublicSources: PUBLIC_K12_SOURCE_LEDGER.length,
     totalPublicAssetPipelines: PUBLIC_K12_ASSET_PIPELINE.length,
     totalPublicCandidateAssets: PUBLIC_K12_CANDIDATE_POOL.length,
+    totalOpenSourceResources: PUBLIC_K12_OPEN_SOURCE_RESOURCE_LEDGER.length,
     totalQuestionTypeClusters: QUESTION_TYPE_CLUSTER_RUNWAY.length,
     totalLongitudinalPressureScenarios: LONGITUDINAL_PRESSURE_SCENARIO_LEDGER.length,
     reportLine: `报告可引用 ${totalSamples} 个压力样本的第一步、错因、小黑板和回访动作。`,
@@ -901,6 +962,7 @@ module.exports = {
   PUBLIC_K12_USE_POLICY,
   PUBLIC_K12_ASSET_PIPELINE,
   PUBLIC_K12_CANDIDATE_POOL,
+  PUBLIC_K12_OPEN_SOURCE_RESOURCE_LEDGER,
   PUBLIC_K12_USE_WORKBENCH,
   PUBLIC_K12_ANTI_FAKE_THICKNESS_GATES,
   PUBLIC_K12_IMPLEMENTATION_PLAYBOOK,
