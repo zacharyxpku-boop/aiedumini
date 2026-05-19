@@ -149,6 +149,13 @@ const QUICK_ASSESSMENT_QUESTIONS = [
   }
 ];
 
+let openMaicInspiredPlanUtils = null;
+try {
+  openMaicInspiredPlanUtils = require('./openmaic-inspired-plan');
+} catch (error) {
+  openMaicInspiredPlanUtils = null;
+}
+
 function nowIso(nowInput) {
   const date = nowInput instanceof Date ? nowInput : new Date(nowInput || Date.now());
   return Number.isNaN(date.getTime()) ? new Date().toISOString() : date.toISOString();
@@ -2190,6 +2197,85 @@ function buildGameReturnEvidence(input = {}) {
   };
 }
 
+function buildOpenMaicInspiredReportDecisionBridge(input = {}) {
+  if (!openMaicInspiredPlanUtils || !openMaicInspiredPlanUtils.buildOpenMaicInspiredTaskPlan || !openMaicInspiredPlanUtils.buildOpenMaicInspiredDecisionBridge) {
+    return null;
+  }
+  const parts = input.parts || {};
+  const behaviorSignals = parts.behaviorSignals || {};
+  const homeworkPressureContext = input.homeworkPressureContext || {};
+  const familyDecisionMemo = input.familyDecisionMemo || {};
+  const tonightDecisionBrief = input.tonightDecisionBrief || {};
+  const gameReturnEvidence = input.gameReturnEvidence || {};
+  const subject = homeworkPressureContext.subject || behaviorSignals.subject || 'current_subject';
+  const taskType = input.taskType || behaviorSignals.taskType || homeworkPressureContext.taskType || 'homework_decision_bridge';
+  const pressureSignal = Object.assign({
+    taskType,
+    subject,
+    firstStep: homeworkPressureContext.firstStep
+      || behaviorSignals.firstStep
+      || behaviorSignals.childFirstStep
+      || (familyDecisionMemo.decisionCard && familyDecisionMemo.decisionCard.firstStep)
+      || tonightDecisionBrief.nextAction
+      || '',
+    wrongCause: homeworkPressureContext.wrongCause
+      || behaviorSignals.wrongCause
+      || behaviorSignals.weakPoint
+      || (familyDecisionMemo.decisionCard && familyDecisionMemo.decisionCard.cause)
+      || '',
+    parentCheck: homeworkPressureContext.parentQuestion
+      || behaviorSignals.parentQuestion
+      || (familyDecisionMemo.parentMeetingScript && familyDecisionMemo.parentMeetingScript[0])
+      || '',
+    reviewMove: gameReturnEvidence.nextDayReplay
+      || gameReturnEvidence.day7Requirement
+      || (Array.isArray(gameReturnEvidence.returnWindows) ? gameReturnEvidence.returnWindows[0] : '')
+      || ''
+  }, input.pressureSignal || {});
+  const plan = input.plan || openMaicInspiredPlanUtils.buildOpenMaicInspiredTaskPlan({
+    taskType,
+    pressureSignal
+  });
+  const reportSummary = {
+    familyDecisionHomepageHeadline: familyDecisionMemo.decisionLine
+      || familyDecisionMemo.tonightDecision
+      || tonightDecisionBrief.title
+      || '',
+    familyDecisionHomepageNextLocalAction: tonightDecisionBrief.tonightDo && tonightDecisionBrief.tonightDo[0]
+      || familyDecisionMemo.nextAction
+      || pressureSignal.firstStep
+      || '',
+    familyDecisionHomepageShareBoundary: familyDecisionMemo.shareBoundary
+      || (tonightDecisionBrief.sharePayload && Array.isArray(tonightDecisionBrief.sharePayload.blocked_fields)
+        ? `blocked: ${tonightDecisionBrief.sharePayload.blocked_fields.join(', ')}`
+        : '')
+  };
+  const reviewSummary = {
+    nextStep: pressureSignal.reviewMove || pressureSignal.parentCheck || ''
+  };
+  const bridge = openMaicInspiredPlanUtils.buildOpenMaicInspiredDecisionBridge(
+    plan,
+    reportSummary,
+    reviewSummary,
+    gameReturnEvidence
+  );
+  return Object.assign({}, bridge, {
+    sourcePolicy: plan.sourcePolicy || null,
+    planId: plan.id || '',
+    localCodeOwns: bridge.localAiBoundary && Array.isArray(bridge.localAiBoundary.localCodeOwns)
+      ? bridge.localAiBoundary.localCodeOwns
+      : [],
+    aiMustNotDecide: bridge.localAiBoundary && Array.isArray(bridge.localAiBoundary.aiMustNotDecide)
+      ? bridge.localAiBoundary.aiMustNotDecide
+      : [],
+    evidenceRequired: Array.from(new Set([]
+      .concat(Array.isArray(bridge.evidenceList) ? bridge.evidenceList : [])
+      .concat(Array.isArray(gameReturnEvidence.evidenceRequired) ? gameReturnEvidence.evidenceRequired : [])
+      .concat(['local_report_decision', 'safe_share_boundary']))).filter(Boolean).slice(0, 10),
+    productBoundaryLine: 'OpenMAIC 只作为两阶段任务计划和质量门的启发；报告层仍由本地代码决定证据、放行、奖励和分享字段。'
+  });
+}
+
 function buildLearningReportDraft(input = {}) {
   const sources = normalizeReportSources(input);
   const allText = [input.sourceText || '', input.scoreText || ''].concat(sources.map((source) => source.text || '')).join('\n');
@@ -2266,6 +2352,16 @@ function buildLearningReportDraft(input = {}) {
     gameEvidence: reportGameEvidence,
     highFrequencyPracticeLoop: reportHighFrequencyLoop
   });
+  const openMaicInspiredDecisionBridge = buildOpenMaicInspiredReportDecisionBridge({
+    parts,
+    homeworkPressureContext,
+    familyDecisionMemo,
+    tonightDecisionBrief,
+    gameReturnEvidence,
+    plan: input.openMaicInspiredTaskPlan || reportGameEvidence.openMaicInspiredTaskPlan || null,
+    taskType: input.openMaicInspiredTaskType || reportGameEvidence.openMaicInspiredTaskType || null,
+    pressureSignal: input.openMaicInspiredPressureSignal || reportGameEvidence.openMaicInspiredPressureSignal || null
+  });
   const parentDecisionBook = buildParentDecisionBook({
     familyDecisionMemo,
     tonightDecisionBrief,
@@ -2329,6 +2425,7 @@ function buildLearningReportDraft(input = {}) {
     reviewReturnSeed,
     spacedRecallPolicy,
     gameReturnEvidence,
+    openMaicInspiredDecisionBridge,
     parentDecisionBook,
     aiLocalImplementationMatrix,
     generatedAt: nowIso(input.now),
@@ -2386,6 +2483,7 @@ function buildLearningReportDraft(input = {}) {
     reviewReturnSeed,
     spacedRecallPolicy,
     gameReturnEvidence,
+    openMaicInspiredDecisionBridge,
     parentDecisionBook,
     aiLocalImplementationMatrix,
     reportCompleteness: completeness,
@@ -2425,6 +2523,7 @@ module.exports = {
   buildSourceEvidenceLedger,
   buildParentDecisionBook,
   buildGameReturnEvidence,
+  buildOpenMaicInspiredReportDecisionBridge,
   buildCrossWeekTrendBoard,
   buildHomeSchoolCollaborationDigest,
   buildHomeSchoolConferenceKit,

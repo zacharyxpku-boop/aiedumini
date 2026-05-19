@@ -8,6 +8,7 @@ const focusCabin = require('../../utils/focus-cabin');
 const learningAssessment = require('../../utils/learning-assessment');
 const learningReport = require('../../utils/learning-report');
 const learningReportRecognition = require('../../utils/learning-report-recognition');
+const openMaicInspiredPlan = require('../../utils/openmaic-inspired-plan');
 
 function sendMiniEvent(payload) {
   api.submitEvent(payload).catch(() => {});
@@ -432,6 +433,12 @@ function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCause
   const sourceChallengeQuery = shareChallengePlan && shareChallengePlan.query
     ? `&source_challenge_count=${encodeURIComponent(shareChallengePlan.query.source_challenge_count || '')}&source_challenge_first=${encodeURIComponent(shareChallengePlan.query.source_challenge_first || '')}&source_challenge_prompt=${encodeURIComponent(shareChallengePlan.query.source_challenge_prompt || '')}&source_challenge_license=${encodeURIComponent(shareChallengePlan.query.source_challenge_license || '')}&source_challenge_decision=${encodeURIComponent(shareChallengePlan.query.source_challenge_decision || '')}&source_challenge_local_rule=${encodeURIComponent(shareChallengePlan.query.source_challenge_local_rule || '')}&source_challenge_blocked=${encodeURIComponent(shareChallengePlan.query.source_challenge_blocked || '')}&source_challenge_route=${encodeURIComponent(shareChallengePlan.query.source_challenge_route || '')}`
     : '';
+  const openMaicDecisionBridge = learningReportSummary && learningReportSummary.openMaicDecisionBridge
+    ? learningReportSummary.openMaicDecisionBridge
+    : null;
+  const openMaicQuery = openMaicDecisionBridge
+    ? `&openmaic_bridge_status=${encodeURIComponent(openMaicDecisionBridge.status || openMaicDecisionBridge.id || '')}&openmaic_next_action=${encodeURIComponent(openMaicDecisionBridge.nextAction || '')}&openmaic_share_boundary=${encodeURIComponent(openMaicDecisionBridge.shareBoundary || '')}&openmaic_game_gate=${encodeURIComponent(openMaicDecisionBridge.gameReturnEvidence && openMaicDecisionBridge.gameReturnEvidence.rewardGate || '')}&openmaic_blocked_fields=${encodeURIComponent((openMaicDecisionBridge.shareRelayPayload && openMaicDecisionBridge.shareRelayPayload.blockedFields || []).join(','))}&openmaic_evidence=${encodeURIComponent((openMaicDecisionBridge.evidenceList || []).slice(0, 3).join(' / '))}&openmaic_return_path=${encodeURIComponent(openMaicDecisionBridge.shareRelayPayload && openMaicDecisionBridge.shareRelayPayload.path || '')}`
+    : '';
   const questionBankRelayQuery = activeRelayCard
     ? `&question_bank_relay_label=${encodeURIComponent(activeRelayCard.label || '')}&question_bank_relay_first_step=${encodeURIComponent(activeRelayCard.firstStep || '')}&question_bank_relay_parent_check=${encodeURIComponent(activeRelayCard.parentCheck || '')}&question_bank_relay_route=${encodeURIComponent(activeRelayCard.route || '')}&question_bank_relay_boundary=${encodeURIComponent(questionBankShareRelayDeck.shareLine || '')}`
     : '';
@@ -471,9 +478,9 @@ function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCause
   const courseUnitQuery = courseUnitDecision
     ? `&course_unit_label=${encodeURIComponent(courseUnitDecision.unitLabel || '')}&course_unit_subject=${encodeURIComponent(courseUnitDecision.subjectLabel || '')}&course_unit_tier=${encodeURIComponent(courseUnitDecision.tier || '')}&course_unit_parent_decision=${encodeURIComponent(courseUnitDecision.parentTonightDecision || '')}&course_unit_report_contract=${encodeURIComponent(courseUnitDecision.reportContract || '')}&course_unit_share_contract=${encodeURIComponent(courseUnitDecision.shareContract || '')}&course_unit_blackboard=${encodeURIComponent(courseUnitDecision.blackboardLine || '')}&course_unit_recall_route=${encodeURIComponent(courseUnitDecision.recallRoute || '')}&course_unit_game_route=${encodeURIComponent(courseUnitDecision.gameRoute || '')}`
     : '';
-  const path = `/pages/home/home?share=${code}&from=daily_card&challenge=arcade&mode=same_identity&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}${sourceChallengeQuery}${courseUnitQuery}${socraticReportQuery}${tonightDecisionQuery}${questionBankRelayQuery}${visualRelayQuery}`;
-  const parentPath = `/pages/home/home?share=${code}&from=parent_card&mode=parent_recap&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}${sourceChallengeQuery}${courseUnitQuery}${socraticReportQuery}${tonightDecisionQuery}${questionBankRelayQuery}${visualRelayQuery}`;
-  const peerPath = `/pages/home/home?share=${code}&from=peer_challenge&challenge=arcade&mode=same_identity&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}${sourceChallengeQuery}${courseUnitQuery}${socraticReportQuery}${tonightDecisionQuery}${questionBankRelayQuery}${visualRelayQuery}`;
+  const path = `/pages/home/home?share=${code}&from=daily_card&challenge=arcade&mode=same_identity&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}${sourceChallengeQuery}${openMaicQuery}${courseUnitQuery}${socraticReportQuery}${tonightDecisionQuery}${questionBankRelayQuery}${visualRelayQuery}`;
+  const parentPath = `/pages/home/home?share=${code}&from=parent_card&mode=parent_recap&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}${sourceChallengeQuery}${openMaicQuery}${courseUnitQuery}${socraticReportQuery}${tonightDecisionQuery}${questionBankRelayQuery}${visualRelayQuery}`;
+  const peerPath = `/pages/home/home?share=${code}&from=peer_challenge&challenge=arcade&mode=same_identity&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}${sourceChallengeQuery}${openMaicQuery}${courseUnitQuery}${socraticReportQuery}${tonightDecisionQuery}${questionBankRelayQuery}${visualRelayQuery}`;
   const parentShareTitle = todayFocus && todayFocus.title
     ? `今晚先看这一处：${storage.formatIssueType(todayFocus.issueType || '卡点')} · ${todayFocus.title}`
     : '给家里看的今日学习复盘';
@@ -544,6 +551,7 @@ function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCause
       evidenceRequired: ['parent_question_used', 'child_first_step', 'next_day_revisit']
     },
     shareChallengePlan,
+    openMaicDecisionBridge,
     socraticMemoryRelay,
     tonightDecisionRelay,
     questionBankShareRelayDeck,
@@ -648,6 +656,13 @@ function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCause
       safe_relay_allowed_fields: shareChallengePlan && shareChallengePlan.safeRelayChallengePacket && shareChallengePlan.safeRelayChallengePacket.allowedFields,
       safe_relay_blocked_fields: shareChallengePlan && shareChallengePlan.safeRelayChallengePacket && shareChallengePlan.safeRelayChallengePacket.blockedFields,
       share_spread_readiness_gate: shareChallengePlan && shareChallengePlan.spreadReadinessGate,
+      openmaic_bridge_status: openMaicDecisionBridge && (openMaicDecisionBridge.status || openMaicDecisionBridge.id),
+      openmaic_next_action: openMaicDecisionBridge && openMaicDecisionBridge.nextAction,
+      openmaic_share_boundary: openMaicDecisionBridge && openMaicDecisionBridge.shareBoundary,
+      openmaic_game_gate: openMaicDecisionBridge && openMaicDecisionBridge.gameReturnEvidence && openMaicDecisionBridge.gameReturnEvidence.rewardGate,
+      openmaic_blocked_fields: openMaicDecisionBridge && openMaicDecisionBridge.shareRelayPayload && openMaicDecisionBridge.shareRelayPayload.blockedFields,
+      openmaic_evidence: openMaicDecisionBridge && Array.isArray(openMaicDecisionBridge.evidenceList) ? openMaicDecisionBridge.evidenceList.slice(0, 3).join(' / ') : '',
+      openmaic_return_path: openMaicDecisionBridge && openMaicDecisionBridge.shareRelayPayload && openMaicDecisionBridge.shareRelayPayload.path,
       socratic_report_status: socraticMemoryRelay && socraticMemoryRelay.status,
       socratic_report_action: socraticMemoryRelay && socraticMemoryRelay.action,
       socratic_report_decision: socraticMemoryRelay && socraticMemoryRelay.decision,
@@ -787,7 +802,14 @@ function buildSafeSharePayload(card = {}, intent = 'peer_challenge', extra = {})
     'wrong_cause_next_revisit',
     'wrong_cause_allowed_fields',
     'wrong_cause_blocked_fields',
-    'source_challenge_route'
+    'source_challenge_route',
+    'openmaic_bridge_status',
+    'openmaic_next_action',
+    'openmaic_share_boundary',
+    'openmaic_game_gate',
+    'openmaic_blocked_fields',
+    'openmaic_evidence',
+    'openmaic_return_path'
   ];
   const denylist = [
     'original_question',

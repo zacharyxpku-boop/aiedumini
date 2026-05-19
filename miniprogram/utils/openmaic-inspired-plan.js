@@ -257,10 +257,75 @@ function evaluateOpenMaicInspiredTaskPlan(plan = {}) {
   };
 }
 
+function buildOpenMaicInspiredDecisionBridge(plan = {}, reportSummary = {}, reviewSummary = {}, gameEvidence = {}) {
+  const outline = plan.outline || {};
+  const reportLine = safeText(
+    reportSummary.familyDecisionHomepageHeadline || reportSummary.reportEvidenceTopLine || plan.reportLine,
+    '今晚先说第一步，再看错因和明天回访。',
+    120
+  );
+  const nextAction = safeText(
+    reportSummary.familyDecisionHomepageNextLocalAction || reviewSummary.nextStep || outline.firstStep,
+    outline.firstStep || '先说第一步。',
+    120
+  );
+  const shareBoundary = safeText(
+    reportSummary.familyDecisionHomepageShareBoundary || plan.shareBoundary,
+    SAFE_SHARE_BOUNDARY,
+    120
+  );
+  const gameLine = safeText(
+    gameEvidence.shareLine || gameEvidence.summary || '回忆卡、轻练习和复访放行后再给奖励。',
+    '回忆卡、轻练习和复访放行后再给奖励。',
+    120
+  );
+  const evidenceList = [
+    outline.firstStep,
+    outline.parentCheck,
+    outline.revisit,
+    `质量门${plan.qualityGate && Array.isArray(plan.qualityGate.gates) ? plan.qualityGate.gates.length : 0}项`
+  ].filter(Boolean);
+  return {
+    id: 'openmaic_inspired_decision_bridge',
+    title: '家庭决策桥',
+    headline: reportLine,
+    nextAction,
+    shareBoundary,
+    gameLine,
+    evidenceList,
+    reportDecisionLine: `${reportLine}｜${nextAction}`,
+    reportDecisionCard: [
+      `今晚先做：${nextAction}`,
+      `今晚不做：完整答案 / 原题外传 / 单次上传就下结论`,
+      `依据：${reportLine}`,
+      `回访：${outline.revisit || '明天复查第一步'}`
+    ],
+    gameReturnEvidence: {
+      status: 'openmaic_inspired_revisit_gate',
+      summary: gameLine,
+      nextDayReplay: outline.revisit || '',
+      rewardGate: '只奖励第一步、错因修复和回访完成',
+      blockedFields: ['final_answer', 'ranking', 'score', 'original_question', 'full_dialogue']
+    },
+    shareRelayPayload: {
+      title: '今晚任务单',
+      subtitle: reportLine,
+      path: '/pages/profile/profile?from=openmaic_inspired_bridge',
+      shareBoundary,
+      blockedFields: ['original_question', 'full_answer', 'full_dialogue', 'ranking', 'score'],
+      nextAction,
+      evidenceList
+    },
+    localAiBoundary: plan.localAiBoundary || buildLocalAiBoundary(),
+    qualityGate: plan.qualityGate || buildQualityGate(outline, plan.scenes || [])
+  };
+}
+
 module.exports = {
   SAFE_SHARE_BOUNDARY,
   OPENMAIC_REFERENCE_POLICY,
   PUBLIC_K12_RESOURCE_DECISIONS,
   buildOpenMaicInspiredTaskPlan,
-  evaluateOpenMaicInspiredTaskPlan
+  evaluateOpenMaicInspiredTaskPlan,
+  buildOpenMaicInspiredDecisionBridge
 };

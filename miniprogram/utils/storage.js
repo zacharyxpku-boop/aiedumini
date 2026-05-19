@@ -6854,6 +6854,13 @@ function saveIncomingShare(share = {}) {
     wrong_cause_blocked_fields: relayBlockedFieldLine(share.wrong_cause_blocked_fields),
     wrong_cause_return_path: share.wrong_cause_return_path || '',
     wrong_cause_gate: share.wrong_cause_gate || '',
+    openmaic_bridge_status: share.openmaic_bridge_status || '',
+    openmaic_next_action: share.openmaic_next_action || '',
+    openmaic_share_boundary: share.openmaic_share_boundary || '',
+    openmaic_game_gate: share.openmaic_game_gate || '',
+    openmaic_blocked_fields: relayBlockedFieldLine(share.openmaic_blocked_fields),
+    openmaic_evidence: share.openmaic_evidence || '',
+    openmaic_return_path: share.openmaic_return_path || '',
     receiver_material_required: share.receiver_material_required || 'receiver_own_material',
     receiver_first_step_required: share.receiver_first_step_required || 'receiver_own_first_step',
     receiver_wrong_cause_required: share.receiver_wrong_cause_required || 'receiver_own_wrong_cause',
@@ -6913,7 +6920,7 @@ function recordShareRelayCompletion(input = {}) {
   const receiverMaterial = relayOwnMaterialValue(input.receiverMaterial || input.materialEvidence, 'receiver_own_material_required');
   const nextRevisit = relayOwnMaterialValue(input.nextRevisit || input.revisitEvidence, incoming.relay_next_revisit || incoming.wrong_cause_next_revisit || 'receiver_next_revisit_required');
   const route = input.route || incoming.relay_return_path || incoming.question_bank_relay_route || incoming.wrong_cause_return_path || '/pages/review/review';
-  const blockedFields = relayBlockedFieldLine(incoming.relay_blocked_fields || incoming.wrong_cause_blocked_fields);
+  const blockedFields = relayBlockedFieldLine(incoming.relay_blocked_fields || incoming.wrong_cause_blocked_fields || incoming.openmaic_blocked_fields);
   const evidenceContract = {
     required: ['receiver_material', 'first_step', 'wrong_cause', 'next_revisit'],
     receiver_material: receiverMaterial,
@@ -6922,7 +6929,10 @@ function recordShareRelayCompletion(input = {}) {
     next_revisit: nextRevisit,
     review_evidence: 'share_relay_receiver_completion',
     event_evidence: 'share_relay_receiver_completion',
-    sync_evidence: 'share_run_and_review_event_mutations'
+    sync_evidence: 'share_run_and_review_event_mutations',
+    openmaic_bridge_status: incoming.openmaic_bridge_status || '',
+    openmaic_next_action: incoming.openmaic_next_action || '',
+    openmaic_game_gate: incoming.openmaic_game_gate || ''
   };
   const record = {
     share_code: shareCode,
