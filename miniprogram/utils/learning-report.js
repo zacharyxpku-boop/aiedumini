@@ -321,7 +321,6 @@ function computeCompleteness(parts) {
   if (Object.keys(parts.emotionSignals || {}).length) score += 12;
   if (Object.keys(parts.interestSignals || {}).length) score += 8;
   if ((parts.assessmentAnswers || []).length >= 5) score += 14;
-  if ((parts.reportSources || []).some((source) => source.type === 'third_party_assessment' || /测评|画像|学习类型|倾向/.test(source.text || ''))) score += 12;
   return clamp(score, Object.keys(parts.parsedScores || {}).length || (parts.reportSources || []).length ? 28 : 0, 100);
 }
 
@@ -375,6 +374,79 @@ function topSubjects(parsedScores = {}) {
     .sort((a, b) => Number(b.score) - Number(a.score));
 }
 
+function hasTalentAssessmentSource(parts = {}) {
+  return (parts.reportSources || []).some((source) => (
+    source.type === 'third_party_assessment'
+    || source.type === 'talent_assessment'
+    || /天赋|测评|画像|学习类型|学习风格|倾向|视觉型|听觉型|动觉型|多元智能|MBTI/.test(source.text || '')
+  ));
+}
+
+function hasRealHomeworkEvidence(parts = {}) {
+  const behavior = parts.behaviorSignals || {};
+  const sourceText = (parts.reportSources || []).map((source) => `${source.type || ''}\n${source.text || ''}`).join('\n');
+  return Object.keys(parts.parsedScores || {}).length > 0
+    || !!(behavior.firstStep || behavior.childFirstStep || behavior.wrongCause || behavior.weakPoint || behavior.homeworkDelay)
+    || /错题|作业|试卷|第一步|卡住|列式|回访|小变式/.test(sourceText);
+}
+
+function safeScoreEvidence(subject = '当前学科') {
+  return `${subject} 已有成绩/资料线索；报告诊断仍以第一步、错因、回访和第 7 天小变式为准，不展示分数或排名。`;
+}
+
+function buildMethodCandidateIsolation(parts = {}) {
+  const talentSource = hasTalentAssessmentSource(parts);
+  const realHomeworkEvidence = hasRealHomeworkEvidence(parts);
+  const assessmentCount = Array.isArray(parts.assessmentAnswers) ? parts.assessmentAnswers.length : 0;
+  return {
+    id: 'method_candidate_isolation',
+    talentSource,
+    realHomeworkEvidence,
+    assessmentCount,
+    methodCandidateOnly: talentSource && !realHomeworkEvidence,
+    localRule: '天赋/学习偏好测评只生成方法候选；没有真实作业、错因、次日回访和第 7 天小变式，不进入长期画像放行。',
+    aiBoundary: 'AI 可把测评摘要改写成孩子能试的方法，但不能做天赋定性、升学判断、掌握结论或排名解释。'
+  };
+}
+
+function buildScoreReleasePolicy(input = {}, sources = [], parsed = {}, behaviorSignals = {}) {
+  const sourceText = [
+    input.sourceType || '',
+    input.materialType || '',
+    input.sourceText || '',
+    input.scoreText || ''
+  ].concat((sources || []).map((source) => `${source.type || ''}\n${source.label || ''}\n${source.text || ''}`)).join('\n');
+  const sourceTypeText = `${input.sourceType || ''}\n${input.materialType || ''}`;
+  const typedAsThirdParty = /talent_assessment|third_party_assessment/.test(sourceTypeText);
+  const parsedSubjectCount = Object.keys(parsed.parsedScores || {}).length;
+  const explicitScoreSheet = /score_sheet|成绩单|分数单|考试成绩/.test(sourceText)
+    || (!!input.scoreText && parsedSubjectCount > 0)
+    || (!typedAsThirdParty && parsedSubjectCount >= 3);
+  const talentOrThirdParty = typedAsThirdParty
+    || /天赋|测评|学习类型|学习风格|视觉型|听觉型|动觉型|多元智能|MBTI/.test(sourceText);
+  const homeworkEvidence = explicitScoreSheet
+    || !!(behaviorSignals.firstStep || behaviorSignals.childFirstStep || behaviorSignals.wrongCause || behaviorSignals.weakPoint || behaviorSignals.homeworkDelay)
+    || /错题|作业|试卷|第一步|卡住|列式|回访|小变式/.test(sourceText);
+  const methodCandidateOnly = talentOrThirdParty && !homeworkEvidence;
+  const incomingScores = Object.assign({}, parsed.parsedScores || {}, input.parsedScores || {});
+  const incomingRanks = Object.assign({}, parsed.parsedRanks || {}, input.parsedRanks || {});
+  return {
+    id: 'score_release_policy',
+    methodCandidateOnly,
+    scoreRankingReleased: !methodCandidateOnly,
+    parsedScores: methodCandidateOnly ? {} : incomingScores,
+    parsedRanks: methodCandidateOnly ? {} : incomingRanks,
+    unreleasedScoreRankingReference: methodCandidateOnly ? {
+      releaseScope: 'unreleased_reference',
+      sourceType: input.sourceType || input.materialType || 'third_party_assessment',
+      reason: '天赋/第三方测评中的分数或排名不能直接进入画像、诊断或分享，必须由成绩单或真实作业证据确认。',
+      scoreCount: Object.keys(incomingScores).length,
+      hasRank: !!(incomingRanks.classRank || incomingRanks.totalRank || incomingRanks.totalScore)
+    } : null,
+    localRule: '分数和排名只有成绩单、试卷或真实作业证据支持时才进入报告画像；天赋测评只放行学习方法候选。'
+  };
+}
+
 function buildTendencies(parts) {
   const text = (parts.reportSources || []).map((source) => source.text).join('\n');
   const scoredAnswers = scoreAssessmentAnswers(parts.assessmentAnswers || [], text);
@@ -386,9 +458,9 @@ function buildTendencies(parts) {
       id: 'subject_strength',
       label: `${subjects[0].subject}当前表现更突出`,
       description: '更容易在这个学科里形成正反馈，可以用来带动待支持学科的方法迁移。',
-      evidence: [`${subjects[0].subject} ${subjects[0].score} 分${subjects[0].rank ? ` / 班名 ${subjects[0].rank}` : ''}`],
+      evidence: [safeScoreEvidence(subjects[0].subject)],
       confidence: confidenceLabel(subjects[0].confidence || 0.62),
-      missing: parts.parsedRanks.totalRank ? [] : ['缺少总排名或年级参照']
+      missing: ['需要真实错题、第一步和回访证据确认方法是否可迁移']
     });
   }
 
@@ -470,9 +542,9 @@ function buildDiagnosisMatrix(parts) {
           : `${item.subject}当前接近已录入学科均值，建议用小题验证具体卡点。`,
       mainCause: cause[0],
       secondaryCause: cause[1],
-      evidence: [`${item.subject} ${item.score} 分${item.rank ? ` / 班名 ${item.rank}` : ''}`, `已录入均值约 ${Math.round(average * 10) / 10}`],
+      evidence: [safeScoreEvidence(item.subject), '已录入成绩资料，但不在报告中展示具体分数或排名'],
       confidence: confidenceLabel(item.confidence || 0.58),
-      missing: item.rank ? [] : ['缺少该学科排名或最近 3 次趋势']
+      missing: ['需要该学科的真实错因、孩子第一步和最近 3 次回访趋势']
     };
   }).slice(0, 8);
 }
@@ -905,15 +977,18 @@ function buildPortraitConfidenceSystem(parts = {}, matrix = [], portrait = {}, c
   const sourceCount = Array.isArray(parts.reportSources) ? parts.reportSources.length : 0;
   const behaviorCount = parts.behaviorSignals ? Object.keys(parts.behaviorSignals).length : 0;
   const emotionCount = parts.emotionSignals ? Object.keys(parts.emotionSignals).length : 0;
-  const evidenceScore = subjects.length * 10 + Math.min(assessmentCount, 15) * 3 + sourceCount * 8 + behaviorCount * 5 + emotionCount * 4;
+  const methodCandidateIsolation = buildMethodCandidateIsolation(parts);
+  const assessmentEvidenceScore = methodCandidateIsolation.methodCandidateOnly ? 0 : Math.min(assessmentCount, 15) * 3;
+  const sourceEvidenceScore = methodCandidateIsolation.methodCandidateOnly ? 0 : sourceCount * 8;
+  const evidenceScore = subjects.length * 10 + assessmentEvidenceScore + sourceEvidenceScore + behaviorCount * 5 + emotionCount * 4;
   const confidenceLevel = evidenceScore >= 120 ? 'high' : evidenceScore >= 70 ? 'medium' : 'low';
   const primary = diagnosis.find((item) => String(item.status || '').indexOf('\u652f\u6301') >= 0) || diagnosis[0] || {};
   const subject = primary.subject || '\u5f53\u524d\u5b66\u79d1';
   const cause = primary.mainCause || '\u7b2c\u4e00\u6b65\u4e0d\u6e05';
-  const readyCount = [subjects.length >= 3, assessmentCount >= 8, behaviorCount >= 2].filter(Boolean).length;
+  const readyCount = [subjects.length >= 3, !methodCandidateIsolation.methodCandidateOnly && assessmentCount >= 8, behaviorCount >= 2].filter(Boolean).length;
   const evidenceLedger = [
     { id: 'score_or_task', label: '\u6210\u7ee9/\u4efb\u52a1\u8bc1\u636e', status: subjects.length >= 3 ? 'ready' : 'weak', proof: subjects.length ? `${subjects.length} \u4e2a\u5b66\u79d1\u5df2\u8bb0\u5f55` : '\u7f3a\u5c11\u53ef\u786e\u8ba4\u5b66\u79d1\u8bb0\u5f55' },
-    { id: 'assessment', label: '\u753b\u50cf\u95ee\u5377', status: assessmentCount >= 8 ? 'ready' : 'weak', proof: `${assessmentCount}/15 \u4e2a\u95ee\u9898\u5df2\u8bb0\u5f55` },
+    { id: 'assessment', label: '\u753b\u50cf\u95ee\u5377', status: methodCandidateIsolation.methodCandidateOnly ? 'candidate_only' : assessmentCount >= 8 ? 'ready' : 'weak', proof: methodCandidateIsolation.methodCandidateOnly ? '仅作为学习方法候选，等待真实作业和回访验证' : `${assessmentCount}/15 \u4e2a\u95ee\u9898\u5df2\u8bb0\u5f55` },
     { id: 'behavior', label: '\u505a\u9898\u8fc7\u7a0b', status: behaviorCount >= 2 ? 'ready' : 'weak', proof: behaviorCount ? `${behaviorCount} \u7c7b\u884c\u4e3a\u4fe1\u53f7` : '\u7f3a\u5c11\u771f\u5b9e\u505a\u9898\u8fc7\u7a0b' },
     { id: 'next_day', label: '\u9694\u5929\u56de\u8bbf', status: portrait.nextReviewCadence ? 'pending' : 'missing', proof: portrait.nextReviewCadence || '\u9700\u8981\u660e\u5929\u56de\u8bbf\u9a8c\u8bc1' }
   ];
@@ -922,6 +997,7 @@ function buildPortraitConfidenceSystem(parts = {}, matrix = [], portrait = {}, c
     title: '\u957f\u671f\u753b\u50cf\u53ef\u4fe1\u5ea6\u8d26\u672c',
     confidenceLevel,
     evidenceScore,
+    methodCandidateIsolation,
     summary: confidenceLevel === 'high'
       ? '\u5f53\u524d\u8bc1\u636e\u8db3\u591f\u5f62\u6210\u9636\u6bb5\u5224\u65ad\uff0c\u4f46\u4ecd\u6309 7 \u5929\u56de\u8bbf\u66f4\u65b0\uff0c\u4e0d\u6309\u5355\u6b21\u5206\u6570\u5b9a\u6027\u3002'
       : confidenceLevel === 'medium'
@@ -930,7 +1006,7 @@ function buildPortraitConfidenceSystem(parts = {}, matrix = [], portrait = {}, c
     evidenceLedger,
     decisionThresholds: [
       { id: 'act_tonight', label: '\u4eca\u665a\u53ef\u884c\u52a8', rule: '\u6709\u4e00\u4e2a\u660e\u786e\u5361\u70b9\u548c\u4e00\u4e2a\u53ef\u6267\u884c\u7b2c\u4e00\u6b65\u5373\u53ef\u884c\u52a8\u3002', met: !!primary.mainCause },
-      { id: 'update_portrait', label: '\u66f4\u65b0\u753b\u50cf', rule: '\u81f3\u5c11 3 \u7c7b\u8bc1\u636e\u540c\u65f6\u6307\u5411\u540c\u4e00\u9519\u56e0\uff0c\u624d\u66f4\u65b0\u957f\u671f\u753b\u50cf\u3002', met: readyCount >= 3 },
+      { id: 'update_portrait', label: '\u66f4\u65b0\u753b\u50cf', rule: '\u81f3\u5c11 3 \u7c7b\u8bc1\u636e\u540c\u65f6\u6307\u5411\u540c\u4e00\u9519\u56e0\uff0c\u624d\u66f4\u65b0\u957f\u671f\u753b\u50cf\u3002', met: readyCount >= 3 && !methodCandidateIsolation.methodCandidateOnly },
       { id: 'increase_load', label: '\u589e\u52a0\u9898\u91cf', rule: '\u8fde\u7eed 2 \u5929\u80fd\u72ec\u7acb\u8bf4\u51fa\u7b2c\u4e00\u6b65\uff0c\u624d\u589e\u52a0\u53d8\u5f0f\u6216\u9898\u91cf\u3002', met: false },
       { id: 'reduce_load', label: '\u964d\u7ea7\u5904\u7406', rule: '\u540c\u4e00\u9519\u56e0\u8fde\u7eed 2 \u6b21\u5931\u8d25\uff0c\u7acb\u5373\u964d\u5230\u5c0f\u9ed1\u677f\u548c\u9519\u56e0\u5361\u3002', met: String(primary.status || '').indexOf('\u652f\u6301') >= 0 }
     ],
@@ -1725,7 +1801,10 @@ function buildSourceEvidenceLedger(input = {}, parts = {}, familyDecisionMemo = 
       missing: ['真实作业卡点', '两次以上回访证据', '第 7 天小变式'],
       nextAction: '只把测评当候选，用错题和回访确认。',
       aiAllowed: '把测评摘要翻译成孩子听得懂的方法建议',
-      aiBlocked: '天赋定性、升学结论、人格标签'
+      aiBlocked: '天赋定性、升学结论、人格标签',
+      releaseScope: 'method_candidate_only',
+      portraitConfidenceWeight: 0,
+      scoreRankingPolicy: 'degrade_to_unreleased_reference'
     },
     {
       id: 'school_material',
@@ -1756,7 +1835,9 @@ function buildSourceEvidenceLedger(input = {}, parts = {}, familyDecisionMemo = 
     return Object.assign({}, lane, {
       collected,
       status: collected ? '已采集' : '待补充',
-      release: collected ? '今晚行动可用，长期画像仍需回访验证' : '不生成该类结论',
+      release: lane.releaseScope === 'method_candidate_only'
+        ? '只放行学习方法候选，不进入长期画像、分数排名或天赋定性'
+        : collected ? '今晚行动可用，长期画像仍需回访验证' : '不生成该类结论',
       evidenceMissing: lane.missing,
       blockedFields: reportEvidenceReleaseGate.homeSchoolSafeHandoff
         ? reportEvidenceReleaseGate.homeSchoolSafeHandoff.blockedFields
@@ -1792,15 +1873,17 @@ function buildLearningReportDraft(input = {}) {
   const interestSignals = normalizeSignals(input.interestSignals || {});
   const explicitAnswers = asArray(input.assessmentAnswers || []);
   const assessmentAnswers = explicitAnswers.length ? explicitAnswers : inferAnswersFromText(allText);
+  const scoreReleasePolicy = buildScoreReleasePolicy(input, sources, parsed, behaviorSignals);
   const seedParts = {
     reportSources: sources,
-    parsedScores: Object.assign({}, parsed.parsedScores, input.parsedScores || {}),
-    parsedRanks: Object.assign({}, parsed.parsedRanks, input.parsedRanks || {}),
+    parsedScores: scoreReleasePolicy.parsedScores,
+    parsedRanks: scoreReleasePolicy.parsedRanks,
     profileBasics,
     behaviorSignals,
     emotionSignals,
     interestSignals,
-    assessmentAnswers
+    assessmentAnswers,
+    scoreReleasePolicy
   };
   const completeness = computeCompleteness(seedParts);
   const parts = Object.assign({}, seedParts, {
@@ -1889,7 +1972,9 @@ function buildLearningReportDraft(input = {}) {
     missingItems: missing,
     sourceIntegrity: {
       requiresConfirmation: parsed.requiresConfirmation,
-      missingFields: parsed.missingFields
+      missingFields: parsed.missingFields,
+      scoreReleasePolicy,
+      unreleasedScoreRankingReference: scoreReleasePolicy.unreleasedScoreRankingReference
     }
   };
 
@@ -1904,6 +1989,8 @@ function buildLearningReportDraft(input = {}) {
     },
     parsedScores: parts.parsedScores,
     parsedRanks: parts.parsedRanks,
+    scoreReleasePolicy,
+    unreleasedScoreRankingReference: scoreReleasePolicy.unreleasedScoreRankingReference,
     profileBasics,
     behaviorSignals,
     emotionSignals,

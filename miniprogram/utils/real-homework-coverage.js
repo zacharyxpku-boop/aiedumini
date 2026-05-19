@@ -612,6 +612,34 @@ const PUBLIC_K12_OPEN_SOURCE_RESOURCE_LEDGER = [
     mustNotUse: ['复制课程视频/练习', '冒充 Khanmigo', '把外部掌握度当本地画像'],
     miniappLanding: ['/pages/tutor/tutor', '/pages/profile/profile', '/pages/review/review'],
     acceptanceGate: ['local_mastery_evidence', 'no_content_copy', 'no_brand_claim']
+  },
+  {
+    id: 'oer_commons_cc_resource_pool',
+    label: 'OER Commons 可筛选开放资源池',
+    sourceType: 'open_resource_directory',
+    sourceUrl: 'https://www.oercommons.org/',
+    licenseSignal: 'resources carry item-level usage rights such as public domain, CC BY, CC BY-SA, CC BY-NC; check each item before adaptation',
+    commercialDecision: '只使用明确可商用或公版的结构信号；不复制未核验资源、不直接导入题目答案、不使用 NC 资源做商业内置内容',
+    directUse: ['授权筛选入口', '学科资源目录', '活动类型参考'],
+    localizeAsCode: ['source_license_registry', 'reuse_level', 'attribution_required', 'adapted_task_template'],
+    aiBetterFor: ['把已授权结构改写成中文第一步追问和家长提示'],
+    mustNotUse: ['忽略单条资源授权', '复制题目和答案', '把 NC 资源放进商业内置题库'],
+    miniappLanding: ['/pages/upload/upload', '/pages/tutor/tutor', '/pages/profile/profile'],
+    acceptanceGate: ['license_checked', 'reuse_level_not_copied_original', 'attribution_recorded']
+  },
+  {
+    id: 'public_curriculum_standards_crosswalk',
+    label: '公开课程标准能力动词交叉表',
+    sourceType: 'public_curriculum_standard_reference',
+    sourceUrl: 'https://www.thecorestandards.org/',
+    licenseSignal: 'public standards are structure references; always check jurisdiction and copyright notices before copying wording',
+    commercialDecision: '只抽取能力动词和知识层级做本地课程骨架，不复制标准原文、不宣称覆盖官方课程或考试',
+    directUse: ['能力动词', '学段层级', '知识点先后关系'],
+    localizeAsCode: ['skill_verb', 'grade_band', 'curriculum_node', 'prerequisite_ladder'],
+    aiBetterFor: ['把能力动词翻译成孩子能执行的一句话'],
+    mustNotUse: ['复制标准措辞', '宣称官方课程覆盖', '把标准当测评结论'],
+    miniappLanding: ['/pages/module/module', '/pages/review/review', '/pages/profile/profile'],
+    acceptanceGate: ['structure_only', 'localized_wording', 'no_official_coverage_claim']
   }
 ];
 
@@ -821,7 +849,7 @@ function buildK12PublicResourceTriageBoard(options = {}) {
     aiRule: 'AI 只把已经确定的提示改写成更自然的中文，不决定答案、掌握度、排行或隐私字段。',
     blockedRule: '不复制原文、不导入答案、不嵌入未授权交互、不宣称外部合作或全科动态板书能力。'
   }));
-  const sourceBackedChallengeSeeds = resourceCards.slice(0, 8).map((item, index) => ({
+  const sourceBackedChallengeSeeds = resourceCards.map((item, index) => ({
     id: `oer_triage_challenge_${item.sourceId || index}`,
     title: `${item.label} · 第一步挑战`,
     prompt: `借这个来源的结构，用孩子自己的作业材料说第一步。`,

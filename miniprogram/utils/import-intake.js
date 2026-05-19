@@ -273,7 +273,12 @@ function buildUploadIntakePacket(text = '', imagePaths = [], materialType = '') 
     sourceSchemaId: intakeSourceSchema.id,
     sourceSchemaLabel: intakeSourceSchema.label,
     reportUse: intakeSourceSchema.reportUse,
-    evidenceGap: intakeSourceSchema.evidenceGap
+    evidenceGap: intakeSourceSchema.evidenceGap,
+    releaseScope: intakeSourceSchema.id === 'talent_assessment' ? 'method_candidate_only' : 'tonight_action_first',
+    portraitConfidenceWeight: intakeSourceSchema.id === 'talent_assessment' ? 0 : 1,
+    scoreRankingPolicy: intakeSourceSchema.id === 'talent_assessment'
+      ? 'degrade_to_unreleased_reference'
+      : 'release_only_with_confirmed_score_sheet_or_homework_evidence'
   };
   const nextActionQueue = buildNextActionQueue(kind, classified, materialSource || classified.sourceMeta || null, images);
   return {

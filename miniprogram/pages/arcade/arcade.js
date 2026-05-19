@@ -606,7 +606,29 @@ Page({
     });
   },
 
+  canPlayGameAction(action = 'play') {
+    const todaySession = storage.getTodaySession ? storage.getTodaySession() : {};
+    const blocked = !!(this.data.gameBlocked || todaySession.gamePlayed);
+    if (!blocked) return true;
+    this.setData({
+      gameBlocked: true,
+      learningBoundLine: '今天的游戏奖励已经结算。继续学习请走回访卡或明天再来。',
+      feedbackText: '今天的游戏奖励已经结算。继续学习请走回访卡或明天再来，避免重复刷 XP。'
+    });
+    if (storage.appendReviewEvent) {
+      storage.appendReviewEvent({
+        kind: 'arcade_blocked_repeat_action',
+        action,
+        game_type: this.data.selectedGame || '',
+        result: 'blocked',
+        xp: 0
+      });
+    }
+    return false;
+  },
+
   tapMatchTile(event) {
+    if (!this.canPlayGameAction('tap_match_tile')) return;
     if (this.data.result || this.data.gameMode !== 'match') return;
     const tileId = event.currentTarget.dataset.id;
     const tile = (this.data.matchTiles || []).find((item) => item.id === tileId);
@@ -694,6 +716,7 @@ Page({
   },
 
   revealAnswer() {
+    if (!this.canPlayGameAction('reveal_answer')) return;
     if (!this.data.currentQuestion || this.data.result) return;
     this.setData({
       revealed: true,
@@ -702,6 +725,7 @@ Page({
   },
 
   gradeQuest(event) {
+    if (!this.canPlayGameAction('grade_quest')) return;
     if (this.data.result || !this.data.currentQuestion || !this.data.revealed) return;
     const rating = event.currentTarget.dataset.rating || 'again';
     const current = this.data.currentQuestion;
@@ -740,6 +764,7 @@ Page({
   },
 
   tapSnakeTile(event) {
+    if (!this.canPlayGameAction('tap_snake_tile')) return;
     if (this.data.result || !this.data.snakeTrack) return;
     const tileId = event.currentTarget.dataset.id;
     const tile = (this.data.snakeTiles || []).find((item) => item.id === tileId);
@@ -811,6 +836,7 @@ Page({
   },
 
   tapHole(event) {
+    if (!this.canPlayGameAction('tap_hole')) return;
     if (this.data.result || !this.data.currentQuestion) return;
     const index = Number(event.currentTarget.dataset.index || 0);
     const hole = this.data.moleHoles[index];
@@ -854,6 +880,7 @@ Page({
   },
 
   recordCardResult(cardId, correct, rating, gameType) {
+    if (!this.canPlayGameAction('record_card_result')) return 0;
     if (!cardId) return 0;
     const reviewedCardIds = this.data.reviewedCardIds || {};
     if (reviewedCardIds[cardId]) {
@@ -910,6 +937,7 @@ Page({
   },
 
   finishRound(answers, bestCombo, score, lives) {
+    if (!this.canPlayGameAction('finish_round')) return;
     const result = arcade.summarizeAttempt({
       gameType: this.data.selectedGame || 'whack',
       expectedTotal: this.data.round.total,
@@ -1392,6 +1420,7 @@ Page({
   },
 
   restartRound() {
+    if (!this.canPlayGameAction('restart_round')) return;
     const round = this.buildRoundForGame(this.data.selectedGame, this.data.cards, this.data.adaptiveChallenge);
     const next = this.firstQuestionForRound(round, this.data.selectedGame);
     this.setData({
