@@ -1258,6 +1258,13 @@
           <text class="parent-brief-label">先用哪个能力</text>
           <text>{{learningAssessment.capability.label}} · {{learningAssessment.capability.reason}}</text>
         </view>
+        <view class="parent-brief-block" wx:if="{{learningAssessment.talentLearningMethodPlan}}">
+          <text class="parent-brief-label">{{learningAssessment.talentLearningMethodPlan.title}}</text>
+          <text>{{learningAssessment.talentLearningMethodPlan.parentLine}}</text>
+          <text>{{learningAssessment.talentLearningMethodPlan.nextAction}}</text>
+          <text wx:for="{{learningAssessment.talentLearningMethodPlan.confirmWithEvidence}}" wx:key="*this">确认：{{item}}</text>
+          <text wx:for="{{learningAssessment.talentLearningMethodPlan.blockedClaims}}" wx:key="*this">不做：{{item}}</text>
+        </view>
         <view class="teacher-actions">
           <button bindtap="generateLearningReport">生成学习画像</button>
           <button bindtap="goLearningReportCta">{{learningReportSummary.ctaLabel}}</button>

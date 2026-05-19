@@ -2554,7 +2554,8 @@ Page({
     const analysis = learningAssessment.buildLearningAssessment(scoreInput);
     const reportInputPatch = analysis && analysis.reportInputPatch ? analysis.reportInputPatch : {};
     const nextReportInput = Object.assign({}, this.data.learningReportInput || {}, reportInputPatch, {
-      sourceText: scoreInput
+      sourceText: scoreInput,
+      talentLearningMethodPlan: analysis.talentLearningMethodPlan
     });
     this.setData({
       'learningAssessment.scoreInput': scoreInput,
@@ -2562,6 +2563,7 @@ Page({
       'learningAssessment.methodLine': analysis.methodHint,
       'learningAssessment.nextQuestion': analysis.nextQuestion,
       'learningAssessment.capability': analysis.capability,
+      'learningAssessment.talentLearningMethodPlan': analysis.talentLearningMethodPlan,
       'learningAssessment.subject': analysis.subject,
       learningReportInput: nextReportInput
     });

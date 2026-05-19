@@ -86,6 +86,59 @@ function scoreEvidenceConfidence(subject, struggle, signals) {
   };
 }
 
+function buildTalentLearningMethodPlan(seed = {}) {
+  const sourceType = seed.sourceType || '';
+  const signals = Array.isArray(seed.matchedSignals) ? seed.matchedSignals : [];
+  const hasTalentSignal = sourceType === 'talent_assessment' || signals.some((item) => item.id === 'talent_assessment');
+  const capabilityId = seed.capabilityId || 'tutor';
+  const subject = seed.subject && seed.subject !== '未知' ? seed.subject : '当前学科';
+  const struggle = seed.struggle && seed.struggle !== '说明学习状态' ? seed.struggle : '第一步不清';
+  const methodMap = {
+    tutor: {
+      label: '先问第一步',
+      action: '用苏格拉底追问让孩子先说入口，不讲完整答案。',
+      route: '/pages/tutor/tutor?from=talent_method_plan'
+    },
+    focus: {
+      label: '先缩小任务',
+      action: '把今晚任务压到 10-15 分钟，先留下开始过的证据。',
+      route: '/pages/focus/focus?from=talent_method_plan'
+    },
+    review: {
+      label: '先修错因',
+      action: '把错题拆成一张错因卡，明天只回访同一错因。',
+      route: '/pages/review/review?from=talent_method_plan'
+    },
+    tools: {
+      label: '先轻回忆',
+      action: '先做 90 秒主动回忆，再决定是否进入轻练习。',
+      route: '/pages/arcade/arcade?from=talent_method_plan'
+    }
+  };
+  const primary = methodMap[capabilityId] || methodMap.tutor;
+  return {
+    id: 'talent_learning_method_plan',
+    title: hasTalentSignal ? '天赋/测评只转成方法候选' : '学习方法候选',
+    status: hasTalentSignal ? 'method_candidate_only' : 'evidence_candidate',
+    subject,
+    struggle,
+    primaryMethod: primary,
+    methodCards: [primary, methodMap.review, methodMap.focus].filter((item, index, arr) => arr.findIndex((other) => other.label === item.label) === index),
+    confirmWithEvidence: [
+      '孩子能否说出第一步',
+      '错因卡是否能复述',
+      '明天是否还能回忆',
+      '第 7 天小变式是否迁移'
+    ],
+    localCodeOwns: ['资料类型', '证据缺口', '画像放行', '分享字段', '奖励门槛'],
+    aiBetterFor: ['把建议改写成孩子听得懂的话', '生成不贴标签的家长摘要', '把追问变得更低压'],
+    blockedClaims: ['天赋定性', '人格标签', '升学判断', '分数排名解释', '长期掌握结论'],
+    parentLine: `先把「${subject} · ${struggle}」当成一个方法实验，不给孩子贴天赋标签。`,
+    nextAction: `${primary.label}：${primary.action}`,
+    route: primary.route
+  };
+}
+
 function buildAssessmentEvidenceSeed(text, options = {}) {
   const source = String(text || '').trim();
   const subject = detectSubject(source);
@@ -103,6 +156,13 @@ function buildAssessmentEvidenceSeed(text, options = {}) {
     'wrong_cause_card',
     'next_day_revisit'
   ].concat(matchedSignals.map((item) => item.evidence)))).filter((item) => item !== 'method_candidate_only').slice(0, 6);
+  const talentLearningMethodPlan = buildTalentLearningMethodPlan({
+    sourceType,
+    subject,
+    struggle,
+    capabilityId: capability.id,
+    matchedSignals
+  });
 
   return {
     id: 'assessment_evidence_seed',
@@ -116,6 +176,7 @@ function buildAssessmentEvidenceSeed(text, options = {}) {
     subjectConfidence: confidence.subjectConfidence,
     struggleConfidence: confidence.struggleConfidence,
     nextEvidenceRequired,
+    talentLearningMethodPlan,
     reportInputPatch: {
       sourceText: source,
       sourceType,
@@ -125,7 +186,8 @@ function buildAssessmentEvidenceSeed(text, options = {}) {
         wrongCause: struggle === '说明学习状态' ? '' : struggle,
         firstStep: matchedSignals.some((item) => item.id === 'first_step_stuck') ? '待孩子说出第一步' : '',
         sourceSchemaId: 'assessment_evidence_seed',
-        requiredNextEvidence: nextEvidenceRequired
+        requiredNextEvidence: nextEvidenceRequired,
+        talentLearningMethodPlan
       }
     },
     blockedClaims: [
@@ -166,6 +228,7 @@ function buildLearningAssessment(text) {
     capability,
     evidenceSeed,
     reportInputPatch: evidenceSeed.reportInputPatch,
+    talentLearningMethodPlan: evidenceSeed.talentLearningMethodPlan,
     nextEvidenceRequired: evidenceSeed.nextEvidenceRequired,
     blockedClaims: evidenceSeed.blockedClaims,
     nextQuestion,
@@ -179,6 +242,7 @@ function buildLearningAssessment(text) {
 module.exports = {
   buildLearningAssessment,
   buildAssessmentEvidenceSeed,
+  buildTalentLearningMethodPlan,
   detectSubject,
   detectStruggle,
   recommendCapability,

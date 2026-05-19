@@ -49,6 +49,7 @@ Page({
     gameRetentionLoop: null,
     highFrequencyPracticeLoop: null,
     dailyReturnMission: null,
+    dailyReturnContract: null,
     arcadeResultActionBridge: null,
     emptyGuide: null,
     feedbackText: '',
@@ -208,6 +209,9 @@ Page({
       highFrequencyPracticeLoop: previewHighFrequencyPracticeLoop,
       dailyReturnMission: previewHighFrequencyPracticeLoop && previewHighFrequencyPracticeLoop.dailyReturnMission
         ? previewHighFrequencyPracticeLoop.dailyReturnMission
+        : null,
+      dailyReturnContract: previewHighFrequencyPracticeLoop && previewHighFrequencyPracticeLoop.dailyReturnContract
+        ? previewHighFrequencyPracticeLoop.dailyReturnContract
         : null,
       emptyGuide: this.emptyGuide(selectedGame, round),
       feedbackText: (round.questions || round.tracks || round.pairs || []).length ? this.openingHint(selectedGame) : '还没有适合游戏化的真实学习卡。'
@@ -1090,6 +1094,9 @@ Page({
     const realHomeworkPressureMemoryPrescription = highFrequencyPracticeLoop && highFrequencyPracticeLoop.realHomeworkPressureMemoryPrescription
       ? highFrequencyPracticeLoop.realHomeworkPressureMemoryPrescription
       : null;
+    const dailyReturnContract = highFrequencyPracticeLoop && highFrequencyPracticeLoop.dailyReturnContract
+      ? highFrequencyPracticeLoop.dailyReturnContract
+      : null;
     const questArcSignal = storage.recordQuestArcGameSignal
       ? storage.recordQuestArcGameSignal({
         mission: this.data.questArcMission,
@@ -1251,6 +1258,13 @@ Page({
       real_homework_pressure_share_boundary: realHomeworkPressureMemoryPrescription && realHomeworkPressureMemoryPrescription.sharePayload
         ? realHomeworkPressureMemoryPrescription.sharePayload.blockedFields.join(',')
         : '',
+      daily_return_contract_mode: dailyReturnContract ? dailyReturnContract.mode : '',
+      daily_return_contract_loop: dailyReturnContract && Array.isArray(dailyReturnContract.loop)
+        ? dailyReturnContract.loop.length
+        : 0,
+      daily_return_contract_blocked_fields: dailyReturnContract && dailyReturnContract.shareCard
+        ? dailyReturnContract.shareCard.blockedFields.join(',')
+        : '',
       share_code: incomingShare && incomingShare.share_code ? incomingShare.share_code : ''
     });
     if (storage.saveTodaySession) {
@@ -1346,8 +1360,15 @@ Page({
           ? gameRetentionLoop.evidenceRequired.join(',')
           : '',
         high_frequency_mode: highFrequencyPracticeLoop && highFrequencyPracticeLoop.mode,
-        high_frequency_evidence: highFrequencyPracticeLoop && Array.isArray(highFrequencyPracticeLoop.evidenceRequired)
-          ? highFrequencyPracticeLoop.evidenceRequired.join(',')
+      high_frequency_evidence: highFrequencyPracticeLoop && Array.isArray(highFrequencyPracticeLoop.evidenceRequired)
+        ? highFrequencyPracticeLoop.evidenceRequired.join(',')
+        : '',
+        daily_return_contract_mode: dailyReturnContract ? dailyReturnContract.mode : '',
+        daily_return_contract_loop: dailyReturnContract && Array.isArray(dailyReturnContract.loop)
+          ? dailyReturnContract.loop.length
+          : 0,
+        daily_return_contract_blocked_fields: dailyReturnContract && dailyReturnContract.shareCard
+          ? dailyReturnContract.shareCard.blockedFields.join(',')
           : '',
         memory_feedback_severity: highFrequencyPracticeLoop && highFrequencyPracticeLoop.memoryFeedbackController
           ? highFrequencyPracticeLoop.memoryFeedbackController.severity
@@ -1505,6 +1526,9 @@ Page({
       dailyReturnMission: highFrequencyPracticeLoop && highFrequencyPracticeLoop.dailyReturnMission
         ? highFrequencyPracticeLoop.dailyReturnMission
         : this.data.dailyReturnMission,
+      dailyReturnContract: highFrequencyPracticeLoop && highFrequencyPracticeLoop.dailyReturnContract
+        ? highFrequencyPracticeLoop.dailyReturnContract
+        : this.data.dailyReturnContract,
       questionProgressionSignal,
       arcadeResultActionBridge,
       challengeBrief: Object.assign({}, this.data.challengeBrief || {}, {
@@ -1554,6 +1578,7 @@ Page({
       arcadeResultActionBridge: null,
       highFrequencyPracticeLoop: null,
       dailyReturnMission: null,
+      dailyReturnContract: null,
       emptyGuide: this.emptyGuide(this.data.selectedGame, round),
       feedbackText: '新一局开始。'
     });

@@ -2120,6 +2120,9 @@ function buildLearningReportDraft(input = {}) {
   const reportEvidenceReleaseGate = buildReportEvidenceReleaseGate(input, portraitDecisionReleaseSystem, crossWeekTrendBoard, homeSchoolCollaborationDigest, homeSchoolConferenceKit, portraitConfidenceSystem, portraitEvidenceMaturitySystem);
   const sourceEvidenceLedger = buildSourceEvidenceLedger(input, parts, familyDecisionMemo, reportEvidenceReleaseGate);
   const tonightDecisionBrief = buildTonightDecisionBrief(parts, diagnosisMatrix, familyDecisionMemo, parentDecisionTrustSystem, questionBankRecallReportBridge, input.socraticPromptQualityJudge || null);
+  const reportGameEvidence = input.gameEvidence || {};
+  const reportHighFrequencyLoop = input.highFrequencyPracticeLoop || reportGameEvidence.highFrequencyPracticeLoop || {};
+  const dailyReturnContract = input.dailyReturnContract || reportHighFrequencyLoop.dailyReturnContract || null;
   const parentDecisionBook = buildParentDecisionBook({
     familyDecisionMemo,
     tonightDecisionBrief,
@@ -2168,10 +2171,12 @@ function buildLearningReportDraft(input = {}) {
     crossWeekTrendBoard,
     homeSchoolCollaborationDigest,
     homeSchoolConferenceKit,
+    talentLearningMethodPlan: input.talentLearningMethodPlan || behaviorSignals.talentLearningMethodPlan || null,
     reportEvidenceReleaseGate,
     sourceEvidenceLedger,
     homeworkPressureContext,
     tonightDecisionBrief,
+    dailyReturnContract,
     parentDecisionBook,
     generatedAt: nowIso(input.now),
     missingItems: missing,
@@ -2219,10 +2224,12 @@ function buildLearningReportDraft(input = {}) {
     crossWeekTrendBoard,
     homeSchoolCollaborationDigest,
     homeSchoolConferenceKit,
+    talentLearningMethodPlan: input.talentLearningMethodPlan || behaviorSignals.talentLearningMethodPlan || null,
     reportEvidenceReleaseGate,
     sourceEvidenceLedger,
     homeworkPressureContext,
     tonightDecisionBrief,
+    dailyReturnContract,
     parentDecisionBook,
     reportCompleteness: completeness,
     reportStatus: {

@@ -1958,6 +1958,13 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
     realHomeworkPressureMemoryPrescription,
     peerMemoryRelayLeague
   }, result, { weakKey });
+  const dailyReturnContract = buildDailyReturnContract({
+    dailyReturnMission,
+    dailyMemoryPrescription,
+    memoryComebackLoop,
+    dailyMemorySprintDeck,
+    adaptiveRecallScheduler
+  }, result, { weakKey });
   return {
     title: needsRepair ? '高频修复循环' : '高频巩固循环',
     mode: needsRepair ? 'repair_recall' : 'mastery_recall',
@@ -1988,13 +1995,14 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
     ninetySecondRecallComboEngine,
     realHomeworkPressureMemoryPrescription,
     dailyReturnMission,
+    dailyReturnContract,
     xpRule: 'XP 只奖励主动回忆、错因修复和次日回访，不奖励盲刷题量。',
     leechRule: needsRepair
       ? `同一错因连续 2 次错，会降到第一步小黑板。`
       : '连续 2 次说清第一步，才进入变式练习。',
     parentShareLine: `家长复盘只看：孩子能否自己说出「${weakKey}」的第一步。`,
     nextRoute: needsRepair ? '/pages/review/review' : '/pages/tutor/tutor',
-    evidenceRequired: ['active_recall_cards', 'spaced_review_plan', 'wrong_cause_return', 'quest_cadence', 'memory_feedback_controller', 'recall_intensity_plan', 'wrong_cause_replay_deck', 'xp_feedback_policy', 'quest_arc_runway', 'gizmo_like_memory_protocol', 'socratic_quality_memory_bridge', 'question_bank_memory_bridge', 'question_bank_recall_workout', 'daily_memory_sprint_deck', 'adaptive_recall_scheduler', 'memory_risk_release_model', 'memory_comeback_loop', 'daily_memory_prescription', 'question_type_cluster_memory_protocol', 'peer_memory_relay_league', 'micro_recall_prescription_engine', 'ninety_second_recall_combo_engine', 'real_homework_pressure_memory_prescription', 'daily_return_mission', 'parent_share_line'],
+    evidenceRequired: ['active_recall_cards', 'spaced_review_plan', 'wrong_cause_return', 'quest_cadence', 'memory_feedback_controller', 'recall_intensity_plan', 'wrong_cause_replay_deck', 'xp_feedback_policy', 'quest_arc_runway', 'gizmo_like_memory_protocol', 'socratic_quality_memory_bridge', 'question_bank_memory_bridge', 'question_bank_recall_workout', 'daily_memory_sprint_deck', 'adaptive_recall_scheduler', 'memory_risk_release_model', 'memory_comeback_loop', 'daily_memory_prescription', 'question_type_cluster_memory_protocol', 'peer_memory_relay_league', 'micro_recall_prescription_engine', 'ninety_second_recall_combo_engine', 'real_homework_pressure_memory_prescription', 'daily_return_mission', 'daily_return_contract', 'parent_share_line'],
     weakKey
   };
 }
@@ -2046,6 +2054,88 @@ function buildDailyReturnMission(highFrequency = {}, result = {}, options = {}) 
   };
 }
 
+function buildDailyReturnContract(highFrequency = {}, report = {}, options = {}) {
+  const mission = highFrequency.dailyReturnMission || {};
+  const prescription = highFrequency.dailyMemoryPrescription || {};
+  const comeback = highFrequency.memoryComebackLoop || {};
+  const sprint = highFrequency.dailyMemorySprintDeck || {};
+  const scheduler = highFrequency.adaptiveRecallScheduler || {};
+  const weakKey = options.weakKey || mission.weakKey || prescription.weakKey || '第一步';
+  const rescue = mission.mode === 'rescue_return' || prescription.mode === 'rescue' || Number(report.wrong || 0) >= 2;
+  const loop = [
+    {
+      id: 'tonight_active_recall',
+      label: '今晚',
+      trigger: '孩子完成点拨或轻练习后',
+      action: `90 秒主动回忆「${weakKey}」的第一步`,
+      proof: 'student_first_step_voice_or_text',
+      route: mission.comebackRoute || '/pages/review/review?from=daily_return_contract'
+    },
+    {
+      id: 'tomorrow_revisit',
+      label: '明天',
+      trigger: '同一错因再次出现前',
+      action: `只回访 1 张最不稳的「${weakKey}」卡`,
+      proof: 'next_day_revisit_result',
+      route: comeback.resumeRoute || '/pages/review/review?from=tomorrow_revisit'
+    },
+    {
+      id: 'day3_wrong_cause_replay',
+      label: '第 3 天',
+      trigger: '错因仍重复或家长反馈卡住',
+      action: '重放错因，不新增题海',
+      proof: 'wrong_cause_replayed_without_full_answer',
+      route: '/pages/tutor/tutor?from=wrong_cause_replay'
+    },
+    {
+      id: 'day7_transfer_gate',
+      label: '第 7 天',
+      trigger: '准备写入长期画像前',
+      action: '换一个小变式，只验证入口能否迁移',
+      proof: 'near_transfer_gate_passed',
+      route: '/pages/profile/profile?from=day7_transfer_gate'
+    }
+  ];
+  const blockedFields = Array.from(new Set([]
+    .concat(Array.isArray(mission.blockedFields) ? mission.blockedFields : [])
+    .concat(['original_question', 'source_answer', 'full_solution', 'full_dialogue', 'score', 'ranking', 'private_comment'])));
+  return {
+    id: 'daily_return_contract',
+    title: rescue ? '每日回流合约：先救一个错因' : '每日回流合约',
+    mode: rescue ? 'rescue_first' : 'steady_growth',
+    weakKey,
+    loop,
+    comebackCopy: `今天只让孩子带着「${weakKey}」回来一次，不靠题量刷存在感。`,
+    unlockRules: [
+      { id: 'xp_unlock', localRule: '说出第一步、复述错因或完成次日回访才给 XP。', aiRole: '把规则改写得更像孩子能听懂的话。' },
+      { id: 'portrait_unlock', localRule: '第 7 天小变式通过前，不提高长期画像置信度。', aiRole: '只能生成家长可读解释，不做能力定性。' },
+      { id: 'share_unlock', localRule: '分享只带行动卡、回访窗口和证据缺口。', aiRole: '只润色分享文案。' }
+    ],
+    parentReceipt: {
+      title: '家长 20 秒检查',
+      question: `你刚才第一步先看哪里？为什么先看这里？`,
+      evidence: ['first_step_named', 'wrong_cause_named', 'next_revisit_locked'],
+      doNotAsk: ['不要追完整答案', '不要比较分数排名', '不要让孩子复述整段解法']
+    },
+    shareCard: {
+      allowedFields: ['weak_key', 'first_step_action', 'wrong_cause_label', 'return_window', 'parent_check_question'],
+      blockedFields,
+      receiverAction: '对方只能接力第一步和回访动作，不能看到原题、答案、照片或完整对话。'
+    },
+    localAiBoundary: {
+      localCodeOwns: ['recall_schedule', 'xp_gate', 'portrait_release_gate', 'share_field_allowlist', 'privacy_blocklist'],
+      aiOwns: ['child_friendly_rewrite', 'parent_copy_rewrite', 'blackboard_prompt_variant'],
+      aiMustNotOwn: ['final_answer', 'mastery_claim', 'ranking_or_score_claim', 'privacy_decision']
+    },
+    evidenceRequired: ['daily_return_loop', 'xp_unlock_rule', 'portrait_unlock_rule', 'safe_share_card', 'parent_receipt', 'local_ai_boundary'],
+    sourceSignals: {
+      sprintReady: !!(sprint && sprint.status),
+      schedulerReady: !!(scheduler && scheduler.status),
+      missionReady: mission.id === 'daily_return_mission'
+    }
+  };
+}
+
 module.exports = {
   ACHIEVEMENTS,
   DAY_MS,
@@ -2062,6 +2152,7 @@ module.exports = {
   buildMicroRecallPrescriptionEngine,
   buildNinetySecondRecallComboEngine,
   buildDailyReturnMission,
+  buildDailyReturnContract,
   buildQuestionTypeClusterMemoryProtocol,
   buildRealHomeworkPressureMemoryPrescription,
   buildMemoryFeedbackController,

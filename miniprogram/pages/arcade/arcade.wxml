@@ -149,6 +149,29 @@
       <view class="daily-return-rule">{{dailyReturnMission.shareLine}}</view>
     </view>
 
+    <view class="daily-return-card" wx:if="{{dailyReturnContract}}">
+      <view class="daily-return-top">
+        <view>
+          <view class="daily-return-kicker">回流合约</view>
+          <view class="daily-return-title">{{dailyReturnContract.title}}</view>
+        </view>
+        <view class="daily-return-pill">{{dailyReturnContract.mode}}</view>
+      </view>
+      <view class="daily-return-line">{{dailyReturnContract.comebackCopy}}</view>
+      <view class="daily-return-steps">
+        <view class="daily-return-step" wx:for="{{dailyReturnContract.loop}}" wx:key="id">
+          <view class="daily-return-step-order">{{index + 1}}</view>
+          <view class="daily-return-step-body">
+            <view class="daily-return-step-action">{{item.label}}：{{item.action}}</view>
+            <view class="daily-return-step-proof">{{item.trigger}} · 证据 {{item.proof}}</view>
+          </view>
+        </view>
+      </view>
+      <view class="daily-return-rule">家长只问：{{dailyReturnContract.parentReceipt.question}}</view>
+      <view class="daily-return-rule">AI 只改写表达；本地代码决定回访节奏、XP、画像放行和分享字段。</view>
+      <view class="daily-return-rule">{{dailyReturnContract.shareCard.receiverAction}}</view>
+    </view>
+
     <view class="surface-depth-card arcade-surface-depth" wx:if="{{surfaceDepthPack}}">
       <view class="surface-depth-title">{{surfaceDepthPack.title}}</view>
       <view class="surface-depth-subtitle">{{surfaceDepthPack.summary}}</view>
