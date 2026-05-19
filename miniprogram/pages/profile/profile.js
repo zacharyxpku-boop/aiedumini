@@ -811,6 +811,7 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
   const portraitEvidenceMaturitySystem = reportState.portraitEvidenceMaturitySystem || draft.portraitEvidenceMaturitySystem || {};
   const crossWeekTrendBoard = reportState.crossWeekTrendBoard || draft.crossWeekTrendBoard || {};
   const homeSchoolCollaborationDigest = reportState.homeSchoolCollaborationDigest || draft.homeSchoolCollaborationDigest || {};
+  const homeSchoolConferenceKit = reportState.homeSchoolConferenceKit || draft.homeSchoolConferenceKit || {};
   const matrix = Array.isArray(draft.diagnosisMatrix) ? draft.diagnosisMatrix : [];
   const tendencies = Array.isArray(draft.capabilityTendencies) ? draft.capabilityTendencies : [];
   const effectiveCourseUnitMap = courseUnitMap || (storage.buildCourseUnitMap ? storage.buildCourseUnitMap({}) : null);
@@ -1107,6 +1108,7 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     portraitEvidenceMaturitySystem,
     crossWeekTrendBoard,
     homeSchoolCollaborationDigest,
+    homeSchoolConferenceKit,
     longitudinalPortraitTimelineTitle: longitudinalPortraitTimeline.title || '',
     longitudinalPortraitTimelineStatus: longitudinalPortraitTimeline.status || '',
     longitudinalPortraitTimelineSummary: longitudinalPortraitTimeline.summary || '',
@@ -1143,6 +1145,17 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     homeSchoolDoNotShare: Array.isArray(homeSchoolCollaborationDigest.doNotShare) ? homeSchoolCollaborationDigest.doNotShare : [],
     homeSchoolHandoffCadence: Array.isArray(homeSchoolCollaborationDigest.handoffCadence) ? homeSchoolCollaborationDigest.handoffCadence : [],
     homeSchoolShareBoundary: homeSchoolCollaborationDigest.shareBoundary || '',
+    homeSchoolConferenceTitle: homeSchoolConferenceKit.title || '',
+    homeSchoolConferenceTeacherQuestions: Array.isArray(homeSchoolConferenceKit.teacherQuestions) ? homeSchoolConferenceKit.teacherQuestions : [],
+    homeSchoolConferenceObservationRequest: Array.isArray(homeSchoolConferenceKit.classroomObservationRequest) ? homeSchoolConferenceKit.classroomObservationRequest : [],
+    homeSchoolConferenceParentLog: Array.isArray(homeSchoolConferenceKit.parentHomeObservationLog) ? homeSchoolConferenceKit.parentHomeObservationLog : [],
+    homeSchoolConferenceFeedbackLoop: Array.isArray(homeSchoolConferenceKit.sevenDayTeacherFeedbackLoop) ? homeSchoolConferenceKit.sevenDayTeacherFeedbackLoop : [],
+    homeSchoolConferenceReleaseGate: homeSchoolConferenceKit.localReleaseGate || null,
+    homeSchoolConferenceBlockedFields: homeSchoolConferenceKit.localReleaseGate && Array.isArray(homeSchoolConferenceKit.localReleaseGate.blockedFields)
+      ? homeSchoolConferenceKit.localReleaseGate.blockedFields
+      : [],
+    homeSchoolConferenceShareBoundary: homeSchoolConferenceKit.shareBoundary || '',
+    homeSchoolConferenceAiBoundary: homeSchoolConferenceKit.aiBoundary || '',
     portraitConfidenceTitle: portraitConfidenceSystem.title || '',
     portraitConfidenceLevel: portraitConfidenceSystem.confidenceLevel || '',
     portraitConfidenceScore: Number(portraitConfidenceSystem.evidenceScore || 0),

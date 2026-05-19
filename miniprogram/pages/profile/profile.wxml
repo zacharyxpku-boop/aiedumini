@@ -834,6 +834,18 @@
           <text wx:if="{{learningReportSummary.homeSchoolShareBoundary}}">分享边界：{{learningReportSummary.homeSchoolShareBoundary}}</text>
         </view>
         <view class="parent-brief-block" wx:if="{{learningReportSummary.socraticPromptQualityJudge}}">
+        <view class="parent-brief-block" wx:if="{{learningReportSummary.homeSchoolConferenceKit}}">
+          <text class="parent-brief-label">{{learningReportSummary.homeSchoolConferenceTitle}}</text>
+          <text wx:for="{{learningReportSummary.homeSchoolConferenceTeacherQuestions}}" wx:key="id">问老师：{{item.question}}｜证据：{{item.evidenceNeeded}}</text>
+          <text wx:for="{{learningReportSummary.homeSchoolConferenceObservationRequest}}" wx:key="id">课堂观察：{{item.observe}}｜{{item.why}}</text>
+          <text wx:for="{{learningReportSummary.homeSchoolConferenceParentLog}}" wx:key="id">家里记录：{{item.log}}｜{{item.proof}}</text>
+          <text wx:for="{{learningReportSummary.homeSchoolConferenceFeedbackLoop}}" wx:key="day">第 {{item.day}} 天：{{item.action}}｜{{item.releaseGate}}</text>
+          <text wx:if="{{learningReportSummary.homeSchoolConferenceReleaseGate}}">放行规则：{{learningReportSummary.homeSchoolConferenceReleaseGate.rule}}</text>
+          <text wx:for="{{learningReportSummary.homeSchoolConferenceBlockedFields}}" wx:key="*this">不带字段：{{item}}</text>
+          <text wx:if="{{learningReportSummary.homeSchoolConferenceShareBoundary}}">分享边界：{{learningReportSummary.homeSchoolConferenceShareBoundary}}</text>
+          <text wx:if="{{learningReportSummary.homeSchoolConferenceAiBoundary}}">AI 边界：{{learningReportSummary.homeSchoolConferenceAiBoundary}}</text>
+        </view>
+        <view class="parent-brief-block" wx:if="{{learningReportSummary.socraticPromptQualityJudge}}">
           <text class="parent-brief-label">{{learningReportSummary.socraticPromptJudgeTitle}}</text>
           <text>{{learningReportSummary.socraticPromptJudgeSummary}}</text>
           <text>{{learningReportSummary.socraticPromptParentDecisionLine}}</text>

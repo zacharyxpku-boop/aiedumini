@@ -1243,6 +1243,103 @@ function buildHomeSchoolCollaborationDigest(parts = {}, matrix = [], classroomDe
   };
 }
 
+function buildHomeSchoolConferenceKit(parts = {}, matrix = [], homeSchoolCollaborationDigest = {}, crossWeekTrendBoard = {}, parentDecisionTrustSystem = {}) {
+  const diagnosis = Array.isArray(matrix) ? matrix : [];
+  const primary = diagnosis[0] || {};
+  const subject = primary.subject || homeSchoolCollaborationDigest.subject || crossWeekTrendBoard.subject || '当前学科';
+  const cause = primary.mainCause || homeSchoolCollaborationDigest.cause || crossWeekTrendBoard.cause || '第一步不清';
+  const trustLevel = parentDecisionTrustSystem.level || '证据继续收集';
+  const blockedFields = ['original_question', 'full_answer', 'full_dialogue', 'score', 'ranking', 'private_comment', 'photo'];
+  return {
+    id: 'home_school_conference_kit',
+    title: '家校沟通证据包',
+    subject,
+    cause,
+    localDeterministic: true,
+    teacherQuestions: [
+      {
+        id: 'locate_breakpoint',
+        question: `${subject} 这类题，孩子主要卡在读题、第一步、错因复现还是迁移？`,
+        evidenceNeeded: 'child_first_step + wrong_cause_replay',
+        blockedField: 'full_answer'
+      },
+      {
+        id: 'observe_start',
+        question: `课堂上遇到 ${cause} 时，孩子能否先说出自己要看的量或关键词？`,
+        evidenceNeeded: 'classroom_start_observation',
+        blockedField: 'score'
+      },
+      {
+        id: 'variant_check',
+        question: '如果换一个同类小变式，孩子是方法迁移失败，还是只是计算/书写慢？',
+        evidenceNeeded: 'day7_variant_result',
+        blockedField: 'original_question'
+      },
+      {
+        id: 'support_level',
+        question: '老师建议家庭这周只做哪一个最小动作，不额外加题海？',
+        evidenceNeeded: 'teacher_minimum_action',
+        blockedField: 'ranking'
+      }
+    ],
+    classroomObservationRequest: [
+      {
+        id: 'first_step_voice',
+        observe: '请观察孩子是否能在动笔前说出第一步。',
+        why: '这是区分不会做和启动慢的关键证据。',
+        parentDoesNotNeed: '不需要老师批改完整答案。'
+      },
+      {
+        id: 'wrong_cause_repeat',
+        observe: `请看 ${cause} 是否连续出现在同类题。`,
+        why: '重复错因比单次分数更能决定家庭干预方式。',
+        parentDoesNotNeed: '不需要同学对比或排名。'
+      },
+      {
+        id: 'variant_transfer',
+        observe: '请给一个同类小变式，看孩子是否能迁移同一第一步。',
+        why: '迁移通过后才进入长期画像，未通过则回到小黑板。',
+        parentDoesNotNeed: '不需要增加整套练习。'
+      }
+    ],
+    parentHomeObservationLog: [
+      {
+        id: 'tonight_first_step',
+        log: '今晚只记录孩子原话里的第一步。',
+        proof: 'child_first_step',
+        route: '/pages/tutor/tutor'
+      },
+      {
+        id: 'tomorrow_revisit',
+        log: '明天只回访同一个错因，不换新目标。',
+        proof: 'next_day_revisit',
+        route: '/pages/review/review'
+      },
+      {
+        id: 'day7_variant',
+        log: '第 7 天只看一个小变式能否迁移。',
+        proof: 'day7_variant',
+        route: '/pages/arcade/arcade'
+      }
+    ],
+    sevenDayTeacherFeedbackLoop: [
+      { day: 1, action: '家庭记录第一步和错因，不联系老师下结论。', evidence: 'child_first_step', releaseGate: 'local_only' },
+      { day: 2, action: '完成一次同错因回访，确认是不是偶发。', evidence: 'next_day_revisit', releaseGate: 'local_only' },
+      { day: 4, action: '如果同错因再次出现，准备课堂观察请求。', evidence: 'wrong_cause_repeat', releaseGate: 'prepare_teacher_question' },
+      { day: 7, action: '用证据包向老师问一个具体问题，不传原题答案。', evidence: 'day7_variant_result', releaseGate: 'safe_teacher_handoff' }
+    ],
+    localReleaseGate: {
+      status: trustLevel,
+      requiredEvidence: ['child_first_step', 'wrong_cause_replay', 'next_day_revisit', 'day7_variant_result'],
+      blockedFields,
+      rule: '只有连续证据显示同一错因反复，才生成家校沟通问题；AI 不决定是否联系老师。'
+    },
+    shareBoundary: '只分享观察问题、家庭动作和证据缺口；不分享原题、完整答案、完整对话、分数、排名、照片或隐私评价。',
+    aiBoundary: 'AI 可以改写家长措辞，但不得替代老师判断、不得生成完整答案、不得决定画像升级。',
+    evidenceRequired: ['teacher_question_list', 'classroom_observation_request', 'parent_home_log', 'seven_day_feedback_loop', 'local_release_gate', 'privacy_blocked_fields']
+  };
+}
+
 function buildSocraticMemoryReportBridge(input = {}, parentDecisionTrust = {}, portraitConfidence = {}) {
   const gameEvidence = input.gameEvidence || {};
   const highFrequencyLoop = input.highFrequencyPracticeLoop || gameEvidence.highFrequencyPracticeLoop || {};
@@ -1505,6 +1602,7 @@ function buildLearningReportDraft(input = {}) {
   const portraitDecisionReleaseSystem = buildPortraitDecisionReleaseSystem(input, parentDecisionTrustSystem, portraitConfidenceSystem, portraitEvidenceMaturitySystem, questionBankRecallReportBridge);
   const crossWeekTrendBoard = buildCrossWeekTrendBoard(parts, diagnosisMatrix, longitudinalPortraitTimeline, portraitEvidenceMaturitySystem, questionBankRecallReportBridge);
   const homeSchoolCollaborationDigest = buildHomeSchoolCollaborationDigest(parts, diagnosisMatrix, classroomDecisionBoard, familyDecisionMemo, crossWeekTrendBoard);
+  const homeSchoolConferenceKit = buildHomeSchoolConferenceKit(parts, diagnosisMatrix, homeSchoolCollaborationDigest, crossWeekTrendBoard, parentDecisionTrustSystem);
   const tonightDecisionBrief = buildTonightDecisionBrief(parts, diagnosisMatrix, familyDecisionMemo, parentDecisionTrustSystem, questionBankRecallReportBridge, input.socraticPromptQualityJudge || null);
   const missing = missingItems(parts);
   const reportDraft = {
@@ -1545,6 +1643,7 @@ function buildLearningReportDraft(input = {}) {
     portraitDecisionReleaseSystem,
     crossWeekTrendBoard,
     homeSchoolCollaborationDigest,
+    homeSchoolConferenceKit,
     tonightDecisionBrief,
     generatedAt: nowIso(input.now),
     missingItems: missing,
@@ -1587,6 +1686,7 @@ function buildLearningReportDraft(input = {}) {
     portraitDecisionReleaseSystem,
     crossWeekTrendBoard,
     homeSchoolCollaborationDigest,
+    homeSchoolConferenceKit,
     tonightDecisionBrief,
     reportCompleteness: completeness,
     reportStatus: {
@@ -1623,6 +1723,7 @@ module.exports = {
   buildPortraitDecisionReleaseSystem,
   buildCrossWeekTrendBoard,
   buildHomeSchoolCollaborationDigest,
+  buildHomeSchoolConferenceKit,
   normalizeReportSources,
   confidenceLabel
 };
