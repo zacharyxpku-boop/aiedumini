@@ -86,6 +86,81 @@ function stableChunks(text) {
   return chunks.filter(Boolean);
 }
 
+function uniqueList(items) {
+  return Array.from(new Set((items || []).filter(Boolean)));
+}
+
+function ngrams(text, size) {
+  const source = compactText(text).replace(/[^\w\u4e00-\u9fff]/g, '');
+  const out = [];
+  for (let index = 0; index <= source.length - size; index += 1) {
+    const chunk = source.slice(index, index + size);
+    if (!/[的了是在和与或及就都也很还再先把这那一个我们你我他她它]/.test(chunk)) out.push(chunk);
+  }
+  return out;
+}
+
+function pressureSampleText(sample = {}) {
+  return [
+    sample.subject,
+    sample.gradeBand,
+    sample.taskType,
+    sample.stem,
+    sample.expectedFirstStep,
+    sample.expectedWrongCause,
+    sample.expectedBoardMove,
+    sample.parentCheck,
+    sample.nearTransfer
+  ].filter(Boolean).join(' ');
+}
+
+function scorePressureSample(sourceText, sample = {}, fallbackTaskType = 'unknown') {
+  const source = compactText(sourceText);
+  if (!source) return { score: 0, matched: [] };
+  const sampleText = pressureSampleText(sample);
+  const source2 = uniqueList(ngrams(source, 2));
+  const source3 = uniqueList(ngrams(source, 3));
+  const sample2 = new Set(ngrams(sampleText, 2));
+  const sample3 = new Set(ngrams(sampleText, 3));
+  const matched2 = source2.filter((item) => sample2.has(item));
+  const matched3 = source3.filter((item) => sample3.has(item));
+  const matched = matched2.concat(matched3);
+  let score = matched2.length + matched3.length * 2;
+  if (fallbackTaskType && fallbackTaskType !== 'unknown' && sample.taskType === fallbackTaskType) {
+    score += 12;
+    matched.push(`task:${fallbackTaskType}`);
+  }
+  if (sample.subject && source.includes(compactText(sample.subject))) {
+    score += 8;
+    matched.push(`subject:${sample.subject}`);
+  }
+  if (sample.gradeBand && source.includes(compactText(sample.gradeBand))) {
+    score += 4;
+    matched.push(`grade:${sample.gradeBand}`);
+  }
+  return {
+    score,
+    matched: uniqueList(matched).slice(0, 12)
+  };
+}
+
+function findApproximatePressureSample(text, fallbackTaskType = 'unknown') {
+  if (!REAL_HOMEWORK_PRESSURE_SAMPLES.length) return null;
+  const ranked = REAL_HOMEWORK_PRESSURE_SAMPLES
+    .map((sample) => Object.assign({ sample }, scorePressureSample(text, sample, fallbackTaskType)))
+    .sort((a, b) => b.score - a.score);
+  const best = ranked[0];
+  if (!best || best.score < 18) return null;
+  const runnerUp = ranked[1] || { score: 0 };
+  const confidence = Math.min(0.94, Math.max(0.52, (best.score - runnerUp.score + 18) / 60));
+  return {
+    sample: best.sample,
+    score: best.score,
+    confidence,
+    matched: best.matched
+  };
+}
+
 function findPressureSample(text) {
   const source = compactText(text);
   if (!source) return null;
@@ -104,7 +179,9 @@ function findPressureSample(text) {
 
 function inferHomeworkPressureSignal(text, fallbackTaskType) {
   const sample = findPressureSample(text);
-  if (!sample) {
+  const approximate = sample ? null : findApproximatePressureSample(text, fallbackTaskType);
+  const matchedSample = sample || (approximate && approximate.sample);
+  if (!matchedSample) {
     return {
       id: 'generic_homework_pressure',
       taskType: fallbackTaskType || 'unknown',
@@ -117,24 +194,27 @@ function inferHomeworkPressureSignal(text, fallbackTaskType) {
     };
   }
   return {
-    id: sample.id,
-    subject: sample.subject,
-    gradeBand: sample.gradeBand,
-    sourceId: sample.sourceId,
-    taskType: sample.taskType,
-    firstStep: sample.expectedFirstStep,
-    wrongCause: sample.expectedWrongCause,
-    boardMove: sample.expectedBoardMove,
-    parentCheck: sample.parentCheck,
-    reviewMove: sample.nearTransfer,
-    source: 'real_homework_pressure_fixture'
+    id: matchedSample.id,
+    subject: matchedSample.subject,
+    gradeBand: matchedSample.gradeBand,
+    sourceId: matchedSample.sourceId,
+    taskType: matchedSample.taskType,
+    firstStep: matchedSample.expectedFirstStep,
+    wrongCause: matchedSample.expectedWrongCause,
+    boardMove: matchedSample.expectedBoardMove,
+    parentCheck: matchedSample.parentCheck,
+    reviewMove: matchedSample.nearTransfer,
+    matchScore: approximate ? approximate.score : 100,
+    matchConfidence: approximate ? approximate.confidence : 0.98,
+    matchEvidence: approximate ? approximate.matched : ['exact_or_stable_chunk'],
+    source: approximate ? 'real_homework_pressure_approximate_match' : 'real_homework_pressure_fixture'
   };
 }
 
 function detectTaskType(text = '', selected = {}) {
   const source = `${text || ''} ${selected.text || ''}`;
   const signal = inferHomeworkPressureSignal(source, 'unknown');
-  if (signal && signal.source === 'real_homework_pressure_fixture') return signal.taskType;
+  if (signal && /^real_homework_pressure_/.test(signal.source || '')) return signal.taskType;
   if (/英语阅读|english reading/i.test(source)) return 'reading_question';
   const hit = TASK_TYPE_RULES.find((item) => item.patterns.test(source));
   return hit ? hit.id : 'unknown';
@@ -893,6 +973,8 @@ module.exports = {
   buildSocraticAiLocalBoundaryContract,
   buildAnswerBoundaryEvidence,
   buildRuntimeSocraticReply,
+  findApproximatePressureSample,
+  scorePressureSample,
   childFriendlyLine,
   nextTutorTurnState,
   guardAiTutorReply,

@@ -350,7 +350,28 @@ Page({
       const text = [card.question, card.answer, card.weakPoint, card.checkpoint].join(' ');
       return cause.wrongCauseLabel && text.indexOf(cause.wrongCauseLabel) >= 0;
     });
-    return (taskBoundCards || []).concat(matched).filter((card) => {
+    const bySourceWeight = (card) => {
+      if (!card) return 0;
+      if (card.source === 'course_unit_question_bank') return 40;
+      if (card.source === 'public_k12_homework_intake_queue') return 32;
+      if (card.source === 'real_homework_pressure_memory') return 30;
+      if (card.due || card.dueReason) return 24;
+      if (card.source === 'recent_task_type') return 8;
+      return 16;
+    };
+    return matched.concat(taskBoundCards || [])
+      .sort((a, b) => bySourceWeight(b) - bySourceWeight(a))
+      .map((card) => Object.assign({}, card, {
+        arcadeLoopSource: card.source === 'recent_task_type' ? 'fallback_recent_task_type' : (card.source || 'review_deck'),
+        arcadeLoopReason: card.source === 'course_unit_question_bank'
+          ? '题库驱动：先练第一步、错因和回访'
+          : card.source === 'public_k12_homework_intake_queue'
+            ? '公开 K12 入口：先转成可回忆卡'
+            : card.source === 'recent_task_type'
+              ? '兜底任务卡：没有更具体题库卡时使用'
+              : '复习回流：跟随最近错因或到期卡'
+      }))
+      .filter((card) => {
       const id = card && card.id;
       if (!id || seen[id]) return false;
       seen[id] = true;

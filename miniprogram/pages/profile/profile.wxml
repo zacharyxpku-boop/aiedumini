@@ -1101,6 +1101,15 @@
           <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierAiLocalSplit}}" wx:key="id">AI/本地分工：{{item.label}}｜{{item.owns}}</text>
           <text wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierReleaseGate}}">放行门槛：{{learningReportSummary.uploadedMaterialDecisionDossierReleaseGate.status}}</text>
           <text wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierShareSafePayload}}">分享安全：{{learningReportSummary.uploadedMaterialDecisionDossierShareSafePayload.allowedFields}} / 禁传 {{learningReportSummary.uploadedMaterialDecisionDossierShareSafePayload.blockedFields}}</text>
+          <view class="parent-brief-block" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierHandoff}}">
+            <text class="parent-brief-label">刚上传资料</text>
+            <text>{{learningReportSummary.uploadedMaterialDecisionDossierHandoffTitle}}</text>
+            <text>{{learningReportSummary.uploadedMaterialDecisionDossierHandoffLine}}</text>
+            <text>资料链路：{{learningReportSummary.uploadedMaterialDecisionDossierHandoffSourceSchemaId}}｜报告 {{learningReportSummary.uploadedMaterialDecisionDossierHandoffReportId}}</text>
+          </view>
+          <view class="profile-action-row" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierRouteActions.length}}">
+            <button class="profile-small-primary" wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierRouteActions}}" wx:key="id" data-id="{{item.id}}" data-label="{{item.label}}" data-route="{{item.route}}" data-reason="{{item.reason}}" bindtap="runUploadedMaterialDossierAction">{{item.label}}</button>
+          </view>
           <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierNextEvidenceQueue}}" wx:key="id">下一证据：{{item.laneLabel}}｜{{item.label}}｜{{item.reason}}</text>
           <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierEvidenceRequired}}" wx:key="*this">卷宗证据：{{item}}</text>
         </view>

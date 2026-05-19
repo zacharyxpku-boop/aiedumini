@@ -1081,6 +1081,9 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
   const reportEvidenceReleaseGate = reportState.reportEvidenceReleaseGate || draft.reportEvidenceReleaseGate || {};
   const sourceEvidenceLedger = reportState.sourceEvidenceLedger || draft.sourceEvidenceLedger || {};
   const uploadedMaterialDecisionDossier = reportState.uploadedMaterialDecisionDossier || draft.uploadedMaterialDecisionDossier || {};
+  const uploadedMaterialReportHandoff = storage.get
+    ? storage.get('upload.report.handoff.v1', null)
+    : null;
   const parentDecisionBook = reportState.parentDecisionBook || draft.parentDecisionBook || {};
   const matrix = Array.isArray(draft.diagnosisMatrix) ? draft.diagnosisMatrix : [];
   const tendencies = Array.isArray(draft.capabilityTendencies) ? draft.capabilityTendencies : [];
@@ -1648,6 +1651,11 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     sourceEvidenceLanes: Array.isArray(sourceEvidenceLedger.lanes) ? sourceEvidenceLedger.lanes : [],
     sourceEvidenceRequired: Array.isArray(sourceEvidenceLedger.evidenceRequired) ? sourceEvidenceLedger.evidenceRequired : [],
     uploadedMaterialDecisionDossier,
+    uploadedMaterialDecisionDossierHandoff: uploadedMaterialReportHandoff || null,
+    uploadedMaterialDecisionDossierHandoffTitle: uploadedMaterialReportHandoff && uploadedMaterialReportHandoff.title ? uploadedMaterialReportHandoff.title : '',
+    uploadedMaterialDecisionDossierHandoffLine: uploadedMaterialReportHandoff && uploadedMaterialReportHandoff.line ? uploadedMaterialReportHandoff.line : '',
+    uploadedMaterialDecisionDossierHandoffReportId: uploadedMaterialReportHandoff && uploadedMaterialReportHandoff.reportId ? uploadedMaterialReportHandoff.reportId : '',
+    uploadedMaterialDecisionDossierHandoffSourceSchemaId: uploadedMaterialReportHandoff && uploadedMaterialReportHandoff.sourceSchemaId ? uploadedMaterialReportHandoff.sourceSchemaId : '',
     uploadedMaterialDecisionDossierTitle: uploadedMaterialDecisionDossier.title || '',
     uploadedMaterialDecisionDossierSummary: uploadedMaterialDecisionDossier.summary || '',
     uploadedMaterialDecisionDossierReportUseRule: uploadedMaterialDecisionDossier.reportUseRule || '',
@@ -1662,7 +1670,24 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     uploadedMaterialDecisionDossierAiLocalSplit: Array.isArray(uploadedMaterialDecisionDossier.aiLocalSplit) ? uploadedMaterialDecisionDossier.aiLocalSplit : [],
     uploadedMaterialDecisionDossierReleaseGate: uploadedMaterialDecisionDossier.releaseGate || null,
     uploadedMaterialDecisionDossierShareSafePayload: uploadedMaterialDecisionDossier.shareSafePayload || null,
-    uploadedMaterialDecisionDossierRouteActions: Array.isArray(uploadedMaterialDecisionDossier.routeActions) ? uploadedMaterialDecisionDossier.routeActions : [],
+    uploadedMaterialDecisionDossierRouteActions: []
+      .concat(uploadedMaterialReportHandoff && uploadedMaterialReportHandoff.actionRoute
+        ? [{
+          id: 'handoff_primary',
+          label: uploadedMaterialReportHandoff.actionLabel || '去处理',
+          route: uploadedMaterialReportHandoff.actionRoute,
+          reason: uploadedMaterialReportHandoff.line || '来自刚上传资料的下一步'
+        }]
+        : [])
+      .concat(uploadedMaterialReportHandoff && uploadedMaterialReportHandoff.gameRoute
+        ? [{
+          id: 'handoff_game',
+          label: '去轻练习',
+          route: uploadedMaterialReportHandoff.gameRoute,
+          reason: '把刚上传资料转成一次主动回忆'
+        }]
+        : [])
+      .concat(Array.isArray(uploadedMaterialDecisionDossier.routeActions) ? uploadedMaterialDecisionDossier.routeActions : []),
     uploadedMaterialDecisionDossierEvidenceRequired: Array.isArray(uploadedMaterialDecisionDossier.evidenceRequired) ? uploadedMaterialDecisionDossier.evidenceRequired : [],
     portraitConfidenceTitle: portraitConfidenceSystem.title || '',
     portraitConfidenceLevel: portraitConfidenceSystem.confidenceLevel || '',
@@ -2918,6 +2943,32 @@ Page({
       return;
     }
     wx.navigateTo({ url: path });
+  },
+
+  runUploadedMaterialDossierAction(event) {
+    const dataset = event.currentTarget.dataset || {};
+    const route = dataset.route || '/pages/upload/upload?from=uploaded_material_dossier';
+    if (storage.recordUnifiedNextAction) {
+      storage.recordUnifiedNextAction({
+        source: 'uploaded_material_dossier',
+        sourceLabel: '刚上传资料卷宗',
+        actionId: dataset.id || 'uploaded_material_dossier',
+        actionLabel: dataset.label || '继续处理资料',
+        route,
+        reasonLine: dataset.reason || '',
+        evidenceLine: this.data.learningReportSummary && this.data.learningReportSummary.uploadedMaterialDecisionDossierHandoffLine || ''
+      });
+    }
+    if (storage.recordSurfaceDepthAction) {
+      storage.recordSurfaceDepthAction({
+        surface: 'profile',
+        dimensionId: dataset.id || 'uploaded_material_dossier',
+        label: dataset.label || '继续处理资料',
+        route,
+        readiness: 'uploaded_material_dossier'
+      });
+    }
+    navigation.navigateLearningRoute(route);
   },
 
   startAssessmentFromProfile() {
