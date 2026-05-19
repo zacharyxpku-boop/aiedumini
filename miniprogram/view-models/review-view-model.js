@@ -96,6 +96,42 @@ function buildPrimaryCta(todayFocus) {
   return { text: '开始 5 分钟修复', action: 'review', completed: false };
 }
 
+function buildRepairContract(todayFocus) {
+  if (!todayFocus) return null;
+  const evidence = focusEvidence(todayFocus);
+  const issue = issueLabel(todayFocus);
+  const childStep = evidence.childArticulatedStep || '';
+  const suggestedStep = evidence.systemSuggestedStep || '先把题目问什么说出来。';
+  const completed = todayFocus.repairStatus === 'completed';
+  return {
+    title: completed ? '这次修复已经收口' : '这次只修到这里',
+    status: completed ? '已完成' : childStep ? '可完成' : '先补一句',
+    rows: [
+      {
+        id: 'say',
+        label: '先说',
+        text: childStep || `我先……（参考：${suggestedStep}）`
+      },
+      {
+        id: 'do',
+        label: '小动作',
+        text: todayFocus.hasMiniActionDone || childStep
+          ? `围绕「${issue}」做一道小变式或坐 5 分钟。`
+          : '先补一句自己的第一步，再开始修。'
+      },
+      {
+        id: 'tomorrow',
+        label: '明天验收',
+        text: completed ? '明天只回访同一处第一步，不扩题量。' : '完成后生成明天回访卡。'
+      }
+    ],
+    boundary: '本页只记录第一步、错因和明天回访，不给完整答案，不做分数比较。',
+    parentLine: childStep
+      ? `家长只问：你刚才第一步为什么先做「${childStep}」？`
+      : '家长只问：你第一步准备先看哪里？'
+  };
+}
+
 function buildReviewViewModel(input = {}) {
   const todayFocus = input.todayFocus || null;
   const evidence = todayFocus ? focusEvidence(todayFocus) : null;
@@ -111,6 +147,7 @@ function buildReviewViewModel(input = {}) {
     title: '今晚只修一个卡点',
     subtitle: '不是整题不会，只先把最卡的这一步说清楚。',
     primaryCard: buildPrimaryCard(input),
+    repairContract: buildRepairContract(todayFocus),
     blackboard,
     primaryCta: buildPrimaryCta(todayFocus),
     focusCabinCta: todayFocus

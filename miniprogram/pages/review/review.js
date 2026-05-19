@@ -330,9 +330,9 @@ Page({
       reviewWindows,
       releaseQueue,
       comboLine: combo.totalSeconds ? `${combo.totalSeconds} 秒主动回忆：先说第一步，再说错因，最后核对。` : '90 秒主动回忆：先说第一步，再说错因，最后核对。',
-      xpRule: daily.antiCramRule || 'XP 只奖励主动回忆、错因回放和明天回访，不奖励速度、分数或排名。',
+      xpRule: daily.antiCramRule || 'XP 只奖励主动回忆、错因回放和明天回访，不奖励速度或分数比较。',
       parentLine: daily.parentLine || `家长只问一句：这张卡第一步为什么先做「${weakKey}」？`,
-      shareLine: daily.shareLine || '分享只带错因和下一步，不带原题、答案、分数、排名或完整对话。',
+      shareLine: daily.shareLine || '分享只带错因和下一步，不带原题、答案、分数或完整对话。',
       nextRoute: '/pages/arcade/arcade?from=memory_prescription'
     };
   },
@@ -356,7 +356,7 @@ Page({
       line: active.question || active.prompt || '换一道同类小题，只说第一步和错因。',
       parentLine: active.parentPrompt || '家长只问：这次第一步是什么？为什么先做这一步？',
       blackboardLine: active.blackboardHint || '小黑板只画第一步关系，不画完整解法。',
-      xpRule: active.xpRule || '奖励说清第一步、错因和回访，不奖励速度、分数或排名。',
+      xpRule: active.xpRule || '奖励说清第一步、错因和回访，不奖励速度或分数比较。',
       releaseGate: retest.releaseGate || '三段复测证据齐之前，不写长期掌握结论。',
       arcadeRoute: active.nextPracticePlan && active.nextPracticePlan.arcadeRoute
         ? active.nextPracticePlan.arcadeRoute

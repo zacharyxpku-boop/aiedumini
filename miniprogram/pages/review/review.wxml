@@ -37,6 +37,18 @@
             <view class="focus-text">{{item.text}}</view>
           </view>
         </view>
+        <view class="repair-contract-card" wx:if="{{reviewViewModel.repairContract}}">
+          <view class="repair-contract-head">
+            <view class="repair-contract-title">{{reviewViewModel.repairContract.title}}</view>
+            <view class="repair-contract-status">{{reviewViewModel.repairContract.status}}</view>
+          </view>
+          <view class="repair-contract-row" wx:for="{{reviewViewModel.repairContract.rows}}" wx:key="id">
+            <text class="repair-contract-label">{{item.label}}</text>
+            <text class="repair-contract-text">{{item.text}}</text>
+          </view>
+          <view class="repair-contract-parent">{{reviewViewModel.repairContract.parentLine}}</view>
+          <view class="repair-contract-boundary">{{reviewViewModel.repairContract.boundary}}</view>
+        </view>
         <view class="blackboard-card" wx:if="{{reviewViewModel.blackboard}}">
           <view class="blackboard-kicker">原点小黑板</view>
           <view class="blackboard-intro">{{reviewViewModel.blackboard.intro}}</view>
