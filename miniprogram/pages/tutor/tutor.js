@@ -205,6 +205,12 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
       null
     )
     : null;
+  const socraticAiLocalBoundaryContract = tutorLadder.buildSocraticAiLocalBoundaryContract
+    ? tutorLadder.buildSocraticAiLocalBoundaryContract(
+      subjectSkillDepth && subjectSkillDepth.taskType ? subjectSkillDepth.taskType : 'unknown',
+      subjectSkillDepth || {}
+    )
+    : null;
   const sevenSubjectMasterySprint = storage.buildSevenSubjectMasterySprint
     ? storage.buildSevenSubjectMasterySprint({
       courseUnitMap,
@@ -313,6 +319,8 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
     questionTypeCoverageAtlas,
     socraticQualityEvaluationSuite,
     socraticPromptQualityJudge,
+    socratic_ai_local_boundary_contract: socraticAiLocalBoundaryContract,
+    socraticAiLocalBoundaryContract,
     socraticPromptEffectivePrompts: socraticPromptQualityJudge && Array.isArray(socraticPromptQualityJudge.effectivePrompts)
       ? socraticPromptQualityJudge.effectivePrompts.slice(0, 4)
       : [],
@@ -754,6 +762,8 @@ Page({
       fallback_recovery_bridge: result && result.fallback_recovery_bridge ? result.fallback_recovery_bridge : null,
       three_round_socratic_protocol: result && result.three_round_socratic_protocol ? result.three_round_socratic_protocol : null,
       socratic_prompt_quality_judge: result && result.socratic_prompt_quality_judge ? result.socratic_prompt_quality_judge : receipt.socraticPromptQualityJudge || null,
+      socratic_ai_local_boundary_contract: result && result.socratic_ai_local_boundary_contract ? result.socratic_ai_local_boundary_contract : receipt.socraticAiLocalBoundaryContract || null,
+      socraticAiLocalBoundaryContract: result && result.socraticAiLocalBoundaryContract ? result.socraticAiLocalBoundaryContract : receipt.socraticAiLocalBoundaryContract || null,
       allowed_moves: result && result.allowed_moves ? result.allowed_moves : [],
       transfer_prompt: result && result.transfer_prompt ? result.transfer_prompt : ''
     });
@@ -822,6 +832,16 @@ Page({
         three_round_socratic_evidence: result.three_round_socratic_protocol && Array.isArray(result.three_round_socratic_protocol.evidenceRequired)
           ? result.three_round_socratic_protocol.evidenceRequired.length
           : 0,
+        socratic_ai_local_boundary_contract: result.socratic_ai_local_boundary_contract || null,
+        socratic_ai_local_rows: result.socratic_ai_local_boundary_contract && Array.isArray(result.socratic_ai_local_boundary_contract.runtimeDecisionRows)
+          ? result.socratic_ai_local_boundary_contract.runtimeDecisionRows.length
+          : 0,
+        socratic_ai_local_local_owns: result.socratic_ai_local_boundary_contract && Array.isArray(result.socratic_ai_local_boundary_contract.localOwns)
+          ? result.socratic_ai_local_boundary_contract.localOwns
+          : [],
+        socratic_ai_local_ai_rewrite: result.socratic_ai_local_boundary_contract && Array.isArray(result.socratic_ai_local_boundary_contract.aiMayRewrite)
+          ? result.socratic_ai_local_boundary_contract.aiMayRewrite
+          : [],
         socratic_prompt_quality_judge: result.socratic_prompt_quality_judge || null,
         prompt_quality_effective_count: result.socratic_prompt_quality_judge && Array.isArray(result.socratic_prompt_quality_judge.effectivePrompts)
           ? result.socratic_prompt_quality_judge.effectivePrompts.length

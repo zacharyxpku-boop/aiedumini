@@ -500,6 +500,94 @@ function sanitizeBoundaryText(value) {
   return value;
 }
 
+function buildSocraticAiLocalBoundaryContract(taskType, signal = {}, options = {}) {
+  const firstStep = signal.firstStep || TASK_TYPE_PROMPTS[taskType] || TASK_TYPE_PROMPTS.unknown;
+  const wrongCause = signal.wrongCause || '先收孩子自己的第一步，再判断错因';
+  const boardMove = signal.boardMove || '小黑板只画入口关系，不展开整题结论';
+  const parentCheck = signal.parentCheck || '家长只问一句检查点，不替孩子做题';
+  const sourcePolicy = options.sourcePolicy || '公开 K12 资料只做题型蓝图和解释素材，不直接复制成答案库';
+  return {
+    id: 'socratic_ai_local_boundary_contract',
+    title: '点拨分工：本地规则定轴，AI 只改写表达',
+    status: 'ready',
+    localDeterministic: true,
+    sourcePolicy,
+    localOwns: [
+      'task_type_axis',
+      'wrong_cause_classification',
+      'first_step_blackboard',
+      'three_round_stop_rule',
+      'fallback_ladder',
+      'report_release_gate',
+      'share_privacy_fields',
+      'xp_reward_release'
+    ],
+    aiMayRewrite: [
+      'child_friendly_prompt_wording',
+      'parent_readable_explanation',
+      'encouragement_tone',
+      'same_first_step_multiple_phrasings'
+    ],
+    aiMustNotDecide: [
+      'final_answer',
+      'reward_release',
+      'share_fields',
+      'mastery_claim',
+      'question_axis',
+      'stop_or_continue',
+      'report_conclusion'
+    ],
+    runtimeDecisionRows: [
+      {
+        id: 'axis',
+        inputSignal: taskType || 'unknown',
+        localDecision: `题型轴由本地规则锁定：${taskType || 'unknown'}`,
+        aiAllowedRewrite: '可以把追问说得更像孩子听得懂的话',
+        blockedBehavior: '不能把题型改成另一个方向'
+      },
+      {
+        id: 'wrong_cause',
+        inputSignal: wrongCause,
+        localDecision: `错因先落到：${wrongCause}`,
+        aiAllowedRewrite: '可以给家长解释为什么先修这个错因',
+        blockedBehavior: '不能因为语气自信就改成已掌握'
+      },
+      {
+        id: 'blackboard',
+        inputSignal: firstStep,
+        localDecision: `第一步小黑板：${boardMove}`,
+        aiAllowedRewrite: '可以换一种问法引导孩子说第一步',
+        blockedBehavior: '不能展开整题结论或代写过程'
+      },
+      {
+        id: 'stop_rule',
+        inputSignal: parentCheck,
+        localDecision: '三轮仍卡住就停止加提示，转家长检查句和明日回访',
+        aiAllowedRewrite: '可以把停止说明改得更温和',
+        blockedBehavior: '不能继续加难题、加奖励或给整题结论'
+      },
+      {
+        id: 'share_report',
+        inputSignal: 'report_and_share',
+        localDecision: '报告与分享只带第一步、错因、回访动作和隐私安全字段',
+        aiAllowedRewrite: '可以生成家长可读摘要',
+        blockedBehavior: '不能带原题图片、对话全文、分数名次或孩子隐私'
+      }
+    ],
+    fallbackLine: `即使 AI 不可用，也按本地路径继续：${firstStep}；${parentCheck}`,
+    parentLine: '家长看到的是本地规则审核后的第一步、错因和回访，不是模型自由判断。',
+    reportLine: '报告只在本地证据齐全时释放，AI 只能改写摘要，不能决定掌握度。',
+    evidenceRequired: [
+      'local_route',
+      'first_step',
+      'wrong_cause',
+      'stop_rule',
+      'fallback_ladder',
+      'safe_share_boundary'
+    ]
+  };
+}
+
 function buildTutorReply(text, options = {}) {
   const messages = options.messages || [];
   const currentHintLevel = options.currentHintLevel || 1;
@@ -517,6 +605,7 @@ function buildTutorReply(text, options = {}) {
   const masteryStatus = answerRequest ? 'blocked_answer_request' : level >= 5 ? 'method_summary_ready' : 'needs_student_step';
   const qualitySuite = buildSocraticQualityEvaluationSuite(taskType, pressureSignal);
   const promptJudge = buildSocraticPromptQualityJudge(taskType, qualitySuite, pressureSignal);
+  const aiLocalBoundaryContract = buildSocraticAiLocalBoundaryContract(taskType, pressureSignal);
 
   const result = {
     reply: withStepIntro(item, reply),
@@ -555,6 +644,8 @@ function buildTutorReply(text, options = {}) {
     socratic_prompt_quality_judge: promptJudge,
     socraticPromptQualityJudge: promptJudge,
     three_round_socratic_protocol: buildThreeRoundSocraticProtocol(taskType, pressureSignal),
+    socratic_ai_local_boundary_contract: aiLocalBoundaryContract,
+    socraticAiLocalBoundaryContract: aiLocalBoundaryContract,
     allowed_moves: ['ask_student_first_step', '说第一步', '圈一个条件', '画入口关系', level >= 4 ? 'similar_example' : 'micro_choice'].filter(Boolean),
     no_full_answer_boundary: SAFE_BOUNDARY_TEXT
   };
@@ -605,6 +696,7 @@ module.exports = {
   buildSocraticQualityEvaluationSuite,
   buildSocraticPromptQualityJudge,
   buildThreeRoundSocraticProtocol,
+  buildSocraticAiLocalBoundaryContract,
   buildTutorReply,
   simulateThreeRoundSocratic,
   MISCONCEPTION_MAP

@@ -192,6 +192,15 @@
             <view class="receipt-board-parent" wx:for="{{thinkingReceipt.sevenSubjectMasterySprint.lanes}}" wx:key="id">{{item.label}}：{{item.target}}</view>
             <view class="receipt-board-avoid">{{thinkingReceipt.sevenSubjectMasterySprint.moatLine}}</view>
           </view>
+          <view class="receipt-first-step-board" wx:if="{{thinkingReceipt.socratic_ai_local_boundary_contract}}">
+            <view class="receipt-diagnostic-title">{{thinkingReceipt.socratic_ai_local_boundary_contract.title}}</view>
+            <view class="receipt-board-avoid">{{thinkingReceipt.socratic_ai_local_boundary_contract.sourcePolicy}}</view>
+            <view class="receipt-board-line">{{thinkingReceipt.socratic_ai_local_boundary_contract.parentLine}}</view>
+            <view class="receipt-board-parent">{{thinkingReceipt.socratic_ai_local_boundary_contract.fallbackLine}}</view>
+            <view class="receipt-board-line" wx:for="{{thinkingReceipt.socratic_ai_local_boundary_contract.runtimeDecisionRows}}" wx:key="id">本地规则：{{item.localDecision}}｜AI改写：{{item.aiAllowedRewrite}}</view>
+            <view class="receipt-board-parent" wx:for="{{thinkingReceipt.socratic_ai_local_boundary_contract.aiMustNotDecide}}" wx:key="*this">禁止交给AI：{{item}}</view>
+            <view class="receipt-board-avoid">{{thinkingReceipt.socratic_ai_local_boundary_contract.reportLine}}</view>
+          </view>
           <view class="receipt-first-step-board" wx:if="{{thinkingReceipt.visualSocraticMatrix}}">
             <view class="receipt-diagnostic-title">{{thinkingReceipt.visualSocraticMatrix.title}}</view>
             <view class="receipt-board-avoid">{{thinkingReceipt.visualSocraticMatrix.visualBoundary}}</view>
