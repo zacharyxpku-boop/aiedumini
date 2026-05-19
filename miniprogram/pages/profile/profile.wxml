@@ -687,6 +687,7 @@
           <text>{{learningReportSummary.realHomeworkCoverageMatrix.publicSourceLine}}</text>
           <text>{{learningReportSummary.realHomeworkCoverageMatrix.openSourceResourceLine}}</text>
           <text>{{learningReportSummary.realHomeworkCoverageMatrix.homeworkIntakeQueueLine}}</text>
+          <text>{{learningReportSummary.realHomeworkCoverageMatrix.intakeChallengeDeckLine}}</text>
           <text>{{learningReportSummary.realHomeworkCoverageMatrix.publicWorkbenchLine}}</text>
           <text>{{learningReportSummary.realHomeworkCoverageMatrix.clusterRunwayLine}}</text>
           <text wx:for="{{learningReportSummary.realHomeworkUseWorkbench}}" wx:key="id">资料工作台：{{item.label}}｜可直接用：{{item.directUse[0]}}｜本地代码：{{item.localizeAsCode[0]}}｜AI：{{item.aiBetterFor[0]}}｜禁用：{{item.mustNotUse[0]}}</text>
@@ -694,6 +695,7 @@
           <text wx:for="{{learningReportSummary.realHomeworkPublicSources}}" wx:key="id">资料账本：{{item.label}}｜本地规则：{{item.localRuleUse[0]}}｜AI：{{item.aiUse[0]}}｜禁用：{{item.blockedUse[0]}}</text>
           <text wx:for="{{learningReportSummary.realHomeworkOpenSourceResources}}" wx:key="id">开源资料：{{item.label}}｜来源：{{item.sourceUrl}}｜使用判断：{{item.commercialDecision}}｜许可提醒：{{item.licenseSignal}}｜本地化：{{item.localizeAsCode[0]}}｜AI：{{item.aiBetterFor[0]}}｜禁用：{{item.mustNotUse[0]}}</text>
           <text wx:for="{{learningReportSummary.realHomeworkIntakeQueue}}" wx:key="id">采集队列：{{item.subject}}｜{{item.observedHomeworkShape}}｜本地化：{{item.localPressureTransform}}｜追问：{{item.socraticProbe}}｜游戏：{{item.gameUse}}｜分享：{{item.shareHook}}</text>
+          <text wx:for="{{learningReportSummary.realHomeworkIntakeChallengeDeck}}" wx:key="id">可玩采集卡：{{item.title}}｜{{item.firstStepPrompt}}｜游戏：{{item.gameUse}}｜边界：{{item.answerBoundary}}</text>
           <text wx:for="{{learningReportSummary.realHomeworkImplementationDecisions}}" wx:key="id">实现判断：{{item.productQuestion}}｜{{item.decision}}</text>
           <text wx:for="{{learningReportSummary.realHomeworkQuestionTypeClusters}}" wx:key="id">题型簇：{{item.subject}}｜{{item.pressureFamily}}｜小黑板：{{item.boardMove}}｜回访：{{item.memoryCadence}}</text>
           <text wx:for="{{learningReportSummary.realHomeworkCoverageSubjects}}" wx:key="id">{{item.label}}：{{item.count}} 个压力样本｜待补：{{item.nextGap}}</text>
@@ -1368,6 +1370,7 @@
           <view wx:for="{{communityShareRelayBoard.peerRelayChallengeLadder.stages}}" wx:key="id">接力阶梯：{{item.label}}｜{{item.visibleLine}}｜{{item.receiverAction}}｜证据 {{item.proofRequired}}</view>
           <view wx:for="{{communityShareRelayBoard.copyableChallengeTemplates}}" wx:key="id">可复制挑战：{{item.title}}｜{{item.copy}}｜证据 {{item.proofRequired}}</view>
           <view wx:for="{{communityShareRelayBoard.sourceBackedChallengeDeck}}" wx:key="id">来源挑战：{{item.title}}｜{{item.receiverPrompt}}｜使用判断 {{item.commercialDecision}}｜许可 {{item.licenseSignal}}</view>
+          <view wx:for="{{communityShareRelayBoard.publicK12IntakeChallengeDeck}}" wx:key="id">公开作业挑战：{{item.title}}｜{{item.firstStepPrompt}}｜{{item.shareHook}}｜禁止 {{item.blockedUse[0]}}</view>
           <view wx:if="{{communityShareRelayBoard.localSpreadReleaseGate}}">
             本地放行门禁：{{communityShareRelayBoard.localSpreadReleaseGate.status}}｜{{communityShareRelayBoard.localSpreadReleaseGate.rule}}
           </view>

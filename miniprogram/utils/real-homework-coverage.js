@@ -1277,6 +1277,36 @@ const LONGITUDINAL_PRESSURE_SCENARIO_LEDGER = [
   }
 ];
 
+function buildPublicK12IntakeChallengeDeck(options = {}) {
+  const limit = Number(options.limit || PUBLIC_K12_HOMEWORK_INTAKE_QUEUE.length);
+  return PUBLIC_K12_HOMEWORK_INTAKE_QUEUE.slice(0, limit).map((item, index) => ({
+    id: `public_k12_intake_${item.id || index + 1}`,
+    sourceId: item.sourceId,
+    sourceUrl: item.sourceUrl,
+    subject: item.subject,
+    taskType: item.taskType,
+    title: `${item.subject} · ${displayLabel(item.taskType)} · 90秒第一步挑战`,
+    prompt: item.observedHomeworkShape,
+    firstStepPrompt: item.socraticProbe,
+    localTransform: item.localPressureTransform,
+    reportUse: item.reportUse,
+    gameUse: item.gameUse,
+    shareHook: item.shareHook,
+    route: `/pages/arcade/arcade?from=public_k12_intake&task_type=${encodeURIComponent(item.taskType)}`,
+    answerBoundary: '只练第一步、错因和回访，不展示原题、答案、分数或排名。',
+    evidenceRequired: item.proofRequired,
+    blockedUse: item.blockedUse,
+    releaseGate: [
+      'receiver_uses_own_material',
+      'first_step_spoken_before_answer',
+      'parent_check_present',
+      'next_day_revisit_scheduled'
+    ],
+    localOwner: 'local_rule',
+    aiOwner: 'ai_wording_only'
+  }));
+}
+
 function buildRealHomeworkCoverageMatrix(options = {}) {
   const activeSubject = String(options.subject || '').trim();
   const subjectRows = countRowsFromSamples(REAL_HOMEWORK_PRESSURE_SAMPLES, 'subject', SUBJECT_COUNTS);
@@ -1303,6 +1333,7 @@ function buildRealHomeworkCoverageMatrix(options = {}) {
     publicK12OpenSourceResourceLedger: PUBLIC_K12_OPEN_SOURCE_RESOURCE_LEDGER,
     publicK12UseWorkbench: PUBLIC_K12_USE_WORKBENCH,
     publicK12HomeworkIntakeQueue: PUBLIC_K12_HOMEWORK_INTAKE_QUEUE,
+    publicK12IntakeChallengeDeck: buildPublicK12IntakeChallengeDeck(),
     implementationDecisionMatrix: K12_PUBLIC_IMPLEMENTATION_DECISION_MATRIX,
     antiFakeThicknessGates: PUBLIC_K12_ANTI_FAKE_THICKNESS_GATES,
     implementationPlaybook: PUBLIC_K12_IMPLEMENTATION_PLAYBOOK,
@@ -1312,6 +1343,7 @@ function buildRealHomeworkCoverageMatrix(options = {}) {
     publicCandidatePoolLine: `已把 ${PUBLIC_K12_CANDIDATE_POOL.length} 条可扩内容候选按 A+/A/B 分级，先过本地化和禁用字段检查再进入样本库。`,
     openSourceResourceLine: `已把 ${PUBLIC_K12_OPEN_SOURCE_RESOURCE_LEDGER.length} 类开源/OER/官方公开资料拆成“直接可用、需本地化、AI 可改写、必须禁用”的产品账本。`,
     homeworkIntakeQueueLine: `已把 ${PUBLIC_K12_HOMEWORK_INTAKE_QUEUE.length} 条公开K12作业形态排入采集队列：先改写为本地压力样本，再压测苏格拉底、报告、游戏和分享。`,
+    intakeChallengeDeckLine: `已把 ${PUBLIC_K12_HOMEWORK_INTAKE_QUEUE.length} 条采集队列转成可玩挑战卡：接收者必须用自己的材料说第一步，不能复制原题或答案。`,
     publicSourceLine: `已把 ${PUBLIC_K12_SOURCE_LEDGER.length} 类公开/一方资料沉淀为本地规则资产：题型、错因、第一步、小黑板、回访、报告和分享边界。`,
     publicSourceBlockedLine: '禁止把公开资料变成原题答案库、拍照搜题承诺、排名晒分或全科动态板书承诺。',
     antiFakeThicknessLine: `已把 ${PUBLIC_K12_ANTI_FAKE_THICKNESS_GATES.length} 类“看起来厚但实际不准”的风险做成硬门槛：来源、苏格拉底、小黑板、记忆游戏、报告画像和分享增长都必须有证据再放行。`,
@@ -1326,6 +1358,7 @@ function buildRealHomeworkCoverageMatrix(options = {}) {
     totalPublicCandidateAssets: PUBLIC_K12_CANDIDATE_POOL.length,
     totalOpenSourceResources: PUBLIC_K12_OPEN_SOURCE_RESOURCE_LEDGER.length,
     totalHomeworkIntakeQueue: PUBLIC_K12_HOMEWORK_INTAKE_QUEUE.length,
+    totalIntakeChallengeCards: PUBLIC_K12_HOMEWORK_INTAKE_QUEUE.length,
     totalQuestionTypeClusters: QUESTION_TYPE_CLUSTER_RUNWAY.length,
     totalLongitudinalPressureScenarios: LONGITUDINAL_PRESSURE_SCENARIO_LEDGER.length,
     reportLine: `报告可引用 ${totalSamples} 个压力样本的第一步、错因、小黑板和回访动作。`,
@@ -1360,5 +1393,6 @@ module.exports = {
   K12_PUBLIC_IMPLEMENTATION_DECISION_MATRIX,
   LONGITUDINAL_PRESSURE_SCENARIO_LEDGER,
   getRealHomeworkPressureSamples,
+  buildPublicK12IntakeChallengeDeck,
   buildRealHomeworkCoverageMatrix
 };

@@ -5301,6 +5301,9 @@ function buildShareSpreadReadinessGate(input = {}) {
 
 function buildCommunityShareRelayBoard(input = {}) {
   const plan = input.shareChallengePlan || buildShareChallengePlan(input);
+  const publicK12IntakeChallengeDeck = realHomeworkCoverage && typeof realHomeworkCoverage.buildPublicK12IntakeChallengeDeck === 'function'
+    ? realHomeworkCoverage.buildPublicK12IntakeChallengeDeck({ limit: 6 })
+    : [];
   const shareRuns = loadShareRuns();
   const incoming = loadIncomingShare();
   const recentRuns = shareRuns.slice(0, 5);
@@ -5377,6 +5380,7 @@ function buildCommunityShareRelayBoard(input = {}) {
     safeRelayChallengePacket: plan.safeRelayChallengePacket,
     shareHookDeck: plan.shareHookDeck || [],
     sourceBackedChallengeDeck: plan.sourceBackedChallengeDeck || [],
+    publicK12IntakeChallengeDeck,
     naturalSpreadTriggers: plan.naturalSpreadTriggers || [],
     naturalSpreadLoop: plan.naturalSpreadLoop || {},
     spreadReadinessGate: plan.spreadReadinessGate || buildShareSpreadReadinessGate({
