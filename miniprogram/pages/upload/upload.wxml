@@ -144,6 +144,19 @@
             <view class="intake-packet-evidence">
               <view class="intake-packet-chip {{item.ready ? 'ready' : ''}}" wx:for="{{uploadIntakePacket.evidence}}" wx:key="id">{{item.label}}</view>
             </view>
+            <view class="intake-action-queue" wx:if="{{uploadIntakePacket.nextActionQueue.length}}">
+              <view class="intake-action-title">下一步动作队列</view>
+              <view class="intake-action-item {{item.status}}" wx:for="{{uploadIntakePacket.nextActionQueue}}" wx:key="id" data-route="{{item.route}}" bindtap="goIntakeAction">
+                <view class="intake-action-main">
+                  <text>{{item.label}}</text>
+                  <text>{{item.action}}</text>
+                </view>
+                <view class="intake-action-meta">
+                  <text>{{item.owner}}</text>
+                  <text>{{item.releaseGate}}</text>
+                </view>
+              </view>
+            </view>
             <view class="intake-packet-boundary">{{uploadIntakePacket.reviewSeed.boundary}}</view>
             <view class="intake-packet-boundary">{{uploadIntakePacket.aiBoundary}}</view>
           </view>

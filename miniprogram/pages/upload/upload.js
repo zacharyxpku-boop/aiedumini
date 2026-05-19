@@ -485,4 +485,20 @@ Page({
     navigation.navigateLearningRoute(next.route || '/pages/tutor/tutor');
   },
 
+  goIntakeAction(event) {
+    const dataset = event.currentTarget.dataset || {};
+    const route = dataset.route || '/pages/upload/upload';
+    const packet = this.data.uploadIntakePacket || {};
+    if (storage.recordSurfaceDepthAction) {
+      storage.recordSurfaceDepthAction({
+        surface: 'upload',
+        dimensionId: 'upload_intake_next_action',
+        label: packet.kind || 'upload_intake',
+        route,
+        readiness: 'intake_action_queue'
+      });
+    }
+    navigation.navigateLearningRoute(route);
+  },
+
 });

@@ -103,6 +103,58 @@ function classifyImportInput(text = '') {
   };
 }
 
+function buildNextActionQueue(kind, classified = {}, materialSource = null, images = []) {
+  const sourceLabel = materialSource && materialSource.label ? materialSource.label : '用户输入';
+  const photoNeedsText = kind === 'photo_evidence_needs_text';
+  return [
+    {
+      id: 'complete_stuck_point',
+      label: photoNeedsText ? '先补一句卡住点' : '确认第一步卡点',
+      route: '/pages/upload/upload',
+      owner: 'local_rule',
+      status: photoNeedsText ? 'required' : 'ready',
+      releaseGate: photoNeedsText ? '补齐错因或卡住点后才进入复习/点拨' : '已有文字证据，可进入今晚闭环',
+      action: photoNeedsText ? '写清孩子卡在哪一步' : '保留题型、错因和来源'
+    },
+    {
+      id: 'socratic_first_step',
+      label: '苏格拉底第一步',
+      route: '/pages/tutor/tutor?from=upload_intake',
+      owner: 'ai_with_local_guardrail',
+      status: photoNeedsText ? 'locked' : (classified.route === 'review' ? 'optional' : 'ready'),
+      releaseGate: '本地规则先判定题型和禁用字段，AI 只改写追问语气',
+      action: '只问第一步，不生成完整答案'
+    },
+    {
+      id: 'review_card_seed',
+      label: '生成回忆卡',
+      route: '/pages/review/review',
+      owner: 'local_rule',
+      status: photoNeedsText ? 'locked' : (kind === 'material_source' || classified.route === 'review' ? 'ready' : 'optional'),
+      releaseGate: '只使用用户粘贴的文字摘录或自己写的错因',
+      action: `${sourceLabel} -> 概念卡/步骤卡/错因卡/明天回访`
+    },
+    {
+      id: 'first_step_challenge',
+      label: '90秒第一步挑战',
+      route: '/pages/arcade/arcade?from=upload_intake',
+      owner: 'local_rule',
+      status: photoNeedsText ? 'locked' : 'optional',
+      releaseGate: '挑战只带动作和回访窗口，不带原题、答案、分数或排名',
+      action: images.length ? '用自己的材料说第一步' : '用当前文字生成低压挑战'
+    },
+    {
+      id: 'parent_report_seed',
+      label: '写入家长复盘',
+      route: '/pages/profile/profile',
+      owner: 'local_rule',
+      status: photoNeedsText ? 'locked' : 'ready',
+      releaseGate: '报告只记录来源、第一步、错因和下一次回访',
+      action: '家长只看今晚能问的一句话'
+    }
+  ];
+}
+
 function buildUploadIntakePacket(text = '', imagePaths = [], materialType = '') {
   const value = String(text || '').trim();
   const images = Array.isArray(imagePaths) ? imagePaths.filter(Boolean).slice(0, 4) : [];
@@ -147,6 +199,7 @@ function buildUploadIntakePacket(text = '', imagePaths = [], materialType = '') 
     confidence: value ? (images.length ? 0.72 : 0.64) : 0.28,
     status: value ? '可进入今晚闭环' : '需要补一句错因或卡点'
   };
+  const nextActionQueue = buildNextActionQueue(kind, classified, materialSource || classified.sourceMeta || null, images);
   return {
     id: `upload_intake_${Date.now ? Date.now() : 0}`,
     kind,
@@ -161,6 +214,7 @@ function buildUploadIntakePacket(text = '', imagePaths = [], materialType = '') 
       ? '照片只做本地留档。请补一句错因或卡住点，系统才会整理成回忆卡。'
       : classified.feedback,
     evidence,
+    nextActionQueue,
     blockedFields,
     reviewSeed,
     reportSeed,
@@ -171,6 +225,7 @@ function buildUploadIntakePacket(text = '', imagePaths = [], materialType = '') 
 module.exports = {
   IMPORT_CHIPS,
   buildUploadIntakePacket,
+  buildNextActionQueue,
   classifyImportInput,
   detectMaterialSource,
   looksLikeMaterialExcerpt,
