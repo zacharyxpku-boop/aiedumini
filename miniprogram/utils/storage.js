@@ -1540,6 +1540,100 @@ function buildRealTrialSocraticStressAudit(options = {}) {
   };
 }
 
+function buildRealTrialStressRepairQueue(options = {}) {
+  const audit = options.audit || buildRealTrialSocraticStressAudit({
+    candidateBoard: options.candidateBoard,
+    samples: options.samples,
+    limit: options.limit || 8
+  });
+  const rows = Array.isArray(audit.rows) ? audit.rows : [];
+  const repairCopy = {
+    first_step_generic: {
+      label: '第一步待修',
+      action: '改成孩子能立刻开口的一步：先圈量、先画关系、先标单位或先复述条件。',
+      probe: '你第一眼先圈哪一个量？为什么先看它？'
+    },
+    wrong_cause_generic: {
+      label: '错因待修',
+      action: '错因必须绑定题型和卡住位置，不能只写粗心、不会、没理解。',
+      probe: '你卡住的是量的关系、条件顺序，还是单位/概念混了？'
+    },
+    blackboard_not_actionable: {
+      label: '小黑板待修',
+      action: '补一个可画动作：圈、线、表、箭头、模型或对照图。',
+      probe: '这一步能不能画成一条线或一个表？'
+    },
+    parent_check_not_question: {
+      label: '家长检查待修',
+      action: '改成家长今晚能问出口的一句话，不追完整答案。',
+      probe: '你第一步先看哪里？你怎么知道先看这里？'
+    },
+    revisit_missing: {
+      label: '回访待修',
+      action: '补明天同类小题回访和第 7 天小变式，不把一次表现当掌握。',
+      probe: '明天换一道同类小题，你还能先说出这一步吗？'
+    },
+    stress_ready: {
+      label: '可放行',
+      action: '保留当前第一步、错因、小黑板和回访，进入下一轮真实变式验证。',
+      probe: '换一道同类小题，只说第一步。'
+    }
+  };
+  const cards = rows.flatMap((row) => {
+    const risks = row.risks && row.risks.length ? row.risks : ['stress_ready'];
+    return risks.map((risk, riskIndex) => {
+      const copy = repairCopy[risk] || repairCopy.stress_ready;
+      return {
+        id: `${row.id}_${risk}_repair`,
+        sourceStressId: row.id,
+        sourceTrialId: row.sourceTrialId,
+        subject: row.subject,
+        taskType: row.taskType,
+        risk,
+        label: copy.label,
+        status: risk === 'stress_ready' ? 'ready_for_next_variant' : 'needs_local_repair',
+        repairAction: copy.action,
+        socraticProbe: copy.probe,
+        reportRule: risk === 'stress_ready'
+          ? '可进入下一轮变式，但仍不写长期掌握结论。'
+          : '报告只写待修动作，不写掌握结论。',
+        blackboardRule: risk === 'blackboard_not_actionable'
+          ? '必须补可画动作后再进入小黑板。'
+          : row.blackboardProbe,
+        revisitRule: risk === 'revisit_missing'
+          ? '必须补明天同类回访。'
+          : row.revisitProbe,
+        tutorRoute: `${row.tutorRoute || '/pages/tutor/tutor'}&repair=${encodeURIComponent(risk)}`,
+        reviewRoute: `${row.reviewRoute || '/pages/review/review'}&repair=${encodeURIComponent(risk)}`,
+        arcadeRoute: `${row.arcadeRoute || '/pages/arcade/arcade'}&repair=${encodeURIComponent(risk)}`,
+        order: row.order * 10 + riskIndex,
+        localOwner: 'local_rule',
+        aiOwner: 'ai_wording_only',
+        allowedFields: ['subject', 'task_type', 'risk', 'repair_action', 'socratic_probe', 'revisit_rule'],
+        blockedFields: ['original_question', 'full_answer', 'photo', 'score', 'ranking', 'full_dialogue']
+      };
+    });
+  }).slice(0, Number(options.limit || 12));
+  const repairCount = cards.filter((item) => item.status === 'needs_local_repair').length;
+  const readyCount = cards.filter((item) => item.status === 'ready_for_next_variant').length;
+  return {
+    id: 'real_trial_stress_repair_queue',
+    title: '真实试用压测修复队列',
+    ready: cards.length > 0,
+    total: cards.length,
+    repairCount,
+    readyCount,
+    cards,
+    firstRepair: cards[0] || null,
+    reportLine: cards.length
+      ? `压测修复：${repairCount} 条先本地修，${readyCount} 条进下一轮变式；不再只堆资料。`
+      : '暂无压测修复项；优先继续回收真实家庭卡住样本。',
+    localRuleLine: '本地代码把压测风险转成修复动作，AI 只改写追问语气。',
+    releaseGate: '待修项未完成前，不进入长期画像、分享传播或掌握结论。',
+    stopRule: '如果修复队列连续两轮没有新增失败项，边际收益降低，应转向真机试用和家庭样本回收。'
+  };
+}
+
 function buildRealTrialRecoveryLoop(options = {}) {
   const samples = loadRealTrialSamples().map(normalizeRealTrialSample);
   const pressureMatrix = options.realHomeworkCoverageMatrix || buildRealHomeworkCoverageMatrix();
@@ -1559,6 +1653,10 @@ function buildRealTrialRecoveryLoop(options = {}) {
   const socraticStressAudit = buildRealTrialSocraticStressAudit({
     candidateBoard: pressureCandidateBoard,
     limit: options.pressureCandidateLimit || 8
+  });
+  const stressRepairQueue = buildRealTrialStressRepairQueue({
+    audit: socraticStressAudit,
+    limit: options.stressRepairLimit || 12
   });
   const riskCounter = {};
   const subjectCounter = {};
@@ -1616,6 +1714,9 @@ function buildRealTrialRecoveryLoop(options = {}) {
     socraticStressAudit,
     socraticStressLine: socraticStressAudit.reportLine,
     socraticStressRows: socraticStressAudit.rows,
+    stressRepairQueue,
+    stressRepairLine: stressRepairQueue.reportLine,
+    stressRepairCards: stressRepairQueue.cards,
     gameChallengeBridge: realTrialGameChallengeBridge,
     gameChallengeLine: realTrialGameChallengeBridge.reportLine,
     gameChallengeCards: realTrialGameChallengeBridge.challengeCards,
@@ -9769,6 +9870,7 @@ module.exports = {
   buildRealTrialGameChallengeBridge,
   buildRealTrialPressureCandidateBoard,
   buildRealTrialSocraticStressAudit,
+  buildRealTrialStressRepairQueue,
   buildRealTrialRecoveryLoop,
   loadFactoryEvents,
   appendFactoryEvent,
