@@ -105,7 +105,16 @@ Page({
       })
       : null;
     const taskBoundCards = this.cardsForRecentTaskType(recentTaskType, loopFocus);
-    const loopBoundCards = this.loopBoundCards(dueCards.concat(fallbackCards), taskBoundCards, loopFocus);
+    const questionBankPlayableCards = gameLogic.buildCourseUnitQuestionBankPlayableCards
+      ? gameLogic.buildCourseUnitQuestionBankPlayableCards(courseUnitQuestionBank, {
+        taskType: recentTaskType,
+        subject: loopFocus && loopFocus.subject,
+        firstStep: loopFocus && (loopFocus.childArticulatedStep || loopFocus.systemSuggestedStep),
+        wrongCauseLabel: this.wrongCauseForLoop(loopFocus).wrongCauseLabel,
+        rescueMode: !!(todaySession && todaySession.gamePlayed)
+      })
+      : [];
+    const loopBoundCards = this.loopBoundCards(dueCards.concat(fallbackCards).concat(questionBankPlayableCards), taskBoundCards, loopFocus);
     const cards = loopBoundCards.length ? loopBoundCards : (dueCards.length ? dueCards : (fallbackCards.length ? fallbackCards : taskBoundCards));
     const profile = storage.loadGameProfile ? storage.loadGameProfile() : {};
     const reviewEvents = storage.loadReviewEvents ? storage.loadReviewEvents() : [];
@@ -151,7 +160,7 @@ Page({
       dailyQuestSet,
       adaptiveChallenge,
       questArcMission,
-      challengeBrief: this.buildChallengeBrief(dailyQuestSet, adaptiveChallenge, questArcMission, evidenceBias, subjectSkillDepth, curriculumSpine, courseUnitMap, courseUnitMasteryTrajectory, courseUnitQuestionBank, commercialDepthRunway, sevenSubjectMasterySprint),
+      challengeBrief: this.buildChallengeBrief(dailyQuestSet, adaptiveChallenge, questArcMission, evidenceBias, subjectSkillDepth, curriculumSpine, courseUnitMap, courseUnitMasteryTrajectory, courseUnitQuestionBank, commercialDepthRunway, sevenSubjectMasterySprint, questionBankPlayableCards),
       surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('arcade') : null,
       subjectSkillDepth,
       curriculumSpine,
@@ -287,7 +296,7 @@ Page({
     return arcade.buildWhackRound(cards, { limit: size });
   },
 
-  buildChallengeBrief(dailyQuestSet = {}, adaptiveChallenge = {}, questArcMission = null, evidenceBias = null, subjectSkillDepth = null, curriculumSpine = null, courseUnitMap = null, courseUnitMasteryTrajectory = null, courseUnitQuestionBank = null, commercialDepthRunway = null, sevenSubjectMasterySprint = null) {
+  buildChallengeBrief(dailyQuestSet = {}, adaptiveChallenge = {}, questArcMission = null, evidenceBias = null, subjectSkillDepth = null, curriculumSpine = null, courseUnitMap = null, courseUnitMasteryTrajectory = null, courseUnitQuestionBank = null, commercialDepthRunway = null, sevenSubjectMasterySprint = null, questionBankPlayableCards = []) {
     const quests = Array.isArray(dailyQuestSet.quests) ? dailyQuestSet.quests : [];
     const activeQuest = quests.find((item) => item && item.progress < item.target) || quests[0] || {};
     const mode = adaptiveChallenge.mode || 'balanced';
@@ -376,6 +385,10 @@ Page({
       courseUnitQuestionBankCards: courseUnitQuestionBank && Array.isArray(courseUnitQuestionBank.activeCards)
         ? courseUnitQuestionBank.activeCards.slice(0, 6)
         : [],
+      questionBankPlayableLine: questionBankPlayableCards.length
+        ? `本局已接入 ${questionBankPlayableCards.length} 张题型卡：只练第一步、错因和回访，不新增完整答案。`
+        : '',
+      questionBankPlayableCards,
       questionBankShareRelayDeckTitle: questionBankShareRelayDeck ? questionBankShareRelayDeck.title : '',
       questionBankShareRelayDeckLine: questionBankShareRelayDeck ? questionBankShareRelayDeck.gameRule : '',
       questionBankShareRelayParentLine: questionBankShareRelayDeck ? questionBankShareRelayDeck.parentDecisionLine : '',

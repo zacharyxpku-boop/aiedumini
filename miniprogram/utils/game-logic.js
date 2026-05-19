@@ -758,6 +758,55 @@ function buildSocraticQualityMemoryBridge(qualitySuite = {}, result = {}, retent
   };
 }
 
+function buildCourseUnitQuestionBankPlayableCards(courseUnitQuestionBank = {}, options = {}) {
+  const activeCards = Array.isArray(courseUnitQuestionBank.activeCards) ? courseUnitQuestionBank.activeCards : [];
+  const allCards = Array.isArray(courseUnitQuestionBank.cards) ? courseUnitQuestionBank.cards : [];
+  const taskType = options.taskType || '';
+  const weakKey = options.weakKey || '第一步';
+  const focusText = [options.firstStep, options.wrongCauseLabel, options.subject].filter(Boolean).join(' ');
+  const sourceCards = (activeCards.length ? activeCards : allCards)
+    .filter((card) => {
+      if (!card) return false;
+      if (!taskType || taskType === 'unknown') return true;
+      const haystack = [card.id, card.type, card.label, card.prompt, card.sampleStem, card.subjectLabel, card.wrongCause].join(' ');
+      return haystack.indexOf(taskType) >= 0 || haystack.indexOf(options.subject || '') >= 0 || haystack.indexOf(options.wrongCauseLabel || '') >= 0 || !focusText;
+    })
+    .slice(0, options.rescueMode ? 3 : 4);
+  return sourceCards.map((card, index) => {
+    const progression = card.progression || {};
+    const firstStep = card.firstStepHint || progression.entryTask || options.firstStep || `先说出「${weakKey}」的第一步`;
+    const wrongCause = card.wrongCause || card.wrongCauseLabel || options.wrongCauseLabel || weakKey;
+    const checkpoint = card.visualMove || card.blackboardMove || progression.parentEvidence || firstStep;
+    return {
+      id: `playable_${card.id || index + 1}`,
+      question: card.sampleStem || card.prompt || `用自己的题复述「${weakKey}」的第一步`,
+      answer: firstStep,
+      hint: `${firstStep}。不写完整答案，只留下第一步证据。`,
+      subject: card.subjectLabel || options.subject || '',
+      source: 'course_unit_question_bank',
+      taskType: taskType || card.taskType || card.type || 'course_unit',
+      weakPoint: wrongCause,
+      wrongCauseBucket: card.type || options.wrongCauseBucket || 'course_unit_question_bank',
+      wrongCauseLabel: wrongCause,
+      checkpoint,
+      parentPrompt: card.parentCheck || progression.parentEvidence || '家长只问第一步和错因，不看完整答案。',
+      next_practice: card.nearTransferStem || progression.nextDayRevisit || '明天换一题，只确认第一步能不能迁移。',
+      nextPracticePlan: {
+        wrongCauseBucket: card.type || options.wrongCauseBucket || 'course_unit_question_bank',
+        wrongCauseLabel: wrongCause,
+        checkpoint,
+        parentPrompt: card.parentCheck || progression.parentEvidence || '家长只问第一步和错因，不看完整答案。',
+        nextPracticeText: card.nearTransferStem || progression.nextDayRevisit || '明天换一题，只确认第一步能不能迁移。'
+      },
+      due: true,
+      dueReason: 'course_unit_question_bank_recall',
+      revisitWindow: index === 0 ? 'tonight' : index === 1 ? 'tomorrow' : 'day_7',
+      answerBoundary: card.answerBoundary || '不提供完整答案，只练第一步、错因和回访。',
+      evidenceRequired: ['course_unit_question_bank', 'first_step_recall', 'wrong_cause_replay', 'next_day_revisit']
+    };
+  });
+}
+
 function buildQuestionBankMemoryBridge(courseUnitQuestionBank = {}, result = {}, retention = {}, options = {}) {
   const activeCards = Array.isArray(courseUnitQuestionBank.activeCards) ? courseUnitQuestionBank.activeCards : [];
   const allCards = Array.isArray(courseUnitQuestionBank.cards) ? courseUnitQuestionBank.cards : [];
@@ -1868,6 +1917,7 @@ module.exports = {
   buildAdaptiveRecallScheduler,
   buildMemoryRiskReleaseModel,
   buildDailyMemorySprintDeck,
+  buildCourseUnitQuestionBankPlayableCards,
   buildQuestionBankMemoryBridge,
   buildQuestionBankRecallWorkout,
   buildQuestArcRunway,
