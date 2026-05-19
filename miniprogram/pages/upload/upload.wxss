@@ -436,6 +436,82 @@ page {
   line-height: 1.35;
 }
 
+.intake-packet-card {
+  margin-top: 20rpx;
+  padding: 22rpx;
+  border: 1rpx solid #d9eadf;
+  border-radius: 24rpx;
+  background: #ffffff;
+}
+
+.intake-packet-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18rpx;
+}
+
+.intake-packet-kicker {
+  color: #1a5336;
+  font-size: 20rpx;
+  font-weight: 950;
+}
+
+.intake-packet-title {
+  margin-top: 5rpx;
+  color: #1a211d;
+  font-size: 28rpx;
+  font-weight: 1000;
+}
+
+.intake-packet-pill {
+  flex: 0 0 auto;
+  min-height: 44rpx;
+  padding: 0 16rpx;
+  color: #1a5336;
+  background: #f7d068;
+  border-radius: 999rpx;
+  font-size: 21rpx;
+  font-weight: 950;
+  line-height: 44rpx;
+}
+
+.intake-packet-feedback,
+.intake-packet-line,
+.intake-packet-boundary {
+  margin-top: 10rpx;
+  color: #626a62;
+  font-size: 22rpx;
+  font-weight: 700;
+  line-height: 1.42;
+}
+
+.intake-packet-line {
+  color: #1a5336;
+  font-weight: 900;
+}
+
+.intake-packet-evidence {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+  margin-top: 14rpx;
+}
+
+.intake-packet-chip {
+  padding: 8rpx 14rpx;
+  border-radius: 999rpx;
+  color: #7a6a4a;
+  background: #f8f3e3;
+  font-size: 20rpx;
+  font-weight: 850;
+}
+
+.intake-packet-chip.ready {
+  color: #1a5336;
+  background: rgba(26, 83, 54, 0.10);
+}
+
 .quick-wrap {
   margin-top: 26rpx;
 }

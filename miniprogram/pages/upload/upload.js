@@ -4,6 +4,7 @@ const storage = require('../../utils/storage');
 const navigation = require('../../utils/navigation');
 const privacy = require('../../utils/privacy');
 const reviewCards = require('../../utils/review-cards');
+const importIntake = require('../../utils/import-intake');
 
 const WRONG_QUESTION_RE = /错题|订正|错因|卡住|不会|总错|做错|漏|粗心|单位|条件|等量关系|建模|符号|公式|审题/;
 
@@ -20,6 +21,7 @@ Page({
     showPlanDetails: false,
     uploadPlaybook: null,
     inputCoach: null,
+    uploadIntakePacket: null,
     submitLabel: '生成今晚作业三分类',
     quickChips: [
       { label: '语文背诵', text: '语文背诵 1 篇，孩子容易卡在开头。' },
@@ -141,6 +143,7 @@ Page({
   updatePreview(text, minutes) {
     const state = storage.loadState();
     const trimmed = String(text || '').trim();
+    const uploadIntakePacket = importIntake.buildUploadIntakePacket(trimmed, this.data.imagePaths, this.data.materialType);
     const previewPlan = trimmed
       ? priority.classifyHomework(trimmed, state.weak_points || [], Number(minutes || 35))
       : null;
@@ -148,6 +151,7 @@ Page({
       previewPlan,
       uploadPlaybook: this.buildUploadPlaybook(previewPlan, state, Number(minutes || 35)),
       inputCoach: this.buildInputCoach(trimmed, previewPlan),
+      uploadIntakePacket,
       submitLabel: this.buildSubmitLabel(trimmed)
     });
   },
@@ -305,6 +309,7 @@ Page({
         this.setData({
           imagePaths: files.map((item) => item.tempFilePath).filter(Boolean).slice(0, 4)
         });
+        this.updatePreview(this.data.homeworkText, this.data.minutes);
       };
       if (wx.chooseMedia) {
         wx.chooseMedia({
@@ -392,6 +397,7 @@ Page({
       return;
     }
     const current = storage.loadState();
+    const uploadIntakePacket = importIntake.buildUploadIntakePacket(text, this.data.imagePaths, this.data.materialType);
     const payload = {
       source: 'mini-upload',
       grade: current.grade,
@@ -411,6 +417,7 @@ Page({
         source: 'mini-upload-server',
         homework_text: text,
         image_count: this.data.imagePaths.length,
+        upload_intake_packet: uploadIntakePacket,
         updated_at: new Date().toISOString()
       });
       storage.saveState(nextState);
@@ -421,6 +428,7 @@ Page({
         source: 'mini-upload-local-fallback',
         homework_text: text,
         image_count: this.data.imagePaths.length,
+        upload_intake_packet: uploadIntakePacket,
         homework_plan: plan,
         updated_at: new Date().toISOString()
       });

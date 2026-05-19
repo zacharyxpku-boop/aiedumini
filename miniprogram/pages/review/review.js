@@ -2,6 +2,7 @@ const reviewCards = require('../../utils/review-cards');
 const storage = require('../../utils/storage');
 const navigation = require('../../utils/navigation');
 const api = require('../../utils/api');
+const gameLogic = require('../../utils/game-logic');
 const reviewViewModels = require('../../view-models/review-view-model');
 
 const DEFAULT_GAME_RUNWAY = {
@@ -74,6 +75,7 @@ Page({
     routeStrip: null,
     surfaceDepthPack: null,
     unifiedNextAction: null,
+    memoryPrescriptionPanel: null,
     transferPractice: null,
     outcomeCheck: null,
     postRepairBridge: null,
@@ -103,6 +105,8 @@ Page({
     const limit = (summary.deck && summary.deck.dailyLimit) || 5;
     const cards = reviewCards.sessionCards(this.data.sessionMode, limit);
     const current = cards[0] || null;
+    const reviewEvents = storage.loadReviewEvents ? storage.loadReviewEvents() : [];
+    const profile = storage.loadGameProfile ? storage.loadGameProfile() : {};
     const gameRunway = this.buildGameRunway(summary, cards);
     const focusProgress = todayFocus ? Number(todayFocus.progress || 0) : gameRunway.percent;
     const reviewViewModel = reviewViewModels.buildReviewViewModel({
@@ -144,6 +148,7 @@ Page({
       routeStrip: this.buildRouteStrip('repair', tonightPlan),
       surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('review') : null,
       unifiedNextAction: storage.buildUnifiedNextActionController ? storage.buildUnifiedNextActionController({ surface: 'review' }) : null,
+      memoryPrescriptionPanel: this.buildMemoryPrescriptionPanel(summary, cards, reviewEvents, profile, todayFocus),
       ruleRetestPanel: this.buildRuleRetestPanel(current, cards),
       transferPractice: this.buildTransferPracticePanel(current),
       outcomeCheck: this.buildOutcomeCheckPanel(current),
@@ -269,6 +274,66 @@ Page({
       evidenceLine,
       parentLine: '家长只看三件事：孩子能否自己说第一步、能否换题、明天是否还记得。',
       actions
+    };
+  },
+
+  buildMemoryPrescriptionPanel(summary = {}, cards = [], reviewEvents = [], profile = {}, todayFocus = {}) {
+    const wrongToday = (Array.isArray(reviewEvents) ? reviewEvents : []).filter((event) => {
+      const rating = event && event.rating;
+      return rating === 'again' || rating === 'hard';
+    }).length;
+    const weakKey = (todayFocus && (todayFocus.wrongCauseLabel || todayFocus.issueType || todayFocus.title))
+      || (summary.wrongCause && summary.wrongCause.top && summary.wrongCause.top.label)
+      || '第一步';
+    const loop = gameLogic.buildHighFrequencyPracticeLoop
+      ? gameLogic.buildHighFrequencyPracticeLoop(profile || {}, cards || [], reviewEvents || [], {
+        wrong: wrongToday,
+        accuracy: wrongToday ? Math.max(35, 100 - wrongToday * 18) : 82
+      }, {}, {}, { weakKey })
+      : {};
+    const daily = loop.dailyMemoryPrescription || {};
+    const combo = loop.ninetySecondRecallComboEngine || {};
+    const recallCards = (loop.recallCards || cards || []).slice(0, 3).map((card, index) => ({
+      id: card.id || `memory_card_${index}`,
+      label: card.weakPoint || card.subject || `第 ${index + 1} 张`,
+      question: card.question || card.prompt || '先说出这张卡的第一步',
+      action: card.answer ? `遮住答案，先说：${String(card.answer).slice(0, 28)}` : '遮住答案，先说第一步和错因',
+      source: card.source || card.taskType || '本地复习卡'
+    }));
+    const reviewWindows = (loop.spacedReviewPlan || [
+      { id: 'tomorrow', label: '明天', action: '只回访同一张卡的第一步' },
+      { id: 'day3', label: '第 3 天', action: '换一个同类小变式' },
+      { id: 'day7', label: '第 7 天', action: '确认能否迁移到新题' }
+    ]).slice(0, 3).map((item, index) => ({
+      id: item.id || `window_${index}`,
+      label: item.label || item.window || `第 ${index + 1} 次`,
+      action: item.action || item.rule || item.releaseGate || '先回忆，再核对'
+    }));
+    const mustDo = (daily.mustDo || []).slice(0, 3).map((item, index) => ({
+      id: item.id || `must_${index}`,
+      label: item.label || `动作 ${index + 1}`,
+      action: item.action || item.rule || '主动回忆，不看答案'
+    }));
+    const releaseQueue = (daily.releaseQueue || []).slice(0, 3).map((item, index) => ({
+      id: item.id || `release_${index}`,
+      label: item.label || `放行 ${index + 1}`,
+      status: item.status || 'hold',
+      rule: item.rule || '证据不足时不放新卡'
+    }));
+    return {
+      title: '今日记忆处方',
+      subtitle: daily.reasonLine || '本地规则只挑今天最该回忆的 3 张卡，先修错因，再放新卡。',
+      doseLine: `今日剂量：${recallCards.length || 0} 张主动回忆卡，${daily.dailyCap && daily.dailyCap.maxMinutes ? daily.dailyCap.maxMinutes : 5} 分钟内收口。`,
+      weakKey,
+      recallCards,
+      mustDo,
+      reviewWindows,
+      releaseQueue,
+      comboLine: combo.totalSeconds ? `${combo.totalSeconds} 秒主动回忆：先说第一步，再说错因，最后核对。` : '90 秒主动回忆：先说第一步，再说错因，最后核对。',
+      xpRule: daily.antiCramRule || 'XP 只奖励主动回忆、错因回放和明天回访，不奖励速度、分数或排名。',
+      parentLine: daily.parentLine || `家长只问一句：这张卡第一步为什么先做「${weakKey}」？`,
+      shareLine: daily.shareLine || '分享只带错因和下一步，不带原题、答案、分数、排名或完整对话。',
+      nextRoute: '/pages/arcade/arcade?from=memory_prescription'
     };
   },
 

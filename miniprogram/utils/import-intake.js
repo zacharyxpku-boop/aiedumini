@@ -103,8 +103,74 @@ function classifyImportInput(text = '') {
   };
 }
 
+function buildUploadIntakePacket(text = '', imagePaths = [], materialType = '') {
+  const value = String(text || '').trim();
+  const images = Array.isArray(imagePaths) ? imagePaths.filter(Boolean).slice(0, 4) : [];
+  const classified = classifyImportInput(value);
+  const materialSource = detectMaterialSource(value)
+    || (materialType ? { type: materialType, label: materialType, hasUrl: false, url: '' } : null);
+  const hasOnlyLink = /^https?:\/\/\S+$/i.test(value);
+  const kind = images.length && !value
+    ? 'photo_evidence_needs_text'
+    : classified.kind;
+  const nextRoute = kind === 'photo_evidence_needs_text'
+    ? '/pages/upload/upload'
+    : classified.route === 'review'
+      ? '/pages/review/review'
+      : classified.route === 'today_focus'
+        ? '/pages/review/review'
+        : '/pages/tutor/tutor?from=upload_intake';
+  const blockedFields = [
+    'original_answer',
+    'full_solution',
+    'auto_link_crawl',
+    'auto_pdf_parse',
+    'photo_ocr_claim',
+    'score',
+    'ranking'
+  ];
+  const evidence = [
+    { id: 'text_present', label: '文字材料', ready: !!value },
+    { id: 'photo_local_only', label: '照片本地留档', ready: images.length > 0 },
+    { id: 'source_classified', label: '来源分类', ready: !!(materialSource || classified.kind !== 'empty') },
+    { id: 'answer_safe', label: '不直接给答案', ready: true }
+  ];
+  const reviewSeed = {
+    source: materialSource ? `upload_${materialSource.type}` : `upload_${kind}`,
+    sourceType: materialSource ? materialSource.type : kind,
+    shouldImport: kind === 'material_source' || kind === 'review_request' || /wrong|review|material|question/.test(kind),
+    boundary: '只把用户提供的文字拆成回忆卡，不抓链接、不解析文件、不生成完整答案。'
+  };
+  const reportSeed = {
+    type: images.length ? 'photo_plus_text_intake' : 'text_intake',
+    label: materialSource ? materialSource.label : (kind === 'photo_evidence_needs_text' ? '照片留档' : '作业/错题文字'),
+    confidence: value ? (images.length ? 0.72 : 0.64) : 0.28,
+    status: value ? '可进入今晚闭环' : '需要补一句错因或卡点'
+  };
+  return {
+    id: `upload_intake_${Date.now ? Date.now() : 0}`,
+    kind,
+    inputKind: classified.kind,
+    route: classified.route,
+    nextRoute,
+    imageCount: images.length,
+    hasText: !!value,
+    hasOnlyLink,
+    sourceMeta: materialSource || classified.sourceMeta || null,
+    feedback: kind === 'photo_evidence_needs_text'
+      ? '照片只做本地留档。请补一句错因或卡住点，系统才会整理成回忆卡。'
+      : classified.feedback,
+    evidence,
+    blockedFields,
+    reviewSeed,
+    reportSeed,
+    aiBoundary: 'AI 只负责改写提示和追问；来源识别、路线、放行、分享字段由本地规则决定。'
+  };
+}
+
 module.exports = {
   IMPORT_CHIPS,
+  buildUploadIntakePacket,
   classifyImportInput,
   detectMaterialSource,
   looksLikeMaterialExcerpt,

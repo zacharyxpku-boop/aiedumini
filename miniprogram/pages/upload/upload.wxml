@@ -130,6 +130,23 @@
             </view>
           </view>
 
+
+          <view class="intake-packet-card" wx:if="{{uploadIntakePacket}}">
+            <view class="intake-packet-head">
+              <view>
+                <view class="intake-packet-kicker">结构化入口</view>
+                <view class="intake-packet-title">{{uploadIntakePacket.reportSeed.label}}</view>
+              </view>
+              <view class="intake-packet-pill">{{uploadIntakePacket.imageCount}} 张图</view>
+            </view>
+            <view class="intake-packet-feedback">{{uploadIntakePacket.feedback}}</view>
+            <view class="intake-packet-line">下一步：{{uploadIntakePacket.nextRoute}}</view>
+            <view class="intake-packet-evidence">
+              <view class="intake-packet-chip {{item.ready ? 'ready' : ''}}" wx:for="{{uploadIntakePacket.evidence}}" wx:key="id">{{item.label}}</view>
+            </view>
+            <view class="intake-packet-boundary">{{uploadIntakePacket.reviewSeed.boundary}}</view>
+            <view class="intake-packet-boundary">{{uploadIntakePacket.aiBoundary}}</view>
+          </view>
           <view class="quick-wrap">
             <view class="quick-label">💡 快捷补充常见项</view>
             <view class="quick-row">

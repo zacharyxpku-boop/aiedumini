@@ -70,6 +70,41 @@
             </view>
           </view>
         </view>
+        <view class="memory-prescription-card" wx:if="{{memoryPrescriptionPanel}}">
+          <view class="memory-prescription-head">
+            <view>
+              <view class="memory-prescription-kicker">Gizmo 式主动回忆，本地规则调度</view>
+              <view class="memory-prescription-title">{{memoryPrescriptionPanel.title}}</view>
+            </view>
+            <view class="memory-prescription-pill">90 秒</view>
+          </view>
+          <view class="memory-prescription-subtitle">{{memoryPrescriptionPanel.subtitle}}</view>
+          <view class="memory-prescription-dose">{{memoryPrescriptionPanel.doseLine}}</view>
+          <view class="memory-prescription-list">
+            <view class="memory-prescription-item" wx:for="{{memoryPrescriptionPanel.recallCards}}" wx:key="id">
+              <view class="memory-prescription-label">{{item.label}}</view>
+              <view class="memory-prescription-question">{{item.question}}</view>
+              <view class="memory-prescription-action">{{item.action}}</view>
+            </view>
+          </view>
+          <view class="memory-prescription-section" wx:if="{{memoryPrescriptionPanel.mustDo.length}}">
+            <view class="memory-prescription-section-title">今天必须做</view>
+            <view class="memory-prescription-line" wx:for="{{memoryPrescriptionPanel.mustDo}}" wx:key="id">{{item.label}}：{{item.action}}</view>
+          </view>
+          <view class="memory-prescription-section">
+            <view class="memory-prescription-section-title">回访窗口</view>
+            <view class="memory-prescription-line" wx:for="{{memoryPrescriptionPanel.reviewWindows}}" wx:key="id">{{item.label}}：{{item.action}}</view>
+          </view>
+          <view class="memory-prescription-section" wx:if="{{memoryPrescriptionPanel.releaseQueue.length}}">
+            <view class="memory-prescription-section-title">新卡放行</view>
+            <view class="memory-prescription-line" wx:for="{{memoryPrescriptionPanel.releaseQueue}}" wx:key="id">{{item.label}}｜{{item.status}}｜{{item.rule}}</view>
+          </view>
+          <view class="memory-prescription-foot">{{memoryPrescriptionPanel.comboLine}}</view>
+          <view class="memory-prescription-foot">{{memoryPrescriptionPanel.xpRule}}</view>
+          <view class="memory-prescription-foot">{{memoryPrescriptionPanel.parentLine}}</view>
+          <view class="memory-prescription-foot">{{memoryPrescriptionPanel.shareLine}}</view>
+          <view class="memory-prescription-cta" data-route="{{memoryPrescriptionPanel.nextRoute}}" bindtap="runSurfaceDepthAction">去 5 分钟轻练习</view>
+        </view>
         </view>
 
         <view class="pack-primary review-hero-cta" wx:if="{{reviewViewModel.primaryCta.action === 'review'}}" data-action="review" bindtap="runPlaybookAction">{{reviewViewModel.primaryCta.text}}</view>
