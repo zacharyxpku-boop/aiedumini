@@ -865,6 +865,29 @@ Page({
         risk: pasteRisk.level
       }));
     }
+    if (storage.appendValidationEvent && diagnosticReceipt.openMaicInspiredTaskPlanAudit && diagnosticReceipt.openMaicInspiredTaskPlanAudit.ok) {
+      storage.appendValidationEvent('openmaic_inspired_task_plan_ready', {
+        turnId: diagnosticReceipt.turnId,
+        sourcePolicy: diagnosticReceipt.openMaicInspiredTaskPlanAudit.sourcePolicy,
+        sceneCount: diagnosticReceipt.openMaicInspiredTaskPlanAudit.sceneCount,
+        eventCount: diagnosticReceipt.openMaicInspiredTaskPlanAudit.eventCount,
+        gateCount: diagnosticReceipt.openMaicInspiredTaskPlanAudit.gateCount,
+        blockedFields: diagnosticReceipt.openMaicInspiredTaskPlanAudit.blockedFields,
+        selected_id: this.data.selected && this.data.selected.id,
+        selected_text: this.data.selected && this.data.selected.text
+      });
+    }
+    if (storage.recordUnifiedNextAction && diagnosticReceipt.openMaicInspiredTaskPlan && diagnosticReceipt.openMaicInspiredTaskPlan.outline) {
+      storage.recordUnifiedNextAction({
+        source: 'openmaic_inspired_task_plan',
+        sourceLabel: '今晚任务单',
+        actionLabel: diagnosticReceipt.openMaicInspiredTaskPlan.outline.firstStep,
+        route: '/pages/review/review?from=openmaic_task_plan',
+        readiness: 'task_plan_ready',
+        capabilityId: 'openmaic_inspired_homework_loop',
+        evidence: diagnosticReceipt.openMaicInspiredTaskPlan.outline.evidenceRequired
+      });
+    }
     if (storage.recordAnswerBoundaryEvidence && result && result.answer_boundary_evidence) {
       storage.recordAnswerBoundaryEvidence(result.answer_boundary_evidence, {
         selected_id: this.data.selected && this.data.selected.id,
