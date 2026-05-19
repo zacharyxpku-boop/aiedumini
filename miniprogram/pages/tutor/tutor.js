@@ -2,6 +2,7 @@ const api = require('../../utils/api');
 const storage = require('../../utils/storage');
 const navigation = require('../../utils/navigation');
 const tutorLadder = require('../../utils/tutor-ladder');
+const openMaicPlan = require('../../utils/openmaic-inspired-plan');
 
 const SOCRATIC_EFFECTIVENESS_BLOCKED_FIELDS = [
   'original_question',
@@ -238,6 +239,15 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
       thought: latestUserText
     })
     : null;
+  const openMaicInspiredTaskPlan = openMaicPlan.buildOpenMaicInspiredTaskPlan({
+    taskType: subjectSkillDepth && subjectSkillDepth.taskType ? subjectSkillDepth.taskType : '',
+    pressureSignal: subjectSkillDepth || {},
+    firstStep: subjectSkillDepth && subjectSkillDepth.firstStep,
+    wrongCause: subjectSkillDepth && (subjectSkillDepth.wrongCause || subjectSkillDepth.reportSignal),
+    parentCheck: subjectSkillDepth && subjectSkillDepth.parentQuestion,
+    revisit: subjectSkillDepth && subjectSkillDepth.revisit
+  });
+  const openMaicInspiredTaskPlanAudit = openMaicPlan.evaluateOpenMaicInspiredTaskPlan(openMaicInspiredTaskPlan);
   const studentFirst = userMessages.some((item) => String(item.text || '').length >= 8 && !/答案|直接|代写|帮我写/.test(String(item.text || '')));
   const realHomeworkCoverageMatrix = storage.buildRealHomeworkCoverageMatrix
     ? storage.buildRealHomeworkCoverageMatrix({
@@ -347,6 +357,11 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
     socraticPromptStopConditions: socraticPromptQualityJudge && Array.isArray(socraticPromptQualityJudge.stopConditions)
       ? socraticPromptQualityJudge.stopConditions.slice(0, 4)
       : [],
+    openMaicInspiredTaskPlan,
+    openMaicInspiredTaskPlanAudit,
+    openMaicInspiredScenes: openMaicInspiredTaskPlan.scenes.slice(0, 6),
+    openMaicInspiredEventFlow: openMaicInspiredTaskPlan.eventFlow.slice(0, 6),
+    openMaicPublicK12Decisions: openMaicInspiredTaskPlan.publicK12ResourceDecisions.slice(0, 4),
     sevenSubjectMasterySprint,
     handoffPlan,
     checks: [

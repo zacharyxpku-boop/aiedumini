@@ -934,6 +934,7 @@ function buildFamilyDecisionHomepage(input = {}) {
   const familyDecisionActionBridge = input.familyDecisionActionBridge || {};
   const homeSchoolCollaborationDigest = input.homeSchoolCollaborationDigest || {};
   const parentDecisionBook = input.parentDecisionBook || {};
+  const parentReflectionSummary = input.parentReflectionSummary || {};
   const active = reportDailyActionQueue.active || {};
   const sourceLanes = Array.isArray(sourceEvidenceLedger.lanes) ? sourceEvidenceLedger.lanes : [];
   const primarySource = sourceLanes.find((item) => item && item.status === 'hit') || sourceLanes[0] || {};
@@ -979,6 +980,12 @@ function buildFamilyDecisionHomepage(input = {}) {
       line: actualLongitudinalEvidence.day7VariantReady ? '第7天迁移证据已就绪' : '未到第7天前不写长期画像'
     },
     {
+      id: 'parent_receipt',
+      label: '家长回执',
+      status: parentReflectionSummary.ready ? 'ready' : 'pending',
+      line: parentReflectionSummary.line || '家长看完报告后，还需要留下是否只问一句、孩子是否能复述的回执。'
+    },
+    {
       id: 'safe_share',
       label: '安全分享',
       status: allowed.length && blocked.length ? 'ready' : 'locked',
@@ -1015,6 +1022,15 @@ function buildFamilyDecisionHomepage(input = {}) {
     evidenceList,
     allowedFields: allowed.slice(0, 6),
     blockedFields: blocked.slice(0, 8),
+    parentReceiptLine: parentReflectionSummary.line || '',
+    parentReceiptReady: !!parentReflectionSummary.ready,
+    parentReceiptStats: {
+      total: Number(parentReflectionSummary.total || 0),
+      askedOneQuestion: Number(parentReflectionSummary.askedOneQuestion || 0),
+      childRecalledFirstStep: Number(parentReflectionSummary.childRecalledFirstStep || 0),
+      nextDayRevisit: Number(parentReflectionSummary.nextDayRevisit || 0),
+      directAnswerCount: Number(parentReflectionSummary.directAnswerCount || 0)
+    },
     route: active.route || familyDecisionActionBridge.primaryRoute || '/pages/tutor/tutor?from=family_decision_homepage',
     ctaLabel: active.task ? '去完成今日动作' : '先补第一步证据',
     ready: !!(doList.length && evidenceList.length)
@@ -1220,6 +1236,9 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
       socraticPromptQualityJudge
     )
     : null);
+  const parentReflectionSummary = storage.buildParentReflectionSummary
+    ? storage.buildParentReflectionSummary()
+    : {};
   const familyDecisionHomepage = buildFamilyDecisionHomepage({
     familyDecisionMemo,
     tonightDecisionBrief,
@@ -1228,7 +1247,8 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     parentDecisionBook,
     reportDailyActionQueue,
     familyDecisionActionBridge,
-    homeSchoolCollaborationDigest
+    homeSchoolCollaborationDigest,
+    parentReflectionSummary
   });
   const realHomeworkCoverageMatrix = storage.buildRealHomeworkCoverageMatrix
     ? storage.buildRealHomeworkCoverageMatrix({
@@ -1794,6 +1814,9 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     familyDecisionHomepageSafeShareBadges: familyDecisionHomepage.safeShareBadges,
     familyDecisionHomepageAllowedFields: familyDecisionHomepage.allowedFields,
     familyDecisionHomepageBlockedFields: familyDecisionHomepage.blockedFields,
+    familyDecisionHomepageParentReceiptLine: familyDecisionHomepage.parentReceiptLine,
+    familyDecisionHomepageParentReceiptReady: familyDecisionHomepage.parentReceiptReady,
+    familyDecisionHomepageParentReceiptStats: familyDecisionHomepage.parentReceiptStats,
     familyDecisionHomepageRoute: familyDecisionHomepage.route,
     familyDecisionHomepageCtaLabel: familyDecisionHomepage.ctaLabel,
     familyDecisionTitle: familyDecisionMemo.title || '',

@@ -256,6 +256,16 @@
             <view class="receipt-board-avoid">{{thinkingReceipt.realHomeworkCoverageMatrix.boundary}}</view>
             <view class="receipt-board-avoid">{{thinkingReceipt.realHomeworkCoverageMatrix.publicSourceBlockedLine}}</view>
           </view>
+          <view class="receipt-first-step-board" wx:if="{{thinkingReceipt.openMaicInspiredTaskPlan}}">
+            <view class="receipt-diagnostic-title">{{thinkingReceipt.openMaicInspiredTaskPlan.title}}</view>
+            <view class="receipt-board-avoid">{{thinkingReceipt.openMaicInspiredTaskPlan.commercialDecision}}</view>
+            <view class="receipt-board-line">第一步：{{thinkingReceipt.openMaicInspiredTaskPlan.outline.firstStep}}</view>
+            <view class="receipt-board-parent">家长只问：{{thinkingReceipt.openMaicInspiredTaskPlan.outline.parentCheck}}</view>
+            <view class="receipt-board-line" wx:for="{{thinkingReceipt.openMaicInspiredScenes}}" wx:key="id">{{item.label}}：{{item.action}}</view>
+            <view class="receipt-board-parent" wx:for="{{thinkingReceipt.openMaicInspiredEventFlow}}" wx:key="event">事件{{item.order}}：{{item.event}}｜{{item.localGate}}</view>
+            <view class="receipt-board-line" wx:for="{{thinkingReceipt.openMaicPublicK12Decisions}}" wx:key="id">{{item.label}}：本地管{{item.localCodeOwns[0]}}，AI 管{{item.aiBetterFor[0]}}</view>
+            <view class="receipt-board-avoid">{{thinkingReceipt.openMaicInspiredTaskPlan.shareBoundary}}</view>
+          </view>
           <view class="receipt-contract" wx:if="{{thinkingReceipt.socratic_contract}}">
             <view class="receipt-diagnostic-title">{{thinkingReceipt.socratic_contract.title}}</view>
             <view class="receipt-diagnostic-line">为什么这样问：{{thinkingReceipt.socratic_contract.whyThisQuestion}}</view>
