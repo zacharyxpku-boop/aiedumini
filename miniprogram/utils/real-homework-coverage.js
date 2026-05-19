@@ -1452,6 +1452,68 @@ const LONGITUDINAL_PRESSURE_SCENARIO_LEDGER = [
   }
 ];
 
+function validatePublicK12AssetBoundary(asset = {}) {
+  const forbiddenFields = [
+    'original_problem',
+    'original_question',
+    'standard_answer',
+    'full_answer',
+    'full_solution',
+    'answer_key',
+    'score_prediction',
+    'ranking'
+  ];
+  const text = JSON.stringify(asset || {});
+  const blockedUse = Array.isArray(asset.blockedUse) ? asset.blockedUse : [];
+  const evidence = Array.isArray(asset.proofRequired)
+    ? asset.proofRequired
+    : Array.isArray(asset.evidenceRequired)
+      ? asset.evidenceRequired
+      : [];
+  const hasTransform = !!(asset.localPressureTransform || asset.localTransform || asset.transformMode);
+  const noForbiddenField = forbiddenFields.every((field) => !Object.prototype.hasOwnProperty.call(asset, field));
+  const noAnswerBankClaim = !/标准答案库|原题答案库|拍照搜题|押题|排名预测/.test(text);
+  const boundaryReady = !!asset.sourceId
+    && hasTransform
+    && evidence.length >= 3
+    && blockedUse.length >= 2
+    && noForbiddenField
+    && noAnswerBankClaim;
+  return {
+    id: asset.id || 'public_k12_asset',
+    sourceId: asset.sourceId || '',
+    boundaryReady,
+    localRuleDecision: true,
+    aiUse: 'AI 只改写追问、家长解释和小黑板旁白，不决定来源可用性、奖励、放行或分享字段。',
+    required: ['sourceId', 'localPressureTransform', 'proofRequired', 'blockedUse', 'no_forbidden_fields'],
+    forbiddenFields,
+    missing: [
+      asset.sourceId ? '' : 'sourceId',
+      hasTransform ? '' : 'localPressureTransform',
+      evidence.length >= 3 ? '' : 'proofRequired>=3',
+      blockedUse.length >= 2 ? '' : 'blockedUse>=2',
+      noForbiddenField ? '' : 'forbidden_field_present',
+      noAnswerBankClaim ? '' : 'answer_bank_claim'
+    ].filter(Boolean)
+  };
+}
+
+function buildPublicK12AssetBoundaryAudit(options = {}) {
+  const assets = Array.isArray(options.assets) ? options.assets : PUBLIC_K12_HOMEWORK_INTAKE_QUEUE;
+  const rows = assets.map(validatePublicK12AssetBoundary);
+  const readyCount = rows.filter((item) => item.boundaryReady).length;
+  return {
+    id: 'public_k12_asset_boundary_audit',
+    title: '公开 K12 资料使用边界审计',
+    readyCount,
+    totalCount: rows.length,
+    ok: rows.length > 0 && readyCount === rows.length,
+    rows,
+    localDecisionLine: '本地代码决定来源、字段、放行和分享；AI 只做中文表达和追问语气。',
+    antiFakeThicknessLine: '公开资料必须先改写为第一步/错因/回访挑战，禁止原题、标准答案、排名预测和拍照搜题承诺。'
+  };
+}
+
 function buildPublicK12IntakeChallengeDeck(options = {}) {
   const limit = Number(options.limit || PUBLIC_K12_HOMEWORK_INTAKE_QUEUE.length);
   return PUBLIC_K12_HOMEWORK_INTAKE_QUEUE.slice(0, limit).map((item, index) => ({
@@ -1467,6 +1529,15 @@ function buildPublicK12IntakeChallengeDeck(options = {}) {
     reportUse: item.reportUse,
     gameUse: item.gameUse,
     shareHook: item.shareHook,
+    observableFirstMove: item.socraticProbe,
+    microRubric: [
+      '孩子先说第一步',
+      '能命名一个错因',
+      '约定明天回访，不看完整答案'
+    ],
+    fallbackIfNoChildInput: '如果孩子说不出第一步，只给 A/B 二选一提示，不进入完整讲解。',
+    receiverMustUseOwnMaterial: true,
+    shareSafeFields: ['subject', 'taskType', 'firstStepPrompt', 'shareHook', 'nextDayRevisit'],
     route: `/pages/arcade/arcade?from=public_k12_intake&task_type=${encodeURIComponent(item.taskType)}`,
     answerBoundary: '只练第一步、错因和回访，不展示原题、答案、分数或排名。',
     evidenceRequired: item.proofRequired,
@@ -1511,6 +1582,7 @@ function buildRealHomeworkCoverageMatrix(options = {}) {
     publicK12UseWorkbench: PUBLIC_K12_USE_WORKBENCH,
     publicK12HomeworkIntakeQueue: PUBLIC_K12_HOMEWORK_INTAKE_QUEUE,
     publicK12IntakeChallengeDeck: buildPublicK12IntakeChallengeDeck(),
+    publicK12AssetBoundaryAudit: buildPublicK12AssetBoundaryAudit(),
     publicResourceTriageBoard,
     pressureFailureTypeAudit,
     implementationDecisionMatrix: K12_PUBLIC_IMPLEMENTATION_DECISION_MATRIX,
@@ -1575,6 +1647,8 @@ module.exports = {
   getRealHomeworkPressureSamples,
   buildPublicK12IntakeChallengeDeck,
   buildK12PublicResourceTriageBoard,
+  buildPublicK12AssetBoundaryAudit,
+  validatePublicK12AssetBoundary,
   buildPressureSampleFailureTypeAudit,
   buildRealHomeworkCoverageMatrix
 };

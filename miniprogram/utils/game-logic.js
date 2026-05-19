@@ -224,16 +224,27 @@ function quizQuestionFromCard(card) {
 
 function buildKnowledgeGap(events, cards) {
   const gaps = {};
+  const list = Array.isArray(cards) ? cards : [];
+  const cardById = list.reduce((acc, card) => {
+    if (card && card.id) acc[card.id] = card;
+    if (card && card.card_id) acc[card.card_id] = card;
+    return acc;
+  }, {});
   (Array.isArray(events) ? events : []).forEach((event) => {
     if (!event || !['again', 'forgotten', 'wrong'].includes(event.rating || event.result)) return;
-    const key = event.weakPoint || event.knowledge_point || event.subject || '未标注';
+    const sourceCard = cardById[event.card_id] || cardById[event.cardId] || null;
+    const key = event.weakPoint
+      || event.knowledge_point
+      || (sourceCard && (sourceCard.weakPoint || sourceCard.wrongCauseLabel || sourceCard.knowledge_point || sourceCard.subject))
+      || event.subject
+      || '未标注';
     if (!gaps[key]) gaps[key] = { key, count: 0, subjects: {} };
     gaps[key].count += 1;
-    if (event.subject) gaps[key].subjects[event.subject] = (gaps[key].subjects[event.subject] || 0) + 1;
+    const subject = event.subject || (sourceCard && sourceCard.subject);
+    if (subject) gaps[key].subjects[subject] = (gaps[key].subjects[subject] || 0) + 1;
   });
-  const list = Array.isArray(cards) ? cards : [];
   return Object.values(gaps).sort((a, b) => b.count - a.count).slice(0, 8).map((item) => Object.assign({}, item, {
-    next_action: list.some((card) => card.weakPoint === item.key) ? '复习相关卡片' : '补充一张错因卡'
+    next_action: list.some((card) => [card.weakPoint, card.wrongCauseLabel, card.knowledge_point, card.subject].includes(item.key)) ? '复习相关卡片' : '补充一张错因卡'
   }));
 }
 
@@ -243,6 +254,13 @@ function dueCardCount(cards = [], now = new Date()) {
     const due = new Date(card.next_review || card.due || card.dueDate || 0).getTime();
     return !Number.isFinite(due) || due <= nowTime;
   }).length;
+}
+
+function isDueCard(card = {}, now = new Date()) {
+  const dueValue = card.next_review || card.due || card.dueDate || '';
+  if (!dueValue) return true;
+  const due = new Date(dueValue).getTime();
+  return !Number.isFinite(due) || due <= now.getTime();
 }
 
 function normalizeEvidenceBias(input = {}) {
@@ -764,14 +782,41 @@ function buildCourseUnitQuestionBankPlayableCards(courseUnitQuestionBank = {}, o
   const taskType = options.taskType || '';
   const weakKey = options.weakKey || '第一步';
   const focusText = [options.firstStep, options.wrongCauseLabel, options.subject].filter(Boolean).join(' ');
-  const sourceCards = (activeCards.length ? activeCards : allCards)
+  const maxCards = options.rescueMode ? 4 : Number(options.maxCards || 21);
+  const focusCards = (activeCards.length ? activeCards : allCards)
     .filter((card) => {
       if (!card) return false;
       if (!taskType || taskType === 'unknown') return true;
       const haystack = [card.id, card.type, card.label, card.prompt, card.sampleStem, card.subjectLabel, card.wrongCause].join(' ');
       return haystack.indexOf(taskType) >= 0 || haystack.indexOf(options.subject || '') >= 0 || haystack.indexOf(options.wrongCauseLabel || '') >= 0 || !focusText;
-    })
-    .slice(0, options.rescueMode ? 4 : 9);
+    });
+  let sourceCards = focusCards.slice(0, maxCards);
+  if (!options.rescueMode && allCards.length) {
+    const seen = {};
+    const bySubject = allCards.reduce((acc, card) => {
+      const key = card.subjectId || card.subjectLabel || 'unknown';
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(card);
+      return acc;
+    }, {});
+    const balanced = [];
+    Object.keys(bySubject).forEach((subjectKey) => {
+      bySubject[subjectKey].slice(0, 3).forEach((card) => {
+        if (balanced.length < maxCards && !seen[card.id]) {
+          balanced.push(card);
+          seen[card.id] = true;
+        }
+      });
+    });
+    sourceCards.forEach((card) => {
+      if (balanced.length < maxCards && !seen[card.id]) {
+        balanced.push(card);
+        seen[card.id] = true;
+      }
+    });
+    sourceCards = balanced;
+  }
+  sourceCards = sourceCards.slice(0, maxCards);
   return sourceCards.map((card, index) => {
     const progression = card.progression || {};
     const firstStep = card.firstStepHint || progression.entryTask || options.firstStep || `先说出「${weakKey}」的第一步`;
@@ -782,6 +827,7 @@ function buildCourseUnitQuestionBankPlayableCards(courseUnitQuestionBank = {}, o
       question: card.sampleStem || card.prompt || `用自己的题复述「${weakKey}」的第一步`,
       answer: firstStep,
       hint: `${firstStep}。不写完整答案，只留下第一步证据。`,
+      subjectId: card.subjectId || '',
       subject: card.subjectLabel || options.subject || '',
       source: 'course_unit_question_bank',
       taskType: taskType || card.taskType || card.type || 'course_unit',
@@ -1659,7 +1705,8 @@ function buildRealHomeworkPressureMemoryPrescription(samples = [], result = {}, 
     dueWindow: index === 0 ? 'tonight' : index === 1 ? 'tomorrow' : index === 2 ? 'day3' : 'day7',
     route: index <= 1 ? '/pages/review/review' : index === 2 ? '/pages/tutor/tutor' : '/pages/profile/profile'
   }));
-  const sampleSpecificReady = reviewQueue.every((item) => item.firstStep && item.wrongCause && item.boardMove && item.parentCheck && item.nearTransfer);
+  const sampleSpecificReady = reviewQueue.length > 0
+    && reviewQueue.every((item) => item.firstStep && item.wrongCause && item.boardMove && item.parentCheck && item.nearTransfer);
   return {
     id: 'real_homework_pressure_memory_prescription',
     title: rescue ? '真实作业错因急救处方' : '真实作业错因巩固处方',
@@ -1709,7 +1756,7 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
   const retention = options.retentionLoop || buildGameRetentionLoop(profile, result, challenge, questSet, options);
   const gaps = buildKnowledgeGap(safeEvents, safeCards);
   const dueCards = safeCards
-    .filter((card) => !card.next_review || new Date(card.next_review).getTime() <= new Date(now).getTime())
+    .filter((card) => isDueCard(card, now))
     .slice(0, 6);
   const weakKey = retention.weakKey || (gaps[0] && gaps[0].key) || questSet.weakKey || '第一步';
   const sourceCards = dueCards.length ? dueCards : safeCards.slice(0, 6);

@@ -711,7 +711,7 @@ function resolveShareIntent(card, intent) {
       share_intent: 'parent_card',
       title: card.parentShareTitle || card.title || '给家里看的今日学习复盘',
       path: card.parentPath || `/pages/home/home?share=${code}&from=parent_card&mode=parent_recap&identity=${encodeURIComponent(card.identityTag || '')}`,
-      payload: Object.assign({}, card.payload || {}, {
+      payload: buildSafeSharePayload(card, 'parent_card', {
         share_intent: 'parent_card',
         from: 'parent_card',
         mode: 'parent_recap'
@@ -722,13 +722,83 @@ function resolveShareIntent(card, intent) {
     share_intent: 'peer_challenge',
     title: card.peerShareTitle || card.title || '来和我一起回访今天的一小步',
     path: card.peerPath || card.path || `/pages/home/home?share=${code}&from=peer_challenge&challenge=arcade&mode=same_identity&identity=${encodeURIComponent(card.identityTag || '')}`,
-    payload: Object.assign({}, card.payload || {}, {
+    payload: buildSafeSharePayload(card, 'peer_challenge', {
       share_intent: 'peer_challenge',
       from: 'peer_challenge',
       mode: 'same_identity',
       challenge: 'arcade'
     })
   };
+}
+
+function buildSafeSharePayload(card = {}, intent = 'peer_challenge', extra = {}) {
+  const source = Object.assign({}, card.payload || {}, extra || {});
+  const allowlist = [
+    'share_intent',
+    'from',
+    'mode',
+    'challenge',
+    'share_code',
+    'invite_code',
+    'identity_tag',
+    'tonight_action',
+    'parent_question',
+    'tomorrow_check',
+    'report_daily_action',
+    'unified_next_action',
+    'unified_next_action_route',
+    'parent_next_action',
+    'next_challenge',
+    'share_challenge_goal',
+    'share_challenge_rule',
+    'share_challenge_route',
+    'share_privacy_boundary',
+    'share_return_contract',
+    'safe_relay_allowed_fields',
+    'safe_relay_blocked_fields',
+    'tonight_parent_question',
+    'tonight_tomorrow_revisit',
+    'tonight_release_gate',
+    'tonight_share_boundary',
+    'tonight_allowed_fields',
+    'tonight_blocked_fields',
+    'question_bank_relay_first_step',
+    'question_bank_relay_wrong_cause',
+    'question_bank_relay_next_action',
+    'course_unit_parent_decision',
+    'course_unit_share_contract',
+    'course_unit_recall_route',
+    'course_unit_game_route'
+  ];
+  const denylist = [
+    'original_question',
+    'original_answer',
+    'photo',
+    'raw_text',
+    'full_answer',
+    'full_solution',
+    'full_dialogue',
+    'score',
+    'ranking',
+    'private_comment',
+    'classmate_comparison',
+    'teacher_private_comment',
+    'complete_transcript'
+  ];
+  const safe = {
+    share_intent: intent,
+    share_code: card.code || source.share_code || source.invite_code || 'LOCAL',
+    allowed_fields: ['share_code', 'tonight_action', 'parent_question', 'tomorrow_check', 'safe_relay_allowed_fields'],
+    blocked_fields: denylist
+  };
+  allowlist.forEach((key) => {
+    if (Object.prototype.hasOwnProperty.call(source, key) && !denylist.includes(key)) {
+      safe[key] = source[key];
+    }
+  });
+  safe.sanitized = true;
+  safe.local_rule = '分享出口只走白名单，本地代码剔除原题、答案、照片、完整对话、分数、排名和私密评论。';
+  return safe;
 }
 
 function buildProfileSafeSummary(todayFocus, focusHistory = [], profileEmptyGuide = '') {
@@ -1920,7 +1990,7 @@ Page({
         payload: Object.assign({
           share_code: dailyShareCard.code,
           title: dailyShareCard.title
-        }, dailyShareCard.payload || {})
+        }, buildSafeSharePayload(dailyShareCard, 'generated'))
       });
     }
     const parentReport = buildParentReport(profile, reviewSummary, moduleSummary, tutorSummary, calibrationProfile, reviewSummary.sync, thinkingSummary, parentGoal, todayFocus);

@@ -130,6 +130,14 @@ function classifyImportInput(text = '') {
       feedback: `收到${sourceMeta.label}。只处理你粘贴的摘录，先导入轻回访；不自动抓取链接、不解析文件、不直接给答案。`
     };
   }
+  if (/^https?:\/\/\S+$/i.test(value)) {
+    return {
+      kind: 'link_excerpt_needs_text',
+      route: 'upload',
+      shouldCreateFocus: false,
+      feedback: '只收到链接。请粘贴一小段摘录或写一句孩子卡住点；我不会自动抓取网页，也不会把裸链接交给 AI 点拨。'
+    };
+  }
   if (looksLikeReviewRequest(value)) {
     return {
       kind: 'review_request',
@@ -165,22 +173,24 @@ function classifyImportInput(text = '') {
 function buildNextActionQueue(kind, classified = {}, materialSource = null, images = []) {
   const sourceLabel = materialSource && materialSource.label ? materialSource.label : '用户输入';
   const photoNeedsText = kind === 'photo_evidence_needs_text';
+  const linkNeedsText = kind === 'link_excerpt_needs_text';
+  const needsText = photoNeedsText || linkNeedsText;
   return [
     {
       id: 'complete_stuck_point',
-      label: photoNeedsText ? '先补一句卡住点' : '确认第一步卡点',
+      label: needsText ? '先补一句卡住点' : '确认第一步卡点',
       route: '/pages/upload/upload',
       owner: 'local_rule',
-      status: photoNeedsText ? 'required' : 'ready',
-      releaseGate: photoNeedsText ? '补齐错因或卡住点后才进入复习/点拨' : '已有文字证据，可进入今晚闭环',
-      action: photoNeedsText ? '写清孩子卡在哪一步' : '保留题型、错因和来源'
+      status: needsText ? 'required' : 'ready',
+      releaseGate: needsText ? '补齐错因、摘录或卡住点后才进入复习/点拨' : '已有文字证据，可进入今晚闭环',
+      action: needsText ? '写清孩子卡在哪一步，或粘贴一小段资料摘录' : '保留题型、错因和来源'
     },
     {
       id: 'socratic_first_step',
       label: '苏格拉底第一步',
       route: '/pages/tutor/tutor?from=upload_intake',
       owner: 'ai_with_local_guardrail',
-      status: photoNeedsText ? 'locked' : (classified.route === 'review' ? 'optional' : 'ready'),
+      status: needsText ? 'locked' : (classified.route === 'review' ? 'optional' : 'ready'),
       releaseGate: '本地规则先判定题型和禁用字段，AI 只改写追问语气',
       action: '只问第一步，不生成完整答案'
     },
@@ -189,7 +199,7 @@ function buildNextActionQueue(kind, classified = {}, materialSource = null, imag
       label: '生成回忆卡',
       route: '/pages/review/review',
       owner: 'local_rule',
-      status: photoNeedsText ? 'locked' : (kind === 'material_source' || classified.route === 'review' ? 'ready' : 'optional'),
+      status: needsText ? 'locked' : (kind === 'material_source' || classified.route === 'review' ? 'ready' : 'optional'),
       releaseGate: '只使用用户粘贴的文字摘录或自己写的错因',
       action: `${sourceLabel} -> 概念卡/步骤卡/错因卡/明天回访`
     },
@@ -198,7 +208,7 @@ function buildNextActionQueue(kind, classified = {}, materialSource = null, imag
       label: '90秒第一步挑战',
       route: '/pages/arcade/arcade?from=upload_intake',
       owner: 'local_rule',
-      status: photoNeedsText ? 'locked' : 'optional',
+      status: needsText ? 'locked' : 'optional',
       releaseGate: '挑战只带动作和回访窗口，不带原题、答案、分数或排名',
       action: images.length ? '用自己的材料说第一步' : '用当前文字生成低压挑战'
     },
@@ -207,7 +217,7 @@ function buildNextActionQueue(kind, classified = {}, materialSource = null, imag
       label: '写入家长复盘',
       route: '/pages/profile/profile',
       owner: 'local_rule',
-      status: photoNeedsText ? 'locked' : 'ready',
+      status: needsText ? 'locked' : 'ready',
       releaseGate: '报告只记录来源、第一步、错因和下一次回访',
       action: '家长只看今晚能问的一句话'
     }
@@ -227,6 +237,8 @@ function buildUploadIntakePacket(text = '', imagePaths = [], materialType = '') 
     : classified.kind;
   const nextRoute = kind === 'photo_evidence_needs_text'
     ? '/pages/upload/upload'
+    : kind === 'link_excerpt_needs_text'
+      ? '/pages/upload/upload'
     : classified.route === 'review'
       ? '/pages/review/review'
       : classified.route === 'today_focus'
