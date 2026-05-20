@@ -1975,9 +1975,9 @@ Page({
     };
   },
 
-  persistNinetySecondRecallEvidence(reason = 'completed') {
+  persistNinetySecondRecallEvidence(reason = 'completed', stateOverride = null) {
     const deck = this.data.ninetySecondRecallDeck || {};
-    const state = this.data.ninetySecondRecallState || {};
+    const state = stateOverride || this.data.ninetySecondRecallState || {};
     const evidence = {
       reason,
       deckId: deck.id || '',
@@ -2045,7 +2045,10 @@ Page({
       const elapsedSeconds = Math.min(Number(current.totalSeconds || 90), Math.floor((Date.now() - this.ninetySecondRecallStartedAt) / 1000));
       const secondsLeft = Math.max(0, Number(current.totalSeconds || 90) - elapsedSeconds);
       if (secondsLeft <= 0 && !current.finished) {
-        this.finishNinetySecondRecall('timeout');
+        this.finishNinetySecondRecall('timeout', Object.assign({}, current, {
+          elapsedSeconds,
+          secondsLeft: 0
+        }));
         return;
       }
       this.setData({
@@ -2092,16 +2095,16 @@ Page({
       feedbackText: nextStep ? `已完成第 ${completedStepIds.length} 步，继续下一步。` : '90 秒四步完成。'
     });
     if (completedStepIds.length >= 4) {
-      this.finishNinetySecondRecall('completed');
+      this.finishNinetySecondRecall('completed', nextState);
     }
   },
 
-  finishNinetySecondRecall(reason = 'completed') {
-    const current = this.data.ninetySecondRecallState || this.buildNinetySecondRecallState(this.data.ninetySecondRecallDeck);
+  finishNinetySecondRecall(reason = 'completed', stateOverride = null) {
+    const current = stateOverride || this.data.ninetySecondRecallState || this.buildNinetySecondRecallState(this.data.ninetySecondRecallDeck);
     const nextState = Object.assign({}, current, {
       status: 'completed',
       finished: true,
-      canReleaseXp: true,
+      canReleaseXp: reason !== 'timeout' && (Array.isArray(current.completedStepIds) ? current.completedStepIds.length >= 4 : false),
       secondsLeft: 0
     });
     this.clearNinetySecondRecallTimer();
@@ -2109,7 +2112,7 @@ Page({
       ninetySecondRecallState: nextState,
       feedbackText: reason === 'timeout' ? '90 秒到点，先回到复习卡。' : '90 秒完成，明天回访已锁定。'
     });
-    this.persistNinetySecondRecallEvidence(reason);
+    this.persistNinetySecondRecallEvidence(reason, nextState);
   },
 
   resetNinetySecondRecall() {
