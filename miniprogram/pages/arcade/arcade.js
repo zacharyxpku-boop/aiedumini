@@ -729,17 +729,27 @@ Page({
       const publicK12 = this.data.challengeBrief && this.data.challengeBrief.publicK12IntakeChallenge
         ? this.data.challengeBrief.publicK12IntakeChallenge
         : {};
-      const sourceCard = Array.isArray(publicK12.cards) && publicK12.cards.length ? publicK12.cards[0] : {};
+      const sourceCard = {
+        id: dataset.challengeId || '',
+        subject: dataset.subject || '',
+        taskType: dataset.taskType || '',
+        route: dataset.route || route,
+        reviewRoute: dataset.reviewRoute || '',
+        observableFirstMove: dataset.firstStep || '',
+        fallbackIfNoChildInput: dataset.fallback || ''
+      };
+      const fallbackCard = Array.isArray(publicK12.cards) && publicK12.cards.length ? publicK12.cards[0] : {};
+      const selectedCard = Object.assign({}, fallbackCard, sourceCard.id || sourceCard.subject || sourceCard.taskType ? sourceCard : {});
       storage.appendReviewEvent({
         eventType: 'public_k12_challenge_selected',
         source: 'public_k12_homework_intake',
-        sourceChallengeId: sourceCard.id || publicK12.id || questId,
-        subject: sourceCard.subject || '',
-        taskType: sourceCard.taskType || '',
+        sourceChallengeId: selectedCard.id || publicK12.id || questId,
+        subject: selectedCard.subject || '',
+        taskType: selectedCard.taskType || '',
         route,
-        reviewRoute: publicK12.reviewRoute || '/pages/review/review?from=public_k12_intake',
-        firstStepRequired: sourceCard.observableFirstMove || publicK12.observableFirstMove || '先说出题目问什么和第一步入口',
-        fallbackIfNoChildInput: sourceCard.fallbackIfNoChildInput || publicK12.fallbackIfNoChildInput || '回到苏格拉底追问，不给整题答案',
+        reviewRoute: selectedCard.reviewRoute || publicK12.reviewRoute || '/pages/review/review?from=public_k12_intake',
+        firstStepRequired: selectedCard.observableFirstMove || publicK12.observableFirstMove || '先说出题目问什么和第一步入口',
+        fallbackIfNoChildInput: selectedCard.fallbackIfNoChildInput || publicK12.fallbackIfNoChildInput || '回到苏格拉底追问，不给整题答案',
         due: true,
         dueWindow: questId === 'public_k12_review' ? '明天 5 分钟' : '本局后生成回访',
         releaseGate: 'child_can_say_first_step_before_reward',
@@ -747,11 +757,11 @@ Page({
       });
       if (storage.set) {
         storage.set('arcade.publicK12.selectedChallenge.v1', {
-          id: sourceCard.id || publicK12.id || questId,
-          subject: sourceCard.subject || '',
-          taskType: sourceCard.taskType || '',
+          id: selectedCard.id || publicK12.id || questId,
+          subject: selectedCard.subject || '',
+          taskType: selectedCard.taskType || '',
           route,
-          reviewRoute: publicK12.reviewRoute || '',
+          reviewRoute: selectedCard.reviewRoute || publicK12.reviewRoute || '',
           selectedAt: new Date().toISOString(),
           releaseGate: 'child_can_say_first_step_before_reward'
         });
@@ -1204,10 +1214,16 @@ Page({
   xpEvidenceForCard(cardId, correct, gameType) {
     const card = (this.data.cards || []).find((item) => item && (item.id === cardId || item.cardId === cardId)) || {};
     const quizEvidence = this.data.quizRecallEvidence || {};
+    const explicitFirstStep = !!(quizEvidence.student_first_step || quizEvidence.child_first_step || quizEvidence.first_step_spoken);
+    const explicitWrongCause = !!(quizEvidence.wrong_cause_named || quizEvidence.child_wrong_cause || quizEvidence.wrong_cause_spoken);
+    const explicitRevisit = !!(quizEvidence.next_day_revisit_locked || quizEvidence.next_revisit_locked || quizEvidence.revisit_committed);
     return Object.assign({}, quizEvidence, {
-      student_first_step: !!(quizEvidence.student_first_step || card.checkpoint || card.answer || card.childArticulatedStep),
-      wrong_cause_named: !!(quizEvidence.wrong_cause_named || card.wrongCauseLabel || card.weakPoint || !correct),
-      next_day_revisit_locked: !!(quizEvidence.next_day_revisit_locked || card.nextPracticePlan || card.next_practice || card.revisitWindow),
+      student_first_step: explicitFirstStep,
+      wrong_cause_named: explicitWrongCause,
+      next_day_revisit_locked: explicitRevisit,
+      hint_first_step_available: !!(card.checkpoint || card.answer || card.childArticulatedStep),
+      hint_wrong_cause_available: !!(card.wrongCauseLabel || card.weakPoint || !correct),
+      hint_revisit_available: !!(card.nextPracticePlan || card.next_practice || card.revisitWindow),
       card_id: cardId,
       game_type: gameType || this.data.selectedGame || 'whack'
     });

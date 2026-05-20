@@ -7545,6 +7545,50 @@ function recordShareRelayCompletion(input = {}) {
     blockedFields,
     senderFirstSteps
   });
+  const completionReady = relayQualityScore.checks
+    .filter((item) => ['receiver_own_material', 'receiver_own_first_step', 'receiver_wrong_cause', 'next_day_revisit'].includes(item.id))
+    .every((item) => item.pass);
+  if (!completionReady) {
+    const attempted = {
+      share_code: shareCode,
+      type: 'share_relay_receiver_attempted_needs_receiver_evidence',
+      title: input.title || 'receiver relay needs own evidence',
+      path: route,
+      share_intent: 'receiver_own_material_first_step',
+      payload: {
+        role: 'receiver',
+        receiver_material: receiverMaterial,
+        first_step: firstStep,
+        wrong_cause: wrongCause,
+        next_revisit: nextRevisit,
+        relay_quality_score: relayQualityScore.score,
+        relay_quality_level: relayQualityScore.level,
+        relay_quality_line: relayQualityScore.line,
+        relay_quality_checks: relayQualityScore.checks,
+        evidence_contract: evidenceContract,
+        allowed_fields: SHARE_RELAY_ALLOWED_FIELDS,
+        blocked_fields: blockedFields,
+        source: 'incoming_share_attempt_needs_evidence'
+      }
+    };
+    appendShareRun(attempted);
+    appendReviewEvent({
+      type: 'share_relay_receiver_attempted_needs_receiver_evidence',
+      event: 'share_relay_receiver_attempted_needs_receiver_evidence',
+      result: 'needs_receiver_evidence',
+      card_id: `share_relay_${shareCode}`,
+      weakPoint: wrongCause || firstStep,
+      firstStep,
+      wrongCause,
+      route,
+      share_code: shareCode,
+      receiverMaterial,
+      nextRevisit,
+      relayQualityScore,
+      evidenceContract
+    });
+    return loadShareRuns()[0];
+  }
   const record = {
     share_code: shareCode,
     type: 'share_relay_receiver_completion',

@@ -732,7 +732,7 @@ Page({
   },
 
   requiresStructuredEvidenceGate(sourceSchemaId = '') {
-    return ['wrong_question_paper', 'parent_report', 'talent_assessment'].includes(sourceSchemaId);
+    return ['wrong_question_paper', 'parent_report', 'talent_assessment', 'school_material'].includes(sourceSchemaId);
   },
 
   buildBlockedMaterialCta(decisionSource = {}, structuredEvidenceCapture = {}) {

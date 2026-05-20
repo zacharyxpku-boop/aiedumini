@@ -1400,17 +1400,19 @@ function reviewCard(cardId, rating, context = {}) {
           : 'review_remembered';
     const xpDelta = gameLogic.calculateXP(xpAction, gameLogic.streakMultiplier(gameBefore.streak || streak || 0));
     const xpEvidence = Object.assign({}, reviewed.recallEvidence || {}, context.xpEvidence || {}, {
-      student_first_step: !!reviewed.childArticulatedStep || !!reviewed.checkpoint || !!reviewed.front,
-      wrong_cause_named: !!reviewed.weakPoint || !!reviewed.wrongCauseLabel,
-      next_day_revisit_locked: !!reviewed.nextPracticePlan || !!reviewed.due || !!reviewed.dueDate
+      student_first_step: !!((context.xpEvidence && context.xpEvidence.student_first_step) || reviewed.childArticulatedStep),
+      wrong_cause_named: !!((context.xpEvidence && context.xpEvidence.wrong_cause_named) || reviewed.childWrongCause),
+      next_day_revisit_locked: !!((context.xpEvidence && context.xpEvidence.next_day_revisit_locked) || reviewed.nextDayRevisitConfirmed)
     });
     const xpResult = storage.addGameXP ? storage.addGameXP(xpDelta, xpAction, xpEvidence) : { profile: gameBefore, accepted: xpDelta, gate: { pass: true } };
     const gameAfterXp = xpResult.profile || gameBefore;
     const todayEvents = storage.loadReviewEvents ? storage.loadReviewEvents().filter((item) => String(item.created_at || '').slice(0, 10) === todayKey()) : [];
+    const ratedTodayEvents = todayEvents.filter((item) => ['again', 'hard', 'good', 'easy'].includes(item.rating));
+    const dailyReviewGoal = Math.min(3, Math.max(1, Number((deck && deck.dailyLimit) || 3)));
     const nextGame = gameLogic.updateStreak(gameAfterXp, {
-      reviewedToday: todayEvents.length + 1,
+      reviewedToday: ratedTodayEvents.length + 1,
       now: new Date(),
-      threshold: 10
+      threshold: dailyReviewGoal
     });
     const gameSaved = storage.saveGameProfile ? storage.saveGameProfile(nextGame) : nextGame;
     storage.appendReviewEvent({
@@ -3351,7 +3353,8 @@ function reviewSummary() {
   const gameProfile = storage.loadGameProfile ? storage.loadGameProfile() : {};
   const today = todayKey();
   const todayEvents = events.filter((item) => String(item.created_at || '').slice(0, 10) === today);
-  const goodToday = todayEvents.filter((item) => ['good', 'easy'].includes(item.rating)).length;
+  const ratedTodayEvents = todayEvents.filter((item) => ['again', 'hard', 'good', 'easy'].includes(item.rating));
+  const goodToday = ratedTodayEvents.filter((item) => ['good', 'easy'].includes(item.rating)).length;
   const due = dueCards(20).length;
   const mastered = cards.filter((item) => Number(item.interval || 0) >= 7 && Number(item.lapses || 0) === 0).length;
   const leeches = cards.filter((item) => item.leech || Number(item.lapses || 0) >= 2).length;
@@ -3370,7 +3373,7 @@ function reviewSummary() {
     total: cards.length,
     notes: notes.length,
     due,
-    reviewedToday: todayEvents.length,
+    reviewedToday: ratedTodayEvents.length,
     goodToday,
     mastered,
     leeches,
@@ -3406,7 +3409,7 @@ function reviewSummary() {
     qualityQueue: enhancedQualityQueue(notes, 6),
     comeback: null,
     avgQuality,
-    accuracy: todayEvents.length ? Math.round((goodToday / todayEvents.length) * 100) : 0,
+    accuracy: ratedTodayEvents.length ? Math.round((goodToday / ratedTodayEvents.length) * 100) : 0,
     label: cards.length ? `今日待复习 ${due} 张` : '还没有复习卡'
   };
   summary.comeback = comebackPlan(summary);

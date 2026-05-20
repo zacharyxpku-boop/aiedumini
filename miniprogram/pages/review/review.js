@@ -423,7 +423,7 @@ Page({
       id: card.id || `memory_card_${index}`,
       label: card.weakPoint || card.subject || `第 ${index + 1} 张`,
       question: card.question || card.prompt || '先说出这张卡的第一步',
-      action: card.answer ? `遮住答案，先说：${String(card.answer).slice(0, 28)}` : '遮住答案，先说第一步和错因',
+      action: '遮住答案，先说第一步和错因；点开核对前不展示答案。',
       source: card.source || card.taskType || '本地复习卡'
     }));
     const activeRecallProtocol = {
@@ -1155,6 +1155,8 @@ Page({
       storage.recordShareRelayCompletion({
         firstStep: miniActionText,
         wrongCause: focus && (focus.wrongCauseLabel || focus.weakPoint || focus.title),
+        receiverMaterial: focus && (focus.title || focus.subject || focus.weakPoint),
+        nextRevisit: '明天回访同一第一步',
         route: '/pages/review/review',
         evidence: 'receiver_first_step_repair_completed',
         title: '接收者完成修卡点第一步'

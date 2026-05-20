@@ -94,7 +94,7 @@
           <button class="quest-action-btn" data-route="{{challengeBrief.publicK12IntakeChallenge.route}}" data-quest-id="public_k12_arcade" data-label="开始挑战" bindtap="goQuestRoute">开始挑战</button>
           <button class="quest-action-btn" data-route="{{challengeBrief.publicK12IntakeChallenge.reviewRoute}}" data-quest-id="public_k12_review" data-label="明天回访" bindtap="goQuestRoute">明天回访</button>
         </view>
-        <view class="story-mission-rule" wx:for="{{challengeBrief.publicK12IntakeChallenge.cards}}" wx:key="id">{{item.subject}} · {{item.taskType}}：{{item.observableFirstMove}}</view>
+        <view class="story-mission-rule public-k12-card-action" wx:for="{{challengeBrief.publicK12IntakeChallenge.cards}}" wx:key="id" data-route="{{item.route}}" data-review-route="{{item.reviewRoute}}" data-challenge-id="{{item.id}}" data-subject="{{item.subject}}" data-task-type="{{item.taskType}}" data-first-step="{{item.observableFirstMove}}" data-fallback="{{item.fallbackIfNoChildInput}}" data-quest-id="public_k12_card" data-label="{{item.subject}} · {{item.taskType}}" bindtap="goQuestRoute">{{item.subject}} · {{item.taskType}}：{{item.observableFirstMove}}</view>
       </view>
       <view class="challenge-brief-sub">{{challengeBrief.bossLine}}</view>
       <view class="challenge-brief-sub">{{challengeBrief.rewardLine}}</view>

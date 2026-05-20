@@ -2021,6 +2021,60 @@ function buildSourceEvidenceLedger(input = {}, parts = {}, familyDecisionMemo = 
   };
 }
 
+function buildFamilyDecisionCalendar(input = {}, methodCandidateCards = [], wrongPaperDiagnosisCards = [], reportEvidenceReleaseGate = {}) {
+  const primaryMethod = methodCandidateCards[0] || {};
+  const primaryWrong = wrongPaperDiagnosisCards[0] || {};
+  const releaseStatus = reportEvidenceReleaseGate.releaseDecision || 'collect_more_evidence';
+  const weeks = [
+    {
+      id: 'tonight',
+      label: '今晚',
+      parentDecision: '只判断孩子能不能说出第一步，不追加题量。',
+      childEvidence: primaryMethod.tonightTry || primaryWrong.nextAction || '说出第一步和卡住原因。',
+      reportAction: '只写今晚动作，不更新长期画像。',
+      releaseGate: 'child_first_step'
+    },
+    {
+      id: 'tomorrow',
+      label: '明天',
+      parentDecision: primaryMethod.parentQuestionTomorrow || '只问昨天那一步还能不能说出来。',
+      childEvidence: primaryWrong.nextAction || primaryMethod.tonightWrongQuestionTest || '用一题真实错题验证同一方法。',
+      reportAction: '生成隔天回访，不写掌握结论。',
+      releaseGate: 'next_day_revisit'
+    },
+    {
+      id: 'day7',
+      label: '第7天',
+      parentDecision: '换一道小变式，只看方法能否迁移。',
+      childEvidence: primaryMethod.day7Evidence || '第 7 天小变式迁移结果。',
+      reportAction: '有迁移证据才允许进入画像候选。',
+      releaseGate: 'day7_variant_result'
+    },
+    {
+      id: 'day30',
+      label: '第30天',
+      parentDecision: '只看同类卡点是否下降，不看排名和分数刺激。',
+      childEvidence: '跨周错因复现次数、第一步稳定性、家校观察一致性。',
+      reportAction: releaseStatus === 'home_school_safe_handoff' ? '可生成家校沟通摘要。' : '继续收集证据，暂不做长期结论。',
+      releaseGate: 'two_week_stability_check'
+    }
+  ];
+  return {
+    id: 'family_decision_calendar',
+    title: '家庭决策日历',
+    summary: '把测评、错题和家长观察压成今晚、明天、第7天、第30天四个可验证动作。',
+    status: releaseStatus,
+    weeks,
+    monthlyReview: {
+      label: '月度复盘',
+      decision: '只升级被真实作业、隔天回访、第7天变式和跨周稳定共同支持的方法候选。',
+      doNotSay: ['天赋定性', '人格标签', '结果承诺', '排名比较', '整卷答案'],
+      nextEvidence: ['child_first_step', 'next_day_revisit', 'day7_variant_result', 'two_week_stability_check']
+    },
+    localRule: '本地代码决定日历状态、证据门槛和能否更新画像；AI 只改写家长话术。'
+  };
+}
+
 function buildUploadedMaterialDecisionDossier(input = {}, parts = {}, sourceEvidenceLedger = {}, reportEvidenceReleaseGate = {}, portraitConfidenceSystem = {}) {
   const sources = Array.isArray(parts.reportSources) ? parts.reportSources : [];
   const lanes = Array.isArray(sourceEvidenceLedger.lanes) ? sourceEvidenceLedger.lanes : [];
@@ -2151,6 +2205,7 @@ function buildUploadedMaterialDecisionDossier(input = {}, parts = {}, sourceEvid
     route: primaryValidationStage.route || '/pages/review/review?from=method_candidate_card',
     blockedClaims: ['天赋定性', '人格标签', '完整答案', '自动判分', '排名刺激']
   }));
+  const familyDecisionCalendar = buildFamilyDecisionCalendar(input, methodCandidateCards, wrongPaperDiagnosisCards, reportEvidenceReleaseGate);
   const releaseStatus = reportEvidenceReleaseGate.releaseDecision || 'collect_more_evidence';
   const detailedReportSections = [
     {
@@ -2196,6 +2251,7 @@ function buildUploadedMaterialDecisionDossier(input = {}, parts = {}, sourceEvid
       : '当前只能说“可能更适合的学习方法”，不能给孩子贴天赋或人格标签。',
     howToLearnBetter: methodHypotheses,
     methodCandidateCards,
+    familyDecisionCalendar,
     wrongPaperDiagnosisCards,
     methodValidationChains,
     methodValidationStages,

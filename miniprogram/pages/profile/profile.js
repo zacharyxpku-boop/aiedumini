@@ -1846,6 +1846,13 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     uploadedMaterialDecisionDossierChildStrengthLine: uploadedMaterialDecisionDossier.childStrengthLine || '',
     uploadedMaterialDecisionDossierHowToLearnBetter: Array.isArray(uploadedMaterialDecisionDossier.howToLearnBetter) ? uploadedMaterialDecisionDossier.howToLearnBetter : [],
     uploadedMaterialDecisionDossierMethodCandidateCards: Array.isArray(uploadedMaterialDecisionDossier.methodCandidateCards) ? uploadedMaterialDecisionDossier.methodCandidateCards : [],
+    uploadedMaterialDecisionDossierFamilyDecisionCalendar: uploadedMaterialDecisionDossier.familyDecisionCalendar || null,
+    uploadedMaterialDecisionDossierFamilyDecisionWeeks: uploadedMaterialDecisionDossier.familyDecisionCalendar && Array.isArray(uploadedMaterialDecisionDossier.familyDecisionCalendar.weeks)
+      ? uploadedMaterialDecisionDossier.familyDecisionCalendar.weeks
+      : [],
+    uploadedMaterialDecisionDossierMonthlyReview: uploadedMaterialDecisionDossier.familyDecisionCalendar && uploadedMaterialDecisionDossier.familyDecisionCalendar.monthlyReview
+      ? uploadedMaterialDecisionDossier.familyDecisionCalendar.monthlyReview
+      : null,
     uploadedMaterialDecisionDossierWrongPaperDiagnosisCards: Array.isArray(uploadedMaterialDecisionDossier.wrongPaperDiagnosisCards) ? uploadedMaterialDecisionDossier.wrongPaperDiagnosisCards : [],
     uploadedMaterialDecisionDossierMethodValidationStages: Array.isArray(uploadedMaterialDecisionDossier.methodValidationStages) ? uploadedMaterialDecisionDossier.methodValidationStages : [],
     uploadedMaterialDecisionDossierMethodValidationReleaseRule: uploadedMaterialDecisionDossier.methodValidationReleaseRule || '',

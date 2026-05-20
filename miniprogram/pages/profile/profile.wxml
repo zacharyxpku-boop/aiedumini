@@ -129,6 +129,12 @@
               <text class="parent-brief-label">方法候选卡</text>
               <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierMethodCandidateCards}}" wx:key="id">{{item.label}}｜今晚：{{item.tonightTry}}｜明天：{{item.parentQuestionTomorrow}}｜第7天：{{item.day7Evidence}}</text>
             </view>
+            <view class="parent-brief-block" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierFamilyDecisionCalendar}}">
+              <text class="parent-brief-label">{{learningReportSummary.uploadedMaterialDecisionDossierFamilyDecisionCalendar.title}}</text>
+              <text>{{learningReportSummary.uploadedMaterialDecisionDossierFamilyDecisionCalendar.summary}}</text>
+              <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierFamilyDecisionWeeks}}" wx:key="id">{{item.label}}｜家长判断：{{item.parentDecision}}｜孩子证据：{{item.childEvidence}}｜门槛：{{item.releaseGate}}</text>
+              <text wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierMonthlyReview}}">月度复盘：{{learningReportSummary.uploadedMaterialDecisionDossierMonthlyReview.decision}}</text>
+            </view>
             <view class="parent-brief-block" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierDetailedSections.length}}">
               <text class="parent-brief-label">详细报告章节</text>
               <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierDetailedSections}}" wx:key="id">{{item.label}}｜{{item.status}}｜{{item.body}}</text>
@@ -1210,6 +1216,8 @@
           <text wx:else>方法候选：先用真实错题、隔天回访和第 7 天小变式验证，不贴天赋或人格标签。</text>
           <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierMaterialLanes}}" wx:key="id">上传链路：{{item.label}}｜{{item.collected ? '已接入' : '待补充'}}｜可说：{{item.canSay}}｜不可说：{{item.cannotSay}}｜产出：{{item.output}}</text>
           <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierHowToLearnBetter}}" wx:key="id">怎么学候选：{{item.label}}｜证据：{{item.evidence}}｜验证：{{item.verifyWith}}</text>
+          <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierFamilyDecisionWeeks}}" wx:key="id">决策日历：{{item.label}}｜{{item.parentDecision}}｜{{item.releaseGate}}</text>
+          <text wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierMonthlyReview}}">月度复盘：{{learningReportSummary.uploadedMaterialDecisionDossierMonthlyReview.decision}}</text>
           <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierWrongPaperDiagnosisCards}}" wx:key="id">错题诊断：{{item.label}}｜{{item.rule}}｜{{item.nextAction}}</text>
           <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierDetailedSections}}" wx:key="id">详细章节：{{item.label}}｜{{item.status}}｜{{item.body}}</text>
           <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierParentDecisionSections}}" wx:key="id">报告章节：{{item.label}}｜{{item.body}}</text>
