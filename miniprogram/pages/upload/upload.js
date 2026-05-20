@@ -904,6 +904,9 @@ Page({
       importedCards,
       cardId
     });
+    const uploadedMaterialDecisionDossier = reportState.uploadedMaterialDecisionDossier
+      || reportDraft.uploadedMaterialDecisionDossier
+      || null;
     return {
       title: sourceSchemaId === 'talent_assessment'
         ? '方法候选已入证据账本'
@@ -931,6 +934,7 @@ Page({
       },
       guardedAiReportDraft,
       servicePathway,
+      uploadedMaterialDecisionDossier,
       sourceSchemaId,
       reportId,
       flowTraceId: `upload_report:${reportId || sourceSchemaId}:${cardId || 'no_card'}`,
@@ -976,6 +980,7 @@ Page({
       miniLessonSourceEvidence: cta.miniLessonSourceEvidence || null,
       guardedAiReportDraft: cta.guardedAiReportDraft || null,
       servicePathway: cta.servicePathway || null,
+      uploadedMaterialDecisionDossier: cta.uploadedMaterialDecisionDossier || reportState.uploadedMaterialDecisionDossier || null,
       uploadReportHandoff: cta,
       flowTraceId: cta.flowTraceId || `upload_report:${cta.reportId || Date.now()}`
     });
@@ -986,6 +991,7 @@ Page({
         miniLessonSourceEvidence: cta.miniLessonSourceEvidence || null,
         guardedAiReportDraft: cta.guardedAiReportDraft || null,
         servicePathway: cta.servicePathway || null,
+        uploadedMaterialDecisionDossier: cta.uploadedMaterialDecisionDossier || nextState.uploadedMaterialDecisionDossier || null,
         uploadReportHandoff: cta,
         flowTraceId: nextState.flowTraceId
       });

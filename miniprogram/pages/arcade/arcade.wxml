@@ -197,6 +197,10 @@
           <view class="daily-return-step-order">{{item.order}}</view>
           <view class="daily-return-step-body">
             <view class="daily-return-step-action">{{item.prompt}}</view>
+            <input wx:if="{{item.inputType === 'short_text' && item.isCurrent}}" class="daily-return-step-input" placeholder="写孩子自己的第一步" value="{{item.inputValue}}" data-step-id="{{item.id}}" bindinput="handleNinetySecondRecallInput" />
+            <view wx:if="{{item.inputType === 'two_choice' && item.isCurrent}}" class="daily-return-choice-row">
+              <button class="daily-return-choice {{choice.id === item.selectedChoiceId ? 'selected' : ''}}" wx:for="{{item.choices}}" wx:for-item="choice" wx:key="id" data-step-id="{{item.id}}" data-choice-id="{{choice.id}}" bindtap="selectNinetySecondRecallChoice">{{choice.label}}</button>
+            </view>
             <view class="daily-return-step-state" wx:if="{{item.isCurrent}}">当前只做这一步</view>
             <view class="daily-return-step-state done" wx:if="{{item.isCompleted}}">已留下证据</view>
             <view class="daily-return-step-proof">{{item.seconds}} 秒 · 证据 {{item.passEvidence}}</view>

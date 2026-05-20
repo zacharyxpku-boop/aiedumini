@@ -1437,6 +1437,11 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
       { id: 'review', label: '做一次回访', route: '/pages/review/review?from=openmaic_k12_workbench' }
     ]
   };
+  openMaicBorrowWorkbench.nextRoutes.splice(2, 0, {
+    id: 'upload_parent_report',
+    label: '家长观察',
+    route: '/pages/upload/upload?from=openmaic_k12_workbench&type=parent_report'
+  });
   return {
     title: draft.title || '学习画像',
     modeLabel: reportState.reportProgress && reportState.reportProgress.label ? reportState.reportProgress.label : '0% · 快速版',
@@ -1666,6 +1671,10 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     sevenSubjectMasterySprintSubjects: sevenSubjectMasterySprint ? sevenSubjectMasterySprint.subjects : [],
     sevenSubjectMasterySprintLanes: sevenSubjectMasterySprint ? sevenSubjectMasterySprint.lanes : [],
     longTermPortrait,
+    longTermPortraitCanRender: portraitConfidenceSystem.portraitStage === 'weekly_portrait_candidate',
+    longTermPortraitLockedLine: portraitConfidenceSystem.portraitStage === 'weekly_portrait_candidate'
+      ? ''
+      : (portraitConfidenceSystem.portraitStageReason || '当前证据只支持今晚行动，不能把孩子定性为长期画像。'),
     longTermPortraitLine: longTermPortrait.learnerPattern || '',
     longTermPortraitStabilityLine: longTermPortrait.stabilityLine || '',
     longTermPortraitRiskLine: longTermPortrait.riskWatch || '',
@@ -1691,6 +1700,13 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     classroomSuccessRule: classroomDecisionBoard.successRule || '',
     familyDecisionMemo,
     portraitConfidenceSystem,
+    portraitConfidenceStage: portraitConfidenceSystem.portraitStage || '',
+    portraitConfidenceStageLabel: portraitConfidenceSystem.portraitStageLabel || '',
+    portraitConfidenceStageReason: portraitConfidenceSystem.portraitStageReason || '',
+    portraitConfidenceNextEvidenceAction: portraitConfidenceSystem.portraitNextEvidenceAction || '',
+    portraitConfidenceStatusLine: portraitConfidenceSystem.portraitStageLabel
+      ? `${portraitConfidenceSystem.portraitStageLabel} / ${portraitConfidenceSystem.portraitNextEvidenceAction || portraitConfidenceSystem.summary || ''}`
+      : '',
     parentDecisionTrustSystem,
     longitudinalPortraitTimeline,
     portraitEvidenceMaturitySystem,

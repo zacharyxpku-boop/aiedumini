@@ -993,7 +993,13 @@
           <text class="parent-brief-label">能力倾向</text>
           <text wx:for="{{learningReportSummary.tendencyLines}}" wx:key="*this">{{item}}</text>
         </view>
-        <view class="parent-brief-block" wx:if="{{learningReportSummary.longTermPortraitLine}}">
+        <view class="parent-brief-block" wx:if="{{learningReportSummary.portraitConfidenceStatusLine}}">
+          <text class="parent-brief-label">画像放行状态</text>
+          <text>{{learningReportSummary.portraitConfidenceStatusLine}}</text>
+          <text wx:if="{{learningReportSummary.portraitConfidenceStageReason}}">{{learningReportSummary.portraitConfidenceStageReason}}</text>
+          <text wx:if="{{learningReportSummary.longTermPortraitLockedLine}}">暂不定性：{{learningReportSummary.longTermPortraitLockedLine}}</text>
+        </view>
+        <view class="parent-brief-block" wx:if="{{learningReportSummary.longTermPortraitLine && learningReportSummary.longTermPortraitCanRender}}">
           <text class="parent-brief-label">长期画像</text>
           <text>{{learningReportSummary.longTermPortraitLine}}</text>
           <text wx:if="{{learningReportSummary.longTermPortraitStabilityLine}}">{{learningReportSummary.longTermPortraitStabilityLine}}</text>

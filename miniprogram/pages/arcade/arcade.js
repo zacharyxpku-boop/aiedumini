@@ -2087,6 +2087,13 @@ Page({
         relay_review: 'ninety_second_first_step',
         relay_next_revisit: 'tomorrow_one_card',
         relay_spread_status: 'no_ranking_no_score',
+        relay_receiver_action: progression.receiverAction || retention.nextRoute || '/pages/review/review',
+        relay_parent_check: progression.parentCheck || retention.parentLine || '',
+        relay_first_step: retention.weakKey || highFrequency.weakKey || progression.weakKey || '',
+        relay_allowed_fields: Array.isArray(retention.allowedFields) ? retention.allowedFields.slice(0, 6) : [],
+        relay_blocked_fields: Array.isArray(retention.blockedFields) ? retention.blockedFields.slice(0, 8) : ['original_question', 'score', 'ranking'],
+        openmaic_game_gate: progression.gameGate || retention.nextRoundLine || '',
+        relay_return_path: '/pages/arcade/arcade?from=peer_90s_relay',
         source_challenge_route: '/pages/arcade/arcade?from=peer_90s_relay'
       },
       tomorrowLine: progression.nextDayRevisit || retention.tomorrowLine || highFrequency.parentShareLine || '明天只回看最不稳的一张卡。',
@@ -2144,6 +2151,9 @@ Page({
       interactions,
       completedStepIds: [],
       evidence: [],
+      inputs: {},
+      selectedChoices: {},
+      localChecks: {},
       finished: false,
       canReleaseXp: false,
       blockedRewards: deck && Array.isArray(deck.localAiSplit && deck.localAiSplit.aiMustNotOwn)
@@ -2163,10 +2173,15 @@ Page({
       const isCompleted = completed.includes(item.id);
       const isCurrent = state.status === 'running' && index === Number(state.stepIndex || 0) && !state.finished;
       const isLocked = state.status !== 'running' || (!isCurrent && !isCompleted);
+      const inputValue = state.inputs && state.inputs[item.id] ? state.inputs[item.id] : '';
+      const selectedChoiceId = state.selectedChoices && state.selectedChoices[item.id] ? state.selectedChoices[item.id] : '';
       return Object.assign({}, item, {
         isCurrent,
         isCompleted,
         isLocked,
+        inputValue,
+        selectedChoiceId,
+        localCheckPassed: !!(state.localChecks && state.localChecks[item.id]),
         uiClass: isCompleted ? 'completed' : isCurrent ? 'current' : isLocked ? 'locked' : ''
       });
     });
@@ -2189,6 +2204,37 @@ Page({
         ? '本轮不发 XP，自动降级为明天回访卡：只问第一步和错因，不继续加题。'
         : ''
     });
+  },
+
+  handleNinetySecondRecallInput(event) {
+    const stepId = event.currentTarget.dataset.stepId || '';
+    const value = event.detail && typeof event.detail.value === 'string' ? event.detail.value.slice(0, 80) : '';
+    const state = this.data.ninetySecondRecallState || {};
+    const inputs = Object.assign({}, state.inputs || {}, { [stepId]: value });
+    this.setData({
+      ninetySecondRecallState: this.decorateNinetySecondRecallState(Object.assign({}, state, { inputs }))
+    });
+  },
+
+  selectNinetySecondRecallChoice(event) {
+    const stepId = event.currentTarget.dataset.stepId || '';
+    const choiceId = event.currentTarget.dataset.choiceId || '';
+    const state = this.data.ninetySecondRecallState || {};
+    const selectedChoices = Object.assign({}, state.selectedChoices || {}, { [stepId]: choiceId });
+    this.setData({
+      ninetySecondRecallState: this.decorateNinetySecondRecallState(Object.assign({}, state, { selectedChoices }))
+    });
+  },
+
+  validateNinetySecondRecallStep(step = {}, state = {}) {
+    if (step.inputType === 'short_text') {
+      const value = String(state.inputs && state.inputs[step.id] || '').trim();
+      return value.length >= 4;
+    }
+    if (step.inputType === 'two_choice') {
+      return !!(state.selectedChoices && state.selectedChoices[step.id]);
+    }
+    return true;
   },
 
   persistNinetySecondRecallEvidence(reason = 'completed', stateOverride = null) {
@@ -2287,11 +2333,23 @@ Page({
       this.setData({ feedbackText: '先按顺序完成当前一步。' });
       return;
     }
+    if (!this.validateNinetySecondRecallStep(currentStep, state)) {
+      this.setData({
+        feedbackText: currentStep.inputType === 'short_text'
+          ? '先写下孩子自己的第一步，至少 4 个字，再进入下一步。'
+          : '先选择一个卡住原因，再继续。'
+      });
+      return;
+    }
     const completedStepIds = state.completedStepIds.concat(stepId);
+    const localChecks = Object.assign({}, state.localChecks || {}, { [stepId]: true });
     const evidence = state.evidence.concat([{
       stepId,
       proof: currentStep.passEvidence || currentStep.proof || '',
       localCheck: currentStep.localCheck || '',
+      localCheckPassed: true,
+      childInput: String(state.inputs && state.inputs[stepId] || '').trim().slice(0, 80),
+      choiceId: state.selectedChoices && state.selectedChoices[stepId] || '',
       prompt: currentStep.prompt || currentStep.action || ''
     }]);
     const nextIndex = state.stepIndex + 1;
@@ -2303,7 +2361,8 @@ Page({
       currentStepId: nextStep ? nextStep.id : currentStep.id,
       completedStepIds,
       evidence,
-      canReleaseXp: completedStepIds.length >= 4,
+      localChecks,
+      canReleaseXp: completedStepIds.length >= 4 && completedStepIds.every((id) => localChecks[id]),
       status: completedStepIds.length >= 4 ? 'completed' : 'running'
     }));
     this.setData({
@@ -2320,7 +2379,9 @@ Page({
     const nextState = this.decorateNinetySecondRecallState(Object.assign({}, current, {
       status: reason === 'timeout' ? 'timeout' : 'completed',
       finished: true,
-      canReleaseXp: reason !== 'timeout' && (Array.isArray(current.completedStepIds) ? current.completedStepIds.length >= 4 : false),
+      canReleaseXp: reason !== 'timeout'
+        && (Array.isArray(current.completedStepIds) ? current.completedStepIds.length >= 4 : false)
+        && (Array.isArray(current.completedStepIds) ? current.completedStepIds.every((id) => current.localChecks && current.localChecks[id]) : false),
       secondsLeft: 0
     }));
     this.clearNinetySecondRecallTimer();
