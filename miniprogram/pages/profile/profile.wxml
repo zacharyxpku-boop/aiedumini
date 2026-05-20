@@ -137,6 +137,14 @@
               <text class="parent-brief-label">家庭行动栈</text>
               <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierFamilyActionStack}}" wx:key="id">{{item.label}}｜{{item.action}}｜门槛：{{item.gate}}</text>
             </view>
+            <view class="parent-brief-block" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierSolutionBlueprint}}">
+              <text class="parent-brief-label">个性化学习方案蓝图</text>
+              <text>{{learningReportSummary.uploadedMaterialDecisionDossierSolutionBlueprint.recommendedMode.label}}：{{learningReportSummary.uploadedMaterialDecisionDossierSolutionBlueprint.recommendedMode.why}}</text>
+              <text>{{learningReportSummary.uploadedMaterialDecisionDossierSolutionBlueprint.servicePathwayHint}}</text>
+              <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierSolutionModeSequence}}" wx:key="id">{{item.label}}｜触发：{{item.trigger}}｜本地门槛：{{item.localGate}}｜AI：{{item.aiRole}}</text>
+              <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierSolutionFusionRules}}" wx:key="id">{{item.label}}｜用于：{{item.useFor}}｜验证：{{item.mustVerifyWith}}</text>
+              <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierSolutionOwnership}}" wx:key="id">{{item.label}}：{{item.reason}}</text>
+            </view>
             <view class="parent-brief-block" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierFamilyDecisionCalendar}}">
               <text class="parent-brief-label">{{learningReportSummary.uploadedMaterialDecisionDossierFamilyDecisionCalendar.title}}</text>
               <text>{{learningReportSummary.uploadedMaterialDecisionDossierFamilyDecisionCalendar.summary}}</text>
@@ -1232,6 +1240,10 @@
           <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierHowToLearnBetter}}" wx:key="id">怎么学候选：{{item.label}}｜证据：{{item.evidence}}｜验证：{{item.verifyWith}}</text>
           <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierDecisionHeatmap}}" wx:key="id">决策热区：{{item.label}}｜{{item.status}}｜{{item.nextAction}}</text>
           <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierFamilyActionStack}}" wx:key="id">家庭行动：{{item.label}}｜{{item.action}}｜{{item.gate}}</text>
+          <text wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierSolutionBlueprint}}">个性化学习方案：{{learningReportSummary.uploadedMaterialDecisionDossierSolutionBlueprint.recommendedMode.label}}｜{{learningReportSummary.uploadedMaterialDecisionDossierSolutionBlueprint.recommendedMode.why}}</text>
+          <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierSolutionModeSequence}}" wx:key="id">方案流转：{{item.label}}｜{{item.trigger}}｜{{item.localGate}}</text>
+          <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierSolutionFusionRules}}" wx:key="id">材料融合：{{item.label}}｜{{item.useFor}}｜{{item.mustVerifyWith}}</text>
+          <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierSolutionOwnership}}" wx:key="id">AI/本地：{{item.label}}｜{{item.reason}}</text>
           <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierFamilyDecisionWeeks}}" wx:key="id">决策日历：{{item.label}}｜{{item.parentDecision}}｜{{item.releaseGate}}</text>
           <text wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierMonthlyReview}}">月度复盘：{{learningReportSummary.uploadedMaterialDecisionDossierMonthlyReview.decision}}</text>
           <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierWrongPaperDiagnosisCards}}" wx:key="id">错题诊断：{{item.label}}｜{{item.rule}}｜{{item.nextAction}}</text>

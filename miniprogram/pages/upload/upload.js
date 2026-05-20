@@ -529,7 +529,7 @@ Page({
     };
   },
 
-  buildStructuredEvidenceSignals(uploadIntakePacket = {}, text = '', manual = {}) {
+  buildStructuredEvidenceSignalsLegacy(uploadIntakePacket = {}, text = '', manual = {}) {
     const schema = uploadIntakePacket.intakeSourceSchema || {};
     const prompts = Array.isArray(uploadIntakePacket.structuredCapturePrompts)
       ? uploadIntakePacket.structuredCapturePrompts
@@ -621,7 +621,7 @@ Page({
     };
   },
 
-  buildStructuredEvidenceCapture(uploadIntakePacket = {}, text = '', manual = {}) {
+  buildStructuredEvidenceCaptureLegacy(uploadIntakePacket = {}, text = '', manual = {}) {
     const signals = this.buildStructuredEvidenceSignals(uploadIntakePacket, text, manual);
     const prompts = Array.isArray(uploadIntakePacket.structuredCapturePrompts)
       ? uploadIntakePacket.structuredCapturePrompts
@@ -706,9 +706,17 @@ Page({
       || promptValueById.next_day_revisit
       || promptValueById.day7_variant
       || wrongCauseGuess;
+    const subjectTask = inferUploadSubjectTask(value, Object.assign({}, manualValues, promptValueById), {
+      sourceSchemaLabel: schema.label || uploadIntakePacket.sourceSchemaLabel || '',
+      materialType: uploadIntakePacket.sourceType || uploadIntakePacket.sourceSchemaId || ''
+    });
     const structuredCapture = {
       sourceSchemaId: schema.id || uploadIntakePacket.sourceSchemaId || '',
       sourceSchemaLabel: schema.label || uploadIntakePacket.sourceSchemaLabel || '',
+      subjectKey: subjectTask.subjectKey,
+      subjectLabel: subjectTask.subjectLabel,
+      taskType: subjectTask.taskType,
+      subjectTaskInferenceSource: subjectTask.source,
       questionType: questionTypeValue || schema.label || '',
       childOriginalThought: childOriginalThoughtValue,
       stuckFirstStep: stuckFirstStepValue,
@@ -725,6 +733,10 @@ Page({
       stuckFirstStep: stuckFirstStepValue || '',
       wrongCause: wrongCauseGuessValue || '',
       wrongCauseGuess: wrongCauseGuessValue,
+      subjectKey: subjectTask.subjectKey,
+      subjectLabel: subjectTask.subjectLabel,
+      taskType: subjectTask.taskType,
+      subjectTaskInferenceSource: subjectTask.source,
       sourceSchemaId: schema.id || '',
       sourceSchemaLabel: schema.label || '',
       structuredCaptureMissing: structuredCapture.missing,
@@ -738,28 +750,19 @@ Page({
     const prompts = Array.isArray(uploadIntakePacket.structuredCapturePrompts)
       ? uploadIntakePacket.structuredCapturePrompts
       : [];
-    const aliasValues = {
-      question_type: signals.questionType || '',
-      child_original_thought: signals.childOriginalThought || '',
-      stuck_first_step: signals.stuckFirstStep || '',
-      wrong_cause_guess: signals.wrongCauseGuess || '',
-      preference_candidate: signals.questionType || '',
-      method_hypothesis: signals.childOriginalThought || '',
-      cross_check_gate: signals.stuckFirstStep || '',
-      review_window: signals.wrongCauseGuess || '',
-      teacher_observation: signals.questionType || '',
-      classroom_signal: signals.childOriginalThought || '',
-      home_school_question: signals.stuckFirstStep || '',
-      safe_handoff: signals.wrongCauseGuess || '',
-      home_observation: signals.questionType || '',
-      parent_goal: signals.childOriginalThought || '',
-      homework_context: signals.stuckFirstStep || '',
-      next_action: signals.wrongCauseGuess || '',
-      wrong_cause: signals.wrongCauseGuess || '',
-      first_step: signals.stuckFirstStep || '',
-      next_day_revisit: signals.wrongCauseGuess || '',
-      day7_variant: signals.wrongCauseGuess || ''
-    };
+    const sourceSchemaId = signals.sourceSchemaId || uploadIntakePacket.sourceSchemaId || '';
+    const aliasValues = sourceSchemaId === 'wrong_question_paper'
+      ? {
+        question_type: signals.questionType || '',
+        child_original_thought: signals.childOriginalThought || '',
+        stuck_first_step: signals.stuckFirstStep || '',
+        wrong_cause_guess: signals.wrongCauseGuess || '',
+        wrong_cause: signals.wrongCauseGuess || '',
+        first_step: signals.stuckFirstStep || '',
+        next_day_revisit: signals.wrongCauseGuess || '',
+        day7_variant: signals.wrongCauseGuess || ''
+      }
+      : {};
     const values = Object.assign({}, aliasValues, signals.structuredFieldValues || {}, manual || {});
     const fields = prompts.map((prompt) => {
       const value = String(values[prompt.id] || '').trim();

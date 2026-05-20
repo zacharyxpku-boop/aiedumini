@@ -1883,6 +1883,16 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     uploadedMaterialDecisionDossierMethodCandidateCards: Array.isArray(uploadedMaterialDecisionDossier.methodCandidateCards) ? uploadedMaterialDecisionDossier.methodCandidateCards : [],
     uploadedMaterialDecisionDossierDecisionHeatmap: Array.isArray(uploadedMaterialDecisionDossier.decisionHeatmap) ? uploadedMaterialDecisionDossier.decisionHeatmap : [],
     uploadedMaterialDecisionDossierFamilyActionStack: Array.isArray(uploadedMaterialDecisionDossier.familyActionStack) ? uploadedMaterialDecisionDossier.familyActionStack : [],
+    uploadedMaterialDecisionDossierSolutionBlueprint: uploadedMaterialDecisionDossier.personalizedLearningSolutionBlueprint || null,
+    uploadedMaterialDecisionDossierSolutionModeSequence: uploadedMaterialDecisionDossier.personalizedLearningSolutionBlueprint && Array.isArray(uploadedMaterialDecisionDossier.personalizedLearningSolutionBlueprint.modeSequence)
+      ? uploadedMaterialDecisionDossier.personalizedLearningSolutionBlueprint.modeSequence
+      : [],
+    uploadedMaterialDecisionDossierSolutionFusionRules: uploadedMaterialDecisionDossier.personalizedLearningSolutionBlueprint && Array.isArray(uploadedMaterialDecisionDossier.personalizedLearningSolutionBlueprint.evidenceFusionRules)
+      ? uploadedMaterialDecisionDossier.personalizedLearningSolutionBlueprint.evidenceFusionRules
+      : [],
+    uploadedMaterialDecisionDossierSolutionOwnership: uploadedMaterialDecisionDossier.personalizedLearningSolutionBlueprint && Array.isArray(uploadedMaterialDecisionDossier.personalizedLearningSolutionBlueprint.localVsAiOwnership)
+      ? uploadedMaterialDecisionDossier.personalizedLearningSolutionBlueprint.localVsAiOwnership
+      : [],
     uploadedMaterialDecisionDossierFamilyDecisionCalendar: uploadedMaterialDecisionDossier.familyDecisionCalendar || null,
     uploadedMaterialDecisionDossierFamilyDecisionWeeks: uploadedMaterialDecisionDossier.familyDecisionCalendar && Array.isArray(uploadedMaterialDecisionDossier.familyDecisionCalendar.weeks)
       ? uploadedMaterialDecisionDossier.familyDecisionCalendar.weeks

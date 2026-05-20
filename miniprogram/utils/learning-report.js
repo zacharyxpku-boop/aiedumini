@@ -2075,6 +2075,130 @@ function buildFamilyDecisionCalendar(input = {}, methodCandidateCards = [], wron
   };
 }
 
+function buildPersonalizedLearningSolutionBlueprint(materialLanes = [], methodHypotheses = [], wrongPaperDiagnosisCards = [], servicePathway = {}) {
+  const laneById = materialLanes.reduce((acc, lane) => {
+    if (lane && lane.id) acc[lane.id] = lane;
+    return acc;
+  }, {});
+  const hasTalentAssessment = !!(laneById.talent_assessment && laneById.talent_assessment.collected);
+  const hasWrongPaper = !!(laneById.wrong_question_paper && laneById.wrong_question_paper.collected);
+  const hasSchoolMaterial = !!(laneById.school_material && laneById.school_material.collected);
+  const hasParentObservation = !!(laneById.parent_report && laneById.parent_report.collected);
+  const recommendedMode = hasWrongPaper
+    ? {
+      id: 'socratic_private_tutor',
+      label: '1 对 1 苏格拉底点拨',
+      why: '已有真实错题或试卷证据，先让孩子说出第一步和错因。',
+      entryRoute: '/pages/tutor/tutor?from=solution_blueprint_wrong_paper'
+    }
+    : hasTalentAssessment
+      ? {
+        id: 'method_candidate_validation',
+        label: '方法候选验证',
+        why: '测评只能说明可能适合的学习方法，必须用真实错题验证。',
+        entryRoute: '/pages/upload/upload?from=solution_blueprint_add_wrong_question&materialType=wrong_question_paper'
+      }
+      : {
+        id: 'parent_first_step',
+        label: '家庭第一步观察',
+        why: '材料还不够，先收集今晚真实卡点和孩子第一步。',
+        entryRoute: '/pages/upload/upload?from=solution_blueprint_collect_evidence'
+      };
+  const modeSequence = [
+    {
+      id: 'step_1_private_tutor',
+      label: '先用苏格拉底私教',
+      trigger: '孩子能描述题目或卡住点时',
+      localGate: '必须先有孩子自己的第一步或卡住表达',
+      aiRole: '把追问改写成孩子听得懂的一句话',
+      route: '/pages/tutor/tutor?from=solution_blueprint'
+    },
+    {
+      id: 'step_2_mini_lesson',
+      label: '连续卡住才切 3 分钟小讲堂',
+      trigger: '同一概念连续卡住、答非所问或只想要答案',
+      localGate: '小讲堂只讲一个概念缺口，并要求退出票',
+      aiRole: '生成一句老师讲解和一个常见误区同学',
+      route: '/pages/tutor/tutor?from=solution_blueprint_mini_lesson'
+    },
+    {
+      id: 'step_3_active_recall',
+      label: '过退出门后进轻练习/主动回忆',
+      trigger: '孩子能用自己的话说出第一步',
+      localGate: '本地代码决定 XP、间隔回访和练习放行',
+      aiRole: '只改写近迁移题的提示语气',
+      route: '/pages/arcade/arcade?from=solution_blueprint'
+    },
+    {
+      id: 'step_4_parent_report',
+      label: '家长看家庭决策书',
+      trigger: '今晚动作、明天回访和第 7 天验证形成记录后',
+      localGate: '报告只放行证据支持的结论，不贴固定标签',
+      aiRole: '把证据改写成低压家长话术',
+      route: '/pages/profile/profile?from=solution_blueprint'
+    }
+  ];
+  const evidenceFusionRules = [
+    {
+      id: 'talent_assessment_rule',
+      label: '测评报告',
+      useFor: hasTalentAssessment ? '学习方法候选' : '待补充',
+      mustVerifyWith: '真实错题第一步、隔天回访、第 7 天小变式',
+      cannotClaim: '不做天赋定性、人格标签、升学判断或结果承诺'
+    },
+    {
+      id: 'wrong_paper_rule',
+      label: '错题/试卷',
+      useFor: hasWrongPaper ? '错因卡、小黑板、轻练习和回访' : '待补充',
+      mustVerifyWith: '孩子原想法、卡住第一步、同错因回访',
+      cannotClaim: '不生成整卷答案、不自动判分、不做竞争比较'
+    },
+    {
+      id: 'school_material_rule',
+      label: '学校反馈',
+      useFor: hasSchoolMaterial ? '家校安全摘要和观察问题' : '待补充',
+      mustVerifyWith: '家庭真实作业记录和孩子复述证据',
+      cannotClaim: '不替代老师判断，不外发原题照片或完整对话'
+    },
+    {
+      id: 'parent_observation_rule',
+      label: '家长观察',
+      useFor: hasParentObservation ? '今晚低压陪伴动作' : '待补充',
+      mustVerifyWith: '孩子实际作业表现和次日回访',
+      cannotClaim: '不把一次情绪或拖拉定性为长期能力问题'
+    }
+  ];
+  const localVsAiOwnership = [
+    {
+      id: 'local_code',
+      label: '本地代码更适合',
+      owns: ['材料分类', '证据权重', '模式放行', '退出门', 'XP/回访', '分享字段', '报告状态'],
+      reason: '这些决定影响隐私、合规和奖励，必须稳定、可测、可回滚。'
+    },
+    {
+      id: 'ai',
+      label: 'AI 更适合',
+      owns: ['苏格拉底追问', '一句话讲解', '误区同学表达', '家长低压话术', '家校摘要润色'],
+      reason: '这些需要语言适配和同理心，但不能决定答案、标签、放行和奖励。'
+    }
+  ];
+  return {
+    id: 'personalized_learning_solution_blueprint',
+    title: '个性化学习方案蓝图',
+    status: hasWrongPaper ? 'ready_for_private_tutor' : hasTalentAssessment ? 'method_candidate_needs_wrong_question' : 'collect_more_evidence',
+    recommendedMode,
+    modeSequence,
+    evidenceFusionRules,
+    localVsAiOwnership,
+    servicePathwayHint: servicePathway && servicePathway.primaryMode
+      ? `当前服务路径建议：${servicePathway.primaryMode.label || servicePathway.primaryMode.id || '家庭私教闭环'}`
+      : '默认路径：苏格拉底私教优先，小讲堂只在连续卡住后补位。',
+    methodHypothesisCount: methodHypotheses.length,
+    wrongPaperActionCount: wrongPaperDiagnosisCards.length,
+    blockedClaims: ['固定天赋标签', '人格定性', '整卷答案', '自动判分', '竞争比较', '结果承诺']
+  };
+}
+
 function buildUploadedMaterialDecisionDossier(input = {}, parts = {}, sourceEvidenceLedger = {}, reportEvidenceReleaseGate = {}, portraitConfidenceSystem = {}, servicePathway = {}) {
   const sources = Array.isArray(parts.reportSources) ? parts.reportSources : [];
   const lanes = Array.isArray(sourceEvidenceLedger.lanes) ? sourceEvidenceLedger.lanes : [];
@@ -2271,6 +2395,12 @@ function buildUploadedMaterialDecisionDossier(input = {}, parts = {}, sourceEvid
     }
   ];
   const familyDecisionCalendar = buildFamilyDecisionCalendar(input, methodCandidateCards, wrongPaperDiagnosisCards, reportEvidenceReleaseGate);
+  const personalizedLearningSolutionBlueprint = buildPersonalizedLearningSolutionBlueprint(
+    materialLanes,
+    methodHypotheses,
+    wrongPaperDiagnosisCards,
+    servicePathway
+  );
   const releaseStatus = reportEvidenceReleaseGate.releaseDecision || 'collect_more_evidence';
   const detailedReportSections = [
     {
@@ -2319,6 +2449,7 @@ function buildUploadedMaterialDecisionDossier(input = {}, parts = {}, sourceEvid
     decisionHeatmap,
     familyActionStack,
     familyDecisionCalendar,
+    personalizedLearningSolutionBlueprint,
     wrongPaperDiagnosisCards,
     methodValidationChains,
     methodValidationStages,
