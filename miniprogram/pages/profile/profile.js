@@ -1881,6 +1881,8 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     uploadedMaterialDecisionDossierChildStrengthLine: uploadedMaterialDecisionDossier.childStrengthLine || '',
     uploadedMaterialDecisionDossierHowToLearnBetter: Array.isArray(uploadedMaterialDecisionDossier.howToLearnBetter) ? uploadedMaterialDecisionDossier.howToLearnBetter : [],
     uploadedMaterialDecisionDossierMethodCandidateCards: Array.isArray(uploadedMaterialDecisionDossier.methodCandidateCards) ? uploadedMaterialDecisionDossier.methodCandidateCards : [],
+    uploadedMaterialDecisionDossierDecisionHeatmap: Array.isArray(uploadedMaterialDecisionDossier.decisionHeatmap) ? uploadedMaterialDecisionDossier.decisionHeatmap : [],
+    uploadedMaterialDecisionDossierFamilyActionStack: Array.isArray(uploadedMaterialDecisionDossier.familyActionStack) ? uploadedMaterialDecisionDossier.familyActionStack : [],
     uploadedMaterialDecisionDossierFamilyDecisionCalendar: uploadedMaterialDecisionDossier.familyDecisionCalendar || null,
     uploadedMaterialDecisionDossierFamilyDecisionWeeks: uploadedMaterialDecisionDossier.familyDecisionCalendar && Array.isArray(uploadedMaterialDecisionDossier.familyDecisionCalendar.weeks)
       ? uploadedMaterialDecisionDossier.familyDecisionCalendar.weeks

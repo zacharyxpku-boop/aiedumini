@@ -465,6 +465,16 @@ Page({
     });
   },
 
+  previewWrongQuestionsToReview(text) {
+    const lines = this.extractWrongQuestionLines(text);
+    return {
+      imported: lines.length,
+      skipped: 0,
+      detected: lines.length,
+      previewOnly: true
+    };
+  },
+
   saveFocusFromUploadText(text, state, plan) {
     if (!storage.saveTodayFocusFromThought) return null;
     const wrongLines = this.extractWrongQuestionLines(text);
@@ -1022,8 +1032,7 @@ Page({
   },
 
   afterPrioritySaved(text, state, plan, mode) {
-    const wrongbook = this.importWrongQuestionsToReview(text, state, plan);
-    this.saveFocusFromUploadText(text, state, plan);
+    let wrongbook = this.previewWrongQuestionsToReview(text);
     let latestReportCta = null;
     if (storage.buildLearningReportFromInput && storage.saveLearningReportState) {
       const profile = storage.loadProfile ? storage.loadProfile() : {};
@@ -1053,6 +1062,8 @@ Page({
         wx.showToast({ title: '已分类，报告待补证据', icon: 'none' });
         return;
       }
+      wrongbook = this.importWrongQuestionsToReview(text, state, plan);
+      this.saveFocusFromUploadText(text, state, plan);
       const _legacyDecisionSource = {
         sourceSchemaId: reportSeed.sourceSchemaId || (wrongbook.imported ? 'wrong_question_paper' : 'parent_report'),
         sourceSchemaLabel: reportSeed.sourceSchemaLabel || (wrongbook.imported ? '错题/试卷' : '家长观察'),

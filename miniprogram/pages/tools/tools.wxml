@@ -125,6 +125,12 @@
           <text>来源</text>
         </view>
       </view>
+      <view class="public-k12-quality" wx:if="{{competitiveMoatWorkbench.qualityGate}}">
+        <view class="public-k12-quality-title">内容质量门：{{competitiveMoatWorkbench.qualityGateReady ? '已通过' : '继续补证据'}}</view>
+        <view class="public-k12-quality-line">样本来源：{{competitiveMoatWorkbench.qualityGate.sampleSourceStatus}} / {{competitiveMoatWorkbench.qualityGate.coverageConfidence}}</view>
+        <view class="public-k12-quality-line">风险计数：伪厚度 {{competitiveMoatWorkbench.qualityGate.pseudoThicknessRiskCount}}，苏格拉底 {{competitiveMoatWorkbench.qualityGate.threeRoundSocraticRiskCount}}，跨模块 {{competitiveMoatWorkbench.qualityGate.crossModuleConsistencyRiskCount}}</view>
+        <view class="public-k12-quality-line">{{competitiveMoatWorkbench.statusReason}}</view>
+      </view>
       <view class="public-k12-lanes">
         <view class="public-k12-lane" wx:for="{{competitiveMoatWorkbench.highLeverageLanes}}" wx:key="id">
           <view class="public-k12-lane-label">{{item.label}}</view>

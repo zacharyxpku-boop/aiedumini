@@ -260,6 +260,8 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
     : null;
   const openMaicInspiredTaskPlan = openMaicPlan.buildOpenMaicInspiredTaskPlan({
     taskType: pressureSignal && pressureSignal.taskType ? pressureSignal.taskType : (subjectSkillDepth && subjectSkillDepth.taskType ? subjectSkillDepth.taskType : ''),
+    subject: selected && selected.subject ? selected.subject : (subjectSkillDepth && subjectSkillDepth.subject) || '',
+    sourceText: latestUserText,
     pressureSignal,
     firstStep: pressureSignal && pressureSignal.firstStep,
     wrongCause: pressureSignal && (pressureSignal.wrongCause || pressureSignal.reportSignal),

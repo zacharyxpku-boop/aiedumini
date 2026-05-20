@@ -2196,6 +2196,9 @@ function buildUploadedMaterialDecisionDossier(input = {}, parts = {}, sourceEvid
     id: `method_candidate_${item.id || index + 1}`,
     label: item.label,
     status: laneById.talent_assessment && laneById.talent_assessment.collected ? 'method_candidate_from_assessment' : 'method_candidate_waiting_evidence',
+    sourceSchemaId: (sources[0] && sources[0].sourceSchemaId) || input.materialType || 'mixed_uploaded_material',
+    sourceTextEvidence: safeText((sources[0] && sources[0].text) || input.sourceText || parts.sourceText || '', 'waiting_for_source_text_evidence').slice(0, 64),
+    confidenceReason: collectedLanes.length >= 2 ? 'evidence_cross_checked' : 'needs_more_evidence',
     tonightTry: item.childLine || item.method,
     tonightWrongQuestionTest: primaryWrongPaperCard.nextAction || '先选一题真实错题，只验证第一步，不追完整答案。',
     parentQuestionTomorrow: item.parentCheck || '明天只问：你还能说出第一步和错因吗？',
@@ -2205,6 +2208,68 @@ function buildUploadedMaterialDecisionDossier(input = {}, parts = {}, sourceEvid
     route: primaryValidationStage.route || '/pages/review/review?from=method_candidate_card',
     blockedClaims: ['天赋定性', '人格标签', '完整答案', '自动判分', '排名刺激']
   }));
+  const decisionHeatmap = [
+    {
+      id: 'method_fit',
+      label: '学习方法适配',
+      status: laneById.talent_assessment && laneById.talent_assessment.collected ? '候选可用' : '待补材料',
+      score: laneById.talent_assessment && laneById.talent_assessment.collected ? 2 : 1,
+      evidence: laneById.talent_assessment && laneById.talent_assessment.collected
+        ? '已有测评/学习偏好材料，但只进入方法候选。'
+        : '先用家长观察或真实错题补一个学习方式线索。',
+      nextAction: '用一题真实作业验证孩子是否能说出第一步。'
+    },
+    {
+      id: 'wrong_cause_repair',
+      label: '错因修复',
+      status: laneById.wrong_question_paper && laneById.wrong_question_paper.collected ? '可进入修复' : '证据不足',
+      score: laneById.wrong_question_paper && laneById.wrong_question_paper.collected ? 3 : 1,
+      evidence: laneById.wrong_question_paper && laneById.wrong_question_paper.collected
+        ? '已有错题/试卷材料，可转成错因卡和回访卡。'
+        : '还缺真实错题、孩子原想法或卡住步骤。',
+      nextAction: primaryWrongPaperCard.nextAction || '先选一题真实错题，只验证第一步。'
+    },
+    {
+      id: 'parent_support',
+      label: '家长陪伴动作',
+      status: laneById.parent_report && laneById.parent_report.collected ? '可执行' : '待观察',
+      score: laneById.parent_report && laneById.parent_report.collected ? 2 : 1,
+      evidence: laneById.parent_report && laneById.parent_report.collected
+        ? '已有家长观察，可生成低压陪伴话术。'
+        : '还缺晚上作业情绪、拖延或开口情况。',
+      nextAction: '家长今晚只问一个第一步问题，不接管答案。'
+    },
+    {
+      id: 'home_school_bridge',
+      label: '家校协同',
+      status: laneById.school_material && laneById.school_material.collected ? '可安全摘要' : '暂不外发',
+      score: laneById.school_material && laneById.school_material.collected ? 2 : 0,
+      evidence: laneById.school_material && laneById.school_material.collected
+        ? '已有学校/老师材料，可整理观察问题。'
+        : '缺老师反馈时不生成家校摘要。',
+      nextAction: '只整理观察问题和家庭动作，不带原题、答案、分数或排名。'
+    }
+  ];
+  const familyActionStack = [
+    {
+      id: 'tonight',
+      label: '今晚',
+      action: methodCandidateCards[0] ? methodCandidateCards[0].tonightTry : '先让孩子说出第一步。',
+      gate: '孩子能说出第一步，才进入回访卡。'
+    },
+    {
+      id: 'tomorrow',
+      label: '明天',
+      action: methodCandidateCards[0] ? methodCandidateCards[0].parentQuestionTomorrow : '明天只问同一错因能否复述。',
+      gate: '同错因能复述，才允许换题。'
+    },
+    {
+      id: 'day7',
+      label: '第 7 天',
+      action: methodCandidateCards[0] ? methodCandidateCards[0].day7Evidence : '做一题小变式，只看第一步迁移。',
+      gate: '能迁移第一步，才把方法候选写入阶段画像。'
+    }
+  ];
   const familyDecisionCalendar = buildFamilyDecisionCalendar(input, methodCandidateCards, wrongPaperDiagnosisCards, reportEvidenceReleaseGate);
   const releaseStatus = reportEvidenceReleaseGate.releaseDecision || 'collect_more_evidence';
   const detailedReportSections = [
@@ -2251,6 +2316,8 @@ function buildUploadedMaterialDecisionDossier(input = {}, parts = {}, sourceEvid
       : '当前只能说“可能更适合的学习方法”，不能给孩子贴天赋或人格标签。',
     howToLearnBetter: methodHypotheses,
     methodCandidateCards,
+    decisionHeatmap,
+    familyActionStack,
     familyDecisionCalendar,
     wrongPaperDiagnosisCards,
     methodValidationChains,
