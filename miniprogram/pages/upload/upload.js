@@ -6,6 +6,7 @@ const privacy = require('../../utils/privacy');
 const reviewCards = require('../../utils/review-cards');
 const importIntake = require('../../utils/import-intake');
 const openMaicInspiredPlan = require('../../utils/openmaic-inspired-plan');
+const learningServicePathway = require('../../utils/learning-service-pathway');
 
 const WRONG_QUESTION_RE = /错题|订正|错因|卡住|不会|总错|做错|漏|粗心|单位|条件|等量关系|建模|符号|公式|审题/;
 const MATERIAL_TYPE_ALLOWLIST = [
@@ -671,6 +672,15 @@ Page({
       returnRoute: actionRoute,
       blockedFields: decisionSource.blockedFields || (openMaicDecisionBridge.shareRelayPayload && openMaicDecisionBridge.shareRelayPayload.blockedFields) || ['original_question', 'full_answer', 'score', 'ranking']
     });
+    const servicePathway = learningServicePathway.buildLearningServicePathway({
+      sourceSchemaId,
+      sourceText: sourceTextForMiniLesson,
+      decisionSource,
+      reportDraft,
+      structuredEvidenceSignals: uploadEvidenceSignals,
+      importedCards,
+      cardId
+    });
     return {
       title: sourceSchemaId === 'talent_assessment'
         ? '测评已进入家长报告'
@@ -697,6 +707,7 @@ Page({
           : 'material_report_requires_structured_evidence_before_release'
       },
       guardedAiReportDraft,
+      servicePathway,
       sourceSchemaId,
       reportId,
       flowTraceId: `upload_report:${reportId || sourceSchemaId}:${cardId || 'no_card'}`,
@@ -739,6 +750,7 @@ Page({
       openMaicInspiredDecisionBridge: cta.openMaicDecisionBridge || null,
       miniLessonSourceEvidence: cta.miniLessonSourceEvidence || null,
       guardedAiReportDraft: cta.guardedAiReportDraft || null,
+      servicePathway: cta.servicePathway || null,
       uploadReportHandoff: cta,
       flowTraceId: cta.flowTraceId || `upload_report:${cta.reportId || Date.now()}`
     });
@@ -748,6 +760,7 @@ Page({
         openMaicInspiredDecisionBridge: cta.openMaicDecisionBridge || null,
         miniLessonSourceEvidence: cta.miniLessonSourceEvidence || null,
         guardedAiReportDraft: cta.guardedAiReportDraft || null,
+        servicePathway: cta.servicePathway || null,
         uploadReportHandoff: cta,
         flowTraceId: nextState.flowTraceId
       });

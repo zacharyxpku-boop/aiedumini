@@ -1126,3 +1126,11 @@ page {
   color: #2F2D29;
   font-size: 24rpx;
 }
+
+.service-pathway-card {
+  margin-top: 18rpx;
+  padding: 20rpx;
+  background: #F3FAF5;
+  border: 1rpx solid #D5E9D8;
+  border-radius: 22rpx;
+}

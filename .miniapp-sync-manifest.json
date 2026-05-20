@@ -2,7 +2,7 @@
   "sourceRepo": "zacharyxpku-boop/ai-edu-platform",
   "sourcePath": "miniprogram",
   "sourceCommit": "0fbca04",
-  "syncedAt": "2026-05-20T15:31:45.856Z",
+  "syncedAt": "2026-05-20T16:15:57.774Z",
   "files": [
     "miniprogram/app.js",
     "miniprogram/app.json",
@@ -91,6 +91,7 @@
     "miniprogram/utils/learning-priority.js",
     "miniprogram/utils/learning-report-recognition.js",
     "miniprogram/utils/learning-report.js",
+    "miniprogram/utils/learning-service-pathway.js",
     "miniprogram/utils/light-features.js",
     "miniprogram/utils/navigation.js",
     "miniprogram/utils/openmaic-inspired-plan.js",

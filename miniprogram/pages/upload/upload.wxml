@@ -227,6 +227,39 @@
         </view>
       </view>
 
+        <view class="service-pathway-card" wx:if="{{lastReportCta.servicePathway}}">
+          <view class="intake-packet-kicker">学习服务路径</view>
+          <view class="intake-packet-title">{{lastReportCta.servicePathway.title}}</view>
+          <view class="intake-packet-feedback">{{lastReportCta.servicePathway.summary}}</view>
+          <view class="intake-packet-line">{{lastReportCta.servicePathway.nextAction}}</view>
+          <view class="intake-packet-boundary">{{lastReportCta.servicePathway.familyVisibleLine}}</view>
+          <view class="intake-action-queue">
+            <view class="intake-action-item" wx:for="{{lastReportCta.servicePathway.modeRecommendations}}" wx:key="id">
+              <view class="intake-action-main">
+                <text>{{item.label}}</text>
+                <text>{{item.action}}</text>
+              </view>
+              <view class="intake-action-meta">
+                <text>{{item.localGate}}</text>
+                <text>{{item.route}}</text>
+              </view>
+            </view>
+          </view>
+          <view class="intake-action-queue">
+            <view class="intake-action-item" wx:for="{{lastReportCta.servicePathway.productTiers}}" wx:key="id">
+              <view class="intake-action-main">
+                <text>{{item.label}}</text>
+                <text>{{item.promise}}</text>
+              </view>
+              <view class="intake-action-meta">
+                <text>{{item.entryGate}}</text>
+                <text>{{item.id}}</text>
+              </view>
+            </view>
+          </view>
+          <view class="intake-packet-boundary">商业闭环：测评入口 → AI 方案 → 7 天验证 → 30 天训练营 / 高阶规划。</view>
+        </view>
+
       <view class="upload-detail-toggle">
         <view>
           <view class="upload-detail-title">咕点会怎么分</view>
