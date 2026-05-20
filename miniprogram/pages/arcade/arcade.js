@@ -53,6 +53,8 @@ Page({
     dailyReturnMission: null,
     dailyReturnContract: null,
     dailyPrimaryRecallAction: null,
+    ninetySecondRecallDeck: null,
+    ninetySecondRecallState: null,
     reviewReturnSeed: null,
     nextDayReturnEvidence: null,
     spacedRecallPolicy: null,
@@ -75,6 +77,14 @@ Page({
 
   onShow() {
     this.refresh();
+  },
+
+  onHide() {
+    this.clearNinetySecondRecallTimer();
+  },
+
+  onUnload() {
+    this.clearNinetySecondRecallTimer();
   },
 
   buildReportSourceContext(query = {}) {
@@ -314,6 +324,12 @@ Page({
       dailyPrimaryRecallAction: previewHighFrequencyPracticeLoop && previewHighFrequencyPracticeLoop.dailyPrimaryRecallAction
         ? previewHighFrequencyPracticeLoop.dailyPrimaryRecallAction
         : null,
+      ninetySecondRecallDeck: previewHighFrequencyPracticeLoop && previewHighFrequencyPracticeLoop.ninetySecondPlayableDeck
+        ? previewHighFrequencyPracticeLoop.ninetySecondPlayableDeck
+        : null,
+      ninetySecondRecallState: this.buildNinetySecondRecallState(
+        previewHighFrequencyPracticeLoop && previewHighFrequencyPracticeLoop.ninetySecondPlayableDeck
+      ),
       reviewReturnSeed: previewHighFrequencyPracticeLoop && previewHighFrequencyPracticeLoop.reviewReturnSeed
         ? previewHighFrequencyPracticeLoop.reviewReturnSeed
         : null,
@@ -1756,6 +1772,14 @@ Page({
       dailyPrimaryRecallAction: highFrequencyPracticeLoop && highFrequencyPracticeLoop.dailyPrimaryRecallAction
         ? highFrequencyPracticeLoop.dailyPrimaryRecallAction
         : this.data.dailyPrimaryRecallAction,
+      ninetySecondRecallDeck: highFrequencyPracticeLoop && highFrequencyPracticeLoop.ninetySecondPlayableDeck
+        ? highFrequencyPracticeLoop.ninetySecondPlayableDeck
+        : this.data.ninetySecondRecallDeck,
+      ninetySecondRecallState: this.buildNinetySecondRecallState(
+        highFrequencyPracticeLoop && highFrequencyPracticeLoop.ninetySecondPlayableDeck
+          ? highFrequencyPracticeLoop.ninetySecondPlayableDeck
+          : this.data.ninetySecondRecallDeck
+      ),
       reviewReturnSeed: highFrequencyPracticeLoop && highFrequencyPracticeLoop.reviewReturnSeed
         ? highFrequencyPracticeLoop.reviewReturnSeed
         : this.data.reviewReturnSeed,
@@ -1816,6 +1840,8 @@ Page({
       dailyReturnMission: null,
       dailyReturnContract: null,
       dailyPrimaryRecallAction: null,
+      ninetySecondRecallDeck: null,
+      ninetySecondRecallState: this.buildNinetySecondRecallState(null),
       reviewReturnSeed: null,
       nextDayReturnEvidence: null,
       spacedRecallPolicy: null,
@@ -1914,6 +1940,185 @@ Page({
 
   goReview() {
     wx.switchTab({ url: '/pages/review/review' });
+  },
+
+  clearNinetySecondRecallTimer() {
+    if (this.ninetySecondRecallTimer) {
+      clearInterval(this.ninetySecondRecallTimer);
+      this.ninetySecondRecallTimer = null;
+    }
+  },
+
+  buildNinetySecondRecallState(deck = null) {
+    const interactions = Array.isArray(deck && deck.interactions) ? deck.interactions : [];
+    const totalSeconds = Number(deck && deck.totalSeconds) || interactions.reduce((sum, item) => sum + Number(item.seconds || 0), 0) || 90;
+    return {
+      status: interactions.length >= 4 && (!deck || !deck.status || deck.status === 'ready') ? 'idle' : 'locked',
+      deckId: deck && deck.id ? deck.id : '',
+      weakKey: deck && deck.weakKey ? deck.weakKey : '第一步',
+      totalSeconds,
+      elapsedSeconds: 0,
+      secondsLeft: totalSeconds,
+      stepIndex: 0,
+      currentStepId: interactions[0] ? interactions[0].id : '',
+      interactions,
+      completedStepIds: [],
+      evidence: [],
+      finished: false,
+      canReleaseXp: false,
+      blockedRewards: deck && Array.isArray(deck.localAiSplit && deck.localAiSplit.aiMustNotOwn)
+        ? deck.localAiSplit.aiMustNotOwn.slice(0, 8)
+        : ['final_answer', 'score', 'ranking'],
+      shareBlockedFields: deck && deck.sharePayload && Array.isArray(deck.sharePayload.blockedFields)
+        ? deck.sharePayload.blockedFields.slice(0, 10)
+        : ['original_question', 'original_answer', 'score', 'ranking', 'full_dialogue']
+    };
+  },
+
+  persistNinetySecondRecallEvidence(reason = 'completed') {
+    const deck = this.data.ninetySecondRecallDeck || {};
+    const state = this.data.ninetySecondRecallState || {};
+    const evidence = {
+      reason,
+      deckId: deck.id || '',
+      weakKey: deck.weakKey || state.weakKey || '第一步',
+      totalSeconds: Number(state.totalSeconds || deck.totalSeconds || 90),
+      elapsedSeconds: Number(state.elapsedSeconds || 0),
+      finished: !!state.finished,
+      stepIds: Array.isArray(state.completedStepIds) ? state.completedStepIds.slice() : [],
+      blockedRewards: Array.isArray(state.blockedRewards) ? state.blockedRewards.slice() : [],
+      shareBlockedFields: Array.isArray(state.shareBlockedFields) ? state.shareBlockedFields.slice() : [],
+      createdAt: new Date().toISOString()
+    };
+    if (storage.set) {
+      storage.set('arcade.ninetySecondRecallEvidence.v1', evidence);
+    }
+    if (storage.appendReviewEvent) {
+      storage.appendReviewEvent({
+        kind: 'arcade_ninety_second_recall_evidence',
+        deck_id: evidence.deckId,
+        weak_key: evidence.weakKey,
+        total_seconds: evidence.totalSeconds,
+        elapsed_seconds: evidence.elapsedSeconds,
+        completed_step_ids: evidence.stepIds,
+        reason
+      });
+    }
+    if (storage.appendSyncMutation) {
+      storage.appendSyncMutation('arcade_ninety_second_recall_evidence', evidence);
+    }
+    if (api.submitEvent) {
+      api.submitEvent({
+        event: 'arcade_ninety_second_recall_evidence',
+        source: 'arcade',
+        entity_id: evidence.deckId || evidence.weakKey,
+        page: 'arcade',
+        payload: evidence
+      }).catch(() => {});
+    }
+    return evidence;
+  },
+
+  startNinetySecondRecall() {
+    if (!this.canPlayGameAction('start_ninety_second_recall')) return;
+    const deck = this.data.ninetySecondRecallDeck || {};
+    const state = this.buildNinetySecondRecallState(deck);
+    if (!state.interactions.length || state.status === 'locked') {
+      this.setData({ feedbackText: '先生成可执行的 90 秒牌组，再开始。' });
+      return;
+    }
+    this.clearNinetySecondRecallTimer();
+    this.setData({
+      ninetySecondRecallState: Object.assign({}, state, {
+        status: 'running',
+        canReleaseXp: false
+      }),
+      feedbackText: '90 秒开始：先补关键词。'
+    });
+    this.ninetySecondRecallStartedAt = Date.now();
+    this.ninetySecondRecallTimer = setInterval(() => {
+      const current = this.data.ninetySecondRecallState || state;
+      if (!current || current.finished) {
+        this.clearNinetySecondRecallTimer();
+        return;
+      }
+      const elapsedSeconds = Math.min(Number(current.totalSeconds || 90), Math.floor((Date.now() - this.ninetySecondRecallStartedAt) / 1000));
+      const secondsLeft = Math.max(0, Number(current.totalSeconds || 90) - elapsedSeconds);
+      if (secondsLeft <= 0 && !current.finished) {
+        this.finishNinetySecondRecall('timeout');
+        return;
+      }
+      this.setData({
+        ninetySecondRecallState: Object.assign({}, current, {
+          elapsedSeconds,
+          secondsLeft
+        })
+      });
+    }, 1000);
+  },
+
+  completeNinetySecondRecallStep(event) {
+    if (!this.canPlayGameAction('complete_ninety_second_recall_step')) return;
+    const deck = this.data.ninetySecondRecallDeck || {};
+    const state = this.data.ninetySecondRecallState || this.buildNinetySecondRecallState(deck);
+    if (state.status !== 'running' || state.finished) return;
+    const stepId = event.currentTarget.dataset.stepId || '';
+    const currentStep = state.interactions[state.stepIndex] || null;
+    if (!currentStep || currentStep.id !== stepId) {
+      this.setData({ feedbackText: '先按顺序完成当前一步。' });
+      return;
+    }
+    const completedStepIds = state.completedStepIds.concat(stepId);
+    const evidence = state.evidence.concat([{
+      stepId,
+      proof: currentStep.passEvidence || currentStep.proof || '',
+      localCheck: currentStep.localCheck || '',
+      prompt: currentStep.prompt || currentStep.action || ''
+    }]);
+    const nextIndex = state.stepIndex + 1;
+    const nextStep = state.interactions[nextIndex] || null;
+    const nextState = Object.assign({}, state, {
+      elapsedSeconds: Math.min(Number(state.totalSeconds || 90), Number(state.elapsedSeconds || 0) + Number(currentStep.seconds || 0)),
+      secondsLeft: Math.max(0, Number(state.totalSeconds || 90) - (Number(state.elapsedSeconds || 0) + Number(currentStep.seconds || 0))),
+      stepIndex: nextIndex,
+      currentStepId: nextStep ? nextStep.id : currentStep.id,
+      completedStepIds,
+      evidence,
+      canReleaseXp: completedStepIds.length >= 4,
+      status: completedStepIds.length >= 4 ? 'completed' : 'running'
+    });
+    this.setData({
+      ninetySecondRecallState: nextState,
+      feedbackText: nextStep ? `已完成第 ${completedStepIds.length} 步，继续下一步。` : '90 秒四步完成。'
+    });
+    if (completedStepIds.length >= 4) {
+      this.finishNinetySecondRecall('completed');
+    }
+  },
+
+  finishNinetySecondRecall(reason = 'completed') {
+    const current = this.data.ninetySecondRecallState || this.buildNinetySecondRecallState(this.data.ninetySecondRecallDeck);
+    const nextState = Object.assign({}, current, {
+      status: 'completed',
+      finished: true,
+      canReleaseXp: true,
+      secondsLeft: 0
+    });
+    this.clearNinetySecondRecallTimer();
+    this.setData({
+      ninetySecondRecallState: nextState,
+      feedbackText: reason === 'timeout' ? '90 秒到点，先回到复习卡。' : '90 秒完成，明天回访已锁定。'
+    });
+    this.persistNinetySecondRecallEvidence(reason);
+  },
+
+  resetNinetySecondRecall() {
+    this.clearNinetySecondRecallTimer();
+    const next = this.buildNinetySecondRecallState(this.data.ninetySecondRecallDeck || this.data.highFrequencyPracticeLoop && this.data.highFrequencyPracticeLoop.ninetySecondPlayableDeck);
+    this.setData({
+      ninetySecondRecallState: next,
+      feedbackText: '90 秒牌组已重置。'
+    });
   },
 
   runDailyPrimaryRecallAction() {

@@ -1914,6 +1914,7 @@ function buildNinetySecondPlayableDeck(ninetySecondRecallComboEngine = {}, quest
   const wrong = Math.max(0, Number(result.wrong || 0));
   const accuracy = Number.isFinite(Number(result.accuracy)) ? Number(result.accuracy) : 0;
   const rescue = ninetySecondRecallComboEngine.mode === 'rescue_combo' || wrong >= 2 || accuracy < 60;
+  const playableReady = source.length > 0 && clozeCards.length > 0;
   const wrongCause = first.wrongCause || second.wrongCause || weakKey;
   const alternativeWrongCause = second.wrongCause && second.wrongCause !== wrongCause ? second.wrongCause : '看答案太早';
   const interactions = [
@@ -1971,7 +1972,7 @@ function buildNinetySecondPlayableDeck(ninetySecondRecallComboEngine = {}, quest
     mode: rescue ? 'rescue_playable' : 'steady_playable',
     localDeterministic: true,
     weakKey,
-    status: interactions.length >= 4 ? 'ready' : 'waiting_cards',
+    status: playableReady && interactions.length >= 4 ? 'ready' : 'waiting_cards',
     totalSeconds: interactions.reduce((sum, item) => sum + item.seconds, 0),
     interactions,
     sourceCardIds: source.map((card) => card && card.id).filter(Boolean).slice(0, 4),
