@@ -6885,6 +6885,80 @@ function buildQuestionBankVisualShareRelayDeck(options = {}) {
   };
 }
 
+function relayText(value, fallback = '') {
+  return String(value == null ? '' : value).replace(/\s+/g, ' ').trim() || fallback;
+}
+
+function inferReceiverChallengeType(incoming = {}) {
+  const text = [
+    incoming.question_bank_relay_label,
+    incoming.wrong_cause_label,
+    incoming.capability_gap,
+    incoming.challenge_goal,
+    incoming.course_unit_label,
+    incoming.relay_receiver_action,
+    incoming.source_challenge_prompt
+  ].filter(Boolean).join(' ');
+  if (/方程|等量|应用题|数量|单位|几何|函数|数学/.test(text)) return 'math_first_step';
+  if (/阅读|作文|文言|语文|关键词|证据句/.test(text)) return 'chinese_evidence';
+  if (/英语|单词|语法|句子|时态/.test(text)) return 'english_sentence';
+  if (/物理|受力|电路|光路|压强|浮力|变量/.test(text)) return 'physics_diagram';
+  if (/化学|实验|反应|溶液|气体|酸碱/.test(text)) return 'chemistry_experiment';
+  if (/生物|结构|功能|生态|遗传|过程/.test(text)) return 'biology_process';
+  if (/地理|地图|经纬|气候|地形/.test(text)) return 'geography_map';
+  return 'same_type_first_step';
+}
+
+function buildReceiverOwnMaterialChallenge(incoming = {}) {
+  const shareCode = incoming.share_code || incoming.code || '';
+  const taskType = inferReceiverChallengeType(incoming);
+  const label = relayText(
+    incoming.question_bank_relay_label || incoming.wrong_cause_label || incoming.capability_label || incoming.course_unit_label,
+    '同题型第一步挑战'
+  );
+  const receiverAction = relayText(
+    incoming.relay_receiver_action || incoming.wrong_cause_receiver_action || incoming.source_challenge_prompt,
+    `打开自己的作业，找一题和「${label}」相似的题，只说第一步。`
+  );
+  const parentCheck = relayText(
+    incoming.relay_parent_check || incoming.wrong_cause_parent_check || incoming.question_bank_relay_parent_check,
+    '家长只听孩子自己的第一步，不看发送者答案，也不追完整过程。'
+  );
+  const nextRevisit = relayText(
+    incoming.relay_next_revisit || incoming.wrong_cause_next_revisit || incoming.relay_review,
+    '明天用接收者自己的材料再说一次第一步。'
+  );
+  const firstStepHint = relayText(
+    incoming.question_bank_relay_first_step || incoming.visual_board_relay_student_line || incoming.challenge_goal,
+    '先说题目要你找什么，再说第一步看哪里。'
+  );
+  const route = `/pages/tutor/tutor?from=receiver_own_material&share=${encodeURIComponent(shareCode)}&task_type=${encodeURIComponent(taskType)}&relay_label=${encodeURIComponent(label)}&receiver_action=${encodeURIComponent(receiverAction)}&parent_check=${encodeURIComponent(parentCheck)}&next_revisit=${encodeURIComponent(nextRevisit)}`;
+  return {
+    id: 'receiver_own_material_challenge',
+    title: '用自己的题接力',
+    status: shareCode ? 'ready' : 'waiting_share_code',
+    taskType,
+    label,
+    route,
+    receiverAction,
+    firstStepHint,
+    parentCheck,
+    nextRevisit,
+    completionRoute: incoming.relay_return_path || incoming.question_bank_relay_route || incoming.wrong_cause_return_path || '/pages/review/review?from=receiver_own_material',
+    evidenceContract: {
+      required: ['receiver_own_material', 'receiver_own_first_step', 'receiver_own_wrong_cause', 'receiver_next_revisit'],
+      senderFirstStepNotAccepted: true,
+      completionEvent: 'share_relay_receiver_completion',
+      localCodeOwns: ['route', 'required_evidence', 'blocked_fields', 'completion_gate'],
+      aiMayRewrite: ['receiver_prompt_copy', 'parent_check_copy'],
+      aiMustNotOwn: ['sender_payload_reuse', 'final_answer', 'xp_release', 'share_fields']
+    },
+    allowedFields: ['share_code', 'task_type', 'relay_label', 'receiver_action', 'parent_check', 'next_revisit'],
+    blockedFields: ['original_question', 'original_answer', 'full_answer', 'photo', 'score', 'ranking', 'full_dialogue'],
+    shareBoundary: '接收者必须使用自己的作业材料完成第一步挑战；不复用发送者原题、答案、照片、分数、排名或完整对话。'
+  };
+}
+
 function saveIncomingShare(share = {}) {
   const normalized = shareRelaySchema.parseShareRelayQuery ? shareRelaySchema.parseShareRelayQuery(share) : share;
   const code = normalized.share_code || normalized.code || '';
@@ -7002,6 +7076,15 @@ function saveIncomingShare(share = {}) {
     receiver_evidence_contract: normalized.receiver_evidence_contract || 'own_material_first_step_wrong_cause_revisit',
     created_at: normalized.created_at || new Date().toISOString()
   };
+  const receiverOwnChallenge = buildReceiverOwnMaterialChallenge(record);
+  record.receiver_own_challenge_status = receiverOwnChallenge.status;
+  record.receiver_own_challenge_route = receiverOwnChallenge.route;
+  record.receiver_own_challenge_label = receiverOwnChallenge.label;
+  record.receiver_own_challenge_task_type = receiverOwnChallenge.taskType;
+  record.receiver_own_challenge_action = receiverOwnChallenge.receiverAction;
+  record.receiver_own_challenge_parent_check = receiverOwnChallenge.parentCheck;
+  record.receiver_own_challenge_next_revisit = receiverOwnChallenge.nextRevisit;
+  record.receiver_own_challenge_boundary = receiverOwnChallenge.shareBoundary;
   set(KEYS.incomingShare, record);
   return record;
 }
@@ -11571,6 +11654,7 @@ module.exports = {
   saveIncomingShare,
   appendShareRun,
   recordShareRelayCompletion,
+  buildReceiverOwnMaterialChallenge,
   loadClientIdentity,
   saveClientIdentity,
   loadSyncState,

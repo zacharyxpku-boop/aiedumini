@@ -1070,6 +1070,9 @@ Page({
       completionSignal: incoming.relay_completion_signal || 'active_recall_next_revisit',
       returnPath: incoming.relay_return_path || challengeRoute
     } : null;
+    const receiverOwnMaterialChallenge = storage.buildReceiverOwnMaterialChallenge
+      ? storage.buildReceiverOwnMaterialChallenge(incoming)
+      : null;
     const shareRuns = storage.loadShareRuns ? storage.loadShareRuns() : [];
     const reviewEvents = storage.loadReviewEvents ? storage.loadReviewEvents() : [];
     const receiverCompletion = shareRuns.find((item) => item && item.share_code === incoming.share_code && item.type === 'share_relay_receiver_completion')
@@ -1145,6 +1148,15 @@ Page({
       relayPackBlockedFields,
       relayPackBlockedLine: `三卡不带：${relayPackBlockedFields}`,
       relayPackCards,
+      receiverOwnMaterialChallenge,
+      receiverOwnMaterialChallengeLine: receiverOwnMaterialChallenge ? `接收者自己的材料挑战：${receiverOwnMaterialChallenge.label}｜${receiverOwnMaterialChallenge.receiverAction}` : '',
+      receiverOwnMaterialChallengeRoute: receiverOwnMaterialChallenge ? receiverOwnMaterialChallenge.route : '',
+      receiverOwnMaterialChallengeParentCheckLine: receiverOwnMaterialChallenge ? receiverOwnMaterialChallenge.parentCheck : '',
+      receiverOwnMaterialChallengeNextRevisitLine: receiverOwnMaterialChallenge ? receiverOwnMaterialChallenge.nextRevisit : '',
+      receiverOwnMaterialChallengeBoundaryLine: receiverOwnMaterialChallenge ? receiverOwnMaterialChallenge.shareBoundary : '',
+      receiverOwnMaterialChallengeEvidenceLine: receiverOwnMaterialChallenge
+        ? `接力证据：${receiverOwnMaterialChallenge.evidenceContract.required.join(' / ')}`
+        : '',
       firstStepLine: `先做第一步：${firstStep}`,
       privacyLine,
       reviewLine,
@@ -1220,6 +1232,13 @@ Page({
         ? '接力成立条件：自己的第一步、错因回退、明天回访预约都要留下证据。'
         : '接力成立条件：主动回忆、错因回退、明天回访三件事至少完成一件并留下记录。',
       actions: [
+        {
+          id: 'receiver_own_material',
+          label: '做自己的题',
+          route: receiverOwnMaterialChallenge ? receiverOwnMaterialChallenge.route : questionBankRelayRoute,
+          reason: receiverOwnMaterialChallenge ? receiverOwnMaterialChallenge.receiverAction : '用自己的作业复刻同类第一步，不复用发送者材料。',
+          evidence: receiverOwnMaterialChallenge ? receiverOwnMaterialChallenge.shareBoundary : 'own-material challenge'
+        },
         {
           id: 'repair',
           label: '先修卡点',
@@ -1980,6 +1999,11 @@ Page({
   goSharedChallenge() {
     const incoming = this.data.incomingShare || (storage.loadIncomingShare && storage.loadIncomingShare()) || {};
     const route = navigation.normalizeRoute(incoming.challenge_route || incoming.capability_route || '/pages/arcade/arcade');
+    const receiverOwnMaterialChallenge = incoming.receiver_own_challenge_route
+      ? storage.buildReceiverOwnMaterialChallenge
+        ? storage.buildReceiverOwnMaterialChallenge(incoming)
+        : null
+      : null;
     const socraticReportQuery = incoming.share_code
       ? `&socratic_report_status=${encodeURIComponent(incoming.socratic_report_status || '')}&socratic_report_action=${encodeURIComponent(incoming.socratic_report_action || '')}&socratic_report_decision=${encodeURIComponent(incoming.socratic_report_decision || '')}&socratic_report_no_increase=${encodeURIComponent(incoming.socratic_report_no_increase || '')}&socratic_report_parent_proof=${encodeURIComponent(incoming.socratic_report_parent_proof || '')}&socratic_report_boundary=${encodeURIComponent(incoming.socratic_report_boundary || '')}`
       : '';
@@ -1989,13 +2013,20 @@ Page({
     const query = incoming.share_code
       ? `from=share&share=${incoming.share_code}&mode=${incoming.mode || ''}&identity=${encodeURIComponent(incoming.identity_tag || '')}&action=${incoming.parent_next_action || ''}&capability_gap=${encodeURIComponent(incoming.capability_gap || '')}&capability_label=${encodeURIComponent(incoming.capability_label || '')}&challenge_goal=${encodeURIComponent(incoming.challenge_goal || '')}&challenge_rule=${encodeURIComponent(incoming.challenge_rule || '')}&relay_privacy=${encodeURIComponent(incoming.relay_privacy || '')}&relay_review=${encodeURIComponent(incoming.relay_review || '')}&relay_first_step=${encodeURIComponent(incoming.relay_first_step || '')}&relay_id=${encodeURIComponent(incoming.relay_id || '')}&relay_receiver_action=${encodeURIComponent(incoming.relay_receiver_action || '')}&relay_parent_check=${encodeURIComponent(incoming.relay_parent_check || '')}&relay_next_revisit=${encodeURIComponent(incoming.relay_next_revisit || '')}&relay_allowed_fields=${encodeURIComponent(incoming.relay_allowed_fields || '')}&relay_blocked_fields=${encodeURIComponent(incoming.relay_blocked_fields || '')}&relay_completion_signal=${encodeURIComponent(incoming.relay_completion_signal || '')}&relay_return_path=${encodeURIComponent(incoming.relay_return_path || '')}${socraticReportQuery}${visualBoardRelayQuery}`
       : '';
-    const target = query && route.indexOf('?') < 0 ? `${route}?${query}` : route;
+    const target = receiverOwnMaterialChallenge && receiverOwnMaterialChallenge.route
+      ? receiverOwnMaterialChallenge.route
+      : (query && route.indexOf('?') < 0 ? `${route}?${query}` : route);
     this.trackShareActivation('challenge_started', {
       next: 'shared_challenge',
       route: target,
       challenge_goal: incoming.challenge_goal || '',
       challenge_rule: incoming.challenge_rule || '',
       challenge_route: incoming.challenge_route || '',
+      receiver_own_challenge_route: receiverOwnMaterialChallenge ? receiverOwnMaterialChallenge.route : '',
+      receiver_own_challenge_label: receiverOwnMaterialChallenge ? receiverOwnMaterialChallenge.label : '',
+      receiver_own_challenge_action: receiverOwnMaterialChallenge ? receiverOwnMaterialChallenge.receiverAction : '',
+      receiver_own_challenge_parent_check: receiverOwnMaterialChallenge ? receiverOwnMaterialChallenge.parentCheck : '',
+      receiver_own_challenge_next_revisit: receiverOwnMaterialChallenge ? receiverOwnMaterialChallenge.nextRevisit : '',
       relay_privacy: incoming.relay_privacy || '',
       relay_review: incoming.relay_review || '',
       relay_first_step: incoming.relay_first_step || '',
@@ -2031,7 +2062,7 @@ Page({
       ? `&wrong_cause_pack=${encodeURIComponent(incoming.wrong_cause_pack || '')}&wrong_cause_label=${encodeURIComponent(incoming.wrong_cause_label || '')}&wrong_cause_first_step=${encodeURIComponent(incoming.wrong_cause_first_step || '')}&wrong_cause_parent_check=${encodeURIComponent(incoming.wrong_cause_parent_check || '')}&wrong_cause_receiver_action=${encodeURIComponent(incoming.wrong_cause_receiver_action || '')}&wrong_cause_next_revisit=${encodeURIComponent(incoming.wrong_cause_next_revisit || '')}&wrong_cause_allowed_fields=${encodeURIComponent(incoming.wrong_cause_allowed_fields || '')}&wrong_cause_blocked_fields=${encodeURIComponent(incoming.wrong_cause_blocked_fields || '')}&wrong_cause_return_path=${encodeURIComponent(incoming.wrong_cause_return_path || '')}&wrong_cause_gate=${encodeURIComponent(incoming.wrong_cause_gate || '')}`
       : '';
     const query = incoming.share_code && route.indexOf('?') < 0
-      ? `?from=share_relay&share=${incoming.share_code}&mode=${incoming.mode || ''}&identity=${encodeURIComponent(incoming.identity_tag || '')}&action=${incoming.parent_next_action || ''}&capability_gap=${encodeURIComponent(incoming.capability_gap || '')}&capability_label=${encodeURIComponent(incoming.capability_label || '')}&challenge_goal=${encodeURIComponent(incoming.challenge_goal || '')}&challenge_rule=${encodeURIComponent(incoming.challenge_rule || '')}&relay_privacy=${encodeURIComponent(incoming.relay_privacy || '')}&relay_review=${encodeURIComponent(incoming.relay_review || '')}&relay_first_step=${encodeURIComponent(incoming.relay_first_step || '')}&relay_id=${encodeURIComponent(incoming.relay_id || '')}&relay_receiver_action=${encodeURIComponent(incoming.relay_receiver_action || '')}&relay_parent_check=${encodeURIComponent(incoming.relay_parent_check || '')}&relay_next_revisit=${encodeURIComponent(incoming.relay_next_revisit || '')}&relay_allowed_fields=${encodeURIComponent(incoming.relay_allowed_fields || '')}&relay_blocked_fields=${encodeURIComponent(incoming.relay_blocked_fields || '')}&relay_completion_signal=${encodeURIComponent(incoming.relay_completion_signal || '')}&relay_return_path=${encodeURIComponent(incoming.relay_return_path || '')}${socraticReportQuery}${visualBoardRelayQuery}${wrongCauseRelayQuery}`
+      ? `?from=share_relay&share=${incoming.share_code}&mode=${incoming.mode || ''}&identity=${encodeURIComponent(incoming.identity_tag || '')}&action=${incoming.parent_next_action || ''}&capability_gap=${encodeURIComponent(incoming.capability_gap || '')}&capability_label=${encodeURIComponent(incoming.capability_label || '')}&challenge_goal=${encodeURIComponent(incoming.challenge_goal || '')}&challenge_rule=${encodeURIComponent(incoming.challenge_rule || '')}&relay_privacy=${encodeURIComponent(incoming.relay_privacy || '')}&relay_review=${encodeURIComponent(incoming.relay_review || '')}&relay_first_step=${encodeURIComponent(incoming.relay_first_step || '')}&relay_id=${encodeURIComponent(incoming.relay_id || '')}&relay_receiver_action=${encodeURIComponent(incoming.relay_receiver_action || '')}&relay_parent_check=${encodeURIComponent(incoming.relay_parent_check || '')}&relay_next_revisit=${encodeURIComponent(incoming.relay_next_revisit || '')}&relay_allowed_fields=${encodeURIComponent(incoming.relay_allowed_fields || '')}&relay_blocked_fields=${encodeURIComponent(incoming.relay_blocked_fields || '')}&relay_completion_signal=${encodeURIComponent(incoming.relay_completion_signal || '')}&relay_return_path=${encodeURIComponent(incoming.relay_return_path || '')}&receiver_own_challenge_route=${encodeURIComponent(incoming.receiver_own_challenge_route || '')}&receiver_own_challenge_label=${encodeURIComponent(incoming.receiver_own_challenge_label || '')}&receiver_own_challenge_action=${encodeURIComponent(incoming.receiver_own_challenge_action || '')}&receiver_own_challenge_parent_check=${encodeURIComponent(incoming.receiver_own_challenge_parent_check || '')}&receiver_own_challenge_next_revisit=${encodeURIComponent(incoming.receiver_own_challenge_next_revisit || '')}${socraticReportQuery}${visualBoardRelayQuery}${wrongCauseRelayQuery}`
       : '';
     const target = `${route}${query}`;
     const action = {

@@ -469,6 +469,11 @@
         <view class="share-relay-evidence" wx:if="{{incomingShareRelay.safeFieldLine}}">{{incomingShareRelay.safeFieldLine}}</view>
         <view class="share-relay-evidence" wx:if="{{incomingShareRelay.blockedFieldLine}}">{{incomingShareRelay.blockedFieldLine}}</view>
         <view class="share-relay-evidence" wx:if="{{incomingShareRelay.completionSignalLine}}">{{incomingShareRelay.completionSignalLine}}</view>
+        <view class="share-relay-evidence" wx:if="{{incomingShareRelay.receiverOwnMaterialChallengeLine}}">{{incomingShareRelay.receiverOwnMaterialChallengeLine}}</view>
+        <view class="share-relay-evidence" wx:if="{{incomingShareRelay.receiverOwnMaterialChallengeParentCheckLine}}">家长检查：{{incomingShareRelay.receiverOwnMaterialChallengeParentCheckLine}}</view>
+        <view class="share-relay-evidence" wx:if="{{incomingShareRelay.receiverOwnMaterialChallengeNextRevisitLine}}">回访：{{incomingShareRelay.receiverOwnMaterialChallengeNextRevisitLine}}</view>
+        <view class="share-relay-evidence" wx:if="{{incomingShareRelay.receiverOwnMaterialChallengeEvidenceLine}}">{{incomingShareRelay.receiverOwnMaterialChallengeEvidenceLine}}</view>
+        <view class="share-relay-evidence" wx:if="{{incomingShareRelay.receiverOwnMaterialChallengeBoundaryLine}}">自有材料边界：{{incomingShareRelay.receiverOwnMaterialChallengeBoundaryLine}}</view>
         <view class="share-relay-evidence" wx:if="{{incomingShareRelay.unitLine}}">单元接力：{{incomingShareRelay.unitLine}}</view>
         <view class="share-relay-evidence" wx:if="{{incomingShareRelay.unitDecisionLine}}">{{incomingShareRelay.unitDecisionLine}}</view>
         <view class="share-relay-evidence" wx:if="{{incomingShareRelay.unitReportLine}}">{{incomingShareRelay.unitReportLine}}</view>
