@@ -2038,6 +2038,30 @@ function buildCurriculumAssetSourceAudit(options = {}) {
   };
 }
 
+function buildK12ContentExpansionQueue(options = {}) {
+  const subjectRows = Array.isArray(options.subjectRows) ? options.subjectRows : countRowsFromSamples([], 'subject', SUBJECT_COUNTS);
+  const typeRows = Array.isArray(options.typeRows) ? options.typeRows : countRowsFromSamples([], 'taskType', TYPE_COUNTS);
+  const typeIds = typeRows.map((item) => item.id).filter(Boolean);
+  return subjectRows.map((subject, index) => {
+    const sampleCount = Number(subject.count || 0);
+    const priority = sampleCount < 50 ? 'P0' : sampleCount < 70 ? 'P1' : 'P2';
+    const nextTaskType = typeIds[index % Math.max(typeIds.length, 1)] || 'mixed_homework';
+    return {
+      id: `content_expansion_${subject.id || index}`,
+      subject: subject.id,
+      label: subject.label,
+      priority,
+      currentSampleCount: sampleCount,
+      nextTaskType,
+      localCodeOwns: ['sample_cleaning', 'question_type_mapping', 'first_step_rule', 'visual_primitive_contract', 'exit_gate', 'share_privacy_fields'],
+      aiBetterFor: ['child_friendly_socratic_wording', 'one_sentence_teacher_explanation', 'parent_readable_summary', 'near_transfer_wording'],
+      mustNotUseAiFor: ['final_answer', 'score_or_ranking', 'talent_label', 'release_decision', 'raw_public_source_copy'],
+      nextLocalDeliverable: 'add five sample-backed mini-lesson topic cards before claiming wider coverage',
+      releaseGate: 'each added card must carry first_step, wrong_cause, visual_primitive, parent_check, revisit, blocked_fields'
+    };
+  });
+}
+
 function buildRealHomeworkCoverageMatrix(options = {}) {
   const activeSubject = String(options.subject || '').trim();
   const fixtureLoaded = Boolean(REAL_HOMEWORK_PRESSURE_FIXTURE_LOADED);
@@ -2057,6 +2081,7 @@ function buildRealHomeworkCoverageMatrix(options = {}) {
   const pressureFailureTypeAudit = buildPressureSampleFailureTypeAudit();
   const unifiedK12SourceRegistry = buildUnifiedK12SourceRegistry();
   const curriculumAssetSourceAudit = buildCurriculumAssetSourceAudit({ registry: unifiedK12SourceRegistry });
+  const contentExpansionQueue = buildK12ContentExpansionQueue({ subjectRows, typeRows });
   return {
     id: 'real_homework_coverage_matrix',
     title: '真实作业压力覆盖矩阵',
@@ -2085,6 +2110,7 @@ function buildRealHomeworkCoverageMatrix(options = {}) {
     publicK12AssetBoundaryAudit: buildPublicK12AssetBoundaryAudit(),
     unifiedK12SourceRegistry,
     curriculumAssetSourceAudit,
+    contentExpansionQueue,
     publicResourceTriageBoard,
     pressureFailureTypeAudit,
     implementationDecisionMatrix: K12_PUBLIC_IMPLEMENTATION_DECISION_MATRIX,
@@ -2112,6 +2138,7 @@ function buildRealHomeworkCoverageMatrix(options = {}) {
     totalOpenSourceResources: PUBLIC_K12_OPEN_SOURCE_RESOURCE_LEDGER.length,
     totalUnifiedSourceRegistryRows: unifiedK12SourceRegistry.length,
     totalCurriculumAssetSourceReady: curriculumAssetSourceAudit.readyCount,
+    totalContentExpansionQueue: contentExpansionQueue.length,
     totalPressureWeakSamples: pressureFailureTypeAudit.weakSampleCount,
     totalHomeworkIntakeQueue: PUBLIC_K12_HOMEWORK_INTAKE_QUEUE.length,
     totalIntakeChallengeCards: PUBLIC_K12_HOMEWORK_INTAKE_QUEUE.length,
@@ -2120,6 +2147,7 @@ function buildRealHomeworkCoverageMatrix(options = {}) {
     reportLine: `报告可引用 ${totalSamples} 个压力样本的第一步、错因、小黑板和回访动作。`,
     parentLine: `家长侧只看 ${active.label} 当前错因和下一次回访，不看孩子完整对话、分数或排名。`,
     nextExpansionLine: active.nextGap,
+    contentExpansionLine: `Content expansion queue keeps ${contentExpansionQueue.length} subject rows under local-code gates before AI wording.`,
     evidenceRequired: [
       'sample_specific_first_step',
       'sample_specific_wrong_cause',
@@ -2157,5 +2185,6 @@ module.exports = {
   buildPublicK12AssetBoundaryAudit,
   validatePublicK12AssetBoundary,
   buildPressureSampleFailureTypeAudit,
+  buildK12ContentExpansionQueue,
   buildRealHomeworkCoverageMatrix
 };

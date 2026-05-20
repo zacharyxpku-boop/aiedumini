@@ -146,6 +146,49 @@ const MINI_LESSON_VISUAL_TEMPLATES = [
   }
 ];
 
+const MINI_LESSON_VISUAL_PRIMITIVE_RENDER_CONTRACT = [
+  ['circle_target_quantity', 'primitive-circle-target', 'target_quantity', 'point_to_what_is_being_found'],
+  ['table_known_unknown', 'primitive-known-unknown-table', 'known_unknown', 'name_one_known_and_one_unknown'],
+  ['draw_equation_arrow', 'primitive-relation-arrow', 'quantity_relation', 'say_the_relation_before_calculating'],
+  ['circle_object', 'primitive-circle-object', 'study_object', 'point_to_the_object_first'],
+  ['draw_force_or_path_arrow', 'primitive-direction-arrow', 'direction_or_path', 'trace_direction_before_formula'],
+  ['mark_unit_quantity', 'primitive-unit-tag', 'unit_quantity', 'read_the_unit_before_number'],
+  ['left_right_before_after', 'primitive-before-after', 'before_after', 'say_before_condition_after'],
+  ['mark_condition', 'primitive-condition-tag', 'condition', 'name_the_condition'],
+  ['tag_observable_change', 'primitive-observation-tag', 'observable_change', 'name_what_changed'],
+  ['underline_subject', 'primitive-underline-subject', 'sentence_subject', 'find_who_does_the_action'],
+  ['box_verb', 'primitive-box-verb', 'sentence_action', 'box_the_action_word'],
+  ['mark_time_signal', 'primitive-time-signal', 'time_signal', 'find_the_time_signal'],
+  ['circle_question_keyword', 'primitive-question-keyword', 'question_keyword', 'circle_what_the_question_asks'],
+  ['quote_evidence_sentence', 'primitive-evidence-quote', 'text_evidence', 'find_one_evidence_sentence'],
+  ['paraphrase_arrow', 'primitive-paraphrase-arrow', 'paraphrase', 'say_it_in_own_words'],
+  ['label_structure', 'primitive-structure-label', 'structure', 'label_the_structure'],
+  ['link_function', 'primitive-function-link', 'function', 'connect_structure_to_function'],
+  ['connect_observed_phenomenon', 'primitive-phenomenon-link', 'phenomenon', 'connect_to_observed_result'],
+  ['locate_region', 'primitive-location-pin', 'location', 'point_to_location_first'],
+  ['draw_condition_arrow', 'primitive-condition-arrow', 'condition_cause', 'draw_condition_to_result'],
+  ['connect_result', 'primitive-result-link', 'result', 'name_one_result']
+].map(([id, wxClass, renderRole, childAction]) => ({
+  id,
+  wxClass,
+  renderRole,
+  childAction,
+  owner: 'local_code',
+  aiAllowed: 'rewrite_short_hint_only',
+  requiredEvidence: ['child_points_or_names_primitive', 'child_says_first_step'],
+  allowedSurfaces: ['tutor_mini_lesson', 'review_return_card', 'parent_report_summary'],
+  blockedFields: ['raw_question', 'full_answer', 'score', 'ranking', 'talent_label']
+}));
+
+function buildMiniLessonVisualPrimitiveContract(primitives = []) {
+  const requested = Array.isArray(primitives) ? primitives : [];
+  const byId = MINI_LESSON_VISUAL_PRIMITIVE_RENDER_CONTRACT.reduce((map, item) => {
+    map[item.id] = item;
+    return map;
+  }, {});
+  return requested.map((id) => byId[id]).filter(Boolean);
+}
+
 const MINI_LESSON_TOPIC_CARDS = [
   {
     id: 'math_equation_story',
@@ -1038,6 +1081,10 @@ function buildMiniLessonRecoveryBranches(visualTemplate = {}, topicCard = {}, ou
 }
 
 function buildMiniLessonExecutionContract(visualTemplate = {}, topicCard = {}, outline = {}) {
+  const primitives = Array.isArray(visualTemplate.visualPrimitives) && visualTemplate.visualPrimitives.length
+    ? visualTemplate.visualPrimitives
+    : ['circle_target', 'mark_known', 'draw_relation_or_direction', 'say_first_step'];
+  const primitiveRenderContract = buildMiniLessonVisualPrimitiveContract(primitives);
   return {
     id: 'mini_lesson_execution_contract',
     positioning: '小讲堂只在苏格拉底连续卡住后补位，不提供可选课堂模式。',
@@ -1070,9 +1117,9 @@ function buildMiniLessonExecutionContract(visualTemplate = {}, topicCard = {}, o
     visualSchema: {
       subject: topicCard.subject || visualTemplate.subject || 'general',
       lens: visualTemplate.conceptLens || topicCard.conceptGap || outline.issue || 'first_step',
-      primitives: Array.isArray(visualTemplate.visualPrimitives) && visualTemplate.visualPrimitives.length
-        ? visualTemplate.visualPrimitives
-        : ['circle_target', 'mark_known', 'draw_relation_or_direction', 'say_first_step'],
+      primitives,
+      primitiveRenderContract,
+      renderContractReady: primitiveRenderContract.length === primitives.length,
       noFullSolution: true,
       noRawQuestionExport: true
     },
@@ -1117,6 +1164,7 @@ function buildThreeMinuteMiniLesson(input = {}) {
   const boardFrames = buildMiniLessonBoardFrames(visualTemplate, topicCard, outline);
   const recoveryBranches = buildMiniLessonRecoveryBranches(visualTemplate, topicCard, outline);
   const executionContract = buildMiniLessonExecutionContract(visualTemplate, topicCard, outline);
+  const primitiveRenderContract = executionContract.visualSchema.primitiveRenderContract || [];
   const modeRouter = buildPrivateTutorModeRouter(input, { trigger });
   return {
     id: 'three_minute_mini_lesson',
@@ -1145,6 +1193,7 @@ function buildThreeMinuteMiniLesson(input = {}) {
       layers: (visualTemplate.boardLayers || []).concat([topicCard.firstBoard]).filter(Boolean).slice(0, 4),
       firstStep: outline.firstStep,
       frames: boardFrames,
+      primitiveRenderContract,
       renderPrompt: '按帧画：圈题目问什么 -> 找一个已知条件 -> 只说第一步动作',
       noFullSolution: true
     },
@@ -1526,7 +1575,9 @@ module.exports = {
   OPENMAIC_REFERENCE_POLICY,
   PUBLIC_K12_RESOURCE_DECISIONS,
   MINI_LESSON_VISUAL_TEMPLATES,
+  MINI_LESSON_VISUAL_PRIMITIVE_RENDER_CONTRACT,
   MINI_LESSON_TOPIC_CARDS,
+  buildMiniLessonVisualPrimitiveContract,
   buildOpenMaicInspiredTaskPlan,
   evaluateOpenMaicInspiredTaskPlan,
   buildMiniLessonTrigger,
