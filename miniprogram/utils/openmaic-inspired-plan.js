@@ -597,6 +597,44 @@ const MINI_LESSON_TOPIC_CARDS = [
   }
 ];
 
+function inferMiniLessonCluster(card = {}) {
+  const id = String(card.id || '');
+  const text = [id, card.label, card.conceptGap, card.firstBoard].join(' ');
+  if (/reading|evidence|poem|word_context|map|graph|climate|image|ray/.test(id) || /证据|图|光线|地图|气候|意象/.test(text)) return 'visual_evidence';
+  if (/equation|ratio|calculation|chem_equation|variable|grammar|sentence|genetics/.test(id) || /变量|方程|句子|结构|守恒|计算/.test(text)) return 'symbol_rule';
+  if (/experiment|reaction|process|ecology|force|circuit|motion/.test(id) || /过程|反应|路径|方向|系统/.test(text)) return 'process_chain';
+  return 'first_step_entry';
+}
+
+function inferMiniLessonDistractor(card = {}) {
+  const text = [card.id, card.conceptGap, card.microScript, card.checkPrompt].join(' ');
+  if (/答案|answer|公式|formula|计算/.test(text)) return 'jump_to_answer_or_formula';
+  if (/证据|evidence|原文|条件/.test(text)) return 'evidence_not_named';
+  if (/方向|路径|过程|变量|关系/.test(text)) return 'relation_or_direction_confused';
+  return 'first_step_too_vague';
+}
+
+function enrichMiniLessonTopicCard(card = {}) {
+  const clusterId = card.clusterId || inferMiniLessonCluster(card);
+  const distractorType = card.distractorType || inferMiniLessonDistractor(card);
+  return Object.assign({}, card, {
+    clusterId,
+    distractorType,
+    exitEvidence: card.exitEvidence || [
+      'child_says_first_step',
+      'child_names_wrong_cause',
+      'parent_can_check_without_answer',
+      'next_day_revisit_card'
+    ],
+    nearTransferType: card.nearTransferType || (clusterId === 'visual_evidence' ? 'swap_visual_or_text' : clusterId === 'symbol_rule' ? 'swap_number_or_symbol' : 'swap_condition_or_context'),
+    releaseGate: card.releaseGate || 'first_step_wrong_cause_parent_check_before_practice'
+  });
+}
+
+MINI_LESSON_TOPIC_CARDS.forEach((card, index) => {
+  MINI_LESSON_TOPIC_CARDS[index] = enrichMiniLessonTopicCard(card);
+});
+
 function safeText(value, fallback, max) {
   const text = String(value || '').replace(/\s+/g, ' ').trim();
   const result = text || fallback || '';
@@ -815,9 +853,10 @@ function pickMiniLessonTopicCard(input = {}, visualTemplate = {}) {
     visualTemplate.subject,
     visualTemplate.conceptLens
   ].join(' ');
-  return MINI_LESSON_TOPIC_CARDS.find((item) => item.match.test(text))
-    || MINI_LESSON_TOPIC_CARDS.find((item) => item.subject === visualTemplate.subject)
-    || {
+  const picked = MINI_LESSON_TOPIC_CARDS.find((item) => item.match.test(text))
+    || MINI_LESSON_TOPIC_CARDS.find((item) => item.subject === visualTemplate.subject);
+  if (picked) return enrichMiniLessonTopicCard(picked);
+  return enrichMiniLessonTopicCard({
       id: 'general_first_step',
       subject: 'general',
       label: '通用卡点：先说第一步',
@@ -828,7 +867,7 @@ function pickMiniLessonTopicCard(input = {}, visualTemplate = {}) {
       parentObserve: visualTemplate.parentLine || '家长只问第一步，不讲完整解法。',
       nextDayCard: visualTemplate.nearTransfer || '明天换材料，只复查第一步。',
       localGate: 'child_says_first_step_before_solution'
-    };
+    });
 }
 
 function buildMiniLessonBoardFrames(visualTemplate = {}, topicCard = {}, outline = {}) {
@@ -1083,6 +1122,10 @@ function buildThreeMinuteMiniLesson(input = {}) {
       conceptGap: topicCard.conceptGap,
       firstBoard: topicCard.firstBoard,
       localGate: topicCard.localGate,
+      clusterId: topicCard.clusterId,
+      distractorType: topicCard.distractorType,
+      nearTransferType: topicCard.nearTransferType,
+      exitEvidence: topicCard.exitEvidence,
       sourcePolicy: 'local_rewrite_from_public_pattern_no_raw_question'
     },
     blackboard: {
@@ -1171,6 +1214,10 @@ function evaluateThreeMinuteMiniLesson(miniLesson = {}) {
       && miniLesson.blackboard
       && miniLesson.blackboard.noFullSolution === true
       && miniLesson.topicCard
+      && miniLesson.topicCard.clusterId
+      && miniLesson.topicCard.distractorType
+      && Array.isArray(miniLesson.topicCard.exitEvidence)
+      && miniLesson.topicCard.exitEvidence.length >= 4
       && miniLesson.topicPractice
       && miniLesson.teacherSchoolBridge
       && miniLesson.nearTransfer
@@ -1190,6 +1237,8 @@ function evaluateThreeMinuteMiniLesson(miniLesson = {}) {
     conceptGap: miniLesson.conceptGap || '',
     topicCardId: miniLesson.topicCard ? miniLesson.topicCard.id : '',
     topicSubject: miniLesson.topicCard ? miniLesson.topicCard.subject : '',
+    topicClusterId: miniLesson.topicCard ? miniLesson.topicCard.clusterId : '',
+    topicDistractorType: miniLesson.topicCard ? miniLesson.topicCard.distractorType : '',
     blockedMode: miniLesson.trigger ? miniLesson.trigger.blockedMode : '',
     routerMode: miniLesson.modeRouter ? miniLesson.modeRouter.nextMode : 'missing'
   };

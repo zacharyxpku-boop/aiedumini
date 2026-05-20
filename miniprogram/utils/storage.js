@@ -9046,6 +9046,30 @@ function scorePressureSampleForUnit(sample = {}, unit = {}, type = 'active_recal
   return subjectHit + taskHit + gradeHit + unitHit + typeBias;
 }
 
+function explainPressureSampleMatch(sample = {}, unit = {}, type = 'active_recall') {
+  const score = scorePressureSampleForUnit(sample, unit, type);
+  const reasons = [];
+  const weaknesses = [];
+  if (sample.subject && unit.subjectLabel && sample.subject === unit.subjectLabel) reasons.push('subject_match');
+  else weaknesses.push('subject_fallback');
+  if (sample.taskType && unit.taskType && sample.taskType === unit.taskType) reasons.push('task_type_match');
+  else weaknesses.push('task_type_fallback');
+  if (sample.gradeBand && unit.gradeBand && normalizeCourseSampleText(sample.gradeBand) === normalizeCourseSampleText(unit.gradeBand)) reasons.push('grade_band_match');
+  else weaknesses.push('grade_band_unverified');
+  if (type === 'wrong_cause' && sample.expectedWrongCause) reasons.push('wrong_cause_evidence');
+  if (type === 'near_transfer' && sample.nearTransfer) reasons.push('near_transfer_evidence');
+  if (type === 'active_recall' && sample.expectedFirstStep) reasons.push('first_step_evidence');
+  return {
+    sampleMatchScore: score,
+    sampleMatchReasons: reasons,
+    sampleMatchWeaknesses: weaknesses,
+    sampleMatchTier: score >= 87 ? 'strong' : score >= 75 ? 'usable' : 'fallback',
+    sampleMatchReleaseGate: score >= 75
+      ? 'sample_specific_release_allowed'
+      : 'fallback_requires_parent_or_child_confirmation'
+  };
+}
+
 function findPressureSampleForUnit(unit = {}, type = 'active_recall', index = 0, samplesInput) {
   const samples = Array.isArray(samplesInput) ? samplesInput : getRealHomeworkPressureSamplePool();
   if (!samples.length) return null;
@@ -9072,6 +9096,7 @@ function findPressureSampleForUnit(unit = {}, type = 'active_recall', index = 0,
 
 function buildPressureSampleEvidence(sample = {}, unit = {}, type = 'active_recall') {
   if (!sample || !sample.id) return null;
+  const match = explainPressureSampleMatch(sample, unit, type);
   return {
     sourceSampleId: sample.id,
     sourceId: sample.sourceId || '',
@@ -9086,6 +9111,11 @@ function buildPressureSampleEvidence(sample = {}, unit = {}, type = 'active_reca
     blackboardMove: sample.expectedBoardMove || '',
     parentCheck: sample.parentCheck || '',
     nearTransferStem: sample.nearTransfer || '',
+    sampleMatchScore: match.sampleMatchScore,
+    sampleMatchReasons: match.sampleMatchReasons,
+    sampleMatchWeaknesses: match.sampleMatchWeaknesses,
+    sampleMatchTier: match.sampleMatchTier,
+    sampleMatchReleaseGate: match.sampleMatchReleaseGate,
     sampleBackedEvidence: {
       id: `${sample.id}_${type}_course_evidence`,
       sourceSampleId: sample.id,
@@ -9094,6 +9124,10 @@ function buildPressureSampleEvidence(sample = {}, unit = {}, type = 'active_reca
       gradeBand: sample.gradeBand || unit.gradeBand || '',
       taskType: sample.taskType || unit.taskType || '',
       releaseScope: 'course_unit_first_step_only',
+      sampleMatchScore: match.sampleMatchScore,
+      sampleMatchTier: match.sampleMatchTier,
+      sampleMatchReasons: match.sampleMatchReasons,
+      sampleMatchWeaknesses: match.sampleMatchWeaknesses,
       localGate: 'local_rule_requires_first_step_wrong_cause_board_parent_check_revisit',
       answerPolicy: 'first_step_only_no_full_answer',
       evidenceRequired: [
@@ -9239,6 +9273,11 @@ function buildQuestionSampleCard(unit = {}, type = 'active_recall', index = 0, o
     sourceSampleBoardMove: sourceEvidence && sourceEvidence.blackboardMove,
     sourceSampleParentCheck: sourceEvidence && sourceEvidence.parentCheck,
     sourceSampleNearTransfer: sourceEvidence && sourceEvidence.nearTransferStem,
+    sampleMatchScore: sourceEvidence && sourceEvidence.sampleMatchScore,
+    sampleMatchReasons: sourceEvidence && sourceEvidence.sampleMatchReasons,
+    sampleMatchWeaknesses: sourceEvidence && sourceEvidence.sampleMatchWeaknesses,
+    sampleMatchTier: sourceEvidence && sourceEvidence.sampleMatchTier,
+    sampleMatchReleaseGate: sourceEvidence && sourceEvidence.sampleMatchReleaseGate,
     sampleBackedEvidence: sourceEvidence && sourceEvidence.sampleBackedEvidence,
     sampleStem: sourceEvidence && sourceEvidence.sampleStem ? sourceEvidence.sampleStem : sample.sampleStem,
     firstStepHint: sourceEvidence && sourceEvidence.firstStepHint ? sourceEvidence.firstStepHint : sample.firstStepHint,
@@ -9641,6 +9680,22 @@ function buildCourseUnitQuestionBank(options = {}) {
   }, []);
   const reviewedPublicAssetCards = buildReviewedPublicCurriculumAssetCards(units);
   const questionCards = baseQuestionCards.concat(reviewedPublicAssetCards);
+  const subjectDepthWeakQueue = units.map((unit) => ({
+    unitId: unit.id,
+    unitLabel: unit.unitLabel,
+    subjectLabel: unit.subjectLabel,
+    weakCards: ['active_recall', 'wrong_cause', 'near_transfer'].map((type, index) => {
+      const sample = buildQuestionSampleCard(unit, type, index, { realHomeworkPressureSamples });
+      return {
+        type,
+        sampleId: sample.sampleId,
+        sampleMatchScore: sample.sampleMatchScore || 0,
+        sampleMatchTier: sample.sampleMatchTier || 'fallback',
+        sampleMatchReasons: Array.isArray(sample.sampleMatchReasons) ? sample.sampleMatchReasons : [],
+        sampleMatchWeaknesses: Array.isArray(sample.sampleMatchWeaknesses) ? sample.sampleMatchWeaknesses : []
+      };
+    })
+  }));
   const activeUnitIds = activeUnits.reduce((acc, unit) => {
     acc[unit.id] = true;
     return acc;
@@ -9682,6 +9737,7 @@ function buildCourseUnitQuestionBank(options = {}) {
     activeCards,
     transferLadders,
     activeTransferLadders,
+    subjectDepthWeakQueue,
     reportLine: `报告可追踪 ${units.length} 个单元、${questionCards.length} 张题库卡的下一证据。`,
     gameLine: '游戏优先抽主动回忆和错因诊断卡，迁移卡只做小变式。',
     shareLine: '分享只带题库动作和证据合同，不带原题答案。'
