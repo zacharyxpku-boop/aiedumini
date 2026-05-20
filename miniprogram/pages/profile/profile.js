@@ -1161,6 +1161,11 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
   const uploadedMaterialReportHandoff = storage.get
     ? storage.get('upload.report.handoff.v1', null)
     : null;
+  const servicePathway = reportState.servicePathway
+    || draft.servicePathway
+    || uploadedMaterialDecisionDossier.servicePathway
+    || (uploadedMaterialReportHandoff && uploadedMaterialReportHandoff.servicePathway)
+    || null;
   const parentDecisionBook = reportState.parentDecisionBook || draft.parentDecisionBook || {};
   const matrix = Array.isArray(draft.diagnosisMatrix) ? draft.diagnosisMatrix : [];
   const tendencies = Array.isArray(draft.capabilityTendencies) ? draft.capabilityTendencies : [];
@@ -1816,6 +1821,16 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     sourceEvidenceSafestNextAction: sourceEvidenceLedger.safestNextAction || '',
     sourceEvidenceLanes: Array.isArray(sourceEvidenceLedger.lanes) ? sourceEvidenceLedger.lanes : [],
     sourceEvidenceRequired: Array.isArray(sourceEvidenceLedger.evidenceRequired) ? sourceEvidenceLedger.evidenceRequired : [],
+    servicePathway,
+    servicePathwayTitle: servicePathway && servicePathway.title ? servicePathway.title : '',
+    servicePathwayStatus: servicePathway && servicePathway.status ? servicePathway.status : '',
+    servicePathwayNextAction: servicePathway && servicePathway.nextAction ? servicePathway.nextAction : '',
+    servicePathwayModes: servicePathway && Array.isArray(servicePathway.modeRecommendations) ? servicePathway.modeRecommendations : [],
+    servicePathwayTiers: servicePathway && Array.isArray(servicePathway.productTiers) ? servicePathway.productTiers : [],
+    servicePathwayValidationPlan: servicePathway && Array.isArray(servicePathway.validationPlan) ? servicePathway.validationPlan : [],
+    servicePathwayAiLocalSplit: servicePathway && Array.isArray(servicePathway.aiLocalDeliverySplit) ? servicePathway.aiLocalDeliverySplit : [],
+    servicePathwayReleaseGate: servicePathway && servicePathway.safetyBoundary ? servicePathway.safetyBoundary.releaseGate : '',
+    servicePathwayMoatLine: servicePathway && servicePathway.moatLine ? servicePathway.moatLine : '',
     uploadedMaterialDecisionDossier,
     uploadedMaterialDecisionDossierHandoff: uploadedMaterialReportHandoff || null,
     uploadedMaterialDecisionDossierHandoffTitle: uploadedMaterialReportHandoff && uploadedMaterialReportHandoff.title ? uploadedMaterialReportHandoff.title : '',

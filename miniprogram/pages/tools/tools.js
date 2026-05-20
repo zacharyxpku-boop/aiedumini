@@ -397,7 +397,12 @@ Page({
         { id: 'ai', label: 'AI更好', body: aiLane.use || '苏格拉底追问、解释改写、家长可读话术交给 AI。' },
         { id: 'reject', label: '必须拒绝', body: rejectLane.use || '不做原题答案库、拍照识题承诺、排名晒分。' }
       ],
-      challengeSeeds: challenges.slice(0, 4),
+      challengeSeeds: challenges.slice(0, 4).map((item) => Object.assign({}, item, {
+        route: item.route || `/pages/tutor/tutor?from=public_k12_seed&challenge_id=${encodeURIComponent(item.id || 'public_k12')}`,
+        reviewRoute: item.reviewRoute || `/pages/review/review?from=public_k12_seed&challenge_id=${encodeURIComponent(item.id || 'public_k12')}`,
+        sourceChallengeId: item.id || '',
+        firstStepGate: item.observableFirstMove || item.firstStepPrompt || '孩子能说出第一步'
+      })),
       primaryRoute: '/pages/upload/upload',
       secondaryRoute: '/pages/arcade/arcade?from=public_k12_intake'
     };
@@ -1196,6 +1201,26 @@ Page({
     const dataset = event.currentTarget.dataset || {};
     const panel = this.data.publicK12ContentOps || {};
     const route = dataset.route || panel.primaryRoute || '/pages/upload/upload';
+    navigation.navigateLearningRoute(route);
+  },
+
+  runPublicK12ChallengeSeed(event) {
+    const dataset = event.currentTarget.dataset || {};
+    const route = dataset.route || '/pages/tutor/tutor?from=public_k12_seed';
+    if (storage.appendReviewEvent) {
+      storage.appendReviewEvent({
+        eventType: 'public_k12_seed_selected',
+        source: 'tools_public_k12_content_ops',
+        sourceChallengeId: dataset.challengeId || '',
+        subject: dataset.subject || '',
+        taskType: dataset.taskType || '',
+        route,
+        reviewRoute: dataset.reviewRoute || '/pages/review/review?from=public_k12_seed',
+        firstStepRequired: dataset.firstStepGate || '孩子能说出第一步',
+        releaseGate: 'own_material_first_step_before_ai_rewrite',
+        blockedFields: ['original_question', 'full_answer', 'score', 'ranking', 'full_dialogue']
+      });
+    }
     navigation.navigateLearningRoute(route);
   },
 

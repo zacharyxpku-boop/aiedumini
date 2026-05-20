@@ -80,6 +80,42 @@ function detectIntakeSourceSchema(text = '', materialType = '') {
   return INTAKE_SOURCE_SCHEMAS.find((schema) => schema.match.test(value)) || INTAKE_SOURCE_SCHEMAS[3];
 }
 
+const STRUCTURED_CAPTURE_PROMPT_BY_FIELD = {
+  question_type: { label: '题型', prompt: '这份材料更像哪类题：审题、列式、概念、实验、阅读、表达，还是记忆？' },
+  child_original_thought: { label: '孩子原想法', prompt: '孩子当时第一反应是什么？只写一句原话或近似表达。' },
+  stuck_first_step: { label: '卡住第一步', prompt: '他卡在读题、找条件、列关系、套概念、检查，还是迁移？' },
+  wrong_cause_guess: { label: '错因猜测', prompt: '先猜一个最可能错因，之后用明天回访验证，不直接下结论。' },
+  preference_candidate: { label: '方法候选', prompt: '报告只提示一个可能适合的学习方式，例如先看图、先复述、先动笔或先拆步。' },
+  method_hypothesis: { label: '方法假设', prompt: '把测评结论改写成可验证假设：今晚试哪一个具体动作？' },
+  cross_check_gate: { label: '交叉验证门槛', prompt: '需要哪条真实错题、作业或回访证据，才能继续相信这个方法？' },
+  review_window: { label: '回访窗口', prompt: '明天或第 7 天要回看什么，才能判断方法是否真的适合？' },
+  teacher_observation: { label: '老师观察', prompt: '老师反馈里可引用的一句事实是什么？不加入排名或评价。' },
+  classroom_signal: { label: '课堂信号', prompt: '课堂/作业中出现的具体信号是什么，例如听懂但列式慢。' },
+  home_school_question: { label: '家校问题', prompt: '家长下一次跟老师确认的一个安全问题是什么？' },
+  safe_handoff: { label: '安全交接', prompt: '哪些内容可以交接给家长，哪些原题、分数、排名不能外传？' },
+  home_observation: { label: '家庭观察', prompt: '家长观察到的一个具体场景是什么？只写事实，不贴标签。' },
+  parent_goal: { label: '家长期望', prompt: '家长今晚最想解决的一个动作问题是什么？' },
+  homework_context: { label: '作业场景', prompt: '这个问题通常出现在什么作业时段、学科或题型里？' },
+  next_action: { label: '下一动作', prompt: '今晚家长只做哪一个低压动作？' },
+  wrong_cause: { label: '错因', prompt: '把错因写成可验证的一句话，不写完整答案。' },
+  first_step: { label: '第一步', prompt: '孩子要自己说出的第一步是什么？' },
+  next_day_revisit: { label: '隔天回访', prompt: '明天只回访哪一张卡或哪一个第一步？' },
+  day7_variant: { label: '第7天小变式', prompt: '第 7 天用哪一个小变式验证不是只会原题？' }
+};
+
+function buildStructuredCapturePromptsForSchema(schema = {}) {
+  const fieldIds = schema.id === 'wrong_question_paper' || schema.id === 'wrong_question_photo'
+    ? ['question_type', 'child_original_thought', 'stuck_first_step', 'wrong_cause_guess']
+    : Array.isArray(schema.localFields) && schema.localFields.length
+    ? schema.localFields
+    : ['question_type', 'child_original_thought', 'stuck_first_step', 'wrong_cause_guess'];
+  return fieldIds.map((id) => Object.assign(
+    { id, label: id, prompt: '补一条真实证据，不写结论。' },
+    STRUCTURED_CAPTURE_PROMPT_BY_FIELD[id] || {},
+    { id }
+  ));
+}
+
 function buildSourceReadinessBoard(schema = {}, kind = '', materialSource = null, images = []) {
   const sourceLabel = schema.label || (materialSource && materialSource.label) || '用户材料';
   const photoOnly = kind === 'photo_evidence_needs_text';
@@ -501,13 +537,17 @@ function buildUploadIntakePacket(text = '', imagePaths = [], materialType = '') 
     boundary: '只把用户提供的文字拆成回忆卡，不抓链接、不解析文件、不生成完整答案。'
   };
   const requiredNextEvidence = buildRequiredNextEvidence(intakeSourceSchema, kind);
-  const requiredTextFields = ['question_type', 'child_original_thought', 'stuck_first_step', 'wrong_cause_guess'];
-  const structuredCapturePrompts = [
+  const schemaStructuredCapturePrompts = buildStructuredCapturePromptsForSchema(intakeSourceSchema);
+  const requiredTextFields = schemaStructuredCapturePrompts.map((item) => item.id);
+  const legacyStructuredCapturePrompts = [
     { id: 'question_type', label: '题型', prompt: '这份材料更像哪类题：审题、列式、概念、实验、阅读、表达，还是记忆？' },
     { id: 'child_original_thought', label: '孩子原想法', prompt: '孩子当时第一反应是什么？只写一句原话或近似表达。' },
     { id: 'stuck_first_step', label: '卡住第一步', prompt: '他卡在读题、找条件、列关系、套概念、检查，还是迁移？' },
     { id: 'wrong_cause_guess', label: '错因猜测', prompt: '先猜一个最可能错因，之后用明天回访验证，不直接下结论。' }
   ];
+  const structuredCapturePrompts = schemaStructuredCapturePrompts.length
+    ? schemaStructuredCapturePrompts
+    : legacyStructuredCapturePrompts;
   const photoEvidencePolicy = {
     mode: 'local_file_reference_only',
     ocrClaim: false,

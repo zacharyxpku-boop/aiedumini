@@ -85,9 +85,10 @@
         </view>
       </view>
       <view class="public-k12-seeds" wx:if="{{publicK12ContentOps.challengeSeeds.length}}">
-        <view class="public-k12-seed" wx:for="{{publicK12ContentOps.challengeSeeds}}" wx:key="id">
+        <view class="public-k12-seed" wx:for="{{publicK12ContentOps.challengeSeeds}}" wx:key="id" data-route="{{item.route}}" data-review-route="{{item.reviewRoute}}" data-challenge-id="{{item.sourceChallengeId}}" data-subject="{{item.subject}}" data-task-type="{{item.taskType}}" data-first-step-gate="{{item.firstStepGate}}" bindtap="runPublicK12ChallengeSeed">
           <text>{{item.subject}}｜{{item.firstStepPrompt}}</text>
           <text>{{item.answerBoundary}}</text>
+          <text>点入后只问第一步：{{item.firstStepGate}}</text>
         </view>
       </view>
       <view class="public-k12-boundary">{{publicK12ContentOps.sourceLine}}</view>

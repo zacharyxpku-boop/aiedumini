@@ -117,7 +117,8 @@
             <view class="parent-brief-block">
               <text class="parent-brief-label">{{learningReportSummary.uploadedMaterialDecisionDossierTitle}}</text>
               <text>{{learningReportSummary.uploadedMaterialDecisionDossierSummary}}</text>
-              <text>{{learningReportSummary.uploadedMaterialDecisionDossierChildStrengthLine}}</text>
+              <text wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierReleaseGate.status === 'portrait_candidate'}}">{{learningReportSummary.uploadedMaterialDecisionDossierChildStrengthLine}}</text>
+              <text wx:else>方法候选：先用真实错题、隔天回访和第 7 天小变式验证，不贴天赋或人格标签。</text>
             </view>
             <view class="parent-brief-block">
               <text class="parent-brief-label">怎么学更好</text>
@@ -1205,7 +1206,8 @@
           <text>{{learningReportSummary.uploadedMaterialDecisionDossierTalentRule}}</text>
           <text>{{learningReportSummary.uploadedMaterialDecisionDossierWrongPaperRule}}</text>
           <text>{{learningReportSummary.uploadedMaterialDecisionDossierSchoolRule}}</text>
-          <text>{{learningReportSummary.uploadedMaterialDecisionDossierChildStrengthLine}}</text>
+          <text wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierReleaseGate.status === 'portrait_candidate'}}">{{learningReportSummary.uploadedMaterialDecisionDossierChildStrengthLine}}</text>
+          <text wx:else>方法候选：先用真实错题、隔天回访和第 7 天小变式验证，不贴天赋或人格标签。</text>
           <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierMaterialLanes}}" wx:key="id">上传链路：{{item.label}}｜{{item.collected ? '已接入' : '待补充'}}｜可说：{{item.canSay}}｜不可说：{{item.cannotSay}}｜产出：{{item.output}}</text>
           <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierHowToLearnBetter}}" wx:key="id">怎么学候选：{{item.label}}｜证据：{{item.evidence}}｜验证：{{item.verifyWith}}</text>
           <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierWrongPaperDiagnosisCards}}" wx:key="id">错题诊断：{{item.label}}｜{{item.rule}}｜{{item.nextAction}}</text>
@@ -1214,6 +1216,16 @@
           <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierAiLocalSplit}}" wx:key="id">AI/本地分工：{{item.label}}｜{{item.owns}}</text>
           <text wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierReleaseGate}}">放行门槛：{{learningReportSummary.uploadedMaterialDecisionDossierReleaseGate.status}}</text>
           <text wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierShareSafePayload}}">分享安全：只带第一步、错因和回访动作，不带原题、完整结果、分数或比较信息。</text>
+          <view class="parent-brief-block" wx:if="{{learningReportSummary.servicePathway}}">
+            <text class="parent-brief-label">{{learningReportSummary.servicePathwayTitle}}</text>
+            <text>路径状态：{{learningReportSummary.servicePathwayStatus}}｜{{learningReportSummary.servicePathwayNextAction}}</text>
+            <text wx:for="{{learningReportSummary.servicePathwayModes}}" wx:key="id">模式：{{item.label}}｜{{item.localGate}}</text>
+            <text wx:for="{{learningReportSummary.servicePathwayTiers}}" wx:key="id">服务：{{item.label}}｜{{item.entryGate}}</text>
+            <text wx:for="{{learningReportSummary.servicePathwayValidationPlan}}" wx:key="day">7天验证：{{item.label}}｜{{item.action}}｜证据 {{item.evidence}}</text>
+            <text wx:for="{{learningReportSummary.servicePathwayAiLocalSplit}}" wx:key="id">AI/本地：{{item.label}}｜{{item.owns}}</text>
+            <text wx:if="{{learningReportSummary.servicePathwayReleaseGate}}">服务放行：{{learningReportSummary.servicePathwayReleaseGate}}</text>
+            <text wx:if="{{learningReportSummary.servicePathwayMoatLine}}">{{learningReportSummary.servicePathwayMoatLine}}</text>
+          </view>
           <view class="parent-brief-block" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierHandoff}}">
             <text class="parent-brief-label">刚上传资料</text>
             <text>{{learningReportSummary.uploadedMaterialDecisionDossierHandoffTitle}}</text>

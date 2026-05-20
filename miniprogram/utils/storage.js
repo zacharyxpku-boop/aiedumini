@@ -131,6 +131,7 @@ const KEYS = {
   localFeedback: 'ydzx.local.feedback.v1',
   todaySession: 'ydzx.today.session.v1',
   learningReport: 'ydzx.learning.report.v1',
+  courseUnitProgress: 'ydzx.course.unit.progress.v1',
   surfaceDepthEvents: 'ydzx.surface.depth.events.v1',
   unifiedActionEvents: 'ydzx.unified.action.events.v1',
   localBackup: 'ydzx.local.backup.v1'
@@ -5799,16 +5800,17 @@ function ensureMiniLessonReturnReviewCard(seed = {}, context = {}) {
 
 function recordMiniLessonExitGate(input = {}, context = {}) {
   const now = new Date();
-  const status = input.status === 'passed' ? 'passed' : 'needs_support';
+  const childExitTicketText = String(input.childExitTicketText || input.receiverFirstStep || input.childFirstStep || '').trim();
+  const hasChildExitTicket = childExitTicketText.length >= 4 && !/答案|直接|代写|帮我写|带我|提示|讲一下|不会|不懂|不知道/.test(childExitTicketText);
+  const status = input.status === 'passed' && hasChildExitTicket ? 'passed' : 'needs_support';
   const evidenceThread = input.evidenceThread && typeof input.evidenceThread === 'object'
     ? input.evidenceThread
     : {};
   const topicCardId = input.topicCardId || evidenceThread.topicCardId || '';
   const flowTraceId = input.flowTraceId || evidenceThread.flowTraceId || context.flowTraceId || '';
-  const firstStepEvidence = input.firstStepEvidence
-    || input.firstStep
-    || evidenceThread.firstStep
-    || 'child_can_say_first_step';
+  const firstStepEvidence = status === 'passed'
+    ? (childExitTicketText || input.firstStepEvidence || input.firstStep || '')
+    : '';
   const blockedFields = Array.isArray(input.blockedFields) && input.blockedFields.length
     ? input.blockedFields
     : Array.isArray(evidenceThread.blockedFields) && evidenceThread.blockedFields.length
@@ -5838,6 +5840,8 @@ function recordMiniLessonExitGate(input = {}, context = {}) {
     evidenceThreadId: evidenceThread.id || '',
     topicCardId,
     firstStepEvidence,
+    childExitTicketText,
+    childAuthoredEvidence: status === 'passed',
     exitGate: input.exitGate || 'child_can_say_first_step',
     nextRoute,
     blockedFields,
@@ -5851,6 +5855,8 @@ function recordMiniLessonExitGate(input = {}, context = {}) {
     evidence_thread_id: event.evidenceThreadId,
     topic_card_id: topicCardId,
     first_step_evidence: firstStepEvidence,
+    child_exit_ticket_text: childExitTicketText,
+    child_authored_evidence: status === 'passed',
     next_route: nextRoute,
     blocked_fields: blockedFields.join(','),
     created_at: event.created_at
@@ -5864,7 +5870,9 @@ function recordMiniLessonExitGate(input = {}, context = {}) {
         recallEvidence: Object.assign({}, item.recallEvidence || {}, {
           student_first_step: status === 'passed',
           mini_lesson_exit_gate: status,
-          first_step_evidence: firstStepEvidence
+          first_step_evidence: firstStepEvidence,
+          child_exit_ticket_text: childExitTicketText,
+          child_authored_evidence: status === 'passed'
         }),
         updated_at: event.created_at
       });
@@ -6072,6 +6080,50 @@ function addGameXP(amount, reason = '', evidence = {}) {
   return { profile: saved, accepted, capped: accepted < delta, gate };
 }
 
+function buildGameSessionXpEvidence(result = {}, context = {}) {
+  const recallEvidence = Array.isArray(result.recallEvidence) ? result.recallEvidence : [];
+  const recallHasFirstStep = recallEvidence.some((item) => item && (item.student_first_step || item.first_step_recall || item.child_first_step));
+  const recallHasWrongCause = recallEvidence.some((item) => item && (item.wrong_cause_named || item.wrong_cause_replay || item.wrongCauseLabel || item.wrongCause));
+  const recallHasRevisit = recallEvidence.some((item) => item && (item.next_day_revisit_locked || item.next_day_revisit || item.revisit_locked || item.revisitWindow));
+  return {
+    student_first_step: recallHasFirstStep || !!(result.firstStep || result.childFirstStep || context.firstStep),
+    wrong_cause_named: recallHasWrongCause || !!(result.wrongCause || result.wrongCauseLabel || context.wrongCause || context.weakKey),
+    next_day_revisit_locked: recallHasRevisit || !!(result.nextDayReturnEvidence || result.nextDayRevisit || context.nextDayReturnEvidence)
+  };
+}
+
+function loadCourseUnitProgress() {
+  const list = get(KEYS.courseUnitProgress, []);
+  return Array.isArray(list) ? list : [];
+}
+
+function recordCourseUnitProgress(progress = {}) {
+  const firstStep = String(progress.firstStep || progress.childFirstStep || '').trim();
+  const wrongCause = String(progress.wrongCause || progress.wrongCauseLabel || '').trim();
+  const nextDayRevisit = String(progress.nextDayRevisit || progress.revisitWindow || '').trim();
+  const nearTransfer = String(progress.nearTransfer || progress.nearTransferEvidence || '').trim();
+  const evidenceReady = !!(firstStep && wrongCause && nextDayRevisit);
+  const status = progress.status || (evidenceReady && nearTransfer ? 'mastery_gate_ready' : evidenceReady ? 'needs_near_transfer' : 'needs_next_revisit');
+  const entry = {
+    id: progress.id || `course_progress_${Date.now()}`,
+    cardId: progress.cardId || '',
+    unitId: progress.unitId || '',
+    source: progress.source || 'arcade_finish_round',
+    firstStep,
+    wrongCause,
+    nextDayRevisit,
+    nearTransfer,
+    status,
+    evidenceReady,
+    blockedFields: ['original_question', 'full_answer', 'score', 'ranking'],
+    created_at: new Date().toISOString()
+  };
+  const next = [entry].concat(loadCourseUnitProgress()).slice(0, 120);
+  set(KEYS.courseUnitProgress, next);
+  appendSyncMutation('course_unit_progress', entry);
+  return entry;
+}
+
 function recordGameSessionResult(result = {}, context = {}) {
   const current = loadGameProfile();
   const total = Number(result.total || 0);
@@ -6121,6 +6173,11 @@ function recordGameSessionResult(result = {}, context = {}) {
     achievements: achievementResult.achievements,
     coins: Number(stats.coins || 0) + Number(achievementResult.coinsAwarded || 0)
   }));
+  const requestedXp = Math.max(0, Number(result.xp || result.pendingXp || 0));
+  const xpEvidence = buildGameSessionXpEvidence(result, context);
+  const xpRelease = requestedXp > 0
+    ? addGameXP(requestedXp, context.xpReason || `game_session_${context.gameType || result.gameType || 'arcade'}`, xpEvidence)
+    : { profile: saved, accepted: 0, gate: normalizeXpEvidenceGate(xpEvidence), blocked: false };
   appendSyncMutation('game_session_result', {
     id: `game_session_${today}_${String(context.gameType || result.gameType || 'arcade')}`,
     game_type: context.gameType || result.gameType || 'arcade',
@@ -6131,15 +6188,21 @@ function recordGameSessionResult(result = {}, context = {}) {
     correct_today: nextCorrectToday,
     evidence_return_count: nextEvidenceReturnToday,
     active_recall_evidence_complete: activeRecallEvidenceComplete,
+    pending_xp: requestedXp,
+    released_xp: xpRelease.accepted || 0,
+    xp_release_blocked: !!xpRelease.blocked,
+    xp_release_gate: xpRelease.gate,
     streak: Number(saved.streak || 0),
     achievements: saved.achievements || [],
     newly_unlocked: achievementResult.newlyUnlocked.map((item) => item.id),
     created_at: new Date().toISOString()
   });
   return {
-    profile: saved,
+    profile: xpRelease && xpRelease.profile ? xpRelease.profile : saved,
     newlyUnlocked: achievementResult.newlyUnlocked,
-    coinsAwarded: achievementResult.coinsAwarded
+    coinsAwarded: achievementResult.coinsAwarded,
+    pendingXp: requestedXp,
+    xpRelease
   };
 }
 
@@ -12078,6 +12141,8 @@ module.exports = {
   recordDailyLearningQuestSignal,
   addGameXP,
   recordGameSessionResult,
+  loadCourseUnitProgress,
+  recordCourseUnitProgress,
   loadGamePurchases,
   saveGamePurchase,
   loadShareRuns,

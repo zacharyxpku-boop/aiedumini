@@ -491,10 +491,39 @@ Page({
     const stuckFirstStep = pickLine([/第一步|卡住|不会下手|先看|先找|先画|先列/]);
     const wrongCauseGuess = pickLine([/错因|错在|扣分|粗心|单位|条件|关系|概念|审题/]);
     const manualValues = manual && typeof manual === 'object' ? manual : {};
-    const questionTypeValue = String(manualValues.question_type || manualValues.questionType || '').trim() || questionType;
-    const childOriginalThoughtValue = String(manualValues.child_original_thought || manualValues.childOriginalThought || '').trim() || childOriginalThought;
-    const stuckFirstStepValue = String(manualValues.stuck_first_step || manualValues.firstStep || manualValues.stuckFirstStep || '').trim() || stuckFirstStep;
-    const wrongCauseGuessValue = String(manualValues.wrong_cause_guess || manualValues.wrongCause || manualValues.wrongCauseGuess || '').trim() || wrongCauseGuess;
+    const promptValueById = {};
+    prompts.forEach((prompt) => {
+      const id = prompt && prompt.id ? prompt.id : '';
+      if (id) promptValueById[id] = String(manualValues[id] || '').trim();
+    });
+    const questionTypeValue = String(manualValues.question_type || manualValues.questionType || '').trim()
+      || promptValueById.question_type
+      || promptValueById.preference_candidate
+      || promptValueById.teacher_observation
+      || promptValueById.home_observation
+      || questionType;
+    const childOriginalThoughtValue = String(manualValues.child_original_thought || manualValues.childOriginalThought || '').trim()
+      || promptValueById.child_original_thought
+      || promptValueById.method_hypothesis
+      || promptValueById.classroom_signal
+      || promptValueById.parent_goal
+      || childOriginalThought;
+    const stuckFirstStepValue = String(manualValues.stuck_first_step || manualValues.firstStep || manualValues.stuckFirstStep || '').trim()
+      || promptValueById.stuck_first_step
+      || promptValueById.cross_check_gate
+      || promptValueById.home_school_question
+      || promptValueById.homework_context
+      || promptValueById.first_step
+      || stuckFirstStep;
+    const wrongCauseGuessValue = String(manualValues.wrong_cause_guess || manualValues.wrongCause || manualValues.wrongCauseGuess || '').trim()
+      || promptValueById.wrong_cause_guess
+      || promptValueById.review_window
+      || promptValueById.safe_handoff
+      || promptValueById.next_action
+      || promptValueById.wrong_cause
+      || promptValueById.next_day_revisit
+      || promptValueById.day7_variant
+      || wrongCauseGuess;
     const structuredCapture = {
       sourceSchemaId: schema.id || uploadIntakePacket.sourceSchemaId || '',
       sourceSchemaLabel: schema.label || uploadIntakePacket.sourceSchemaLabel || '',
@@ -528,7 +557,7 @@ Page({
   },
 
   buildStructuredEvidenceCapture(uploadIntakePacket = {}, text = '', manual = {}) {
-    const signals = this.buildStructuredEvidenceSignals(uploadIntakePacket, text);
+    const signals = this.buildStructuredEvidenceSignals(uploadIntakePacket, text, manual);
     const prompts = Array.isArray(uploadIntakePacket.structuredCapturePrompts)
       ? uploadIntakePacket.structuredCapturePrompts
       : [];
@@ -552,6 +581,135 @@ Page({
       title: '材料证据补全',
       summary: '先补题型、孩子原想法、卡住第一步和错因猜测；报告只按证据放行，不凭一次测评贴标签。',
       releaseGate: '本地规则决定报告放行、奖励和分享字段；AI 只改写追问和家长摘要。',
+      fields,
+      values,
+      readyCount,
+      totalCount: fields.length,
+      missing,
+      ready: fields.length > 0 && readyCount === fields.length,
+      nextAction: missing.length
+        ? `还差：${missing.slice(0, 2).join(' / ')}`
+        : '证据已补齐，可以生成家长决策报告。'
+    };
+  },
+
+  buildStructuredEvidenceSignals(uploadIntakePacket = {}, text = '', manual = {}) {
+    const schema = uploadIntakePacket.intakeSourceSchema || {};
+    const prompts = Array.isArray(uploadIntakePacket.structuredCapturePrompts)
+      ? uploadIntakePacket.structuredCapturePrompts
+      : [];
+    const value = String(text || '');
+    const pickLine = (patterns) => {
+      const lines = value.split(/\n+/).map((line) => line.trim()).filter(Boolean);
+      return lines.find((line) => patterns.some((pattern) => pattern.test(line))) || '';
+    };
+    const manualValues = manual && typeof manual === 'object' ? manual : {};
+    const promptValueById = {};
+    prompts.forEach((prompt) => {
+      const id = prompt && prompt.id ? prompt.id : '';
+      if (id) promptValueById[id] = String(manualValues[id] || '').trim();
+    });
+    const questionType = pickLine([/题型|类型|阅读|应用题|实验|方程|证明|语法|地图|过程/]);
+    const childOriginalThought = pickLine([/原想法|当时想|孩子说|第一反应|我以为|我觉得/]);
+    const stuckFirstStep = pickLine([/第一步|卡住|不会下手|先看|先找|先画|先列/]);
+    const wrongCauseGuess = pickLine([/错因|错在|扣分|粗心|单位|条件|关系|概念|审题/]);
+    const questionTypeValue = String(manualValues.question_type || manualValues.questionType || '').trim()
+      || promptValueById.question_type
+      || promptValueById.preference_candidate
+      || promptValueById.teacher_observation
+      || promptValueById.home_observation
+      || questionType;
+    const childOriginalThoughtValue = String(manualValues.child_original_thought || manualValues.childOriginalThought || '').trim()
+      || promptValueById.child_original_thought
+      || promptValueById.method_hypothesis
+      || promptValueById.classroom_signal
+      || promptValueById.parent_goal
+      || childOriginalThought;
+    const stuckFirstStepValue = String(manualValues.stuck_first_step || manualValues.firstStep || manualValues.stuckFirstStep || '').trim()
+      || promptValueById.stuck_first_step
+      || promptValueById.cross_check_gate
+      || promptValueById.home_school_question
+      || promptValueById.homework_context
+      || promptValueById.first_step
+      || stuckFirstStep;
+    const wrongCauseGuessValue = String(manualValues.wrong_cause_guess || manualValues.wrongCause || manualValues.wrongCauseGuess || '').trim()
+      || promptValueById.wrong_cause_guess
+      || promptValueById.review_window
+      || promptValueById.safe_handoff
+      || promptValueById.next_action
+      || promptValueById.wrong_cause
+      || promptValueById.next_day_revisit
+      || promptValueById.day7_variant
+      || wrongCauseGuess;
+    const structuredCapture = {
+      sourceSchemaId: schema.id || uploadIntakePacket.sourceSchemaId || '',
+      sourceSchemaLabel: schema.label || uploadIntakePacket.sourceSchemaLabel || '',
+      questionType: questionTypeValue || schema.label || '',
+      childOriginalThought: childOriginalThoughtValue,
+      stuckFirstStep: stuckFirstStepValue,
+      wrongCauseGuess: wrongCauseGuessValue,
+      missing: prompts
+        .filter((prompt) => !String(promptValueById[prompt.id] || '').trim())
+        .map((prompt) => prompt.label || prompt.id)
+    };
+    return {
+      structuredCapture,
+      questionType: questionTypeValue || schema.label || '',
+      childOriginalThought: childOriginalThoughtValue,
+      firstStep: stuckFirstStepValue || '',
+      stuckFirstStep: stuckFirstStepValue || '',
+      wrongCause: wrongCauseGuessValue || '',
+      wrongCauseGuess: wrongCauseGuessValue,
+      sourceSchemaId: schema.id || '',
+      sourceSchemaLabel: schema.label || '',
+      structuredCaptureMissing: structuredCapture.missing,
+      structuredCapturePrompts: prompts,
+      structuredFieldValues: promptValueById
+    };
+  },
+
+  buildStructuredEvidenceCapture(uploadIntakePacket = {}, text = '', manual = {}) {
+    const signals = this.buildStructuredEvidenceSignals(uploadIntakePacket, text, manual);
+    const prompts = Array.isArray(uploadIntakePacket.structuredCapturePrompts)
+      ? uploadIntakePacket.structuredCapturePrompts
+      : [];
+    const aliasValues = {
+      question_type: signals.questionType || '',
+      child_original_thought: signals.childOriginalThought || '',
+      stuck_first_step: signals.stuckFirstStep || '',
+      wrong_cause_guess: signals.wrongCauseGuess || '',
+      preference_candidate: signals.questionType || '',
+      method_hypothesis: signals.childOriginalThought || '',
+      cross_check_gate: signals.stuckFirstStep || '',
+      review_window: signals.wrongCauseGuess || '',
+      teacher_observation: signals.questionType || '',
+      classroom_signal: signals.childOriginalThought || '',
+      home_school_question: signals.stuckFirstStep || '',
+      safe_handoff: signals.wrongCauseGuess || '',
+      home_observation: signals.questionType || '',
+      parent_goal: signals.childOriginalThought || '',
+      homework_context: signals.stuckFirstStep || '',
+      next_action: signals.wrongCauseGuess || '',
+      wrong_cause: signals.wrongCauseGuess || '',
+      first_step: signals.stuckFirstStep || '',
+      next_day_revisit: signals.wrongCauseGuess || '',
+      day7_variant: signals.wrongCauseGuess || ''
+    };
+    const values = Object.assign({}, aliasValues, signals.structuredFieldValues || {}, manual || {});
+    const fields = prompts.map((prompt) => {
+      const value = String(values[prompt.id] || '').trim();
+      return Object.assign({}, prompt, {
+        value,
+        ready: !!value,
+        placeholder: prompt.prompt || '补一条真实证据，不写结论。'
+      });
+    });
+    const readyCount = fields.filter((item) => item.ready).length;
+    const missing = fields.filter((item) => !item.ready).map((item) => item.label || item.id);
+    return {
+      title: '材料证据补全',
+      summary: '不同材料补不同证据：测评补方法假设，学校材料补家校交接，家长观察补今晚动作，错题补第一步和错因。',
+      releaseGate: '本地规则决定报告、游戏和分享是否放行；AI 只改写追问和家长摘要。',
       fields,
       values,
       readyCount,
@@ -610,7 +768,7 @@ Page({
         ? 'talent_method_candidate_until_real_wrong_question'
         : 'local_guarded_report_draft',
       blockedFields,
-      safeForReport: !blockedFields.includes('full_answer') || true
+      safeForReport: !blockedFields.some((field) => ['full_answer', 'auto_grading', 'talent_label'].includes(field))
     });
   },
 
@@ -683,7 +841,7 @@ Page({
     });
     return {
       title: sourceSchemaId === 'talent_assessment'
-        ? '测评已进入家长报告'
+        ? '方法候选已入证据账本'
         : sourceSchemaId === 'wrong_question_paper'
           ? '错题已进入家长报告'
           : '资料已进入家长报告',
@@ -779,7 +937,28 @@ Page({
         || importIntake.buildUploadIntakePacket(text, this.data.imagePaths, this.data.materialType);
       const reportSeed = (uploadIntakePacket && uploadIntakePacket.reportSeed) || {};
       const decisionSource = this.buildDecisionSource(uploadIntakePacket, text, wrongbook, reportSeed);
-      const structuredEvidenceSignals = this.buildStructuredEvidenceSignals(uploadIntakePacket, text);
+      const structuredEvidenceCapture = this.buildStructuredEvidenceCapture(
+        uploadIntakePacket,
+        text,
+        this.data.structuredEvidenceCapture && this.data.structuredEvidenceCapture.values
+      );
+      const evidenceText = this.mergeStructuredEvidenceText(text, structuredEvidenceCapture);
+      const structuredEvidenceSignals = this.buildStructuredEvidenceSignals(
+        uploadIntakePacket,
+        evidenceText,
+        structuredEvidenceCapture.values
+      );
+      if (this.requiresStructuredEvidenceGate(decisionSource.sourceSchemaId) && !structuredEvidenceCapture.ready) {
+        latestReportCta = this.buildBlockedMaterialCta(decisionSource, structuredEvidenceCapture);
+        this.setData({
+          uploadIntakePacket,
+          structuredEvidenceCapture,
+          lastDecisionSource: decisionSource,
+          lastReportCta: latestReportCta
+        });
+        wx.showToast({ title: '已分类，报告待补证据', icon: 'none' });
+        return;
+      }
       const _legacyDecisionSource = {
         sourceSchemaId: reportSeed.sourceSchemaId || (wrongbook.imported ? 'wrong_question_paper' : 'parent_report'),
         sourceSchemaLabel: reportSeed.sourceSchemaLabel || (wrongbook.imported ? '错题/试卷' : '家长观察'),
@@ -800,11 +979,11 @@ Page({
       const guardedAiReportDraft = this.buildGuardedAiReportDraft(uploadIntakePacket, structuredEvidenceSignals);
       let reportState = storage.buildLearningReportFromInput({
         mode: wrongbook.imported ? 'full' : 'fast',
-        sourceText: text,
+        sourceText: evidenceText,
         reportSources: [{
           type: decisionSource.sourceSchemaId,
           label: decisionSource.sourceSchemaLabel,
-          text,
+          text: evidenceText,
           confidence: decisionSource.confidence,
           status: reportSeed.status || '待家长确认',
           sourceSchemaId: decisionSource.sourceSchemaId,
@@ -841,6 +1020,9 @@ Page({
           nextDayRevisit: '明天遮住答案，只回看一张最不稳的卡',
           sourceSchemaId: decisionSource.sourceSchemaId,
           requiredNextEvidence: decisionSource.requiredNextEvidence,
+          structuredEvidenceCapture,
+          structuredEvidenceReady: structuredEvidenceCapture.ready,
+          structuredEvidenceMissing: structuredEvidenceCapture.missing,
           structuredCapturePrompts: uploadIntakePacket && Array.isArray(uploadIntakePacket.structuredCapturePrompts)
             ? uploadIntakePacket.structuredCapturePrompts
             : [],
@@ -858,7 +1040,7 @@ Page({
         importedCards: wrongbook.imported,
         cardId: wrongbook.firstCardId || '',
         importedCardIds: wrongbook.importedCardIds || [],
-        sourceText: text,
+        sourceText: evidenceText,
         structuredEvidenceSignals,
         guardedAiReportDraft,
         subject: profile.subject || state.subject || ''

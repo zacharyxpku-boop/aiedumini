@@ -270,8 +270,8 @@
           <view class="mini-lesson-live-panel" wx:if="{{thinkingReceipt.miniLesson && thinkingReceipt.miniLesson.trigger && thinkingReceipt.miniLesson.trigger.shouldTrigger}}">
             <view class="mini-lesson-head">
               <view>
-                <view class="mini-lesson-kicker">3 分钟小讲堂</view>
-                <view class="mini-lesson-title">先补一个概念缺口，再回到练习</view>
+                <view class="mini-lesson-kicker">3 分钟第一步补位</view>
+                <view class="mini-lesson-title">只补一个入口，再回到练习</view>
               </view>
               <view class="mini-lesson-pill">补位</view>
             </view>
@@ -289,16 +289,16 @@
             </view>
             <view class="mini-lesson-two-col">
               <view class="mini-lesson-note">
-                <view class="mini-lesson-note-label">AI 老师</view>
+                <view class="mini-lesson-note-label">小黑板提示</view>
                 <view class="mini-lesson-note-text">{{thinkingReceipt.miniLesson.roles[0].line}}</view>
               </view>
               <view class="mini-lesson-note">
-                <view class="mini-lesson-note-label">误区同学</view>
+                <view class="mini-lesson-note-label">常见误区</view>
                 <view class="mini-lesson-note-text">{{thinkingReceipt.miniLesson.roles[1].line}}</view>
               </view>
             </view>
-            <view class="mini-lesson-check">检查题：{{thinkingReceipt.miniLesson.checkQuestion}}</view>
-            <view class="mini-lesson-check">近迁移：{{thinkingReceipt.miniLesson.nearTransfer.prompt}}</view>
+            <view class="mini-lesson-check">检查一句：{{thinkingReceipt.miniLesson.checkQuestion}}</view>
+            <view class="mini-lesson-check">换题只看第一步：{{thinkingReceipt.miniLesson.nearTransfer.prompt}}</view>
             <view class="mini-lesson-parent">家长只问：{{thinkingReceipt.miniLesson.parentLine || thinkingReceipt.miniLesson.parentCheck}}</view>
             <view class="mini-lesson-exit">退出门：{{thinkingReceipt.miniLesson.exitGate.passEvidence}}</view>
             <view class="mini-lesson-exit-actions">

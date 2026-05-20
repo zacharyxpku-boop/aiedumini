@@ -76,6 +76,35 @@ const PRODUCT_TIERS = [
   }
 ];
 
+const AI_LOCAL_DELIVERY_SPLIT = [
+  {
+    id: 'local_release_gate',
+    label: '本地代码负责放行',
+    owns: ['资料类型识别', '证据是否补齐', '报告/游戏/分享能否放行', '隐私字段拦截'],
+    reason: '这些是安全和商业可信度问题，不能交给 AI 临场判断。'
+  },
+  {
+    id: 'ai_expression_layer',
+    label: 'AI 负责表达和追问',
+    owns: ['测评摘要改写', '苏格拉底追问', '小讲堂一句话解释', '家长可读话术'],
+    reason: '这些需要自然语言适配孩子和家长，用 AI 更有弹性。'
+  },
+  {
+    id: 'hybrid_validation_loop',
+    label: '混合验证学习方法',
+    owns: ['AI 给方法候选', '本地生成 7 天验证任务', '错题/回访确认是否适合'],
+    reason: '测评只能给假设，真实作业证据决定是否继续。'
+  }
+];
+
+const SEVEN_DAY_VALIDATION_PLAN = [
+  { day: 1, label: '今晚', action: '只试一个学习方法候选，并记录孩子自己的第一步。', evidence: 'child_first_step' },
+  { day: 2, label: '明天', action: '遮住答案回访同一第一步，看是否转身还记得。', evidence: 'next_day_revisit' },
+  { day: 3, label: '第 3 天', action: '换一道同题型小变式，只看是否能迁移第一步。', evidence: 'near_transfer' },
+  { day: 5, label: '第 5 天', action: '进入一局轻复练，验证错因是否复现。', evidence: 'game_recall' },
+  { day: 7, label: '第 7 天', action: '家长复盘：保留、降级或换一种学习方法。', evidence: 'family_decision' }
+];
+
 function textOf(value) {
   return String(value || '').trim();
 }
@@ -100,7 +129,8 @@ function inferSignals(input = {}) {
     wrongCause,
     firstStep,
     questionType,
-    hasRealTaskEvidence: !!(wrongCause || firstStep || questionType || input.cardId || Number(input.importedCards || 0) > 0),
+    hasTaskClassification: !!questionType,
+    hasRealTaskEvidence: !!(wrongCause || firstStep || input.cardId || Number(input.importedCards || 0) > 0),
     hasAssessment: schemaId === 'talent_assessment' || includesAny(sourceText, ['测评', '学习偏好', '视觉', '听觉', '报告']),
     hasWrongQuestion: schemaId === 'wrong_question_paper' || schemaId === 'wrong_question_photo' || includesAny(sourceText, ['错题', '错因', '订正', '不会', '卡住']),
     hasSchoolFeedback: schemaId === 'school_material' || includesAny(sourceText, ['老师', '学校', '课堂', '作业反馈']),
@@ -145,6 +175,17 @@ function buildLearningServicePathway(input = {}) {
   const firstMode = modeRecommendations[0] || MODE_CATALOG[0];
   const firstTier = productTiers[0] || PRODUCT_TIERS[1];
   const requiresEvidenceBeforeCommercialPush = signals.hasAssessment && !signals.hasRealTaskEvidence;
+  const quickAssessmentBridge = {
+    id: 'quick_learning_preference_assessment',
+    label: '小程序内 15 题学习偏好快测',
+    route: '/pages/profile/profile?from=service_pathway&panel=report&quick_assessment=1',
+    useWhen: '没有第三方测评，或测评只给了笼统标签时使用。',
+    releaseRule: '快测结果只进入学习方法候选，必须用真实错题、隔天回访和第 7 天小变式验证。'
+  };
+  const validationPlan = SEVEN_DAY_VALIDATION_PLAN.map((item) => Object.assign({}, item, {
+    locked: requiresEvidenceBeforeCommercialPush && item.day > 1,
+    unlockRule: item.day === 1 ? '可立即执行' : '先补真实作业卡点和孩子第一步'
+  }));
   return {
     id: 'learning_service_pathway',
     status: requiresEvidenceBeforeCommercialPush ? 'needs_real_task_validation' : 'ready_for_family_plan',
@@ -168,6 +209,10 @@ function buildLearningServicePathway(input = {}) {
       { step: '验证', owner: '家庭', action: '7 天内用真实作业和回访验证学习方式' },
       { step: '转化', owner: '双方共营', action: '进入线上课、训练营或高阶学习规划' }
     ],
+    quickAssessmentBridge,
+    aiLocalDeliverySplit: AI_LOCAL_DELIVERY_SPLIT,
+    validationPlan,
+    moatLine: '护城河不在“生成一份测评结论”，而在测评、错题、回访、游戏和家长决策反复闭环后的家庭证据账本。',
     safetyBoundary: {
       allowed: ['学习方式建议', '第一步点拨', '家长陪伴话术', '课程/训练营候选'],
       blocked: ['天赋定论', '自动判分', '整卷答案', '结果承诺', '公开原题或孩子隐私材料'],

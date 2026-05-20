@@ -868,17 +868,30 @@ function buildMiniLessonTrigger(input = {}) {
   const hintLevel = Number(input.hintLevel || 1);
   const hasChildFirstStep = Boolean(input.hasChildFirstStep);
   const answerRisk = Boolean(input.answerRisk);
+  const repeatedBlocked = stillBlockedCount >= 2;
+  const highHintStillBlocked = hintLevel >= 4 && stillBlockedCount >= 1 && !hasChildFirstStep;
+  const noFirstStepAfterDialog = userTurnCount >= 3 && !hasChildFirstStep;
   const shouldTrigger = Boolean(
     input.forceMiniLesson
-    || stillBlockedCount >= 1
     || answerRisk
-    || (userTurnCount >= 2 && !hasChildFirstStep)
-    || hintLevel >= 4
+    || repeatedBlocked
+    || highHintStillBlocked
+    || noFirstStepAfterDialog
   );
   return {
     id: 'mini_lesson_trigger',
     mode: shouldTrigger ? 'mini_lesson' : 'socratic_first',
     shouldTrigger,
+    triggerEvidence: {
+      userTurnCount,
+      stillBlockedCount,
+      hintLevel,
+      hasChildFirstStep,
+      answerRisk,
+      repeatedBlocked,
+      highHintStillBlocked,
+      noFirstStepAfterDialog
+    },
     reason: shouldTrigger
       ? '孩子还说不出第一步时，才切入 3 分钟小讲堂。'
       : '继续保持苏格拉底追问，不提前上完整课堂。',

@@ -715,14 +715,47 @@ Page({
 
   goQuestRoute(event) {
     const route = event.currentTarget.dataset.route || '/pages/tutor/tutor';
+    const questId = event.currentTarget.dataset.questId || 'daily_quest';
     if (storage.recordSurfaceDepthAction) {
       storage.recordSurfaceDepthAction({
         surface: 'arcade',
-        dimensionId: event.currentTarget.dataset.questId || 'daily_quest',
+        dimensionId: questId,
         label: event.currentTarget.dataset.label || 'daily quest',
         route,
         readiness: 'quest_entry'
       });
+    }
+    if (/^public_k12/.test(questId) && storage.appendReviewEvent) {
+      const publicK12 = this.data.challengeBrief && this.data.challengeBrief.publicK12IntakeChallenge
+        ? this.data.challengeBrief.publicK12IntakeChallenge
+        : {};
+      const sourceCard = Array.isArray(publicK12.cards) && publicK12.cards.length ? publicK12.cards[0] : {};
+      storage.appendReviewEvent({
+        eventType: 'public_k12_challenge_selected',
+        source: 'public_k12_homework_intake',
+        sourceChallengeId: sourceCard.id || publicK12.id || questId,
+        subject: sourceCard.subject || '',
+        taskType: sourceCard.taskType || '',
+        route,
+        reviewRoute: publicK12.reviewRoute || '/pages/review/review?from=public_k12_intake',
+        firstStepRequired: sourceCard.observableFirstMove || publicK12.observableFirstMove || '先说出题目问什么和第一步入口',
+        fallbackIfNoChildInput: sourceCard.fallbackIfNoChildInput || publicK12.fallbackIfNoChildInput || '回到苏格拉底追问，不给整题答案',
+        due: true,
+        dueWindow: questId === 'public_k12_review' ? '明天 5 分钟' : '本局后生成回访',
+        releaseGate: 'child_can_say_first_step_before_reward',
+        blockedFields: publicK12.blockedFields || ['original_question', 'full_answer', 'score', 'ranking', 'full_dialogue']
+      });
+      if (storage.set) {
+        storage.set('arcade.publicK12.selectedChallenge.v1', {
+          id: sourceCard.id || publicK12.id || questId,
+          subject: sourceCard.subject || '',
+          taskType: sourceCard.taskType || '',
+          route,
+          reviewRoute: publicK12.reviewRoute || '',
+          selectedAt: new Date().toISOString(),
+          releaseGate: 'child_can_say_first_step_before_reward'
+        });
+      }
     }
     const cleanPath = route.split('?')[0];
     if (['/pages/home/home', '/pages/review/review', '/pages/focus/focus', '/pages/tools/tools', '/pages/profile/profile', '/pages/arcade/arcade'].indexOf(cleanPath) >= 0) {
@@ -1352,6 +1385,18 @@ Page({
       : null;
     const incomingShare = storage.loadIncomingShare ? storage.loadIncomingShare() : null;
     const questionProgressionSignal = this.buildQuestionProgressionSignal(savedResult, wrongAnswers);
+    const courseUnitProgress = storage.recordCourseUnitProgress
+      ? storage.recordCourseUnitProgress({
+        cardId: repairFocus && repairFocus.cardId ? repairFocus.cardId : (answers[0] && answers[0].cardId) || '',
+        unitId: this.data.courseUnitMap && this.data.courseUnitMap.active ? this.data.courseUnitMap.active.id : '',
+        firstStep: repairFocus && repairFocus.firstStep ? repairFocus.firstStep : '',
+        wrongCause: repairFocus && repairFocus.reason ? repairFocus.reason : '',
+        nextDayRevisit: questionProgressionSignal.nextDayRevisit || '',
+        nearTransfer: savedResult.activeRecallEvidenceComplete ? 'active_recall_evidence_complete' : '',
+        status: questionProgressionSignal.status,
+        source: 'arcade_finish_round'
+      })
+      : null;
     storage.appendSyncMutation('arcade_attempt', {
       game_type: savedResult.gameType,
       total: savedResult.total,
@@ -1375,6 +1420,8 @@ Page({
       question_progression_stages: questionProgressionSignal.stageCount,
       question_progression_mastery_gates: questionProgressionSignal.masteryGateCount,
       question_progression_revisit: questionProgressionSignal.nextDayRevisit,
+      course_unit_progress_id: courseUnitProgress && courseUnitProgress.id ? courseUnitProgress.id : '',
+      course_unit_progress_status: courseUnitProgress && courseUnitProgress.status ? courseUnitProgress.status : '',
       retention_mode: gameRetentionLoop && gameRetentionLoop.mode,
       retention_next_route: gameRetentionLoop && gameRetentionLoop.nextRoute,
       retention_weak_key: gameRetentionLoop && gameRetentionLoop.weakKey,
@@ -1585,20 +1632,35 @@ Page({
       });
     }
     if (incomingShare && incomingShare.share_code && storage.recordShareRelayCompletion) {
-      storage.recordShareRelayCompletion({
-        incomingShare,
-        firstStep: incomingShare.relay_first_step
-          || incomingShare.question_bank_relay_first_step
-          || (this.data.subjectSkillDepth && this.data.subjectSkillDepth.firstStep)
-          || '',
-        wrongCause: incomingShare.wrong_cause_label
-          || incomingShare.capability_gap
-          || (gameRetentionLoop && gameRetentionLoop.weakKey)
-          || '',
-        route: '/pages/arcade/arcade',
-        evidence: savedResult.passed ? 'receiver_90_second_recall_passed' : 'receiver_90_second_recall_attempted',
-        title: '接收者完成 90 秒回忆接力'
-      });
+      const receiverFirstStep = this.pickReceiverOwnFirstStepEvidence(savedResult);
+      if (receiverFirstStep) {
+        storage.recordShareRelayCompletion({
+          incomingShare,
+          receiverFirstStep,
+          receiverMaterial: this.pickReceiverOwnMaterialEvidence(),
+          nextRevisit: '明天用自己的作业再回访同一个第一步',
+          wrongCause: incomingShare.wrong_cause_label
+            || incomingShare.capability_gap
+            || (gameRetentionLoop && gameRetentionLoop.weakKey)
+            || '',
+          route: '/pages/arcade/arcade',
+          evidence: savedResult.passed ? 'receiver_90_second_recall_passed' : 'receiver_90_second_recall_attempted',
+          title: '接收者完成 90 秒回忆接力'
+        });
+      } else if (storage.appendReviewEvent) {
+        storage.appendReviewEvent({
+          type: 'share_relay_receiver_attempted',
+          event: 'share_relay_receiver_attempted',
+          source: 'arcade_share_relay',
+          shareCode: incomingShare.share_code,
+          status: 'attempted_without_receiver_first_step',
+          firstStep: '',
+          requiredNextEvidence: 'receiver_own_first_step',
+          nextRoute: '/pages/tutor/tutor?from=share_relay_receiver_first_step',
+          blockedFields: ['original_question', 'full_answer', 'score', 'ranking', 'full_dialogue'],
+          created_at: new Date().toISOString()
+        });
+      }
     }
     api.submitEvent({
       event: 'arcade_completed',
@@ -1856,6 +1918,41 @@ Page({
       repairFocus,
       feedbackText: result.passed ? '通关了，错因会按间隔复习继续回访。' : '没关系，错因卡已经回到复习队列。'
     });
+  },
+
+  pickReceiverOwnFirstStepEvidence(savedResult = {}) {
+    const session = storage.getTodaySession ? storage.getTodaySession() : {};
+    const incomingShare = this.data.incomingShare || {};
+    const senderSteps = [
+      incomingShare.relay_first_step,
+      incomingShare.question_bank_relay_first_step,
+      incomingShare.wrong_cause_first_step,
+      incomingShare.visual_board_relay_student_line
+    ].map((item) => String(item || '').trim()).filter(Boolean);
+    const candidates = [
+      session && session.childArticulatedStep,
+      this.data.todayFocus && this.data.todayFocus.childArticulatedStep,
+      this.data.dailyPrimaryRecallEvidencePacket && this.data.dailyPrimaryRecallEvidencePacket.childFirstStep,
+      this.data.quizRecallEvidence && this.data.quizRecallEvidence.childFirstStep
+    ].concat(
+      Array.isArray(savedResult.recallEvidence)
+        ? savedResult.recallEvidence.map((item) => item && (item.childFirstStep || item.firstStepText || item.first_step_evidence))
+        : []
+    );
+    return candidates
+      .map((item) => String(item || '').trim())
+      .find((text) => text.length >= 4 && !senderSteps.includes(text) && !/答案|直接|代写|帮我写|不会|不懂|不知道/.test(text)) || '';
+  },
+
+  pickReceiverOwnMaterialEvidence() {
+    const session = storage.getTodaySession ? storage.getTodaySession() : {};
+    const focus = this.data.todayFocus || {};
+    return String(
+      (session && (session.title || session.stuckPointText || session.taskTitle))
+      || focus.title
+      || focus.text
+      || 'receiver_own_homework_material'
+    ).trim();
   },
 
   restartRound() {
@@ -2335,6 +2432,21 @@ Page({
       }
     }).catch(() => {});
     navigation.navigateLearningRoute(route);
+  },
+
+  onShareAppMessage() {
+    const bridge = this.data.arcadeResultActionBridge || {};
+    const payload = bridge.shareChallengePayload || {};
+    const title = bridge.shareChallengeTitle || bridge.primaryShareLabel || '发起90秒回忆挑战';
+    const path = payload.source_challenge_route || '/pages/arcade/arcade?from=peer_90s_relay';
+    const safeQuery = Object.keys(payload)
+      .filter((key) => payload[key])
+      .map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(String(payload[key]))}`)
+      .join('&');
+    return {
+      title,
+      path: safeQuery ? `${path}&${safeQuery}` : path
+    };
   },
 
   repairWrongCard() {

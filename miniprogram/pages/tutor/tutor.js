@@ -77,6 +77,21 @@ const TUTOR_GUARDRAILS = [
   '发现抄答案风险会收紧提示'
 ];
 
+function hasFirstStepEvidence(text = '') {
+  const value = String(text || '');
+  return value.length >= 8
+    && /第一步|先|我先|可以先|圈|找|设|列|画|标|比较|单位|条件|未知/.test(value)
+    && !/答案|直接|代写|帮我写|不会|不懂|看不懂|没思路|卡住/.test(value);
+}
+
+function countRecentStuckTurns(messages = []) {
+  return messages.slice(-4).filter((item) => {
+    const text = String(item && item.text ? item.text : '');
+    return /不会|不懂|看不懂|没思路|卡住|还是不会|直接给答案|给答案|帮我写|代写/.test(text)
+      && !hasFirstStepEvidence(text);
+  }).length;
+}
+
 function pedagogyPanel(selected, misconceptionTags, masterySignal) {
   const misconception = (misconceptionTags || []).map((item) => item.label || item.axis).filter(Boolean).slice(0, 2);
   const status = storage.formatInternalLabel
@@ -249,7 +264,8 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
     revisit: subjectSkillDepth && subjectSkillDepth.revisit
   });
   const openMaicInspiredTaskPlanAudit = openMaicPlan.evaluateOpenMaicInspiredTaskPlan(openMaicInspiredTaskPlan);
-  const studentFirst = userMessages.some((item) => String(item.text || '').length >= 8 && !/答案|直接|代写|帮我写/.test(String(item.text || '')));
+  const studentFirst = userMessages.some((item) => hasFirstStepEvidence(item.text || ''));
+  const recentStuckCount = countRecentStuckTurns(userMessages);
   const realHomeworkCoverageMatrix = storage.buildRealHomeworkCoverageMatrix
     ? storage.buildRealHomeworkCoverageMatrix({
       subject: selected && selected.subject ? selected.subject : (subjectSkillDepth && subjectSkillDepth.subject) || ''
@@ -266,11 +282,11 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
     parentCheck: subjectSkillDepth && subjectSkillDepth.parentQuestion,
     revisit: subjectSkillDepth && subjectSkillDepth.revisit,
     userTurnCount: userMessages.length,
-    stillBlockedCount: blockedAnswer || !studentFirst ? 1 : 0,
+    stillBlockedCount: blockedAnswer ? Math.max(2, recentStuckCount) : recentStuckCount,
     hintLevel: activeStep === 'micro_choice' ? 4 : 2,
     hasChildFirstStep: studentFirst,
     answerRisk: blockedAnswer,
-    forceMiniLesson: blockedAnswer || (!studentFirst && userMessages.length >= 2)
+    forceMiniLesson: blockedAnswer || (!studentFirst && recentStuckCount >= 2 && userMessages.length >= 3)
   });
   const miniLessonAudit = openMaicPlan.evaluateThreeMinuteMiniLesson(miniLesson);
   const evidenceThread = openMaicPlan.buildEvidenceThread
@@ -1377,17 +1393,25 @@ Page({
     const miniLesson = receipt.miniLesson || {};
     const evidenceThread = receipt.evidenceThread || miniLesson.evidenceThread || {};
     const selected = this.data.selected || {};
-    const firstStepEvidence = miniLesson.blackboard && miniLesson.blackboard.firstStep
-      ? miniLesson.blackboard.firstStep
-      : evidenceThread.firstStep || selected.firstStep || 'child_can_say_first_step';
+    const userMessages = Array.isArray(this.data.messages)
+      ? this.data.messages.filter((item) => item && item.role === 'user')
+      : [];
+    const childExitTicketText = userMessages
+      .slice()
+      .reverse()
+      .map((item) => String(item.text || '').trim())
+      .find((text) => text.length >= 4 && !/答案|直接|代写|帮我写|带我|提示|讲一下|不会|不懂|不知道/.test(text)) || '';
+    const passedWithChildTicket = passed && !!childExitTicketText;
+    const firstStepEvidence = passedWithChildTicket ? childExitTicketText : '';
     const exitGateRecord = storage.recordMiniLessonExitGate
       ? storage.recordMiniLessonExitGate({
-        status: passed ? 'passed' : 'needs_support',
+        status: passedWithChildTicket ? 'passed' : 'needs_support',
         source: 'tutor_mini_lesson_exit_gate',
         turnId: receipt.turnId || '',
         flowTraceId: receipt.flowTraceId || selected.flowTraceId || '',
         evidenceThread,
         topicCardId: evidenceThread.topicCardId || (miniLesson.topicCard && miniLesson.topicCard.id) || '',
+        childExitTicketText,
         firstStepEvidence,
         exitGate: miniLesson.exitGate ? miniLesson.exitGate.passEvidence : 'child_can_say_first_step',
         blockedFields: ['original_question', 'full_answer', 'full_dialogue', 'score', 'ranking', 'talent_label'],
@@ -1403,14 +1427,14 @@ Page({
       : null;
     const nextRoute = exitGateRecord && exitGateRecord.nextRoute
       ? exitGateRecord.nextRoute
-      : passed ? '/pages/review/review?from=mini_lesson_exit_passed' : '/pages/tutor/tutor?from=mini_lesson_exit_needs_support';
+      : passedWithChildTicket ? '/pages/review/review?from=mini_lesson_exit_passed' : '/pages/tutor/tutor?from=mini_lesson_exit_needs_support';
     if (storage.recordUnifiedNextAction) {
       storage.recordUnifiedNextAction({
         source: 'tutor_mini_lesson_exit_gate',
         sourceLabel: '3 分钟小讲堂退出门',
-        actionLabel: passed ? '明天回访第一步' : '继续降级到家长协助',
+        actionLabel: passedWithChildTicket ? '明天回访第一步' : '继续降级到家长协助',
         route: nextRoute,
-        readiness: passed ? 'exit_gate_passed' : 'exit_gate_needs_support',
+        readiness: passedWithChildTicket ? 'exit_gate_passed' : 'exit_gate_needs_support',
         capabilityId: 'mini_lesson_exit_gate',
         evidence: ['child_exit_ticket', 'first_step_evidence', 'next_day_revisit'],
         subject: selected.subject || receipt.subject || '',
@@ -1421,22 +1445,24 @@ Page({
       storage.recordSurfaceDepthAction({
         surface: 'tutor',
         dimensionId: 'mini_lesson_exit_gate',
-        evidence: passed ? 'child_can_say_first_step' : 'parent_support_needed',
-        nextAction: passed ? 'next_day_revisit' : 'parent_handoff',
+        evidence: passedWithChildTicket ? 'child_exit_ticket_text' : 'parent_support_needed',
+        nextAction: passedWithChildTicket ? 'next_day_revisit' : 'parent_handoff',
         route: nextRoute,
         subject: selected.subject || receipt.subject || '',
         taskType: selected.taskType || receipt.taskType || ''
       });
     }
     this.setData({
-      miniLessonExitGateStatus: passed ? '已过退出门' : '还不能过，转家长协助',
+      miniLessonExitGateStatus: passedWithChildTicket
+        ? '已过退出门'
+        : (passed ? '缺孩子自己的退出票，转家长协助' : '还不能过，转家长协助'),
       miniLessonExitGateNextRoute: nextRoute,
-      socraticFeedbackStatus: passed ? 'first_step_spoken' : 'still_blocked',
-      socraticFeedbackNextAction: passed ? '明天只回访同一个第一步' : '停止加提示，交给家长只问一句'
+      socraticFeedbackStatus: passedWithChildTicket ? 'first_step_spoken' : 'still_blocked',
+      socraticFeedbackNextAction: passedWithChildTicket ? '明天只回访同一个第一步' : '停止加提示，交给家长只问一句'
     });
     if (typeof wx !== 'undefined' && wx.showToast) {
       wx.showToast({
-        title: passed ? '已记录退出门' : '已转家长协助',
+        title: passedWithChildTicket ? '已记录退出门' : '已转家长协助',
         icon: 'none'
       });
     }

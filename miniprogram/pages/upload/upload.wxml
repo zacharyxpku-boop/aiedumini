@@ -257,6 +257,44 @@
               </view>
             </view>
           </view>
+          <view class="intake-action-queue" wx:if="{{lastReportCta.servicePathway.quickAssessmentBridge}}">
+            <view class="intake-action-title">没有现成测评时</view>
+            <view class="intake-action-item">
+              <view class="intake-action-main">
+                <text>{{lastReportCta.servicePathway.quickAssessmentBridge.label}}</text>
+                <text>{{lastReportCta.servicePathway.quickAssessmentBridge.useWhen}}</text>
+              </view>
+              <view class="intake-action-meta">
+                <text>{{lastReportCta.servicePathway.quickAssessmentBridge.releaseRule}}</text>
+                <text>{{lastReportCta.servicePathway.quickAssessmentBridge.route}}</text>
+              </view>
+            </view>
+          </view>
+          <view class="intake-action-queue" wx:if="{{lastReportCta.servicePathway.aiLocalDeliverySplit.length}}">
+            <view class="intake-action-title">AI / 本地分工</view>
+            <view class="intake-action-item" wx:for="{{lastReportCta.servicePathway.aiLocalDeliverySplit}}" wx:key="id">
+              <view class="intake-action-main">
+                <text>{{item.label}}</text>
+                <text>{{item.reason}}</text>
+              </view>
+              <view class="intake-action-meta">
+                <text>{{item.owns}}</text>
+              </view>
+            </view>
+          </view>
+          <view class="intake-action-queue" wx:if="{{lastReportCta.servicePathway.validationPlan.length}}">
+            <view class="intake-action-title">7 天验证</view>
+            <view class="intake-action-item" wx:for="{{lastReportCta.servicePathway.validationPlan}}" wx:key="day">
+              <view class="intake-action-main">
+                <text>{{item.label}}：{{item.action}}</text>
+                <text>证据：{{item.evidence}}</text>
+              </view>
+              <view class="intake-action-meta">
+                <text>{{item.unlockRule}}</text>
+              </view>
+            </view>
+          </view>
+          <view class="intake-packet-boundary">{{lastReportCta.servicePathway.moatLine}}</view>
           <view class="intake-packet-boundary">商业闭环：测评入口 → AI 方案 → 7 天验证 → 30 天训练营 / 高阶规划。</view>
         </view>
 
