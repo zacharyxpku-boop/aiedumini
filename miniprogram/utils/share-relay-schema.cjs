@@ -2,6 +2,7 @@
 
 const DEFAULT_ALLOWLIST = [
   'share_intent',
+  'share',
   'from',
   'mode',
   'challenge',
@@ -84,6 +85,7 @@ const COMPACT_QUERY_LIMIT = 900;
 
 const COMPACT_PRIMARY_KEYS = [
   'share_intent',
+  'share',
   'from',
   'mode',
   'challenge',
@@ -163,9 +165,11 @@ function buildSafeSharePayload(card = {}, intent = 'peer_challenge', extra = {},
   const allowlist = Array.isArray(options.allowlist) && options.allowlist.length ? options.allowlist : DEFAULT_ALLOWLIST;
   const denylist = Array.isArray(options.denylist) && options.denylist.length ? options.denylist : DEFAULT_DENYLIST;
   const { safe } = mergeAllowedFields(source, allowlist, denylist);
+  const shareCode = card.code || source.share || source.share_code || source.invite_code || 'LOCAL';
   const payload = Object.assign({
     share_intent: intent,
-    share_code: card.code || source.share_code || source.invite_code || 'LOCAL',
+    share: shareCode,
+    share_code: shareCode,
     allowed_fields: ['share_code', 'tonight_action', 'parent_question', 'tomorrow_check', 'safe_relay_allowed_fields'],
     blocked_fields: denylist.slice(0)
   }, safe);

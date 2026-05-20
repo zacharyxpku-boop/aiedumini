@@ -14,7 +14,7 @@ const XP_REWARDS = {
   study_pack_created: 20
 };
 
-const LEVEL_TITLES = ['新手', '起步', '会学', '学霸', '学神'];
+const LEVEL_TITLES = ['新手', '起步', '会学', '稳步掌握', '能讲清楚'];
 
 const ACHIEVEMENTS = [
   { id: 'first_review', title: '初出茅庐', description: '完成第一次复习', recordPoints: 20, test: (stats) => Number(stats.review_count || 0) >= 1 },
@@ -22,7 +22,7 @@ const ACHIEVEMENTS = [
   { id: 'seven_day_streak', title: '七日之约', description: '连续 7 天完成复习', recordPoints: 70, test: (stats) => Number(stats.streak || 0) >= 7 },
   {
     id: 'quiz_master_3',
-    title: '考神附体',
+    title: '稳定回忆',
     description: '连续 3 次小测正确率达到 90%',
     recordPoints: 90,
     test: (stats) => {

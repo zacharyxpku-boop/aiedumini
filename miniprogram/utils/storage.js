@@ -107,6 +107,7 @@ const KEYS = {
   gameProfile: 'ydzx.game.profile.v1',
   gamePurchases: 'ydzx.game.purchases.v1',
   shareRuns: 'ydzx.share.runs.v1',
+  shareFollowUpQueue: 'ydzx.share.follow.up.queue.v1',
   parentGoal: 'ydzx.parent.goal.v1',
   todayFocus: 'ydzx.today.focus.v1',
   tonightPlan: 'ydzx.tonight.plan.v1',
@@ -7524,6 +7525,7 @@ function appendShareRun(event = {}) {
   };
   const next = [record].concat(list).slice(0, 80);
   set(KEYS.shareRuns, next);
+  appendShareFollowUpQueue(record);
   appendSyncMutation('share_run', {
     id: record.id,
     type: record.type,
@@ -7535,6 +7537,36 @@ function appendShareRun(event = {}) {
     payload: record.payload,
     created_at: record.created_at
   });
+  return next;
+}
+
+function loadShareFollowUpQueue() {
+  return get(KEYS.shareFollowUpQueue, []);
+}
+
+function appendShareFollowUpQueue(record = {}) {
+  const shareCode = record.share_code || record.code || '';
+  if (!shareCode) return loadShareFollowUpQueue();
+  const queue = loadShareFollowUpQueue();
+  const nextAction = record.type === 'invite_parent_view'
+    ? '明天只问一句：孩子第一步先看哪里？'
+    : '明天回看一张同类卡，先说第一步再核对。';
+  const followUp = {
+    id: `follow_${record.id || shareCode}`,
+    share_code: shareCode,
+    source_type: record.type || 'share_run',
+    share_intent: record.share_intent || '',
+    due: 'tomorrow',
+    action: nextAction,
+    route: `/pages/review/review?from=share_follow_up&share=${encodeURIComponent(shareCode)}`,
+    evidence_contract: '只记录接力码、下一步和回访动作；不带原题、答案、分数或排名。',
+    created_at: record.created_at || new Date().toISOString()
+  };
+  const next = [followUp]
+    .concat(queue.filter((item) => item && item.id !== followUp.id && item.share_code !== shareCode))
+    .slice(0, 40);
+  set(KEYS.shareFollowUpQueue, next);
+  appendSyncMutation('share_follow_up', followUp);
   return next;
 }
 
@@ -12501,6 +12533,7 @@ module.exports = {
   loadGamePurchases,
   saveGamePurchase,
   loadShareRuns,
+  loadShareFollowUpQueue,
   loadIncomingShare,
   buildSafeRelayChallengePacket,
   buildShareSpreadReadinessGate,
@@ -12511,6 +12544,7 @@ module.exports = {
   buildQuestionBankVisualShareRelayDeck,
   saveIncomingShare,
   appendShareRun,
+  appendShareFollowUpQueue,
   recordShareRelayCompletion,
   buildReceiverOwnMaterialChallenge,
   loadClientIdentity,

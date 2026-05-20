@@ -2883,7 +2883,19 @@ Page({
     const summary = this.data.profileSafeSummary || {};
     const localUserId = storage.getLocalUserId ? storage.getLocalUserId() : 'user_local';
     const ledger = storage.recordInvite ? storage.recordInvite({ source: 'profile_parent_invite' }) : null;
-    const invitePath = `/pages/home/home?ref=${localUserId}`;
+    const inviteCode = `PARENT_${localUserId}`;
+    const safePayload = buildSafeSharePayload({ code: inviteCode, payload: {} }, 'parent_invite', {
+      share: inviteCode,
+      share_code: inviteCode,
+      share_intent: 'parent_invite',
+      from: 'parent_invite',
+      mode: 'parent_recap',
+      tonight_action: summary.recentSummary || '今晚先听孩子说出自己的第一步',
+      parent_question: summary.parentQuestion || '刚才你第一步先看了哪里？',
+      tomorrow_check: '明天只回看一张最不稳的卡',
+      relay_blocked_fields: ['original_question', 'full_answer', 'score', 'ranking', 'private_comment']
+    });
+    const invitePath = buildSchemaSharePath(safePayload);
     const card = {
       title: '今晚家里只看这一句',
       body: summary.recentSummary || '今晚还没有足够记录。先让孩子说出自己的第一步。',
@@ -2894,10 +2906,12 @@ Page({
     };
     if (storage.appendShareRun) {
       storage.appendShareRun({
+        share_code: inviteCode,
         type: 'invite_parent_view',
         title: '邀请另一位家长查看',
         path: invitePath,
-        payload: card
+        share_intent: 'parent_invite',
+        payload: Object.assign({}, safePayload, { card })
       });
     }
     this.setData({ parentInviteCard: card });

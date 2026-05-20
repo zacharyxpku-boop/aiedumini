@@ -152,9 +152,10 @@ Page({
         this.setData({ showFirstRunOverlay: false });
       }, 3000);
     }
-    if (query && query.share) {
+    const incomingShareCode = query && (query.share || query.share_code || query.invite_code);
+    if (incomingShareCode) {
       const incoming = storage.saveIncomingShare ? storage.saveIncomingShare({
-        code: query.share,
+        code: incomingShareCode,
         from: query.from || '',
         challenge: query.challenge || '',
         mode: query.mode || '',
@@ -241,8 +242,8 @@ Page({
         openmaic_evidence: safeDecodeShareParam(query.openmaic_evidence),
         openmaic_return_path: safeDecodeShareParam(query.openmaic_return_path)
       }) : {
-        code: query.share,
-        share_code: query.share,
+        code: incomingShareCode,
+        share_code: incomingShareCode,
         challenge: query.challenge || '',
         from: query.from || '',
         mode: query.mode || '',
@@ -343,12 +344,12 @@ Page({
       };
       if (storage.appendShareRun) {
         storage.appendShareRun({
-          share_code: query.share,
+          share_code: incomingShareCode,
           type: 'share_clicked',
           path: '/pages/home/home',
           title: 'incoming_share',
           payload: {
-            share_code: query.share,
+            share_code: incomingShareCode,
             from: query.from || '',
             challenge: query.challenge || '',
             mode: query.mode || '',
@@ -389,11 +390,11 @@ Page({
       api.submitEvent({
         event: 'share_clicked',
         source: query.from || 'share',
-        entity_id: query.share,
+        entity_id: incomingShareCode,
         page: 'home',
         payload: {
-          code: query.share,
-          share_code: query.share,
+          code: incomingShareCode,
+          share_code: incomingShareCode,
           challenge: query.challenge || '',
           mode: query.mode || '',
           identity_tag: query.identity || '',

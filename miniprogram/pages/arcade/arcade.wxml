@@ -308,11 +308,11 @@
           <view class="stage-kicker">打地鼠速记关</view>
           <view class="stage-question">{{currentQuestion.question}}</view>
         </view>
-        <view class="life-pill">生命 {{lives}}</view>
+        <view class="life-pill">可回访 {{lives}}</view>
       </view>
       <view class="combo-row">
         <view>进度 {{currentIndex + 1}} / {{round.total}}</view>
-        <view>Combo {{combo}}</view>
+        <view>连续答对 {{combo}}</view>
       </view>
       <view class="mole-grid">
         <button
@@ -344,7 +344,7 @@
             <view class="stage-kicker">轻练答题 · {{currentQuestion.knowledgeType}}</view>
             <view class="quest-checkpoint">{{currentQuestion.checkpoint}}</view>
           </view>
-          <view class="life-pill">生命 {{lives}}</view>
+          <view class="life-pill">可回访 {{lives}}</view>
         </view>
         <view class="quest-question">{{currentQuestion.question}}</view>
         <view class="quest-hint" wx:if="{{currentQuestion.hint}}">{{currentQuestion.hint}}</view>
@@ -372,7 +372,7 @@
             <view class="stage-kicker">贪吃蛇顺序关 · {{snakeTrack.knowledgeType}}</view>
             <view class="snake-title">{{snakeTrack.question}}</view>
           </view>
-          <view class="life-pill">生命 {{lives}}</view>
+          <view class="life-pill">可回访 {{lives}}</view>
         </view>
         <view class="snake-path">
           <view
@@ -409,11 +409,11 @@
             <view class="bubble-kicker">泡泡消消乐 · {{currentQuestion.knowledgeType}}</view>
             <view class="bubble-title">点一颗题泡泡，再点对应泡泡</view>
           </view>
-          <view class="life-pill bubble-life">生命 {{lives}}</view>
+          <view class="life-pill bubble-life">可回访 {{lives}}</view>
         </view>
         <view class="bubble-progress">
           <view>已消 {{matchPairsDone}} / {{round.total}}</view>
-          <view>Combo {{combo}}</view>
+          <view>连续答对 {{combo}}</view>
         </view>
         <view class="bubble-grid">
           <button
@@ -451,7 +451,7 @@
         </view>
         <view>
           <view class="result-num">{{result.bestCombo}}</view>
-          <view class="result-label">最佳 Combo</view>
+          <view class="result-label">最稳连续</view>
         </view>
       </view>
       <view class="answer-review" wx:if="{{wrongAnswers.length}}">

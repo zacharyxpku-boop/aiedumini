@@ -6,6 +6,7 @@ const navigation = require('../../utils/navigation');
 const api = require('../../utils/api');
 const tutorLadder = require('../../utils/tutor-ladder');
 const realHomeworkCoverage = require('../../utils/real-homework-coverage');
+const shareRelaySchema = require('../../utils/share-relay-schema');
 
 Page({
   data: {
@@ -2559,15 +2560,31 @@ Page({
   onShareAppMessage() {
     const bridge = this.data.arcadeResultActionBridge || {};
     const payload = bridge.shareChallengePayload || {};
-    const title = bridge.shareChallengeTitle || bridge.primaryShareLabel || '发起90秒回忆挑战';
-    const path = payload.source_challenge_route || '/pages/arcade/arcade?from=peer_90s_relay';
-    const safeQuery = Object.keys(payload)
-      .filter((key) => payload[key])
-      .map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(String(payload[key]))}`)
-      .join('&');
+    const shareCode = payload.share_code || payload.invite_code || `ARCADE_${Date.now()}`;
+    const title = bridge.shareChallengeTitle || bridge.primaryShareLabel || '同类第一步接力';
+    const safePayload = shareRelaySchema.buildSafeSharePayload({ code: shareCode, payload }, 'peer_90s_relay', {
+      share: shareCode,
+      share_code: shareCode,
+      share_intent: 'peer_90s_relay',
+      from: 'arcade_peer_relay',
+      mode: 'receiver_own_material',
+      challenge: 'arcade',
+      next_challenge: 'arcade'
+    });
+    const path = shareRelaySchema.buildShareRelayQuery('/pages/home/home', safePayload);
+    if (storage.appendShareRun) {
+      storage.appendShareRun({
+        share_code: shareCode,
+        type: 'arcade_peer_90s_relay',
+        title,
+        path,
+        share_intent: 'peer_90s_relay',
+        payload: safePayload
+      });
+    }
     return {
       title,
-      path: safeQuery ? `${path}&${safeQuery}` : path
+      path
     };
   },
 
