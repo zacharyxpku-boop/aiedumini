@@ -2171,6 +2171,8 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
   const recallCards = sourceCards.slice(0, 3).map((card, index) => ({
     id: card.id || `recall_${index + 1}`,
     order: index + 1,
+    executable: true,
+    sourceKind: 'real_review_card',
     prompt: card.question || card.front || card.weakPoint || `回忆 ${weakKey} 的第一步`,
     firstStep: card.checkpoint || card.nextAction || card.next_practice || `先说清 ${weakKey} 的第一步。`,
     wrongCause: card.wrongCauseLabel || card.weakPoint || weakKey,
@@ -2181,12 +2183,16 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
     recallCards.push({
       id: `synthetic_recall_${order}`,
       order,
+      executable: false,
+      sourceKind: 'synthetic_guidance',
       prompt: `第 ${order} 次回忆：${weakKey}`,
       firstStep: `只说 ${weakKey} 的第一步，不直接看答案。`,
       wrongCause: weakKey,
       route: '/pages/review/review'
     });
   }
+  const realRecallCards = recallCards.filter((card) => card && card.executable !== false && !String(card.id || '').startsWith('synthetic_recall_'));
+  const hasRealRecallSource = realRecallCards.length > 0;
   const needsRepair = retention.mode === 'repair' || Number(result.wrong || 0) > 0 || Number(result.accuracy || 0) < Number(challenge.targetAccuracy || 80);
   const spacedReviewPlan = [
     { id: 'same_day', label: '今晚', action: `再回忆 3 张 ${weakKey} 卡，只说第一步。`, route: '/pages/arcade/arcade' },
@@ -2197,6 +2203,7 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
     weakKey,
     dueCards,
     recallCards,
+    hasRealRecallSource,
     spacedReviewPlan,
     reviewEventPressure,
     result,
@@ -2423,6 +2430,7 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
     dailyReturnMission,
     dailyReturnContract,
     dailyPrimaryRecallAction,
+    hasRealRecallSource,
     greenWordClozeProtocol: gizmoLikeMemoryProtocol.greenWordClozeProtocol || null,
     nextDayReturnEvidence: dailyReturnContract.nextDayReturnEvidence || null,
     xpRule: 'XP 只奖励主动回忆、错因修复和次日回访，不奖励盲刷题量。',
@@ -2445,7 +2453,11 @@ function buildReviewReturnSeed(input = {}) {
   const result = input.result || {};
   const wrongCardIds = Object.keys(pressure).filter((id) => pressure[id] && Number(pressure[id].wrong || 0) > 0);
   const dueCardIds = dueCards.map((card) => card && card.id).filter(Boolean).slice(0, 6);
-  const recallCardIds = recallCards.map((card) => card && card.id).filter(Boolean).slice(0, 3);
+  const executableRecallCards = recallCards.filter((card) => card && card.executable !== false && !String(card.id || '').startsWith('synthetic_recall_'));
+  const hasRealRecallSource = input.hasRealRecallSource !== false && executableRecallCards.length > 0;
+  const recallCardIds = hasRealRecallSource
+    ? executableRecallCards.map((card) => card && card.id).filter(Boolean).slice(0, 3)
+    : [];
   const repairMode = Boolean(input.needsRepair || Number(result.wrong || 0) > 0 || Number(result.accuracy || 0) < 80);
   const windows = spacedReviewPlan.map((item, index) => ({
     id: item.id || `window_${index + 1}`,
@@ -2460,6 +2472,8 @@ function buildReviewReturnSeed(input = {}) {
     questionTypeClusterId: input.questionTypeClusterId || '',
     courseUnitId: input.courseUnitId || '',
     activeSampleId: input.activeSampleId || '',
+    executable: hasRealRecallSource,
+    status: hasRealRecallSource ? 'ready' : 'waiting_real_recall_card',
     wrongCardIds,
     dueCardIds,
     recallCardIds,
@@ -2472,7 +2486,7 @@ function buildReviewReturnSeed(input = {}) {
       id: 'spaced_recall_policy',
       cadence: windows,
       sameDayCardIds: recallCardIds.slice(0, 3),
-      nextDayCardIds: wrongCardIds.length ? wrongCardIds.slice(0, 2) : dueCardIds.slice(0, 2),
+      nextDayCardIds: hasRealRecallSource ? (wrongCardIds.length ? wrongCardIds.slice(0, 2) : dueCardIds.slice(0, 2)) : [],
       day7Check: {
         route: '/pages/tutor/tutor',
         requirement: 'near_transfer_without_full_solution'

@@ -6178,11 +6178,12 @@ function recordGameSessionResult(result = {}, context = {}) {
   const activeRecallEvidenceComplete = !!result.activeRecallEvidenceComplete
     || (Array.isArray(result.recallEvidence) && result.recallEvidence.some((item) => item && item.student_first_step && item.next_day_revisit_locked));
   const nextEvidenceReturnToday = previousEvidenceReturnToday + (activeRecallEvidenceComplete ? 1 : 0);
-  const streaked = gameLogic.updateStreak(current, {
-    reviewedToday,
+  const streakEligible = activeRecallEvidenceComplete || reviewedToday >= 4 || !!result.streakEligible;
+  const streaked = streakEligible ? gameLogic.updateStreak(current, {
+    reviewedToday: Math.max(1, reviewedToday),
     threshold: 1,
     now: nowInput
-  });
+  }) : current;
   const recentQuiz = (Array.isArray(streaked.recent_quiz_accuracy) ? streaked.recent_quiz_accuracy : [])
     .concat([accuracy])
     .slice(-7);
@@ -6219,6 +6220,7 @@ function recordGameSessionResult(result = {}, context = {}) {
     correct_today: nextCorrectToday,
     evidence_return_count: nextEvidenceReturnToday,
     active_recall_evidence_complete: activeRecallEvidenceComplete,
+    streak_eligible: streakEligible,
     pending_xp: requestedXp,
     released_xp: xpRelease.accepted || 0,
     xp_release_blocked: !!xpRelease.blocked,

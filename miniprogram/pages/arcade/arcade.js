@@ -2269,6 +2269,36 @@ Page({
     if (storage.appendSyncMutation) {
       storage.appendSyncMutation('arcade_ninety_second_recall_evidence', evidence);
     }
+    if (reason === 'completed' && state.canReleaseXp && storage.recordGameSessionResult) {
+      const recallEvidence = {
+        event: 'ninety_second_recall_completed',
+        deckId: evidence.deckId,
+        weakKey: evidence.weakKey,
+        student_first_step: true,
+        wrong_cause_named: true,
+        next_day_revisit_locked: true,
+        child_first_step: (Array.isArray(state.evidence) ? state.evidence : [])
+          .map((item) => item && item.childInput)
+          .filter(Boolean)[0] || '',
+        completed_step_ids: evidence.stepIds,
+        source: 'arcade_ninety_second_recall'
+      };
+      storage.recordGameSessionResult({
+        gameType: 'ninety_second_recall',
+        total: Math.max(4, evidence.stepIds.length || 4),
+        correct: Math.max(4, evidence.stepIds.length || 4),
+        accuracy: 100,
+        xp: 8,
+        recallEvidence: [recallEvidence],
+        activeRecallEvidenceComplete: true,
+        streakEligible: true,
+        nextDayRevisit: true
+      }, {
+        gameType: 'ninety_second_recall',
+        xpReason: 'ninety_second_recall_completed',
+        weakKey: evidence.weakKey
+      });
+    }
     if (api.submitEvent) {
       api.submitEvent({
         event: 'arcade_ninety_second_recall_evidence',

@@ -974,13 +974,17 @@ Page({
 
   persistReportCtaToReportState(reportState = {}, cta = {}) {
     if (!storage.saveLearningReportState || !reportState || !cta) return reportState;
+    const uploadedMaterialDecisionDossier = this.attachServicePathwayToUploadedDossier(
+      cta.uploadedMaterialDecisionDossier || reportState.uploadedMaterialDecisionDossier || null,
+      cta.servicePathway || reportState.servicePathway || null
+    );
     const nextState = Object.assign({}, reportState, {
       openMaicDecisionBridge: cta.openMaicDecisionBridge || null,
       openMaicInspiredDecisionBridge: cta.openMaicDecisionBridge || null,
       miniLessonSourceEvidence: cta.miniLessonSourceEvidence || null,
       guardedAiReportDraft: cta.guardedAiReportDraft || null,
       servicePathway: cta.servicePathway || null,
-      uploadedMaterialDecisionDossier: cta.uploadedMaterialDecisionDossier || reportState.uploadedMaterialDecisionDossier || null,
+      uploadedMaterialDecisionDossier,
       uploadReportHandoff: cta,
       flowTraceId: cta.flowTraceId || `upload_report:${cta.reportId || Date.now()}`
     });
@@ -991,13 +995,30 @@ Page({
         miniLessonSourceEvidence: cta.miniLessonSourceEvidence || null,
         guardedAiReportDraft: cta.guardedAiReportDraft || null,
         servicePathway: cta.servicePathway || null,
-        uploadedMaterialDecisionDossier: cta.uploadedMaterialDecisionDossier || nextState.uploadedMaterialDecisionDossier || null,
+        uploadedMaterialDecisionDossier,
         uploadReportHandoff: cta,
         flowTraceId: nextState.flowTraceId
       });
     }
     storage.saveLearningReportState(nextState, { skipBuild: true });
     return nextState;
+  },
+
+  attachServicePathwayToUploadedDossier(dossier = null, servicePathway = null) {
+    if (!dossier || !servicePathway || !servicePathway.id) return dossier;
+    return Object.assign({}, dossier, {
+      servicePathwaySummary: Object.assign({}, dossier.servicePathwaySummary || {}, {
+        status: servicePathway.status || '',
+        primaryMode: servicePathway.primaryMode || null,
+        primaryTier: servicePathway.primaryTier || null,
+        releaseGate: servicePathway.safetyBoundary ? servicePathway.safetyBoundary.releaseGate : '',
+        validationPlan: Array.isArray(servicePathway.validationPlan) ? servicePathway.validationPlan.slice(0, 7) : [],
+        partnerHandoffPolicy: servicePathway.partnerHandoffPolicy || null,
+        blockedClaims: servicePathway.safetyBoundary && Array.isArray(servicePathway.safetyBoundary.blocked)
+          ? servicePathway.safetyBoundary.blocked.slice()
+          : []
+      })
+    });
   },
 
   afterPrioritySaved(text, state, plan, mode) {
