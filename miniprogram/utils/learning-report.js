@@ -2199,6 +2199,71 @@ function buildPersonalizedLearningSolutionBlueprint(materialLanes = [], methodHy
   };
 }
 
+function collectMethodRankingCorpus(input = {}, parts = {}, sources = []) {
+  return [input.sourceText, parts.sourceText]
+    .concat((sources || []).map((source) => [
+      source && source.text,
+      source && source.label,
+      source && source.sourceSchemaId,
+      source && source.structuredCapture && source.structuredCapture.subjectLabel,
+      source && source.structuredCapture && source.structuredCapture.taskType,
+      source && source.structuredCapture && source.structuredCapture.safe_handoff,
+      source && source.structuredCapture && source.structuredCapture.cross_check_gate
+    ].filter(Boolean).join(' ')))
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+}
+
+function rankMethodHypotheses(methodHypotheses = [], context = {}) {
+  const corpus = collectMethodRankingCorpus(context.input || {}, context.parts || {}, context.sources || []);
+  const laneById = context.laneById || {};
+  const hasTalent = !!(laneById.talent_assessment && laneById.talent_assessment.collected);
+  const hasWrongPaper = !!(laneById.wrong_question_paper && laneById.wrong_question_paper.collected);
+  const hasSchool = !!(laneById.school_material && laneById.school_material.collected);
+  const hasParent = !!(laneById.parent_report && laneById.parent_report.collected);
+  return methodHypotheses
+    .map((item, index) => {
+      const evidence = [];
+      let score = 10 - index;
+      if (item.id === 'visual_first' && /图|视觉|画|关系图|条件表|小黑板|模型/.test(corpus)) {
+        score += 8;
+        evidence.push('材料出现视觉化/画图/关系表线索');
+      }
+      if (item.id === 'verbal_retell' && /复述|听觉|讲|说|题意|阅读|老师反馈/.test(corpus)) {
+        score += 7;
+        evidence.push('材料出现复述/题意/语言表达线索');
+      }
+      if (item.id === 'write_first_step' && /列式|动笔|写|公式|计算|第一步|启动|变量/.test(corpus)) {
+        score += 7;
+        evidence.push('材料出现列式/动笔/第一步启动线索');
+      }
+      if (hasWrongPaper && item.id === 'write_first_step') {
+        score += 5;
+        evidence.push('已有错题/试卷，优先验证可执行第一步');
+      }
+      if (hasTalent && item.id === 'visual_first') {
+        score += 3;
+        evidence.push('测评只能进入方法候选，先用视觉化候选试错');
+      }
+      if (hasSchool && item.id === 'verbal_retell') {
+        score += 3;
+        evidence.push('学校材料更适合转成复述和家校观察问题');
+      }
+      if (hasParent && item.id === 'verbal_retell') {
+        score += 2;
+        evidence.push('家长观察优先落到孩子能说清的一句话');
+      }
+      if (!evidence.length) evidence.push('作为备选方法，等待真实作业验证');
+      return Object.assign({}, item, {
+        rankScore: score,
+        rankingEvidence: evidence,
+        rankingSource: 'uploaded_material_local_rules'
+      });
+    })
+    .sort((a, b) => b.rankScore - a.rankScore);
+}
+
 function buildUploadedMaterialDecisionDossier(input = {}, parts = {}, sourceEvidenceLedger = {}, reportEvidenceReleaseGate = {}, portraitConfidenceSystem = {}, servicePathway = {}) {
   const sources = Array.isArray(parts.reportSources) ? parts.reportSources : [];
   const lanes = Array.isArray(sourceEvidenceLedger.lanes) ? sourceEvidenceLedger.lanes : [];
@@ -2316,13 +2381,20 @@ function buildUploadedMaterialDecisionDossier(input = {}, parts = {}, sourceEvid
   const collectedCount = materialLanes.filter((lane) => lane.collected).length;
   const primaryWrongPaperCard = wrongPaperDiagnosisCards[0] || {};
   const primaryValidationStage = methodValidationStages[0] || {};
-  const methodCandidateCards = methodHypotheses.map((item, index) => ({
+  const rankedMethodHypotheses = rankMethodHypotheses(methodHypotheses, { input, parts, sources, laneById });
+  const methodCandidateCards = rankedMethodHypotheses.map((item, index) => ({
     id: `method_candidate_${item.id || index + 1}`,
     label: item.label,
     status: laneById.talent_assessment && laneById.talent_assessment.collected ? 'method_candidate_from_assessment' : 'method_candidate_waiting_evidence',
     sourceSchemaId: (sources[0] && sources[0].sourceSchemaId) || input.materialType || 'mixed_uploaded_material',
     sourceTextEvidence: safeText((sources[0] && sources[0].text) || input.sourceText || parts.sourceText || '', 'waiting_for_source_text_evidence').slice(0, 64),
-    confidenceReason: collectedLanes.length >= 2 ? 'evidence_cross_checked' : 'needs_more_evidence',
+    confidenceReason: item.rankingEvidence && item.rankingEvidence.length
+      ? item.rankingEvidence.join('；')
+      : (collectedLanes.length >= 2 ? 'evidence_cross_checked' : 'needs_more_evidence'),
+    rank: index + 1,
+    rankScore: item.rankScore,
+    rankingSource: item.rankingSource,
+    rankingEvidence: item.rankingEvidence || [],
     tonightTry: item.childLine || item.method,
     tonightWrongQuestionTest: primaryWrongPaperCard.nextAction || '先选一题真实错题，只验证第一步，不追完整答案。',
     parentQuestionTomorrow: item.parentCheck || '明天只问：你还能说出第一步和错因吗？',
@@ -2401,6 +2473,19 @@ function buildUploadedMaterialDecisionDossier(input = {}, parts = {}, sourceEvid
     wrongPaperDiagnosisCards,
     servicePathway
   );
+  personalizedLearningSolutionBlueprint.primaryMethodCandidate = methodCandidateCards[0] ? {
+    id: methodCandidateCards[0].id,
+    label: methodCandidateCards[0].label,
+    rankScore: methodCandidateCards[0].rankScore,
+    confidenceReason: methodCandidateCards[0].confidenceReason,
+    route: methodCandidateCards[0].route
+  } : null;
+  personalizedLearningSolutionBlueprint.methodRankingRules = {
+    id: 'method_candidate_ranking_rules',
+    localCodeOwns: ['source_schema', 'structured_capture', 'lane_collected_status', 'rank_score', 'release_gate'],
+    aiMayRewrite: ['child_line', 'parent_check', 'report_copy'],
+    blocked: ['talent_label', 'personality_label', 'automatic_score', 'ranking_compare', 'guaranteed_improvement']
+  };
   const releaseStatus = reportEvidenceReleaseGate.releaseDecision || 'collect_more_evidence';
   const detailedReportSections = [
     {
