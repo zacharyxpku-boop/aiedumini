@@ -282,11 +282,11 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
     parentCheck: subjectSkillDepth && subjectSkillDepth.parentQuestion,
     revisit: subjectSkillDepth && subjectSkillDepth.revisit,
     userTurnCount: userMessages.length,
-    stillBlockedCount: blockedAnswer ? Math.max(2, recentStuckCount) : recentStuckCount,
+    stillBlockedCount: recentStuckCount,
     hintLevel: activeStep === 'micro_choice' ? 4 : 2,
     hasChildFirstStep: studentFirst,
     answerRisk: blockedAnswer,
-    forceMiniLesson: blockedAnswer || (!studentFirst && recentStuckCount >= 2 && userMessages.length >= 3)
+    forceMiniLesson: !studentFirst && recentStuckCount >= 2 && userMessages.length >= 3
   });
   const miniLessonAudit = openMaicPlan.evaluateThreeMinuteMiniLesson(miniLesson);
   const evidenceThread = openMaicPlan.buildEvidenceThread
