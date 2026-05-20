@@ -296,8 +296,16 @@ function normalizeReportSources(input = {}) {
     confidence: clamp(source.confidence === undefined ? 0.72 : source.confidence, 0.2, 0.98),
     status: source.status || '待家长确认',
     createdAt: source.createdAt || nowIso(),
+    sourceSchemaId: source.sourceSchemaId || source.schemaId || source.type || '',
+    sourceSchemaLabel: source.sourceSchemaLabel || source.schemaLabel || source.label || '',
+    inputChannel: source.inputChannel || source.channel || '',
+    imageCount: Number.isFinite(Number(source.imageCount)) ? Number(source.imageCount) : 0,
+    releaseScope: source.releaseScope || '',
+    portraitConfidenceWeight: Number.isFinite(Number(source.portraitConfidenceWeight)) ? Number(source.portraitConfidenceWeight) : undefined,
+    evidenceGap: Array.isArray(source.evidenceGap) ? source.evidenceGap : [],
     requiredNextEvidence: Array.isArray(source.requiredNextEvidence) ? source.requiredNextEvidence : [],
-    nextEvidenceUnlockPlan: source.nextEvidenceUnlockPlan || ''
+    nextEvidenceUnlockPlan: source.nextEvidenceUnlockPlan || '',
+    blockedFields: Array.isArray(source.blockedFields) ? source.blockedFields : []
   })).filter((source) => source.text || source.type);
 
   if (sourceText) {

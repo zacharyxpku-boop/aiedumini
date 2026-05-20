@@ -1900,6 +1900,103 @@ function buildNinetySecondRecallComboEngine(microRecallPrescriptionEngine = {}, 
   };
 }
 
+function buildNinetySecondPlayableDeck(ninetySecondRecallComboEngine = {}, questionBankRecallWorkout = {}, dailyMemorySprintDeck = {}, gizmoLikeMemoryProtocol = {}, result = {}, options = {}) {
+  const weakKey = options.weakKey || ninetySecondRecallComboEngine.weakKey || '第一步';
+  const workoutCards = Array.isArray(questionBankRecallWorkout.workoutCards) ? questionBankRecallWorkout.workoutCards : [];
+  const sprintCards = Array.isArray(dailyMemorySprintDeck.sprintCards) ? dailyMemorySprintDeck.sprintCards : [];
+  const clozeCards = gizmoLikeMemoryProtocol.greenWordClozeProtocol && Array.isArray(gizmoLikeMemoryProtocol.greenWordClozeProtocol.clozeCards)
+    ? gizmoLikeMemoryProtocol.greenWordClozeProtocol.clozeCards
+    : [];
+  const source = workoutCards.length ? workoutCards : sprintCards;
+  const first = source[0] || {};
+  const second = source[1] || first || {};
+  const cloze = clozeCards[0] || {};
+  const wrong = Math.max(0, Number(result.wrong || 0));
+  const accuracy = Number.isFinite(Number(result.accuracy)) ? Number(result.accuracy) : 0;
+  const rescue = ninetySecondRecallComboEngine.mode === 'rescue_combo' || wrong >= 2 || accuracy < 60;
+  const wrongCause = first.wrongCause || second.wrongCause || weakKey;
+  const alternativeWrongCause = second.wrongCause && second.wrongCause !== wrongCause ? second.wrongCause : '看答案太早';
+  const interactions = [
+    {
+      id: 'cloze_keyword',
+      order: 1,
+      seconds: 20,
+      inputType: 'tap_or_type_keyword',
+      prompt: cloze.clozePrompt || `遮住答案，先补出「${weakKey}」这一处关键词：____`,
+      target: cloze.targetKeyword || weakKey,
+      passEvidence: 'green_word_cloze',
+      localCheck: 'target_keyword_present_or_parent_confirmed',
+      failTo: 'typed_first_step_with_two_choices'
+    },
+    {
+      id: 'typed_first_step',
+      order: 2,
+      seconds: 30,
+      inputType: 'short_text',
+      prompt: first.action || first.firstStep || `用自己的话写下「${weakKey}」的第一步，不写完整答案。`,
+      target: first.firstStep || first.action || weakKey,
+      passEvidence: 'student_first_step',
+      localCheck: 'non_empty_child_text',
+      failTo: 'first_step_blackboard'
+    },
+    {
+      id: 'wrong_cause_choice',
+      order: 3,
+      seconds: 25,
+      inputType: 'two_choice',
+      prompt: '这次更像哪一种卡住？',
+      choices: [
+        { id: 'primary_wrong_cause', label: wrongCause, next: 'lock_next_day_revisit' },
+        { id: 'answer_peeking', label: alternativeWrongCause, next: 'first_step_blackboard' }
+      ],
+      passEvidence: 'wrong_cause_named',
+      localCheck: 'one_choice_selected',
+      failTo: 'review_rescue'
+    },
+    {
+      id: 'lock_next_day_revisit',
+      order: 4,
+      seconds: 15,
+      inputType: 'commit_button',
+      prompt: '锁定明天只回访这一张：第一步还说得出来吗？',
+      target: 'tomorrow_revisit_locked',
+      passEvidence: 'next_day_revisit_locked',
+      localCheck: 'return_window_created',
+      failTo: 'no_mastery_reward'
+    }
+  ];
+  return {
+    id: 'ninety_second_playable_deck',
+    title: rescue ? '90 秒回忆急救牌组' : '90 秒回忆连击牌组',
+    mode: rescue ? 'rescue_playable' : 'steady_playable',
+    localDeterministic: true,
+    weakKey,
+    status: interactions.length >= 4 ? 'ready' : 'waiting_cards',
+    totalSeconds: interactions.reduce((sum, item) => sum + item.seconds, 0),
+    interactions,
+    sourceCardIds: source.map((card) => card && card.id).filter(Boolean).slice(0, 4),
+    rewardGate: rescue
+      ? '急救模式只记录完成证据，不释放新卡、XP、掌握奖励或排行榜。'
+      : '四步都有证据后，只释放小额 XP；长期掌握仍等明天和第 7 天。',
+    failurePolicy: [
+      { id: 'empty_first_step', action: '降到二选一第一步，不给完整答案。' },
+      { id: 'wrong_cause_unclear', action: '转入复习页，只修同一错因。' },
+      { id: 'next_day_missing', action: '不写入长期画像，不开放分享成绩。' }
+    ],
+    parentEvidenceLine: '家长只看四个动作：补关键词、写第一步、选错因、锁定明天。',
+    sharePayload: {
+      allowedFields: ['deck_title', 'weak_key', 'first_step_action', 'wrong_cause_label', 'return_window'],
+      blockedFields: ['original_question', 'original_answer', 'photo', 'score', 'ranking', 'full_dialogue', 'private_comment']
+    },
+    localAiSplit: {
+      localCodeOwns: ['interaction_order', 'local_check', 'reward_gate', 'failure_policy', 'share_payload', 'return_window'],
+      aiBetterFor: ['prompt_rewrite', 'encouragement_copy', 'parent_summary_copy'],
+      aiMustNotOwn: ['final_answer', 'score', 'ranking', 'xp_release', 'mastery_claim', 'share_fields']
+    },
+    evidenceRequired: ['green_word_cloze', 'student_first_step', 'wrong_cause_named', 'next_day_revisit_locked', 'local_reward_gate', 'safe_share_payload']
+  };
+}
+
 function buildQuestionTypeClusterMemoryProtocol(questionTypeClusters = [], result = {}, options = {}) {
   const clusters = Array.isArray(questionTypeClusters) ? questionTypeClusters : [];
   const accuracy = Number.isFinite(Number(result.accuracy)) ? Number(result.accuracy) : 0;
@@ -2215,6 +2312,14 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
     result,
     { weakKey }
   );
+  const ninetySecondPlayableDeck = buildNinetySecondPlayableDeck(
+    ninetySecondRecallComboEngine,
+    questionBankRecallWorkout,
+    dailyMemorySprintDeck,
+    gizmoLikeMemoryProtocol,
+    result,
+    { weakKey }
+  );
   const realHomeworkPressureMemoryPrescription = buildRealHomeworkPressureMemoryPrescription(
     options.realHomeworkPressureSamples || [],
     result,
@@ -2306,6 +2411,7 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
     dailyMemorySeasonPlan,
     microRecallPrescriptionEngine,
     ninetySecondRecallComboEngine,
+    ninetySecondPlayableDeck,
     realHomeworkPressureMemoryPrescription,
     dailyReturnMission,
     dailyReturnContract,
@@ -2318,7 +2424,7 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
       : '连续 2 次说清第一步，才进入变式练习。',
     parentShareLine: `家长复盘只看：孩子能否自己说出「${weakKey}」的第一步。`,
     nextRoute: needsRepair ? '/pages/review/review' : '/pages/tutor/tutor',
-    evidenceRequired: ['active_recall_cards', 'spaced_review_plan', 'review_return_seed', 'spaced_recall_policy', 'wrong_cause_return', 'quest_cadence', 'memory_feedback_controller', 'recall_intensity_plan', 'wrong_cause_replay_deck', 'xp_feedback_policy', 'quest_arc_runway', 'gizmo_like_memory_protocol', 'green_word_cloze_protocol', 'socratic_quality_memory_bridge', 'question_bank_memory_bridge', 'question_bank_recall_workout', 'daily_memory_sprint_deck', 'adaptive_recall_scheduler', 'memory_risk_release_model', 'memory_comeback_loop', 'daily_memory_prescription', 'question_type_cluster_memory_protocol', 'peer_memory_relay_league', 'daily_memory_season_plan', 'micro_recall_prescription_engine', 'ninety_second_recall_combo_engine', 'real_homework_pressure_memory_prescription', 'daily_return_mission', 'daily_return_contract', 'daily_primary_recall_action', 'next_day_return_evidence', 'parent_share_line'],
+    evidenceRequired: ['active_recall_cards', 'spaced_review_plan', 'review_return_seed', 'spaced_recall_policy', 'wrong_cause_return', 'quest_cadence', 'memory_feedback_controller', 'recall_intensity_plan', 'wrong_cause_replay_deck', 'xp_feedback_policy', 'quest_arc_runway', 'gizmo_like_memory_protocol', 'green_word_cloze_protocol', 'socratic_quality_memory_bridge', 'question_bank_memory_bridge', 'question_bank_recall_workout', 'daily_memory_sprint_deck', 'adaptive_recall_scheduler', 'memory_risk_release_model', 'memory_comeback_loop', 'daily_memory_prescription', 'question_type_cluster_memory_protocol', 'peer_memory_relay_league', 'daily_memory_season_plan', 'micro_recall_prescription_engine', 'ninety_second_recall_combo_engine', 'ninety_second_playable_deck', 'real_homework_pressure_memory_prescription', 'daily_return_mission', 'daily_return_contract', 'daily_primary_recall_action', 'next_day_return_evidence', 'parent_share_line'],
     weakKey
   };
 }
@@ -2545,6 +2651,7 @@ module.exports = {
   buildPeerMemoryRelayLeague,
   buildMicroRecallPrescriptionEngine,
   buildNinetySecondRecallComboEngine,
+  buildNinetySecondPlayableDeck,
   buildDailyReturnMission,
   buildDailyReturnContract,
   buildQuestionTypeClusterMemoryProtocol,

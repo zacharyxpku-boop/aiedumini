@@ -329,6 +329,58 @@ function buildRequiredNextEvidence(schema = {}, kind = '') {
   }));
 }
 
+function buildMethodValidationChallengeChain(schema = {}, requiredNextEvidence = [], kind = '') {
+  const sourceSchemaId = schema.id || 'parent_report';
+  const methodCandidateOnly = sourceSchemaId === 'talent_assessment';
+  const blockedUntilText = kind === 'photo_evidence_needs_text' || kind === 'link_excerpt_needs_text';
+  const evidenceRows = Array.isArray(requiredNextEvidence) ? requiredNextEvidence : [];
+  const firstEvidence = evidenceRows[0] || {};
+  const secondEvidence = evidenceRows[1] || {};
+  const thirdEvidence = evidenceRows[2] || {};
+  return {
+    id: 'method_validation_challenge_chain',
+    sourceSchemaId,
+    title: methodCandidateOnly ? '学习方法候选验证链' : '材料证据验证链',
+    status: blockedUntilText ? 'blocked_until_text' : 'ready',
+    releaseRule: methodCandidateOnly
+      ? '只把天赋/学习偏好当作方法候选；必须经过真实作业卡点、两次回访和第 7 天小变式，才进入周/月报告。'
+      : '材料先生成今晚行动证据；长期画像必须等待回访、错因卡和小变式验证。',
+    stages: [
+      {
+        id: 'stage_1_real_task',
+        label: firstEvidence.label || '真实作业卡点',
+        route: firstEvidence.route || '/pages/tutor/tutor?from=method_validation',
+        owner: firstEvidence.owner || 'local_rule',
+        unlocks: firstEvidence.unlocks || 'first_step_evidence',
+        requiredEvidence: 'child_first_step'
+      },
+      {
+        id: 'stage_2_revisit',
+        label: secondEvidence.label || '明天回访证据',
+        route: secondEvidence.route || '/pages/review/review?from=method_validation',
+        owner: secondEvidence.owner || 'local_rule',
+        unlocks: secondEvidence.unlocks || 'revisit_evidence',
+        requiredEvidence: 'next_day_revisit'
+      },
+      {
+        id: 'stage_3_day7_variant',
+        label: thirdEvidence.label || '第 7 天小变式',
+        route: thirdEvidence.route || '/pages/arcade/arcade?from=method_validation',
+        owner: thirdEvidence.owner || 'local_rule',
+        unlocks: thirdEvidence.unlocks || 'weekly_method_signal',
+        requiredEvidence: 'day7_variant_result'
+      }
+    ],
+    reportCopy: methodCandidateOnly
+      ? '报告只说“建议先试的学习方法”，不说孩子天赋是什么；等三段证据齐了再提高置信度。'
+      : '报告只说“这份材料支持今晚做什么”，不把单次材料当长期能力结论。',
+    localCodeOwns: ['release_gate', 'evidence_order', 'report_confidence_weight', 'share_fields'],
+    aiBetterFor: ['child_friendly_prompt', 'parent_summary_copy', 'method_explanation'],
+    aiMustNotOwn: ['talent_label', 'mastery_claim', 'score_ranking', 'reward_release'],
+    blockedFields: ['original_answer', 'full_solution', 'score', 'ranking', 'talent_label', 'private_comment']
+  };
+}
+
 function buildUploadIntakePacket(text = '', imagePaths = [], materialType = '') {
   const value = String(text || '').trim();
   const images = Array.isArray(imagePaths) ? imagePaths.filter(Boolean).slice(0, 4) : [];
@@ -385,6 +437,11 @@ function buildUploadIntakePacket(text = '', imagePaths = [], materialType = '') 
     allowedUse: ['local_archive', 'parent_context', 'manual_text_capture_prompt'],
     blockedUse: ['photo_ocr_claim', 'auto_answer', 'score_ranking', 'public_share']
   };
+  const methodValidationChallengeChain = buildMethodValidationChallengeChain(
+    intakeSourceSchema,
+    requiredNextEvidence,
+    kind
+  );
   const reportSeed = {
     type: images.length ? 'photo_plus_text_intake' : 'text_intake',
     label: materialSource ? materialSource.label : (kind === 'photo_evidence_needs_text' ? '照片留档' : '作业/错题文字'),
@@ -403,6 +460,7 @@ function buildUploadIntakePacket(text = '', imagePaths = [], materialType = '') 
       : 'release_only_with_confirmed_score_sheet_or_homework_evidence',
     requiredTextFields,
     structuredCapturePrompts,
+    methodValidationChallengeChain,
     photoEvidencePolicy
   };
   const nextActionQueue = buildNextActionQueue(kind, classified, materialSource || classified.sourceMeta || null, images);
@@ -428,6 +486,7 @@ function buildUploadIntakePacket(text = '', imagePaths = [], materialType = '') 
     blockedFields,
     requiredTextFields,
     structuredCapturePrompts,
+    methodValidationChallengeChain,
     photoEvidencePolicy,
     reviewSeed,
     reportSeed,
@@ -441,6 +500,7 @@ module.exports = {
   buildUploadIntakePacket,
   buildNextActionQueue,
   buildSourceReadinessBoard,
+  buildMethodValidationChallengeChain,
   classifyImportInput,
   detectMaterialSource,
   detectIntakeSourceSchema,

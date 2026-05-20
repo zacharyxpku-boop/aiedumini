@@ -610,23 +610,10 @@ Page({
     const structuredEvidenceSignals = this.buildStructuredEvidenceSignals(uploadIntakePacket, text);
     const profile = storage.loadProfile();
     const shouldImportCards = decisionSource.sourceSchemaId !== 'talent_assessment';
-    const result = shouldImportCards
-      ? reviewCards.importTextToDeck(text, {
-        subject: profile.subject || '',
-        weakPoint: this.data.materialType,
-        calibrationKey: `material:${this.data.materialType}`,
-        source: `material_${this.data.materialType}:${decisionSource.sourceSchemaId}`,
-        sourceSchemaId: decisionSource.sourceSchemaId,
-        reportId: decisionSource.reportId || '',
-        reportSourceId: decisionSource.sourceSchemaId,
-        uploadMaterialType: this.data.materialType,
-        releaseScope: decisionSource.releaseScope,
-        requiredNextEvidence: decisionSource.requiredNextEvidence
-      })
-      : { imported: 0, skipped: 0, methodCandidateOnly: true };
     let latestReportCta = null;
+    let reportState = null;
     if (storage.buildLearningReportFromInput && storage.saveLearningReportState) {
-      const reportState = storage.buildLearningReportFromInput({
+      reportState = storage.buildLearningReportFromInput({
         mode: decisionSource.sourceSchemaId === 'wrong_question_paper' ? 'full' : 'standard',
         sourceText: text,
         reportSources: [{
@@ -635,6 +622,13 @@ Page({
           text,
           confidence: decisionSource.confidence,
           status: '待家长确认',
+          sourceSchemaId: decisionSource.sourceSchemaId,
+          sourceSchemaLabel: decisionSource.sourceSchemaLabel,
+          inputChannel: decisionSource.inputChannel,
+          imageCount: decisionSource.imageCount,
+          releaseScope: decisionSource.releaseScope,
+          portraitConfidenceWeight: decisionSource.portraitConfidenceWeight,
+          evidenceGap: decisionSource.evidenceGap,
           requiredNextEvidence: decisionSource.requiredNextEvidence,
           nextEvidenceUnlockPlan: decisionSource.nextEvidenceUnlockPlan,
           blockedFields: decisionSource.blockedFields
@@ -648,6 +642,22 @@ Page({
         }, structuredEvidenceSignals)
       });
       storage.saveLearningReportState(reportState, { skipBuild: true });
+    }
+    const result = shouldImportCards
+      ? reviewCards.importTextToDeck(text, {
+        subject: profile.subject || '',
+        weakPoint: this.data.materialType,
+        calibrationKey: `material:${this.data.materialType}`,
+        source: `material_${this.data.materialType}:${decisionSource.sourceSchemaId}`,
+        sourceSchemaId: decisionSource.sourceSchemaId,
+        reportId: (reportState && reportState.id) || decisionSource.reportId || '',
+        reportSourceId: decisionSource.sourceSchemaId,
+        uploadMaterialType: this.data.materialType,
+        releaseScope: decisionSource.releaseScope,
+        requiredNextEvidence: decisionSource.requiredNextEvidence
+      })
+      : { imported: 0, skipped: 0, methodCandidateOnly: true };
+    if (reportState) {
       latestReportCta = this.buildReportCta(decisionSource, reportState, {
         importedCards: result.imported,
         cardId: result.firstCardId || '',

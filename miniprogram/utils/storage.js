@@ -1120,7 +1120,17 @@ function saveLearningReportSource(source = {}, options = {}) {
     text: String(source.text || source.rawText || source.content || '').trim(),
     confidence: Number.isFinite(Number(source.confidence)) ? Math.max(0.2, Math.min(0.98, Number(source.confidence))) : 0.72,
     status: source.status || '待家长确认',
-    createdAt: source.createdAt || new Date().toISOString()
+    createdAt: source.createdAt || new Date().toISOString(),
+    sourceSchemaId: source.sourceSchemaId || source.schemaId || source.type || '',
+    sourceSchemaLabel: source.sourceSchemaLabel || source.schemaLabel || source.label || '',
+    inputChannel: source.inputChannel || source.channel || '',
+    imageCount: Number.isFinite(Number(source.imageCount)) ? Number(source.imageCount) : 0,
+    releaseScope: source.releaseScope || '',
+    portraitConfidenceWeight: Number.isFinite(Number(source.portraitConfidenceWeight)) ? Number(source.portraitConfidenceWeight) : undefined,
+    evidenceGap: Array.isArray(source.evidenceGap) ? source.evidenceGap : [],
+    requiredNextEvidence: Array.isArray(source.requiredNextEvidence) ? source.requiredNextEvidence : [],
+    nextEvidenceUnlockPlan: source.nextEvidenceUnlockPlan || '',
+    blockedFields: Array.isArray(source.blockedFields) ? source.blockedFields : []
   };
   const next = Object.assign({}, current, {
     reportSources: [normalizedSource].concat(current.reportSources || []).slice(0, 30)
@@ -1132,7 +1142,16 @@ function buildLearningReportFromInput(input = {}, options = {}) {
   if (!learningReport || !learningReport.buildLearningReportDraft) {
     return normalizeLearningReportState(input, options.now || new Date());
   }
-  return learningReport.buildLearningReportDraft(Object.assign({}, loadLearningReportState(), input || {}, {
+  const current = loadLearningReportState();
+  const incoming = input || {};
+  const incomingSources = Array.isArray(incoming.reportSources) ? incoming.reportSources : [];
+  const currentSources = Array.isArray(current.reportSources) ? current.reportSources : [];
+  const mergedSources = incomingSources.concat(currentSources).filter((source, index, list) => {
+    const key = `${source && (source.id || source.sourceSchemaId || source.type) || 'source'}::${source && (source.text || source.rawText || source.content) || ''}`;
+    return list.findIndex((item) => `${item && (item.id || item.sourceSchemaId || item.type) || 'source'}::${item && (item.text || item.rawText || item.content) || ''}` === key) === index;
+  }).slice(0, 30);
+  return learningReport.buildLearningReportDraft(Object.assign({}, current, incoming, {
+    reportSources: mergedSources,
     spacedReviewEvidenceLedger: buildSpacedReviewEvidenceLedger()
   }));
 }
