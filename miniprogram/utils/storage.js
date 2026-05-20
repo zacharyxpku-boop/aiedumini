@@ -12100,6 +12100,21 @@ function buildCompetitiveMoatWorkbench(options = {}) {
   const questionCards = courseUnitQuestionBank && Array.isArray(courseUnitQuestionBank.cards)
     ? courseUnitQuestionBank.cards
     : [];
+  const contentScaleReady = resources.length >= 10 && subjects.length >= 7 && questionCards.length >= 21;
+  const qualityGate = {
+    fixtureLoaded: coverageMatrix.fixtureLoaded === true,
+    sampleSourceStatus: coverageMatrix.sampleSourceStatus || 'unknown',
+    coverageConfidence: coverageMatrix.coverageConfidence || 'unknown',
+    pseudoThicknessRiskCount: reportPressureTruthAudit.pseudoThicknessRiskCount || 0,
+    threeRoundSocraticRiskCount: reportPressureTruthAudit.threeRoundSocraticRiskCount || 0,
+    crossModuleConsistencyRiskCount: reportPressureTruthAudit.crossModuleConsistencyRiskCount || 0
+  };
+  const qualityGateReady = qualityGate.fixtureLoaded
+    && qualityGate.sampleSourceStatus === 'fixture_loaded'
+    && qualityGate.coverageConfidence === 'fixture_verified'
+    && qualityGate.pseudoThicknessRiskCount === 0
+    && qualityGate.threeRoundSocraticRiskCount === 0
+    && qualityGate.crossModuleConsistencyRiskCount === 0;
   const highLeverageLanes = [
     {
       id: 'content_depth',
@@ -12283,7 +12298,10 @@ function buildCompetitiveMoatWorkbench(options = {}) {
     id: 'competitive_moat_workbench',
     title: '竞品级加厚工作台',
     summary: '对标 Gizmo 的主动回忆与游戏留存、Khanmigo 的引导式点拨、OpenMAIC 的事件流与质量门，但产品仍聚焦家庭晚间作业闭环。',
-    status: resources.length >= 10 && subjects.length >= 7 && questionCards.length >= 21 ? 'local_moat_building' : 'needs_more_content_evidence',
+    status: contentScaleReady && qualityGateReady ? 'local_moat_building' : 'needs_more_content_evidence',
+    statusReason: contentScaleReady && qualityGateReady ? 'content_scale_and_sample_quality_verified' : 'content_scale_or_sample_quality_not_verified',
+    qualityGate,
+    qualityGateReady,
     progressPercent: Math.min(92, Math.round((resources.length * 2 + subjects.length * 5 + questionCards.length + challenges.length) / 1.4)),
     sourcePolicyRows,
     sourceLicenseGateRows,

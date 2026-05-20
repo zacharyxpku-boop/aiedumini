@@ -25,7 +25,16 @@ function createShareRelaySchemaFallback() {
     });
     return safe;
   }
-  return { buildSafeSharePayload };
+  function buildShareRelayQuery(path = '', payload = {}) {
+    const base = toText(path);
+    const query = Object.keys(payload || {})
+      .filter((key) => payload[key] !== undefined && payload[key] !== null && payload[key] !== '')
+      .map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(toText(payload[key]))}`)
+      .join('&');
+    if (!query) return base;
+    return `${base}${base.indexOf('?') >= 0 ? '&' : '?'}${query}`;
+  }
+  return { buildSafeSharePayload, buildShareRelayQuery };
 }
 
 let shareRelaySchema = null;
@@ -749,30 +758,35 @@ function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCause
 
 function resolveShareIntent(card, intent) {
   const current = intent || 'peer_challenge';
-  const code = card.code || 'LOCAL';
   if (current === 'parent_card') {
+    const payload = buildSafeSharePayload(card, 'parent_card', {
+      share_intent: 'parent_card',
+      from: 'parent_card',
+      mode: 'parent_recap'
+    });
     return {
       share_intent: 'parent_card',
       title: card.parentShareTitle || card.title || '给家里看的今日学习复盘',
-      path: card.parentPath || `/pages/home/home?share=${code}&from=parent_card&mode=parent_recap&identity=${encodeURIComponent(card.identityTag || '')}`,
-      payload: buildSafeSharePayload(card, 'parent_card', {
-        share_intent: 'parent_card',
-        from: 'parent_card',
-        mode: 'parent_recap'
-      })
+      path: buildSchemaSharePath(payload),
+      payload
     };
   }
+  const payload = buildSafeSharePayload(card, 'peer_challenge', {
+    share_intent: 'peer_challenge',
+    from: 'peer_challenge',
+    mode: 'same_identity',
+    challenge: 'arcade'
+  });
   return {
     share_intent: 'peer_challenge',
     title: card.peerShareTitle || card.title || '来和我一起回访今天的一小步',
-    path: card.peerPath || card.path || `/pages/home/home?share=${code}&from=peer_challenge&challenge=arcade&mode=same_identity&identity=${encodeURIComponent(card.identityTag || '')}`,
-    payload: buildSafeSharePayload(card, 'peer_challenge', {
-      share_intent: 'peer_challenge',
-      from: 'peer_challenge',
-      mode: 'same_identity',
-      challenge: 'arcade'
-    })
+    path: buildSchemaSharePath(payload),
+    payload
   };
+}
+
+function buildSchemaSharePath(payload = {}) {
+  return shareRelaySchema.buildShareRelayQuery('/pages/home/home', payload);
 }
 
 function buildSafeSharePayload(card = {}, intent = 'peer_challenge', extra = {}) {
