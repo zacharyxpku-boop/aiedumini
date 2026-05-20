@@ -9346,6 +9346,206 @@ function buildQuestionTypeTransferLadder(unit = {}, cards = []) {
   };
 }
 
+const REVIEWED_PUBLIC_CURRICULUM_ASSET_CARDS = [
+  {
+    id: 'reviewed_public_math_equation_first_step',
+    subjectId: 'math',
+    type: 'active_recall',
+    sourceAssetId: 'public_curriculum_standards_crosswalk',
+    sourceAssetType: 'skill_verb_crosswalk',
+    label: '数学等量关系第一步',
+    prompt: '看到应用题，先把“已知量、目标量、关系词”各圈一次，再写一个等量关系。',
+    firstStepHint: '先圈目标量和关系词，不急着列式。',
+    blackboardMove: '小黑板只画：已知量 -> 关系词 -> 目标量。',
+    wrongCauseProbe: '常见卡点是先套公式，没说清等量关系从哪里来。',
+    nearTransferStem: '把数字换掉，只检查孩子能不能重新圈出关系词。',
+    parentCheck: '家长只问：你先找的是目标量还是关系词？',
+    taskType: 'math_word_problem',
+    gradeBand: 'primary_to_junior'
+  },
+  {
+    id: 'reviewed_public_chinese_argument_evidence',
+    subjectId: 'chinese',
+    type: 'wrong_cause',
+    sourceAssetId: 'public_curriculum_standards_crosswalk',
+    sourceAssetType: 'reading_skill_structure',
+    label: '语文论证证据第一步',
+    prompt: '读论述类材料时，先分清观点句和证据句，不直接写“说明了中心”。',
+    firstStepHint: '先标出作者正在证明的观点。',
+    blackboardMove: '小黑板画两栏：观点 / 证据。',
+    wrongCauseProbe: '常见卡点是把例子当结论，没说出它服务哪个观点。',
+    nearTransferStem: '换一段材料，只让孩子指出“这句话是在证明什么”。',
+    parentCheck: '家长只问：这句材料是在帮哪个观点说话？',
+    taskType: 'reading_inference',
+    gradeBand: 'primary_to_junior'
+  },
+  {
+    id: 'reviewed_public_english_time_anchor',
+    subjectId: 'english',
+    type: 'active_recall',
+    sourceAssetId: 'public_curriculum_standards_crosswalk',
+    sourceAssetType: 'grammar_skill_structure',
+    label: '英语时态时间锚点',
+    prompt: '做时态题时，先找时间锚点和动作是否已经发生，不直接凭语感选。',
+    firstStepHint: '先圈时间词，再判断动作发生在过去、现在还是将来。',
+    blackboardMove: '小黑板写：time word -> action state -> verb form。',
+    wrongCauseProbe: '常见卡点是只看中文意思，没用时间锚点约束动词形式。',
+    nearTransferStem: '换一句话，只保留时间词，让孩子先判断动作状态。',
+    parentCheck: '家长只问：你圈到的时间词是什么？',
+    taskType: 'english_grammar',
+    gradeBand: 'primary_to_junior'
+  },
+  {
+    id: 'reviewed_public_physics_force_diagram',
+    subjectId: 'physics',
+    type: 'near_transfer',
+    sourceAssetId: 'phet_simulation_oer',
+    sourceAssetType: 'visual_board_structure',
+    label: '物理受力图第一笔',
+    prompt: '遇到受力题，先画研究对象和接触面，不直接代公式。',
+    firstStepHint: '先圈研究对象，再标接触面。',
+    blackboardMove: '小黑板只画一个物体框和接触面箭头。',
+    wrongCauseProbe: '常见卡点是把所有力都写上，却没确认研究对象。',
+    nearTransferStem: '换一个场景，只检查研究对象有没有重新圈准。',
+    parentCheck: '家长只问：你研究的是哪个物体？',
+    taskType: 'physics_diagram',
+    gradeBand: 'junior'
+  },
+  {
+    id: 'reviewed_public_chem_experiment_sequence',
+    subjectId: 'chemistry',
+    type: 'wrong_cause',
+    sourceAssetId: 'openscied_science_inquiry_structure',
+    sourceAssetType: 'evidence_chain_board',
+    label: '化学实验顺序证据链',
+    prompt: '做实验现象题时，先写“操作 -> 现象 -> 说明”，不直接背结论。',
+    firstStepHint: '先把题目里的操作顺序排出来。',
+    blackboardMove: '小黑板三格：操作 / 现象 / 说明。',
+    wrongCauseProbe: '常见卡点是只记现象，不知道现象对应哪一步操作。',
+    nearTransferStem: '换一个实验，只保留三格证据链。',
+    parentCheck: '家长只问：这个现象是哪一步操作后出现的？',
+    taskType: 'chemistry_experiment',
+    gradeBand: 'junior'
+  },
+  {
+    id: 'reviewed_public_biology_structure_function',
+    subjectId: 'biology',
+    type: 'active_recall',
+    sourceAssetId: 'libretexts_stem_reference',
+    sourceAssetType: 'concept_prerequisite_ladder',
+    label: '生物结构功能对应',
+    prompt: '遇到结构功能题，先说结构位置和功能关键词，不直接背整段定义。',
+    firstStepHint: '先说这个结构在哪里，再说它服务什么功能。',
+    blackboardMove: '小黑板写：结构位置 -> 功能关键词。',
+    wrongCauseProbe: '常见卡点是背了名词，但不能把结构和功能连起来。',
+    nearTransferStem: '换一个结构，只要求说出位置和功能关键词。',
+    parentCheck: '家长只问：这个结构帮身体完成什么事？',
+    taskType: 'biology_concept',
+    gradeBand: 'junior'
+  },
+  {
+    id: 'reviewed_public_geo_space_relation',
+    subjectId: 'geography',
+    type: 'near_transfer',
+    sourceAssetId: 'geogebra_classroom_activity',
+    sourceAssetType: 'spatial_reasoning_structure',
+    label: '地理空间关系第一步',
+    prompt: '做地理图题时，先找方向、位置、变化量，不直接猜结论。',
+    firstStepHint: '先确定方向和参照物。',
+    blackboardMove: '小黑板画：方向箭头 + 参照物 + 变化量。',
+    wrongCauseProbe: '常见卡点是看到了图，却没说参照物和方向。',
+    nearTransferStem: '换一张图，只检查方向和参照物是否先说清。',
+    parentCheck: '家长只问：你是相对哪个地方判断方向的？',
+    taskType: 'geography_spatial',
+    gradeBand: 'junior'
+  }
+];
+
+function buildReviewedPublicCurriculumAssetCards(units = []) {
+  return REVIEWED_PUBLIC_CURRICULUM_ASSET_CARDS.map((asset, index) => {
+    const unit = units.find((item) => item.subjectId === asset.subjectId) || units[index % Math.max(units.length, 1)] || {};
+    const baseCard = {
+      id: asset.id,
+      unitId: unit.id || `${asset.subjectId}_reviewed_public_unit`,
+      subjectId: asset.subjectId,
+      subjectLabel: unit.subjectLabel || asset.subjectId,
+      type: asset.type,
+      label: asset.label,
+      prompt: asset.prompt,
+      answerBoundary: '只使用公开资料的结构信号生成第一步练习，不展示原题、原文、图片、答案或标准解析。',
+      wrongCause: asset.wrongCauseProbe,
+      visualMove: asset.blackboardMove,
+      evidenceRequired: 'reviewed_public_asset_first_step',
+      sourceContentPolicy: 'no_source_text_no_source_image_no_source_answer',
+      answerVisibility: 'first_step_only_no_full_answer',
+      oerResourceId: asset.sourceAssetId,
+      sourceRegistryId: asset.sourceAssetId,
+      sourceAssetId: asset.sourceAssetId,
+      sourceAssetType: asset.sourceAssetType,
+      sourceUrl: `structure-only://${asset.sourceAssetId}`,
+      licenseSignal: 'structure_signal_only_reviewed_before_use',
+      commercialDecision: '只借鉴题型结构、能力动词和课堂活动形态；不复制、不搬运、不导入原题原文，不宣称官方合作。',
+      distributionPolicy: 'structure_index_only_no_source_content_distribution',
+      licenseCheckedAt: '2026-05-20',
+      rightsBoundary: '只使用结构信号、能力轴和教学活动形态，不复制原文、图片、题目、答案或品牌素材。',
+      allowedDerivedArtifacts: ['first_step_card', 'wrong_cause_probe', 'visual_board_move', 'near_transfer_prompt', 'parent_check_line'],
+      mustNotSurface: ['source_original_text', 'source_question', 'source_answer', 'source_image', 'brand_claim', 'official_partnership_claim', 'full_solution', 'answer_key'],
+      oerReuseLevel: 'structure_only',
+      oerDerivedArtifact: 'reviewed_public_curriculum_asset_card',
+      oerAttributionRequired: false,
+      derivedFrom: 'structure_only',
+      answerPolicy: 'first_step_only_no_full_answer',
+      blockedFields: ['original_question', 'original_answer', 'source_image', 'full_answer', 'full_solution', 'score', 'ranking', 'full_dialogue'],
+      aiRole: 'socratic_wording_only',
+      localCodeOwns: ['source_match', 'license_boundary', 'question_type_route', 'answer_policy', 'xp_unlock', 'share_boundary'],
+      sourceBacked: true,
+      reviewedPublicAsset: true,
+      sourceSampleId: asset.id,
+      sourceId: asset.sourceAssetId,
+      sourceType: asset.sourceAssetType,
+      gradeBand: asset.gradeBand,
+      sourceSampleStem: asset.prompt,
+      sourceSampleFirstStep: asset.firstStepHint,
+      sourceSampleWrongCause: asset.wrongCauseProbe,
+      sourceSampleBoardMove: asset.blackboardMove,
+      sourceSampleParentCheck: asset.parentCheck,
+      sourceSampleNearTransfer: asset.nearTransferStem,
+      sampleBackedEvidence: {
+        sourceSampleId: asset.id,
+        sourceId: asset.sourceAssetId,
+        sourceType: asset.sourceAssetType,
+        taskType: asset.taskType,
+        answerPolicy: 'first_step_only_no_full_answer',
+        sourceContentPolicy: 'no_source_text_no_source_image_no_source_answer',
+        blockedFields: ['original_question', 'original_answer', 'source_image', 'full_answer', 'full_solution', 'score', 'ranking']
+      },
+      sampleStem: asset.prompt,
+      firstStepHint: asset.firstStepHint,
+      blackboardMove: asset.blackboardMove,
+      wrongCauseProbe: asset.wrongCauseProbe,
+      nearTransferStem: asset.nearTransferStem,
+      parentCheck: asset.parentCheck,
+      flashcardFront: asset.label,
+      flashcardBack: asset.firstStepHint,
+      quizPrompt: asset.nearTransferStem,
+      spacedReviewWindow: '今晚 / 明天 / 第 7 天',
+      activeRecallPrompt: `不看答案，说出：${asset.firstStepHint}`,
+      memoryLoopMode: 'flashcard_quiz_active_recall_spaced_review',
+      sampleId: `${asset.id}_sample`,
+      classroomUse: '适合家庭晚间作业 3 分钟小黑板，不作为全科课堂或押题服务。',
+      evidenceRubric: [
+        '孩子能说出第一步',
+        '孩子能命名错因',
+        '孩子能做一次近迁移或隔天回看'
+      ],
+      safetyBoundary: '不展示完整答案、不替孩子写过程、不用分数或排名证明能力。'
+    };
+    return Object.assign({}, baseCard, {
+      progression: buildQuestionProgressionCard(unit, baseCard, index)
+    });
+  });
+}
+
 function buildCourseUnitQuestionBank(options = {}) {
   const courseUnitMap = options.courseUnitMap || buildCourseUnitMap(options);
   const active = courseUnitMap && courseUnitMap.active ? courseUnitMap.active : null;
@@ -9355,7 +9555,7 @@ function buildCourseUnitQuestionBank(options = {}) {
   const realHomeworkPressureSamples = Array.isArray(options.realHomeworkPressureSamples)
     ? options.realHomeworkPressureSamples
     : getRealHomeworkPressureSamplePool();
-  const questionCards = units.reduce((list, unit) => {
+  const baseQuestionCards = units.reduce((list, unit) => {
     const base = `${unit.subjectLabel}/${unit.unitLabel}`;
     const cards = [
       {
@@ -9406,6 +9606,8 @@ function buildCourseUnitQuestionBank(options = {}) {
       });
     }));
   }, []);
+  const reviewedPublicAssetCards = buildReviewedPublicCurriculumAssetCards(units);
+  const questionCards = baseQuestionCards.concat(reviewedPublicAssetCards);
   const activeUnitIds = activeUnits.reduce((acc, unit) => {
     acc[unit.id] = true;
     return acc;
@@ -9429,6 +9631,8 @@ function buildCourseUnitQuestionBank(options = {}) {
     unitCount: units.length,
     subjectCount: subjects.length,
     questionCount: questionCards.length,
+    reviewedPublicAssetCount: reviewedPublicAssetCards.length,
+    reviewedPublicAssetSubjectCount: new Set(reviewedPublicAssetCards.map((card) => card.subjectId).filter(Boolean)).size,
     sourceBackedCount: questionCards.filter((card) => card.sourceBacked && card.sourceSampleId && card.sampleBackedEvidence).length,
     sourceBackedSubjectCount: new Set(questionCards.filter((card) => card.sourceBacked).map((card) => card.subjectLabel)).size,
     sourceBackedGradeBandCount: new Set(questionCards.filter((card) => card.sourceBacked).map((card) => card.gradeBand).filter(Boolean)).size,

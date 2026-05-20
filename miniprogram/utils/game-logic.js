@@ -910,7 +910,7 @@ function buildCourseUnitQuestionBankPlayableCards(courseUnitQuestionBank = {}, o
   const taskType = options.taskType || '';
   const weakKey = options.weakKey || '第一步';
   const focusText = [options.firstStep, options.wrongCauseLabel, options.subject].filter(Boolean).join(' ');
-  const maxCards = options.rescueMode ? 4 : Number(options.maxCards || 21);
+  const maxCards = options.rescueMode ? 4 : Number(options.maxCards || 42);
   const focusCards = (activeCards.length ? activeCards : allCards)
     .filter((card) => {
       if (!card) return false;
@@ -971,6 +971,12 @@ function buildCourseUnitQuestionBankPlayableCards(courseUnitQuestionBank = {}, o
       }
       seen[candidate.id] = true;
       represented[subjectKey] = true;
+    });
+    allCards.forEach((card) => {
+      if (balanced.length >= maxCards) return;
+      if (!card || !card.id || seen[card.id]) return;
+      balanced.push(card);
+      seen[card.id] = true;
     });
     sourceCards = balanced;
   }

@@ -295,7 +295,7 @@
             </view>
           </view>
           <view class="intake-packet-boundary">{{lastReportCta.servicePathway.moatLine}}</view>
-          <view class="intake-packet-boundary">商业闭环：测评入口 → AI 方案 → 7 天验证 → 30 天训练营 / 高阶规划。</view>
+          <view class="intake-packet-boundary">商业闭环：学习偏好/测评资料 → AI 辅助学习方法候选 → 7 天验证 → 30 天训练营 / 高阶规划。</view>
         </view>
 
       <view class="upload-detail-toggle">
@@ -364,7 +364,7 @@
         <view class="material-report-title">上传测评 / 错题试卷 / 学校反馈，先生成家庭决策报告</view>
         <view class="material-report-desc">只做方法候选、错因修复和下一证据；不贴天赋标签，不自动判分，不输出整卷结果。</view>
         <view class="material-report-actions">
-          <button class="material-report-chip" data-type="talent_assessment" bindtap="openMaterialReportPanel">天赋测评</button>
+          <button class="material-report-chip" data-type="talent_assessment" bindtap="openMaterialReportPanel">学习偏好/测评资料</button>
           <button class="material-report-chip" data-type="wrong_question_paper" bindtap="openMaterialReportPanel">错题试卷</button>
           <button class="material-report-chip" data-type="school_material" bindtap="openMaterialReportPanel">学校反馈</button>
           <button class="material-report-chip" data-type="parent_report" bindtap="openMaterialReportPanel">家长观察</button>
@@ -388,7 +388,7 @@
           <button class="material-source-chip {{materialType === 'pdf_excerpt' ? 'active' : ''}}" data-type="pdf_excerpt" bindtap="setMaterialType">PDF 摘录</button>
           <button class="material-source-chip {{materialType === 'class_notes' ? 'active' : ''}}" data-type="class_notes" bindtap="setMaterialType">课堂笔记</button>
           <button class="material-source-chip {{materialType === 'wrong_question_paper' ? 'active' : ''}}" data-type="wrong_question_paper" bindtap="setMaterialType">错题/试卷</button>
-          <button class="material-source-chip {{materialType === 'talent_assessment' ? 'active' : ''}}" data-type="talent_assessment" bindtap="setMaterialType">天赋测评</button>
+          <button class="material-source-chip {{materialType === 'talent_assessment' ? 'active' : ''}}" data-type="talent_assessment" bindtap="setMaterialType">学习偏好/测评资料</button>
           <button class="material-source-chip {{materialType === 'school_material' ? 'active' : ''}}" data-type="school_material" bindtap="setMaterialType">学校材料</button>
           <button class="material-source-chip {{materialType === 'parent_report' ? 'active' : ''}}" data-type="parent_report" bindtap="setMaterialType">家长观察</button>
         </view>

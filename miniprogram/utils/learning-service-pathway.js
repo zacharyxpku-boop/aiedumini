@@ -105,6 +105,26 @@ const SEVEN_DAY_VALIDATION_PLAN = [
   { day: 7, label: '第 7 天', action: '家长复盘：保留、降级或换一种学习方法。', evidence: 'family_decision' }
 ];
 
+const COMMERCIAL_CLAIM_BLOCKLIST = [
+  '提分承诺',
+  '保证成绩提升',
+  '保分',
+  '升学承诺',
+  '天赋定性',
+  '一次报告决定长期能力',
+  '自动判分',
+  '整卷答案',
+  '排名承诺'
+];
+
+const PARTNER_HANDOFF_POLICY = {
+  id: 'partner_handoff_policy',
+  visibleToPartner: ['tonight_action', 'parent_question', 'next_evidence', 'service_candidate'],
+  blockedFields: ['original_question', 'photo', 'full_answer', 'score', 'ranking', 'talent_label', 'full_dialogue'],
+  rule: '合作方只看服务候选、今晚行动和下一条证据；不看原题、照片、完整答案、分数排名、天赋标签或完整对话。',
+  releaseGate: 'parent_confirmed_and_private_fields_removed'
+};
+
 function textOf(value) {
   return String(value || '').trim();
 }
@@ -186,6 +206,9 @@ function buildLearningServicePathway(input = {}) {
     locked: requiresEvidenceBeforeCommercialPush && item.day > 1,
     unlockRule: item.day === 1 ? '可立即执行' : '先补真实作业卡点和孩子第一步'
   }));
+  const safeProductTiers = productTiers.map((tier) => Object.assign({}, tier, {
+    blockedClaims: Array.from(new Set([].concat(tier.blockedClaims || [], COMMERCIAL_CLAIM_BLOCKLIST)))
+  }));
   return {
     id: 'learning_service_pathway',
     status: requiresEvidenceBeforeCommercialPush ? 'needs_real_task_validation' : 'ready_for_family_plan',
@@ -196,7 +219,7 @@ function buildLearningServicePathway(input = {}) {
     primaryMode: firstMode,
     primaryTier: firstTier,
     modeRecommendations,
-    productTiers,
+    productTiers: safeProductTiers,
     nextAction: requiresEvidenceBeforeCommercialPush
       ? '补一条真实错题/作业卡点，再放行课程或训练营建议。'
       : `先进入${firstMode.label}，再根据 7 天复盘决定是否进入${firstTier.label}。`,
@@ -212,10 +235,11 @@ function buildLearningServicePathway(input = {}) {
     quickAssessmentBridge,
     aiLocalDeliverySplit: AI_LOCAL_DELIVERY_SPLIT,
     validationPlan,
+    partnerHandoffPolicy: Object.assign({}, PARTNER_HANDOFF_POLICY),
     moatLine: '护城河不在“生成一份测评结论”，而在测评、错题、回访、游戏和家长决策反复闭环后的家庭证据账本。',
     safetyBoundary: {
       allowed: ['学习方式建议', '第一步点拨', '家长陪伴话术', '课程/训练营候选'],
-      blocked: ['天赋定论', '自动判分', '整卷答案', '结果承诺', '公开原题或孩子隐私材料'],
+      blocked: Array.from(new Set(['天赋定论', '自动判分', '整卷答案', '结果承诺', '公开原题或孩子隐私材料'].concat(COMMERCIAL_CLAIM_BLOCKLIST))),
       releaseGate: requiresEvidenceBeforeCommercialPush
         ? 'assessment_requires_real_homework_evidence'
         : 'service_pathway_requires_parent_confirmation'
