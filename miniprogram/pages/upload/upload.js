@@ -54,6 +54,8 @@ Page({
     uploadPlaybook: null,
     inputCoach: null,
     uploadIntakePacket: null,
+    materialIntakePacket: null,
+    structuredEvidenceCapture: null,
     lastReportCta: null,
     submitLabel: '生成今晚作业三分类',
     quickChips: [
@@ -371,6 +373,52 @@ Page({
     };
   },
 
+  buildStructuredEvidenceCapture(uploadIntakePacket = {}, text = '', manual = {}) {
+    const signals = this.buildStructuredEvidenceSignals(uploadIntakePacket, text);
+    const prompts = Array.isArray(uploadIntakePacket.structuredCapturePrompts)
+      ? uploadIntakePacket.structuredCapturePrompts
+      : [];
+    const values = Object.assign({
+      question_type: signals.questionType || '',
+      child_original_thought: signals.childOriginalThought || '',
+      stuck_first_step: signals.stuckFirstStep || '',
+      wrong_cause_guess: signals.wrongCauseGuess || ''
+    }, manual || {});
+    const fields = prompts.map((prompt) => {
+      const value = String(values[prompt.id] || '').trim();
+      return Object.assign({}, prompt, {
+        value,
+        ready: !!value,
+        placeholder: prompt.prompt || '补一句真实证据，不写结论。'
+      });
+    });
+    const readyCount = fields.filter((item) => item.ready).length;
+    const missing = fields.filter((item) => !item.ready).map((item) => item.label || item.id);
+    return {
+      title: '材料证据补全',
+      summary: '先补题型、孩子原想法、卡住第一步和错因猜测；报告只按证据放行，不凭一次测评贴标签。',
+      releaseGate: '本地规则决定报告放行、奖励和分享字段；AI 只改写追问和家长摘要。',
+      fields,
+      values,
+      readyCount,
+      totalCount: fields.length,
+      missing,
+      ready: fields.length > 0 && readyCount === fields.length,
+      nextAction: missing.length
+        ? `还差：${missing.slice(0, 2).join(' / ')}`
+        : '证据已补齐，可以生成家长决策报告。'
+    };
+  },
+
+  mergeStructuredEvidenceText(text = '', capture = null) {
+    const value = String(text || '').trim();
+    const fields = capture && Array.isArray(capture.fields) ? capture.fields : [];
+    const extra = fields
+      .filter((field) => String(field.value || '').trim())
+      .map((field) => `${field.label || field.id}: ${String(field.value || '').trim()}`);
+    return [value].concat(extra).filter(Boolean).join('\n');
+  },
+
   buildReportCta(decisionSource = {}, reportState = {}, options = {}) {
     const sourceSchemaId = decisionSource.sourceSchemaId || 'parent_report';
     const importedCards = Number(options.importedCards || 0);
@@ -541,8 +589,16 @@ Page({
   },
 
   updateMaterialPreview(text, type) {
+    const materialIntakePacket = importIntake.buildUploadIntakePacket(String(text || '').trim(), this.data.imagePaths, type);
+    const structuredEvidenceCapture = this.buildStructuredEvidenceCapture(
+      materialIntakePacket,
+      text,
+      this.data.structuredEvidenceCapture && this.data.structuredEvidenceCapture.values
+    );
     this.setData({
-      materialPreview: this.buildMaterialPreview(text, type)
+      materialPreview: this.buildMaterialPreview(text, type),
+      materialIntakePacket,
+      structuredEvidenceCapture
     });
   },
 
@@ -584,6 +640,20 @@ Page({
     this.updateMaterialPreview(materialText, this.data.materialType);
   },
 
+  onStructuredEvidenceInput(event) {
+    const fieldId = event.currentTarget.dataset.fieldId || '';
+    const value = event.detail.value;
+    const current = this.data.structuredEvidenceCapture || this.buildStructuredEvidenceCapture(this.data.materialIntakePacket || {}, this.data.materialText || '');
+    const values = Object.assign({}, current.values || {}, { [fieldId]: value });
+    this.setData({
+      structuredEvidenceCapture: this.buildStructuredEvidenceCapture(
+        this.data.materialIntakePacket || importIntake.buildUploadIntakePacket(this.data.materialText || '', this.data.imagePaths, this.data.materialType),
+        this.data.materialText || '',
+        values
+      )
+    });
+  },
+
   setMaterialType(event) {
     const materialType = event.currentTarget.dataset.type || 'class_notes';
     this.setData({ materialType });
@@ -606,8 +676,14 @@ Page({
       return;
     }
     const uploadIntakePacket = importIntake.buildUploadIntakePacket(text, this.data.imagePaths, this.data.materialType);
+    const structuredEvidenceCapture = this.buildStructuredEvidenceCapture(
+      uploadIntakePacket,
+      text,
+      this.data.structuredEvidenceCapture && this.data.structuredEvidenceCapture.values
+    );
+    const evidenceText = this.mergeStructuredEvidenceText(text, structuredEvidenceCapture);
     const decisionSource = this.buildDecisionSource(uploadIntakePacket, text, { imported: false }, (uploadIntakePacket && uploadIntakePacket.reportSeed) || {});
-    const structuredEvidenceSignals = this.buildStructuredEvidenceSignals(uploadIntakePacket, text);
+    const structuredEvidenceSignals = this.buildStructuredEvidenceSignals(uploadIntakePacket, evidenceText);
     const profile = storage.loadProfile();
     const shouldImportCards = decisionSource.sourceSchemaId !== 'talent_assessment';
     let latestReportCta = null;
@@ -615,11 +691,11 @@ Page({
     if (storage.buildLearningReportFromInput && storage.saveLearningReportState) {
       reportState = storage.buildLearningReportFromInput({
         mode: decisionSource.sourceSchemaId === 'wrong_question_paper' ? 'full' : 'standard',
-        sourceText: text,
+        sourceText: evidenceText,
         reportSources: [{
           type: decisionSource.sourceSchemaId,
           label: decisionSource.sourceSchemaLabel,
-          text,
+          text: evidenceText,
           confidence: decisionSource.confidence,
           status: '待家长确认',
           sourceSchemaId: decisionSource.sourceSchemaId,
@@ -639,7 +715,11 @@ Page({
           nextDayRevisit: '明天遮住答案，只回访同一第一步。',
           sourceSchemaId: decisionSource.sourceSchemaId,
           requiredNextEvidence: decisionSource.requiredNextEvidence
-        }, structuredEvidenceSignals)
+        }, structuredEvidenceSignals, {
+          structuredEvidenceCapture,
+          structuredEvidenceReady: structuredEvidenceCapture.ready,
+          structuredEvidenceMissing: structuredEvidenceCapture.missing
+        })
       });
       storage.saveLearningReportState(reportState, { skipBuild: true });
     }
@@ -667,6 +747,8 @@ Page({
     }
     this.setData({
       uploadIntakePacket,
+      materialIntakePacket: uploadIntakePacket,
+      structuredEvidenceCapture,
       lastDecisionSource: decisionSource,
       lastReportCta: latestReportCta
     });

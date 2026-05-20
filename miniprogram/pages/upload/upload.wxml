@@ -307,6 +307,30 @@
             </view>
           </view>
         </view>
+        <view class="structured-evidence-card" wx:if="{{structuredEvidenceCapture && structuredEvidenceCapture.fields.length}}">
+          <view class="structured-evidence-head">
+            <view>
+              <view class="structured-evidence-kicker">证据补全</view>
+              <view class="structured-evidence-title">{{structuredEvidenceCapture.title}}</view>
+            </view>
+            <view class="structured-evidence-score">{{structuredEvidenceCapture.readyCount}}/{{structuredEvidenceCapture.totalCount}}</view>
+          </view>
+          <view class="structured-evidence-summary">{{structuredEvidenceCapture.summary}}</view>
+          <view class="structured-evidence-fields">
+            <view class="structured-evidence-field {{item.ready ? 'ready' : ''}}" wx:for="{{structuredEvidenceCapture.fields}}" wx:key="id">
+              <view class="structured-evidence-label">{{item.label}}</view>
+              <input
+                class="structured-evidence-input"
+                value="{{item.value}}"
+                data-field-id="{{item.id}}"
+                bindinput="onStructuredEvidenceInput"
+                placeholder="{{item.placeholder}}"
+              />
+            </view>
+          </view>
+          <view class="structured-evidence-gate">{{structuredEvidenceCapture.releaseGate}}</view>
+          <view class="structured-evidence-next">{{structuredEvidenceCapture.nextAction}}</view>
+        </view>
         <textarea
           class="material-textarea"
           value="{{materialText}}"

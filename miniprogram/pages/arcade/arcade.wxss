@@ -1260,6 +1260,19 @@
   background: rgba(94, 140, 97, 0.08);
 }
 
+.daily-return-step.current {
+  background: rgba(242, 212, 121, 0.28);
+  border: 2rpx solid rgba(242, 169, 59, 0.55);
+}
+
+.daily-return-step.completed {
+  background: rgba(94, 140, 97, 0.16);
+}
+
+.daily-return-step.locked {
+  opacity: 0.72;
+}
+
 .daily-return-step-order {
   width: 42rpx;
   height: 42rpx;
@@ -1285,6 +1298,30 @@
   color: rgba(27, 67, 50, 0.58);
   font-size: 21rpx;
   line-height: 1.4;
+}
+
+.daily-return-step-state {
+  display: inline-flex;
+  width: fit-content;
+  margin-top: 8rpx;
+  padding: 6rpx 12rpx;
+  border-radius: 999rpx;
+  color: #6D4D12;
+  background: rgba(242, 212, 121, 0.38);
+  font-size: 20rpx;
+  font-weight: 900;
+}
+
+.daily-return-step-state.done {
+  color: #1B4332;
+  background: rgba(94, 140, 97, 0.18);
+}
+
+.daily-return-rule.timeout {
+  color: #8A4D24;
+  background: rgba(255, 248, 234, 0.88);
+  border-radius: 16rpx;
+  padding: 12rpx 14rpx;
 }
 
 .retention-loop-kicker {

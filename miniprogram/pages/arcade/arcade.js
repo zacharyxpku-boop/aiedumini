@@ -1952,7 +1952,7 @@ Page({
   buildNinetySecondRecallState(deck = null) {
     const interactions = Array.isArray(deck && deck.interactions) ? deck.interactions : [];
     const totalSeconds = Number(deck && deck.totalSeconds) || interactions.reduce((sum, item) => sum + Number(item.seconds || 0), 0) || 90;
-    return {
+    const state = {
       status: interactions.length >= 4 && (!deck || !deck.status || deck.status === 'ready') ? 'idle' : 'locked',
       deckId: deck && deck.id ? deck.id : '',
       weakKey: deck && deck.weakKey ? deck.weakKey : '第一步',
@@ -1973,6 +1973,42 @@ Page({
         ? deck.sharePayload.blockedFields.slice(0, 10)
         : ['original_question', 'original_answer', 'score', 'ranking', 'full_dialogue']
     };
+    return this.decorateNinetySecondRecallState(state);
+  },
+
+  decorateNinetySecondRecallState(state = {}) {
+    const completed = Array.isArray(state.completedStepIds) ? state.completedStepIds : [];
+    const interactions = Array.isArray(state.interactions) ? state.interactions : [];
+    const decoratedInteractions = interactions.map((item, index) => {
+      const isCompleted = completed.includes(item.id);
+      const isCurrent = state.status === 'running' && index === Number(state.stepIndex || 0) && !state.finished;
+      const isLocked = state.status !== 'running' || (!isCurrent && !isCompleted);
+      return Object.assign({}, item, {
+        isCurrent,
+        isCompleted,
+        isLocked,
+        uiClass: isCompleted ? 'completed' : isCurrent ? 'current' : isLocked ? 'locked' : ''
+      });
+    });
+    return Object.assign({}, state, {
+      interactions: decoratedInteractions,
+      statusLabel: state.status === 'running'
+        ? '进行中'
+        : state.status === 'completed'
+          ? '已完成'
+          : state.status === 'timeout'
+            ? '超时回访'
+            : state.status === 'locked'
+              ? '待生成'
+              : '待开始',
+      currentStepLabel: decoratedInteractions[state.stepIndex] && (decoratedInteractions[state.stepIndex].label || decoratedInteractions[state.stepIndex].prompt) || '',
+      completionLine: completed.length
+        ? `已完成 ${completed.length}/${decoratedInteractions.length} 步`
+        : '还没有完成证据',
+      failureDowngradeLine: state.status === 'timeout'
+        ? '本轮不发 XP，自动降级为明天回访卡：只问第一步和错因，不继续加题。'
+        : ''
+    });
   },
 
   persistNinetySecondRecallEvidence(reason = 'completed', stateOverride = null) {
@@ -2029,10 +2065,10 @@ Page({
     }
     this.clearNinetySecondRecallTimer();
     this.setData({
-      ninetySecondRecallState: Object.assign({}, state, {
+      ninetySecondRecallState: this.decorateNinetySecondRecallState(Object.assign({}, state, {
         status: 'running',
         canReleaseXp: false
-      }),
+      })),
       feedbackText: '90 秒开始：先补关键词。'
     });
     this.ninetySecondRecallStartedAt = Date.now();
@@ -2052,10 +2088,10 @@ Page({
         return;
       }
       this.setData({
-        ninetySecondRecallState: Object.assign({}, current, {
+        ninetySecondRecallState: this.decorateNinetySecondRecallState(Object.assign({}, current, {
           elapsedSeconds,
           secondsLeft
-        })
+        }))
       });
     }, 1000);
   },
@@ -2080,7 +2116,7 @@ Page({
     }]);
     const nextIndex = state.stepIndex + 1;
     const nextStep = state.interactions[nextIndex] || null;
-    const nextState = Object.assign({}, state, {
+    const nextState = this.decorateNinetySecondRecallState(Object.assign({}, state, {
       elapsedSeconds: Math.min(Number(state.totalSeconds || 90), Number(state.elapsedSeconds || 0) + Number(currentStep.seconds || 0)),
       secondsLeft: Math.max(0, Number(state.totalSeconds || 90) - (Number(state.elapsedSeconds || 0) + Number(currentStep.seconds || 0))),
       stepIndex: nextIndex,
@@ -2089,7 +2125,7 @@ Page({
       evidence,
       canReleaseXp: completedStepIds.length >= 4,
       status: completedStepIds.length >= 4 ? 'completed' : 'running'
-    });
+    }));
     this.setData({
       ninetySecondRecallState: nextState,
       feedbackText: nextStep ? `已完成第 ${completedStepIds.length} 步，继续下一步。` : '90 秒四步完成。'
@@ -2101,12 +2137,12 @@ Page({
 
   finishNinetySecondRecall(reason = 'completed', stateOverride = null) {
     const current = stateOverride || this.data.ninetySecondRecallState || this.buildNinetySecondRecallState(this.data.ninetySecondRecallDeck);
-    const nextState = Object.assign({}, current, {
-      status: 'completed',
+    const nextState = this.decorateNinetySecondRecallState(Object.assign({}, current, {
+      status: reason === 'timeout' ? 'timeout' : 'completed',
       finished: true,
       canReleaseXp: reason !== 'timeout' && (Array.isArray(current.completedStepIds) ? current.completedStepIds.length >= 4 : false),
       secondsLeft: 0
-    });
+    }));
     this.clearNinetySecondRecallTimer();
     this.setData({
       ninetySecondRecallState: nextState,

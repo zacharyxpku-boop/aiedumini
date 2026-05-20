@@ -1007,3 +1007,75 @@ page {
   color: #FFFFFF;
   background: #1E4233;
 }
+
+.structured-evidence-card {
+  margin-top: 18rpx;
+  padding: 20rpx;
+  background: #F7FBF7;
+  border: 1rpx solid #D8E8D8;
+  border-radius: 22rpx;
+}
+
+.structured-evidence-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 18rpx;
+}
+
+.structured-evidence-kicker {
+  color: #2A5C45;
+  font-size: 20rpx;
+  font-weight: 900;
+}
+
+.structured-evidence-title {
+  margin-top: 4rpx;
+  color: #1F241F;
+  font-size: 27rpx;
+  font-weight: 900;
+}
+
+.structured-evidence-score {
+  color: #1E4233;
+  font-size: 24rpx;
+  font-weight: 950;
+}
+
+.structured-evidence-summary,
+.structured-evidence-gate,
+.structured-evidence-next {
+  margin-top: 10rpx;
+  color: #655F56;
+  font-size: 22rpx;
+  line-height: 1.45;
+}
+
+.structured-evidence-fields {
+  margin-top: 14rpx;
+  display: grid;
+  gap: 12rpx;
+}
+
+.structured-evidence-field {
+  padding: 14rpx;
+  background: #FFFFFF;
+  border: 1rpx solid #E7E2D8;
+  border-radius: 18rpx;
+}
+
+.structured-evidence-field.ready {
+  border-color: #A7C8A9;
+}
+
+.structured-evidence-label {
+  color: #2A5C45;
+  font-size: 21rpx;
+  font-weight: 900;
+}
+
+.structured-evidence-input {
+  margin-top: 8rpx;
+  min-height: 58rpx;
+  color: #2F2D29;
+  font-size: 24rpx;
+}
