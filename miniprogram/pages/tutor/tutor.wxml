@@ -301,6 +301,14 @@
             <view class="mini-lesson-check">换题只看第一步：{{thinkingReceipt.miniLesson.nearTransfer.prompt}}</view>
             <view class="mini-lesson-parent">家长只问：{{thinkingReceipt.miniLesson.parentLine || thinkingReceipt.miniLesson.parentCheck}}</view>
             <view class="mini-lesson-exit">退出门：{{thinkingReceipt.miniLesson.exitGate.passEvidence}}</view>
+            <textarea
+              class="mini-lesson-exit-ticket"
+              value="{{childExitTicketText}}"
+              bindinput="onMiniLessonExitTicketInput"
+              maxlength="80"
+              auto-height
+              placeholder="让孩子自己写一句：我第一步会先……"
+            />
             <view class="mini-lesson-exit-actions">
               <button class="mini-lesson-exit-button primary" data-status="passed" bindtap="recordMiniLessonExitGate">我能说第一步</button>
               <button class="mini-lesson-exit-button" data-status="needs_support" bindtap="recordMiniLessonExitGate">还不能过</button>

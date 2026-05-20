@@ -100,10 +100,92 @@ Page({
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().setData({ selected: 1 });
     }
+    const publicK12Context = this.consumePublicK12ReviewContext();
+    if (publicK12Context) {
+      this.setData({ reportSourceContext: publicK12Context });
+    }
     const yesterday = storage.getYesterdayReview ? storage.getYesterdayReview() : null;
     if (yesterday && storage.markReviewCardRevisited) storage.markReviewCardRevisited(yesterday.id);
     this.refresh();
     this.refreshServerGameState();
+  },
+
+  consumePublicK12ReviewContext() {
+    if (!storage.get || !storage.set || !storage.loadReviewCards || !storage.saveReviewCards) return null;
+    const context = storage.get('publicK12.reviewContext.v1', null);
+    if (!context || !context.id) return null;
+    const expiresAt = context.expiresAt ? Date.parse(context.expiresAt) : 0;
+    if (expiresAt && expiresAt < Date.now()) {
+      storage.set('publicK12.reviewContext.v1', Object.assign({}, context, { status: 'expired' }));
+      return null;
+    }
+    const cardId = `public_k12_review_${String(context.id || context.taskType || 'first_step').replace(/[^a-zA-Z0-9_\u4e00-\u9fa5:-]/g, '_')}`;
+    const cards = storage.loadReviewCards();
+    const existing = cards.find((card) => card && card.id === cardId);
+    const blockedFields = Array.isArray(context.blockedFields) && context.blockedFields.length
+      ? context.blockedFields
+      : ['original_question', 'full_answer', 'score', 'ranking', 'full_dialogue'];
+    if (!existing) {
+      const now = new Date().toISOString();
+      const firstStep = context.firstStepRequired || '先说出题目问什么和第一步入口';
+      const parentPrompt = context.fallbackIfNoChildInput || '如果孩子说不出第一步，回到苏格拉底追问，不给整题答案。';
+      storage.saveReviewCards([{
+        id: cardId,
+        type: 'public_k12_first_step_revisit',
+        source: 'public_k12_homework_intake',
+        state: 'new',
+        due: now,
+        created_at: now,
+        question: `${context.subject || '这类题'}：先说哪一个第一步？`,
+        answer: firstStep,
+        subject: context.subject || '',
+        taskType: context.taskType || '',
+        weakPoint: '第一步入口',
+        wrongCauseBucket: context.taskType || 'first_step',
+        parentPrompt,
+        checkpoint: firstStep,
+        calibrationKey: context.id || context.taskType || 'public_k12_intake',
+        blockedFields,
+        publicK12ReviewContext: context,
+        nextPracticePlan: {
+          wrongCauseBucket: context.taskType || 'first_step',
+          wrongCauseLabel: '公开题型第一步',
+          checkpoint: firstStep,
+          parentPrompt,
+          nextPracticeText: '换一个同类题，只说第一步和理由，不看完整答案。',
+          appRoute: '/pages/review/review?from=public_k12_intake'
+        }
+      }].concat(cards).slice(0, 260));
+      if (storage.appendReviewEvent) {
+        storage.appendReviewEvent({
+          type: 'public_k12_review_card_created',
+          source: 'public_k12_homework_intake',
+          cardId,
+          sourceChallengeId: context.id,
+          subject: context.subject || '',
+          taskType: context.taskType || '',
+          blockedFields,
+          releaseGate: context.releaseGate || 'child_can_say_first_step_before_reward'
+        });
+      }
+    }
+    storage.set('publicK12.reviewContext.v1', Object.assign({}, context, {
+      status: 'review_card_ready',
+      cardId,
+      consumedAt: new Date().toISOString()
+    }));
+    return {
+      from: 'public_k12_intake',
+      sourceSchemaId: 'public_k12_intake',
+      cardId,
+      title: context.title || '公开K12第一步回访',
+      line: `${context.subject || '公开题型'}：只回访第一步，不展示原题或完整答案。`,
+      actionLabel: '回访第一步',
+      blockedFields,
+      returnRoute: context.route || '/pages/arcade/arcade',
+      flowTraceId: `public_k12:${context.id || context.taskType || cardId}`,
+      publicK12Review: true
+    };
   },
 
   buildReportSourceContext(query = {}) {

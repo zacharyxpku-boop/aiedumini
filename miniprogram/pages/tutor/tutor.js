@@ -816,6 +816,7 @@ Page({
     socraticFeedbackNextAction: '',
     miniLessonExitGateStatus: '',
     miniLessonExitGateNextRoute: '',
+    childExitTicketText: '',
     surfaceDepthPack: null,
     unifiedNextAction: null,
     showTutorDetails: false
@@ -899,6 +900,7 @@ Page({
       socraticFeedbackNextAction: '',
       miniLessonExitGateStatus: '',
       miniLessonExitGateNextRoute: '',
+      childExitTicketText: '',
       tutorTurnState,
       surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('tutor') : null,
       unifiedNextAction: storage.buildUnifiedNextActionController ? storage.buildUnifiedNextActionController({ surface: 'tutor' }) : null
@@ -912,6 +914,10 @@ Page({
 
   onInput(event) {
     this.setData({ input: event.detail.value });
+  },
+
+  onMiniLessonExitTicketInput(event) {
+    this.setData({ childExitTicketText: event.detail.value });
   },
 
   quickStart() {
@@ -1301,7 +1307,8 @@ Page({
       socraticFeedbackRecordedAt: '',
       socraticFeedbackNextAction: '',
       miniLessonExitGateStatus: '',
-      miniLessonExitGateNextRoute: ''
+      miniLessonExitGateNextRoute: '',
+      childExitTicketText: ''
     });
     this.syncTutorSignal(masterySignal, coachStep);
   },
@@ -1393,14 +1400,7 @@ Page({
     const miniLesson = receipt.miniLesson || {};
     const evidenceThread = receipt.evidenceThread || miniLesson.evidenceThread || {};
     const selected = this.data.selected || {};
-    const userMessages = Array.isArray(this.data.messages)
-      ? this.data.messages.filter((item) => item && item.role === 'user')
-      : [];
-    const childExitTicketText = userMessages
-      .slice()
-      .reverse()
-      .map((item) => String(item.text || '').trim())
-      .find((text) => text.length >= 4 && !/答案|直接|代写|帮我写|带我|提示|讲一下|不会|不懂|不知道/.test(text)) || '';
+    const childExitTicketText = String(this.data.childExitTicketText || '').trim();
     const passedWithChildTicket = passed && !!childExitTicketText;
     const firstStepEvidence = passedWithChildTicket ? childExitTicketText : '';
     const exitGateRecord = storage.recordMiniLessonExitGate

@@ -860,6 +860,20 @@ page {
   border-radius: 18rpx;
 }
 
+.mini-lesson-exit-ticket {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 96rpx;
+  padding: 16rpx;
+  color: #1B4332;
+  font-size: 22rpx;
+  font-weight: 820;
+  line-height: 1.45;
+  background: #FFFFFF;
+  border: 2rpx solid rgba(27, 67, 50, 0.16);
+  border-radius: 18rpx;
+}
+
 .mini-lesson-exit-actions {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

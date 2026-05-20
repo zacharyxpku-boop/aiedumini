@@ -756,15 +756,30 @@ Page({
         blockedFields: publicK12.blockedFields || ['original_question', 'full_answer', 'score', 'ranking', 'full_dialogue']
       });
       if (storage.set) {
-        storage.set('arcade.publicK12.selectedChallenge.v1', {
+        const reviewContext = {
           id: selectedCard.id || publicK12.id || questId,
+          title: selectedCard.title || publicK12.title || '公开K12第一步回访',
           subject: selectedCard.subject || '',
           taskType: selectedCard.taskType || '',
           route,
-          reviewRoute: selectedCard.reviewRoute || publicK12.reviewRoute || '',
+          reviewRoute: selectedCard.reviewRoute || publicK12.reviewRoute || '/pages/review/review?from=public_k12_intake',
+          firstStepRequired: selectedCard.observableFirstMove || publicK12.observableFirstMove || '先说出题目问什么和第一步入口',
+          fallbackIfNoChildInput: selectedCard.fallbackIfNoChildInput || publicK12.fallbackIfNoChildInput || '回到苏格拉底追问，不给整题答案',
+          blockedFields: publicK12.blockedFields || ['original_question', 'full_answer', 'score', 'ranking', 'full_dialogue'],
           selectedAt: new Date().toISOString(),
+          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
           releaseGate: 'child_can_say_first_step_before_reward'
+        };
+        storage.set('arcade.publicK12.selectedChallenge.v1', {
+          id: reviewContext.id,
+          subject: reviewContext.subject,
+          taskType: reviewContext.taskType,
+          route,
+          reviewRoute: reviewContext.reviewRoute,
+          selectedAt: reviewContext.selectedAt,
+          releaseGate: reviewContext.releaseGate
         });
+        storage.set('publicK12.reviewContext.v1', reviewContext);
       }
     }
     const cleanPath = route.split('?')[0];

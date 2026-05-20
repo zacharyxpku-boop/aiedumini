@@ -25,6 +25,41 @@ const MATERIAL_TYPE_ALLOWLIST = [
   'handwriting'
 ];
 
+const UPLOAD_SUBJECT_TASK_PATTERNS = [
+  { subjectKey: 'math', subjectLabel: '数学', taskType: 'math_word_problem', match: /数学|应用题|等量|数量关系|方程|列式|几何|函数|面积|体积|比例/ },
+  { subjectKey: 'physics', subjectLabel: '物理', taskType: 'physics_diagram', match: /物理|受力|电路|光路|速度|压强|浮力|凸透镜|运动|实验器材/ },
+  { subjectKey: 'chemistry', subjectLabel: '化学', taskType: 'chemistry_experiment', match: /化学|方程式|实验|溶液|气体|沉淀|酸碱|质量守恒|微粒|分子/ },
+  { subjectKey: 'geography', subjectLabel: '地理', taskType: 'geography_map', match: /地理|地图|经纬|气候|地形|公转|自转|昼夜|季风|等高线/ },
+  { subjectKey: 'biology', subjectLabel: '生物', taskType: 'biology_process', match: /生物|细胞|遗传|生态|光合|呼吸|消化|循环|实验过程/ },
+  { subjectKey: 'english', subjectLabel: '英语', taskType: 'english_sentence', match: /英语|英文|语法|句型|完形|阅读|单词|时态|从句|作文/ },
+  { subjectKey: 'chinese', subjectLabel: '语文', taskType: 'reading_question', match: /语文|阅读理解|古诗|文言|作文|修辞|概括|主旨|背诵/ }
+];
+
+function inferUploadSubjectTask(text = '', manual = {}, fallback = {}) {
+  const value = [
+    manual.subject,
+    manual.subjectKey,
+    manual.question_type,
+    manual.questionType,
+    manual.teacher_observation,
+    manual.home_observation,
+    fallback.sourceSchemaLabel,
+    fallback.materialType,
+    text
+  ].join('\n');
+  const matched = UPLOAD_SUBJECT_TASK_PATTERNS.find((item) => item.match.test(value)) || null;
+  const subjectKey = String(manual.subjectKey || manual.subject_key || fallback.subjectKey || (matched && matched.subjectKey) || '').trim();
+  const subjectLabel = String(manual.subject || manual.subjectLabel || manual.subject_label || fallback.subjectLabel || (matched && matched.subjectLabel) || subjectKey || '').trim();
+  const taskType = String(manual.taskType || manual.task_type || fallback.taskType || (matched && matched.taskType) || '').trim();
+  return {
+    subjectKey,
+    subjectLabel,
+    taskType,
+    inferred: !!matched,
+    source: matched ? 'upload_subject_task_pattern' : 'structured_or_schema_fallback'
+  };
+}
+
 function safeQueryText(value) {
   const raw = String(value || '').trim();
   if (!raw) return '';
@@ -455,9 +490,17 @@ Page({
     const packet = uploadIntakePacket || {};
     const seed = reportSeed || {};
     const imported = !!wrongbook.imported;
+    const subjectTask = inferUploadSubjectTask(text, {}, {
+      sourceSchemaLabel: seed.sourceSchemaLabel || packet.sourceSchemaLabel || '',
+      materialType: this.data.materialType || ''
+    });
     return {
       sourceSchemaId: seed.sourceSchemaId || (imported ? 'wrong_question_paper' : 'parent_report'),
       sourceSchemaLabel: seed.sourceSchemaLabel || (imported ? '错题/试卷' : '家长观察'),
+      subjectKey: subjectTask.subjectKey,
+      subjectLabel: subjectTask.subjectLabel,
+      taskType: subjectTask.taskType,
+      subjectTaskInferenceSource: subjectTask.source,
       inputChannel: packet.kind || 'upload_text',
       hasText: !!String(text || '').trim(),
       imageCount: Number(packet.imageCount || (this.data.imagePaths || []).length || 0),
@@ -524,9 +567,17 @@ Page({
       || promptValueById.next_day_revisit
       || promptValueById.day7_variant
       || wrongCauseGuess;
+    const subjectTask = inferUploadSubjectTask(value, Object.assign({}, manualValues, promptValueById), {
+      sourceSchemaLabel: schema.label || uploadIntakePacket.sourceSchemaLabel || '',
+      materialType: uploadIntakePacket.sourceType || uploadIntakePacket.sourceSchemaId || ''
+    });
     const structuredCapture = {
       sourceSchemaId: schema.id || uploadIntakePacket.sourceSchemaId || '',
       sourceSchemaLabel: schema.label || uploadIntakePacket.sourceSchemaLabel || '',
+      subjectKey: subjectTask.subjectKey,
+      subjectLabel: subjectTask.subjectLabel,
+      taskType: subjectTask.taskType,
+      subjectTaskInferenceSource: subjectTask.source,
       questionType: questionTypeValue || schema.label || '',
       childOriginalThought: childOriginalThoughtValue,
       stuckFirstStep: stuckFirstStepValue,
@@ -549,6 +600,10 @@ Page({
       stuckFirstStep: stuckFirstStepValue || '',
       wrongCause: wrongCauseGuessValue || '',
       wrongCauseGuess: wrongCauseGuessValue,
+      subjectKey: subjectTask.subjectKey,
+      subjectLabel: subjectTask.subjectLabel,
+      taskType: subjectTask.taskType,
+      subjectTaskInferenceSource: subjectTask.source,
       sourceSchemaId: schema.id || '',
       sourceSchemaLabel: schema.label || '',
       structuredCaptureMissing: structuredCapture.missing,
@@ -799,12 +854,22 @@ Page({
       || reportBehaviorSignals.wrongCause
       || (reportDraft.familyDecisionMemo && reportDraft.familyDecisionMemo.decisionCard && reportDraft.familyDecisionMemo.decisionCard.cause)
       || (decisionSource.sourceSchemaLabel || '资料还需要真实作业证据确认。');
-    const miniLessonTaskType = uploadEvidenceSignals.questionType
+    const miniLessonTaskType = uploadEvidenceSignals.taskType
+      || decisionSource.taskType
+      || uploadEvidenceSignals.questionType
       || reportBehaviorSignals.questionType
+      || sourceSchemaId;
+    const miniLessonSubject = uploadEvidenceSignals.subjectLabel
+      || uploadEvidenceSignals.subjectKey
+      || decisionSource.subjectLabel
+      || decisionSource.subjectKey
+      || options.subject
+      || reportBehaviorSignals.subject
+      || decisionSource.sourceSchemaLabel
       || sourceSchemaId;
     const openMaicTaskPlan = openMaicInspiredPlan.buildOpenMaicInspiredTaskPlan({
       taskType: miniLessonTaskType,
-      subject: options.subject || reportBehaviorSignals.subject || decisionSource.sourceSchemaLabel || sourceSchemaId,
+      subject: miniLessonSubject,
       sourceText: sourceTextForMiniLesson,
       firstStep: miniLessonFirstStep,
       wrongCause: miniLessonWrongCause,
@@ -876,6 +941,8 @@ Page({
       openMaicDecisionBridge,
       miniLessonSourceEvidence: {
         sourceSchemaId,
+        subjectKey: uploadEvidenceSignals.subjectKey || decisionSource.subjectKey || '',
+        subjectLabel: uploadEvidenceSignals.subjectLabel || decisionSource.subjectLabel || '',
         taskType: miniLessonTaskType,
         sourceTextReady: !!sourceTextForMiniLesson,
         structuredEvidenceReady: !!(uploadEvidenceSignals.firstStep || uploadEvidenceSignals.wrongCause || uploadEvidenceSignals.questionType),
@@ -988,6 +1055,9 @@ Page({
           status: reportSeed.status || '待家长确认',
           sourceSchemaId: decisionSource.sourceSchemaId,
           sourceSchemaLabel: decisionSource.sourceSchemaLabel,
+          subjectKey: structuredEvidenceSignals.subjectKey || decisionSource.subjectKey || '',
+          subjectLabel: structuredEvidenceSignals.subjectLabel || decisionSource.subjectLabel || '',
+          taskType: structuredEvidenceSignals.taskType || decisionSource.taskType || '',
           inputChannel: decisionSource.inputChannel,
           imageCount: decisionSource.imageCount,
           releaseScope: decisionSource.releaseScope,
@@ -1015,6 +1085,9 @@ Page({
           firstStep: structuredEvidenceSignals.firstStep || reportSeed.firstStep || '',
           childOriginalThought: structuredEvidenceSignals.childOriginalThought || '',
           questionType: structuredEvidenceSignals.questionType || '',
+          subjectKey: structuredEvidenceSignals.subjectKey || decisionSource.subjectKey || '',
+          subjectLabel: structuredEvidenceSignals.subjectLabel || decisionSource.subjectLabel || '',
+          taskType: structuredEvidenceSignals.taskType || decisionSource.taskType || '',
           structuredCapture: structuredEvidenceSignals.structuredCapture,
           parentQuestion: '今晚只问：这题第一步你先看哪里？',
           nextDayRevisit: '明天遮住答案，只回看一张最不稳的卡',
@@ -1043,7 +1116,7 @@ Page({
         sourceText: evidenceText,
         structuredEvidenceSignals,
         guardedAiReportDraft,
-        subject: profile.subject || state.subject || ''
+        subject: structuredEvidenceSignals.subjectLabel || decisionSource.subjectLabel || profile.subject || state.subject || ''
       });
       reportState = this.persistReportCtaToReportState(reportState, latestReportCta);
       this.saveReportHandoff(latestReportCta);
@@ -1187,6 +1260,9 @@ Page({
           status: '待家长确认',
           sourceSchemaId: decisionSource.sourceSchemaId,
           sourceSchemaLabel: decisionSource.sourceSchemaLabel,
+          subjectKey: structuredEvidenceSignals.subjectKey || decisionSource.subjectKey || '',
+          subjectLabel: structuredEvidenceSignals.subjectLabel || decisionSource.subjectLabel || '',
+          taskType: structuredEvidenceSignals.taskType || decisionSource.taskType || '',
           inputChannel: decisionSource.inputChannel,
           imageCount: decisionSource.imageCount,
           releaseScope: decisionSource.releaseScope,
@@ -1216,7 +1292,8 @@ Page({
     }
     const result = shouldImportCards
       ? reviewCards.importTextToDeck(text, {
-        subject: profile.subject || '',
+        subject: structuredEvidenceSignals.subjectLabel || decisionSource.subjectLabel || profile.subject || '',
+        taskType: structuredEvidenceSignals.taskType || decisionSource.taskType || '',
         weakPoint: this.data.materialType,
         calibrationKey: `material:${this.data.materialType}`,
         source: `material_${this.data.materialType}:${decisionSource.sourceSchemaId}`,
@@ -1236,7 +1313,7 @@ Page({
         sourceText: evidenceText,
         structuredEvidenceSignals,
         guardedAiReportDraft: this.buildGuardedAiReportDraft(uploadIntakePacket, structuredEvidenceSignals),
-        subject: profile.subject || ''
+        subject: structuredEvidenceSignals.subjectLabel || decisionSource.subjectLabel || profile.subject || ''
       });
       reportState = this.persistReportCtaToReportState(reportState, latestReportCta);
       this.saveReportHandoff(latestReportCta);
