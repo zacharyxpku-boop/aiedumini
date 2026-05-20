@@ -168,6 +168,25 @@ const PARTNER_HANDOFF_POLICY = {
   releaseGate: 'parent_confirmed_and_private_fields_removed'
 };
 
+const MODE_CHOICE_GUARDRAILS = [
+  {
+    id: 'socratic_stays_default',
+    rule: 'Socratic 1:1 stays the default first move when the child has a real stuck point.'
+  },
+  {
+    id: 'mini_lesson_is_rescue',
+    rule: 'Mini lesson opens only for concept, visual, or repeated-start failures; it must end with an exit ticket.'
+  },
+  {
+    id: 'game_after_evidence',
+    rule: 'Game recall opens after a first-step or wrong-cause signal, not from assessment labels alone.'
+  },
+  {
+    id: 'parent_confirms_service',
+    rule: 'Parent confirms before any course, camp, or partner handoff is shown as a service candidate.'
+  }
+];
+
 function textOf(value) {
   return String(value || '').trim();
 }
@@ -231,6 +250,49 @@ function pickTiers(signals) {
   return PRODUCT_TIERS.filter((tier) => tiers.includes(tier.id));
 }
 
+function buildModeChoiceProtocol(signals, modeRecommendations, options = {}) {
+  const recommended = modeRecommendations[0] || MODE_CATALOG[0];
+  const hasRealTaskEvidence = !!(signals && signals.hasRealTaskEvidence);
+  const choiceCards = modeRecommendations.map((mode) => {
+    const isGame = mode.id === 'game_recall';
+    const isMiniLesson = mode.id === 'three_minute_mini_lesson';
+    const locked = (isGame && !hasRealTaskEvidence) || (mode.id === 'wrong_question_repair_course' && !hasRealTaskEvidence);
+    return Object.assign({}, mode, {
+      recommended: mode.id === recommended.id,
+      childCanChoose: !locked,
+      parentConfirmRequired: mode.id === 'online_method_course'
+        || mode.id === 'wrong_question_repair_course'
+        || mode.id === 'parent_coaching',
+      choiceRole: isMiniLesson
+        ? 'rescue_or_concept_bridge'
+        : isGame
+          ? 'memory_and_return_loop'
+          : mode.id === 'socratic_private_tutor'
+            ? 'default_private_tutor'
+            : 'family_service_support',
+      lockReason: locked ? 'requires_real_first_step_or_wrong_cause_evidence' : '',
+      exitEvidenceRequired: isMiniLesson
+        ? ['one_blackboard_frame', 'child_exit_ticket', 'near_transfer_prompt']
+        : isGame
+          ? ['recall_attempt', 'wrong_cause_revisit', 'parent_safe_share_line']
+          : ['child_first_step', 'parent_one_question']
+    });
+  });
+  return {
+    id: 'family_learning_mode_choice_protocol',
+    title: 'Family learning mode choice',
+    recommendedModeId: recommended.id,
+    recommendedModeLabel: recommended.label,
+    childChoiceAllowed: choiceCards.some((card) => card.childCanChoose),
+    parentConfirmRequired: true,
+    choiceCards,
+    guardrails: MODE_CHOICE_GUARDRAILS,
+    decisionOrder: ['socratic_private_tutor', 'three_minute_mini_lesson', 'game_recall', 'parent_coaching', 'online_method_course', 'wrong_question_repair_course'],
+    positioningLine: 'Classroom mode is a short rescue bridge; the main product remains a Socratic family tutor with evidence, review, parent action, and safe share loops.',
+    releaseGate: options.releaseGate || (hasRealTaskEvidence ? 'mode_choice_requires_parent_confirmation' : 'mode_choice_requires_real_task_evidence')
+  };
+}
+
 function buildLearningServicePathway(input = {}) {
   const signals = inferSignals(input);
   const modeRecommendations = pickModes(signals);
@@ -238,6 +300,11 @@ function buildLearningServicePathway(input = {}) {
   const firstMode = modeRecommendations[0] || MODE_CATALOG[0];
   const firstTier = productTiers[0] || PRODUCT_TIERS[1];
   const requiresEvidenceBeforeCommercialPush = signals.hasAssessment && !signals.hasRealTaskEvidence;
+  const modeChoiceProtocol = buildModeChoiceProtocol(signals, modeRecommendations, {
+    releaseGate: requiresEvidenceBeforeCommercialPush
+      ? 'mode_choice_requires_real_task_evidence'
+      : 'mode_choice_requires_parent_confirmation'
+  });
   const quickAssessmentBridge = {
     id: 'quick_learning_preference_assessment',
     label: '小程序内 15 题学习偏好快测',
@@ -262,6 +329,7 @@ function buildLearningServicePathway(input = {}) {
     primaryMode: firstMode,
     primaryTier: firstTier,
     modeRecommendations,
+    modeChoiceProtocol,
     productTiers: safeProductTiers,
     nextAction: requiresEvidenceBeforeCommercialPush
       ? '补一条真实错题/作业卡点，再放行课程或训练营建议。'
@@ -296,6 +364,8 @@ module.exports = {
   MODE_CATALOG,
   PRODUCT_TIERS,
   AI_LOCAL_DECISION_MATRIX,
+  MODE_CHOICE_GUARDRAILS,
   inferSignals,
+  buildModeChoiceProtocol,
   buildLearningServicePathway
 };

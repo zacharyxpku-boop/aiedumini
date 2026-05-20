@@ -245,6 +245,21 @@
               </view>
             </view>
           </view>
+          <view class="intake-action-queue" wx:if="{{lastReportCta.servicePathway.modeChoiceProtocol}}">
+            <view class="intake-action-title">{{lastReportCta.servicePathway.modeChoiceProtocol.title}}</view>
+            <view class="intake-action-item" wx:for="{{lastReportCta.servicePathway.modeChoiceProtocol.choiceCards}}" wx:key="id">
+              <view class="intake-action-main">
+                <text>{{item.recommended ? '推荐：' : '可选：'}}{{item.label}}</text>
+                <text>{{item.choiceRole}}｜{{item.childCanChoose ? '孩子可选' : item.lockReason}}</text>
+              </view>
+              <view class="intake-action-meta">
+                <text>退出证据：{{item.exitEvidenceRequired}}</text>
+                <text>{{item.parentConfirmRequired ? '家长确认后进入服务' : '先做孩子第一步'}}</text>
+              </view>
+            </view>
+            <view class="intake-packet-boundary">{{lastReportCta.servicePathway.modeChoiceProtocol.positioningLine}}</view>
+            <view class="intake-packet-boundary">{{lastReportCta.servicePathway.modeChoiceProtocol.releaseGate}}</view>
+          </view>
           <view class="intake-action-queue">
             <view class="intake-action-item" wx:for="{{lastReportCta.servicePathway.productTiers}}" wx:key="id">
               <view class="intake-action-main">
