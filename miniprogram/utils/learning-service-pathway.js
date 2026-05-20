@@ -140,6 +140,59 @@ const AI_LOCAL_DECISION_MATRIX = [
   }
 ];
 
+const PUBLIC_K12_BORROW_PLAYBOOK = [
+  {
+    id: 'official_curriculum_standards',
+    label: '公开课标 / 教材结构',
+    sourceKind: 'public_reference',
+    bestUse: '搭课程骨架、年级轴、章节轴和题型路由。',
+    localCodeOwns: ['课程骨架', '题型路由', '报告放行门槛', '来源登记'],
+    aiBetterFor: ['把课标改写成孩子能懂的第一步', '把老师话术压成家长可读句'],
+    mustNotUse: ['复制原文段落', '包装成官方题库', '自动给标准答案'],
+    productEntry: '课程体系/知识点路由'
+  },
+  {
+    id: 'public_oer_materials',
+    label: '公开 OER / 开放许可资料',
+    sourceKind: 'public_reference',
+    bestUse: '补概念解释、例题变式和可验证的学习动作。',
+    localCodeOwns: ['license_gate', 'source_registry', 'reuse_scope', 'share_blocklist'],
+    aiBetterFor: ['改写成小黑板说明', '生成一问一答的孩子版解释'],
+    mustNotUse: ['未核查许可直接复用', '生成整套答案包', '把外部图文当自有内容发布'],
+    productEntry: '概念解释 / 轻练习'
+  },
+  {
+    id: 'family_uploaded_material',
+    label: '家长上传测评 / 错题 / 试卷 / 观察',
+    sourceKind: 'private_family_material',
+    bestUse: '形成今晚行动、错因卡、家长复盘和 7 天游程。',
+    localCodeOwns: ['隐私闸门', '答案封存', '分享脱敏', '长期画像放行门槛'],
+    aiBetterFor: ['把材料改写成家长能看懂的话', '把错因转成第一步提问'],
+    mustNotUse: ['天赋定性', '自动判分承诺', '公开原题或完整对话'],
+    productEntry: '上传入口 / 家庭决策报告'
+  },
+  {
+    id: 'school_feedback',
+    label: '学校反馈 / 老师留言',
+    sourceKind: 'school_private_material',
+    bestUse: '家校协同摘要、观察问题、下一步家长动作。',
+    localCodeOwns: ['家校摘要放行', '去隐私字段', '不替老师判断'],
+    aiBetterFor: ['把老师留言改写成一句家长可执行的话'],
+    mustNotUse: ['外传原题照片', '替老师评分', '生成家校对立文案'],
+    productEntry: '家校协同 / 报告摘要'
+  },
+  {
+    id: 'generated_practice_variants',
+    label: '本地生成的变式 / 复练 / 回访卡',
+    sourceKind: 'product_generated',
+    bestUse: '把真实材料变成可练、可回访、可复核的动作卡。',
+    localCodeOwns: ['答案释放', 'XP 奖励', '间隔复习', '分享字段'],
+    aiBetterFor: ['改写题面语气', '生成更自然的孩子话术'],
+    mustNotUse: ['直接给完整答案', '把变式包装成新题库版权', '替代真实回访'],
+    productEntry: '轻复练 / 闯关 / 分享回流'
+  }
+];
+
 const SEVEN_DAY_VALIDATION_PLAN = [
   { day: 1, label: '今晚', action: '只试一个学习方法候选，并记录孩子自己的第一步。', evidence: 'child_first_step' },
   { day: 2, label: '明天', action: '遮住答案回访同一第一步，看是否转身还记得。', evidence: 'next_day_revisit' },
@@ -319,6 +372,17 @@ function buildLearningServicePathway(input = {}) {
   const safeProductTiers = productTiers.map((tier) => Object.assign({}, tier, {
     blockedClaims: Array.from(new Set([].concat(tier.blockedClaims || [], COMMERCIAL_CLAIM_BLOCKLIST)))
   }));
+  const publicK12BorrowPlaybook = PUBLIC_K12_BORROW_PLAYBOOK.map((item, index) => Object.assign({}, item, {
+    priority: index + 1,
+    recommended: index === 0,
+    route: index === 2
+      ? '/pages/upload/upload?from=service_pathway&material=1'
+      : index === 3
+        ? '/pages/profile/profile?from=service_pathway&panel=report'
+        : index === 4
+          ? '/pages/arcade/arcade?from=service_pathway&mode=recall'
+          : '/pages/tutor/tutor?from=service_pathway'
+  }));
   return {
     id: 'learning_service_pathway',
     status: requiresEvidenceBeforeCommercialPush ? 'needs_real_task_validation' : 'ready_for_family_plan',
@@ -346,6 +410,7 @@ function buildLearningServicePathway(input = {}) {
     quickAssessmentBridge,
     aiLocalDeliverySplit: AI_LOCAL_DELIVERY_SPLIT,
     aiLocalDecisionMatrix: AI_LOCAL_DECISION_MATRIX,
+    publicK12BorrowPlaybook,
     validationPlan,
     partnerHandoffPolicy: Object.assign({}, PARTNER_HANDOFF_POLICY),
     moatLine: '护城河不在“生成一份测评结论”，而在测评、错题、回访、游戏和家长决策反复闭环后的家庭证据账本。',
@@ -363,6 +428,7 @@ function buildLearningServicePathway(input = {}) {
 module.exports = {
   MODE_CATALOG,
   PRODUCT_TIERS,
+  PUBLIC_K12_BORROW_PLAYBOOK,
   AI_LOCAL_DECISION_MATRIX,
   MODE_CHOICE_GUARDRAILS,
   inferSignals,

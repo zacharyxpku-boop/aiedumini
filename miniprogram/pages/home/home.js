@@ -551,6 +551,24 @@ Page({
     };
   },
 
+  buildMiniLessonResumeCard(cards = []) {
+    const list = Array.isArray(cards) ? cards : [];
+    const card = list.find((item) => item && item.type === 'three_minute_mini_lesson_return' && !item.isRevisited);
+    if (!card) return null;
+    return {
+      id: card.id,
+      title: card.title || '3 分钟小讲堂回访卡',
+      topicLabel: card.topicLabel || card.weakPoint || card.wrongCause || '',
+      conceptGap: card.wrongCause || card.wrongCauseBucket || '',
+      firstStep: card.prompt || card.front || '',
+      blackboardLine: card.blackboardLine || card.prompt || '',
+      parentLine: card.backPrompt || (card.nextPracticePlan && card.nextPracticePlan.parentPrompt) || '',
+      nextDayReview: card.revisit || (card.nextPracticePlan && card.nextPracticePlan.nextPracticeText) || '',
+      route: '/pages/review/review?from=home_mini_lesson_resume',
+      blockedFields: card.blockedFields || ['original_question', 'full_answer', 'score', 'ranking', 'talent_label']
+    };
+  },
+
   refresh() {
     const loadedState = storage.loadState();
     const state = loadedState;
@@ -565,6 +583,7 @@ Page({
     const thinkingSummary = storage.thinkingReceiptSummary ? storage.thinkingReceiptSummary() : null;
     const tonightPlan = storage.loadTonightPlan ? storage.loadTonightPlan() : null;
     const todayFocus = storage.loadTodayFocus ? storage.loadTodayFocus() : null;
+    const miniLessonResume = this.buildMiniLessonResumeCard(storage.loadReviewCards ? storage.loadReviewCards() : []);
     const todaySession = storage.getTodaySession ? storage.getTodaySession() : null;
     const focusEntryReady = storage.canStartFocusFromTodaySession
       ? storage.canStartFocusFromTodaySession(todaySession)
@@ -667,6 +686,7 @@ Page({
         companionPreference,
         tonightPlan,
         todayFocus,
+        miniLessonResume,
         growthMemory: growthMemoryLine
       }),
       growthMemory: {
@@ -1972,6 +1992,16 @@ Page({
 
   goReview() {
     wx.switchTab({ url: '/pages/review/review' });
+  },
+
+  goMiniLessonResume() {
+    const card = this.data.homeViewModel && this.data.homeViewModel.miniLessonResume;
+    const route = card && card.route ? card.route : '/pages/review/review?from=home_mini_lesson_resume';
+    if (route.indexOf('/pages/review/review') === 0) {
+      wx.switchTab({ url: '/pages/review/review' });
+      return;
+    }
+    navigation.navigateLearningRoute(route);
   },
 
   goFocus() {

@@ -2225,3 +2225,43 @@
   font-size: 20rpx;
   line-height: 1.35;
 }
+
+.mini-lesson-resume-card {
+  margin-top: 20rpx;
+  padding: 24rpx;
+  border-radius: 20rpx;
+  background: #f8fafc;
+  border: 1rpx solid #dbe7ef;
+  box-shadow: 0 14rpx 34rpx rgba(15, 23, 42, 0.08);
+}
+
+.mini-lesson-resume-kicker {
+  color: #0f766e;
+  font-size: 21rpx;
+  font-weight: 900;
+}
+
+.mini-lesson-resume-title {
+  margin-top: 8rpx;
+  color: #0f172a;
+  font-size: 30rpx;
+  font-weight: 900;
+  line-height: 1.35;
+}
+
+.mini-lesson-resume-line {
+  margin-top: 10rpx;
+  color: #475569;
+  font-size: 23rpx;
+  line-height: 1.45;
+}
+
+.mini-lesson-resume-guard {
+  margin-top: 14rpx;
+  padding: 12rpx 14rpx;
+  border-radius: 14rpx;
+  background: #ecfeff;
+  color: #155e75;
+  font-size: 21rpx;
+  line-height: 1.4;
+}

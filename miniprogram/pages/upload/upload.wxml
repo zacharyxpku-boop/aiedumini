@@ -297,6 +297,20 @@
               </view>
             </view>
           </view>
+          <view class="intake-action-queue" wx:if="{{lastReportCta.servicePathway.publicK12BorrowPlaybook.length}}">
+            <view class="intake-action-title">公开资料借力表</view>
+            <view class="intake-action-item" wx:for="{{lastReportCta.servicePathway.publicK12BorrowPlaybook}}" wx:key="id">
+              <view class="intake-action-main">
+                <text>{{item.label}}</text>
+                <text>{{item.bestUse}}</text>
+              </view>
+              <view class="intake-action-meta">
+                <text>本地守：{{item.localCodeOwns}}</text>
+                <text>AI 做：{{item.aiBetterFor}}</text>
+                <text>不做：{{item.mustNotUse}}</text>
+              </view>
+            </view>
+          </view>
           <view class="intake-action-queue" wx:if="{{lastReportCta.servicePathway.validationPlan.length}}">
             <view class="intake-action-title">7 天验证</view>
             <view class="intake-action-item" wx:for="{{lastReportCta.servicePathway.validationPlan}}" wx:key="day">

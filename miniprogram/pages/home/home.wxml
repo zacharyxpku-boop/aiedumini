@@ -100,6 +100,13 @@
           <text>{{homeViewModel.nextStep.text}}</text>
           <text class="route-next-link">{{homeViewModel.nextStep.cta}}</text>
         </view>
+        <view class="mini-lesson-resume-card" wx:if="{{homeViewModel.miniLessonResume}}" catchtap="goMiniLessonResume">
+          <view class="mini-lesson-resume-kicker">3 分钟小讲堂</view>
+          <view class="mini-lesson-resume-title">{{homeViewModel.miniLessonResume.topicLabel}}</view>
+          <view class="mini-lesson-resume-line">小黑板：{{homeViewModel.miniLessonResume.blackboardLine}}</view>
+          <view class="mini-lesson-resume-line">家长只问：{{homeViewModel.miniLessonResume.parentLine}}</view>
+          <view class="mini-lesson-resume-guard">只带下一步动作，不带原题、完整答案、分数、竞争比较或评价标签</view>
+        </view>
         <view class="focus-entry-lite" wx:if="{{todayFocus}}" catchtap="goFocus">
           <text>咕点陪你把这一小步做完</text>
           <text class="route-next-link">进专注舱</text>

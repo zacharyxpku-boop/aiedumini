@@ -23,6 +23,13 @@ function companionStrip(input) {
 }
 
 function buildNextStep(input) {
+  if (input && input.miniLessonResume) {
+    return {
+      text: `下一步：接上 ${safeText(input.miniLessonResume.topicLabel || input.miniLessonResume.conceptGap, '3 分钟小讲堂')}。`,
+      cta: '继续小讲堂',
+      action: 'miniLesson'
+    };
+  }
   if (input && input.todayFocus) {
     return {
       text: '下一步：去修今晚最卡的一步。',
@@ -40,8 +47,24 @@ function buildNextStep(input) {
   return null;
 }
 
+function buildMiniLessonResume(input = {}) {
+  const source = input.miniLessonResume || null;
+  if (!source) return null;
+  return {
+    id: source.id || 'mini_lesson_resume',
+    title: '继续 3 分钟小讲堂',
+    topicLabel: safeText(source.topicLabel || source.title || source.conceptGap, '当前概念缺口'),
+    blackboardLine: safeText(source.blackboardLine || source.firstStep || source.prompt, '先说出第一步'),
+    parentLine: safeText(source.parentLine || source.backPrompt || source.parentCheck, '家长只问这一题第一步先看什么'),
+    nextDayReview: safeText(source.nextDayReview || source.revisit, '明天换一题只复述第一步'),
+    route: source.route || '/pages/review/review?from=home_mini_lesson_resume',
+    blockedFields: ['原题', '完整答案', '分数', '排名', '天赋标签']
+  };
+}
+
 function buildHomeViewModel(input = {}) {
   const hasPlanOrFocus = !!(input.tonightPlan || input.todayFocus);
+  const miniLessonResume = buildMiniLessonResume(input);
   return {
     routePill: '今晚路线 · 第 1 步：排顺序',
     companionStrip: companionStrip(input.companionPreference),
@@ -60,7 +83,8 @@ function buildHomeViewModel(input = {}) {
     teacherPickerHint: '我懂你卡住了，我陪你先迈出第一步。',
     selectedCompanionLabel: safeText((companionPreference(input.companionPreference) || {}).selectedLabel, '咕点'),
     emptyState: hasPlanOrFocus ? null : '还没有今晚路线。咕点在旁边，先说一句卡在哪里。',
-    nextStep: buildNextStep(input),
+    nextStep: buildNextStep(Object.assign({}, input, { miniLessonResume })),
+    miniLessonResume,
     debugWarnings: []
   };
 }
