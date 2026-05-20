@@ -3295,7 +3295,12 @@ function commercialReadiness(summary) {
     featureHit(hasQuizLoop, 10, 'quiz attempts feed memory scheduling and repair', 'Add timed tests and richer answer checking.'),
     featureHit(hasGameLoop, 14, 'challenge/mission/learning-record loop exists', 'Add richer streak quests and seasonal checkpoints.'),
     featureHit(hasLeaderboard, 8, '本机进展快照已存在', '多人排行等强社交功能先保持隐藏，等连续记录稳定后再开放。'),
-    featureHit(false, 12, '', '外部材料接入需要先完成上传、解析和家长确认链路。'),
+    featureHit(
+      safe.materialMemoryBridge && Array.isArray(safe.materialMemoryBridge.sourceRows) && safe.materialMemoryBridge.sourceRows.length > 0,
+      12,
+      '外部材料上传已接入材料记忆桥',
+      '继续把导出和家长确认包装成更完整的外部协作路径。'
+    ),
     featureHit(hasShareLibrary, 10, '本机分享卡片库已存在', '后续再扩展共享素材库。'),
     featureHit(hasTutorLoop || hasWeakLoop, 10, hasThinkingProof ? '作业、雷达、点拨和思路记录已连通' : '作业、雷达和点拨已连通', '继续收集真实学习记录，提高个性化质量。'),
     featureHit(sync.readyForCloud, 10, '连续记录协议已就绪', '开通真实会话后再做多端承接。')
