@@ -97,6 +97,49 @@ const AI_LOCAL_DELIVERY_SPLIT = [
   }
 ];
 
+const AI_LOCAL_DECISION_MATRIX = [
+  {
+    id: 'socratic_question_wording',
+    module: '苏格拉底点拨',
+    betterOwner: 'ai',
+    aiUse: '根据孩子当前表达改写追问语气、类比和鼓励方式。',
+    localRule: '本地代码决定题型轴、提示层级、答案拦截和是否切入小讲堂。',
+    releaseGate: 'blocked_answer_request_must_fallback_to_first_step'
+  },
+  {
+    id: 'mini_lesson_mode_route',
+    module: '3 分钟小讲堂',
+    betterOwner: 'local_code',
+    aiUse: '只生成 AI 老师一句话和 AI 同学常见误区。',
+    localRule: '本地代码决定触发阈值、三帧小黑板、退出票据、回访卡和游戏解锁。',
+    releaseGate: 'child_exit_ticket_required'
+  },
+  {
+    id: 'learning_preference_report',
+    module: '学习偏好/测评资料报告',
+    betterOwner: 'hybrid',
+    aiUse: '把测评摘要改写成家长能理解的学习方法候选。',
+    localRule: '本地代码阻断天赋定性、分数排名、提分承诺，并生成 7 天验证计划。',
+    releaseGate: 'assessment_requires_real_homework_evidence'
+  },
+  {
+    id: 'game_recall_and_xp',
+    module: '游戏化轻复练',
+    betterOwner: 'local_code',
+    aiUse: '改写挑战文案和鼓励语。',
+    localRule: '本地代码决定 XP、间隔复习、失败重练、排行榜禁用和分享字段。',
+    releaseGate: 'reward_only_first_step_wrong_cause_revisit'
+  },
+  {
+    id: 'parent_partner_handoff',
+    module: '家长/合作方交付包',
+    betterOwner: 'local_code',
+    aiUse: '生成低压家长话术和服务候选摘要。',
+    localRule: '本地代码只放行今晚行动、家长问题、下一证据和服务候选。',
+    releaseGate: 'private_fields_removed_before_partner_view'
+  }
+];
+
 const SEVEN_DAY_VALIDATION_PLAN = [
   { day: 1, label: '今晚', action: '只试一个学习方法候选，并记录孩子自己的第一步。', evidence: 'child_first_step' },
   { day: 2, label: '明天', action: '遮住答案回访同一第一步，看是否转身还记得。', evidence: 'next_day_revisit' },
@@ -234,6 +277,7 @@ function buildLearningServicePathway(input = {}) {
     ],
     quickAssessmentBridge,
     aiLocalDeliverySplit: AI_LOCAL_DELIVERY_SPLIT,
+    aiLocalDecisionMatrix: AI_LOCAL_DECISION_MATRIX,
     validationPlan,
     partnerHandoffPolicy: Object.assign({}, PARTNER_HANDOFF_POLICY),
     moatLine: '护城河不在“生成一份测评结论”，而在测评、错题、回访、游戏和家长决策反复闭环后的家庭证据账本。',
@@ -251,6 +295,7 @@ function buildLearningServicePathway(input = {}) {
 module.exports = {
   MODE_CATALOG,
   PRODUCT_TIERS,
+  AI_LOCAL_DECISION_MATRIX,
   inferSignals,
   buildLearningServicePathway
 };

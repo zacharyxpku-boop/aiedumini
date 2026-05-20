@@ -816,6 +816,7 @@ Page({
     socraticFeedbackNextAction: '',
     miniLessonExitGateStatus: '',
     miniLessonExitGateNextRoute: '',
+    miniLessonActiveFrameIndex: 0,
     childExitTicketText: '',
     surfaceDepthPack: null,
     unifiedNextAction: null,
@@ -900,6 +901,7 @@ Page({
       socraticFeedbackNextAction: '',
       miniLessonExitGateStatus: '',
       miniLessonExitGateNextRoute: '',
+      miniLessonActiveFrameIndex: 0,
       childExitTicketText: '',
       tutorTurnState,
       surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('tutor') : null,
@@ -918,6 +920,32 @@ Page({
 
   onMiniLessonExitTicketInput(event) {
     this.setData({ childExitTicketText: event.detail.value });
+  },
+
+  setMiniLessonActiveFrame(event) {
+    const receipt = this.data.thinkingReceipt || {};
+    const frames = receipt.miniLesson && receipt.miniLesson.blackboard && Array.isArray(receipt.miniLesson.blackboard.frames)
+      ? receipt.miniLesson.blackboard.frames
+      : [];
+    const rawIndex = event && event.currentTarget && event.currentTarget.dataset
+      ? Number(event.currentTarget.dataset.index || 0)
+      : 0;
+    const nextIndex = Math.max(0, Math.min(Number.isFinite(rawIndex) ? rawIndex : 0, Math.max(frames.length - 1, 0)));
+    this.setData({ miniLessonActiveFrameIndex: nextIndex });
+  },
+
+  advanceMiniLessonFrame() {
+    const receipt = this.data.thinkingReceipt || {};
+    const frames = receipt.miniLesson && receipt.miniLesson.blackboard && Array.isArray(receipt.miniLesson.blackboard.frames)
+      ? receipt.miniLesson.blackboard.frames
+      : [];
+    const maxIndex = Math.max(frames.length - 1, 0);
+    const nextIndex = Math.min(Number(this.data.miniLessonActiveFrameIndex || 0) + 1, maxIndex);
+    this.setData({ miniLessonActiveFrameIndex: nextIndex });
+  },
+
+  replayMiniLessonFrame() {
+    this.setData({ miniLessonActiveFrameIndex: 0 });
   },
 
   quickStart() {
@@ -1308,6 +1336,7 @@ Page({
       socraticFeedbackNextAction: '',
       miniLessonExitGateStatus: '',
       miniLessonExitGateNextRoute: '',
+      miniLessonActiveFrameIndex: 0,
       childExitTicketText: ''
     });
     this.syncTutorSignal(masterySignal, coachStep);
@@ -1488,7 +1517,8 @@ Page({
       socraticFeedbackRecordedAt: '',
       socraticFeedbackNextAction: '',
       miniLessonExitGateStatus: '',
-      miniLessonExitGateNextRoute: ''
+      miniLessonExitGateNextRoute: '',
+      miniLessonActiveFrameIndex: 0
     });
   },
 

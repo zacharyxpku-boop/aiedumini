@@ -2075,7 +2075,7 @@ function buildFamilyDecisionCalendar(input = {}, methodCandidateCards = [], wron
   };
 }
 
-function buildUploadedMaterialDecisionDossier(input = {}, parts = {}, sourceEvidenceLedger = {}, reportEvidenceReleaseGate = {}, portraitConfidenceSystem = {}) {
+function buildUploadedMaterialDecisionDossier(input = {}, parts = {}, sourceEvidenceLedger = {}, reportEvidenceReleaseGate = {}, portraitConfidenceSystem = {}, servicePathway = {}) {
   const sources = Array.isArray(parts.reportSources) ? parts.reportSources : [];
   const lanes = Array.isArray(sourceEvidenceLedger.lanes) ? sourceEvidenceLedger.lanes : [];
   const laneById = lanes.reduce((acc, lane) => {
@@ -2261,6 +2261,17 @@ function buildUploadedMaterialDecisionDossier(input = {}, parts = {}, sourceEvid
     methodValidationNextAction: methodValidationStages[0]
       ? methodValidationStages[0].label
       : '补一条真实作业第一步证据',
+    servicePathwaySummary: servicePathway && servicePathway.id ? {
+      status: servicePathway.status || '',
+      primaryMode: servicePathway.primaryMode || null,
+      primaryTier: servicePathway.primaryTier || null,
+      releaseGate: servicePathway.safetyBoundary ? servicePathway.safetyBoundary.releaseGate : '',
+      validationPlan: Array.isArray(servicePathway.validationPlan) ? servicePathway.validationPlan.slice(0, 7) : [],
+      partnerHandoffPolicy: servicePathway.partnerHandoffPolicy || null,
+      blockedClaims: servicePathway.safetyBoundary && Array.isArray(servicePathway.safetyBoundary.blocked)
+        ? servicePathway.safetyBoundary.blocked
+        : []
+    } : null,
     detailedReportSections,
     materialLanes,
     nextEvidenceQueue: nextQueue,
@@ -2307,6 +2318,7 @@ function buildParentDecisionBook(input = {}) {
   const reportEvidenceReleaseGate = input.reportEvidenceReleaseGate || {};
   const sourceEvidenceLedger = input.sourceEvidenceLedger || {};
   const portraitConfidenceSystem = input.portraitConfidenceSystem || {};
+  const servicePathway = input.servicePathway || {};
   const releaseDecision = reportEvidenceReleaseGate.releaseDecision || 'collect_more_evidence';
   const safeHandoff = reportEvidenceReleaseGate.homeSchoolSafeHandoff || {};
   const nextEvidenceQueue = Array.isArray(sourceEvidenceLedger.nextEvidenceQueue) ? sourceEvidenceLedger.nextEvidenceQueue : [];
@@ -2351,6 +2363,14 @@ function buildParentDecisionBook(input = {}) {
     tonightDoNot,
     tomorrowCheck: tonightDecisionBrief.tomorrowRevisit || '明天换一题回访同一第一步。',
     releaseGates,
+    servicePathway: servicePathway && servicePathway.id ? {
+      status: servicePathway.status || '',
+      primaryMode: servicePathway.primaryMode || null,
+      primaryTier: servicePathway.primaryTier || null,
+      releaseGate: servicePathway.safetyBoundary ? servicePathway.safetyBoundary.releaseGate : '',
+      validationPlan: Array.isArray(servicePathway.validationPlan) ? servicePathway.validationPlan.slice(0, 7) : [],
+      partnerHandoffPolicy: servicePathway.partnerHandoffPolicy || null
+    } : null,
     sharePolicy: {
       allowedFields: Array.isArray(safeHandoff.allowedFields) ? safeHandoff.allowedFields.slice(0, 8) : ['tonight_action', 'parent_question', 'next_day_revisit_status'],
       blockedFields: Array.isArray(safeHandoff.blockedFields) ? safeHandoff.blockedFields.slice(0, 10) : ['original_question', 'full_answer', 'score', 'ranking', 'full_dialogue'],
@@ -2643,7 +2663,8 @@ function buildLearningReportDraft(input = {}) {
   const homeSchoolConferenceKit = buildHomeSchoolConferenceKit(parts, diagnosisMatrix, homeSchoolCollaborationDigest, crossWeekTrendBoard, parentDecisionTrustSystem);
   const reportEvidenceReleaseGate = buildReportEvidenceReleaseGate(input, portraitDecisionReleaseSystem, crossWeekTrendBoard, homeSchoolCollaborationDigest, homeSchoolConferenceKit, portraitConfidenceSystem, portraitEvidenceMaturitySystem);
   const sourceEvidenceLedger = buildSourceEvidenceLedger(input, parts, familyDecisionMemo, reportEvidenceReleaseGate);
-  const uploadedMaterialDecisionDossier = buildUploadedMaterialDecisionDossier(input, parts, sourceEvidenceLedger, reportEvidenceReleaseGate, portraitConfidenceSystem);
+  const servicePathway = input.servicePathway && typeof input.servicePathway === 'object' ? input.servicePathway : null;
+  const uploadedMaterialDecisionDossier = buildUploadedMaterialDecisionDossier(input, parts, sourceEvidenceLedger, reportEvidenceReleaseGate, portraitConfidenceSystem, servicePathway);
   const tonightDecisionBrief = buildTonightDecisionBrief(parts, diagnosisMatrix, familyDecisionMemo, parentDecisionTrustSystem, questionBankRecallReportBridge, input.socraticPromptQualityJudge || null);
   const reportGameEvidence = input.gameEvidence || {};
   const reportHighFrequencyLoop = input.highFrequencyPracticeLoop || reportGameEvidence.highFrequencyPracticeLoop || {};
@@ -2676,7 +2697,8 @@ function buildLearningReportDraft(input = {}) {
     parentDecisionTrustSystem,
     reportEvidenceReleaseGate,
     sourceEvidenceLedger,
-    portraitConfidenceSystem
+    portraitConfidenceSystem,
+    servicePathway
   });
   const aiLocalImplementationMatrix = buildAiLocalImplementationMatrix({
     sourceEvidenceLedger,
@@ -2735,6 +2757,7 @@ function buildLearningReportDraft(input = {}) {
     spacedRecallPolicy,
     gameReturnEvidence,
     openMaicInspiredDecisionBridge,
+    servicePathway,
     parentDecisionBook,
     aiLocalImplementationMatrix,
     generatedAt: nowIso(input.now),
@@ -2794,6 +2817,7 @@ function buildLearningReportDraft(input = {}) {
     spacedRecallPolicy,
     gameReturnEvidence,
     openMaicInspiredDecisionBridge,
+    servicePathway,
     parentDecisionBook,
     aiLocalImplementationMatrix,
     reportCompleteness: completeness,

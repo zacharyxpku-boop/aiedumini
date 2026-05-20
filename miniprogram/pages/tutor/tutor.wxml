@@ -279,12 +279,26 @@
             <view class="mini-lesson-gap">卡点：{{thinkingReceipt.miniLesson.conceptGap}}</view>
             <view class="mini-lesson-board">
               <view class="mini-lesson-board-title">{{thinkingReceipt.miniLesson.blackboard.title}}</view>
-              <view class="mini-lesson-frame" wx:for="{{thinkingReceipt.miniLesson.blackboard.frames}}" wx:key="id">
+              <view class="mini-lesson-frame-step">第 {{miniLessonActiveFrameIndex + 1}} / {{thinkingReceipt.miniLesson.blackboard.frames.length}} 帧，只看当前这一格</view>
+              <view class="mini-lesson-frame-tabs">
+                <button
+                  class="mini-lesson-frame-tab {{index === miniLessonActiveFrameIndex ? 'active' : ''}}"
+                  wx:for="{{thinkingReceipt.miniLesson.blackboard.frames}}"
+                  wx:key="id"
+                  data-index="{{index}}"
+                  bindtap="setMiniLessonActiveFrame"
+                >{{index + 1}}</button>
+              </view>
+              <view class="mini-lesson-frame" wx:for="{{thinkingReceipt.miniLesson.blackboard.frames}}" wx:key="id" wx:if="{{index === miniLessonActiveFrameIndex}}">
                 <view class="mini-lesson-frame-index">{{index + 1}}</view>
                 <view class="mini-lesson-frame-copy">
                   <view class="mini-lesson-frame-draw">{{item.draw}}</view>
                   <view class="mini-lesson-frame-say">{{item.say}}</view>
                 </view>
+              </view>
+              <view class="mini-lesson-frame-actions">
+                <button class="mini-lesson-frame-action" bindtap="replayMiniLessonFrame">回到第 1 帧</button>
+                <button class="mini-lesson-frame-action primary" bindtap="advanceMiniLessonFrame">看下一帧</button>
               </view>
             </view>
             <view class="mini-lesson-two-col">

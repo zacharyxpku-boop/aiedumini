@@ -2741,11 +2741,21 @@ Page({
     });
   },
 
-  onLoad() {
+  onLoad(options = {}) {
     if (wx.showShareMenu) {
       wx.showShareMenu({
         withShareTicket: true,
         menus: ['shareAppMessage', 'shareTimeline']
+      });
+    }
+    const query = options || {};
+    const panel = query.panel === 'report' ? 'assessment' : (query.panel || '');
+    if (query.quick_assessment === '1' || panel === 'assessment') {
+      this.setData({
+        profilePanel: 'assessment',
+        profilePanelTitle: '测评与方法建议',
+        showAdvancedProfile: true,
+        showLearningQuestionnaire: query.quick_assessment === '1' ? true : this.data.showLearningQuestionnaire
       });
     }
   },
@@ -3087,6 +3097,8 @@ Page({
   syncLearningReportFromInput(patch = {}) {
     const input = Object.assign({}, this.data.learningReportInput, patch || {});
     const existingSources = Array.isArray(input.reportSources) ? input.reportSources : [];
+    const selectedAnswers = this.learningReportAnswersAsList(this.data.learningReportAnswers);
+    const patchAnswers = Array.isArray(input.assessmentAnswers) ? input.assessmentAnswers : [];
     const payload = Object.assign({}, input, {
       reportSources: existingSources.length ? existingSources : input.sourceText ? [{
         type: 'manual_text',
@@ -3098,7 +3110,7 @@ Page({
       parsedScores: input.parsedScores || {},
       parsedRanks: input.parsedRanks || {},
       recognitionDraft: input.recognitionDraft || null,
-      assessmentAnswers: this.learningReportAnswersAsList(this.data.learningReportAnswers)
+      assessmentAnswers: selectedAnswers.length ? selectedAnswers : patchAnswers
     });
     const reportState = storage.buildLearningReportFromInput
       ? storage.buildLearningReportFromInput(payload)

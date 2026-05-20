@@ -5801,11 +5801,36 @@ function ensureMiniLessonReturnReviewCard(seed = {}, context = {}) {
 function recordMiniLessonExitGate(input = {}, context = {}) {
   const now = new Date();
   const childExitTicketText = String(input.childExitTicketText || input.receiverFirstStep || input.childFirstStep || '').trim();
-  const hasChildExitTicket = childExitTicketText.length >= 4 && !/答案|直接|代写|帮我写|带我|提示|讲一下|不会|不懂|不知道/.test(childExitTicketText);
-  const status = input.status === 'passed' && hasChildExitTicket ? 'passed' : 'needs_support';
   const evidenceThread = input.evidenceThread && typeof input.evidenceThread === 'object'
     ? input.evidenceThread
     : {};
+  const exitTicketQuality = childStepQuality(childExitTicketText);
+  const hasChildExitTicket = childExitTicketText.length >= 4
+    && !/答案|直接|代写|帮我写|带我|提示|讲一下|不会|不懂|不知道/.test(childExitTicketText)
+    && ['partial', 'actionable'].includes(exitTicketQuality);
+  const alignmentSource = [
+    input.firstStep,
+    input.firstStepEvidence,
+    evidenceThread.firstStep,
+    evidenceThread.wrongCause,
+    evidenceThread.parentCheck,
+    evidenceThread.topicLabel,
+    evidenceThread.topicCardId
+  ].concat((Array.isArray(input.blackboardFrames) ? input.blackboardFrames : []).reduce((acc, frame) => acc.concat([
+    frame.draw,
+    frame.say,
+    frame.evidence,
+    frame.localGate
+  ]), [])).join(' ');
+  const alignmentTokens = String(alignmentSource || '')
+    .split(/[\s，。；、：:,.!?/|\->]+/)
+    .map((item) => item.trim())
+    .filter((item) => item && item.length >= 2 && !/child|first|step|gate|frame|board|evidence|local|topic|card/.test(item))
+    .slice(0, 24);
+  const alignedWithFirstStep = !alignmentTokens.length
+    || alignmentTokens.some((token) => childExitTicketText.indexOf(token) >= 0)
+    || /先|第一步|圈|找|看|写|列|读|标|画/.test(childExitTicketText);
+  const status = input.status === 'passed' && hasChildExitTicket && alignedWithFirstStep ? 'passed' : 'needs_support';
   const topicCardId = input.topicCardId || evidenceThread.topicCardId || '';
   const flowTraceId = input.flowTraceId || evidenceThread.flowTraceId || context.flowTraceId || '';
   const firstStepEvidence = status === 'passed'
@@ -5841,6 +5866,8 @@ function recordMiniLessonExitGate(input = {}, context = {}) {
     topicCardId,
     firstStepEvidence,
     childExitTicketText,
+    exitTicketQuality,
+    alignedWithFirstStep,
     childAuthoredEvidence: status === 'passed',
     exitGate: input.exitGate || 'child_can_say_first_step',
     nextRoute,
@@ -5856,6 +5883,8 @@ function recordMiniLessonExitGate(input = {}, context = {}) {
     topic_card_id: topicCardId,
     first_step_evidence: firstStepEvidence,
     child_exit_ticket_text: childExitTicketText,
+    exit_ticket_quality: exitTicketQuality,
+    aligned_with_first_step: alignedWithFirstStep,
     child_authored_evidence: status === 'passed',
     next_route: nextRoute,
     blocked_fields: blockedFields.join(','),
@@ -5872,6 +5901,8 @@ function recordMiniLessonExitGate(input = {}, context = {}) {
           mini_lesson_exit_gate: status,
           first_step_evidence: firstStepEvidence,
           child_exit_ticket_text: childExitTicketText,
+          exit_ticket_quality: exitTicketQuality,
+          aligned_with_first_step: alignedWithFirstStep,
           child_authored_evidence: status === 'passed'
         }),
         updated_at: event.created_at

@@ -871,9 +871,10 @@ function buildMiniLessonTrigger(input = {}) {
   const repeatedBlocked = stillBlockedCount >= 2;
   const highHintStillBlocked = hintLevel >= 4 && stillBlockedCount >= 1 && !hasChildFirstStep;
   const noFirstStepAfterDialog = userTurnCount >= 3 && !hasChildFirstStep;
+  const answerRiskAfterRecovery = answerRisk && (stillBlockedCount >= 2 || userTurnCount >= 2 || hintLevel >= 4);
   const shouldTrigger = Boolean(
     input.forceMiniLesson
-    || answerRisk
+    || answerRiskAfterRecovery
     || repeatedBlocked
     || highHintStillBlocked
     || noFirstStepAfterDialog
@@ -888,6 +889,7 @@ function buildMiniLessonTrigger(input = {}) {
       hintLevel,
       hasChildFirstStep,
       answerRisk,
+      answerRiskAfterRecovery,
       repeatedBlocked,
       highHintStillBlocked,
       noFirstStepAfterDialog
@@ -897,6 +899,55 @@ function buildMiniLessonTrigger(input = {}) {
       : '继续保持苏格拉底追问，不提前上完整课堂。',
     blockedMode: 'full_ai_classroom',
     releaseCondition: '孩子能用自己的话说出第一步，才回到练习、报告或分享。'
+  };
+}
+
+function buildPrivateTutorModeRouter(input = {}, miniLesson = {}) {
+  const trigger = miniLesson.trigger || buildMiniLessonTrigger(input);
+  const hasChildFirstStep = Boolean(input.hasChildFirstStep || input.childFirstStep || input.childExitTicketText);
+  const exitPassed = input.exitGateStatus === 'passed' || Boolean(input.exitPassed);
+  const needsParentSupport = input.exitGateStatus === 'needs_support'
+    || input.parentSupportNeeded === true
+    || (trigger.shouldTrigger && Number(input.stillBlockedCount || 0) >= 3 && !hasChildFirstStep);
+  const nextMode = needsParentSupport
+    ? 'parent_handoff'
+    : exitPassed
+      ? 'game_recall'
+      : trigger.shouldTrigger
+        ? 'three_minute_mini_lesson'
+        : 'socratic_private_tutor';
+  const routeByMode = {
+    socratic_private_tutor: '/pages/tutor/tutor?from=private_tutor_router',
+    three_minute_mini_lesson: '/pages/tutor/tutor?from=mini_lesson_router',
+    game_recall: '/pages/arcade/arcade?from=mini_lesson_exit_passed',
+    parent_handoff: '/pages/profile/profile?from=mini_lesson_parent_handoff'
+  };
+  const reasonByMode = {
+    socratic_private_tutor: '孩子还在正常追问区间，继续苏格拉底 1 对 1，不提前上课。',
+    three_minute_mini_lesson: '孩子连续卡住或有答案捷径风险，只补一个概念缺口和三帧小黑板。',
+    game_recall: '孩子已经写出退出票据，进入轻复练巩固第一步和错因。',
+    parent_handoff: '孩子仍说不出第一步，降级为家长一句低压检查和明天回访。'
+  };
+  return {
+    id: 'private_tutor_mode_router',
+    positioning: '家庭晚间作业的苏格拉底式私教补位，不提供孩子自由选择的 AI 课堂模式。',
+    childSelectableMode: false,
+    nextMode,
+    route: routeByMode[nextMode],
+    reason: reasonByMode[nextMode],
+    triggerEvidence: trigger.triggerEvidence || {},
+    releaseGate: nextMode === 'three_minute_mini_lesson'
+      ? 'child_exit_ticket_required_before_game_or_share'
+      : nextMode === 'game_recall'
+        ? 'child_can_say_first_step_in_own_words'
+        : nextMode === 'parent_handoff'
+          ? 'parent_confirms_one_question_and_next_day_revisit'
+          : 'socratic_progress_not_yet_stuck',
+    allowedNextModes: ['socratic_private_tutor', 'three_minute_mini_lesson', 'game_recall', 'parent_handoff'],
+    blockedModes: ['full_ai_classroom', 'free_classroom_mode_picker', 'answer_reveal_mode', 'score_ranking_competition'],
+    localCodeOwns: ['mode_route', 'trigger_threshold', 'exit_gate', 'parent_handoff', 'game_unlock', 'share_fields'],
+    aiMayHelp: ['teacher_line', 'misconception_line', 'child_friendly_rephrase', 'parent_readable_summary'],
+    aiMustNotOwn: ['mode_release', 'final_answer', 'full_solution', 'talent_label', 'score', 'ranking']
   };
 }
 
@@ -1016,11 +1067,13 @@ function buildThreeMinuteMiniLesson(input = {}) {
   const boardFrames = buildMiniLessonBoardFrames(visualTemplate, topicCard, outline);
   const recoveryBranches = buildMiniLessonRecoveryBranches(visualTemplate, topicCard, outline);
   const executionContract = buildMiniLessonExecutionContract(visualTemplate, topicCard, outline);
+  const modeRouter = buildPrivateTutorModeRouter(input, { trigger });
   return {
     id: 'three_minute_mini_lesson',
     title: '3 分钟小讲堂',
     positioning: '只在苏格拉底点拨连续卡住时补位；不是 AI 课堂平台，不生成完整课程。',
     trigger,
+    modeRouter,
     conceptGap: visualTemplate.conceptLens,
     topicCard,
     topicTrack: {
@@ -1095,6 +1148,7 @@ function buildThreeMinuteMiniLesson(input = {}) {
       { id: 'has_parent_and_review', ok: Boolean(outline.parentCheck && outline.revisit) },
       { id: 'has_recovery_branches', ok: recoveryBranches.length >= 4 && recoveryBranches.every((item) => item.requiredEvidence && item.nextRoute) },
       { id: 'has_execution_contract', ok: executionContract.localCodeOwns.includes('portrait_release_gate') && executionContract.aiMustNotDecide.includes('portrait_update') },
+      { id: 'has_private_tutor_router', ok: modeRouter.childSelectableMode === false && modeRouter.blockedModes.includes('full_ai_classroom') && modeRouter.localCodeOwns.includes('mode_route') },
       { id: 'exit_before_reward_or_share', ok: true }
     ],
     shareBoundary: SAFE_SHARE_BOUNDARY
@@ -1121,6 +1175,10 @@ function evaluateThreeMinuteMiniLesson(miniLesson = {}) {
       && miniLesson.teacherSchoolBridge
       && miniLesson.nearTransfer
       && miniLesson.exitGate
+      && miniLesson.modeRouter
+      && miniLesson.modeRouter.childSelectableMode === false
+      && Array.isArray(miniLesson.modeRouter.blockedModes)
+      && miniLesson.modeRouter.blockedModes.includes('free_classroom_mode_picker')
       && localOwns.includes('trigger')
       && localOwns.includes('exit_gate')
       && aiMustNotDecide.includes('final_answer')
@@ -1132,7 +1190,8 @@ function evaluateThreeMinuteMiniLesson(miniLesson = {}) {
     conceptGap: miniLesson.conceptGap || '',
     topicCardId: miniLesson.topicCard ? miniLesson.topicCard.id : '',
     topicSubject: miniLesson.topicCard ? miniLesson.topicCard.subject : '',
-    blockedMode: miniLesson.trigger ? miniLesson.trigger.blockedMode : ''
+    blockedMode: miniLesson.trigger ? miniLesson.trigger.blockedMode : '',
+    routerMode: miniLesson.modeRouter ? miniLesson.modeRouter.nextMode : 'missing'
   };
 }
 
@@ -1339,6 +1398,7 @@ function buildOpenMaicInspiredDecisionBridge(plan = {}, reportSummary = {}, revi
       topicLabel: miniLesson.topicCard ? miniLesson.topicCard.label : '',
       topicLocalGate: miniLesson.topicCard ? miniLesson.topicCard.localGate : '',
       topicPractice: miniLesson.topicPractice || null,
+      modeRouter: miniLesson.modeRouter || null,
       activeRecallRevisitLadder,
       blackboardLine: miniLesson.blackboard ? miniLesson.blackboard.boardMove : '',
       blackboardFrames: miniLesson.blackboard && Array.isArray(miniLesson.blackboard.frames) ? miniLesson.blackboard.frames : [],
@@ -1360,6 +1420,7 @@ function buildOpenMaicInspiredDecisionBridge(plan = {}, reportSummary = {}, revi
       topicLabel: miniLesson.topicCard ? miniLesson.topicCard.label : '',
       topicLocalGate: miniLesson.topicCard ? miniLesson.topicCard.localGate : '',
       teacherObserve: miniLesson.teacherSchoolBridge ? miniLesson.teacherSchoolBridge.teacherObserve : '',
+      modeRouter: miniLesson.modeRouter || null,
       activeRecallRevisitLadder,
       blackboardFrames: miniLesson.blackboard && Array.isArray(miniLesson.blackboard.frames) ? miniLesson.blackboard.frames : [],
       sourceUseDecision,
@@ -1409,6 +1470,7 @@ module.exports = {
   buildOpenMaicInspiredTaskPlan,
   evaluateOpenMaicInspiredTaskPlan,
   buildMiniLessonTrigger,
+  buildPrivateTutorModeRouter,
   buildThreeMinuteMiniLesson,
   evaluateThreeMinuteMiniLesson,
   buildEvidenceThread,
