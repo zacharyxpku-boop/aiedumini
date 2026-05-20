@@ -1234,6 +1234,10 @@
             <text class="parent-brief-label">{{learningReportSummary.servicePathwayTitle}}</text>
             <text>路径状态：{{learningReportSummary.servicePathwayStatus}}｜{{learningReportSummary.servicePathwayNextAction}}</text>
             <text wx:for="{{learningReportSummary.servicePathwayModes}}" wx:key="id">模式：{{item.label}}｜{{item.localGate}}</text>
+            <text wx:if="{{learningReportSummary.servicePathwayModeChoiceProtocol}}">家庭模式选择：{{learningReportSummary.servicePathwayModeChoicePositioning}}</text>
+            <text wx:for="{{learningReportSummary.servicePathwayModeChoiceCards}}" wx:key="id">路径卡：{{item.recommended ? '推荐' : '可选'}}｜{{item.label}}｜{{item.choiceRole}}｜{{item.childCanChoose ? '孩子可选' : item.lockReason}}</text>
+            <text wx:for="{{learningReportSummary.servicePathwayModeChoiceGuardrails}}" wx:key="id">护栏：{{item.rule}}</text>
+            <text wx:if="{{learningReportSummary.servicePathwayModeChoiceReleaseGate}}">模式放行：{{learningReportSummary.servicePathwayModeChoiceReleaseGate}}</text>
             <text wx:for="{{learningReportSummary.servicePathwayTiers}}" wx:key="id">服务：{{item.label}}｜{{item.entryGate}}</text>
             <text wx:for="{{learningReportSummary.servicePathwayValidationPlan}}" wx:key="day">7天验证：{{item.label}}｜{{item.action}}｜证据 {{item.evidence}}</text>
             <text wx:for="{{learningReportSummary.servicePathwayAiLocalSplit}}" wx:key="id">AI/本地：{{item.label}}｜{{item.owns}}</text>

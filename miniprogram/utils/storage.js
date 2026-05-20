@@ -6175,10 +6175,11 @@ function recordGameSessionResult(result = {}, context = {}) {
     : 0;
   const nextReviewedToday = previousReviewedToday + reviewedToday;
   const nextCorrectToday = previousCorrectToday + Math.max(0, correct);
-  const activeRecallEvidenceComplete = !!result.activeRecallEvidenceComplete
-    || (Array.isArray(result.recallEvidence) && result.recallEvidence.some((item) => item && item.student_first_step && item.next_day_revisit_locked));
+  const xpEvidence = buildGameSessionXpEvidence(result, context);
+  const evidenceGate = normalizeXpEvidenceGate(xpEvidence);
+  const activeRecallEvidenceComplete = evidenceGate.pass;
   const nextEvidenceReturnToday = previousEvidenceReturnToday + (activeRecallEvidenceComplete ? 1 : 0);
-  const streakEligible = activeRecallEvidenceComplete || reviewedToday >= 4 || !!result.streakEligible;
+  const streakEligible = activeRecallEvidenceComplete;
   const streaked = streakEligible ? gameLogic.updateStreak(current, {
     reviewedToday: Math.max(1, reviewedToday),
     threshold: 1,
@@ -6206,7 +6207,6 @@ function recordGameSessionResult(result = {}, context = {}) {
     coins: Number(stats.coins || 0) + Number(achievementResult.coinsAwarded || 0)
   }));
   const requestedXp = Math.max(0, Number(result.xp || result.pendingXp || 0));
-  const xpEvidence = buildGameSessionXpEvidence(result, context);
   const xpRelease = requestedXp > 0
     ? addGameXP(requestedXp, context.xpReason || `game_session_${context.gameType || result.gameType || 'arcade'}`, xpEvidence)
     : { profile: saved, accepted: 0, gate: normalizeXpEvidenceGate(xpEvidence), blocked: false };

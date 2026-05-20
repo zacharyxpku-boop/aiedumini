@@ -2266,6 +2266,28 @@ function buildUploadedMaterialDecisionDossier(input = {}, parts = {}, sourceEvid
       primaryMode: servicePathway.primaryMode || null,
       primaryTier: servicePathway.primaryTier || null,
       releaseGate: servicePathway.safetyBoundary ? servicePathway.safetyBoundary.releaseGate : '',
+      modeChoiceProtocol: servicePathway.modeChoiceProtocol ? {
+        id: servicePathway.modeChoiceProtocol.id || '',
+        recommendedModeId: servicePathway.modeChoiceProtocol.recommendedModeId || '',
+        recommendedModeLabel: servicePathway.modeChoiceProtocol.recommendedModeLabel || '',
+        releaseGate: servicePathway.modeChoiceProtocol.releaseGate || '',
+        positioningLine: servicePathway.modeChoiceProtocol.positioningLine || '',
+        choiceCards: Array.isArray(servicePathway.modeChoiceProtocol.choiceCards)
+          ? servicePathway.modeChoiceProtocol.choiceCards.slice(0, 6).map((card) => ({
+            id: card.id || '',
+            label: card.label || '',
+            choiceRole: card.choiceRole || '',
+            recommended: !!card.recommended,
+            childCanChoose: !!card.childCanChoose,
+            parentConfirmRequired: !!card.parentConfirmRequired,
+            lockReason: card.lockReason || '',
+            exitEvidenceRequired: Array.isArray(card.exitEvidenceRequired) ? card.exitEvidenceRequired.slice(0, 4) : []
+          }))
+          : [],
+        guardrails: Array.isArray(servicePathway.modeChoiceProtocol.guardrails)
+          ? servicePathway.modeChoiceProtocol.guardrails.slice(0, 4)
+          : []
+      } : null,
       validationPlan: Array.isArray(servicePathway.validationPlan) ? servicePathway.validationPlan.slice(0, 7) : [],
       partnerHandoffPolicy: servicePathway.partnerHandoffPolicy || null,
       blockedClaims: servicePathway.safetyBoundary && Array.isArray(servicePathway.safetyBoundary.blocked)
@@ -2368,6 +2390,28 @@ function buildParentDecisionBook(input = {}) {
       primaryMode: servicePathway.primaryMode || null,
       primaryTier: servicePathway.primaryTier || null,
       releaseGate: servicePathway.safetyBoundary ? servicePathway.safetyBoundary.releaseGate : '',
+      modeChoiceProtocol: servicePathway.modeChoiceProtocol ? {
+        id: servicePathway.modeChoiceProtocol.id || '',
+        recommendedModeId: servicePathway.modeChoiceProtocol.recommendedModeId || '',
+        recommendedModeLabel: servicePathway.modeChoiceProtocol.recommendedModeLabel || '',
+        releaseGate: servicePathway.modeChoiceProtocol.releaseGate || '',
+        positioningLine: servicePathway.modeChoiceProtocol.positioningLine || '',
+        choiceCards: Array.isArray(servicePathway.modeChoiceProtocol.choiceCards)
+          ? servicePathway.modeChoiceProtocol.choiceCards.slice(0, 6).map((card) => ({
+            id: card.id || '',
+            label: card.label || '',
+            choiceRole: card.choiceRole || '',
+            recommended: !!card.recommended,
+            childCanChoose: !!card.childCanChoose,
+            parentConfirmRequired: !!card.parentConfirmRequired,
+            lockReason: card.lockReason || '',
+            exitEvidenceRequired: Array.isArray(card.exitEvidenceRequired) ? card.exitEvidenceRequired.slice(0, 4) : []
+          }))
+          : [],
+        guardrails: Array.isArray(servicePathway.modeChoiceProtocol.guardrails)
+          ? servicePathway.modeChoiceProtocol.guardrails.slice(0, 4)
+          : []
+      } : null,
       validationPlan: Array.isArray(servicePathway.validationPlan) ? servicePathway.validationPlan.slice(0, 7) : [],
       partnerHandoffPolicy: servicePathway.partnerHandoffPolicy || null
     } : null,

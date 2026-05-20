@@ -157,7 +157,7 @@ function coachConsole(selected, misconceptionTags, masterySignal, pasteRisk, act
   };
 }
 
-function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeStep, selected) {
+function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeStep, selected, runtimePressureSignal = null) {
   const safeMessages = Array.isArray(messages) ? messages : [];
   const userMessages = safeMessages.filter((item) => item.role === 'user');
   const assistantMessages = safeMessages.filter((item) => item.role === 'assistant');
@@ -179,6 +179,9 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
       title: selected && selected.text ? selected.text : ''
     })
     : null;
+  const pressureSignal = runtimePressureSignal && runtimePressureSignal.id
+    ? Object.assign({}, subjectSkillDepth || {}, runtimePressureSignal)
+    : (subjectSkillDepth || {});
   const curriculumSpine = storage.buildCurriculumSpine
     ? storage.buildCurriculumSpine({
       sourceText: latestUserText,
@@ -236,13 +239,13 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
     ? tutorLadder.buildSocraticPromptQualityJudge(
       subjectSkillDepth && subjectSkillDepth.taskType ? subjectSkillDepth.taskType : 'unknown',
       socraticQualityEvaluationSuite,
-      null
+      pressureSignal
     )
     : null;
   const socraticAiLocalBoundaryContract = tutorLadder.buildSocraticAiLocalBoundaryContract
     ? tutorLadder.buildSocraticAiLocalBoundaryContract(
       subjectSkillDepth && subjectSkillDepth.taskType ? subjectSkillDepth.taskType : 'unknown',
-      subjectSkillDepth || {}
+      pressureSignal
     )
     : null;
   const sevenSubjectMasterySprint = storage.buildSevenSubjectMasterySprint
@@ -256,15 +259,16 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
     })
     : null;
   const openMaicInspiredTaskPlan = openMaicPlan.buildOpenMaicInspiredTaskPlan({
-    taskType: subjectSkillDepth && subjectSkillDepth.taskType ? subjectSkillDepth.taskType : '',
-    pressureSignal: subjectSkillDepth || {},
-    firstStep: subjectSkillDepth && subjectSkillDepth.firstStep,
-    wrongCause: subjectSkillDepth && (subjectSkillDepth.wrongCause || subjectSkillDepth.reportSignal),
-    parentCheck: subjectSkillDepth && subjectSkillDepth.parentQuestion,
-    revisit: subjectSkillDepth && subjectSkillDepth.revisit
+    taskType: pressureSignal && pressureSignal.taskType ? pressureSignal.taskType : (subjectSkillDepth && subjectSkillDepth.taskType ? subjectSkillDepth.taskType : ''),
+    pressureSignal,
+    firstStep: pressureSignal && pressureSignal.firstStep,
+    wrongCause: pressureSignal && (pressureSignal.wrongCause || pressureSignal.reportSignal),
+    parentCheck: pressureSignal && (pressureSignal.parentCheck || pressureSignal.parentQuestion),
+    revisit: pressureSignal && (pressureSignal.revisit || pressureSignal.reviewMove)
   });
   const openMaicInspiredTaskPlanAudit = openMaicPlan.evaluateOpenMaicInspiredTaskPlan(openMaicInspiredTaskPlan);
-  const studentFirst = userMessages.some((item) => hasFirstStepEvidence(item.text || ''));
+  const recentUserMessages = userMessages.slice(-3);
+  const studentFirst = recentUserMessages.some((item) => hasFirstStepEvidence(item.text || ''));
   const recentStuckCount = countRecentStuckTurns(userMessages);
   const realHomeworkCoverageMatrix = storage.buildRealHomeworkCoverageMatrix
     ? storage.buildRealHomeworkCoverageMatrix({
@@ -274,13 +278,13 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
   const blockedAnswer = (masterySignal && masterySignal.status === 'blocked_answer_request')
     || (pasteRisk && pasteRisk.level === 'high');
   const miniLesson = openMaicPlan.buildThreeMinuteMiniLesson({
-    taskType: subjectSkillDepth && subjectSkillDepth.taskType ? subjectSkillDepth.taskType : '',
+    taskType: pressureSignal && pressureSignal.taskType ? pressureSignal.taskType : (subjectSkillDepth && subjectSkillDepth.taskType ? subjectSkillDepth.taskType : ''),
     subject: selected && selected.subject ? selected.subject : (subjectSkillDepth && subjectSkillDepth.subject) || '',
     sourceText: latestUserText,
-    firstStep: subjectSkillDepth && subjectSkillDepth.firstStep,
-    wrongCause: subjectSkillDepth && (subjectSkillDepth.wrongCause || subjectSkillDepth.reportSignal),
-    parentCheck: subjectSkillDepth && subjectSkillDepth.parentQuestion,
-    revisit: subjectSkillDepth && subjectSkillDepth.revisit,
+    firstStep: pressureSignal && pressureSignal.firstStep,
+    wrongCause: pressureSignal && (pressureSignal.wrongCause || pressureSignal.reportSignal),
+    parentCheck: pressureSignal && (pressureSignal.parentCheck || pressureSignal.parentQuestion),
+    revisit: pressureSignal && (pressureSignal.revisit || pressureSignal.reviewMove),
     userTurnCount: userMessages.length,
     stillBlockedCount: recentStuckCount,
     hintLevel: activeStep === 'micro_choice' ? 4 : 2,
@@ -293,11 +297,11 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
     ? openMaicPlan.buildEvidenceThread({
       miniLesson,
       topicCard: miniLesson.topicCard,
-      taskType: subjectSkillDepth && subjectSkillDepth.taskType ? subjectSkillDepth.taskType : '',
+      taskType: pressureSignal && pressureSignal.taskType ? pressureSignal.taskType : (subjectSkillDepth && subjectSkillDepth.taskType ? subjectSkillDepth.taskType : ''),
       subject: selected && selected.subject ? selected.subject : (subjectSkillDepth && subjectSkillDepth.subject) || '',
-      firstStep: subjectSkillDepth && subjectSkillDepth.firstStep,
-      wrongCause: subjectSkillDepth && (subjectSkillDepth.wrongCause || subjectSkillDepth.reportSignal),
-      parentCheck: subjectSkillDepth && subjectSkillDepth.parentQuestion
+      firstStep: pressureSignal && pressureSignal.firstStep,
+      wrongCause: pressureSignal && (pressureSignal.wrongCause || pressureSignal.reportSignal),
+      parentCheck: pressureSignal && (pressureSignal.parentCheck || pressureSignal.parentQuestion)
     })
     : null;
   const namedWrongCause = safeMessages.some((item) => /错因|卡在|审题|建模|条件|单位|符号|第一步/.test(String(item.text || '')));
@@ -348,6 +352,8 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
     focus: selected && selected.text ? selected.text : '还没锁定必须做',
     status: proofSentence ? '已可自己复述' : blockedAnswer ? '已拦住答案捷径' : '还在等一句自己的话',
     firstStepBoard,
+    real_homework_pressure_signal: pressureSignal,
+    pressureSignal,
     subjectSkillDepth,
     curriculumSpine,
     visualSocraticMatrix,
@@ -1115,7 +1121,7 @@ Page({
     const mergedTurnState = result && (result.tutor_turn_state || result.tutorTurnState) ? (result.tutor_turn_state || result.tutorTurnState) : turnState;
     storage.set(storage.KEYS.tutorMessages, next.slice(-20));
     const pasteRisk = pasteRiskSignal(next);
-    const receipt = buildThinkingReceipt(next, masterySignal, pasteRisk, coachStep, this.data.selected);
+    const receipt = buildThinkingReceipt(next, masterySignal, pasteRisk, coachStep, this.data.selected, result && result.real_homework_pressure_signal ? result.real_homework_pressure_signal : null);
     const diagnosticReceipt = Object.assign({}, receipt, {
       turnId: makeReceiptId('tutor_turn'),
       tutor_turn_state: mergedTurnState,
