@@ -475,15 +475,18 @@ function publicK12TutorIntro(challenge = {}, selected = {}) {
 function buildSocraticFeedbackAdjustment(item, turnState = {}) {
   const currentLevel = Math.max(1, Math.min(5, Number((item && item.hintLevel) || turnState.hintLevel || 1)));
   if (item && item.status === 'first_step_spoken') {
+    const nextHintLevel = Math.max(1, currentLevel - 1);
     return {
       status: item.status,
-      nextHintLevel: 5,
+      nextHintLevel,
       activeStep: 'method_summary',
-      coachStepLabel: '提示 5/5',
-      nextAction: '把第一步收成一句复盘，再生成明天回访。',
-      nextQuestion: '你用一句话说：这类题下次第一步先看哪里？',
+      coachStepLabel: `?? ${nextHintLevel}/5`,
+      nextAction: '???????????????????',
+      nextQuestion: '??????????????????',
       shouldUseTwoChoice: false,
-      releaseLine: '孩子已经能说第一步，下一轮转复盘和轻回访，不继续加提示。'
+      releaseLine: '????????????????????????????',
+      reviewEvidence: 'child_first_step_spoken',
+      reviewSeedType: 'next_day_first_step_revisit'
     };
   }
   const nextHintLevel = Math.max(4, Math.min(5, currentLevel + 1));
@@ -491,11 +494,13 @@ function buildSocraticFeedbackAdjustment(item, turnState = {}) {
     status: 'still_blocked',
     nextHintLevel,
     activeStep: 'micro_choice',
-    coachStepLabel: `提示 ${nextHintLevel}/5`,
-    nextAction: '下一轮只给二选一：先圈条件，还是先判断题目问什么。',
-    nextQuestion: '你现在只选一个：先圈条件，还是先看题目问什么？',
+    coachStepLabel: `?? ${nextHintLevel}/5`,
+    nextAction: '?????????????????????????',
+    nextQuestion: '???????????????????????',
     shouldUseTwoChoice: true,
-    releaseLine: '孩子还卡住，下一轮降到二选一和小黑板，不继续抽象追问。'
+    releaseLine: '???????????????????????????',
+    reviewEvidence: 'socratic_still_blocked',
+    reviewSeedType: 'two_choice_parent_handoff'
   };
 }
 
@@ -1126,6 +1131,45 @@ Page({
       storage.appendSyncMutation('socratic_effectiveness_feedback', item);
     }
     const adjustment = buildSocraticFeedbackAdjustment(item, turnState);
+    const reviewSeed = {
+      type: 'socratic_effectiveness_review_seed',
+      event: 'socratic_effectiveness_review_seed',
+      status: item.status,
+      evidence: adjustment.reviewEvidence,
+      seedType: adjustment.reviewSeedType,
+      route: '/pages/review/review?from=tutor_feedback',
+      nextAction: adjustment.nextAction,
+      turnId: item.turnId,
+      fallbackId: item.fallbackId,
+      hintLevel: adjustment.nextHintLevel,
+      coachStep: adjustment.activeStep,
+      createdAt: item.createdAt,
+      created_at: item.createdAt
+    };
+    if (storage.appendReviewEvent) {
+      storage.appendReviewEvent(reviewSeed);
+    }
+    if (storage.recordUnifiedNextAction) {
+      storage.recordUnifiedNextAction({
+        source: 'tutor_socratic_effectiveness_feedback',
+        route: reviewSeed.route,
+        nextAction: adjustment.nextAction,
+        evidence: reviewSeed.evidence,
+        subject: turnState.subject || receipt.subject || '',
+        taskType: turnState.taskType || receipt.taskType || ''
+      });
+    }
+    if (storage.recordSurfaceDepthAction) {
+      storage.recordSurfaceDepthAction({
+        surface: 'tutor',
+        dimensionId: 'socratic_effectiveness_feedback',
+        evidence: reviewSeed.evidence,
+        nextAction: adjustment.nextAction,
+        route: reviewSeed.route,
+        subject: turnState.subject || receipt.subject || '',
+        taskType: turnState.taskType || receipt.taskType || ''
+      });
+    }
     const adjustedTurnState = Object.assign({}, turnState, {
       hintLevel: adjustment.nextHintLevel,
       feedbackStatus: item.status,
