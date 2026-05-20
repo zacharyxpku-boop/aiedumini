@@ -43,10 +43,10 @@
       <view class="story-mission" wx:if="{{reportSourcePanel}}">
         <view class="story-mission-title">{{reportSourcePanel.title}}</view>
         <view class="story-mission-line">{{reportSourcePanel.line}}</view>
-        <view class="story-mission-rule">来源：{{reportSourcePanel.sourceSchemaId}} / {{reportSourcePanel.reportId}} / {{reportSourcePanel.cardId}}</view>
+        <view class="story-mission-rule">来源：已接入家长报告 / 错题回访 / 今日轻练</view>
         <view class="story-mission-rule" wx:if="{{reportSourcePanel.firstQuestion}}">本局先练：{{reportSourcePanel.firstQuestion}}</view>
-        <view class="story-mission-rule">来源卡：{{reportSourcePanel.matchedCount}} 张；禁传字段：{{reportSourcePanel.blockedFields}}</view>
-        <view class="story-mission-rule" wx:if="{{reportSourcePanel.openMaicBridgeStatus}}">OpenMAIC 任务门：{{reportSourcePanel.openMaicBridgeStatus}}</view>
+        <view class="story-mission-rule">来源卡：{{reportSourcePanel.matchedCount}} 张；原题、答案和分数不会进入分享。</view>
+        <view class="story-mission-rule" wx:if="{{reportSourcePanel.openMaicBridgeStatus}}">小讲堂回流：先说第一步，再锁明天回访。</view>
         <view class="story-mission-rule" wx:if="{{reportSourcePanel.returnRoute}}">练后回流：{{reportSourcePanel.returnRoute}}</view>
       </view>
       <view class="challenge-brief-top">
@@ -68,13 +68,28 @@
           bindtap="goQuestRoute"
         >{{item.label}} {{item.progressText}}</button>
       </view>
+      <view class="story-mission first-step-sprint-card" wx:if="{{challengeBrief.firstStepSprint}}">
+        <view class="story-mission-title">{{challengeBrief.firstStepSprint.title}}</view>
+        <view class="story-mission-line">{{challengeBrief.firstStepSprint.sourceLine}}</view>
+        <view class="story-mission-rule">本局只练：{{challengeBrief.firstStepSprint.weakKey}}</view>
+        <view class="story-mission-rule">{{challengeBrief.firstStepSprint.goalLine}}</view>
+        <view class="story-mission-rule">{{challengeBrief.firstStepSprint.rewardLine}}</view>
+        <view class="story-mission-rule">{{challengeBrief.firstStepSprint.parentLine}}</view>
+        <view class="story-mission-rule">{{challengeBrief.firstStepSprint.nextDayLine}}</view>
+        <view class="story-mission-rule">{{challengeBrief.firstStepSprint.safetyLine}}</view>
+        <view class="quest-action-row">
+          <button class="quest-action-btn" bindtap="startNinetySecondRecall">开始 90 秒第一步</button>
+          <button class="quest-action-btn" data-route="{{challengeBrief.firstStepSprint.reviewRoute}}" data-quest-id="first_step_sprint_review" data-label="明天回访" bindtap="goQuestRoute">明天回访</button>
+        </view>
+        <view class="story-mission-rule" wx:for="{{challengeBrief.firstStepSprintCheckpoints}}" wx:key="id">{{item.label}}：{{item.evidence}}</view>
+      </view>
       <view class="story-mission public-k12-challenge-mission" wx:if="{{challengeBrief.publicK12IntakeChallenge}}">
         <view class="story-mission-title">{{challengeBrief.publicK12IntakeChallenge.title}}</view>
         <view class="story-mission-line">公开 K12 挑战卡 {{challengeBrief.publicK12IntakeChallenge.challengeCount}} 张，可执行 {{challengeBrief.publicK12IntakeChallenge.executableCardCount}} 张；必须用自己的作业材料说第一步。</view>
         <view class="story-mission-rule">第一步：{{challengeBrief.publicK12IntakeChallenge.observableFirstMove}}</view>
         <view class="story-mission-rule">不会说时：{{challengeBrief.publicK12IntakeChallenge.fallbackIfNoChildInput}}</view>
         <view class="story-mission-rule">安全分享字段：{{challengeBrief.publicK12IntakeChallenge.shareSafeFields}}</view>
-        <view class="story-mission-rule">禁止字段：{{challengeBrief.publicK12IntakeChallenge.blockedFields}}</view>
+        <view class="story-mission-rule">安全边界：不带原题、完整答案、分数和同伴比较。</view>
         <view class="quest-action-row">
           <button class="quest-action-btn" data-route="{{challengeBrief.publicK12IntakeChallenge.route}}" data-quest-id="public_k12_arcade" data-label="开始挑战" bindtap="goQuestRoute">开始挑战</button>
           <button class="quest-action-btn" data-route="{{challengeBrief.publicK12IntakeChallenge.reviewRoute}}" data-quest-id="public_k12_review" data-label="明天回访" bindtap="goQuestRoute">明天回访</button>
@@ -159,6 +174,7 @@
       <view class="daily-return-line">{{dailyPrimaryRecallAction.oneActionLine}}</view>
       <view class="daily-return-rule">{{dailyPrimaryRecallAction.xpGate}}</view>
       <view class="daily-return-rule">明天回访：{{dailyPrimaryRecallAction.nextReturnWindow}}｜{{dailyPrimaryRecallAction.parentLine}}</view>
+      <view class="daily-return-rule" wx:if="{{dailyPrimaryRecallEvidencePacket}}">已写入：明天回访已锁定｜待补：第一步和错因回放</view>
       <view class="daily-return-rule">{{dailyPrimaryRecallAction.shareBoundary}}</view>
       <button class="daily-return-button" bindtap="runDailyPrimaryRecallAction">开始主回忆</button>
     </view>

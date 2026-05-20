@@ -207,7 +207,7 @@
           </view>
           <view class="receipt-first-step-board" wx:if="{{thinkingReceipt.socratic_ai_local_boundary_contract}}">
             <view class="receipt-diagnostic-title">{{thinkingReceipt.socratic_ai_local_boundary_contract.title}}</view>
-            <view class="receipt-board-avoid">{{thinkingReceipt.socratic_ai_local_boundary_contract.sourcePolicy}}</view>
+            <view class="receipt-board-avoid">只借公开结构做题型路由，不复制题文、不输出完整答案。</view>
             <view class="receipt-board-line">{{thinkingReceipt.socratic_ai_local_boundary_contract.parentLine}}</view>
             <view class="receipt-board-parent">{{thinkingReceipt.socratic_ai_local_boundary_contract.fallbackLine}}</view>
             <view class="receipt-board-line" wx:for="{{thinkingReceipt.socratic_ai_local_boundary_contract.runtimeDecisionRows}}" wx:key="id">本地规则：{{item.localDecision}}｜AI改写：{{item.aiAllowedRewrite}}</view>
@@ -264,22 +264,58 @@
             <view class="receipt-board-parent">家长只问：{{thinkingReceipt.openMaicInspiredTaskPlan.outline.parentCheck}}</view>
             <view class="receipt-board-line" wx:for="{{thinkingReceipt.openMaicInspiredScenes}}" wx:key="id">{{item.label}}：{{item.action}}</view>
             <view class="receipt-board-parent" wx:for="{{thinkingReceipt.openMaicInspiredEventFlow}}" wx:key="event">事件{{item.order}}：{{item.event}}｜{{item.localGate}}</view>
-            <view class="receipt-board-line" wx:for="{{thinkingReceipt.openMaicPublicK12Decisions}}" wx:key="id">{{item.label}}：本地管{{item.localCodeOwns[0]}}，AI 管{{item.aiBetterFor[0]}}</view>
+            <view class="receipt-board-line" wx:for="{{thinkingReceipt.openMaicPublicK12Decisions}}" wx:key="id">{{item.label}}：系统先定第一步，AI 只把提示说得更容易懂。</view>
             <view class="receipt-board-avoid">{{thinkingReceipt.openMaicInspiredTaskPlan.shareBoundary}}</view>
           </view>
-          <view class="receipt-first-step-board" wx:if="{{thinkingReceipt.miniLesson}}">
-            <view class="receipt-diagnostic-title">{{thinkingReceipt.miniLesson.title}}</view>
-            <view class="receipt-board-avoid">{{thinkingReceipt.miniLesson.positioning}}</view>
-            <view class="receipt-board-line">触发：{{thinkingReceipt.miniLesson.trigger.reason}}</view>
-            <view class="receipt-board-line">概念缺口：{{thinkingReceipt.miniLesson.conceptGap}}</view>
-            <view class="receipt-board-parent">{{thinkingReceipt.miniLesson.blackboard.title}}：{{thinkingReceipt.miniLesson.blackboard.boardMove}}</view>
-            <view class="receipt-board-line">第一步：{{thinkingReceipt.miniLesson.blackboard.firstStep}}</view>
-            <view class="receipt-board-parent" wx:for="{{thinkingReceipt.miniLesson.roles}}" wx:key="id">{{item.label}}：{{item.line}}</view>
-            <view class="receipt-board-line">近迁移：{{thinkingReceipt.miniLesson.nearTransfer.prompt}}</view>
-            <view class="receipt-board-parent">家长只问：{{thinkingReceipt.miniLesson.parentCheck}}</view>
-            <view class="receipt-board-line">明天回访：{{thinkingReceipt.miniLesson.nextDayReview}}</view>
-            <view class="receipt-board-avoid">退出门：{{thinkingReceipt.miniLesson.exitGate.passEvidence}}</view>
-            <view class="receipt-board-avoid">{{thinkingReceipt.miniLesson.shareBoundary}}</view>
+          <view class="mini-lesson-live-panel" wx:if="{{thinkingReceipt.miniLesson && thinkingReceipt.miniLesson.trigger && thinkingReceipt.miniLesson.trigger.shouldTrigger}}">
+            <view class="mini-lesson-head">
+              <view>
+                <view class="mini-lesson-kicker">3 分钟小讲堂</view>
+                <view class="mini-lesson-title">先补一个概念缺口，再回到练习</view>
+              </view>
+              <view class="mini-lesson-pill">补位</view>
+            </view>
+            <view class="mini-lesson-reason">{{thinkingReceipt.miniLesson.trigger.reason}}</view>
+            <view class="mini-lesson-gap">卡点：{{thinkingReceipt.miniLesson.conceptGap}}</view>
+            <view class="mini-lesson-board">
+              <view class="mini-lesson-board-title">{{thinkingReceipt.miniLesson.blackboard.title}}</view>
+              <view class="mini-lesson-frame" wx:for="{{thinkingReceipt.miniLesson.blackboard.frames}}" wx:key="id">
+                <view class="mini-lesson-frame-index">{{index + 1}}</view>
+                <view class="mini-lesson-frame-copy">
+                  <view class="mini-lesson-frame-draw">{{item.draw}}</view>
+                  <view class="mini-lesson-frame-say">{{item.say}}</view>
+                </view>
+              </view>
+            </view>
+            <view class="mini-lesson-two-col">
+              <view class="mini-lesson-note">
+                <view class="mini-lesson-note-label">AI 老师</view>
+                <view class="mini-lesson-note-text">{{thinkingReceipt.miniLesson.roles[0].line}}</view>
+              </view>
+              <view class="mini-lesson-note">
+                <view class="mini-lesson-note-label">误区同学</view>
+                <view class="mini-lesson-note-text">{{thinkingReceipt.miniLesson.roles[1].line}}</view>
+              </view>
+            </view>
+            <view class="mini-lesson-check">检查题：{{thinkingReceipt.miniLesson.checkQuestion}}</view>
+            <view class="mini-lesson-check">近迁移：{{thinkingReceipt.miniLesson.nearTransfer.prompt}}</view>
+            <view class="mini-lesson-parent">家长只问：{{thinkingReceipt.miniLesson.parentLine || thinkingReceipt.miniLesson.parentCheck}}</view>
+            <view class="mini-lesson-exit">退出门：{{thinkingReceipt.miniLesson.exitGate.passEvidence}}</view>
+            <view class="mini-lesson-exit-actions">
+              <button class="mini-lesson-exit-button primary" data-status="passed" bindtap="recordMiniLessonExitGate">我能说第一步</button>
+              <button class="mini-lesson-exit-button" data-status="needs_support" bindtap="recordMiniLessonExitGate">还不能过</button>
+            </view>
+            <view class="mini-lesson-check" wx:if="{{miniLessonExitGateStatus}}">已记录：{{miniLessonExitGateStatus}}</view>
+            <view class="mini-lesson-check" wx:if="{{miniLessonExitGateNextRoute}}">下一步：{{miniLessonExitGateNextRoute}}</view>
+            <view class="mini-lesson-check" wx:if="{{thinkingReceipt.miniLesson.executionContract}}">
+              本地门禁：{{thinkingReceipt.miniLesson.executionContract.releaseGates[0]}} / {{thinkingReceipt.miniLesson.executionContract.releaseGates[2]}}
+            </view>
+            <view class="mini-lesson-check" wx:for="{{thinkingReceipt.miniLesson.recoveryBranches}}" wx:key="id">
+              卡住分支：{{item.trigger}} → {{item.localAction}}
+            </view>
+            <view class="mini-lesson-thread" wx:if="{{thinkingReceipt.evidenceThread.topicCardId}}">
+              证据主键：{{thinkingReceipt.evidenceThread.topicCardId}} · 第 7 天：{{thinkingReceipt.evidenceThread.day7Gate}}
+            </view>
           </view>
           <view class="receipt-contract" wx:if="{{thinkingReceipt.socratic_contract}}">
             <view class="receipt-diagnostic-title">{{thinkingReceipt.socratic_contract.title}}</view>

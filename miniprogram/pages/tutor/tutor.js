@@ -273,6 +273,17 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
     forceMiniLesson: blockedAnswer || (!studentFirst && userMessages.length >= 2)
   });
   const miniLessonAudit = openMaicPlan.evaluateThreeMinuteMiniLesson(miniLesson);
+  const evidenceThread = openMaicPlan.buildEvidenceThread
+    ? openMaicPlan.buildEvidenceThread({
+      miniLesson,
+      topicCard: miniLesson.topicCard,
+      taskType: subjectSkillDepth && subjectSkillDepth.taskType ? subjectSkillDepth.taskType : '',
+      subject: selected && selected.subject ? selected.subject : (subjectSkillDepth && subjectSkillDepth.subject) || '',
+      firstStep: subjectSkillDepth && subjectSkillDepth.firstStep,
+      wrongCause: subjectSkillDepth && (subjectSkillDepth.wrongCause || subjectSkillDepth.reportSignal),
+      parentCheck: subjectSkillDepth && subjectSkillDepth.parentQuestion
+    })
+    : null;
   const namedWrongCause = safeMessages.some((item) => /错因|卡在|审题|建模|条件|单位|符号|第一步/.test(String(item.text || '')));
   const proofSentence = masterySignal && masterySignal.status === 'ready_for_parent_review';
   const score = Math.min(100,
@@ -378,6 +389,7 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
     openMaicInspiredTaskPlanAudit,
     miniLesson,
     miniLessonAudit,
+    evidenceThread,
     openMaicInspiredScenes: openMaicInspiredTaskPlan.scenes.slice(0, 6),
     openMaicInspiredEventFlow: openMaicInspiredTaskPlan.eventFlow.slice(0, 6),
     openMaicPublicK12Decisions: openMaicInspiredTaskPlan.publicK12ResourceDecisions.slice(0, 4),
@@ -519,6 +531,61 @@ function buildSocraticFeedbackAdjustment(item, turnState = {}) {
     releaseLine: '???????????????????????????',
     reviewEvidence: 'socratic_still_blocked',
     reviewSeedType: 'two_choice_parent_handoff'
+  };
+}
+
+function buildUploadReportSelectedHomework(handoff = {}, options = {}) {
+  if (!handoff || handoff.status !== 'ready') return null;
+  const miniLessonReport = handoff.openMaicDecisionBridge && handoff.openMaicDecisionBridge.miniLessonReport
+    ? handoff.openMaicDecisionBridge.miniLessonReport
+    : {};
+  const sourceSchemaId = handoff.sourceSchemaId || options.sourceSchemaId || 'uploaded_material';
+  const reportId = handoff.reportId || options.reportId || '';
+  const firstStep = miniLessonReport.blackboardLine
+    || (miniLessonReport.topicPractice && miniLessonReport.topicPractice.prompt)
+    || handoff.actionLabel
+    || '先说出第一步，不要写完整结果。';
+  const parentCheck = miniLessonReport.parentLine
+    || miniLessonReport.checkQuestion
+    || '家长只问第一步和错因，不看完整结果。';
+  const wrongCause = miniLessonReport.conceptGap
+    || miniLessonReport.topicLabel
+    || '上传材料里的第一步还没说清。';
+  return {
+    id: `upload_report_tutor_${reportId || sourceSchemaId}`,
+    text: handoff.line || handoff.title || `刚上传的${sourceSchemaId}，先做苏格拉底第一步。`,
+    subject: handoff.subject || '',
+    taskType: miniLessonReport.topicLabel || sourceSchemaId,
+    source: 'upload_report_handoff',
+    flowTraceId: handoff.flowTraceId || `upload_report:${reportId || sourceSchemaId}`,
+    reportId,
+    sourceSchemaId,
+    evidence: {
+      source: 'upload_report_handoff',
+      report_id: reportId,
+      source_schema_id: sourceSchemaId,
+      flow_trace_id: handoff.flowTraceId || `upload_report:${reportId || sourceSchemaId}`,
+      task_type: miniLessonReport.topicLabel || sourceSchemaId,
+      first_step_prompt: firstStep,
+      wrong_cause: wrongCause,
+      parent_check: parentCheck,
+      next_day_review: miniLessonReport.nextDayReview || '',
+      mini_lesson_check_question: miniLessonReport.checkQuestion || '',
+      mini_lesson_blackboard_line: miniLessonReport.blackboardLine || '',
+      mini_lesson_topic_gate: miniLessonReport.topicLocalGate || '',
+      blackboard_frames: Array.isArray(miniLessonReport.blackboardFrames) ? miniLessonReport.blackboardFrames : [],
+      blocked_fields: Array.isArray(handoff.blockedFields) ? handoff.blockedFields : ['original_question', 'full_answer', 'score', 'ranking'],
+      misconception_tags: [
+        { label: wrongCause, axis: sourceSchemaId, hint: firstStep }
+      ],
+      answer_boundary: 'first_step_only_no_full_answer'
+    },
+    uploadReportHandoff: {
+      title: handoff.title || '',
+      actionRoute: handoff.actionRoute || '',
+      returnRoute: handoff.returnRoute || '',
+      miniLessonReport
+    }
   };
 }
 
@@ -731,6 +798,8 @@ Page({
     socraticFeedbackStatus: '',
     socraticFeedbackRecordedAt: '',
     socraticFeedbackNextAction: '',
+    miniLessonExitGateStatus: '',
+    miniLessonExitGateNextRoute: '',
     surfaceDepthPack: null,
     unifiedNextAction: null,
     showTutorDetails: false
@@ -743,7 +812,13 @@ Page({
     const routeOptions = currentRouteOptions();
     const publicK12Challenge = findPublicK12Challenge(routeOptions);
     const publicK12Selected = publicK12Challenge ? buildPublicK12SelectedHomework(publicK12Challenge) : null;
-    let selected = publicK12Selected || storage.get(storage.KEYS.selectedHomework, null);
+    const uploadReportHandoff = routeOptions.from === 'upload_report_ready' && storage.get
+      ? storage.get('upload.report.handoff.v1', null)
+      : null;
+    const uploadReportSelected = !publicK12Selected && uploadReportHandoff
+      ? buildUploadReportSelectedHomework(uploadReportHandoff, routeOptions)
+      : null;
+    let selected = publicK12Selected || uploadReportSelected || storage.get(storage.KEYS.selectedHomework, null);
     if (publicK12Selected) {
       const sourceKey = `public_k12_intake:${publicK12Challenge.id || publicK12Selected.taskType}`;
       const previousSource = storage.get(storage.KEYS.selectedHomeworkSource, '');
@@ -752,6 +827,17 @@ Page({
       if (previousSource !== sourceKey) {
         storage.set(storage.KEYS.tutorMessages, [
           { role: 'assistant', text: publicK12TutorIntro(publicK12Challenge, publicK12Selected) }
+        ]);
+      }
+    }
+    if (uploadReportSelected) {
+      const sourceKey = `upload_report:${uploadReportSelected.flowTraceId || uploadReportSelected.reportId || uploadReportSelected.sourceSchemaId}`;
+      const previousSource = storage.get(storage.KEYS.selectedHomeworkSource, '');
+      storage.set(storage.KEYS.selectedHomework, uploadReportSelected);
+      storage.set(storage.KEYS.selectedHomeworkSource, sourceKey);
+      if (previousSource !== sourceKey) {
+        storage.set(storage.KEYS.tutorMessages, [
+          { role: 'assistant', text: `我已接住刚上传的材料。先不讲完整过程，只问一句：${uploadReportSelected.evidence.parent_check}` }
         ]);
       }
     }
@@ -795,6 +881,8 @@ Page({
       socraticFeedbackStatus: '',
       socraticFeedbackRecordedAt: '',
       socraticFeedbackNextAction: '',
+      miniLessonExitGateStatus: '',
+      miniLessonExitGateNextRoute: '',
       tutorTurnState,
       surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('tutor') : null,
       unifiedNextAction: storage.buildUnifiedNextActionController ? storage.buildUnifiedNextActionController({ surface: 'tutor' }) : null
@@ -1028,6 +1116,71 @@ Page({
         evidence: diagnosticReceipt.openMaicInspiredTaskPlan.outline.evidenceRequired
       });
     }
+    const miniLessonTriggered = diagnosticReceipt.miniLesson
+      && diagnosticReceipt.miniLesson.trigger
+      && diagnosticReceipt.miniLesson.trigger.shouldTrigger;
+    if (miniLessonTriggered && diagnosticReceipt.miniLessonAudit && diagnosticReceipt.miniLessonAudit.ok) {
+      const miniLessonReviewSeed = {
+        type: 'three_minute_mini_lesson_review_seed',
+        event: 'three_minute_mini_lesson_review_seed',
+        source: 'tutor_mini_lesson_trigger',
+        status: 'needs_child_exit_ticket',
+        route: '/pages/review/review?from=mini_lesson_exit_gate',
+        conceptGap: diagnosticReceipt.miniLesson.conceptGap || '',
+        topicLabel: diagnosticReceipt.miniLesson.topicCard ? diagnosticReceipt.miniLesson.topicCard.label : '',
+        topicCardId: diagnosticReceipt.evidenceThread ? diagnosticReceipt.evidenceThread.topicCardId : '',
+        sourceSchemaId: diagnosticReceipt.evidenceThread ? diagnosticReceipt.evidenceThread.sourceSchemaId : '',
+        evidenceThread: diagnosticReceipt.evidenceThread || null,
+        day7Gate: diagnosticReceipt.evidenceThread ? diagnosticReceipt.evidenceThread.day7Gate : '',
+        firstStep: diagnosticReceipt.miniLesson.blackboard ? diagnosticReceipt.miniLesson.blackboard.firstStep : '',
+        blackboardFrames: diagnosticReceipt.miniLesson.blackboard && Array.isArray(diagnosticReceipt.miniLesson.blackboard.frames)
+          ? diagnosticReceipt.miniLesson.blackboard.frames
+          : [],
+        parentCheck: diagnosticReceipt.miniLesson.parentCheck || diagnosticReceipt.miniLesson.parentLine || '',
+        nextDayReview: diagnosticReceipt.miniLesson.nextDayReview || '',
+        exitGate: diagnosticReceipt.miniLesson.exitGate ? diagnosticReceipt.miniLesson.exitGate.passEvidence : 'child_can_say_first_step',
+        blockedFields: ['original_question', 'full_answer', 'full_dialogue', 'score', 'ranking', 'talent_label'],
+        created_at: Date.now()
+      };
+      if (storage.appendReviewEvent) {
+        storage.appendReviewEvent(miniLessonReviewSeed);
+      }
+      const miniLessonReturnCard = storage.ensureMiniLessonReturnReviewCard
+        ? storage.ensureMiniLessonReturnReviewCard(Object.assign({}, miniLessonReviewSeed, {
+          flowTraceId: diagnosticReceipt.flowTraceId || (this.data.selected && this.data.selected.flowTraceId) || '',
+          subject: diagnosticReceipt.subject || (this.data.selected && this.data.selected.subject) || '',
+          taskType: diagnosticReceipt.taskType || (this.data.selected && this.data.selected.taskType) || ''
+        }), {
+          source: 'tutor_mini_lesson_trigger',
+          turnId: diagnosticReceipt.turnId,
+          selectedId: this.data.selected && this.data.selected.id
+        })
+        : null;
+      if (storage.recordUnifiedNextAction) {
+        storage.recordUnifiedNextAction({
+          source: 'three_minute_mini_lesson',
+          sourceLabel: '3 分钟小讲堂',
+          actionLabel: miniLessonReviewSeed.firstStep || miniLessonReviewSeed.parentCheck,
+          route: miniLessonReviewSeed.route,
+          readiness: 'exit_gate_required',
+          capabilityId: 'mini_lesson_socratic_fallback',
+          evidence: ['mini_lesson_triggered', 'blackboard_frames', 'child_exit_ticket', 'next_day_revisit'],
+          subject: diagnosticReceipt.subject || (this.data.selected && this.data.selected.subject) || '',
+          taskType: diagnosticReceipt.taskType || ''
+        });
+      }
+      if (storage.appendValidationEvent) {
+        storage.appendValidationEvent('three_minute_mini_lesson_triggered', {
+          turnId: diagnosticReceipt.turnId,
+          conceptGap: miniLessonReviewSeed.conceptGap,
+          topicLabel: miniLessonReviewSeed.topicLabel,
+          exitGate: miniLessonReviewSeed.exitGate,
+          reviewCardId: miniLessonReturnCard && miniLessonReturnCard.id ? miniLessonReturnCard.id : '',
+          frameCount: miniLessonReviewSeed.blackboardFrames.length,
+          blockedFields: miniLessonReviewSeed.blockedFields
+        });
+      }
+    }
     if (storage.recordAnswerBoundaryEvidence && result && result.answer_boundary_evidence) {
       storage.recordAnswerBoundaryEvidence(result.answer_boundary_evidence, {
         selected_id: this.data.selected && this.data.selected.id,
@@ -1130,7 +1283,9 @@ Page({
       thinkingReceipt: diagnosticReceipt,
       socraticFeedbackStatus: '',
       socraticFeedbackRecordedAt: '',
-      socraticFeedbackNextAction: ''
+      socraticFeedbackNextAction: '',
+      miniLessonExitGateStatus: '',
+      miniLessonExitGateNextRoute: ''
     });
     this.syncTutorSignal(masterySignal, coachStep);
   },
@@ -1213,6 +1368,80 @@ Page({
     }
   },
 
+  recordMiniLessonExitGate(event) {
+    const status = event && event.currentTarget && event.currentTarget.dataset
+      ? event.currentTarget.dataset.status
+      : '';
+    const passed = status === 'passed';
+    const receipt = this.data.thinkingReceipt || {};
+    const miniLesson = receipt.miniLesson || {};
+    const evidenceThread = receipt.evidenceThread || miniLesson.evidenceThread || {};
+    const selected = this.data.selected || {};
+    const firstStepEvidence = miniLesson.blackboard && miniLesson.blackboard.firstStep
+      ? miniLesson.blackboard.firstStep
+      : evidenceThread.firstStep || selected.firstStep || 'child_can_say_first_step';
+    const exitGateRecord = storage.recordMiniLessonExitGate
+      ? storage.recordMiniLessonExitGate({
+        status: passed ? 'passed' : 'needs_support',
+        source: 'tutor_mini_lesson_exit_gate',
+        turnId: receipt.turnId || '',
+        flowTraceId: receipt.flowTraceId || selected.flowTraceId || '',
+        evidenceThread,
+        topicCardId: evidenceThread.topicCardId || (miniLesson.topicCard && miniLesson.topicCard.id) || '',
+        firstStepEvidence,
+        exitGate: miniLesson.exitGate ? miniLesson.exitGate.passEvidence : 'child_can_say_first_step',
+        blockedFields: ['original_question', 'full_answer', 'full_dialogue', 'score', 'ranking', 'talent_label'],
+        passRoute: '/pages/review/review?from=mini_lesson_exit_passed',
+        failRoute: '/pages/tutor/tutor?from=mini_lesson_exit_needs_support',
+        subject: receipt.subject || selected.subject || '',
+        taskType: receipt.taskType || selected.taskType || ''
+      }, {
+        source: 'tutor_mini_lesson_exit_gate',
+        selectedId: selected.id || '',
+        taskType: selected.taskType || ''
+      })
+      : null;
+    const nextRoute = exitGateRecord && exitGateRecord.nextRoute
+      ? exitGateRecord.nextRoute
+      : passed ? '/pages/review/review?from=mini_lesson_exit_passed' : '/pages/tutor/tutor?from=mini_lesson_exit_needs_support';
+    if (storage.recordUnifiedNextAction) {
+      storage.recordUnifiedNextAction({
+        source: 'tutor_mini_lesson_exit_gate',
+        sourceLabel: '3 分钟小讲堂退出门',
+        actionLabel: passed ? '明天回访第一步' : '继续降级到家长协助',
+        route: nextRoute,
+        readiness: passed ? 'exit_gate_passed' : 'exit_gate_needs_support',
+        capabilityId: 'mini_lesson_exit_gate',
+        evidence: ['child_exit_ticket', 'first_step_evidence', 'next_day_revisit'],
+        subject: selected.subject || receipt.subject || '',
+        taskType: selected.taskType || receipt.taskType || ''
+      });
+    }
+    if (storage.recordSurfaceDepthAction) {
+      storage.recordSurfaceDepthAction({
+        surface: 'tutor',
+        dimensionId: 'mini_lesson_exit_gate',
+        evidence: passed ? 'child_can_say_first_step' : 'parent_support_needed',
+        nextAction: passed ? 'next_day_revisit' : 'parent_handoff',
+        route: nextRoute,
+        subject: selected.subject || receipt.subject || '',
+        taskType: selected.taskType || receipt.taskType || ''
+      });
+    }
+    this.setData({
+      miniLessonExitGateStatus: passed ? '已过退出门' : '还不能过，转家长协助',
+      miniLessonExitGateNextRoute: nextRoute,
+      socraticFeedbackStatus: passed ? 'first_step_spoken' : 'still_blocked',
+      socraticFeedbackNextAction: passed ? '明天只回访同一个第一步' : '停止加提示，交给家长只问一句'
+    });
+    if (typeof wx !== 'undefined' && wx.showToast) {
+      wx.showToast({
+        title: passed ? '已记录退出门' : '已转家长协助',
+        icon: 'none'
+      });
+    }
+  },
+
   clearChat() {
     const messages = [
       {
@@ -1231,7 +1460,9 @@ Page({
       }),
       socraticFeedbackStatus: '',
       socraticFeedbackRecordedAt: '',
-      socraticFeedbackNextAction: ''
+      socraticFeedbackNextAction: '',
+      miniLessonExitGateStatus: '',
+      miniLessonExitGateNextRoute: ''
     });
   },
 

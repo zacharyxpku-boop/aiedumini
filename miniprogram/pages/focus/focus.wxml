@@ -189,6 +189,13 @@
         <button class="secondary-action" bindtap="goProfile">{{secondStepNotice.cta}}</button>
       </view>
 
+      <view class="completion-card" wx:if="{{reviewCard}}">
+        <view class="completion-title">明天回访已生成</view>
+        <view class="completion-body">{{reviewCard.firstStep}}</view>
+        <view class="completion-parent">{{reviewCard.revisit}}</view>
+        <button class="secondary-action" bindtap="goReview">去回访卡</button>
+      </view>
+
       <view class="focus-bottom"></view>
     </view>
   </scroll-view>

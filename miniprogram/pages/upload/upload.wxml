@@ -89,6 +89,28 @@
     </view>
 
       <view class="upload-stack">
+        <view class="soft-card upload-three-step-card" wx:if="{{uploadEntryDeck}}">
+          <view class="card-title-row compact">
+            <view class="card-title-icon">1</view>
+            <view class="card-title">{{uploadEntryDeck.title}}</view>
+          </view>
+          <view class="material-desc">{{uploadEntryDeck.summary}}</view>
+          <view class="upload-entry-grid">
+            <button
+              class="upload-entry-chip {{item.active ? 'active' : ''}}"
+              wx:for="{{uploadEntryDeck.entries}}"
+              wx:key="id"
+              data-mode="{{item.id}}"
+              bindtap="setUploadEntryMode"
+            >
+              <text class="upload-entry-label">{{item.label}}</text>
+              <text class="upload-entry-title">{{item.title}}</text>
+              <text class="upload-entry-line">{{item.line}}</text>
+            </button>
+          </view>
+          <view class="intake-packet-boundary">{{uploadEntryDeck.nextLine}}</view>
+        </view>
+
         <view class="soft-card">
           <view class="card-title-row">
             <view class="card-title-icon">◷</view>
@@ -117,7 +139,7 @@
               value="{{homeworkText}}"
               maxlength="1200"
               bindinput="onInput"
-              placeholder="例如：&#10;数学方程基础题 8 道；&#10;错题订正：应用题卡在等量关系；&#10;错因：漏看单位，想要举一反三。"
+              placeholder="{{homeworkPlaceholder}}"
             />
             <view class="voice-hint">支持语音输入</view>
           </view>
@@ -188,16 +210,20 @@
             <view class="intake-packet-kicker">报告已生成</view>
             <view class="intake-packet-title">{{lastReportCta.title}}</view>
           </view>
-          <view class="intake-packet-pill">{{lastReportCta.sourceSchemaId}}</view>
+          <view class="intake-packet-pill">已接入报告</view>
         </view>
         <view class="intake-packet-feedback">{{lastReportCta.line}}</view>
-        <view class="intake-packet-boundary">禁传字段：{{lastReportCta.blockedFields}}</view>
-        <view class="intake-packet-boundary" wx:if="{{lastReportCta.openMaicTaskPlanAudit}}">OpenMAIC 任务单：{{lastReportCta.openMaicTaskPlanAudit.sceneCount}} 场景 / {{lastReportCta.openMaicTaskPlanAudit.gateCount}} 门槛</view>
+        <view class="intake-packet-boundary">安全边界：不带原题、完整结果、分数或比较信息。</view>
+        <view class="intake-packet-boundary" wx:if="{{lastReportCta.openMaicTaskPlanAudit}}">小讲堂任务单：先说第一步，再做轻练习和明天回访。</view>
+        <view class="intake-packet-boundary" wx:if="{{lastReportCta.aiLocalBoundary}}">AI 只做改写和追问；本地代码负责放行门和下一证据。</view>
+        <view class="intake-packet-boundary" wx:if="{{lastReportCta.aiLocalBoundary}}">{{lastReportCta.aiLocalBoundary.releaseRule}}</view>
         <view class="intake-packet-boundary" wx:if="{{lastReportCta.safeRelayPayload}}">回流动作：{{lastReportCta.safeRelayPayload.returnRoute}}</view>
+        <view class="intake-packet-boundary" wx:if="{{lastReportCta.guardedAiReportDraft}}">{{lastReportCta.guardedAiReportDraft.visibleLine}}</view>
+        <view class="intake-packet-boundary" wx:if="{{lastReportCta.guardedAiReportDraft}}">AI 草案字段：摘要 / 追问 / 今晚行动 / 小讲堂候选；本地二次校验后才放行。</view>
         <view class="upload-flow-actions">
           <button bindtap="viewLatestReport">查看家长报告</button>
           <button bindtap="runReportFollowupAction">{{lastReportCta.actionLabel}}</button>
-          <button bindtap="runReportGameAction">去轻练习</button>
+          <button wx:if="{{lastReportCta.gameRoute}}" bindtap="runReportGameAction">去轻练习</button>
         </view>
       </view>
 
@@ -265,7 +291,7 @@
       <view class="material-report-hero">
         <view class="material-report-kicker">家长资料入口</view>
         <view class="material-report-title">上传测评 / 错题试卷 / 学校反馈，先生成家庭决策报告</view>
-        <view class="material-report-desc">只做方法候选、错因修复和下一证据；不贴天赋标签，不自动判分，不输出整卷答案。</view>
+        <view class="material-report-desc">只做方法候选、错因修复和下一证据；不贴天赋标签，不自动判分，不输出整卷结果。</view>
         <view class="material-report-actions">
           <button class="material-report-chip" data-type="talent_assessment" bindtap="openMaterialReportPanel">天赋测评</button>
           <button class="material-report-chip" data-type="wrong_question_paper" bindtap="openMaterialReportPanel">错题试卷</button>
@@ -297,6 +323,9 @@
         </view>
         <view class="material-source-line">{{materialPreview.sourceLine}}</view>
         <view class="material-boundary">{{materialPreview.importBoundary}}</view>
+        <view class="material-source-line" wx:if="{{materialPreview.statusLine}}">{{materialPreview.statusLine}}</view>
+        <view class="material-source-line" wx:if="{{materialPreview.modeLine}}">{{materialPreview.modeLine}}</view>
+        <view class="material-boundary" wx:if="{{materialPreview.blockedClaimsLine}}">{{materialPreview.blockedClaimsLine}}</view>
         <view class="material-boundary" wx:if="{{materialPreview.sourceReadinessBoard}}">{{materialPreview.sourceReadinessBoard.releaseRule}}</view>
         <view class="intake-action-queue" wx:if="{{materialPreview.sourceReadinessBoard && materialPreview.sourceReadinessBoard.nextEvidence.length}}">
           <view class="intake-action-title">还差哪些证据</view>
@@ -335,7 +364,7 @@
           class="material-textarea"
           value="{{materialText}}"
           bindinput="onMaterialInput"
-          placeholder="粘贴公众号/网页摘录、PDF 摘录、课堂笔记或 PPT 要点；这里只处理你粘贴的内容，不自动抓取链接。"
+          placeholder="{{materialPreview.examplePlaceholder}}"
         />
         <button class="material-import" bindtap="importMaterialPack">导入轻回访</button>
         <view class="material-source-line" wx:if="{{materialPreview.sourceReadinessBoard}}">AI 负责：{{materialPreview.sourceReadinessBoard.aiBetterLine}}</view>

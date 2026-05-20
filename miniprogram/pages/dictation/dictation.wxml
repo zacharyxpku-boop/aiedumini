@@ -54,9 +54,12 @@
     <input value="{{firstStepText}}" bindinput="onFirstStepInput" placeholder="我先看了拼音 / 字形 / 意思" />
     <button bindtap="submit">确认我的第一步</button>
   </view>
+  <input wx:if="{{session}}" value="{{mistakeText}}" bindinput="onMistakeInput" placeholder="补一句易错点：拼音 / 字形 / 意思 / 粗心" />
   <view wx:if="{{result}}">
     已记录：{{result.event.childArticulatedStep}}
   </view>
+  <view wx:if="{{result && result.mistakeType}}">错字类型：{{result.mistakeType.label}}</view>
+  <view wx:if="{{result && result.reviewCard}}">明天回访：{{result.reviewCard.firstStep}}</view>
   <view wx:if="{{transitionPrompt}}" class="transition-card">
     <view>{{transitionPrompt.title}}</view>
     <view>{{transitionPrompt.body}}</view>

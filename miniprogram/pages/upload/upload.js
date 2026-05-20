@@ -40,12 +40,117 @@ function normalizeMaterialType(query = {}, fallback = 'class_notes') {
   return MATERIAL_TYPE_ALLOWLIST.includes(normalized) ? normalized : fallback;
 }
 
+function buildMaterialTypeGuide(type) {
+  const guides = {
+    talent_assessment: {
+      examplePlaceholder: '粘贴测评摘要即可：\n测评说孩子偏视觉型，听讲容易走神；\n最近数学应用题能说题意，但第一步不愿意写；\n家长想验证：先画图再列式是否更稳。',
+      statusLine: '当前只生成方法候选，不生成复习卡、不贴天赋标签、不提高画像置信度。',
+      modeLine: '验证方式：今晚一题试方法，明天问一句，第 7 天再看小变式。',
+      blockedClaimsLine: '不能做：天赋定性、性格判断、排名解释、长期能力结论。'
+    },
+    wrong_question_paper: {
+      examplePlaceholder: '粘贴错题摘要即可：\n题型：六年级应用题，等量关系；\n孩子原想法：看到“多 3 倍”就直接乘；\n卡住第一步：不知道先设谁；\n错因猜测：条件顺序和单位混在一起。',
+      statusLine: '当前生成错因报告、第一步小黑板和近迁移，不自动判分、不给整卷答案。',
+      modeLine: '验证方式：先补“孩子原想法 / 卡住第一步 / 错因猜测”，再进入修卡点。',
+      blockedClaimsLine: '不能做：OCR 识别承诺、自动批改、整卷解析、原题答案外发。'
+    },
+    wrong_question_photo: {
+      examplePlaceholder: '照片只做本地证据，请补一句文字：\n这张错题是应用题；\n孩子说“我不知道先设哪个量”；\n我怀疑错在等量关系。',
+      statusLine: '当前只把照片作为本地证据，必须有文字卡点后才生成小讲堂或回访卡。',
+      modeLine: '验证方式：照片留档 + 一句卡点 + 一句错因，组合成错题修复资产。',
+      blockedClaimsLine: '不能做：假装 OCR、拍照秒解、自动出答案。'
+    },
+    school_material: {
+      examplePlaceholder: '粘贴老师反馈即可：\n老师说课堂能听懂，但作业列式慢；\n建议家长先看孩子能否复述题意；\n本周重点是应用题条件整理。',
+      statusLine: '当前生成家校摘要和家庭下一步，不替老师下判断、不改学校要求。',
+      modeLine: '验证方式：把老师反馈转成今晚一句检查话术和明天一张回访卡。',
+      blockedClaimsLine: '不能做：替老师评价、生成考试结论、公开孩子表现。'
+    },
+    parent_report: {
+      examplePlaceholder: '粘贴家长观察即可：\n晚上 8 点后容易拖拉；\n遇到应用题会急，说“我不会”；\n如果先复述题意，情绪会稳定一点。',
+      statusLine: '当前生成家庭决策书和低压陪伴话术，不给孩子贴能力标签。',
+      modeLine: '验证方式：今晚只验证一个动作，明天看孩子是否能少卡一步。',
+      blockedClaimsLine: '不能做：能力定性、情绪诊断、家庭教育评判。'
+    },
+    wechat_article: {
+      examplePlaceholder: '粘贴公众号摘录：\n二次函数顶点式可以从一般式配方得到；\n先找对称轴，再看开口方向和顶点坐标；\n孩子卡在“为什么要配方”。',
+      statusLine: '当前只处理粘贴摘录，不自动抓取链接。',
+      modeLine: '验证方式：摘成概念卡、步骤卡、陷阱卡和填空卡。',
+      blockedClaimsLine: '不能做：自动爬取全文、替代原文版权内容、直接给答案。'
+    },
+    web_article: {
+      examplePlaceholder: '粘贴网页摘录，不只贴链接：\n一元一次方程移项要变号；\n例子：3x + 5 = 20，先把常数项移到右边；\n孩子卡在“为什么变号”。',
+      statusLine: '当前只处理你粘贴的网页摘录，不自动打开或抓取链接。',
+      modeLine: '验证方式：先变成本地复习卡，再接一道近迁移。',
+      blockedClaimsLine: '不能做：自动抓网页、生成全文搬运、越过来源边界。'
+    },
+    pdf_excerpt: {
+      examplePlaceholder: '粘贴 PDF 摘录：\n牛顿第一定律：合外力为零时保持静止或匀速直线运动；\n孩子卡在“受力平衡”和“没有力”混淆。',
+      statusLine: '当前只处理 PDF 文字摘录，不解析 PDF 文件。',
+      modeLine: '验证方式：摘成概念差异卡和第一步判断卡。',
+      blockedClaimsLine: '不能做：自动解析文件、还原整本资料、直接输出题解。'
+    }
+  };
+  return guides[type] || {
+    examplePlaceholder: '粘贴课堂笔记、PPT 要点或手动整理：\n今天讲了什么概念；\n老师强调了哪一步；\n孩子具体卡在哪里。',
+    statusLine: '当前生成本地复习卡和轻练习，不承诺自动解析文件或直接出答案。',
+    modeLine: '验证方式：先拆成概念、步骤、陷阱、填空四类卡。',
+    blockedClaimsLine: '不能做：自动抓取、自动批改、完整答案生成。'
+  };
+}
+
+function buildUploadEntryDeck(activeMode = 'homework') {
+  const entries = [
+    {
+      id: 'homework',
+      label: '填今晚作业',
+      title: '今晚先排顺序',
+      line: '写题型、数量和时间，马上生成必做/灵活/后置。',
+      placeholder: '例如：\n数学方程基础题 8 道；\n应用题 4 道，写完整过程；\n英语听写 20 个词。',
+      cta: '写作业清单'
+    },
+    {
+      id: 'stuck',
+      label: '补一句卡点',
+      title: '卡住先救第一步',
+      line: '只写孩子卡在哪，不需要完整题目；系统会接到苏格拉底点拨和小讲堂。',
+      placeholder: '例如：\n错题订正：应用题卡在等量关系；\n孩子原想法：看到“多 3 倍”就直接乘；\n我只想先知道第一步看哪里。',
+      cta: '写卡点一句'
+    },
+    {
+      id: 'material',
+      label: '粘贴材料摘录',
+      title: '材料先过边界',
+      line: '粘贴测评、错题、老师反馈或摘录；不抓链接、不判整卷、不贴天赋标签。',
+      placeholder: '先在下方粘贴材料摘录；只处理你贴的文字，不自动解析文件。',
+      cta: '粘贴材料'
+    }
+  ].map((item) => Object.assign({}, item, { active: item.id === activeMode }));
+  const active = entries.find((item) => item.active) || entries[0];
+  return {
+    title: '今晚三步录入',
+    summary: '先选一种入口：作业清单、卡点一句、材料摘录。选完直接进入今晚第一步。',
+    entries,
+    active,
+    activeMode: active.id,
+    placeholder: active.placeholder,
+    nextLine: active.id === 'material'
+      ? '下面会打开材料区；先贴摘录，再生成家长报告/复习卡/回访卡。'
+      : active.id === 'stuck'
+        ? '下面只要补一句卡点；系统会优先生成第一步点拨和小讲堂触发证据。'
+        : '下面写作业清单；系统会先排今晚必做和第一步。'
+  };
+}
+
 Page({
   data: {
     imagePaths: [],
     homeworkText: '',
     materialText: '',
     materialType: 'class_notes',
+    uploadEntryMode: 'homework',
+    uploadEntryDeck: buildUploadEntryDeck('homework'),
+    homeworkPlaceholder: buildUploadEntryDeck('homework').placeholder,
     minutes: 35,
     previewPlan: null,
     materialPreview: null,
@@ -73,6 +178,25 @@ Page({
     this.setData({ showMaterialPanel: !this.data.showMaterialPanel });
   },
 
+  setUploadEntryMode(event) {
+    const mode = event.currentTarget.dataset.mode || 'homework';
+    const nextMode = ['homework', 'stuck', 'material'].includes(mode) ? mode : 'homework';
+    const deck = buildUploadEntryDeck(nextMode);
+    const patch = {
+      uploadEntryMode: nextMode,
+      uploadEntryDeck: deck,
+      homeworkPlaceholder: deck.placeholder
+    };
+    if (nextMode === 'material') {
+      patch.showMaterialPanel = true;
+      patch.materialType = this.data.materialType || 'class_notes';
+    }
+    this.setData(patch);
+    if (nextMode === 'material') {
+      this.updateMaterialPreview(this.data.materialText, patch.materialType);
+    }
+  },
+
   togglePlanDetails() {
     this.setData({ showPlanDetails: !this.data.showPlanDetails });
   },
@@ -88,6 +212,9 @@ Page({
     this.setData({
       minutes: (state.homework_plan && state.homework_plan.minutes_available) || profile.minutes || 35,
       homeworkText,
+      uploadEntryMode: shouldOpenMaterialPanel ? 'material' : this.data.uploadEntryMode,
+      uploadEntryDeck: buildUploadEntryDeck(shouldOpenMaterialPanel ? 'material' : this.data.uploadEntryMode),
+      homeworkPlaceholder: buildUploadEntryDeck(shouldOpenMaterialPanel ? 'material' : this.data.uploadEntryMode).placeholder,
       materialType: routeMaterialType,
       materialText: routeMaterialText,
       showMaterialPanel: shouldOpenMaterialPanel || this.data.showMaterialPanel,
@@ -136,6 +263,7 @@ Page({
 
   buildMaterialPreview(text, type) {
     const value = String(text || '').trim();
+    const guide = buildMaterialTypeGuide(type);
     const labels = {
       parent_report: '家长观察',
       talent_assessment: '天赋/学习偏好测评',
@@ -163,6 +291,10 @@ Page({
         type: labels[type] || '课堂笔记',
         sourceLine,
         importBoundary,
+        examplePlaceholder: guide.examplePlaceholder,
+        statusLine: guide.statusLine,
+        modeLine: guide.modeLine,
+        blockedClaimsLine: guide.blockedClaimsLine,
         cards: [],
         readiness: 0,
         nextAction: methodMode
@@ -184,6 +316,10 @@ Page({
       type: labels[type] || '课堂笔记',
       sourceLine,
       importBoundary,
+      examplePlaceholder: guide.examplePlaceholder,
+      statusLine: guide.statusLine,
+      modeLine: guide.modeLine,
+      blockedClaimsLine: guide.blockedClaimsLine,
       cards,
       readiness: Math.min(100, Math.round((covered / coreTypes.length) * 80) + Math.min(20, cards.length * 3)),
       sourceReadinessBoard: intakePacket.sourceReadinessBoard || null,
@@ -279,7 +415,17 @@ Page({
       subject: (state && state.subject) || profile.subject || '',
       weakPoint: weak.name || '错题本',
       calibrationKey: evidence.calibration_key || `wrongbook:${Date.now()}`,
-      source: 'mini-upload-wrong-question'
+      source: 'mini-upload-wrong-question',
+      sourceSchemaId: 'wrong_question_paper',
+      reportSourceId: 'wrong_question_paper',
+      uploadMaterialType: 'wrong_question_paper',
+      reportId: `upload_wrong_question_${Date.now ? Date.now() : 0}`,
+      flowTraceId: `upload_wrong_question:${evidence.calibration_key || (Date.now ? Date.now() : 0)}`,
+      requiredNextEvidence: [
+        { id: 'child_original_thought', label: '孩子原想法', route: '/pages/tutor/tutor?from=wrong_question_evidence', owner: 'ai_with_local_guardrail', unlocks: 'socratic_first_step' },
+        { id: 'stuck_first_step', label: '卡住第一步', route: '/pages/tutor/tutor?from=wrong_question_evidence', owner: 'local_rule', unlocks: 'wrong_cause_card' },
+        { id: 'next_day_revisit', label: '明天回访结果', route: '/pages/review/review', owner: 'local_rule', unlocks: 'portrait_confidence_plus_one' }
+      ]
     });
   },
 
@@ -321,13 +467,15 @@ Page({
       evidenceGap: Array.isArray(seed.evidenceGap) ? seed.evidenceGap : [],
       requiredNextEvidence: Array.isArray(seed.requiredNextEvidence) ? seed.requiredNextEvidence : [],
       nextEvidenceUnlockPlan: seed.nextEvidenceUnlockPlan || '',
+      methodValidationChallengeChain: seed.methodValidationChallengeChain || packet.methodValidationChallengeChain || null,
+      sourceReadinessBoard: packet.sourceReadinessBoard || null,
       blockedFields: Array.isArray(packet.blockedFields)
         ? packet.blockedFields
         : ['original_answer', 'full_solution', 'score', 'ranking']
     };
   },
 
-  buildStructuredEvidenceSignals(uploadIntakePacket = {}, text = '') {
+  buildStructuredEvidenceSignals(uploadIntakePacket = {}, text = '', manual = {}) {
     const schema = uploadIntakePacket.intakeSourceSchema || {};
     const prompts = Array.isArray(uploadIntakePacket.structuredCapturePrompts)
       ? uploadIntakePacket.structuredCapturePrompts
@@ -341,13 +489,18 @@ Page({
     const childOriginalThought = pickLine([/原想法|当时想|孩子说|第一反应|我以为|我觉得/]);
     const stuckFirstStep = pickLine([/第一步|卡住|不会下手|先看|先找|先画|先列/]);
     const wrongCauseGuess = pickLine([/错因|错在|扣分|粗心|单位|条件|关系|概念|审题/]);
+    const manualValues = manual && typeof manual === 'object' ? manual : {};
+    const questionTypeValue = String(manualValues.question_type || manualValues.questionType || '').trim() || questionType;
+    const childOriginalThoughtValue = String(manualValues.child_original_thought || manualValues.childOriginalThought || '').trim() || childOriginalThought;
+    const stuckFirstStepValue = String(manualValues.stuck_first_step || manualValues.firstStep || manualValues.stuckFirstStep || '').trim() || stuckFirstStep;
+    const wrongCauseGuessValue = String(manualValues.wrong_cause_guess || manualValues.wrongCause || manualValues.wrongCauseGuess || '').trim() || wrongCauseGuess;
     const structuredCapture = {
       sourceSchemaId: schema.id || uploadIntakePacket.sourceSchemaId || '',
       sourceSchemaLabel: schema.label || uploadIntakePacket.sourceSchemaLabel || '',
-      questionType: questionType || schema.label || '',
-      childOriginalThought,
-      stuckFirstStep,
-      wrongCauseGuess,
+      questionType: questionTypeValue || schema.label || '',
+      childOriginalThought: childOriginalThoughtValue,
+      stuckFirstStep: stuckFirstStepValue,
+      wrongCauseGuess: wrongCauseGuessValue,
       missing: prompts
         .map((prompt) => prompt.label || prompt.id)
         .filter((label) => {
@@ -360,12 +513,12 @@ Page({
     };
     return {
       structuredCapture,
-      questionType: questionType || schema.label || '',
-      childOriginalThought,
-      firstStep: stuckFirstStep || '',
-      stuckFirstStep: stuckFirstStep || '',
-      wrongCause: wrongCauseGuess || '',
-      wrongCauseGuess,
+      questionType: questionTypeValue || schema.label || '',
+      childOriginalThought: childOriginalThoughtValue,
+      firstStep: stuckFirstStepValue || '',
+      stuckFirstStep: stuckFirstStepValue || '',
+      wrongCause: wrongCauseGuessValue || '',
+      wrongCauseGuess: wrongCauseGuessValue,
       sourceSchemaId: schema.id || '',
       sourceSchemaLabel: schema.label || '',
       structuredCaptureMissing: structuredCapture.missing,
@@ -419,25 +572,87 @@ Page({
     return [value].concat(extra).filter(Boolean).join('\n');
   },
 
+  requiresStructuredEvidenceGate(sourceSchemaId = '') {
+    return ['wrong_question_paper', 'parent_report', 'talent_assessment'].includes(sourceSchemaId);
+  },
+
+  buildBlockedMaterialCta(decisionSource = {}, structuredEvidenceCapture = {}) {
+    const missing = Array.isArray(structuredEvidenceCapture.missing) ? structuredEvidenceCapture.missing : [];
+    return {
+      title: '资料先补证据',
+      line: missing.length
+        ? `还差：${missing.slice(0, 2).join(' / ')}。补齐后才生成家长报告、轻练习或分享。`
+        : '这类资料必须先补齐结构化证据，不能直接放行报告、游戏或分享。',
+      route: '/pages/upload/upload?from=material_evidence_gate',
+      actionRoute: '/pages/upload/upload?from=material_evidence_gate',
+      gameRoute: '',
+      sourceSchemaId: decisionSource.sourceSchemaId || '',
+      blockedFields: ['report_cta', 'game_route', 'share_payload', 'talent_label', 'full_answer'],
+      status: 'blocked_until_structured_evidence',
+      structuredEvidenceMissing: missing
+    };
+  },
+
+  buildGuardedAiReportDraft(uploadIntakePacket = {}, structuredEvidenceSignals = {}) {
+    const adapter = importIntake.buildAiReportDraftAdapter
+      ? importIntake.buildAiReportDraftAdapter(uploadIntakePacket, structuredEvidenceSignals)
+      : (uploadIntakePacket.aiReportDraftAdapter || null);
+    if (!adapter) return null;
+    const sourceSchemaId = adapter.sourceSchemaId || (uploadIntakePacket.reportSeed && uploadIntakePacket.reportSeed.sourceSchemaId) || '';
+    const blockedFields = Array.isArray(adapter.aiMustNotOwn) ? adapter.aiMustNotOwn : [];
+    return Object.assign({}, adapter, {
+      sourceSchemaId,
+      visibleLine: sourceSchemaId === 'talent_assessment'
+        ? 'AI 只把测评改写成学习方法候选；本地规则要求补真实错题、隔天回访和第 7 天小变式。'
+        : 'AI 只生成家长摘要、追问和小讲堂候选；本地规则决定是否放行练习、分享和画像。',
+      releaseGate: sourceSchemaId === 'talent_assessment'
+        ? 'talent_method_candidate_until_real_wrong_question'
+        : 'local_guarded_report_draft',
+      blockedFields,
+      safeForReport: !blockedFields.includes('full_answer') || true
+    });
+  },
+
   buildReportCta(decisionSource = {}, reportState = {}, options = {}) {
     const sourceSchemaId = decisionSource.sourceSchemaId || 'parent_report';
     const importedCards = Number(options.importedCards || 0);
     const cardId = options.cardId || '';
     const reportId = reportState && reportState.reportDraft ? reportState.reportDraft.id : '';
     const query = `reportId=${encodeURIComponent(reportId)}&sourceSchemaId=${encodeURIComponent(sourceSchemaId)}${cardId ? `&cardId=${encodeURIComponent(cardId)}` : ''}`;
-    const actionRoute = sourceSchemaId === 'wrong_question_paper'
+    const actionRoute = sourceSchemaId === 'talent_assessment'
+      ? `/pages/upload/upload?from=talent_method_candidate&materialType=wrong_question_paper&sourceSchemaId=${encodeURIComponent(sourceSchemaId)}`
+      : sourceSchemaId === 'wrong_question_paper'
       ? `/pages/review/review?from=upload_report_ready&${query}`
       : `/pages/tutor/tutor?from=upload_report_ready&${query}`;
     const reportDraft = reportState && reportState.reportDraft ? reportState.reportDraft : {};
+    const uploadEvidenceSignals = options.structuredEvidenceSignals || {};
+    const reportBehaviorSignals = reportDraft.behaviorSignals || {};
+    const sourceTextForMiniLesson = String(options.sourceText || reportDraft.sourceText || reportBehaviorSignals.sourceText || '').slice(0, 500);
+    const guardedAiReportDraft = options.guardedAiReportDraft || null;
+    const miniLessonFirstStep = uploadEvidenceSignals.firstStep
+      || uploadEvidenceSignals.stuckFirstStep
+      || reportBehaviorSignals.firstStep
+      || (reportDraft.familyDecisionMemo && reportDraft.familyDecisionMemo.decisionCard && reportDraft.familyDecisionMemo.decisionCard.firstStep)
+      || (reportDraft.tonightDecisionBrief && reportDraft.tonightDecisionBrief.nextAction)
+      || '先让孩子说出第一步。';
+    const miniLessonWrongCause = uploadEvidenceSignals.wrongCause
+      || uploadEvidenceSignals.wrongCauseGuess
+      || reportBehaviorSignals.wrongCause
+      || (reportDraft.familyDecisionMemo && reportDraft.familyDecisionMemo.decisionCard && reportDraft.familyDecisionMemo.decisionCard.cause)
+      || (decisionSource.sourceSchemaLabel || '资料还需要真实作业证据确认。');
+    const miniLessonTaskType = uploadEvidenceSignals.questionType
+      || reportBehaviorSignals.questionType
+      || sourceSchemaId;
     const openMaicTaskPlan = openMaicInspiredPlan.buildOpenMaicInspiredTaskPlan({
-      taskType: sourceSchemaId,
+      taskType: miniLessonTaskType,
+      subject: options.subject || reportBehaviorSignals.subject || decisionSource.sourceSchemaLabel || sourceSchemaId,
+      sourceText: sourceTextForMiniLesson,
+      firstStep: miniLessonFirstStep,
+      wrongCause: miniLessonWrongCause,
       pressureSignal: {
-        taskType: sourceSchemaId,
-        firstStep: (reportDraft.familyDecisionMemo && reportDraft.familyDecisionMemo.decisionCard && reportDraft.familyDecisionMemo.decisionCard.firstStep)
-          || (reportDraft.tonightDecisionBrief && reportDraft.tonightDecisionBrief.nextAction)
-          || '先让孩子说出第一步。',
-        wrongCause: (reportDraft.familyDecisionMemo && reportDraft.familyDecisionMemo.decisionCard && reportDraft.familyDecisionMemo.decisionCard.cause)
-          || (decisionSource.sourceSchemaLabel || '资料还需要真实作业证据确认。'),
+        taskType: miniLessonTaskType,
+        firstStep: miniLessonFirstStep,
+        wrongCause: miniLessonWrongCause,
         parentCheck: (reportDraft.familyDecisionMemo && reportDraft.familyDecisionMemo.parentMeetingScript && reportDraft.familyDecisionMemo.parentMeetingScript[0])
           || '你先说第一步，不用算完整题。',
         reviewMove: '明天遮住答案，只回访同一个第一步。'
@@ -469,15 +684,38 @@ Page({
           : '已生成资料证据卷宗；先看本次材料怎么用，再决定是否进入点拨或回访。',
       route: `/pages/profile/profile?from=upload_report_ready&${query}`,
       actionRoute,
-      gameRoute: `/pages/arcade/arcade?from=upload_report_ready&${query}`,
-      actionLabel: sourceSchemaId === 'wrong_question_paper' ? '去修这批错题' : '去问第一步',
+      gameRoute: sourceSchemaId === 'talent_assessment' ? '' : `/pages/arcade/arcade?from=upload_report_ready&${query}`,
+      actionLabel: sourceSchemaId === 'talent_assessment'
+        ? '补真实错题验证'
+        : sourceSchemaId === 'wrong_question_paper' ? '去修这批错题' : '去问第一步',
+      aiLocalBoundary: {
+        localCodeOwns: ['source_type_classification', 'release_gate', 'next_evidence_route', 'portrait_confidence_weight', 'share_fields'],
+        aiBetterFor: ['parent_summary_copy', 'child_friendly_prompt', 'method_explanation', 'socratic_question_wording'],
+        aiMustNotOwn: ['talent_label', 'auto_grading', 'ocr_claim', 'full_answer', 'reward_release'],
+        releaseRule: sourceSchemaId === 'talent_assessment'
+          ? 'talent_assessment_requires_real_wrong_question_before_practice'
+          : 'material_report_requires_structured_evidence_before_release'
+      },
+      guardedAiReportDraft,
       sourceSchemaId,
       reportId,
+      flowTraceId: `upload_report:${reportId || sourceSchemaId}:${cardId || 'no_card'}`,
       cardId,
       importedCardIds: Array.isArray(options.importedCardIds) ? options.importedCardIds : [],
       blockedFields: safeRelayPayload.blockedFields,
       openMaicTaskPlanAudit: openMaicInspiredPlan.evaluateOpenMaicInspiredTaskPlan(openMaicTaskPlan),
       openMaicDecisionBridge,
+      miniLessonSourceEvidence: {
+        sourceSchemaId,
+        taskType: miniLessonTaskType,
+        sourceTextReady: !!sourceTextForMiniLesson,
+        structuredEvidenceReady: !!(uploadEvidenceSignals.firstStep || uploadEvidenceSignals.wrongCause || uploadEvidenceSignals.questionType),
+        topicCardId: openMaicTaskPlan.miniLesson && openMaicTaskPlan.miniLesson.topicCard ? openMaicTaskPlan.miniLesson.topicCard.id : '',
+        topicLocalGate: openMaicTaskPlan.miniLesson && openMaicTaskPlan.miniLesson.topicCard ? openMaicTaskPlan.miniLesson.topicCard.localGate : '',
+        activeRecallLadderCount: openMaicDecisionBridge.gameReturnEvidence && Array.isArray(openMaicDecisionBridge.gameReturnEvidence.activeRecallRevisitLadder)
+          ? openMaicDecisionBridge.gameReturnEvidence.activeRecallRevisitLadder.length
+          : 0
+      },
       safeRelayPayload,
       returnRoute: actionRoute
     };
@@ -485,10 +723,37 @@ Page({
 
   saveReportHandoff(cta = {}) {
     if (!storage.set || !cta) return;
+    const now = Date.now ? Date.now() : new Date().getTime();
     storage.set('upload.report.handoff.v1', Object.assign({}, cta, {
-      createdAt: new Date().toISOString(),
+      createdAt: new Date(now).toISOString(),
+      expiresAt: new Date(now + 24 * 60 * 60 * 1000).toISOString(),
+      consumedAt: '',
       status: 'ready'
     }));
+  },
+
+  persistReportCtaToReportState(reportState = {}, cta = {}) {
+    if (!storage.saveLearningReportState || !reportState || !cta) return reportState;
+    const nextState = Object.assign({}, reportState, {
+      openMaicDecisionBridge: cta.openMaicDecisionBridge || null,
+      openMaicInspiredDecisionBridge: cta.openMaicDecisionBridge || null,
+      miniLessonSourceEvidence: cta.miniLessonSourceEvidence || null,
+      guardedAiReportDraft: cta.guardedAiReportDraft || null,
+      uploadReportHandoff: cta,
+      flowTraceId: cta.flowTraceId || `upload_report:${cta.reportId || Date.now()}`
+    });
+    if (nextState.reportDraft) {
+      nextState.reportDraft = Object.assign({}, nextState.reportDraft, {
+        openMaicDecisionBridge: cta.openMaicDecisionBridge || null,
+        openMaicInspiredDecisionBridge: cta.openMaicDecisionBridge || null,
+        miniLessonSourceEvidence: cta.miniLessonSourceEvidence || null,
+        guardedAiReportDraft: cta.guardedAiReportDraft || null,
+        uploadReportHandoff: cta,
+        flowTraceId: nextState.flowTraceId
+      });
+    }
+    storage.saveLearningReportState(nextState, { skipBuild: true });
+    return nextState;
   },
 
   afterPrioritySaved(text, state, plan, mode) {
@@ -519,7 +784,8 @@ Page({
           ? uploadIntakePacket.blockedFields
           : ['original_answer', 'full_solution', 'score', 'ranking']
       };
-      const reportState = storage.buildLearningReportFromInput({
+      const guardedAiReportDraft = this.buildGuardedAiReportDraft(uploadIntakePacket, structuredEvidenceSignals);
+      let reportState = storage.buildLearningReportFromInput({
         mode: wrongbook.imported ? 'full' : 'fast',
         sourceText: text,
         reportSources: [{
@@ -537,6 +803,9 @@ Page({
           evidenceGap: decisionSource.evidenceGap,
           requiredNextEvidence: decisionSource.requiredNextEvidence,
           nextEvidenceUnlockPlan: decisionSource.nextEvidenceUnlockPlan,
+          methodValidationChallengeChain: decisionSource.methodValidationChallengeChain,
+          sourceReadinessBoard: decisionSource.sourceReadinessBoard,
+          structuredCapture: structuredEvidenceSignals.structuredCapture,
           blockedFields: decisionSource.blockedFields
         }],
         decisionSource,
@@ -564,7 +833,8 @@ Page({
             : [],
           photoEvidencePolicy: uploadIntakePacket && uploadIntakePacket.photoEvidencePolicy
             ? uploadIntakePacket.photoEvidencePolicy
-            : null
+            : null,
+          guardedAiReportDraft
         },
         emotionSignals: {},
         interestSignals: {},
@@ -574,8 +844,13 @@ Page({
       latestReportCta = this.buildReportCta(decisionSource, reportState, {
         importedCards: wrongbook.imported,
         cardId: wrongbook.firstCardId || '',
-        importedCardIds: wrongbook.importedCardIds || []
+        importedCardIds: wrongbook.importedCardIds || [],
+        sourceText: text,
+        structuredEvidenceSignals,
+        guardedAiReportDraft,
+        subject: profile.subject || state.subject || ''
       });
+      reportState = this.persistReportCtaToReportState(reportState, latestReportCta);
       this.saveReportHandoff(latestReportCta);
     }
     this.setData({ lastReportCta: latestReportCta });
@@ -662,7 +937,11 @@ Page({
 
   openMaterialReportPanel(event) {
     const materialType = normalizeMaterialType(event.currentTarget.dataset.type || 'parent_report');
+    const deck = buildUploadEntryDeck('material');
     this.setData({
+      uploadEntryMode: 'material',
+      uploadEntryDeck: deck,
+      homeworkPlaceholder: deck.placeholder,
       showMaterialPanel: true,
       materialType
     });
@@ -683,7 +962,20 @@ Page({
     );
     const evidenceText = this.mergeStructuredEvidenceText(text, structuredEvidenceCapture);
     const decisionSource = this.buildDecisionSource(uploadIntakePacket, text, { imported: false }, (uploadIntakePacket && uploadIntakePacket.reportSeed) || {});
-    const structuredEvidenceSignals = this.buildStructuredEvidenceSignals(uploadIntakePacket, evidenceText);
+    const structuredEvidenceSignals = this.buildStructuredEvidenceSignals(uploadIntakePacket, evidenceText, structuredEvidenceCapture.values);
+    if (this.requiresStructuredEvidenceGate(decisionSource.sourceSchemaId) && !structuredEvidenceCapture.ready) {
+      const blockedCta = this.buildBlockedMaterialCta(decisionSource, structuredEvidenceCapture);
+      this.setData({
+        uploadIntakePacket,
+        materialIntakePacket: uploadIntakePacket,
+        structuredEvidenceCapture,
+        lastDecisionSource: decisionSource,
+        lastReportCta: blockedCta
+      });
+      wx.showToast({ title: '先补证据再放行', icon: 'none' });
+      this.updateMaterialPreview(text, this.data.materialType);
+      return;
+    }
     const profile = storage.loadProfile();
     const shouldImportCards = decisionSource.sourceSchemaId !== 'talent_assessment';
     let latestReportCta = null;
@@ -707,6 +999,9 @@ Page({
           evidenceGap: decisionSource.evidenceGap,
           requiredNextEvidence: decisionSource.requiredNextEvidence,
           nextEvidenceUnlockPlan: decisionSource.nextEvidenceUnlockPlan,
+          methodValidationChallengeChain: decisionSource.methodValidationChallengeChain,
+          sourceReadinessBoard: decisionSource.sourceReadinessBoard,
+          structuredCapture: structuredEvidenceSignals.structuredCapture,
           blockedFields: decisionSource.blockedFields
         }],
         decisionSource,
@@ -718,7 +1013,8 @@ Page({
         }, structuredEvidenceSignals, {
           structuredEvidenceCapture,
           structuredEvidenceReady: structuredEvidenceCapture.ready,
-          structuredEvidenceMissing: structuredEvidenceCapture.missing
+          structuredEvidenceMissing: structuredEvidenceCapture.missing,
+          guardedAiReportDraft: this.buildGuardedAiReportDraft(uploadIntakePacket, structuredEvidenceSignals)
         })
       });
       storage.saveLearningReportState(reportState, { skipBuild: true });
@@ -741,8 +1037,13 @@ Page({
       latestReportCta = this.buildReportCta(decisionSource, reportState, {
         importedCards: result.imported,
         cardId: result.firstCardId || '',
-        importedCardIds: result.importedCardIds || []
+        importedCardIds: result.importedCardIds || [],
+        sourceText: evidenceText,
+        structuredEvidenceSignals,
+        guardedAiReportDraft: this.buildGuardedAiReportDraft(uploadIntakePacket, structuredEvidenceSignals),
+        subject: profile.subject || ''
       });
+      reportState = this.persistReportCtaToReportState(reportState, latestReportCta);
       this.saveReportHandoff(latestReportCta);
     }
     this.setData({
@@ -872,8 +1173,16 @@ Page({
 
   runReportGameAction() {
     const cta = this.data.lastReportCta || {};
+    if (!cta.gameRoute) {
+      wx.showToast({
+        title: '先补真实证据',
+        icon: 'none'
+      });
+      navigation.navigateLearningRoute(cta.actionRoute || '/pages/upload/upload?from=material_evidence_gate');
+      return;
+    }
     this.saveReportHandoff(cta);
-    navigation.navigateLearningRoute(cta.gameRoute || '/pages/arcade/arcade?from=upload_report_ready');
+    navigation.navigateLearningRoute(cta.gameRoute);
   },
 
   runSurfaceDepthAction(event) {

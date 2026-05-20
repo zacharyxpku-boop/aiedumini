@@ -293,6 +293,53 @@ page {
   box-shadow: 0 8rpx 48rpx -12rpx rgba(0, 0, 0, 0.03), 0 4rpx 16rpx -4rpx rgba(0, 0, 0, 0.02);
 }
 
+.upload-three-step-card {
+  border-color: rgba(65, 113, 92, 0.12);
+}
+
+.upload-entry-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16rpx;
+  margin: 18rpx 0;
+}
+
+.upload-entry-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8rpx;
+  padding: 22rpx;
+  text-align: left;
+  background: #F9F7F1;
+  border: 1rpx solid #EEE7D8;
+  border-radius: 18rpx;
+  color: #34312C;
+  line-height: 1.35;
+}
+
+.upload-entry-chip.active {
+  background: #EFF6F1;
+  border-color: rgba(65, 113, 92, 0.28);
+}
+
+.upload-entry-label {
+  color: #41715C;
+  font-size: 22rpx;
+  font-weight: 850;
+}
+
+.upload-entry-title {
+  color: #292722;
+  font-size: 28rpx;
+  font-weight: 850;
+}
+
+.upload-entry-line {
+  color: #767067;
+  font-size: 23rpx;
+}
+
 .card-title-row {
   display: flex;
   align-items: center;

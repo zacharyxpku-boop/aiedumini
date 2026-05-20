@@ -5651,6 +5651,310 @@ function recordAnswerBoundaryEvidence(evidence = {}, context = {}) {
   return { card, event };
 }
 
+function ensureMiniLessonReturnReviewCard(seed = {}, context = {}) {
+  if (!seed || typeof seed !== 'object') return null;
+  const now = new Date();
+  const sourceSeedId = seed.id || seed.eventId || seed.turnId || context.turnId || '';
+  const flowTraceId = seed.flowTraceId || context.flowTraceId || '';
+  const stableKey = flowTraceId || sourceSeedId || seed.cardId || seed.topicLabel || seed.conceptGap || `mini_lesson_${now.getTime()}_${randomPart()}`;
+  const safeKey = String(stableKey).replace(/[^A-Za-z0-9_-]+/g, '_').slice(0, 72) || `${now.getTime()}_${randomPart()}`;
+  const cardId = seed.reviewCardId || `mini_lesson_return_${safeKey}`;
+  const cards = loadReviewCards();
+  const existing = cards.find((card) => card && (
+    card.id === cardId
+    || (flowTraceId && card.flowTraceId === flowTraceId && card.source === 'three_minute_mini_lesson')
+    || (sourceSeedId && card.sourceSeedId === sourceSeedId && card.source === 'three_minute_mini_lesson')
+  ));
+  if (existing) return existing;
+
+  const firstStep = seed.firstStep
+    || seed.blackboardLine
+    || seed.firstStepRequired
+    || (seed.reviewSeed && seed.reviewSeed.prompt)
+    || context.firstStep
+    || '先说出这类题的第一步，不看完整答案';
+  const conceptGap = seed.conceptGap
+    || seed.wrongCause
+    || seed.wrongCauseBucket
+    || context.conceptGap
+    || '第一步还没有稳定说清楚';
+  const nextDayReview = seed.nextDayReview
+    || seed.revisit
+    || seed.dueWindow
+    || (seed.reviewReturnSeed && seed.reviewReturnSeed.revisit)
+    || '明天换一题，只复述第一步和错因';
+  const parentLine = seed.parentCheck
+    || seed.parentLine
+    || context.parentLine
+    || '家长只问：这题第一步先看什么？不要追完整答案。';
+  const blockedFields = Array.isArray(seed.blockedFields) && seed.blockedFields.length
+    ? seed.blockedFields
+    : ['original_question', 'full_answer', 'full_solution', 'score', 'ranking', 'talent_label'];
+  const evidenceThread = seed.evidenceThread && typeof seed.evidenceThread === 'object'
+    ? seed.evidenceThread
+    : {
+      id: `evidence_thread_${safeKey}`,
+      sourceSchemaId: seed.sourceSchemaId || seed.topicCardId || seed.taskType || 'three_minute_mini_lesson',
+      flowTraceId,
+      taskType: seed.taskType || context.taskType || seed.topicLabel || '',
+      subject: seed.subject || context.subject || '',
+      topicCardId: seed.topicCardId || seed.sourceSchemaId || '',
+      topicLabel: seed.topicLabel || '',
+      firstStep,
+      wrongCause: conceptGap,
+      parentCheck: parentLine,
+      nextDayReview,
+      day7Gate: seed.day7Gate || 'day7_variant_first_step_evidence',
+      releaseGates: ['child_can_say_first_step', 'wrong_cause_named', 'next_day_revisit_locked', seed.day7Gate || 'day7_variant_first_step_evidence'],
+      routes: {
+        tutor: '/pages/tutor/tutor',
+        review: '/pages/review/review',
+        arcade: '/pages/arcade/arcade',
+        profile: '/pages/profile/profile'
+      },
+      blockedFields
+    };
+  const dueDate = seed.dueAt || seed.dueDate || addDaysIso(1, now);
+  const card = {
+    id: cardId,
+    noteId: `note_${cardId}`,
+    deckId: 'ydzx-core',
+    template: 'active_recall',
+    type: 'three_minute_mini_lesson_return',
+    source: 'three_minute_mini_lesson',
+    sourceSeedId,
+    flowTraceId,
+    subject: seed.subject || context.subject || '',
+    taskType: seed.taskType || context.taskType || seed.topicLabel || '',
+    title: seed.title || '3 分钟小讲堂回访卡',
+    prompt: firstStep,
+    front: `明天只回访第一步：${firstStep}`,
+    question: seed.checkQuestion || `不看答案，说出第一步：${firstStep}`,
+    answer: firstStep,
+    backPrompt: parentLine,
+    wrongCause: conceptGap,
+    wrongCauseBucket: conceptGap,
+    weakPoint: seed.topicLabel || conceptGap,
+    revisit: nextDayReview,
+    nextPracticePlan: {
+      wrongCauseBucket: conceptGap,
+      wrongCauseLabel: conceptGap,
+      checkpoint: firstStep,
+      parentPrompt: parentLine,
+      nextPracticeText: nextDayReview
+    },
+    blackboardLine: seed.blackboardLine || firstStep,
+    blackboardFrames: Array.isArray(seed.blackboardFrames) ? seed.blackboardFrames : [],
+    exitGate: seed.exitGate || 'child_can_say_first_step',
+    evidenceThread,
+    blockedFields,
+    due: dueDate,
+    dueDate,
+    interval: 1,
+    intervalLevel: 1,
+    state: 'new',
+    status: 'new',
+    suspended: false,
+    recallEvidence: {
+      student_first_step: false,
+      wrong_cause_named: false,
+      next_day_revisit_locked: true,
+      source: 'three_minute_mini_lesson'
+    },
+    created_at: now.toISOString(),
+    updated_at: now.toISOString()
+  };
+  saveReviewCards([card].concat(cards).slice(0, 260));
+  const event = {
+    type: 'three_minute_mini_lesson_review_card_created',
+    source: seed.source || context.source || 'three_minute_mini_lesson',
+    cardId: card.id,
+    sourceSeedId,
+    flowTraceId,
+    conceptGap,
+    firstStep,
+    nextDayReview,
+    exitGate: card.exitGate,
+    blockedFields,
+    evidenceThread,
+    route: seed.route || '/pages/review/review?from=mini_lesson_return_card',
+    created_at: now.toISOString()
+  };
+  appendReviewEvent(event);
+  appendSyncMutation('three_minute_mini_lesson_review_card', {
+    id: card.id,
+    source_seed_id: sourceSeedId,
+    flow_trace_id: flowTraceId,
+    evidence_thread_id: evidenceThread.id || '',
+    source_schema_id: evidenceThread.sourceSchemaId || '',
+    topic_card_id: evidenceThread.topicCardId || '',
+    concept_gap: conceptGap,
+    first_step: firstStep,
+    next_day_review: nextDayReview,
+    blocked_fields: blockedFields.join(','),
+    created_at: event.created_at
+  });
+  return card;
+}
+
+function recordMiniLessonExitGate(input = {}, context = {}) {
+  const now = new Date();
+  const status = input.status === 'passed' ? 'passed' : 'needs_support';
+  const evidenceThread = input.evidenceThread && typeof input.evidenceThread === 'object'
+    ? input.evidenceThread
+    : {};
+  const topicCardId = input.topicCardId || evidenceThread.topicCardId || '';
+  const flowTraceId = input.flowTraceId || evidenceThread.flowTraceId || context.flowTraceId || '';
+  const firstStepEvidence = input.firstStepEvidence
+    || input.firstStep
+    || evidenceThread.firstStep
+    || 'child_can_say_first_step';
+  const blockedFields = Array.isArray(input.blockedFields) && input.blockedFields.length
+    ? input.blockedFields
+    : Array.isArray(evidenceThread.blockedFields) && evidenceThread.blockedFields.length
+      ? evidenceThread.blockedFields
+      : ['original_question', 'full_answer', 'full_dialogue', 'score', 'ranking', 'talent_label'];
+  const nextRoute = status === 'passed'
+    ? (input.passRoute || '/pages/review/review?from=mini_lesson_exit_passed')
+    : (input.failRoute || '/pages/tutor/tutor?from=mini_lesson_exit_needs_support');
+  const card = ensureMiniLessonReturnReviewCard(Object.assign({}, input, {
+    flowTraceId,
+    topicCardId,
+    firstStep: firstStepEvidence,
+    evidenceThread,
+    blockedFields,
+    route: nextRoute,
+    status: status === 'passed' ? 'exit_gate_passed' : 'exit_gate_needs_support'
+  }), Object.assign({}, context, {
+    source: input.source || context.source || 'mini_lesson_exit_gate'
+  }));
+  const event = {
+    type: 'mini_lesson_exit_gate_recorded',
+    source: input.source || context.source || 'mini_lesson_exit_gate',
+    status,
+    turnId: input.turnId || context.turnId || '',
+    cardId: card && card.id ? card.id : '',
+    flowTraceId,
+    evidenceThreadId: evidenceThread.id || '',
+    topicCardId,
+    firstStepEvidence,
+    exitGate: input.exitGate || 'child_can_say_first_step',
+    nextRoute,
+    blockedFields,
+    created_at: now.toISOString()
+  };
+  appendReviewEvent(event);
+  appendSyncMutation('mini_lesson_exit_gate', {
+    status,
+    card_id: event.cardId,
+    flow_trace_id: flowTraceId,
+    evidence_thread_id: event.evidenceThreadId,
+    topic_card_id: topicCardId,
+    first_step_evidence: firstStepEvidence,
+    next_route: nextRoute,
+    blocked_fields: blockedFields.join(','),
+    created_at: event.created_at
+  });
+  if (card && card.id) {
+    const cards = loadReviewCards();
+    const updated = cards.map((item) => {
+      if (!item || item.id !== card.id) return item;
+      return Object.assign({}, item, {
+        status: status === 'passed' ? 'exit_gate_passed' : 'exit_gate_needs_support',
+        recallEvidence: Object.assign({}, item.recallEvidence || {}, {
+          student_first_step: status === 'passed',
+          mini_lesson_exit_gate: status,
+          first_step_evidence: firstStepEvidence
+        }),
+        updated_at: event.created_at
+      });
+    });
+    saveReviewCards(updated);
+  }
+  return { event, card, nextRoute, status };
+}
+
+function recordMiniLessonReviewResult(input = {}, context = {}) {
+  const now = new Date();
+  const cardId = input.cardId || (input.card && input.card.id) || '';
+  if (!cardId) return null;
+  const rating = ['again', 'hard', 'good', 'easy'].includes(input.rating) ? input.rating : 'good';
+  const passed = rating === 'good' || rating === 'easy';
+  const cards = loadReviewCards();
+  let updatedCard = null;
+  const next = cards.map((card) => {
+    if (!card || card.id !== cardId) return card;
+    const evidenceThread = input.evidenceThread && typeof input.evidenceThread === 'object'
+      ? input.evidenceThread
+      : card.evidenceThread && typeof card.evidenceThread === 'object'
+        ? card.evidenceThread
+        : {};
+    const completedGates = Array.from(new Set([].concat(
+      Array.isArray(evidenceThread.completedGates) ? evidenceThread.completedGates : [],
+      passed ? ['child_can_say_first_step', 'next_day_revisit_completed'] : ['next_day_revisit_attempted']
+    )));
+    const nextEvidenceThread = Object.assign({}, evidenceThread, {
+      completedGates,
+      latestReviewRating: rating,
+      latestReviewAt: now.toISOString(),
+      day7GateStatus: passed ? 'pending_day7_variant' : 'needs_parent_support_before_day7'
+    });
+    updatedCard = Object.assign({}, card, {
+      isRevisited: true,
+      miniLessonReviewResult: {
+        rating,
+        passed,
+        reviewEvidence: passed ? 'child_recalled_first_step' : 'child_still_needs_support',
+        day7GateStatus: nextEvidenceThread.day7GateStatus,
+        recordedAt: now.toISOString()
+      },
+      recallEvidence: Object.assign({}, card.recallEvidence || {}, {
+        student_first_step: passed || !!((card.recallEvidence || {}).student_first_step),
+        wrong_cause_named: passed || !!((card.recallEvidence || {}).wrong_cause_named),
+        next_day_revisit_completed: passed,
+        next_day_revisit_attempted: true,
+        day7_variant_pending: passed,
+        mini_lesson_review_rating: rating
+      }),
+      evidenceThread: nextEvidenceThread,
+      updated_at: now.toISOString()
+    });
+    return updatedCard;
+  });
+  if (!updatedCard) return null;
+  saveReviewCards(next);
+  const event = {
+    type: 'mini_lesson_review_result_recorded',
+    source: input.source || context.source || 'review_mini_lesson_return',
+    cardId,
+    rating,
+    passed,
+    flowTraceId: updatedCard.flowTraceId || (updatedCard.evidenceThread && updatedCard.evidenceThread.flowTraceId) || '',
+    evidenceThreadId: updatedCard.evidenceThread && updatedCard.evidenceThread.id ? updatedCard.evidenceThread.id : '',
+    topicCardId: updatedCard.evidenceThread && updatedCard.evidenceThread.topicCardId ? updatedCard.evidenceThread.topicCardId : '',
+    completedGates: updatedCard.evidenceThread && Array.isArray(updatedCard.evidenceThread.completedGates)
+      ? updatedCard.evidenceThread.completedGates
+      : [],
+    day7GateStatus: updatedCard.evidenceThread ? updatedCard.evidenceThread.day7GateStatus : '',
+    blockedFields: Array.isArray(updatedCard.blockedFields) ? updatedCard.blockedFields : ['original_question', 'full_answer', 'score', 'ranking', 'talent_label'],
+    created_at: now.toISOString()
+  };
+  appendReviewEvent(event);
+  appendSyncMutation('mini_lesson_review_result', {
+    card_id: cardId,
+    rating,
+    passed,
+    flow_trace_id: event.flowTraceId,
+    evidence_thread_id: event.evidenceThreadId,
+    topic_card_id: event.topicCardId,
+    completed_gates: event.completedGates.join(','),
+    day7_gate_status: event.day7GateStatus,
+    blocked_fields: event.blockedFields.join(','),
+    created_at: event.created_at
+  });
+  return { event, card: updatedCard, passed, rating };
+}
+
 function loadGameProfile() {
   return get(KEYS.gameProfile, {
     xp: 0,
@@ -7872,6 +8176,55 @@ function recordLightFeatureFirstStep(feature, payload = {}) {
   const events = get(KEYS.lightFeatureEvents, []);
   set(KEYS.lightFeatureEvents, [Object.assign({}, event, { feature })].concat(Array.isArray(events) ? events : []).slice(0, 240));
   return event;
+}
+
+function ensureFocusReviewCard(record = {}, options = {}) {
+  if (!record || !loadReviewCards || !saveReviewCards) return null;
+  const target = record.focusTarget || {};
+  const focusId = target.focusId || record.id || record.startedAt || Date.now();
+  const safeId = String(focusId).replace(/[^\w-]+/g, '_').slice(0, 80);
+  const cardId = `focus_review_${safeId}`;
+  const cards = loadReviewCards();
+  const existing = cards.find((card) => card && card.id === cardId);
+  if (existing) return existing;
+  const firstStep = record.linkedChildArticulatedStep || record.linkedSystemSuggestedStep || target.title || '先说昨天坐住的第一步。';
+  const card = {
+    id: cardId,
+    type: 'focus_cabin_return',
+    source: 'focus',
+    title: '专注舱明天回访',
+    question: `遮住答案，先说昨天那一步：${firstStep}`,
+    answer: '',
+    weakPoint: target.title || record.linkedStuckPointText || '专注第一步',
+    firstStep,
+    revisit: '明天只确认第一步是否还说得出，再决定是否进入第二步。',
+    due: true,
+    dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    releaseGate: 'focus_first_step_recalled_before_second_step',
+    blockedFields: ['score', 'ranking', 'full_answer'],
+    focusEvidence: {
+      completionType: record.completionType || '',
+      completedSeconds: record.completedSeconds || record.actualFocusSeconds || 0,
+      taskBound: !!record.taskBound
+    },
+    nextRoute: options.nextRoute || '/pages/review/review?from=focus_return'
+  };
+  saveReviewCards([card].concat(cards).slice(0, 80));
+  appendReviewEvent({
+    type: 'focus_review_card_created',
+    cardId,
+    source: 'focus',
+    focusTitle: target.title || '',
+    createdAt: new Date().toISOString()
+  });
+  appendSyncMutation('focus_review_card', {
+    id: cardId,
+    source: 'focus',
+    release_gate: card.releaseGate,
+    blocked_fields: card.blockedFields,
+    next_route: card.nextRoute
+  });
+  return card;
 }
 
 function loadLightFeatureEvents() {
@@ -11717,6 +12070,9 @@ module.exports = {
   loadReviewEvents,
   appendReviewEvent,
   recordAnswerBoundaryEvidence,
+  ensureMiniLessonReturnReviewCard,
+  recordMiniLessonExitGate,
+  recordMiniLessonReviewResult,
   loadGameProfile,
   saveGameProfile,
   recordDailyLearningQuestSignal,
@@ -11769,6 +12125,7 @@ module.exports = {
   buildSecondStepHint,
   recordFirstStepEvent,
   recordLightFeatureFirstStep,
+  ensureFocusReviewCard,
   loadLightFeatureEvents,
   buildLightFeatureEvidenceSummary,
   detectAvoidancePattern,

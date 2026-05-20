@@ -381,6 +381,84 @@ function buildMethodValidationChallengeChain(schema = {}, requiredNextEvidence =
   };
 }
 
+function buildAiReportDraftAdapter(packet = {}, evidenceSignals = {}) {
+  const schema = packet.intakeSourceSchema || {};
+  const reportSeed = packet.reportSeed || {};
+  const sourceSchemaId = schema.id || reportSeed.sourceSchemaId || 'parent_report';
+  const isTalent = sourceSchemaId === 'talent_assessment';
+  const isWrongPaper = sourceSchemaId === 'wrong_question_paper';
+  const firstStep = evidenceSignals.firstStep || evidenceSignals.stuckFirstStep || '先让孩子说出第一步，不要求算完整题。';
+  const wrongCause = evidenceSignals.wrongCause || evidenceSignals.wrongCauseGuess || '先把卡点当作候选错因，等回访验证。';
+  const questionType = evidenceSignals.questionType || schema.label || reportSeed.sourceSchemaLabel || '今晚材料';
+  const missing = Array.isArray(evidenceSignals.structuredCaptureMissing)
+    ? evidenceSignals.structuredCaptureMissing
+    : [];
+  return {
+    id: 'ai_report_draft_adapter',
+    sourceSchemaId,
+    mode: 'ai_draft_local_guardrail',
+    status: isTalent ? 'method_candidate_only' : 'ready_for_guarded_draft',
+    aiAllowedSections: [
+      'parent_readable_summary',
+      'socratic_followup_questions',
+      'tonight_action_wording',
+      'mini_lesson_candidate_copy'
+    ],
+    localCodeOwns: [
+      'source_classification',
+      'release_gate',
+      'portrait_confidence_weight',
+      'reward_release',
+      'share_fields',
+      'day7_evidence_gate'
+    ],
+    aiMustNotOwn: [
+      'talent_label',
+      'auto_grading',
+      'ocr_claim',
+      'full_answer',
+      'mastery_claim',
+      'ranking',
+      'reward_release'
+    ],
+    localSanitizer: {
+      rule: 'AI 草案只能作为文案候选；本地二次校验后才写入报告、练习、分享和画像。',
+      degradeRule: isTalent
+        ? '测评材料一律降级为学习方法候选，必须补真实错题、隔天回访和第 7 天小变式。'
+        : isWrongPaper
+          ? '错题材料只放行错因候选、第一步和近迁移，不自动判分、不输出整卷答案。'
+          : '家长/学校/摘录材料只放行今晚行动和下一证据，不写长期能力结论。',
+      blockedClaims: [
+        '孩子天赋就是',
+        '自动判分',
+        'OCR 已识别全部内容',
+        '整卷答案',
+        '长期掌握',
+        '排名提升保证'
+      ]
+    },
+    draftSeed: {
+      parentSummary: isTalent
+        ? `这份测评只能提示可能适合的学习方法：围绕“${questionType}”，今晚先验证一个动作。`
+        : `这份材料先用于今晚决策：卡点暂定为“${wrongCause}”，先看孩子能否说出第一步。`,
+      socraticQuestions: [
+        '这题第一步你先看哪里？',
+        '你刚才卡住的是读题、列关系，还是检查？',
+        '如果换一个数字或条件，第一步还一样吗？'
+      ],
+      tonightAction: firstStep,
+      miniLessonCandidate: {
+        title: '3 分钟小讲堂候选',
+        conceptGap: wrongCause,
+        blackboardFirstStep: firstStep,
+        parentCheckLine: '家长只问第一步，不追问完整答案。',
+        nextDayRevisit: '明天遮住答案，只回访同一第一步。'
+      },
+      evidenceMissing: missing
+    }
+  };
+}
+
 function buildUploadIntakePacket(text = '', imagePaths = [], materialType = '') {
   const value = String(text || '').trim();
   const images = Array.isArray(imagePaths) ? imagePaths.filter(Boolean).slice(0, 4) : [];
@@ -465,6 +543,11 @@ function buildUploadIntakePacket(text = '', imagePaths = [], materialType = '') 
   };
   const nextActionQueue = buildNextActionQueue(kind, classified, materialSource || classified.sourceMeta || null, images);
   const sourceReadinessBoard = buildSourceReadinessBoard(intakeSourceSchema, kind, materialSource || classified.sourceMeta || null, images);
+  const aiReportDraftAdapter = buildAiReportDraftAdapter({
+    intakeSourceSchema,
+    reportSeed,
+    kind
+  });
   return {
     id: `upload_intake_${Date.now ? Date.now() : 0}`,
     kind,
@@ -488,6 +571,7 @@ function buildUploadIntakePacket(text = '', imagePaths = [], materialType = '') 
     structuredCapturePrompts,
     methodValidationChallengeChain,
     photoEvidencePolicy,
+    aiReportDraftAdapter,
     reviewSeed,
     reportSeed,
     aiBoundary: 'AI 只负责改写提示和追问；来源识别、路线、放行、分享字段由本地规则决定。'
@@ -501,6 +585,7 @@ module.exports = {
   buildNextActionQueue,
   buildSourceReadinessBoard,
   buildMethodValidationChallengeChain,
+  buildAiReportDraftAdapter,
   classifyImportInput,
   detectMaterialSource,
   detectIntakeSourceSchema,

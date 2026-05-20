@@ -1089,6 +1089,53 @@ function buildFamilyDecisionHomepage(input = {}) {
   };
 }
 
+function buildTonightParentDecisionCard(input = {}) {
+  const familyDecisionHomepage = input.familyDecisionHomepage || {};
+  const tonightDecisionBrief = input.tonightDecisionBrief || {};
+  const familyDecisionMemo = input.familyDecisionMemo || {};
+  const reportDailyActionQueue = input.reportDailyActionQueue || {};
+  const active = reportDailyActionQueue.active || {};
+  const doList = Array.isArray(familyDecisionHomepage.doList) ? familyDecisionHomepage.doList : [];
+  const evidenceList = Array.isArray(familyDecisionHomepage.evidenceList) ? familyDecisionHomepage.evidenceList : [];
+  const firstAction = familyDecisionHomepage.primaryAction
+    || active.task
+    || doList[0]
+    || familyDecisionMemo.tonightDecision
+    || '今晚只做一个第一步动作';
+  const childFirstStep = familyDecisionHomepage.childLine
+    || tonightDecisionBrief.childScript
+    || '孩子只需要说出第一步，不需要一次讲完整过程。';
+  const parentQuestion = familyDecisionHomepage.parentQuestion
+    || tonightDecisionBrief.parentScript
+    || '你第一步准备先看哪里？';
+  const tomorrowCheck = familyDecisionHomepage.tomorrow
+    || tonightDecisionBrief.tomorrowRevisit
+    || active.checkpoint
+    || '明天换一题，只回访同一个第一步。';
+  return {
+    id: 'tonight_parent_decision_card',
+    title: '今晚四行决策卡',
+    subtitle: '先看这一张，再决定要不要展开完整报告。',
+    firstAction,
+    childFirstStep,
+    parentQuestion,
+    tomorrowCheck,
+    evidenceLine: evidenceList.length
+      ? `依据：${evidenceList.slice(0, 3).join(' / ')}`
+      : familyDecisionHomepage.sourceLine || '依据不足时，只放行今晚动作，不写长期画像。',
+    safetyLine: familyDecisionHomepage.shareBoundary || '不带原题、答案、完整对话、分数或排名。',
+    route: familyDecisionHomepage.route || active.route || '/pages/tutor/tutor?from=tonight_parent_decision_card',
+    ctaLabel: familyDecisionHomepage.ctaLabel || (active.task ? '去完成今日动作' : '先补第一步证据'),
+    rows: [
+      { id: 'do', label: '今晚先做', text: firstAction },
+      { id: 'child', label: '孩子第一步', text: childFirstStep },
+      { id: 'parent', label: '家长只问', text: parentQuestion },
+      { id: 'tomorrow', label: '明天回访', text: tomorrowCheck }
+    ],
+    ready: !!(firstAction && parentQuestion && tomorrowCheck)
+  };
+}
+
 function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, subjectSkillDepth, curriculumSpine, visualSocraticMatrix, courseUnitMap, latestThinkingReceipt = null) {
   const globalEvidenceBrief = storage.buildGlobalEvidenceBrief ? storage.buildGlobalEvidenceBrief() : null;
   const capabilityLedger = capabilityEvidenceLedger || (storage.buildCapabilityEvidenceLedger ? storage.buildCapabilityEvidenceLedger({ globalEvidenceBrief }) : null);
@@ -1306,6 +1353,12 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     homeSchoolCollaborationDigest,
     parentReflectionSummary
   });
+  const tonightParentDecisionCard = buildTonightParentDecisionCard({
+    familyDecisionHomepage,
+    tonightDecisionBrief,
+    familyDecisionMemo,
+    reportDailyActionQueue
+  });
   const realHomeworkCoverageMatrix = storage.buildRealHomeworkCoverageMatrix
     ? storage.buildRealHomeworkCoverageMatrix({
       subject: subjectSkillDepth && subjectSkillDepth.subject ? subjectSkillDepth.subject : ''
@@ -1334,12 +1387,12 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     : [];
   const openMaicBorrowWorkbench = {
     id: 'openmaic_k12_borrow_workbench',
-    title: 'OpenMAIC / K12 借力工作台',
+    title: '小讲堂借力工作台',
     summary: `只借公开资料的结构、场景流和质量门；本地代码负责门禁、回流、奖励、隐私和报告放行，AI 只负责追问与表达。`,
     statusLine: `已接 ${publicK12Resources.length} 类公开资料线索、${publicK12Workbench.length} 条使用工作台、${publicK12ChallengeDeck.length} 张可玩采集卡。`,
     sourcePolicyLine: openMaicDecisionBridge && openMaicDecisionBridge.sourcePolicy
-      ? `OpenMAIC：${openMaicDecisionBridge.sourcePolicy.decision || 'reference_workflow_only'}，不复制 AGPL 代码、不承诺完整 AI 课堂。`
-      : 'OpenMAIC：只参考两阶段生成、事件流和质量门，不复制代码、不照搬提示词、不部署 AGPL 服务端。',
+      ? '只借公开结构和课堂编排思路，不复制代码、不照搬题文、不承诺完整 AI 课堂。'
+      : '只参考两阶段生成、事件流和质量门，不复制代码、不照搬提示词、不做完整课堂平台。',
     releaseLine: '放行规则：没有孩子第一步、错因回放、次日回访和家长确认，不写长期画像，不发奖励，不生成可分享结论。',
     lanes: [
       {
@@ -1504,6 +1557,25 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
       ? realHomeworkCoverageMatrix.implementationDecisionMatrix
       : [],
     openMaicDecisionBridge,
+    openMaicMiniLessonReport: openMaicDecisionBridge ? openMaicDecisionBridge.miniLessonReport : null,
+    openMaicMiniLessonTitle: openMaicDecisionBridge && openMaicDecisionBridge.miniLessonReport ? openMaicDecisionBridge.miniLessonReport.title : '',
+    openMaicMiniLessonTriggerLine: openMaicDecisionBridge && openMaicDecisionBridge.miniLessonReport ? openMaicDecisionBridge.miniLessonReport.triggerLine : '',
+    openMaicMiniLessonConceptGap: openMaicDecisionBridge && openMaicDecisionBridge.miniLessonReport ? openMaicDecisionBridge.miniLessonReport.conceptGap : '',
+    openMaicMiniLessonTopicLabel: openMaicDecisionBridge && openMaicDecisionBridge.miniLessonReport ? openMaicDecisionBridge.miniLessonReport.topicLabel : '',
+    openMaicMiniLessonTopicLocalGate: openMaicDecisionBridge && openMaicDecisionBridge.miniLessonReport ? openMaicDecisionBridge.miniLessonReport.topicLocalGate : '',
+    openMaicMiniLessonTopicPractice: openMaicDecisionBridge && openMaicDecisionBridge.miniLessonReport ? openMaicDecisionBridge.miniLessonReport.topicPractice : null,
+    openMaicMiniLessonActiveRecallLadder: openMaicDecisionBridge && openMaicDecisionBridge.miniLessonReport && Array.isArray(openMaicDecisionBridge.miniLessonReport.activeRecallRevisitLadder) ? openMaicDecisionBridge.miniLessonReport.activeRecallRevisitLadder : [],
+    openMaicMiniLessonBlackboardLine: openMaicDecisionBridge && openMaicDecisionBridge.miniLessonReport ? openMaicDecisionBridge.miniLessonReport.blackboardLine : '',
+    openMaicMiniLessonBlackboardFrames: openMaicDecisionBridge && openMaicDecisionBridge.miniLessonReport && Array.isArray(openMaicDecisionBridge.miniLessonReport.blackboardFrames) ? openMaicDecisionBridge.miniLessonReport.blackboardFrames : [],
+    openMaicMiniLessonBlackboardRenderPrompt: openMaicDecisionBridge && openMaicDecisionBridge.miniLessonReport ? openMaicDecisionBridge.miniLessonReport.blackboardRenderPrompt : '',
+    openMaicMiniLessonMisconceptionLine: openMaicDecisionBridge && openMaicDecisionBridge.miniLessonReport ? openMaicDecisionBridge.miniLessonReport.misconceptionLine : '',
+    openMaicMiniLessonCheckQuestion: openMaicDecisionBridge && openMaicDecisionBridge.miniLessonReport ? openMaicDecisionBridge.miniLessonReport.checkQuestion : '',
+    openMaicMiniLessonParentLine: openMaicDecisionBridge && openMaicDecisionBridge.miniLessonReport ? openMaicDecisionBridge.miniLessonReport.parentLine : '',
+    openMaicMiniLessonNextDayReview: openMaicDecisionBridge && openMaicDecisionBridge.miniLessonReport ? openMaicDecisionBridge.miniLessonReport.nextDayReview : '',
+    openMaicMiniLessonExitGate: openMaicDecisionBridge && openMaicDecisionBridge.miniLessonReport ? openMaicDecisionBridge.miniLessonReport.exitGate : '',
+    openMaicMiniLessonTeacherSchoolBridge: openMaicDecisionBridge && openMaicDecisionBridge.miniLessonReport ? openMaicDecisionBridge.miniLessonReport.teacherSchoolBridge : null,
+    openMaicMiniLessonBoundary: openMaicDecisionBridge && openMaicDecisionBridge.miniLessonReport ? openMaicDecisionBridge.miniLessonReport.boundary : '',
+    openMaicHomeSchoolMiniLessonPacket: openMaicDecisionBridge ? openMaicDecisionBridge.homeSchoolMiniLessonPacket : null,
     openMaicBorrowWorkbench,
     openMaicBorrowWorkbenchLanes: openMaicBorrowWorkbench.lanes,
     openMaicBorrowWorkbenchBlockedClaims: openMaicBorrowWorkbench.blockedClaims,
@@ -1758,7 +1830,11 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     uploadedMaterialDecisionDossierSchoolRule: uploadedMaterialDecisionDossier.schoolRule || '',
     uploadedMaterialDecisionDossierChildStrengthLine: uploadedMaterialDecisionDossier.childStrengthLine || '',
     uploadedMaterialDecisionDossierHowToLearnBetter: Array.isArray(uploadedMaterialDecisionDossier.howToLearnBetter) ? uploadedMaterialDecisionDossier.howToLearnBetter : [],
+    uploadedMaterialDecisionDossierMethodCandidateCards: Array.isArray(uploadedMaterialDecisionDossier.methodCandidateCards) ? uploadedMaterialDecisionDossier.methodCandidateCards : [],
     uploadedMaterialDecisionDossierWrongPaperDiagnosisCards: Array.isArray(uploadedMaterialDecisionDossier.wrongPaperDiagnosisCards) ? uploadedMaterialDecisionDossier.wrongPaperDiagnosisCards : [],
+    uploadedMaterialDecisionDossierMethodValidationStages: Array.isArray(uploadedMaterialDecisionDossier.methodValidationStages) ? uploadedMaterialDecisionDossier.methodValidationStages : [],
+    uploadedMaterialDecisionDossierMethodValidationReleaseRule: uploadedMaterialDecisionDossier.methodValidationReleaseRule || '',
+    uploadedMaterialDecisionDossierMethodValidationNextAction: uploadedMaterialDecisionDossier.methodValidationNextAction || '',
     uploadedMaterialDecisionDossierDetailedSections: Array.isArray(uploadedMaterialDecisionDossier.detailedReportSections) ? uploadedMaterialDecisionDossier.detailedReportSections : [],
     uploadedMaterialDecisionDossierMaterialLanes: Array.isArray(uploadedMaterialDecisionDossier.materialLanes) ? uploadedMaterialDecisionDossier.materialLanes : [],
     uploadedMaterialDecisionDossierNextEvidenceQueue: Array.isArray(uploadedMaterialDecisionDossier.nextEvidenceQueue) ? uploadedMaterialDecisionDossier.nextEvidenceQueue : [],
@@ -1961,6 +2037,10 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
       ? fallbackRecoveryReportBridge.evidenceRequired
       : [],
     familyDecisionHomepage,
+    tonightParentDecisionCard,
+    tonightParentDecisionCardRows: tonightParentDecisionCard.rows,
+    tonightParentDecisionCardRoute: tonightParentDecisionCard.route,
+    tonightParentDecisionCardCtaLabel: tonightParentDecisionCard.ctaLabel,
     familyDecisionHomepageTitle: familyDecisionHomepage.title,
     familyDecisionHomepageHeadline: familyDecisionHomepage.headline,
     familyDecisionHomepageStatus: familyDecisionHomepage.status,

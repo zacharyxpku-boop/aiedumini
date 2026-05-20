@@ -8,6 +8,7 @@ Page({
   data: {
     wordsText: '',
     firstStepText: '',
+    mistakeText: '',
     session: null,
     result: null,
     transitionPrompt: null,
@@ -36,6 +37,10 @@ Page({
 
   onFirstStepInput(event) {
     this.setData({ firstStepText: event.detail.value });
+  },
+
+  onMistakeInput(event) {
+    this.setData({ mistakeText: event.detail.value });
   },
 
   build() {
@@ -95,10 +100,12 @@ Page({
   },
 
   submit() {
-    const result = lightFeatures.submitDictation(this.data.wordsText, this.data.firstStepText);
+    const result = lightFeatures.submitDictation(this.data.wordsText, this.data.firstStepText, this.data.mistakeText);
     storage.recordLightEntryCompletion && storage.recordLightEntryCompletion('dictation', {
       dictationCompletionTime: new Date().toISOString(),
-      wordCount: (result.session.words || []).length
+      wordCount: (result.session.words || []).length,
+      mistakeType: result.mistakeType && result.mistakeType.id,
+      reviewCardId: result.reviewCard && result.reviewCard.id
     });
     this.setData({
       session: result.session,

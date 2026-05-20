@@ -276,13 +276,17 @@ Page({
     const chains = storage.loadScaffoldingChains ? storage.loadScaffoldingChains() : [];
     const latestChain = chains[0] || null;
     const secondStepDone = !!(latestChain && (latestChain.steps || []).some((step) => Number(step.order) === 2 && step.completed));
+    const reviewCard = storage.ensureFocusReviewCard ? storage.ensureFocusReviewCard(record, {
+      nextRoute: '/pages/review/review?from=focus_return'
+    }) : null;
     this.setData({
       completionCard: record,
       secondStepNotice: !secondStepDone && latestChain ? {
         title: '第二步轻提示',
         body: '孩子今天第一步完成了，但第二步还没完成。你可以只问：第一步圈的条件，哪两个有关系？',
         cta: '查看下一步提示'
-      } : null
+      } : null,
+      reviewCard
     });
     this.playDoneSound();
     this.refresh();

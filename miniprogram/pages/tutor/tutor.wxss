@@ -718,6 +718,177 @@ page {
   color: rgba(255, 253, 248, 0.68);
 }
 
+.mini-lesson-live-panel {
+  display: grid;
+  gap: 14rpx;
+  margin-top: 16rpx;
+  padding: 22rpx;
+  color: #163B2D;
+  background: #FFF9E8;
+  border: 1rpx solid rgba(184, 128, 34, 0.18);
+  border-radius: 24rpx;
+}
+
+.mini-lesson-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
+.mini-lesson-kicker,
+.mini-lesson-pill {
+  color: #8A5A12;
+  font-size: 20rpx;
+  font-weight: 950;
+}
+
+.mini-lesson-title {
+  margin-top: 4rpx;
+  color: #1B4332;
+  font-size: 28rpx;
+  font-weight: 1000;
+  line-height: 1.25;
+}
+
+.mini-lesson-pill {
+  flex: 0 0 auto;
+  padding: 8rpx 14rpx;
+  background: rgba(184, 128, 34, 0.12);
+  border-radius: 999rpx;
+}
+
+.mini-lesson-reason,
+.mini-lesson-gap,
+.mini-lesson-check,
+.mini-lesson-parent,
+.mini-lesson-exit,
+.mini-lesson-thread {
+  color: #38564B;
+  font-size: 22rpx;
+  font-weight: 820;
+  line-height: 1.45;
+}
+
+.mini-lesson-gap,
+.mini-lesson-exit {
+  color: #1B4332;
+  font-weight: 1000;
+}
+
+.mini-lesson-board {
+  display: grid;
+  gap: 12rpx;
+  padding: 18rpx;
+  color: #FFFDF8;
+  background: #112A23;
+  border-radius: 20rpx;
+}
+
+.mini-lesson-board-title {
+  color: #F2D479;
+  font-size: 22rpx;
+  font-weight: 1000;
+}
+
+.mini-lesson-frame {
+  display: grid;
+  grid-template-columns: 42rpx minmax(0, 1fr);
+  gap: 12rpx;
+  align-items: flex-start;
+}
+
+.mini-lesson-frame-index {
+  display: flex;
+  width: 42rpx;
+  height: 42rpx;
+  align-items: center;
+  justify-content: center;
+  color: #112A23;
+  background: #F2D479;
+  border-radius: 999rpx;
+  font-size: 20rpx;
+  font-weight: 1000;
+}
+
+.mini-lesson-frame-draw,
+.mini-lesson-frame-say,
+.mini-lesson-note-text {
+  font-size: 21rpx;
+  line-height: 1.45;
+}
+
+.mini-lesson-frame-draw {
+  color: #FFFDF8;
+  font-weight: 950;
+}
+
+.mini-lesson-frame-say {
+  margin-top: 4rpx;
+  color: rgba(255, 253, 248, 0.72);
+}
+
+.mini-lesson-two-col {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12rpx;
+}
+
+.mini-lesson-note {
+  min-width: 0;
+  padding: 14rpx;
+  background: #FFFFFF;
+  border: 1rpx solid rgba(27, 67, 50, 0.1);
+  border-radius: 18rpx;
+}
+
+.mini-lesson-note-label {
+  color: #8A5A12;
+  font-size: 19rpx;
+  font-weight: 950;
+}
+
+.mini-lesson-note-text {
+  margin-top: 6rpx;
+  color: #1B4332;
+  font-weight: 820;
+}
+
+.mini-lesson-parent {
+  padding: 14rpx 16rpx;
+  background: #FFFFFF;
+  border-radius: 18rpx;
+}
+
+.mini-lesson-exit-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12rpx;
+}
+
+.mini-lesson-exit-button {
+  min-width: 0;
+  min-height: 76rpx;
+  padding: 0 14rpx;
+  color: #1B4332;
+  background: #FFFFFF;
+  border: 1rpx solid rgba(27, 67, 50, 0.16);
+  border-radius: 18rpx;
+  font-size: 22rpx;
+  font-weight: 950;
+  line-height: 76rpx;
+}
+
+.mini-lesson-exit-button.primary {
+  color: #FFFDF8;
+  background: #1B4332;
+}
+
+.mini-lesson-thread {
+  color: #7C7468;
+  font-size: 19rpx;
+}
+
 .receipt-diagnostic-title {
   color: #1B4332;
   font-size: 22rpx;

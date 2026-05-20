@@ -1115,6 +1115,19 @@ Page({
     const primaryParentCheck = (safeRelayPacket && safeRelayPacket.parentCheck) || incoming.question_bank_relay_parent_check || incoming.visual_board_relay_parent_line || incoming.tonight_parent_question || '家长只问孩子第一步怎么想，不看完整答案。';
     const primaryNextRevisit = (safeRelayPacket && safeRelayPacket.nextDayRevisit) || incoming.tonight_tomorrow || (wrongCauseViralPack && wrongCauseViralPack.nextRevisit) || reviewLine;
     const relayPackBlockedFields = (safeRelayPacket && safeRelayPacket.blockedFields) || (wrongCauseViralPack && wrongCauseViralPack.blockedFields) || 'original_question,full_answer,photo,score,ranking,full_dialogue';
+    const defaultReceiverAction = {
+      id: 'receiver_own_material',
+      label: '用我自己的作业做同类第一步',
+      displayLabel: '用我自己的作业做同类第一步',
+      route: receiverOwnMaterialChallenge ? receiverOwnMaterialChallenge.route : questionBankRelayRoute,
+      reason: receiverOwnMaterialChallenge
+        ? receiverOwnMaterialChallenge.receiverAction
+        : '不用看对方原题；打开自己的作业或错题，只复刻同类第一步。',
+      evidence: 'receiver_own_first_step',
+      parentCheck: primaryParentCheck,
+      tomorrow: primaryNextRevisit,
+      safetyLine: `默认接力不带：${relayPackBlockedFields}`
+    };
     const relayPackCards = [
       {
         id: 'tonight_action',
@@ -1148,6 +1161,12 @@ Page({
       relayPackBlockedFields,
       relayPackBlockedLine: `三卡不带：${relayPackBlockedFields}`,
       relayPackCards,
+      defaultReceiverAction,
+      defaultReceiverActionTitle: defaultReceiverAction.label,
+      defaultReceiverActionLine: defaultReceiverAction.reason,
+      defaultReceiverActionParentCheck: defaultReceiverAction.parentCheck,
+      defaultReceiverActionTomorrow: defaultReceiverAction.tomorrow,
+      defaultReceiverActionSafetyLine: defaultReceiverAction.safetyLine,
       receiverOwnMaterialChallenge,
       receiverOwnMaterialChallengeLine: receiverOwnMaterialChallenge ? `接收者自己的材料挑战：${receiverOwnMaterialChallenge.label}｜${receiverOwnMaterialChallenge.receiverAction}` : '',
       receiverOwnMaterialChallengeRoute: receiverOwnMaterialChallenge ? receiverOwnMaterialChallenge.route : '',
@@ -1232,13 +1251,7 @@ Page({
         ? '接力成立条件：自己的第一步、错因回退、明天回访预约都要留下证据。'
         : '接力成立条件：主动回忆、错因回退、明天回访三件事至少完成一件并留下记录。',
       actions: [
-        {
-          id: 'receiver_own_material',
-          label: '做自己的题',
-          route: receiverOwnMaterialChallenge ? receiverOwnMaterialChallenge.route : questionBankRelayRoute,
-          reason: receiverOwnMaterialChallenge ? receiverOwnMaterialChallenge.receiverAction : '用自己的作业复刻同类第一步，不复用发送者材料。',
-          evidence: receiverOwnMaterialChallenge ? receiverOwnMaterialChallenge.shareBoundary : 'own-material challenge'
-        },
+        defaultReceiverAction,
         {
           id: 'repair',
           label: '先修卡点',

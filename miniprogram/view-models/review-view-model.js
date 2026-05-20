@@ -17,7 +17,7 @@ function companionStrip(input) {
   const preference = companionPreference(input);
   const line = storage.getCompanionStageCopy
     ? storage.getCompanionStageCopy('review_focus', preference)
-    : '咕点陪你只修这一小步，不讲完整答案。';
+    : '咕点陪你只修这一小步，不讲完整结果。';
   return safeText(line, '咕点陪你只修今晚最卡的这一小步。');
 }
 
@@ -125,7 +125,7 @@ function buildRepairContract(todayFocus) {
         text: completed ? '明天只回访同一处第一步，不扩题量。' : '完成后生成明天回访卡。'
       }
     ],
-    boundary: '本页只记录第一步、错因和明天回访，不给完整答案，不做分数比较。',
+    boundary: '本页只记录第一步、错因和明天回访，不给完整结果，不做分数比较。',
     parentLine: childStep
       ? `家长只问：你刚才第一步为什么先做「${childStep}」？`
       : '家长只问：你第一步准备先看哪里？'
@@ -170,8 +170,8 @@ function buildVisualBlackboard(todayFocus) {
     firstStrokeLine: firstStroke
       ? `${safeText(firstStroke.drawAction, '只画第一笔')}｜${safeText(firstStroke.childReply, '孩子说出自己的第一步')}`
       : rawBlackboard.firstMove || '',
-    stopRuleLine: blueprint && blueprint.stopRule ? blueprint.stopRule : '孩子能说出第一步就停，不继续代讲完整答案。',
-    boundaryLine: blueprint && blueprint.boundary ? blueprint.boundary : (rawBlackboard.avoid || '只给第一步，不给完整答案。'),
+    stopRuleLine: blueprint && blueprint.stopRule ? blueprint.stopRule : '孩子能说出第一步就停，不继续代讲完整结果。',
+    boundaryLine: blueprint && blueprint.boundary ? blueprint.boundary : (rawBlackboard.avoid || '只给第一步，不给完整结果。'),
     nextRevisitLine: blueprint && blueprint.wrongCauseReturn ? blueprint.wrongCauseReturn : '同类题又错时，先回到这一笔，不加题量。',
     localAiSplitLine: blueprint && blueprint.aiRole
       ? `本地代码管层级、停笔和放行；AI 只负责把同一第一步讲得更像孩子听得懂的话。`
@@ -201,7 +201,7 @@ function buildReviewViewModel(input = {}) {
     miniAction: todayFocus && !(evidence && evidence.childArticulatedStep)
       ? {
           question: '你可以用自己的话补一句：我先……',
-          helper: '说不完整也没关系，先补一句就好。这不是答案，只是你准备开始的第一步。',
+          helper: '说不完整也没关系，先补一句就好。这不是结果，只是你准备开始的第一步。',
           placeholder: '比如：我先圈出题干条件',
           saveCta: '保存我的第一步',
           quickChoices: evidence ? evidence.quickChoices : []

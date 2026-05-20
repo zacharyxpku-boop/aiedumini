@@ -5,7 +5,7 @@
 
   <view class="first-run-overlay" wx:if="{{showFirstRunOverlay}}" catchtap="closeFirstRunOverlay">
     <view class="first-run-card">
-      <view>咕点不直接给答案</view>
+      <view>咕点不直接给结果</view>
       <text>陪你先看清今晚第一步。</text>
       <text>点一下继续，或等 3 秒自动收起。</text>
     </view>
@@ -416,6 +416,24 @@
       <view class="share-relay-board" wx:if="{{incomingShareRelay}}">
         <view class="share-relay-title">{{incomingShareRelay.title}}</view>
         <view class="share-relay-summary">{{incomingShareRelay.summary}}</view>
+        <view class="share-relay-pack receiver-default-action" wx:if="{{incomingShareRelay.defaultReceiverAction}}">
+          <view class="share-relay-pack-head">
+            <text>{{incomingShareRelay.defaultReceiverActionTitle}}</text>
+            <text>{{incomingShareRelay.defaultReceiverActionLine}}</text>
+          </view>
+          <view class="share-relay-evidence">家长检查：{{incomingShareRelay.defaultReceiverActionParentCheck}}</view>
+          <view class="share-relay-evidence">明天回访：{{incomingShareRelay.defaultReceiverActionTomorrow}}</view>
+          <view class="share-relay-pack-safe">{{incomingShareRelay.defaultReceiverActionSafetyLine}}</view>
+          <button
+            class="share-relay-action"
+            data-id="{{incomingShareRelay.defaultReceiverAction.id}}"
+            data-label="{{incomingShareRelay.defaultReceiverAction.displayLabel}}"
+            data-route="{{incomingShareRelay.defaultReceiverAction.route}}"
+            data-reason="{{incomingShareRelay.defaultReceiverAction.reason}}"
+            data-evidence="{{incomingShareRelay.defaultReceiverAction.evidence}}"
+            bindtap="runIncomingShareRelayAction"
+          >马上做这一小步</button>
+        </view>
         <view class="share-relay-pack" wx:if="{{incomingShareRelay.relayPackReady}}">
           <view class="share-relay-pack-head">
             <text>{{incomingShareRelay.relayPackTitle}}</text>

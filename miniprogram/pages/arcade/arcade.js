@@ -53,6 +53,7 @@ Page({
     dailyReturnMission: null,
     dailyReturnContract: null,
     dailyPrimaryRecallAction: null,
+    dailyPrimaryRecallEvidencePacket: null,
     ninetySecondRecallDeck: null,
     ninetySecondRecallState: null,
     reviewReturnSeed: null,
@@ -545,6 +546,36 @@ Page({
         blockedFields: Array.isArray(card.blockedFields) ? card.blockedFields : []
       }))
     } : null;
+    const firstStepSprintWeakKey = subjectSkillDepth && subjectSkillDepth.firstStep
+      ? subjectSkillDepth.firstStep
+      : adaptiveChallenge && adaptiveChallenge.bossCard && adaptiveChallenge.bossCard.nextAction
+        ? adaptiveChallenge.bossCard.nextAction
+        : '同类题第一步';
+    const firstStepSprintWrongCause = adaptiveChallenge && adaptiveChallenge.bossCard && adaptiveChallenge.bossCard.key
+      ? adaptiveChallenge.bossCard.key
+      : activeQuest.id === 'quest_boss_gap'
+        ? '高频卡点'
+        : '今晚错因';
+    const firstStepSprint = {
+      id: 'ninety_second_first_step_challenge',
+      title: '90 秒同类第一步挑战',
+      sourceLine: '来自错题 / 小讲堂 / 家长报告，只练今晚这一处。',
+      totalSeconds: 90,
+      weakKey: firstStepSprintWeakKey,
+      wrongCause: firstStepSprintWrongCause,
+      goalLine: `90 秒内完成：说出第一步、指出错因、换一个同类壳还能开口。`,
+      rewardLine: 'XP 只记录学习证据，不奖励速度、分数、排行或抄答案。',
+      parentLine: '家长只听第一步是否说清，不追问完整答案。',
+      nextDayLine: '明天只回访同一第一步，过了再放小变式。',
+      route: '/pages/arcade/arcade?from=90s_first_step_challenge',
+      reviewRoute: '/pages/review/review?from=90s_first_step_challenge',
+      safetyLine: '不带原题、完整答案、分数、排名或完整对话。',
+      checkpoints: [
+        { id: 'say_first_step', label: '说出第一步', evidence: 'student_first_step' },
+        { id: 'name_wrong_cause', label: '指出错因', evidence: 'wrong_cause_named' },
+        { id: 'near_transfer_open', label: '同类换壳能开口', evidence: 'near_transfer_first_move' }
+      ]
+    };
     return {
       mode,
       modeLabel: labels[mode] || labels.balanced,
@@ -593,6 +624,8 @@ Page({
         ? questArcMission.evidenceRequired.join(' / ')
         : '',
       publicK12IntakeChallenge,
+      firstStepSprint,
+      firstStepSprintCheckpoints: firstStepSprint.checkpoints,
       publicK12IntakeChallengeCount: publicK12IntakeChallenge ? publicK12IntakeChallenge.challengeCount : 0,
       publicK12IntakeExecutableCardCount: publicK12IntakeChallenge ? publicK12IntakeChallenge.executableCardCount : 0,
       evidenceBiasSource: evidenceBias && evidenceBias.source ? evidenceBias.source : '',
@@ -1294,6 +1327,23 @@ Page({
     const spacedRecallPolicy = highFrequencyPracticeLoop && highFrequencyPracticeLoop.spacedRecallPolicy
       ? highFrequencyPracticeLoop.spacedRecallPolicy
       : null;
+    const miniLessonReturnCard = storage.ensureMiniLessonReturnReviewCard
+      && (reviewReturnSeed || nextDayReturnEvidence)
+      ? storage.ensureMiniLessonReturnReviewCard(
+        Object.assign({}, nextDayReturnEvidence || {}, reviewReturnSeed || {}, {
+          firstStep: repairFocus && repairFocus.firstStep ? repairFocus.firstStep : '',
+          conceptGap: repairFocus && repairFocus.reason ? repairFocus.reason : '',
+          parentCheck: repairFocus && repairFocus.parentLine ? repairFocus.parentLine : '',
+          nextDayReview: repairFocus && repairFocus.nextPracticeText ? repairFocus.nextPracticeText : ''
+        }),
+        {
+          source: 'arcade_finish_round',
+          flowTraceId: savedResult.flowTraceId || savedResult.traceId || '',
+          subject: this.data.subjectSkillDepth && this.data.subjectSkillDepth.subjectLabel ? this.data.subjectSkillDepth.subjectLabel : '',
+          taskType: this.data.recentTaskType || ''
+        }
+      )
+      : null;
     const questArcSignal = storage.recordQuestArcGameSignal
       ? storage.recordQuestArcGameSignal({
         mission: this.data.questArcMission,
@@ -1477,6 +1527,7 @@ Page({
       next_day_return_blocked_fields: nextDayReturnEvidence && Array.isArray(nextDayReturnEvidence.blockedFields)
         ? nextDayReturnEvidence.blockedFields.join(',')
         : '',
+      mini_lesson_review_card_id: miniLessonReturnCard && miniLessonReturnCard.id ? miniLessonReturnCard.id : '',
       review_return_seed_mode: reviewReturnSeed ? reviewReturnSeed.mode : '',
       review_return_seed_next_route: reviewReturnSeed ? reviewReturnSeed.nextRoute : '',
       review_return_seed_wrong_cards: reviewReturnSeed && Array.isArray(reviewReturnSeed.wrongCardIds)
@@ -1528,6 +1579,7 @@ Page({
           dailyReturnContract,
           reviewReturnSeed,
           nextDayReturnEvidence,
+          miniLessonReturnCard,
           spacedRecallPolicy
         }
       });
@@ -2160,8 +2212,55 @@ Page({
     });
   },
 
+  buildDailyPrimaryRecallEvidencePacket(action = {}) {
+    const weakKey = action.weakKey || (this.data.repairFocus && this.data.repairFocus.title) || '今晚最不稳的一步';
+    const now = new Date().toISOString();
+    return {
+      id: `daily_primary_recall_${Date.now()}`,
+      event: 'daily_primary_recall_evidence_ticket',
+      cardId: action.cardId || action.weakKey || weakKey,
+      weakKey,
+      firstStepSpoken: false,
+      wrongCauseReplay: false,
+      nextDayRevisitLocked: true,
+      day7VariantDue: true,
+      student_first_step: false,
+      wrong_cause_named: false,
+      next_day_revisit_locked: true,
+      day7_variant_due: true,
+      evidenceStatus: 'locked_pending_child_first_step',
+      route: action.route || '/pages/review/review?mode=recall_return',
+      parentLine: action.parentLine || '家长只问第一步，不问完整答案。',
+      rewardEvidence: action.rewardEvidence || ['student_first_step', 'wrong_cause_named', 'next_day_revisit'],
+      blockedRewards: action.blockedRewards || ['speed', 'score', 'ranking', 'raw_volume'],
+      sourceRoute: 'pages/arcade/arcade',
+      createdAt: now
+    };
+  },
+
+  persistDailyPrimaryRecallEvidence(action = {}) {
+    const packet = this.buildDailyPrimaryRecallEvidencePacket(action);
+    if (storage.appendReviewEvent) {
+      storage.appendReviewEvent(packet);
+    }
+    if (storage.recordGameSessionResult) {
+      storage.recordGameSessionResult({
+        gameType: 'daily_primary_recall_ticket',
+        total: 1,
+        correct: 0,
+        accuracy: 0,
+        recallEvidence: [packet],
+        activeRecallEvidenceComplete: false
+      }, {
+        gameType: 'daily_primary_recall_ticket'
+      });
+    }
+    return packet;
+  },
+
   runDailyPrimaryRecallAction() {
     const action = this.data.dailyPrimaryRecallAction || {};
+    const evidencePacket = this.persistDailyPrimaryRecallEvidence(action);
     if (storage.recordUnifiedNextAction) {
       storage.recordUnifiedNextAction({
         source: 'daily_primary_recall_action',
@@ -2173,6 +2272,10 @@ Page({
         evidenceLine: action.xpGate || ''
       });
     }
+    this.setData({
+      dailyPrimaryRecallEvidencePacket: evidencePacket,
+      feedbackText: '已锁定明天回访。先去说第一步，完成后才释放 XP。'
+    });
     navigation.navigateLearningRoute(action.route || '/pages/review/review?mode=recall_return');
   },
 

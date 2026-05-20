@@ -86,7 +86,8 @@ Page({
     showAdvancedReview: false,
     lastWrongCard: null,
     reportSourceContext: null,
-    reportSourcePanel: null
+    reportSourcePanel: null,
+    miniLessonReturnPanel: null
   },
 
   onLoad(query = {}) {
@@ -107,9 +108,25 @@ Page({
 
   buildReportSourceContext(query = {}) {
     const handoff = storage.get ? storage.get('upload.report.handoff.v1', null) : null;
-    const context = Object.assign({}, handoff || {}, query || {});
-    const fromUpload = context.from === 'upload_report_ready' || (handoff && handoff.status === 'ready');
+    const rawQuery = query || {};
+    const hasQueryContext = !!(rawQuery.reportId || rawQuery.cardId || rawQuery.sourceSchemaId || rawQuery.from === 'upload_report_ready');
+    const expiresAt = handoff && handoff.expiresAt ? Date.parse(handoff.expiresAt) : 0;
+    const expired = !!(expiresAt && expiresAt < (Date.now ? Date.now() : new Date().getTime()));
+    const matchesQuery = !!(handoff && !expired && hasQueryContext && (
+      (rawQuery.reportId && rawQuery.reportId === handoff.reportId)
+      || (rawQuery.cardId && rawQuery.cardId === handoff.cardId)
+      || (rawQuery.sourceSchemaId && rawQuery.sourceSchemaId === handoff.sourceSchemaId)
+      || rawQuery.from === 'upload_report_ready'
+    ));
+    const context = Object.assign({}, matchesQuery ? handoff : {}, rawQuery);
+    const fromUpload = context.from === 'upload_report_ready' || matchesQuery;
     if (!fromUpload && !context.cardId && !context.sourceSchemaId) return null;
+    if (matchesQuery && storage.set) {
+      storage.set('upload.report.handoff.v1', Object.assign({}, handoff, {
+        consumedAt: new Date().toISOString(),
+        status: 'consumed'
+      }));
+    }
     return {
       from: context.from || 'upload_report_ready',
       reportId: context.reportId || '',
@@ -122,7 +139,11 @@ Page({
       openMaicBridgeStatus: context.openMaicDecisionBridge && context.openMaicDecisionBridge.qualityGate
         ? context.openMaicDecisionBridge.qualityGate.status
         : '',
-      returnRoute: context.returnRoute || context.actionRoute || ''
+      returnRoute: context.returnRoute || context.actionRoute || '',
+      miniLessonReport: context.openMaicDecisionBridge && context.openMaicDecisionBridge.miniLessonReport
+        ? context.openMaicDecisionBridge.miniLessonReport
+        : null,
+      flowTraceId: context.flowTraceId || ''
     };
   },
 
@@ -157,7 +178,44 @@ Page({
       blockedFields: context.blockedFields || [],
       openMaicBridgeStatus: context.openMaicBridgeStatus || '',
       returnRoute: context.returnRoute || '',
+      miniLessonReport: context.miniLessonReport || null,
+      miniLessonCheckQuestion: context.miniLessonReport ? context.miniLessonReport.checkQuestion : '',
+      miniLessonBlackboardLine: context.miniLessonReport ? context.miniLessonReport.blackboardLine : '',
+      miniLessonNextDayReview: context.miniLessonReport ? context.miniLessonReport.nextDayReview : '',
+      miniLessonTopicGate: context.miniLessonReport ? context.miniLessonReport.topicLocalGate : '',
+      miniLessonBlackboardFrames: context.miniLessonReport && Array.isArray(context.miniLessonReport.blackboardFrames)
+        ? context.miniLessonReport.blackboardFrames
+        : [],
+      flowTraceId: context.flowTraceId || '',
       next: matchedCount ? '先修这张卡，再进入轻练习。' : '未找到对应卡，会先展示当前到期卡。'
+    };
+  },
+
+  buildMiniLessonReturnPanel(current = null) {
+    if (!current || current.type !== 'three_minute_mini_lesson_return') return null;
+    const frames = Array.isArray(current.blackboardFrames) ? current.blackboardFrames : [];
+    const blockedFields = Array.isArray(current.blockedFields) && current.blockedFields.length
+      ? current.blockedFields
+      : ['original_question', 'full_answer', 'score', 'ranking', 'talent_label'];
+    const evidenceThread = current.evidenceThread && typeof current.evidenceThread === 'object'
+      ? current.evidenceThread
+      : null;
+    return {
+      title: current.title || '3 分钟小讲堂回访',
+      status: '先说第一步，再进练习',
+      conceptGap: current.wrongCause || current.wrongCauseBucket || current.weakPoint || '这类题第一步还不稳定',
+      firstStep: current.prompt || current.answer || current.blackboardLine || '先说出这类题的第一步',
+      checkQuestion: current.question || '不看答案，说出第一步',
+      parentLine: current.backPrompt || (current.nextPracticePlan && current.nextPracticePlan.parentPrompt) || '家长只问第一步，不追完整答案。',
+      nextDayReview: current.revisit || (current.nextPracticePlan && current.nextPracticePlan.nextPracticeText) || '换一题，只回访第一步和错因。',
+      exitGate: current.exitGate || 'child_can_say_first_step',
+      flowTraceId: current.flowTraceId || '',
+      evidenceThreadId: evidenceThread ? evidenceThread.id : '',
+      topicCardId: evidenceThread ? evidenceThread.topicCardId : '',
+      day7Gate: evidenceThread ? evidenceThread.day7Gate : '',
+      frames,
+      blockedFields,
+      boundary: '不展示原题、不展示完整答案、不做分数/排名/天赋结论；只放行第一步、错因和明天回访。'
     };
   },
 
@@ -185,6 +243,7 @@ Page({
       current,
       reportSourceContext,
       reportSourcePanel: this.buildReportSourcePanel(reportSourceContext, current, cards),
+      miniLessonReturnPanel: this.buildMiniLessonReturnPanel(current),
       index: 0,
       showAnswer: false,
       done: !cards.length,
@@ -946,7 +1005,19 @@ Page({
     const rating = event.currentTarget.dataset.rating || 'good';
     const current = this.data.current;
     if (!current) return;
-    reviewCards.reviewCard(current.id, rating);
+    const reviewedCard = reviewCards.reviewCard(current.id, rating);
+    if (current.type === 'three_minute_mini_lesson_return' && storage.recordMiniLessonReviewResult) {
+      storage.recordMiniLessonReviewResult({
+        cardId: current.id,
+        rating,
+        reviewedCard,
+        evidenceThread: current.evidenceThread || null,
+        source: 'review_mini_lesson_return'
+      }, {
+        source: 'review_rate',
+        reportSourceContext: this.data.reportSourceContext || null
+      });
+    }
     api.gradeReview({
       card: current,
       rating,

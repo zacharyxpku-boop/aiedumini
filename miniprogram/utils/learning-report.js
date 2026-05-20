@@ -305,7 +305,10 @@ function normalizeReportSources(input = {}) {
     evidenceGap: Array.isArray(source.evidenceGap) ? source.evidenceGap : [],
     requiredNextEvidence: Array.isArray(source.requiredNextEvidence) ? source.requiredNextEvidence : [],
     nextEvidenceUnlockPlan: source.nextEvidenceUnlockPlan || '',
-    blockedFields: Array.isArray(source.blockedFields) ? source.blockedFields : []
+    blockedFields: Array.isArray(source.blockedFields) ? source.blockedFields : [],
+    methodValidationChallengeChain: source.methodValidationChallengeChain || null,
+    sourceReadinessBoard: source.sourceReadinessBoard || null,
+    structuredCapture: source.structuredCapture || null
   })).filter((source) => source.text || source.type);
 
   if (sourceText) {
@@ -2019,6 +2022,7 @@ function buildSourceEvidenceLedger(input = {}, parts = {}, familyDecisionMemo = 
 }
 
 function buildUploadedMaterialDecisionDossier(input = {}, parts = {}, sourceEvidenceLedger = {}, reportEvidenceReleaseGate = {}, portraitConfidenceSystem = {}) {
+  const sources = Array.isArray(parts.reportSources) ? parts.reportSources : [];
   const lanes = Array.isArray(sourceEvidenceLedger.lanes) ? sourceEvidenceLedger.lanes : [];
   const laneById = lanes.reduce((acc, lane) => {
     acc[lane.id] = lane;
@@ -2032,6 +2036,18 @@ function buildUploadedMaterialDecisionDossier(input = {}, parts = {}, sourceEvid
   const nextQueue = Array.isArray(sourceEvidenceLedger.nextEvidenceQueue)
     ? sourceEvidenceLedger.nextEvidenceQueue.slice(0, 6)
     : [];
+  const methodValidationChains = sources
+    .map((source) => source && source.methodValidationChallengeChain)
+    .filter((chain) => chain && Array.isArray(chain.stages) && chain.stages.length)
+    .slice(0, 4);
+  const methodValidationStages = methodValidationChains
+    .reduce((acc, chain) => acc.concat(chain.stages.map((stage) => Object.assign({
+      sourceSchemaId: chain.sourceSchemaId || '',
+      chainTitle: chain.title || '',
+      releaseRule: chain.releaseRule || '',
+      reportCopy: chain.reportCopy || ''
+    }, stage))), [])
+    .slice(0, 9);
   const methodHypotheses = [
     {
       id: 'visual_first',
@@ -2120,6 +2136,21 @@ function buildUploadedMaterialDecisionDossier(input = {}, parts = {}, sourceEvid
     }
   ];
   const collectedCount = materialLanes.filter((lane) => lane.collected).length;
+  const primaryWrongPaperCard = wrongPaperDiagnosisCards[0] || {};
+  const primaryValidationStage = methodValidationStages[0] || {};
+  const methodCandidateCards = methodHypotheses.map((item, index) => ({
+    id: `method_candidate_${item.id || index + 1}`,
+    label: item.label,
+    status: laneById.talent_assessment && laneById.talent_assessment.collected ? 'method_candidate_from_assessment' : 'method_candidate_waiting_evidence',
+    tonightTry: item.childLine || item.method,
+    tonightWrongQuestionTest: primaryWrongPaperCard.nextAction || '先选一题真实错题，只验证第一步，不追完整答案。',
+    parentQuestionTomorrow: item.parentCheck || '明天只问：你还能说出第一步和错因吗？',
+    day7Evidence: primaryValidationStage.requiredEvidence || primaryValidationStage.releaseRule || item.verifyWith || '第 7 天换一道小变式，只看能否迁移第一步。',
+    reportCopy: item.evidence || '这是学习方法候选，不是天赋标签。',
+    releaseRule: '必须经过真实错题、隔天回访、第 7 天小变式验证；不生成天赋定性、人格标签或升学判断。',
+    route: primaryValidationStage.route || '/pages/review/review?from=method_candidate_card',
+    blockedClaims: ['天赋定性', '人格标签', '完整答案', '自动判分', '排名刺激']
+  }));
   const releaseStatus = reportEvidenceReleaseGate.releaseDecision || 'collect_more_evidence';
   const detailedReportSections = [
     {
@@ -2164,7 +2195,16 @@ function buildUploadedMaterialDecisionDossier(input = {}, parts = {}, sourceEvid
       ? '可以描述阶段性学习优势，但仍按“证据支持的学习方法”表达，不贴固定天赋标签。'
       : '当前只能说“可能更适合的学习方法”，不能给孩子贴天赋或人格标签。',
     howToLearnBetter: methodHypotheses,
+    methodCandidateCards,
     wrongPaperDiagnosisCards,
+    methodValidationChains,
+    methodValidationStages,
+    methodValidationReleaseRule: methodValidationChains[0]
+      ? methodValidationChains[0].releaseRule
+      : '上传材料先变成方法候选和今晚动作；长期画像必须等真实作业、回访和第 7 天小变式验证。',
+    methodValidationNextAction: methodValidationStages[0]
+      ? methodValidationStages[0].label
+      : '补一条真实作业第一步证据',
     detailedReportSections,
     materialLanes,
     nextEvidenceQueue: nextQueue,
@@ -2193,7 +2233,12 @@ function buildUploadedMaterialDecisionDossier(input = {}, parts = {}, sourceEvid
       { id: 'upload_more', label: '补资料', route: '/pages/upload/upload?from=uploaded_material_dossier' },
       { id: 'ask_first_step', label: '问第一步', route: '/pages/tutor/tutor?from=uploaded_material_dossier' },
       { id: 'review_revisit', label: '做回访', route: '/pages/review/review?from=uploaded_material_dossier' }
-    ],
+    ].concat(methodValidationStages.slice(0, 3).map((stage, index) => ({
+      id: `method_validation_${index + 1}`,
+      label: stage.label || `验证 ${index + 1}`,
+      route: stage.route || '/pages/review/review?from=method_validation',
+      reason: stage.releaseRule || stage.requiredEvidence || '按证据链验证方法候选，不贴标签。'
+    }))),
     collectedSourceIds: collectedLanes.map((lane) => lane.id),
     evidenceRequired: ['source_type', 'method_candidate', 'child_first_step', 'wrong_cause_card', 'next_day_revisit', 'day7_variant_result', 'safe_share_fields']
   };
