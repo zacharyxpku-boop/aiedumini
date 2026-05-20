@@ -7170,6 +7170,14 @@ function recordShareRelayCompletion(input = {}) {
     openmaic_next_action: incoming.openmaic_next_action || '',
     openmaic_game_gate: incoming.openmaic_game_gate || ''
   };
+  const relayQualityScore = buildRelayQualityScore({
+    receiverMaterial,
+    firstStep,
+    wrongCause,
+    nextRevisit,
+    blockedFields,
+    senderFirstSteps
+  });
   const record = {
     share_code: shareCode,
     type: 'share_relay_receiver_completion',
@@ -7186,6 +7194,10 @@ function recordShareRelayCompletion(input = {}) {
       parent_check: input.parentCheck || incoming.relay_parent_check || incoming.wrong_cause_parent_check || '',
       next_revisit: nextRevisit,
       evidence: input.evidence || 'receiver_own_material_first_step_wrong_cause_revisit',
+      relay_quality_score: relayQualityScore.score,
+      relay_quality_level: relayQualityScore.level,
+      relay_quality_line: relayQualityScore.line,
+      relay_quality_checks: relayQualityScore.checks,
       evidence_contract: evidenceContract,
       allowed_fields: SHARE_RELAY_ALLOWED_FIELDS,
       blocked_fields: blockedFields,
@@ -7206,9 +7218,60 @@ function recordShareRelayCompletion(input = {}) {
     share_code: shareCode,
     receiverMaterial,
     nextRevisit,
+    relayQualityScore,
     evidenceContract
   });
   return loadShareRuns()[0];
+}
+
+function buildRelayQualityScore(input = {}) {
+  const firstStep = String(input.firstStep || '');
+  const wrongCause = String(input.wrongCause || '');
+  const receiverMaterial = String(input.receiverMaterial || '');
+  const nextRevisit = String(input.nextRevisit || '');
+  const senderFirstSteps = Array.isArray(input.senderFirstSteps) ? input.senderFirstSteps.filter(Boolean) : [];
+  const blockedFields = Array.isArray(input.blockedFields) ? input.blockedFields : [];
+  const checks = [
+    {
+      id: 'receiver_own_material',
+      label: '接收者使用自己的材料',
+      pass: !!receiverMaterial && !/required|发送者|sender/.test(receiverMaterial)
+    },
+    {
+      id: 'receiver_own_first_step',
+      label: '接收者写出自己的第一步',
+      pass: !!firstStep && !/required|sender/.test(firstStep) && !senderFirstSteps.includes(firstStep)
+    },
+    {
+      id: 'receiver_wrong_cause',
+      label: '接收者说出自己的错因',
+      pass: !!wrongCause && !/required|sender/.test(wrongCause)
+    },
+    {
+      id: 'next_day_revisit',
+      label: '锁定明天回访',
+      pass: !!nextRevisit && !/required/.test(nextRevisit)
+    },
+    {
+      id: 'privacy_safe',
+      label: '不奖励转发量、分数、排名或答案',
+      pass: blockedFields.includes('score') || blockedFields.includes('ranking') || blockedFields.includes('full_answer')
+    }
+  ];
+  const score = checks.reduce((sum, item) => sum + (item.pass ? 20 : 0), 0);
+  const level = score >= 80 ? 'strong' : score >= 60 ? 'usable' : 'weak';
+  return {
+    id: 'relay_quality_score',
+    score,
+    level,
+    checks,
+    rewardPolicy: '只奖励自有材料、第一步、错因和回访证据；不奖励转发量、分数、排名或答案。',
+    line: level === 'strong'
+      ? '接力有效：对方用了自己的材料，并留下第一步、错因和明天回访。'
+      : level === 'usable'
+        ? '接力可用：已有部分自有证据，还需要补齐第一步/错因/回访。'
+        : '接力未放行：不能靠转发或复制发送者内容获得学习记录。'
+  };
 }
 
 function randomPart() {

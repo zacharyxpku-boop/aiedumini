@@ -59,6 +59,58 @@ const PUBLIC_K12_RESOURCE_DECISIONS = [
   }
 ];
 
+const MINI_LESSON_VISUAL_TEMPLATES = [
+  {
+    subject: 'math',
+    match: /数学|方程|应用题|比例|几何|函数|计算|代数|数量|math/i,
+    boardMove: '画数量关系：已知量 -> 未知量 -> 先设谁',
+    conceptLens: '数量关系入口',
+    nearTransfer: '换一个数字，只复述等量关系，不求完整答案。'
+  },
+  {
+    subject: 'physics',
+    match: /物理|力|电路|光|速度|压强|浮力|physics/i,
+    boardMove: '画对象和方向：研究对象 -> 受力/路径 -> 已知量',
+    conceptLens: '对象方向入口',
+    nearTransfer: '换一个图，只说研究对象、方向和第一个已知量。'
+  },
+  {
+    subject: 'chemistry',
+    match: /化学|反应|溶液|气体|酸|碱|盐|分子|chem/i,
+    boardMove: '画变化前后：物质A -> 条件 -> 物质B',
+    conceptLens: '变化前后入口',
+    nearTransfer: '换一个现象，只说反应前后分别有什么。'
+  },
+  {
+    subject: 'english',
+    match: /英语|英文|单词|句子|时态|语法|阅读|english/i,
+    boardMove: '划句子骨架：主语 -> 动作 -> 时间/修饰',
+    conceptLens: '句子结构入口',
+    nearTransfer: '换一句话，只圈主语、动作和时间信号。'
+  },
+  {
+    subject: 'chinese',
+    match: /语文|阅读|作文|古诗|文言|段落|chinese/i,
+    boardMove: '画证据线：题目问法 -> 原文句子 -> 自己的话',
+    conceptLens: '证据句入口',
+    nearTransfer: '换一个段落，只找一句能支撑答案的原文。'
+  },
+  {
+    subject: 'biology',
+    match: /生物|细胞|器官|生态|遗传|结构|功能|biology/i,
+    boardMove: '画结构功能：结构 -> 功能 -> 现象',
+    conceptLens: '结构功能入口',
+    nearTransfer: '换一个结构，只说它对应的功能。'
+  },
+  {
+    subject: 'geography',
+    match: /地理|地图|气候|经纬|地形|公转|自转|geography/i,
+    boardMove: '画空间因果：位置 -> 条件 -> 结果',
+    conceptLens: '空间因果入口',
+    nearTransfer: '换一个区域，只说位置、条件和一个结果。'
+  }
+];
+
 function safeText(value, fallback, max) {
   const text = String(value || '').replace(/\s+/g, ' ').trim();
   const result = text || fallback || '';
@@ -203,11 +255,151 @@ function buildQualityGate(outline = {}, scenes = []) {
   };
 }
 
+function pickMiniLessonVisualTemplate(input = {}) {
+  const text = [
+    input.subject,
+    input.taskType,
+    input.sourceText,
+    input.firstStep,
+    input.wrongCause
+  ].join(' ');
+  return MINI_LESSON_VISUAL_TEMPLATES.find((item) => item.match.test(text)) || {
+    subject: 'general',
+    boardMove: '画第一步入口：题目问什么 -> 已知什么 -> 先做哪一步',
+    conceptLens: '第一步入口',
+    nearTransfer: '换一个相似材料，只复述题目问什么和第一步。'
+  };
+}
+
+function buildMiniLessonTrigger(input = {}) {
+  const userTurnCount = Number(input.userTurnCount || 0);
+  const stillBlockedCount = Number(input.stillBlockedCount || 0);
+  const hintLevel = Number(input.hintLevel || 1);
+  const hasChildFirstStep = Boolean(input.hasChildFirstStep);
+  const answerRisk = Boolean(input.answerRisk);
+  const shouldTrigger = Boolean(
+    input.forceMiniLesson
+    || stillBlockedCount >= 1
+    || answerRisk
+    || (userTurnCount >= 2 && !hasChildFirstStep)
+    || hintLevel >= 4
+  );
+  return {
+    id: 'mini_lesson_trigger',
+    mode: shouldTrigger ? 'mini_lesson' : 'socratic_first',
+    shouldTrigger,
+    reason: shouldTrigger
+      ? '孩子还说不出第一步时，才切入 3 分钟小讲堂。'
+      : '继续保持苏格拉底追问，不提前上完整课堂。',
+    blockedMode: 'full_ai_classroom',
+    releaseCondition: '孩子能用自己的话说出第一步，才回到练习、报告或分享。'
+  };
+}
+
+function buildThreeMinuteMiniLesson(input = {}) {
+  const outline = input.outline || buildOutline(input);
+  const visualTemplate = pickMiniLessonVisualTemplate({
+    subject: input.subject,
+    taskType: outline.taskType,
+    sourceText: input.sourceText,
+    firstStep: outline.firstStep,
+    wrongCause: outline.issue
+  });
+  const trigger = buildMiniLessonTrigger(input);
+  const aiTeacherLine = safeText(
+    input.aiTeacherLine,
+    `先不讲完整解法，只看「${visualTemplate.conceptLens}」：${outline.firstStep}`,
+    120
+  );
+  const aiClassmateMisconception = safeText(
+    input.aiClassmateMisconception,
+    `我可能会急着算答案，但其实还没说清：${outline.issue}`,
+    120
+  );
+  return {
+    id: 'three_minute_mini_lesson',
+    title: '3 分钟小讲堂',
+    positioning: '只在苏格拉底点拨连续卡住时补位；不是 AI 课堂平台，不生成完整课程。',
+    trigger,
+    conceptGap: visualTemplate.conceptLens,
+    blackboard: {
+      title: '第一步小黑板',
+      boardMove: visualTemplate.boardMove,
+      firstStep: outline.firstStep,
+      noFullSolution: true
+    },
+    roles: [
+      { id: 'socratic_teacher', label: '苏格拉底老师', line: aiTeacherLine, aiUse: '把本地第一步改写成孩子听得懂的一句话' },
+      { id: 'misconception_classmate', label: '误区同学', line: aiClassmateMisconception, aiUse: '暴露常见误区，促使孩子辨析' },
+      { id: 'parent_observer', label: '家长观察者', line: outline.parentCheck, aiUse: '把检查句改写成低压话术' }
+    ],
+    nearTransfer: {
+      prompt: visualTemplate.nearTransfer,
+      gate: '只检查第一步和错因，不检查最终答案。'
+    },
+    parentCheck: outline.parentCheck,
+    nextDayReview: outline.revisit,
+    exitGate: {
+      passEvidence: 'child_can_say_first_step_in_own_words',
+      passRoute: '/pages/review/review?from=mini_lesson_exit',
+      failRoute: '/pages/profile/profile?from=mini_lesson_parent_handoff',
+      failAction: '降级为家长只问一句和明天回访，不继续加课。'
+    },
+    localAiBoundary: {
+      localCodeOwns: ['trigger', 'concept_gap', 'visual_template', 'exit_gate', 'reward_release', 'share_privacy_fields'],
+      aiBetterFor: ['teacher_line', 'classmate_misconception', 'parent_readable_wording'],
+      aiMustNotDecide: ['final_answer', 'mastery_claim', 'talent_label', 'score', 'ranking', 'share_fields']
+    },
+    qualityGate: [
+      { id: 'not_default_mode', ok: trigger.shouldTrigger === true || trigger.mode === 'socratic_first' },
+      { id: 'no_full_classroom', ok: true },
+      { id: 'has_blackboard_first_step', ok: Boolean(visualTemplate.boardMove && outline.firstStep) },
+      { id: 'has_misconception_role', ok: true },
+      { id: 'has_near_transfer', ok: Boolean(visualTemplate.nearTransfer) },
+      { id: 'has_parent_and_review', ok: Boolean(outline.parentCheck && outline.revisit) },
+      { id: 'exit_before_reward_or_share', ok: true }
+    ],
+    shareBoundary: SAFE_SHARE_BOUNDARY
+  };
+}
+
+function evaluateThreeMinuteMiniLesson(miniLesson = {}) {
+  const localOwns = miniLesson.localAiBoundary && Array.isArray(miniLesson.localAiBoundary.localCodeOwns)
+    ? miniLesson.localAiBoundary.localCodeOwns
+    : [];
+  const aiMustNotDecide = miniLesson.localAiBoundary && Array.isArray(miniLesson.localAiBoundary.aiMustNotDecide)
+    ? miniLesson.localAiBoundary.aiMustNotDecide
+    : [];
+  const gates = Array.isArray(miniLesson.qualityGate) ? miniLesson.qualityGate : [];
+  return {
+    ok: Boolean(
+      miniLesson.id === 'three_minute_mini_lesson'
+      && miniLesson.trigger
+      && miniLesson.trigger.blockedMode === 'full_ai_classroom'
+      && miniLesson.blackboard
+      && miniLesson.blackboard.noFullSolution === true
+      && miniLesson.nearTransfer
+      && miniLesson.exitGate
+      && localOwns.includes('trigger')
+      && localOwns.includes('exit_gate')
+      && aiMustNotDecide.includes('final_answer')
+      && aiMustNotDecide.includes('talent_label')
+      && gates.every((item) => item.ok === true)
+    ),
+    gateCount: gates.length,
+    triggerMode: miniLesson.trigger ? miniLesson.trigger.mode : 'missing',
+    conceptGap: miniLesson.conceptGap || '',
+    blockedMode: miniLesson.trigger ? miniLesson.trigger.blockedMode : ''
+  };
+}
+
 function buildOpenMaicInspiredTaskPlan(input = {}) {
   const outline = buildOutline(input);
   const scenes = buildScenes(outline);
   const eventFlow = buildEventFlow(outline, scenes);
   const qualityGate = buildQualityGate(outline, scenes);
+  const miniLesson = buildThreeMinuteMiniLesson(Object.assign({}, input, { outline }));
+  const miniLessonAudit = evaluateThreeMinuteMiniLesson(miniLesson);
   return {
     id: 'openmaic_inspired_homework_task_plan',
     title: '今晚任务单',
@@ -217,6 +409,8 @@ function buildOpenMaicInspiredTaskPlan(input = {}) {
     eventFlow,
     localAiBoundary: buildLocalAiBoundary(),
     qualityGate,
+    miniLesson,
+    miniLessonAudit,
     publicK12ResourceDecisions: PUBLIC_K12_RESOURCE_DECISIONS,
     reportLine: qualityGate.reportLine,
     shareBoundary: SAFE_SHARE_BOUNDARY,
@@ -247,11 +441,15 @@ function evaluateOpenMaicInspiredTaskPlan(plan = {}) {
       && localOwns.includes('share_privacy_fields')
       && aiMustNotDecide.includes('final_answer')
       && aiMustNotDecide.includes('talent_label')
+      && plan.miniLessonAudit
+      && plan.miniLessonAudit.ok === true
       && gates.every((item) => item.ok === true)
     ),
     gateCount: gates.length,
     sceneCount: Array.isArray(plan.scenes) ? plan.scenes.length : 0,
     eventCount: Array.isArray(plan.eventFlow) ? plan.eventFlow.length : 0,
+    miniLessonGateCount: plan.miniLessonAudit ? plan.miniLessonAudit.gateCount : 0,
+    miniLessonTriggerMode: plan.miniLessonAudit ? plan.miniLessonAudit.triggerMode : 'missing',
     blockedFields: aiMustNotDecide,
     sourcePolicy: plan.sourcePolicy ? plan.sourcePolicy.decision : 'missing'
   };
@@ -325,7 +523,11 @@ module.exports = {
   SAFE_SHARE_BOUNDARY,
   OPENMAIC_REFERENCE_POLICY,
   PUBLIC_K12_RESOURCE_DECISIONS,
+  MINI_LESSON_VISUAL_TEMPLATES,
   buildOpenMaicInspiredTaskPlan,
   evaluateOpenMaicInspiredTaskPlan,
+  buildMiniLessonTrigger,
+  buildThreeMinuteMiniLesson,
+  evaluateThreeMinuteMiniLesson,
   buildOpenMaicInspiredDecisionBridge
 };

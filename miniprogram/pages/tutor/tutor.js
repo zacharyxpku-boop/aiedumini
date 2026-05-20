@@ -257,6 +257,22 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
     : null;
   const blockedAnswer = (masterySignal && masterySignal.status === 'blocked_answer_request')
     || (pasteRisk && pasteRisk.level === 'high');
+  const miniLesson = openMaicPlan.buildThreeMinuteMiniLesson({
+    taskType: subjectSkillDepth && subjectSkillDepth.taskType ? subjectSkillDepth.taskType : '',
+    subject: selected && selected.subject ? selected.subject : (subjectSkillDepth && subjectSkillDepth.subject) || '',
+    sourceText: latestUserText,
+    firstStep: subjectSkillDepth && subjectSkillDepth.firstStep,
+    wrongCause: subjectSkillDepth && (subjectSkillDepth.wrongCause || subjectSkillDepth.reportSignal),
+    parentCheck: subjectSkillDepth && subjectSkillDepth.parentQuestion,
+    revisit: subjectSkillDepth && subjectSkillDepth.revisit,
+    userTurnCount: userMessages.length,
+    stillBlockedCount: blockedAnswer || !studentFirst ? 1 : 0,
+    hintLevel: activeStep === 'micro_choice' ? 4 : 2,
+    hasChildFirstStep: studentFirst,
+    answerRisk: blockedAnswer,
+    forceMiniLesson: blockedAnswer || (!studentFirst && userMessages.length >= 2)
+  });
+  const miniLessonAudit = openMaicPlan.evaluateThreeMinuteMiniLesson(miniLesson);
   const namedWrongCause = safeMessages.some((item) => /错因|卡在|审题|建模|条件|单位|符号|第一步/.test(String(item.text || '')));
   const proofSentence = masterySignal && masterySignal.status === 'ready_for_parent_review';
   const score = Math.min(100,
@@ -360,6 +376,8 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
       : [],
     openMaicInspiredTaskPlan,
     openMaicInspiredTaskPlanAudit,
+    miniLesson,
+    miniLessonAudit,
     openMaicInspiredScenes: openMaicInspiredTaskPlan.scenes.slice(0, 6),
     openMaicInspiredEventFlow: openMaicInspiredTaskPlan.eventFlow.slice(0, 6),
     openMaicPublicK12Decisions: openMaicInspiredTaskPlan.publicK12ResourceDecisions.slice(0, 4),

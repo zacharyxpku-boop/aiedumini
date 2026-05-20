@@ -267,6 +267,20 @@
             <view class="receipt-board-line" wx:for="{{thinkingReceipt.openMaicPublicK12Decisions}}" wx:key="id">{{item.label}}：本地管{{item.localCodeOwns[0]}}，AI 管{{item.aiBetterFor[0]}}</view>
             <view class="receipt-board-avoid">{{thinkingReceipt.openMaicInspiredTaskPlan.shareBoundary}}</view>
           </view>
+          <view class="receipt-first-step-board" wx:if="{{thinkingReceipt.miniLesson}}">
+            <view class="receipt-diagnostic-title">{{thinkingReceipt.miniLesson.title}}</view>
+            <view class="receipt-board-avoid">{{thinkingReceipt.miniLesson.positioning}}</view>
+            <view class="receipt-board-line">触发：{{thinkingReceipt.miniLesson.trigger.reason}}</view>
+            <view class="receipt-board-line">概念缺口：{{thinkingReceipt.miniLesson.conceptGap}}</view>
+            <view class="receipt-board-parent">{{thinkingReceipt.miniLesson.blackboard.title}}：{{thinkingReceipt.miniLesson.blackboard.boardMove}}</view>
+            <view class="receipt-board-line">第一步：{{thinkingReceipt.miniLesson.blackboard.firstStep}}</view>
+            <view class="receipt-board-parent" wx:for="{{thinkingReceipt.miniLesson.roles}}" wx:key="id">{{item.label}}：{{item.line}}</view>
+            <view class="receipt-board-line">近迁移：{{thinkingReceipt.miniLesson.nearTransfer.prompt}}</view>
+            <view class="receipt-board-parent">家长只问：{{thinkingReceipt.miniLesson.parentCheck}}</view>
+            <view class="receipt-board-line">明天回访：{{thinkingReceipt.miniLesson.nextDayReview}}</view>
+            <view class="receipt-board-avoid">退出门：{{thinkingReceipt.miniLesson.exitGate.passEvidence}}</view>
+            <view class="receipt-board-avoid">{{thinkingReceipt.miniLesson.shareBoundary}}</view>
+          </view>
           <view class="receipt-contract" wx:if="{{thinkingReceipt.socratic_contract}}">
             <view class="receipt-diagnostic-title">{{thinkingReceipt.socratic_contract.title}}</view>
             <view class="receipt-diagnostic-line">为什么这样问：{{thinkingReceipt.socratic_contract.whyThisQuestion}}</view>
