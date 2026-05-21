@@ -288,7 +288,9 @@ function buildPartnerDeliveryWorkbench(input = {}) {
     ? input.materials
     : input.materials
       ? list(input.materials).map((item) => ({ title: item }))
-      : [input.material || input.decisionSource || {}];
+      : input.material || input.decisionSource
+        ? [input.material || input.decisionSource]
+        : [];
   const materials = materialInput
       .filter(Boolean)
       .map(normalizeMaterial);
@@ -300,7 +302,7 @@ function buildPartnerDeliveryWorkbench(input = {}) {
   const crmExport = buildCrmExport(childRecord, primaryMode, primaryPackage, advisorQueue);
   const pilotReadinessChecklist = buildPilotReadinessChecklist(childRecord, materials, solutionPipeline, crmExport);
   const revenueMilestones = [
-    { id: 'free_interpretation', allowed: true, gate: 'material_intake_done' },
+    { id: 'free_interpretation', allowed: materials.length > 0, gate: 'material_intake_done' },
     { id: 'paid_7_day_execution', allowed: childRecord.evidenceStage === 'real_task_evidence_ready', gate: 'real_task_evidence_ready' },
     { id: 'course_or_counselor_upgrade', allowed: childRecord.evidenceStage === 'real_task_evidence_ready' && childRecord.parentConfirmationStatus === 'confirmed', gate: 'day7_review_and_parent_confirmation' }
   ];
