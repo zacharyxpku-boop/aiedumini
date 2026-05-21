@@ -54,6 +54,15 @@ function sanitizePartnerAction(value = '', fallback = '') {
   return raw.slice(0, 140);
 }
 
+function sanitizePartnerLabel(value = '', fallback = '') {
+  const raw = text(value);
+  const safeFallback = text(fallback) || 'partner_loop';
+  if (!raw) return safeFallback;
+  const unsafe = /name|phone|mobile|wechat|score|ranking|rank|percentile|photo|image|raw|answer|solution|dialogue|transcript|diagnosis|talent|personality|Ming|分数|排名|名次|照片|原图|原题|答案|解法|完整对话|聊天记录|诊断|天赋|性格|手机号|电话|微信/i.test(raw);
+  if (unsafe) return safeFallback;
+  return raw.slice(0, 48);
+}
+
 function stableChildCode(profile = {}, seed = '') {
   const raw = [
     profile.childId,
@@ -119,7 +128,7 @@ function buildChildRecord(profile = {}, materials = [], options = {}) {
 
 function pickPrimaryMode(servicePathway = {}, aiAnalysis = {}, materials = []) {
   const mode = servicePathway.primaryMode || {};
-  if (mode.id) return { id: mode.id, label: mode.label || mode.id, route: mode.route || '' };
+  if (mode.id) return { id: mode.id, label: sanitizePartnerLabel(mode.label, mode.id), route: mode.route || '' };
   const hasWrongQuestion = materials.some((item) => item.kind.indexOf('wrong_question') >= 0);
   const recommended = aiAnalysis.recommendedProductLoop || {};
   if (hasWrongQuestion) {
@@ -134,7 +143,7 @@ function pickPrimaryMode(servicePathway = {}, aiAnalysis = {}, materials = []) {
 
 function pickPrimaryPackage(servicePathway = {}, childRecord = {}) {
   const tier = servicePathway.primaryTier || {};
-  if (tier.id) return { id: tier.id, label: tier.label || tier.id };
+  if (tier.id) return { id: tier.id, label: sanitizePartnerLabel(tier.label, tier.id) };
   return childRecord.evidenceStage === 'real_task_evidence_ready'
     ? { id: 'seven_day_family_execution', label: '7-day family execution' }
     : { id: 'assessment_interpretation_addon', label: 'Assessment interpretation add-on' };
