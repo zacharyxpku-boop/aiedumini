@@ -2556,6 +2556,77 @@ function buildUploadedMaterialDecisionDossier(input = {}, parts = {}, sourceEvid
     aiMayRewrite: ['child_line', 'parent_check', 'report_copy'],
     blocked: ['talent_label', 'personality_label', 'automatic_score', 'ranking_compare', 'guaranteed_improvement']
   };
+  const familyPrivateTutorSolutionPack = {
+    id: 'family_private_tutor_solution_pack',
+    title: '家庭私教补位方案',
+    positioning: '不是 AI 课堂平台，而是把上传材料转成今晚可执行的一对一苏格拉底私教补位。',
+    primaryPromise: '先验证一种学习方法，再沉淀错因和回访证据；不贴天赋标签，不承诺提分。',
+    sourceToPlanMap: materialLanes.map((lane) => ({
+      id: lane.id,
+      label: lane.label,
+      collected: !!lane.collected,
+      planRole: lane.id === 'talent_assessment'
+        ? '方法候选来源'
+        : lane.id === 'wrong_question_paper'
+          ? '错因修复来源'
+          : lane.id === 'school_material'
+            ? '家校沟通来源'
+            : '家庭观察来源',
+      releaseGate: lane.id === 'talent_assessment'
+        ? '必须补真实错题、隔天回访和第 7 天小变式后才更新画像'
+        : '必须有孩子第一步证据后才进入练习、分享或长期画像',
+      cannotSay: lane.cannotSay
+    })),
+    modeOrchestration: [
+      {
+        id: 'socratic_tutor',
+        label: '苏格拉底私教',
+        when: '默认主线：孩子还能回答或只需要一层点拨时',
+        localGate: 'child_attempt_or_first_step_recorded',
+        aiBetterFor: '追问措辞、低压解释、孩子能听懂的一句话'
+      },
+      {
+        id: 'three_minute_mini_lesson',
+        label: '3 分钟小讲堂',
+        when: '连续卡住、第一步说不出、或误区反复出现时才补位',
+        localGate: 'child_exit_ticket_before_practice',
+        aiBetterFor: '小黑板讲一句、AI 同学暴露一个常见误区'
+      },
+      {
+        id: 'active_recall_game',
+        label: '主动回忆游戏',
+        when: '已有真实错题/回忆卡和孩子第一步证据后',
+        localGate: 'real_recall_source_and_no_answer_leak',
+        aiBetterFor: '变换题干语气和鼓励反馈；不决定 XP 或掌握'
+      },
+      {
+        id: 'parent_decision_book',
+        label: '家长决策书',
+        when: '每次上传、回访或小讲堂退出后',
+        localGate: 'safe_fields_and_next_evidence_queue',
+        aiBetterFor: '家长摘要、家校沟通措辞、今晚一句检查话术'
+      }
+    ],
+    deliveryLoop: [
+      { day: 0, label: '今晚', evidence: 'child_first_step', action: familyActionStack[0] ? familyActionStack[0].action : '先说第一步' },
+      { day: 1, label: '明天', evidence: 'next_day_revisit', action: familyActionStack[1] ? familyActionStack[1].action : '回访同一错因' },
+      { day: 7, label: '第 7 天', evidence: 'near_transfer_first_step', action: familyActionStack[2] ? familyActionStack[2].action : '小变式验证' },
+      { day: 14, label: '第 14 天', evidence: 'two_week_stability_check', action: '只有跨周稳定后，才把方法候选写入阶段画像。' }
+    ],
+    commercialHandoff: {
+      canSell: ['测评报告复合解读', '7 天家庭作业陪跑', '错因修复包', '家校沟通摘要', '线上课前诊断'],
+      mustNotSellAs: ['天赋定论', '自动判分', '拍照搜题答案', '结果承诺', '排名刺激'],
+      handoffRoute: servicePathway && servicePathway.primaryTier ? servicePathway.primaryTier : null,
+      partnerBoundary: '合作方材料只作为方法候选和证据来源；最终放行由本地证据链决定。'
+    },
+    moatSignals: [
+      '上传材料不直接下结论，而是进入证据账本',
+      '小讲堂只在苏格拉底卡住后触发，避免课堂平台漂移',
+      '游戏奖励只绑定真实回忆来源和孩子第一步证据',
+      '家长看到的是下一步行动和边界，不是焦虑型标签'
+    ],
+    blockedClaims: blockedFields.concat(['guaranteed_improvement', 'fixed_talent_type'])
+  };
   const releaseStatus = reportEvidenceReleaseGate.releaseDecision || 'collect_more_evidence';
   const detailedReportSections = [
     {
@@ -2604,6 +2675,7 @@ function buildUploadedMaterialDecisionDossier(input = {}, parts = {}, sourceEvid
     decisionHeatmap,
     familyActionStack,
     familyDecisionCalendar,
+    familyPrivateTutorSolutionPack,
     personalizedLearningSolutionBlueprint,
     wrongPaperDiagnosisCards,
     methodValidationChains,

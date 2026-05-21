@@ -1948,6 +1948,19 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     uploadedMaterialDecisionDossierMethodCandidateCards: Array.isArray(uploadedMaterialDecisionDossier.methodCandidateCards) ? uploadedMaterialDecisionDossier.methodCandidateCards : [],
     uploadedMaterialDecisionDossierDecisionHeatmap: Array.isArray(uploadedMaterialDecisionDossier.decisionHeatmap) ? uploadedMaterialDecisionDossier.decisionHeatmap : [],
     uploadedMaterialDecisionDossierFamilyActionStack: Array.isArray(uploadedMaterialDecisionDossier.familyActionStack) ? uploadedMaterialDecisionDossier.familyActionStack : [],
+    uploadedMaterialDecisionDossierPrivateTutorSolutionPack: uploadedMaterialDecisionDossier.familyPrivateTutorSolutionPack || null,
+    uploadedMaterialDecisionDossierPrivateTutorModeOrchestration: uploadedMaterialDecisionDossier.familyPrivateTutorSolutionPack && Array.isArray(uploadedMaterialDecisionDossier.familyPrivateTutorSolutionPack.modeOrchestration)
+      ? uploadedMaterialDecisionDossier.familyPrivateTutorSolutionPack.modeOrchestration
+      : [],
+    uploadedMaterialDecisionDossierPrivateTutorDeliveryLoop: uploadedMaterialDecisionDossier.familyPrivateTutorSolutionPack && Array.isArray(uploadedMaterialDecisionDossier.familyPrivateTutorSolutionPack.deliveryLoop)
+      ? uploadedMaterialDecisionDossier.familyPrivateTutorSolutionPack.deliveryLoop
+      : [],
+    uploadedMaterialDecisionDossierPrivateTutorSourceMap: uploadedMaterialDecisionDossier.familyPrivateTutorSolutionPack && Array.isArray(uploadedMaterialDecisionDossier.familyPrivateTutorSolutionPack.sourceToPlanMap)
+      ? uploadedMaterialDecisionDossier.familyPrivateTutorSolutionPack.sourceToPlanMap
+      : [],
+    uploadedMaterialDecisionDossierPrivateTutorMoatSignals: uploadedMaterialDecisionDossier.familyPrivateTutorSolutionPack && Array.isArray(uploadedMaterialDecisionDossier.familyPrivateTutorSolutionPack.moatSignals)
+      ? uploadedMaterialDecisionDossier.familyPrivateTutorSolutionPack.moatSignals
+      : [],
     uploadedMaterialDecisionDossierSolutionBlueprint: uploadedMaterialDecisionDossier.personalizedLearningSolutionBlueprint || null,
     reportRevisitEvidence: reportState.reportRevisitEvidence || uploadedMaterialDecisionDossier.servicePathwaySummary && uploadedMaterialDecisionDossier.servicePathwaySummary.revisitEvidence || null,
     reportRevisitValidationStage: reportState.reportRevisitEvidence ? reportState.reportRevisitEvidence.validationStage : '',

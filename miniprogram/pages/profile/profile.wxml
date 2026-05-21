@@ -137,6 +137,14 @@
               <text class="parent-brief-label">家庭行动栈</text>
               <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierFamilyActionStack}}" wx:key="id">{{item.label}}｜{{item.action}}｜门槛：{{item.gate}}</text>
             </view>
+            <view class="parent-brief-block" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierPrivateTutorSolutionPack}}">
+              <text class="parent-brief-label">家庭私教方案｜{{learningReportSummary.uploadedMaterialDecisionDossierPrivateTutorSolutionPack.title}}</text>
+              <text>{{learningReportSummary.uploadedMaterialDecisionDossierPrivateTutorSolutionPack.positioning}}</text>
+              <text>{{learningReportSummary.uploadedMaterialDecisionDossierPrivateTutorSolutionPack.primaryPromise}}</text>
+              <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierPrivateTutorModeOrchestration}}" wx:key="id">{{item.label}}｜{{item.when}}｜门槛：{{item.localGate}}</text>
+              <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierPrivateTutorDeliveryLoop}}" wx:key="day">{{item.label}}｜{{item.action}}｜证据：{{item.evidence}}</text>
+              <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierPrivateTutorMoatSignals}}" wx:key="*this">护城河：{{item}}</text>
+            </view>
             <view class="parent-brief-block" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierSolutionBlueprint}}">
               <text class="parent-brief-label">个性化学习方案蓝图</text>
               <text>{{learningReportSummary.uploadedMaterialDecisionDossierSolutionBlueprint.recommendedMode.label}}：{{learningReportSummary.uploadedMaterialDecisionDossierSolutionBlueprint.recommendedMode.why}}</text>
