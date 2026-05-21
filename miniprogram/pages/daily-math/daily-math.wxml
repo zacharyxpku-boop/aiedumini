@@ -57,7 +57,7 @@
       <view>{{result.shareCard.title}}</view>
       <text>{{result.shareCard.body}}</text>
     </view>
-    <button bindtap="shareFirstStep">分享今晚我先做了什么</button>
+    <button open-type="share" bindtap="shareFirstStep">分享今晚我先做了什么</button>
   </view>
   <view wx:if="{{transitionPrompt}}" class="transition-card">
     <view>{{transitionPrompt.title}}</view>
