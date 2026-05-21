@@ -2298,13 +2298,25 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
     result,
     { taskType: options.taskType }
   );
-  const peerMemoryRelayLeague = buildPeerMemoryRelayLeague(
+  let peerMemoryRelayLeague = buildPeerMemoryRelayLeague(
     dailyMemoryPrescription,
     questionTypeClusterMemoryProtocol,
     memoryComebackLoop,
     result,
     { weakKey }
   );
+  if (!hasRealRecallSource) {
+    peerMemoryRelayLeague = Object.assign({}, peerMemoryRelayLeague, {
+      mode: 'blocked_until_real_recall_source',
+      relayOpen: false,
+      lanes: [],
+      gateLine: '没有真实回忆卡时，不开放同伴接力、分享或排名式传播。',
+      sharePayload: {
+        allowedFields: [],
+        blockedFields: ['original_question', 'full_answer', 'score', 'ranking', 'full_dialogue', 'peer_relay']
+      }
+    });
+  }
   const dailyMemorySeasonPlan = buildDailyMemorySeasonPlan(
     peerMemoryRelayLeague,
     dailyMemoryPrescription,
@@ -2326,7 +2338,7 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
     result,
     { weakKey }
   );
-  const ninetySecondPlayableDeck = buildNinetySecondPlayableDeck(
+  const rawNinetySecondPlayableDeck = buildNinetySecondPlayableDeck(
     ninetySecondRecallComboEngine,
     questionBankRecallWorkout,
     dailyMemorySprintDeck,
@@ -2334,6 +2346,19 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
     result,
     { weakKey }
   );
+  const ninetySecondPlayableDeck = hasRealRecallSource
+    ? rawNinetySecondPlayableDeck
+    : Object.assign({}, rawNinetySecondPlayableDeck, {
+      status: 'waiting_real_recall_source',
+      interactions: [],
+      sourceCardIds: [],
+      rewardGate: '没有真实回忆卡时，不释放 XP、不开放 90 秒开始、不生成同伴分享。',
+      sharePayload: {
+        allowedFields: [],
+        blockedFields: ['original_question', 'full_answer', 'score', 'ranking', 'full_dialogue', 'peer_relay']
+      },
+      evidenceRequired: ['real_recall_source_required', 'local_reward_gate', 'safe_share_payload']
+    });
   const realHomeworkPressureMemoryPrescription = buildRealHomeworkPressureMemoryPrescription(
     options.realHomeworkPressureSamples || [],
     result,
@@ -2364,6 +2389,12 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
   }, result, { weakKey, now });
   const dailyPrimaryRecallAction = {
     id: 'daily_primary_recall_action',
+    status: hasRealRecallSource ? 'ready' : 'waiting_real_recall_source',
+    sourceGate: hasRealRecallSource ? 'real_recall_source_ready' : 'waiting_real_recall_source_no_xp_no_share_no_90s',
+    xpReleaseAllowed: hasRealRecallSource,
+    playableReleaseAllowed: hasRealRecallSource,
+    peerShareReleaseAllowed: hasRealRecallSource,
+    blockedUntil: hasRealRecallSource ? '' : 'real_recall_source',
     title: needsRepair ? '今天只救一张错卡' : '今天只做一个主回忆动作',
     mode: needsRepair ? 'rescue_first_action' : 'steady_first_action',
     weakKey,
