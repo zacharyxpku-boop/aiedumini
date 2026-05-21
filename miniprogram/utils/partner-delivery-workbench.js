@@ -192,6 +192,7 @@ function buildSolutionPipeline(childRecord, primaryMode, primaryPackage, materia
 
 function buildAdvisorQueue(childRecord, materials = [], servicePathway = {}) {
   const needsEvidence = childRecord.evidenceStage !== 'real_task_evidence_ready';
+  const parentConfirmed = childRecord.parentConfirmationStatus === 'confirmed';
   const nextAction = needsEvidence
     ? 'Ask parent to add one real wrong question or homework stuck point before any paid package.'
     : sanitizePartnerAction(
@@ -214,7 +215,7 @@ function buildAdvisorQueue(childRecord, materials = [], servicePathway = {}) {
     {
       id: 'schedule_day7_review',
       priority: 3,
-      status: needsEvidence ? 'locked' : 'todo',
+      status: needsEvidence || !parentConfirmed ? 'locked' : 'todo',
       action: 'Schedule day-7 review with confirmed evidence, not anxiety or sensitive comparison.'
     }
   ];
@@ -222,6 +223,8 @@ function buildAdvisorQueue(childRecord, materials = [], servicePathway = {}) {
 
 function buildCrmExport(childRecord, primaryMode, primaryPackage, advisorQueue = []) {
   const next = advisorQueue.find((item) => item.status === 'todo') || advisorQueue[0] || {};
+  const readyForDay7 = childRecord.evidenceStage === 'real_task_evidence_ready'
+    && childRecord.parentConfirmationStatus === 'confirmed';
   return {
     allowedFields: ALLOWED_CRM_FIELDS.slice(),
     blockedFields: BLOCKED_CLAIMS.slice(),
@@ -233,7 +236,7 @@ function buildCrmExport(childRecord, primaryMode, primaryPackage, advisorQueue =
       primary_package: primaryPackage.id,
       next_action: next.action || '',
       parent_confirmation_status: childRecord.parentConfirmationStatus,
-      followup_due_day: childRecord.evidenceStage === 'real_task_evidence_ready' ? 7 : 1
+      followup_due_day: readyForDay7 ? 7 : 1
     }
   };
 }
