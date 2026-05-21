@@ -21,6 +21,236 @@ const UPLOAD_DECISION_BLOCKED_FIELDS = [
   'full_dialogue'
 ];
 
+const AI_MATERIAL_ANALYSIS_SCHEMA = {
+  id: 'miniapp_ai_material_analysis_v1',
+  endpointPath: '/api/miniapp-material-analysis',
+  transport: 'server_env_key_only',
+  requestFields: [
+    'source_schema_id',
+    'source_text_excerpt',
+    'structured_evidence',
+    'grade',
+    'subject',
+    'confirmed_scores',
+    'parent_observation'
+  ],
+  responseFields: [
+    'source_type',
+    'student_profile_signals',
+    'score_signals',
+    'wrong_question_signals',
+    'learning_method_candidates',
+    'socratic_next_questions',
+    'recommended_product_loop',
+    'family_solution_book',
+    'risk_flags',
+    'blocked_claims',
+    'manual_confirmation_fields'
+  ],
+  localCodeOwns: [
+    'source_classification',
+    'release_gate',
+    'blocked_claim_sanitizer',
+    'portrait_confidence_weight',
+    'reward_release',
+    'share_payload',
+    'service_conversion_gate'
+  ],
+  aiMayDraft: [
+    'parent_summary',
+    'child_friendly_rewording',
+    'socratic_question_variants',
+    'method_candidate_explanation',
+    'family_solution_book_copy'
+  ],
+  aiMustNotOwn: [
+    'talent_label',
+    'personality_label',
+    'auto_grading',
+    'ocr_claim',
+    'full_answer',
+    'ranking',
+    'guaranteed_improvement',
+    'diagnosis_label',
+    'reward_release'
+  ]
+};
+
+const AI_MATERIAL_BLOCKED_CLAIM_PATTERNS = [
+  { id: 'talent_label', pattern: /天赋|皮纹决定|优势脑|学习类型就是|孩子属于|personality|mbti/i },
+  { id: 'auto_grading', pattern: /自动判分|自动批改|得分为|扣分|score\s*[:：]/i },
+  { id: 'ocr_claim', pattern: /ocr|识别照片|图片内容已经全部|整张试卷/i },
+  { id: 'full_answer', pattern: /完整答案|整题答案|最终答案|解答如下|therefore the answer/i },
+  { id: 'ranking', pattern: /排名|超过.*同学|班级第|年级第|percentile/i },
+  { id: 'guaranteed_improvement', pattern: /保证提升|一定提高|必然进步|包提分/i },
+  { id: 'diagnosis_label', pattern: /障碍|疾病|缺陷|诊断为|adhd|自闭/i }
+];
+
+function normalizeAiList(value) {
+  if (!value) return [];
+  if (Array.isArray(value)) return value.filter(Boolean).map((item) => String(item).trim()).filter(Boolean);
+  return String(value).split(/[,\n；;、]+/).map((item) => item.trim()).filter(Boolean);
+}
+
+function findBlockedClaims(value) {
+  const text = typeof value === 'string' ? value : JSON.stringify(value || {});
+  return AI_MATERIAL_BLOCKED_CLAIM_PATTERNS
+    .filter((rule) => rule.pattern.test(text))
+    .map((rule) => rule.id);
+}
+
+function buildAiMaterialAnalysisRequest(packet = {}, evidenceSignals = {}, options = {}) {
+  const schema = packet.intakeSourceSchema || {};
+  const reportSeed = packet.reportSeed || {};
+  const sourceSchemaId = schema.id || reportSeed.sourceSchemaId || options.sourceSchemaId || 'parent_report';
+  const sourceText = String(options.sourceText || evidenceSignals.sourceText || '').slice(0, 1200);
+  return {
+    schemaId: AI_MATERIAL_ANALYSIS_SCHEMA.id,
+    endpointPath: AI_MATERIAL_ANALYSIS_SCHEMA.endpointPath,
+    transport: AI_MATERIAL_ANALYSIS_SCHEMA.transport,
+    providerPolicy: {
+      serverEnvOnly: true,
+      clientMaySendKey: false,
+      cacheRawMaterial: false,
+      logRawMaterial: false
+    },
+    payload: {
+      source_schema_id: sourceSchemaId,
+      source_schema_label: schema.label || reportSeed.sourceSchemaLabel || sourceSchemaId,
+      source_text_excerpt: sourceText,
+      structured_evidence: {
+        question_type: evidenceSignals.questionType || '',
+        child_original_thought: evidenceSignals.childOriginalThought || '',
+        stuck_first_step: evidenceSignals.stuckFirstStep || evidenceSignals.firstStep || '',
+        wrong_cause_guess: evidenceSignals.wrongCauseGuess || evidenceSignals.wrongCause || '',
+        method_hypothesis: evidenceSignals.methodHypothesis || '',
+        cross_check_gate: evidenceSignals.crossCheckGate || '',
+        review_window: evidenceSignals.reviewWindow || ''
+      },
+      grade: options.grade || '',
+      subject: evidenceSignals.subjectLabel || evidenceSignals.subjectKey || options.subject || '',
+      confirmed_scores: options.confirmedScores || null,
+      parent_observation: options.parentObservation || ''
+    },
+    expectedResponseSchema: AI_MATERIAL_ANALYSIS_SCHEMA.responseFields.slice(),
+    blockedClaims: AI_MATERIAL_ANALYSIS_SCHEMA.aiMustNotOwn.slice(),
+    fallbackMode: 'local_family_solution_draft_requires_manual_confirmation'
+  };
+}
+
+function sanitizeAiMaterialAnalysisResult(raw = {}, context = {}) {
+  const sourceSchemaId = context.sourceSchemaId || raw.source_type || 'parent_report';
+  const blockedClaimIds = Array.from(new Set([]
+    .concat(findBlockedClaims(raw))
+    .concat(normalizeAiList(raw.blocked_claims))
+    .concat(AI_MATERIAL_ANALYSIS_SCHEMA.aiMustNotOwn.filter((field) => {
+      return Object.prototype.hasOwnProperty.call(raw, field);
+    }))));
+  const riskFlags = Array.from(new Set(normalizeAiList(raw.risk_flags).concat(blockedClaimIds)));
+  const methodCandidates = normalizeAiList(raw.learning_method_candidates || raw.method_candidates)
+    .slice(0, 4)
+    .map((item, index) => ({
+      id: `method_candidate_${index + 1}`,
+      label: item,
+      status: sourceSchemaId === 'talent_assessment' ? 'hypothesis_requires_real_homework' : 'candidate_requires_parent_confirmation',
+      validationGate: index === 0 ? 'tonight_one_real_task' : 'after_next_day_revisit'
+    }));
+  const socraticQuestions = normalizeAiList(raw.socratic_next_questions)
+    .filter((item) => !findBlockedClaims(item).length)
+    .slice(0, 3);
+  const safeQuestions = socraticQuestions.length ? socraticQuestions : [
+    '这份材料里，孩子今晚最先能说清的第一步是什么？',
+    '如果只验证一个方法，应该拿哪一道真实错题来试？',
+    '明天回访时，怎样判断这个方法真的帮到了孩子？'
+  ];
+  return {
+    id: 'sanitized_ai_material_analysis_result',
+    status: blockedClaimIds.length ? 'sanitized_requires_manual_confirmation' : 'safe_draft_requires_manual_confirmation',
+    sourceSchemaId,
+    studentProfileSignals: raw.student_profile_signals || {},
+    scoreSignals: raw.score_signals || {},
+    wrongQuestionSignals: raw.wrong_question_signals || {},
+    learningMethodCandidates: methodCandidates,
+    socraticNextQuestions: safeQuestions,
+    recommendedProductLoop: raw.recommended_product_loop || {
+      entry: sourceSchemaId === 'talent_assessment' ? 'socratic_method_validation' : 'family_private_tutor_loop',
+      route: sourceSchemaId === 'wrong_question_paper' ? '/pages/review/review?from=ai_material_analysis' : '/pages/tutor/tutor?from=ai_material_analysis',
+      reason: 'AI draft is only released after local evidence and parent confirmation'
+    },
+    familySolutionBook: Object.assign({
+      onePageDiagnosis: '先把材料降级为可验证假设，不做天赋/能力定性。',
+      methodCandidatePage: methodCandidates.map((item) => item.label),
+      sevenDayActionPage: ['今晚验证一张真实卡', '明天回访第一步', '第 7 天换一个小变式'],
+      parentScriptPage: safeQuestions.slice(0, 2),
+      evidencePage: ['真实错题', '孩子第一步', '隔天回访', '第 7 天小变式'],
+      nextServicePage: '若 7 天证据齐，再进入家庭私教服务包或顾问复盘。'
+    }, raw.family_solution_book || {}),
+    riskFlags,
+    blockedClaims: blockedClaimIds,
+    manualConfirmationFields: Array.from(new Set(normalizeAiList(raw.manual_confirmation_fields).concat([
+      'source_text_excerpt',
+      'stuck_first_step',
+      'method_candidate',
+      'next_day_revisit'
+    ]))),
+    localReleaseGate: sourceSchemaId === 'talent_assessment'
+      ? 'talent_report_ai_draft_requires_real_wrong_question_and_day7_variant'
+      : 'ai_material_analysis_requires_structured_evidence_and_parent_confirmation',
+    aiLocalBoundary: {
+      localCodeOwns: AI_MATERIAL_ANALYSIS_SCHEMA.localCodeOwns.slice(),
+      aiMayDraft: AI_MATERIAL_ANALYSIS_SCHEMA.aiMayDraft.slice(),
+      aiMustNotOwn: AI_MATERIAL_ANALYSIS_SCHEMA.aiMustNotOwn.slice()
+    }
+  };
+}
+
+function buildAiMaterialAnalysisFallback(packet = {}, evidenceSignals = {}, reason = 'service_not_configured') {
+  const schema = packet.intakeSourceSchema || {};
+  const sourceSchemaId = schema.id || 'parent_report';
+  return sanitizeAiMaterialAnalysisResult({
+    source_type: sourceSchemaId,
+    learning_method_candidates: sourceSchemaId === 'talent_assessment'
+      ? ['先用一张真实错题验证学习方法候选', '先复述题意再动笔', '用小黑板写第一步']
+      : ['先定位错因候选', '只追问第一步', '明天回访同一类卡点'],
+    socratic_next_questions: [
+      evidenceSignals.firstStep || evidenceSignals.stuckFirstStep || '孩子今晚能先说出哪一步？',
+      '这个方法要用哪一道真实错题验证？',
+      '明天回访时看什么证据？'
+    ],
+    family_solution_book: {
+      onePageDiagnosis: reason,
+      sevenDayActionPage: ['补齐结构化证据', '完成一次第一步点拨', '隔天回访', '第 7 天小变式']
+    },
+    risk_flags: [reason],
+    blocked_claims: [],
+    manual_confirmation_fields: ['source_text_excerpt', 'structured_evidence', 'parent_confirmation']
+  }, { sourceSchemaId });
+}
+
+function buildAiMaterialAnalysisContract(packet = {}, evidenceSignals = {}, options = {}) {
+  const request = buildAiMaterialAnalysisRequest(packet, evidenceSignals, options);
+  return {
+    id: 'real_ai_material_analysis_contract',
+    version: 'v1',
+    endpointPath: AI_MATERIAL_ANALYSIS_SCHEMA.endpointPath,
+    request,
+    fallback: buildAiMaterialAnalysisFallback(packet, evidenceSignals, 'pending_server_ai_analysis'),
+    sanitizerPolicy: {
+      blockedClaimPatterns: AI_MATERIAL_BLOCKED_CLAIM_PATTERNS.map((item) => item.id),
+      talentDegradeRule: 'talent or dermatoglyphic reports can only become learning-method hypotheses',
+      manualConfirmationRequired: true
+    },
+    releaseGates: [
+      'server_env_key_configured',
+      'json_schema_valid',
+      'blocked_claim_sanitized',
+      'parent_manual_confirmation',
+      'real_homework_evidence_before_practice',
+      'day7_variant_before_method_claim'
+    ]
+  };
+}
+
 const INTAKE_SOURCE_SCHEMAS = [
   {
     id: 'parent_report',
@@ -711,6 +941,13 @@ function buildUploadIntakePacket(text = '', imagePaths = [], materialType = '') 
     reportSeed,
     kind
   });
+  const realAiMaterialAnalysisContract = buildAiMaterialAnalysisContract({
+    intakeSourceSchema,
+    reportSeed,
+    kind
+  }, {}, {
+    sourceText: value
+  });
   return {
     id: `upload_intake_${Date.now ? Date.now() : 0}`,
     kind,
@@ -734,6 +971,7 @@ function buildUploadIntakePacket(text = '', imagePaths = [], materialType = '') 
     structuredCapturePrompts,
     methodValidationChallengeChain,
     photoEvidencePolicy,
+    realAiMaterialAnalysisContract,
     aiReportDraftAdapter,
     personalizedUploadSolutionRunway,
     reviewSeed,
@@ -750,6 +988,10 @@ module.exports = {
   buildSourceReadinessBoard,
   buildMethodValidationChallengeChain,
   buildAiReportDraftAdapter,
+  buildAiMaterialAnalysisRequest,
+  sanitizeAiMaterialAnalysisResult,
+  buildAiMaterialAnalysisFallback,
+  buildAiMaterialAnalysisContract,
   buildPersonalizedUploadSolutionRunway,
   classifyImportInput,
   detectMaterialSource,

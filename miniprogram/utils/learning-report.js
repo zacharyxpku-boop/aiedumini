@@ -2862,6 +2862,94 @@ function buildParentDecisionBook(input = {}) {
   };
 }
 
+function buildCommercialFamilySolutionBook(input = {}) {
+  const parentDecisionBook = input.parentDecisionBook || {};
+  const uploadedMaterialDecisionDossier = input.uploadedMaterialDecisionDossier || {};
+  const servicePathway = input.servicePathway || {};
+  const sourceEvidenceLedger = input.sourceEvidenceLedger || {};
+  const reportEvidenceReleaseGate = input.reportEvidenceReleaseGate || {};
+  const tonightDecisionBrief = input.tonightDecisionBrief || {};
+  const aiMaterialAnalysisContract = input.aiMaterialAnalysisContract || {};
+  const nextEvidence = Array.isArray(parentDecisionBook.nextEvidenceQueue) && parentDecisionBook.nextEvidenceQueue.length
+    ? parentDecisionBook.nextEvidenceQueue
+    : (Array.isArray(sourceEvidenceLedger.nextEvidenceQueue) ? sourceEvidenceLedger.nextEvidenceQueue : []);
+  const methodCards = Array.isArray(uploadedMaterialDecisionDossier.methodCandidateCards)
+    ? uploadedMaterialDecisionDossier.methodCandidateCards.slice(0, 3)
+    : [];
+  const actionStack = Array.isArray(uploadedMaterialDecisionDossier.familyActionStack)
+    ? uploadedMaterialDecisionDossier.familyActionStack.slice(0, 4)
+    : [];
+  const validationPlan = servicePathway && Array.isArray(servicePathway.validationPlan)
+    ? servicePathway.validationPlan.slice(0, 7)
+    : [];
+  return {
+    id: 'commercial_family_solution_book',
+    title: 'Family solution book',
+    status: reportEvidenceReleaseGate.releaseDecision || parentDecisionBook.status || 'collect_more_evidence',
+    pages: [
+      {
+        id: 'one_page_diagnosis',
+        title: 'One-page diagnosis',
+        body: parentDecisionBook.oneSentenceDecision || tonightDecisionBrief.headline || 'Only release tonight action until evidence is confirmed.',
+        evidenceGate: 'source_type_and_structured_evidence_confirmed'
+      },
+      {
+        id: 'method_candidates',
+        title: 'Method candidates',
+        body: methodCards.length ? methodCards.map((item) => item.method || item.label || item.title).filter(Boolean) : ['Socratic first-step validation', 'three-minute mini lesson only as rescue', 'game recall only after real card evidence'],
+        evidenceGate: 'talent_or_assessment_degraded_to_method_hypothesis'
+      },
+      {
+        id: 'seven_day_action',
+        title: '7-day action plan',
+        body: actionStack.length ? actionStack.map((item) => item.action || item.label).filter(Boolean) : ['Tonight: one first step', 'Tomorrow: revisit the same wrong cause', 'Day 7: one near-transfer variant'],
+        evidenceGate: 'day7_variant_before_method_claim'
+      },
+      {
+        id: 'parent_script',
+        title: 'Parent script',
+        body: parentDecisionBook.tonightDo && parentDecisionBook.tonightDo.length
+          ? parentDecisionBook.tonightDo
+          : [tonightDecisionBrief.parentScript || 'Ask only: what is your first step?'],
+        evidenceGate: 'low_pressure_parent_prompt_only'
+      },
+      {
+        id: 'review_evidence',
+        title: 'Review evidence',
+        body: nextEvidence.slice(0, 5).map((item) => item.label || item.id || item).filter(Boolean),
+        evidenceGate: 'next_day_revisit_and_safe_handoff'
+      },
+      {
+        id: 'next_service',
+        title: 'Next service suggestion',
+        body: servicePathway && servicePathway.primaryTier
+          ? [servicePathway.primaryTier.label || servicePathway.primaryTier.id || 'family private tutor service']
+          : ['7-day homework companion pack', 'wrong-cause repair pack', 'assessment interpretation plus real-task validation'],
+        evidenceGate: 'commercial_offer_after_parent_confirmation'
+      }
+    ],
+    aiMaterialAnalysis: aiMaterialAnalysisContract && aiMaterialAnalysisContract.id ? {
+      id: aiMaterialAnalysisContract.id,
+      endpointPath: aiMaterialAnalysisContract.endpointPath || '',
+      releaseGates: Array.isArray(aiMaterialAnalysisContract.releaseGates) ? aiMaterialAnalysisContract.releaseGates.slice(0, 6) : [],
+      fallbackStatus: aiMaterialAnalysisContract.fallback ? aiMaterialAnalysisContract.fallback.status || '' : ''
+    } : null,
+    commercialLoop: [
+      { id: 'partner_upload', route: '/pages/upload/upload?from=partner_material', gate: 'parent_confirmed_material' },
+      { id: 'ai_assisted_interpretation', route: '/pages/profile/profile?from=solution_book', gate: 'server_env_key_and_sanitizer' },
+      { id: 'product_execution', route: parentDecisionBook.routeActions && parentDecisionBook.routeActions[0] ? parentDecisionBook.routeActions[0].route : '/pages/tutor/tutor?from=solution_book', gate: 'child_first_step' },
+      { id: 'parent_report', route: '/pages/profile/profile?from=solution_book_report', gate: 'safe_share_payload' },
+      { id: 'service_conversion', route: '/pages/profile/profile?from=solution_book_service', gate: 'evidence_based_offer' }
+    ],
+    sharePolicy: parentDecisionBook.sharePolicy || {
+      allowedFields: ['tonight_action', 'parent_question', 'next_day_revisit_status'],
+      blockedFields: ['original_question', 'full_answer', 'score', 'ranking', 'full_dialogue']
+    },
+    blockedClaims: ['talent_label', 'personality_label', 'auto_grading', 'ocr_claim', 'full_answer', 'ranking', 'guaranteed_improvement'],
+    evidenceRequired: ['one_page_diagnosis', 'method_candidates', 'seven_day_action', 'parent_script', 'review_evidence', 'next_service_suggestion', 'safe_share_policy']
+  };
+}
+
 function buildAiLocalImplementationMatrix(input = {}) {
   const sourceEvidenceLedger = input.sourceEvidenceLedger || {};
   const reportEvidenceReleaseGate = input.reportEvidenceReleaseGate || {};
@@ -3169,11 +3257,24 @@ function buildLearningReportDraft(input = {}) {
     portraitConfidenceSystem,
     servicePathway
   });
+  const commercialFamilySolutionBook = buildCommercialFamilySolutionBook({
+    parentDecisionBook,
+    uploadedMaterialDecisionDossier,
+    servicePathway,
+    sourceEvidenceLedger,
+    reportEvidenceReleaseGate,
+    tonightDecisionBrief,
+    aiMaterialAnalysisContract: input.aiMaterialAnalysisContract
+      || behaviorSignals.aiMaterialAnalysisContract
+      || input.realAiMaterialAnalysisContract
+      || null
+  });
   const aiLocalImplementationMatrix = buildAiLocalImplementationMatrix({
     sourceEvidenceLedger,
     reportEvidenceReleaseGate,
     gameReturnEvidence,
-    parentDecisionBook
+    parentDecisionBook,
+    commercialFamilySolutionBook
   });
   const missing = missingItems(parts);
   const reportDraft = {
@@ -3228,6 +3329,7 @@ function buildLearningReportDraft(input = {}) {
     openMaicInspiredDecisionBridge,
     servicePathway,
     parentDecisionBook,
+    commercialFamilySolutionBook,
     aiLocalImplementationMatrix,
     generatedAt: nowIso(input.now),
     missingItems: missing,
@@ -3288,6 +3390,7 @@ function buildLearningReportDraft(input = {}) {
     openMaicInspiredDecisionBridge,
     servicePathway,
     parentDecisionBook,
+    commercialFamilySolutionBook,
     aiLocalImplementationMatrix,
     reportCompleteness: completeness,
     reportStatus: {
@@ -3326,6 +3429,7 @@ module.exports = {
   buildSourceEvidenceLedger,
   buildUploadedMaterialDecisionDossier,
   buildParentDecisionBook,
+  buildCommercialFamilySolutionBook,
   buildGameReturnEvidence,
   buildOpenMaicInspiredReportDecisionBridge,
   buildCrossWeekTrendBoard,

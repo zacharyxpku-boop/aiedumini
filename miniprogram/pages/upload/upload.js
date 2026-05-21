@@ -967,6 +967,15 @@ Page({
     const reportBehaviorSignals = reportDraft.behaviorSignals || {};
     const sourceTextForMiniLesson = String(options.sourceText || reportDraft.sourceText || reportBehaviorSignals.sourceText || '').slice(0, 500);
     const guardedAiReportDraft = options.guardedAiReportDraft || null;
+    const aiMaterialAnalysisContract = importIntake.buildAiMaterialAnalysisContract
+      ? importIntake.buildAiMaterialAnalysisContract(uploadEvidenceSignals.uploadIntakePacket || {
+        intakeSourceSchema: { id: sourceSchemaId, label: decisionSource.sourceSchemaLabel || sourceSchemaId },
+        reportSeed: { sourceSchemaId, sourceSchemaLabel: decisionSource.sourceSchemaLabel || sourceSchemaId }
+      }, uploadEvidenceSignals, {
+        sourceText: sourceTextForMiniLesson,
+        subject: miniLessonSubject
+      })
+      : null;
     const miniLessonFirstStep = uploadEvidenceSignals.firstStep
       || uploadEvidenceSignals.stuckFirstStep
       || reportBehaviorSignals.firstStep
@@ -1071,6 +1080,7 @@ Page({
           : 'material_report_requires_structured_evidence_before_release'
       },
       guardedAiReportDraft,
+      aiMaterialAnalysisContract,
       tonightTaskCard,
       servicePathway,
       uploadedMaterialDecisionDossier,
@@ -1122,6 +1132,7 @@ Page({
       openMaicInspiredDecisionBridge: cta.openMaicDecisionBridge || null,
       miniLessonSourceEvidence: cta.miniLessonSourceEvidence || null,
       guardedAiReportDraft: cta.guardedAiReportDraft || null,
+      aiMaterialAnalysisContract: cta.aiMaterialAnalysisContract || null,
       servicePathway: cta.servicePathway || null,
       tonightTaskCard: cta.tonightTaskCard || null,
       uploadedMaterialDecisionDossier,
@@ -1134,6 +1145,7 @@ Page({
         openMaicInspiredDecisionBridge: cta.openMaicDecisionBridge || null,
         miniLessonSourceEvidence: cta.miniLessonSourceEvidence || null,
         guardedAiReportDraft: cta.guardedAiReportDraft || null,
+        aiMaterialAnalysisContract: cta.aiMaterialAnalysisContract || null,
         servicePathway: cta.servicePathway || null,
         tonightTaskCard: cta.tonightTaskCard || null,
         uploadedMaterialDecisionDossier,

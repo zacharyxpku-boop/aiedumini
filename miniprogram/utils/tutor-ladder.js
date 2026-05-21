@@ -857,6 +857,51 @@ function buildRuntimeSocraticReply(turnState = {}, item = {}, signal = {}, flags
   };
 }
 
+function evaluateSocraticTurnQuality(turn = {}, context = {}) {
+  const reply = String(turn.reply || turn.text || '');
+  const taskType = context.taskType || turn.task_type || 'unknown';
+  const signal = context.pressureSignal || turn.real_homework_pressure_signal || {};
+  const answerBlocked = !!context.answerRequest || (turn.mastery_signal && turn.mastery_signal.status === 'blocked_answer_request');
+  const checks = {
+    firstStepOnly: /绗竴姝|第一步|first step|known conditions|已知条件|入口/.test(reply)
+      && !/完整答案|最终答案|therefore the answer|答案是|结果是/.test(reply),
+    wrongCauseFit: !!(signal.wrongCause || signal.expectedWrongCause || (turn.diagnostic_probe && turn.diagnostic_probe.focus)),
+    noEarlyAnswer: !/完整答案|最终答案|therefore the answer|答案是|结果是|直接算出/.test(reply),
+    childCanContinue: /A|B|先|圈|说|写|画|复述|检查|第一步|绗竴姝/.test(reply),
+    fallbackReady: !!(turn.socratic_fallback_plan || turn.visual_socratic_recovery || (context.runtimeState && context.runtimeState.branch)),
+    miniLessonBridgeReady: !!(turn.visual_socratic_recovery || turn.question_bank_visual_board_bridge || context.miniLessonReady),
+    parentSafe: !/原题照片|完整对话|排名|分数|发到家长群/.test(reply)
+  };
+  const weights = {
+    firstStepOnly: 22,
+    wrongCauseFit: 16,
+    noEarlyAnswer: 22,
+    childCanContinue: 16,
+    fallbackReady: 10,
+    miniLessonBridgeReady: 8,
+    parentSafe: 6
+  };
+  const score = Object.keys(weights).reduce((sum, key) => sum + (checks[key] ? weights[key] : 0), 0);
+  const failed = Object.keys(checks).filter((key) => !checks[key]);
+  return {
+    id: 'socratic_turn_quality_scorecard',
+    taskType,
+    score,
+    status: score >= 88 ? 'pass' : score >= 72 ? 'needs_review' : 'fail_to_mini_lesson_or_parent_handoff',
+    checks,
+    failed,
+    answerBlocked,
+    nextAction: failed.includes('firstStepOnly') || failed.includes('noEarlyAnswer')
+      ? 'replace_with_local_first_step_prompt'
+      : failed.includes('childCanContinue')
+        ? 'switch_to_two_choice_micro_action'
+        : failed.includes('miniLessonBridgeReady')
+          ? 'route_to_three_minute_mini_lesson'
+          : 'record_next_day_revisit',
+    reportableEvidence: ['first_step_only', 'wrong_cause_fit', 'no_early_answer', 'fallback_ready', 'parent_safe']
+  };
+}
+
 function buildTutorReply(text, options = {}) {
   const messages = options.messages || [];
   const currentHintLevel = options.currentHintLevel || 1;
@@ -875,9 +920,25 @@ function buildTutorReply(text, options = {}) {
   const qualitySuite = buildSocraticQualityEvaluationSuite(taskType, pressureSignal);
   const promptJudge = buildSocraticPromptQualityJudge(taskType, qualitySuite, pressureSignal);
   const aiLocalBoundaryContract = buildSocraticAiLocalBoundaryContract(taskType, pressureSignal);
+  const replyWithIntro = withStepIntro(item, reply);
+  const qualityScorecard = evaluateSocraticTurnQuality({
+    reply: replyWithIntro,
+    mastery_signal: { status: masteryStatus },
+    socratic_fallback_plan: runtimeReply.fallbackPlan,
+    visual_socratic_recovery: true,
+    question_bank_visual_board_bridge: true,
+    diagnostic_probe: { focus: pressureSignal.wrongCause },
+    real_homework_pressure_signal: pressureSignal
+  }, {
+    taskType,
+    pressureSignal,
+    answerRequest,
+    runtimeState: runtimeReply.runtimeState,
+    miniLessonReady: true
+  });
 
   const result = {
-    reply: withStepIntro(item, reply),
+    reply: replyWithIntro,
     hint_level: item.level,
     hint_label: item.label,
     coach_step: item.step,
@@ -914,6 +975,8 @@ function buildTutorReply(text, options = {}) {
     questionTypeCoverageAtlas: buildQuestionTypeCoverageAtlas(taskType),
     socratic_quality_evaluation_suite: qualitySuite,
     socraticQualityEvaluationSuite: qualitySuite,
+    socratic_turn_quality_scorecard: qualityScorecard,
+    socraticTurnQualityScorecard: qualityScorecard,
     socratic_prompt_quality_judge: promptJudge,
     socraticPromptQualityJudge: promptJudge,
     three_round_socratic_protocol: buildThreeRoundSocraticProtocol(taskType, pressureSignal),
@@ -969,6 +1032,7 @@ module.exports = {
   buildQuestionBankVisualBoardBridge,
   buildSocraticQualityEvaluationSuite,
   buildSocraticPromptQualityJudge,
+  evaluateSocraticTurnQuality,
   buildThreeRoundSocraticProtocol,
   buildSocraticAiLocalBoundaryContract,
   buildAnswerBoundaryEvidence,

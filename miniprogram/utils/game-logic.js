@@ -575,6 +575,72 @@ function buildHealthyReturnHabitEngine(profile = {}, result = {}, retention = {}
   };
 }
 
+function buildFamilyCoCreationReturnLoop(healthyReturnHabitEngine = {}, dailyPrimaryRecallAction = {}, result = {}, options = {}) {
+  const weakKey = options.weakKey || dailyPrimaryRecallAction.weakKey || 'first_step';
+  const rescue = healthyReturnHabitEngine.mode === 'rescue_first' || Number(result.wrong || 0) > 0 || Number(result.accuracy || 100) < 80;
+  const returnStory = [
+    {
+      id: 'episode_1_name_the_stuck_point',
+      day: 'today',
+      childAction: dailyPrimaryRecallAction.oneActionLine || `Say the first step for ${weakKey}.`,
+      parentAction: dailyPrimaryRecallAction.parentLine || `Ask one first-step question about ${weakKey}.`,
+      unlockGate: 'child_first_step_recorded'
+    },
+    {
+      id: 'episode_2_wrong_cause_echo',
+      day: 'tomorrow',
+      childAction: `Retell why ${weakKey} was stuck without opening the answer.`,
+      parentAction: 'Confirm the wrong-cause wording, not the score.',
+      unlockGate: 'next_day_revisit_recorded'
+    },
+    {
+      id: 'episode_3_near_transfer',
+      day: 'day7',
+      childAction: `Try one tiny transfer for ${weakKey}.`,
+      parentAction: 'Only ask whether the first step stayed the same.',
+      unlockGate: 'day7_transfer_evidence'
+    }
+  ];
+  return {
+    id: 'family_co_creation_return_loop',
+    mode: rescue ? 'rescue_story' : 'steady_story',
+    title: 'Family co-created comeback story',
+    dailyComebackCard: {
+      id: 'daily_most_worth_return_card',
+      weakKey,
+      route: dailyPrimaryRecallAction.route || '/pages/review/review?from=family_return_loop',
+      action: dailyPrimaryRecallAction.oneActionLine || `One ${weakKey} first-step recall.`,
+      rewardGate: dailyPrimaryRecallAction.xpGate || 'XP only after first-step and revisit evidence',
+      blockedRewards: ['speed', 'ranking', 'raw_volume', 'score_pressure']
+    },
+    returnStory,
+    weeklyChallenge: {
+      id: 'family_weekly_no_ranking_challenge',
+      target: 'finish 3 evidence-backed returns in 7 days',
+      allowedProof: ['child_first_step', 'wrong_cause_echo', 'next_day_revisit', 'day7_transfer'],
+      notAllowed: ['leaderboard', 'class_rank', 'screen_time_binge', 'raw_problem_count'],
+      route: '/pages/profile/profile?from=family_weekly_return'
+    },
+    shareCard: {
+      id: 'family_co_creation_safe_share',
+      allowedFields: ['weak_key', 'first_step_action', 'return_window', 'parent_question', 'next_route'],
+      blockedFields: ['original_question', 'full_answer', 'score', 'ranking', 'full_dialogue', 'private_comment'],
+      receiverAction: 'Open the same first-step return card; do not compare scores or rankings.'
+    },
+    localCodeOwns: ['daily_card_selection', 'unlock_gate', 'xp_gate', 'share_fields', 'anti_addiction_cap'],
+    aiMayRewrite: ['child_card_copy', 'parent_question_copy', 'weekly_story_title'],
+    aiMustNotOwn: ['reward_release', 'leaderboard', 'ranking', 'score_pressure', 'infinite_return_trigger'],
+    antiAddictionPolicy: {
+      maxDailyComebackCards: 1,
+      maxWeeklyChallenges: 1,
+      stopAfterEvidence: true,
+      noRankingPressure: true,
+      noInfiniteScroll: true
+    },
+    evidenceRequired: ['daily_most_worth_return_card', 'wrong_cause_episode', 'weekly_no_ranking_challenge', 'family_safe_share_payload']
+  };
+}
+
 function buildMemoryFeedbackController(cards = [], events = [], result = {}, retention = {}, options = {}) {
   const safeCards = Array.isArray(cards) ? cards : [];
   const safeEvents = Array.isArray(events) ? events : [];
@@ -2517,6 +2583,12 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
     ))),
     evidenceRequired: ['student_first_step', 'wrong_cause_named', 'next_day_revisit', 'share_boundary', 'xp_gate', 'review_return_seed']
   };
+  const familyCoCreationReturnLoop = buildFamilyCoCreationReturnLoop(
+    healthyReturnHabitEngine,
+    dailyPrimaryRecallAction,
+    result,
+    { weakKey }
+  );
   return {
     title: needsRepair ? '高频修复循环' : '高频巩固循环',
     mode: needsRepair ? 'repair_recall' : 'mastery_recall',
@@ -2554,6 +2626,7 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
     dailyReturnContract,
     healthyReturnHabitEngine,
     dailyPrimaryRecallAction,
+    familyCoCreationReturnLoop,
     hasRealRecallSource,
     greenWordClozeProtocol: gizmoLikeMemoryProtocol.greenWordClozeProtocol || null,
     nextDayReturnEvidence: dailyReturnContract.nextDayReturnEvidence || null,
@@ -2563,7 +2636,7 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
       : '连续 2 次说清第一步，才进入变式练习。',
     parentShareLine: `家长复盘只看：孩子能否自己说出「${weakKey}」的第一步。`,
     nextRoute: needsRepair ? '/pages/review/review' : '/pages/tutor/tutor',
-    evidenceRequired: ['active_recall_cards', 'spaced_review_plan', 'review_return_seed', 'spaced_recall_policy', 'wrong_cause_return', 'quest_cadence', 'memory_feedback_controller', 'recall_intensity_plan', 'wrong_cause_replay_deck', 'xp_feedback_policy', 'quest_arc_runway', 'gizmo_like_memory_protocol', 'green_word_cloze_protocol', 'socratic_quality_memory_bridge', 'question_bank_memory_bridge', 'question_bank_recall_workout', 'daily_memory_sprint_deck', 'adaptive_recall_scheduler', 'memory_risk_release_model', 'memory_comeback_loop', 'daily_memory_prescription', 'question_type_cluster_memory_protocol', 'peer_memory_relay_league', 'daily_memory_season_plan', 'micro_recall_prescription_engine', 'ninety_second_recall_combo_engine', 'ninety_second_playable_deck', 'real_homework_pressure_memory_prescription', 'daily_return_mission', 'daily_return_contract', 'healthy_return_habit_engine', 'daily_primary_recall_action', 'next_day_return_evidence', 'parent_share_line'],
+    evidenceRequired: ['active_recall_cards', 'spaced_review_plan', 'review_return_seed', 'spaced_recall_policy', 'wrong_cause_return', 'quest_cadence', 'memory_feedback_controller', 'recall_intensity_plan', 'wrong_cause_replay_deck', 'xp_feedback_policy', 'quest_arc_runway', 'gizmo_like_memory_protocol', 'green_word_cloze_protocol', 'socratic_quality_memory_bridge', 'question_bank_memory_bridge', 'question_bank_recall_workout', 'daily_memory_sprint_deck', 'adaptive_recall_scheduler', 'memory_risk_release_model', 'memory_comeback_loop', 'daily_memory_prescription', 'question_type_cluster_memory_protocol', 'peer_memory_relay_league', 'daily_memory_season_plan', 'micro_recall_prescription_engine', 'ninety_second_recall_combo_engine', 'ninety_second_playable_deck', 'real_homework_pressure_memory_prescription', 'daily_return_mission', 'daily_return_contract', 'healthy_return_habit_engine', 'daily_primary_recall_action', 'family_co_creation_return_loop', 'next_day_return_evidence', 'parent_share_line'],
     weakKey
   };
 }
@@ -2800,6 +2873,7 @@ module.exports = {
   buildDailyReturnMission,
   buildDailyReturnContract,
   buildHealthyReturnHabitEngine,
+  buildFamilyCoCreationReturnLoop,
   buildQuestionTypeClusterMemoryProtocol,
   buildRealHomeworkPressureMemoryPrescription,
   buildMemoryFeedbackController,

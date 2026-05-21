@@ -374,6 +374,63 @@ function buildModeChoiceProtocol(signals, modeRecommendations, options = {}) {
   };
 }
 
+function buildPartnerServiceDeliveryLedger(signals = {}, modeRecommendations = [], productTiers = [], validationPlan = []) {
+  const hasRealTaskEvidence = !!(signals && signals.hasRealTaskEvidence);
+  const primaryMode = modeRecommendations[0] || MODE_CATALOG[0];
+  const primaryTier = productTiers[0] || PRODUCT_TIERS[1];
+  return {
+    id: 'partner_service_delivery_ledger',
+    status: hasRealTaskEvidence ? 'deliverable_after_parent_confirmation' : 'pre_sale_needs_real_task_evidence',
+    title: 'Partner service delivery ledger',
+    packageCards: [
+      {
+        id: 'assessment_interpretation',
+        label: 'Assessment interpretation add-on',
+        deliverable: 'Turn report into learning method candidates, not talent labels.',
+        entryGate: 'partner_material_uploaded_and_parent_confirmed',
+        nextRoute: '/pages/upload/upload?from=partner_delivery_ledger'
+      },
+      {
+        id: 'seven_day_execution',
+        label: '7-day family execution',
+        deliverable: 'One first-step task, one next-day revisit, one day-7 variant.',
+        entryGate: hasRealTaskEvidence ? 'real_task_evidence_ready' : 'blocked_until_real_wrong_question',
+        nextRoute: '/pages/profile/profile?from=partner_delivery_ledger'
+      },
+      {
+        id: 'course_or_counselor_handoff',
+        label: primaryTier.label || 'service handoff',
+        deliverable: `Route to ${primaryMode.label || primaryMode.id} only after evidence.`,
+        entryGate: 'evidence_based_offer_only',
+        nextRoute: primaryMode.route || '/pages/tutor/tutor?from=partner_delivery_ledger'
+      }
+    ],
+    crmFields: [
+      { id: 'child_profile_status', allowed: true, field: 'evidence_stage' },
+      { id: 'primary_mode', allowed: true, field: primaryMode.id || '' },
+      { id: 'primary_tier', allowed: true, field: primaryTier.id || '' },
+      { id: 'next_service_candidate', allowed: true, field: primaryTier.label || '' },
+      { id: 'original_question', allowed: false, field: 'blocked' },
+      { id: 'score_ranking', allowed: false, field: 'blocked' },
+      { id: 'talent_label', allowed: false, field: 'blocked' }
+    ],
+    revenueLoop: [
+      { id: 'lead', owner: 'partner', action: 'upload confirmed report or observation' },
+      { id: 'diagnose', owner: 'miniapp', action: 'build guarded method candidates and family action book' },
+      { id: 'execute', owner: 'family', action: 'finish one 7-day evidence loop in product' },
+      { id: 'convert', owner: 'operator', action: 'offer course, companion, or high-touch planning only from evidence' },
+      { id: 'renew', owner: 'operator', action: 'renew from next evidence gap, not anxiety or ranking' }
+    ],
+    validationPlan: Array.isArray(validationPlan) ? validationPlan.slice(0, 7) : [],
+    blockedClaims: COMMERCIAL_CLAIM_BLOCKLIST.concat(['talent_label', 'full_answer', 'score_ranking']),
+    partnerVisibleFields: PARTNER_HANDOFF_POLICY.visibleToPartner.slice(),
+    partnerBlockedFields: PARTNER_HANDOFF_POLICY.blockedFields.slice(),
+    releaseGate: hasRealTaskEvidence
+      ? 'parent_confirmed_private_fields_removed'
+      : 'real_homework_evidence_required_before_commercial_push'
+  };
+}
+
 function buildLearningServicePathway(input = {}) {
   const signals = inferSignals(input);
   const modeRecommendations = pickModes(signals);
@@ -411,6 +468,12 @@ function buildLearningServicePathway(input = {}) {
           ? '/pages/arcade/arcade?from=service_pathway&mode=recall'
           : '/pages/tutor/tutor?from=service_pathway'
   }));
+  const partnerServiceDeliveryLedger = buildPartnerServiceDeliveryLedger(
+    signals,
+    modeRecommendations,
+    safeProductTiers,
+    validationPlan
+  );
   return {
     id: 'learning_service_pathway',
     status: requiresEvidenceBeforeCommercialPush ? 'needs_real_task_validation' : 'ready_for_family_plan',
@@ -440,6 +503,7 @@ function buildLearningServicePathway(input = {}) {
     aiLocalDecisionMatrix: AI_LOCAL_DECISION_MATRIX,
     publicK12BorrowPlaybook,
     validationPlan,
+    partnerServiceDeliveryLedger,
     partnerHandoffPolicy: Object.assign({}, PARTNER_HANDOFF_POLICY),
     moatLine: '护城河不在“生成一份测评结论”，而在测评、错题、回访、游戏和家长决策反复闭环后的家庭证据账本。',
     safetyBoundary: {
@@ -461,5 +525,6 @@ module.exports = {
   MODE_CHOICE_GUARDRAILS,
   inferSignals,
   buildModeChoiceProtocol,
+  buildPartnerServiceDeliveryLedger,
   buildLearningServicePathway
 };
