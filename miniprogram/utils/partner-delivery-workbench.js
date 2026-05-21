@@ -64,6 +64,7 @@ function stableChildCode(profile = {}, seed = '') {
 function normalizeMaterial(material = {}, index = 0) {
   const sourceSchemaId = text(material.sourceSchemaId || material.source_schema_id || material.type || material.kind || 'parent_report');
   const kind = MATERIAL_KIND_MAP[sourceSchemaId] || 'learning_material_excerpt';
+  const sourceAlias = `${kind}_${index + 1}`;
   const evidenceSignals = material.structuredEvidenceSignals || material.evidenceSignals || {};
   const hasRealTaskEvidence = !!(
     evidenceSignals.firstStep
@@ -76,7 +77,8 @@ function normalizeMaterial(material = {}, index = 0) {
     id: text(material.id) || `material_${index + 1}`,
     sourceSchemaId,
     kind,
-    title: text(material.title || material.label) || kind,
+    title: sourceAlias,
+    sourceAlias,
     status: hasRealTaskEvidence ? 'evidence_ready' : 'needs_real_task_evidence',
     evidenceSignals: {
       subject: text(evidenceSignals.subjectLabel || evidenceSignals.subjectKey || material.subject),
@@ -84,7 +86,8 @@ function normalizeMaterial(material = {}, index = 0) {
       firstStep: text(evidenceSignals.firstStep || evidenceSignals.stuckFirstStep),
       wrongCause: text(evidenceSignals.wrongCause || evidenceSignals.wrongCauseGuess)
     },
-    partnerVisible: ['kind', 'status', 'subject', 'question_type', 'next_evidence'],
+    partnerVisible: ['source_alias', 'kind', 'status', 'subject', 'question_type', 'next_evidence'],
+    privateFieldsKeptLocal: ['title', 'label', 'raw_filename', 'raw_report_name', 'source_text_excerpt'],
     blockedFields: BLOCKED_CLAIMS.slice()
   };
 }
