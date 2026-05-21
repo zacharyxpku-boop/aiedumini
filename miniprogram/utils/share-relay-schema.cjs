@@ -81,6 +81,86 @@ const DEFAULT_DENYLIST = [
   'complete_transcript'
 ];
 
+const RECEIVER_CONTEXT_ALLOWLIST = [
+  'code',
+  'action',
+  'action_label',
+  'action_detail',
+  'parent_next_action',
+  'capability_gap',
+  'capability_label',
+  'capability_next_action',
+  'capability_route',
+  'challenge_goal',
+  'challenge_rule',
+  'challenge_route',
+  'relay_id',
+  'relay_privacy',
+  'relay_review',
+  'relay_invite_line',
+  'relay_receiver_prompt',
+  'relay_parent_reassurance',
+  'relay_day7_return',
+  'relay_proof_signal',
+  'relay_guardrail',
+  'relay_ladder',
+  'relay_attraction_hook',
+  'relay_local_gate',
+  'relay_spread_score',
+  'relay_spread_line',
+  'relay_spread_fallback',
+  'relay_spread_reason',
+  'relay_spread_required',
+  'relay_season',
+  'relay_season_days',
+  'relay_season_gate',
+  'relay_season_line',
+  'question_bank_relay_label',
+  'question_bank_relay_boundary',
+  'question_bank_relay_parent_check',
+  'question_bank_relay_route',
+  'visual_board_relay_title',
+  'visual_board_relay_layer',
+  'visual_board_relay_student_line',
+  'visual_board_relay_parent_line',
+  'visual_board_relay_exit',
+  'visual_board_relay_boundary',
+  'visual_board_relay_route',
+  'source_challenge_prompt',
+  'source_challenge_route',
+  'source_challenge_blocked',
+  'source_challenge_count',
+  'source_challenge_decision',
+  'source_challenge_first',
+  'source_challenge_license',
+  'source_challenge_local_rule',
+  'course_unit_label',
+  'course_unit_subject',
+  'course_unit_tier',
+  'course_unit_blackboard',
+  'course_unit_report_contract',
+  'wrong_cause_gate',
+  'wrong_cause_pack',
+  'wrong_cause_return_path',
+  'receiver_material_required',
+  'receiver_first_step_required',
+  'receiver_wrong_cause_required',
+  'receiver_revisit_required',
+  'receiver_evidence_contract',
+  'socratic_report_status',
+  'socratic_report_decision',
+  'socratic_report_action',
+  'socratic_report_parent_proof',
+  'socratic_report_boundary',
+  'socratic_report_no_increase',
+  'tonight_decision',
+  'tonight_tomorrow',
+  'source',
+  'day',
+  'split',
+  'created_at'
+];
+
 const COMPACT_QUERY_LIMIT = 900;
 
 const COMPACT_PRIMARY_KEYS = [
@@ -113,6 +193,18 @@ const COMPACT_SKIP_KEYS = [
   'sanitized',
   'local_rule'
 ];
+
+const RELAY_META_KEYS = [
+  'relay_pack_schema',
+  'relay_pack_fields',
+  'relay_pack',
+  'relay_query_mode',
+  'relay_query_gate'
+];
+
+function safeKeySet(extra = []) {
+  return new Set(DEFAULT_ALLOWLIST.concat(RECEIVER_CONTEXT_ALLOWLIST).concat(RELAY_META_KEYS).concat(extra));
+}
 
 function toText(value) {
   return String(value == null ? '' : value).trim();
@@ -188,6 +280,7 @@ function buildQueryString(payload = {}) {
 function buildCompactRelayPayload(payload = {}, options = {}) {
   const denylist = Array.isArray(options.denylist) && options.denylist.length ? options.denylist : DEFAULT_DENYLIST;
   const primaryKeys = Array.isArray(options.primaryKeys) && options.primaryKeys.length ? options.primaryKeys : COMPACT_PRIMARY_KEYS;
+  const allowedKeys = safeKeySet(Array.isArray(options.allowlist) ? options.allowlist : []);
   const compact = {};
   const pack = {};
 
@@ -198,6 +291,7 @@ function buildCompactRelayPayload(payload = {}, options = {}) {
 
   Object.keys(payload || {}).forEach((key) => {
     if (denylist.includes(key) || primaryKeys.includes(key) || COMPACT_SKIP_KEYS.includes(key)) return;
+    if (!allowedKeys.has(key)) return;
     const value = normalizeQueryValue(payload[key]);
     if (!value) return;
     pack[key] = value.slice(0, 96);
@@ -230,14 +324,15 @@ function buildShareRelayQuery(path = '', payload = {}, options = {}) {
 
 function parseShareRelayQuery(query = {}) {
   const safe = {};
+  const allowedKeys = safeKeySet();
   const relayPack = parseJsonMaybe(query.relay_pack);
   if (relayPack && typeof relayPack === 'object') {
     Object.keys(relayPack).forEach((key) => {
-      if (!DEFAULT_DENYLIST.includes(key)) safe[key] = toText(relayPack[key]);
+      if (allowedKeys.has(key) && !DEFAULT_DENYLIST.includes(key)) safe[key] = toText(relayPack[key]);
     });
   }
   Object.keys(query || {}).forEach((key) => {
-    if (Object.prototype.hasOwnProperty.call(query, key) && !DEFAULT_DENYLIST.includes(key)) {
+    if (Object.prototype.hasOwnProperty.call(query, key) && allowedKeys.has(key) && !DEFAULT_DENYLIST.includes(key)) {
       safe[key] = toText(query[key]);
     }
   });
@@ -246,6 +341,7 @@ function parseShareRelayQuery(query = {}) {
 
 module.exports = {
   DEFAULT_ALLOWLIST,
+  RECEIVER_CONTEXT_ALLOWLIST,
   DEFAULT_DENYLIST,
   COMPACT_PRIMARY_KEYS,
   mergeAllowedFields,
