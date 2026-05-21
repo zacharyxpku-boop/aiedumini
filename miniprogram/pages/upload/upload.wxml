@@ -213,6 +213,21 @@
           <view class="intake-packet-pill">已接入报告</view>
         </view>
         <view class="intake-packet-feedback">{{lastReportCta.line}}</view>
+        <view class="tonight-task-card" wx:if="{{lastReportCta.tonightTaskCard}}">
+          <view class="intake-packet-kicker">今晚任务卡</view>
+          <view class="intake-packet-title">{{lastReportCta.tonightTaskCard.title}}</view>
+          <view class="intake-packet-line">第一小步：{{lastReportCta.tonightTaskCard.firstStep}}</view>
+          <view class="intake-packet-boundary">小黑板：{{lastReportCta.tonightTaskCard.blackboardLine}}</view>
+          <view class="intake-packet-boundary">误区同学：{{lastReportCta.tonightTaskCard.classmateMistake}}</view>
+          <view class="intake-packet-boundary">近迁移：{{lastReportCta.tonightTaskCard.nearTransfer}}</view>
+          <view class="intake-packet-boundary">家长只问：{{lastReportCta.tonightTaskCard.parentCheck}}</view>
+          <view class="intake-packet-boundary">明天回访：{{lastReportCta.tonightTaskCard.tomorrowReview}}</view>
+          <view class="intake-packet-boundary">{{lastReportCta.tonightTaskCard.boundaryLine}}</view>
+          <view class="intake-packet-evidence">
+            <view class="intake-packet-chip ready">{{lastReportCta.tonightTaskCard.releaseGate}}</view>
+            <view class="intake-packet-chip">{{lastReportCta.tonightTaskCard.sourceSchemaLabel}}</view>
+          </view>
+        </view>
         <view class="intake-packet-boundary">安全边界：不带原题、完整结果、分数或比较信息。</view>
         <view class="intake-packet-boundary" wx:if="{{lastReportCta.openMaicTaskPlanAudit}}">小讲堂任务单：先说第一步，再做轻练习和明天回访。</view>
         <view class="intake-packet-boundary" wx:if="{{lastReportCta.aiLocalBoundary}}">AI 只做改写和追问；本地代码负责放行门和下一证据。</view>

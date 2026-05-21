@@ -6276,6 +6276,21 @@ function buildGameSessionXpEvidence(result = {}, context = {}) {
   };
 }
 
+function buildGameSessionReportRevisitEvidence(result = {}, context = {}) {
+  const recallEvidence = Array.isArray(result.recallEvidence) ? result.recallEvidence : [];
+  const first = recallEvidence.find((item) => item && (item.child_first_step || item.childFirstStep || item.student_first_step || item.first_step_recall)) || {};
+  const wrong = recallEvidence.find((item) => item && (item.wrongCause || item.wrongCauseLabel || item.wrong_cause_named || item.wrong_cause_replay)) || {};
+  return {
+    status: 'active_recall_completed',
+    nextDayRevisit: true,
+    firstStep: first.child_first_step || first.childFirstStep || result.childFirstStep || result.firstStep || context.firstStep || '孩子已完成一次主动回忆第一步',
+    wrongCause: wrong.wrongCause || wrong.wrongCauseLabel || result.wrongCause || result.wrongCauseLabel || context.wrongCause || context.weakKey || '主动回忆中已回到错因',
+    parentCheck: result.parentCheck || context.parentCheck || '家长只问第一步，不追完整答案。',
+    route: context.route || result.route || '/pages/arcade/arcade',
+    source: context.gameType || result.gameType || 'arcade'
+  };
+}
+
 function loadCourseUnitProgress() {
   const list = get(KEYS.courseUnitProgress, []);
   return Array.isArray(list) ? list : [];
@@ -6363,6 +6378,16 @@ function recordGameSessionResult(result = {}, context = {}) {
   const xpRelease = requestedXp > 0
     ? addGameXP(requestedXp, context.xpReason || `game_session_${context.gameType || result.gameType || 'arcade'}`, xpEvidence)
     : { profile: saved, accepted: 0, gate: normalizeXpEvidenceGate(xpEvidence), blocked: false };
+  let reportRevisitEvidence = null;
+  const reportState = loadLearningReportState();
+  const reportId = context.reportId
+    || result.reportId
+    || reportState.reportId
+    || (reportState.reportDraft && reportState.reportDraft.id)
+    || '';
+  if (activeRecallEvidenceComplete && reportId) {
+    reportRevisitEvidence = recordReportRevisitEvidence(reportId, buildGameSessionReportRevisitEvidence(result, context));
+  }
   appendSyncMutation('game_session_result', {
     id: `game_session_${today}_${String(context.gameType || result.gameType || 'arcade')}`,
     game_type: context.gameType || result.gameType || 'arcade',
@@ -6376,6 +6401,7 @@ function recordGameSessionResult(result = {}, context = {}) {
     streak_eligible: streakEligible,
     pending_xp: requestedXp,
     released_xp: xpRelease.accepted || 0,
+    report_revisit_linked: !!reportRevisitEvidence,
     xp_release_blocked: !!xpRelease.blocked,
     xp_release_gate: xpRelease.gate,
     streak: Number(saved.streak || 0),
@@ -6388,6 +6414,7 @@ function recordGameSessionResult(result = {}, context = {}) {
     newlyUnlocked: achievementResult.newlyUnlocked,
     coinsAwarded: achievementResult.coinsAwarded,
     pendingXp: requestedXp,
+    reportRevisitEvidence,
     xpRelease
   };
 }

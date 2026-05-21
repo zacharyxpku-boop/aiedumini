@@ -879,6 +879,81 @@ Page({
     });
   },
 
+  buildTonightTaskCard(decisionSource = {}, reportState = {}, options = {}) {
+    const sourceSchemaId = decisionSource.sourceSchemaId || 'parent_report';
+    const reportDraft = reportState && reportState.reportDraft ? reportState.reportDraft : {};
+    const evidence = options.structuredEvidenceSignals || {};
+    const taskPlan = options.openMaicTaskPlan || {};
+    const miniLesson = taskPlan.miniLesson || {};
+    const topicCard = miniLesson.topicCard || taskPlan.topicCard || {};
+    const miniLessonReport = taskPlan.miniLessonReport || {};
+    const servicePathway = options.servicePathway || {};
+    const firstStep = evidence.firstStep
+      || evidence.stuckFirstStep
+      || miniLessonReport.firstStep
+      || (miniLesson.blackboard && miniLesson.blackboard.firstStep)
+      || topicCard.microScript
+      || topicCard.firstBoard
+      || (reportDraft.tonightDecisionBrief && reportDraft.tonightDecisionBrief.nextAction)
+      || '先让孩子说出第一步，不追完整答案。';
+    const blackboardLine = miniLessonReport.blackboardLine
+      || (miniLesson.blackboard && (miniLesson.blackboard.boardMove || miniLesson.blackboard.firstStep))
+      || topicCard.firstBoard
+      || '小黑板只画：题目问什么、已知什么、第一步做什么。';
+    const commonMistake = miniLessonReport.misconceptionLine
+      || miniLesson.misconception
+      || evidence.wrongCause
+      || evidence.wrongCauseGuess
+      || '容易急着算完整答案，漏掉第一步的可检查证据。';
+    const parentCheck = miniLessonReport.parentLine
+      || miniLesson.parentLine
+      || miniLesson.parentCheck
+      || (reportDraft.familyDecisionMemo && reportDraft.familyDecisionMemo.parentMeetingScript && reportDraft.familyDecisionMemo.parentMeetingScript[0])
+      || '你先说第一步，不用算完整题。';
+    const tomorrowReview = miniLessonReport.nextDayReview
+      || (miniLesson.nearTransfer && miniLesson.nearTransfer.prompt)
+      || topicCard.nextDayCard
+      || '明天只换一个相似材料，回访同一个第一步。';
+    const nearTransfer = (miniLesson.nearTransfer && miniLesson.nearTransfer.prompt)
+      || topicCard.nextDayCard
+      || '换一个数字、图或材料，只复述第一步。';
+    const blockedFields = decisionSource.blockedFields || options.blockedFields || [
+      'original_question',
+      'full_answer',
+      'score',
+      'ranking',
+      'talent_label'
+    ];
+    const needsEvidence = sourceSchemaId === 'talent_assessment';
+    return {
+      id: 'tonight_task_card',
+      title: needsEvidence ? '今晚只验证一种学习方法' : '今晚先跑通一张任务卡',
+      status: needsEvidence ? 'method_candidate_only' : 'ready_for_first_step',
+      sourceSchemaId,
+      sourceSchemaLabel: decisionSource.sourceSchemaLabel || sourceSchemaId,
+      subjectLabel: evidence.subjectLabel || evidence.subjectKey || decisionSource.subjectLabel || decisionSource.subjectKey || miniLessonReport.subject || topicCard.subject || '本次材料',
+      taskType: evidence.taskType || decisionSource.taskType || topicCard.id || sourceSchemaId,
+      conceptGap: miniLessonReport.conceptGap || miniLesson.conceptGap || topicCard.conceptGap || commonMistake,
+      firstStep,
+      blackboardLine,
+      teacherLine: topicCard.microScript || '老师只讲一句：先把第一步说清楚。',
+      classmateMistake: commonMistake,
+      nearTransfer,
+      parentCheck,
+      tomorrowReview,
+      actionRoute: options.actionRoute || servicePathway.nextRoute || '',
+      gameRoute: needsEvidence ? '' : (options.gameRoute || ''),
+      releaseGate: needsEvidence
+        ? 'talent_method_candidate_requires_wrong_question_evidence'
+        : (topicCard.localGate || miniLessonReport.topicLocalGate || 'child_can_say_first_step'),
+      blockedFields,
+      boundaryLine: needsEvidence
+        ? '测评报告只作为方法候选，必须用真实错题和隔天回访验证。'
+        : '小讲堂只补第一步，不给整题答案，不外发原题和孩子隐私。',
+      safeShareFields: ['conceptGap', 'firstStep', 'blackboardLine', 'parentCheck', 'tomorrowReview']
+    };
+  },
+
   buildReportCta(decisionSource = {}, reportState = {}, options = {}) {
     const sourceSchemaId = decisionSource.sourceSchemaId || 'parent_report';
     const importedCards = Number(options.importedCards || 0);
@@ -959,6 +1034,15 @@ Page({
     const uploadedMaterialDecisionDossier = reportState.uploadedMaterialDecisionDossier
       || reportDraft.uploadedMaterialDecisionDossier
       || null;
+    const gameRoute = sourceSchemaId === 'talent_assessment' ? '' : `/pages/arcade/arcade?from=upload_report_ready&${query}`;
+    const tonightTaskCard = this.buildTonightTaskCard(decisionSource, reportState, {
+      structuredEvidenceSignals: uploadEvidenceSignals,
+      openMaicTaskPlan,
+      servicePathway,
+      actionRoute,
+      gameRoute,
+      blockedFields: safeRelayPayload.blockedFields
+    });
     return {
       title: sourceSchemaId === 'talent_assessment'
         ? '方法候选已入证据账本'
@@ -972,7 +1056,7 @@ Page({
           : '已生成资料证据卷宗；先看本次材料怎么用，再决定是否进入点拨或回访。',
       route: `/pages/profile/profile?from=upload_report_ready&${query}`,
       actionRoute,
-      gameRoute: sourceSchemaId === 'talent_assessment' ? '' : `/pages/arcade/arcade?from=upload_report_ready&${query}`,
+      gameRoute,
       actionLabel: sourceSchemaId === 'talent_assessment'
         ? '补真实错题验证'
         : sourceSchemaId === 'wrong_question_paper' ? '去修这批错题' : '去问第一步',
@@ -985,6 +1069,7 @@ Page({
           : 'material_report_requires_structured_evidence_before_release'
       },
       guardedAiReportDraft,
+      tonightTaskCard,
       servicePathway,
       uploadedMaterialDecisionDossier,
       sourceSchemaId,
@@ -1036,6 +1121,7 @@ Page({
       miniLessonSourceEvidence: cta.miniLessonSourceEvidence || null,
       guardedAiReportDraft: cta.guardedAiReportDraft || null,
       servicePathway: cta.servicePathway || null,
+      tonightTaskCard: cta.tonightTaskCard || null,
       uploadedMaterialDecisionDossier,
       uploadReportHandoff: cta,
       flowTraceId: cta.flowTraceId || `upload_report:${cta.reportId || Date.now()}`
@@ -1047,6 +1133,7 @@ Page({
         miniLessonSourceEvidence: cta.miniLessonSourceEvidence || null,
         guardedAiReportDraft: cta.guardedAiReportDraft || null,
         servicePathway: cta.servicePathway || null,
+        tonightTaskCard: cta.tonightTaskCard || null,
         uploadedMaterialDecisionDossier,
         uploadReportHandoff: cta,
         flowTraceId: nextState.flowTraceId
