@@ -5842,9 +5842,10 @@ function ensureMiniLessonReturnReviewCard(seed = {}, context = {}) {
     || seed.parentLine
     || context.parentLine
     || '家长只问：这题第一步先看什么？不要追完整答案。';
-  const blockedFields = Array.isArray(seed.blockedFields) && seed.blockedFields.length
-    ? seed.blockedFields
-    : ['original_question', 'full_answer', 'full_solution', 'score', 'ranking', 'talent_label'];
+  const miniLessonDefaultBlockedFields = ['original_question', 'full_answer', 'full_solution', 'full_dialogue', 'score', 'ranking', 'talent_label'];
+  const blockedFields = Array.from(new Set(miniLessonDefaultBlockedFields.concat(
+    Array.isArray(seed.blockedFields) ? seed.blockedFields : []
+  )));
   const evidenceThread = seed.evidenceThread && typeof seed.evidenceThread === 'object'
     ? seed.evidenceThread
     : {
@@ -6061,11 +6062,11 @@ function recordMiniLessonExitGate(input = {}, context = {}) {
   const firstStepEvidence = status === 'passed'
     ? (childExitTicketText || input.firstStepEvidence || input.firstStep || '')
     : '';
-  const blockedFields = Array.isArray(input.blockedFields) && input.blockedFields.length
-    ? input.blockedFields
-    : Array.isArray(evidenceThread.blockedFields) && evidenceThread.blockedFields.length
-      ? evidenceThread.blockedFields
-      : ['original_question', 'full_answer', 'full_dialogue', 'score', 'ranking', 'talent_label'];
+  const miniLessonDefaultBlockedFields = ['original_question', 'full_answer', 'full_solution', 'full_dialogue', 'score', 'ranking', 'talent_label'];
+  const blockedFields = Array.from(new Set(miniLessonDefaultBlockedFields.concat(
+    Array.isArray(evidenceThread.blockedFields) ? evidenceThread.blockedFields : [],
+    Array.isArray(input.blockedFields) ? input.blockedFields : []
+  )));
   const nextRoute = status === 'passed'
     ? (input.passRoute || '/pages/review/review?from=mini_lesson_exit_passed')
     : (input.failRoute || '/pages/tutor/tutor?from=mini_lesson_exit_needs_support');
