@@ -565,7 +565,23 @@ function buildMiniLessonFeedbackBridge(item = {}, receipt = {}, adjustment = {})
   const modeRouter = miniLesson.modeRouter || {};
   const renderGate = miniLesson.renderGate || {};
   const canRenderMiniLesson = renderGate.canRender === true || (!modeRouter.nextMode || modeRouter.nextMode === 'three_minute_mini_lesson');
-  if (item.status !== 'still_blocked' || !trigger.shouldTrigger || miniLessonAudit.ok !== true || !canRenderMiniLesson) return null;
+  if (item.status !== 'still_blocked' || !trigger.shouldTrigger || miniLessonAudit.ok !== true) return null;
+  if (!canRenderMiniLesson && modeRouter.nextMode === 'parent_handoff') {
+    return {
+      id: 'socratic_feedback_parent_handoff_bridge',
+      type: 'parent_handoff_required',
+      title: '家长接手',
+      reason: modeRouter.reason || trigger.reason || adjustment.nextAction,
+      route: modeRouter.route || '/pages/profile/profile?from=mini_lesson_parent_handoff',
+      nextAction: '停止继续加提示，家长只问一句第一步，明天再回访同一个卡点。',
+      evidence: {
+        triggerEvidence: trigger.triggerEvidence || {},
+        releaseGate: modeRouter.releaseGate || 'parent_confirms_one_question_and_next_day_revisit',
+        blockedFields: ['original_question', 'full_answer', 'full_dialogue', 'score', 'ranking', 'talent_label']
+      }
+    };
+  }
+  if (!canRenderMiniLesson) return null;
   const evidenceThread = receipt.evidenceThread || miniLesson.evidenceThread || {};
   const topicCard = miniLesson.topicCard || {};
   const blackboard = miniLesson.blackboard || {};
@@ -1440,7 +1456,7 @@ Page({
       storage.appendReviewEvent(reviewSeed);
     }
     let miniLessonReturnCard = null;
-    if (miniLessonFeedbackBridge && storage.ensureMiniLessonReturnReviewCard) {
+    if (miniLessonFeedbackBridge && miniLessonFeedbackBridge.type !== 'parent_handoff_required' && storage.ensureMiniLessonReturnReviewCard) {
       miniLessonReturnCard = storage.ensureMiniLessonReturnReviewCard(miniLessonFeedbackBridge.reviewSeed, {
         source: 'socratic_feedback_still_blocked',
         taskType: miniLessonFeedbackBridge.reviewSeed.taskType || '',
@@ -1459,6 +1475,17 @@ Page({
           created_at: item.createdAt
         });
       }
+    } else if (miniLessonFeedbackBridge && miniLessonFeedbackBridge.type === 'parent_handoff_required' && storage.appendReviewEvent) {
+      storage.appendReviewEvent({
+        type: 'socratic_feedback_parent_handoff_required',
+        event: 'socratic_feedback_parent_handoff_required',
+        route: miniLessonFeedbackBridge.route,
+        evidence: miniLessonFeedbackBridge.evidence,
+        nextAction: miniLessonFeedbackBridge.nextAction,
+        blockedFields: miniLessonFeedbackBridge.evidence.blockedFields,
+        createdAt: item.createdAt,
+        created_at: item.createdAt
+      });
     }
     if (storage.recordUnifiedNextAction) {
       storage.recordUnifiedNextAction({

@@ -90,7 +90,7 @@
             <view class="socratic-feedback-state" wx:if="{{socraticFeedbackStatus}}">已记录：{{socraticFeedbackStatus}}</view>
             <view class="socratic-feedback-next" wx:if="{{socraticFeedbackNextAction}}">下一轮：{{socraticFeedbackNextAction}}</view>
             <view class="socratic-feedback-next" wx:if="{{miniLessonFeedbackBridge}}">
-              小讲堂补位：{{miniLessonFeedbackBridge.nextAction}}｜回访卡：{{miniLessonFeedbackBridge.reviewCardId || '已准备'}}
+              {{miniLessonFeedbackBridge.title || '小讲堂补位'}}：{{miniLessonFeedbackBridge.nextAction}}｜{{miniLessonFeedbackBridge.type === 'parent_handoff_required' ? '家长复盘' : '回访卡'}}：{{miniLessonFeedbackBridge.reviewCardId || '已准备'}}
             </view>
           </view>
           <view class="receipt-diagnostic" wx:if="{{thinkingReceipt.diagnostic_probe}}">
