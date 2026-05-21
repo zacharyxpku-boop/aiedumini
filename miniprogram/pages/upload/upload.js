@@ -917,13 +917,10 @@ Page({
     const nearTransfer = (miniLesson.nearTransfer && miniLesson.nearTransfer.prompt)
       || topicCard.nextDayCard
       || '换一个数字、图或材料，只复述第一步。';
-    const blockedFields = decisionSource.blockedFields || options.blockedFields || [
-      'original_question',
-      'full_answer',
-      'score',
-      'ranking',
-      'talent_label'
-    ];
+    const blockedFields = Array.from(new Set(UPLOAD_DECISION_BLOCKED_FIELDS.concat(
+      Array.isArray(options.blockedFields) ? options.blockedFields : [],
+      Array.isArray(decisionSource.blockedFields) ? decisionSource.blockedFields : []
+    )));
     const needsEvidence = sourceSchemaId === 'talent_assessment';
     return {
       id: 'tonight_task_card',
@@ -1020,7 +1017,12 @@ Page({
       sourceSchemaId,
       cardId,
       returnRoute: actionRoute,
-      blockedFields: decisionSource.blockedFields || (openMaicDecisionBridge.shareRelayPayload && openMaicDecisionBridge.shareRelayPayload.blockedFields) || ['original_question', 'full_answer', 'score', 'ranking']
+      blockedFields: Array.from(new Set(UPLOAD_DECISION_BLOCKED_FIELDS.concat(
+        openMaicDecisionBridge.shareRelayPayload && Array.isArray(openMaicDecisionBridge.shareRelayPayload.blockedFields)
+          ? openMaicDecisionBridge.shareRelayPayload.blockedFields
+          : [],
+        Array.isArray(decisionSource.blockedFields) ? decisionSource.blockedFields : []
+      )))
     });
     const servicePathway = learningServicePathway.buildLearningServicePathway({
       sourceSchemaId,
