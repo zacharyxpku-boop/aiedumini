@@ -70,7 +70,7 @@ function normalizeMaterial(material = {}, index = 0) {
     || evidenceSignals.stuckFirstStep
     || evidenceSignals.wrongCause
     || evidenceSignals.wrongCauseGuess
-    || /wrong_question|school_feedback/.test(kind)
+    || /wrong_question/.test(kind)
   );
   return {
     id: text(material.id) || `material_${index + 1}`,
