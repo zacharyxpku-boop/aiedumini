@@ -9,6 +9,7 @@ const learningAssessment = require('../../utils/learning-assessment');
 const learningReport = require('../../utils/learning-report');
 const learningReportRecognition = require('../../utils/learning-report-recognition');
 const openMaicInspiredPlan = require('../../utils/openmaic-inspired-plan');
+const partnerDeliveryWorkbench = require('../../utils/partner-delivery-workbench');
 function createShareRelaySchemaFallback() {
   const allowlist = [
     'share_intent',
@@ -1245,6 +1246,20 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     || uploadedMaterialDecisionDossier.servicePathway
     || (uploadedMaterialReportHandoff && uploadedMaterialReportHandoff.servicePathway)
     || null;
+  const partnerWorkbench = reportState.partnerDeliveryWorkbench
+    || draft.partnerDeliveryWorkbench
+    || (uploadedMaterialReportHandoff && uploadedMaterialReportHandoff.partnerDeliveryWorkbench)
+    || (servicePathway ? partnerDeliveryWorkbench.buildPartnerDeliveryWorkbench({
+      profile: reportState.profileBasics || draft.profileBasics || {},
+      materials: [{
+        id: draft.id || 'profile_report_material',
+        sourceSchemaId: uploadedMaterialDecisionDossier.sourceSchemaId || 'parent_report',
+        title: uploadedMaterialDecisionDossier.title || 'uploaded material',
+        structuredEvidenceSignals: uploadedMaterialDecisionDossier.structuredEvidenceSignals || uploadedMaterialDecisionDossier.evidenceSignals || {}
+      }],
+      servicePathway,
+      parentConfirmed: !!(reportState.parentConfirmed || draft.parentConfirmed)
+    }) : null);
   const parentDecisionBook = reportState.parentDecisionBook || draft.parentDecisionBook || {};
   const matrix = Array.isArray(draft.diagnosisMatrix) ? draft.diagnosisMatrix : [];
   const tendencies = Array.isArray(draft.capabilityTendencies) ? draft.capabilityTendencies : [];
@@ -1938,6 +1953,17 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     servicePathwayAiLocalSplit: servicePathway && Array.isArray(servicePathway.aiLocalDeliverySplit) ? servicePathway.aiLocalDeliverySplit : [],
     servicePathwayReleaseGate: servicePathway && servicePathway.safetyBoundary ? servicePathway.safetyBoundary.releaseGate : '',
     servicePathwayMoatLine: servicePathway && servicePathway.moatLine ? servicePathway.moatLine : '',
+    partnerDeliveryWorkbench: partnerWorkbench,
+    partnerWorkbenchTitle: partnerWorkbench ? '合作交付工作台' : '',
+    partnerWorkbenchStatus: partnerWorkbench ? partnerWorkbench.status : '',
+    partnerWorkbenchNextAction: partnerWorkbench ? partnerWorkbench.nextBestAction : '',
+    partnerWorkbenchChildRecord: partnerWorkbench ? partnerWorkbench.childRecord : null,
+    partnerWorkbenchMaterialLedger: partnerWorkbench && Array.isArray(partnerWorkbench.materialLedger) ? partnerWorkbench.materialLedger : [],
+    partnerWorkbenchSolutionPipeline: partnerWorkbench && Array.isArray(partnerWorkbench.solutionPipeline) ? partnerWorkbench.solutionPipeline : [],
+    partnerWorkbenchAdvisorQueue: partnerWorkbench && Array.isArray(partnerWorkbench.advisorQueue) ? partnerWorkbench.advisorQueue : [],
+    partnerWorkbenchCrmExport: partnerWorkbench ? partnerWorkbench.crmExport : null,
+    partnerWorkbenchRevenueMilestones: partnerWorkbench && Array.isArray(partnerWorkbench.revenueMilestones) ? partnerWorkbench.revenueMilestones : [],
+    partnerWorkbenchPrivacyGate: partnerWorkbench ? partnerWorkbench.privacyGate : null,
     uploadedMaterialDecisionDossier,
     uploadedMaterialDecisionDossierHandoff: uploadedMaterialReportHandoff || null,
     uploadedMaterialDecisionDossierHandoffTitle: uploadedMaterialReportHandoff && uploadedMaterialReportHandoff.title ? uploadedMaterialReportHandoff.title : '',
