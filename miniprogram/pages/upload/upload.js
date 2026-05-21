@@ -7,6 +7,7 @@ const reviewCards = require('../../utils/review-cards');
 const importIntake = require('../../utils/import-intake');
 const openMaicInspiredPlan = require('../../utils/openmaic-inspired-plan');
 const learningServicePathway = require('../../utils/learning-service-pathway');
+const partnerDeliveryWorkbench = require('../../utils/partner-delivery-workbench');
 
 const WRONG_QUESTION_RE = /错题|订正|错因|卡住|不会|总错|做错|漏|粗心|单位|条件|等量关系|建模|符号|公式|审题/;
 const MATERIAL_TYPE_ALLOWLIST = [
@@ -1042,6 +1043,18 @@ Page({
       importedCards,
       cardId
     });
+    const partnerWorkbench = partnerDeliveryWorkbench.buildPartnerDeliveryWorkbench({
+      childProfile: reportState.childProfile || reportDraft.childProfile || {},
+      parentConfirmed: !!(reportState.parentConfirmed || reportDraft.parentConfirmed),
+      materials: [{
+        id: cardId || reportId || sourceSchemaId,
+        sourceSchemaId,
+        title: decisionSource.sourceSchemaLabel || sourceSchemaId,
+        structuredEvidenceSignals: uploadEvidenceSignals
+      }],
+      servicePathway,
+      aiAnalysis: guardedAiReportDraft
+    });
     const uploadedMaterialDecisionDossier = reportState.uploadedMaterialDecisionDossier
       || reportDraft.uploadedMaterialDecisionDossier
       || null;
@@ -1083,6 +1096,7 @@ Page({
       aiMaterialAnalysisContract,
       tonightTaskCard,
       servicePathway,
+      partnerDeliveryWorkbench: partnerWorkbench,
       uploadedMaterialDecisionDossier,
       sourceSchemaId,
       reportId,
@@ -1134,6 +1148,7 @@ Page({
       guardedAiReportDraft: cta.guardedAiReportDraft || null,
       aiMaterialAnalysisContract: cta.aiMaterialAnalysisContract || null,
       servicePathway: cta.servicePathway || null,
+      partnerDeliveryWorkbench: cta.partnerDeliveryWorkbench || null,
       tonightTaskCard: cta.tonightTaskCard || null,
       uploadedMaterialDecisionDossier,
       uploadReportHandoff: cta,
@@ -1147,6 +1162,7 @@ Page({
         guardedAiReportDraft: cta.guardedAiReportDraft || null,
         aiMaterialAnalysisContract: cta.aiMaterialAnalysisContract || null,
         servicePathway: cta.servicePathway || null,
+        partnerDeliveryWorkbench: cta.partnerDeliveryWorkbench || null,
         tonightTaskCard: cta.tonightTaskCard || null,
         uploadedMaterialDecisionDossier,
         uploadReportHandoff: cta,
