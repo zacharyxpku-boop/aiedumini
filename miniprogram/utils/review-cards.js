@@ -3288,12 +3288,19 @@ function commercialReadiness(summary) {
   const hasGameLoop = !!safe.challenge && (safe.missions || []).length >= 3 && (safe.rewards || []).length > 0;
   const hasLeaderboard = loop.leaderboard && loop.leaderboard.length > 0;
   const hasSyncProtocol = sync.diagnostics && sync.diagnostics.schemaVersion;
+  const hasStructuredImportExport = !!(
+    safe.materialMemoryBridge &&
+    Array.isArray(safe.materialMemoryBridge.sourceRows) &&
+    safe.materialMemoryBridge.sourceRows.length > 0 &&
+    hasShareLibrary
+  );
+  const hasComposableAbilityRuntime = !!(hasCoreCardTypes && hasRepair && hasTutorLoop && hasQuizLoop);
   const contentLoopFeatures = [
-    featureHit(hasCoreCardTypes, 14, 'concept/step/trap/cloze card engine exists', 'Add reliable AI generation for every card type.'),
-    featureHit(hasModulePack, 10, 'module content can become review packs', 'Convert more learning modules and prompts into instant decks.'),
+    featureHit(hasCoreCardTypes, 14, '概念、步骤、陷阱、填空四类卡片引擎已存在', '补齐每类卡片的稳定生成和人工校验口径。'),
+    featureHit(hasModulePack, 10, '模块内容可沉淀成复习包', '把更多模块题型转成可直接回访的小卡组。'),
     featureHit(hasRepair, 12, '本机错因修复已能处理薄弱卡片', '接入稳定评分规则后再扩展复杂修复。'),
-    featureHit(hasQuizLoop, 10, 'quiz attempts feed memory scheduling and repair', 'Add timed tests and richer answer checking.'),
-    featureHit(hasGameLoop, 14, 'challenge/mission/learning-record loop exists', 'Add richer streak quests and seasonal checkpoints.'),
+    featureHit(hasQuizLoop, 10, '小测结果已能回写记忆排程和修卡点', '补齐限时小测和更细的答题校验。'),
+    featureHit(hasGameLoop, 14, '挑战、任务、学习记录已形成游戏回流', '补齐连续任务和阶段检查点。'),
     featureHit(hasLeaderboard, 8, '本机进展快照已存在', '多人排行等强社交功能先保持隐藏，等连续记录稳定后再开放。'),
     featureHit(
       safe.materialMemoryBridge && Array.isArray(safe.materialMemoryBridge.sourceRows) && safe.materialMemoryBridge.sourceRows.length > 0,
@@ -3306,15 +3313,15 @@ function commercialReadiness(summary) {
     featureHit(sync.readyForCloud, 10, '连续记录协议已就绪', '开通真实会话后再做多端承接。')
   ];
   const memoryLoopFeatures = [
-    featureHit(safe.deck && safe.deck.fsrsVersion, 18, 'spaced scheduling state is stored', 'Tune scheduling parameters from real review history.'),
-    featureHit(typeof safe.deck.desiredRetention === 'number', 12, 'desired retention setting exists', 'Add per-subject/deck retention presets.'),
-    featureHit(safe.longWorkload && safe.longWorkload.horizonDays >= 90 && safe.cramPlan, 10, '90-day workload simulator and exam cram mode exist', 'Tune the planner from real exam cohorts.'),
-    featureHit(hasReverse && hasCloze, 12, 'reverse and cloze cards exist', 'Add richer note templates and card-type controls.'),
-    featureHit((safe.queue && safe.queue.buried >= 0) && safe.suspended >= 0, 10, 'bury/suspend card controls exist', 'Add bulk browser operations and deck maintenance tools.'),
-    featureHit(safe.progress && safe.progress.mastered >= 0, 10, 'mastery and practice history exists', 'Add retention analytics over months.'),
+    featureHit(safe.deck && safe.deck.fsrsVersion, 18, '间隔复习排程状态已本机保存', '用真实复习历史继续校准排程参数。'),
+    featureHit(typeof safe.deck.desiredRetention === 'number', 12, '目标记忆保持率已可配置', '补齐分学科、分卡组的保持率预设。'),
+    featureHit(safe.longWorkload && safe.longWorkload.horizonDays >= 90 && safe.cramPlan, 10, '90 天负荷模拟和考前冲刺模式已存在', '用真实考试周期继续校准计划器。'),
+    featureHit(hasReverse && hasCloze, 12, '反向卡和填空卡已存在', '补齐更丰富的笔记模板和卡型控制。'),
+    featureHit((safe.queue && safe.queue.buried >= 0) && safe.suspended >= 0, 10, '搁置和暂停卡片控制已存在', '补齐批量维护和卡组整理能力。'),
+    featureHit(safe.progress && safe.progress.mastered >= 0, 10, '掌握度和练习历史已存在', '补齐跨月保持率分析。'),
     featureHit(sync.readyForCloud, 10, '连续记录协议已就绪', '补齐多端冲突恢复测试。'),
-    featureHit(false, 8, '', '后续再补结构化导入和导出。'),
-    featureHit(false, 10, '', '后续再扩展插件式能力。')
+    featureHit(hasStructuredImportExport, 8, '材料记忆桥和分享卡库已构成轻量导入导出', '补齐可复用的家长确认包和外部交接摘要。'),
+    featureHit(hasComposableAbilityRuntime, 10, '卡片、修卡点、点拨和小测可组合成能力运行链', '补齐面向真实会话的能力编排和失败降级。')
   ];
   const products = [
     {
