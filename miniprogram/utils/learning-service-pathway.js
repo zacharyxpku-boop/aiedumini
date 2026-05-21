@@ -216,8 +216,8 @@ const COMMERCIAL_CLAIM_BLOCKLIST = [
 const PARTNER_HANDOFF_POLICY = {
   id: 'partner_handoff_policy',
   visibleToPartner: ['tonight_action', 'parent_question', 'next_evidence', 'service_candidate'],
-  blockedFields: ['original_question', 'photo', 'full_answer', 'score', 'ranking', 'talent_label', 'full_dialogue'],
-  rule: '合作方只看服务候选、今晚行动和下一条证据；不看原题、照片、完整答案、分数排名、天赋标签或完整对话。',
+  blockedFields: ['original_question', 'photo', 'full_answer', 'score', 'ranking', 'talent_label', 'full_dialogue', 'child_name', 'parent_phone', 'parent_wechat', 'contact_info'],
+  rule: '合作方只看服务候选、今晚行动和下一条证据；不看原题、照片、完整答案、分数排名、天赋标签、完整对话、孩子姓名或家长联系方式。',
   releaseGate: 'parent_confirmed_and_private_fields_removed'
 };
 

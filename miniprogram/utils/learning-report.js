@@ -1421,13 +1421,13 @@ function buildHomeSchoolCollaborationDigest(parts = {}, matrix = [], classroomDe
       '记录孩子原话和错因，不做情绪评价。',
       '明天回访同一张卡，第 7 天再看迁移。'
     ],
-    doNotShare: ['原题照片', '完整答案', '完整对话', '分数', '排名', '孩子隐私评价'],
+    doNotShare: ['原题照片', '完整答案', '完整对话', '分数', '排名', '孩子姓名', '家长联系方式', '孩子隐私评价'],
     handoffCadence: [
       { id: 'tonight', label: '今晚', action: '家庭记录第一步和错因。' },
       { id: 'tomorrow', label: '明天', action: '家庭回访同一错因。' },
       { id: 'day7', label: '第 7 天', action: '如仍反复，再把证据包带给老师沟通。' }
     ],
-    shareBoundary: '家校协同只传证据包和问题清单，不传原题、答案、分数、排名或完整对话。',
+    shareBoundary: '家校协同只传证据包和问题清单，不传原题、答案、分数、排名、完整对话、孩子姓名或家长联系方式。',
     evidenceRequired: ['classroom_evidence_packet', 'family_evidence_checklist', 'teacher_question', 'handoff_cadence', 'safe_share_boundary']
   };
 }
@@ -1438,7 +1438,7 @@ function buildHomeSchoolConferenceKit(parts = {}, matrix = [], homeSchoolCollabo
   const subject = primary.subject || homeSchoolCollaborationDigest.subject || crossWeekTrendBoard.subject || '当前学科';
   const cause = primary.mainCause || homeSchoolCollaborationDigest.cause || crossWeekTrendBoard.cause || '第一步不清';
   const trustLevel = parentDecisionTrustSystem.level || '证据继续收集';
-  const blockedFields = ['original_question', 'full_answer', 'full_dialogue', 'score', 'ranking', 'private_comment', 'photo'];
+  const blockedFields = ['original_question', 'full_answer', 'full_dialogue', 'score', 'ranking', 'private_comment', 'photo', 'child_name', 'parent_phone', 'parent_wechat', 'contact_info'];
   return {
     id: 'home_school_conference_kit',
     title: '家校沟通证据包',
@@ -1779,7 +1779,11 @@ function buildReportEvidenceReleaseGate(input = {}, portraitDecisionReleaseSyste
     'score',
     'ranking',
     'private_comment',
-    'classmate_comparison'
+    'classmate_comparison',
+    'child_name',
+    'parent_phone',
+    'parent_wechat',
+    'contact_info'
   ].concat(
     Array.isArray(homeSchoolConferenceKit.localReleaseGate && homeSchoolConferenceKit.localReleaseGate.blockedFields)
       ? homeSchoolConferenceKit.localReleaseGate.blockedFields
@@ -2842,8 +2846,8 @@ function buildParentDecisionBook(input = {}) {
     } : null,
     sharePolicy: {
       allowedFields: Array.isArray(safeHandoff.allowedFields) ? safeHandoff.allowedFields.slice(0, 8) : ['tonight_action', 'parent_question', 'next_day_revisit_status'],
-      blockedFields: Array.isArray(safeHandoff.blockedFields) ? safeHandoff.blockedFields.slice(0, 10) : ['original_question', 'full_answer', 'score', 'ranking', 'full_dialogue'],
-      line: tonightDecisionBrief.shareLine || familyDecisionMemo.shareLine || '只分享行动、证据缺口和回访时间，不分享原题、答案、分数、排名或完整对话。'
+      blockedFields: Array.isArray(safeHandoff.blockedFields) ? safeHandoff.blockedFields.slice(0, 12) : ['original_question', 'full_answer', 'score', 'ranking', 'full_dialogue', 'child_name', 'parent_phone', 'parent_wechat', 'contact_info'],
+      line: tonightDecisionBrief.shareLine || familyDecisionMemo.shareLine || '只分享行动、证据缺口和回访时间，不分享原题、答案、分数、排名、完整对话、孩子姓名或家长联系方式。'
     },
     routeActions: [
       { id: 'ask_first_step', label: '先问第一步', route: '/pages/tutor/tutor?from=parent_decision_book', evidence: 'child_first_step' },
@@ -2943,7 +2947,7 @@ function buildCommercialFamilySolutionBook(input = {}) {
     ],
     sharePolicy: parentDecisionBook.sharePolicy || {
       allowedFields: ['tonight_action', 'parent_question', 'next_day_revisit_status'],
-      blockedFields: ['original_question', 'full_answer', 'score', 'ranking', 'full_dialogue']
+      blockedFields: ['original_question', 'full_answer', 'score', 'ranking', 'full_dialogue', 'child_name', 'parent_phone', 'parent_wechat', 'contact_info']
     },
     blockedClaims: ['talent_label', 'personality_label', 'auto_grading', 'ocr_claim', 'full_answer', 'ranking', 'guaranteed_improvement'],
     evidenceRequired: ['one_page_diagnosis', 'method_candidates', 'seven_day_action', 'parent_script', 'review_evidence', 'next_service_suggestion', 'safe_share_policy']
