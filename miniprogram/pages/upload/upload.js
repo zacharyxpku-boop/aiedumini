@@ -36,7 +36,11 @@ const UPLOAD_DECISION_BLOCKED_FIELDS = [
   'private_comment',
   'photo',
   'original_question',
-  'full_dialogue'
+  'full_dialogue',
+  'child_name',
+  'parent_phone',
+  'parent_wechat',
+  'contact_info'
 ];
 
 const UPLOAD_SUBJECT_TASK_PATTERNS = [
