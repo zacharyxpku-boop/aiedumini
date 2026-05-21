@@ -151,6 +151,7 @@ function pickPrimaryPackage(servicePathway = {}, childRecord = {}) {
 
 function buildSolutionPipeline(childRecord, primaryMode, primaryPackage, materials = []) {
   const evidenceReady = childRecord.evidenceStage === 'real_task_evidence_ready';
+  const parentConfirmed = childRecord.parentConfirmationStatus === 'confirmed';
   return [
     {
       id: 'intake',
@@ -170,8 +171,14 @@ function buildSolutionPipeline(childRecord, primaryMode, primaryPackage, materia
       id: 'family_execution',
       label: primaryMode.label,
       owner: 'family',
-      status: evidenceReady ? 'ready' : 'locked',
-      releaseGate: evidenceReady ? 'parent_confirmation_required' : 'real_wrong_question_or_homework_required'
+      status: evidenceReady && parentConfirmed
+        ? 'ready'
+        : evidenceReady
+          ? 'needs_parent_confirmation'
+          : 'locked',
+      releaseGate: evidenceReady
+        ? 'parent_confirmation_required'
+        : 'real_wrong_question_or_homework_required'
     },
     {
       id: 'service_offer',
