@@ -258,12 +258,18 @@ function inferSignals(input = {}) {
   const wrongCause = textOf(structured.wrongCause || structured.wrongCauseGuess || behavior.wrongCause);
   const firstStep = textOf(structured.firstStep || structured.stuckFirstStep || behavior.firstStep);
   const questionType = textOf(structured.questionType || behavior.questionType);
+  const parentConfirmed = !!(input.parentConfirmed
+    || input.parent_confirmation
+    || input.parentConfirmation
+    || (input.profile && input.profile.parentConfirmed)
+    || (input.childRecord && input.childRecord.parentConfirmationStatus === 'confirmed'));
   return {
     schemaId,
     sourceText,
     wrongCause,
     firstStep,
     questionType,
+    parentConfirmed,
     hasTaskClassification: !!questionType,
     hasRealTaskEvidence: !!(wrongCause || firstStep || input.cardId || Number(input.importedCards || 0) > 0),
     hasAssessment: schemaId === 'talent_assessment' || includesAny(sourceText, ['测评', '学习偏好', '视觉', '听觉', '报告']),
@@ -376,11 +382,17 @@ function buildModeChoiceProtocol(signals, modeRecommendations, options = {}) {
 
 function buildPartnerServiceDeliveryLedger(signals = {}, modeRecommendations = [], productTiers = [], validationPlan = []) {
   const hasRealTaskEvidence = !!(signals && signals.hasRealTaskEvidence);
+  const parentConfirmed = !!(signals && signals.parentConfirmed);
   const primaryMode = modeRecommendations[0] || MODE_CATALOG[0];
   const primaryTier = productTiers[0] || PRODUCT_TIERS[1];
+  const deliveryStatus = !hasRealTaskEvidence
+    ? 'pre_sale_needs_real_task_evidence'
+    : parentConfirmed
+      ? 'deliverable_after_parent_confirmation'
+      : 'needs_parent_confirmation';
   return {
     id: 'partner_service_delivery_ledger',
-    status: hasRealTaskEvidence ? 'deliverable_after_parent_confirmation' : 'pre_sale_needs_real_task_evidence',
+    status: deliveryStatus,
     title: 'Partner service delivery ledger',
     packageCards: [
       {
@@ -394,7 +406,11 @@ function buildPartnerServiceDeliveryLedger(signals = {}, modeRecommendations = [
         id: 'seven_day_execution',
         label: '7-day family execution',
         deliverable: 'One first-step task, one next-day revisit, one day-7 variant.',
-        entryGate: hasRealTaskEvidence ? 'real_task_evidence_ready' : 'blocked_until_real_wrong_question',
+        entryGate: hasRealTaskEvidence
+          ? parentConfirmed
+            ? 'real_task_evidence_ready_and_parent_confirmed'
+            : 'parent_confirmation_required'
+          : 'blocked_until_real_wrong_question',
         nextRoute: '/pages/profile/profile?from=partner_delivery_ledger'
       },
       {
@@ -425,9 +441,11 @@ function buildPartnerServiceDeliveryLedger(signals = {}, modeRecommendations = [
     blockedClaims: COMMERCIAL_CLAIM_BLOCKLIST.concat(['talent_label', 'full_answer', 'score_ranking']),
     partnerVisibleFields: PARTNER_HANDOFF_POLICY.visibleToPartner.slice(),
     partnerBlockedFields: PARTNER_HANDOFF_POLICY.blockedFields.slice(),
-    releaseGate: hasRealTaskEvidence
-      ? 'parent_confirmed_private_fields_removed'
-      : 'real_homework_evidence_required_before_commercial_push'
+    releaseGate: !hasRealTaskEvidence
+      ? 'real_homework_evidence_required_before_commercial_push'
+      : parentConfirmed
+        ? 'parent_confirmed_private_fields_removed'
+        : 'parent_confirmation_required_before_partner_delivery'
   };
 }
 
