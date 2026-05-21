@@ -562,7 +562,10 @@ function buildMiniLessonFeedbackBridge(item = {}, receipt = {}, adjustment = {})
   const miniLesson = receipt.miniLesson || {};
   const miniLessonAudit = receipt.miniLessonAudit || {};
   const trigger = miniLesson.trigger || {};
-  if (item.status !== 'still_blocked' || !trigger.shouldTrigger || miniLessonAudit.ok !== true) return null;
+  const modeRouter = miniLesson.modeRouter || {};
+  const renderGate = miniLesson.renderGate || {};
+  const canRenderMiniLesson = renderGate.canRender === true || (!modeRouter.nextMode || modeRouter.nextMode === 'three_minute_mini_lesson');
+  if (item.status !== 'still_blocked' || !trigger.shouldTrigger || miniLessonAudit.ok !== true || !canRenderMiniLesson) return null;
   const evidenceThread = receipt.evidenceThread || miniLesson.evidenceThread || {};
   const topicCard = miniLesson.topicCard || {};
   const blackboard = miniLesson.blackboard || {};
@@ -1224,7 +1227,9 @@ Page({
     }
     const miniLessonTriggered = diagnosticReceipt.miniLesson
       && diagnosticReceipt.miniLesson.trigger
-      && diagnosticReceipt.miniLesson.trigger.shouldTrigger;
+      && diagnosticReceipt.miniLesson.trigger.shouldTrigger
+      && diagnosticReceipt.miniLesson.renderGate
+      && diagnosticReceipt.miniLesson.renderGate.canRender;
     if (miniLessonTriggered && diagnosticReceipt.miniLessonAudit && diagnosticReceipt.miniLessonAudit.ok) {
       const miniLessonReviewSeed = {
         type: 'three_minute_mini_lesson_review_seed',

@@ -1177,12 +1177,21 @@ function buildThreeMinuteMiniLesson(input = {}) {
   const executionContract = buildMiniLessonExecutionContract(visualTemplate, topicCard, outline);
   const primitiveRenderContract = executionContract.visualSchema.primitiveRenderContract || [];
   const modeRouter = buildPrivateTutorModeRouter(input, { trigger });
+  const renderGate = {
+    id: 'mini_lesson_render_gate',
+    canRender: trigger.shouldTrigger === true && modeRouter.nextMode === 'three_minute_mini_lesson',
+    routerMode: modeRouter.nextMode,
+    blockedWhen: ['parent_handoff', 'socratic_private_tutor', 'game_recall'],
+    requiredMode: 'three_minute_mini_lesson',
+    localCodeOwns: ['panel_visibility', 'review_seed_release', 'exit_gate_actions']
+  };
   return {
     id: 'three_minute_mini_lesson',
     title: '3 分钟小讲堂',
     positioning: '只在苏格拉底点拨连续卡住时补位；不是 AI 课堂平台，不生成完整课程。',
     trigger,
     modeRouter,
+    renderGate,
     conceptGap: visualTemplate.conceptLens,
     topicCard,
     topicTrack: {

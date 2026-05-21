@@ -270,7 +270,7 @@
             <view class="receipt-board-line" wx:for="{{thinkingReceipt.openMaicPublicK12Decisions}}" wx:key="id">{{item.label}}：系统先定第一步，AI 只把提示说得更容易懂。</view>
             <view class="receipt-board-avoid">{{thinkingReceipt.openMaicInspiredTaskPlan.shareBoundary}}</view>
           </view>
-          <view class="mini-lesson-live-panel" wx:if="{{thinkingReceipt.miniLesson && thinkingReceipt.miniLesson.trigger && thinkingReceipt.miniLesson.trigger.shouldTrigger}}">
+          <view class="mini-lesson-live-panel" wx:if="{{thinkingReceipt.miniLesson && thinkingReceipt.miniLesson.renderGate && thinkingReceipt.miniLesson.renderGate.canRender}}">
             <view class="mini-lesson-head">
               <view>
                 <view class="mini-lesson-kicker">3 分钟第一步补位</view>
