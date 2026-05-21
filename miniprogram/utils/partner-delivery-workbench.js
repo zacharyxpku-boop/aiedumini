@@ -9,6 +9,10 @@ const BLOCKED_CLAIMS = [
   'full_answer',
   'raw_photo',
   'full_dialogue',
+  'child_name',
+  'parent_phone',
+  'parent_wechat',
+  'contact_info',
   'medical_or_psychological_diagnosis'
 ];
 
@@ -121,7 +125,7 @@ function buildChildRecord(profile = {}, materials = [], options = {}) {
     gradeBand: text(profile.gradeBand || profile.grade || options.grade) || 'unknown',
     evidenceStage: evidenceReadyCount > 0 ? 'real_task_evidence_ready' : 'assessment_or_observation_only',
     parentConfirmationStatus: confirmed ? 'confirmed' : 'required_before_delivery',
-    privateFieldsKeptLocal: ['name', 'phone', 'raw_report', 'photo', 'full_dialogue', 'score_detail'],
+    privateFieldsKeptLocal: ['name', 'phone', 'wechat', 'parent_contact', 'raw_report', 'photo', 'full_dialogue', 'score_detail'],
     partnerViewPolicy: 'de_identified_delivery_only'
   };
 }
