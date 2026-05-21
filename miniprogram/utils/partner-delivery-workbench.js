@@ -182,7 +182,7 @@ function buildAdvisorQueue(childRecord, materials = [], servicePathway = {}) {
       id: 'schedule_day7_review',
       priority: 3,
       status: needsEvidence ? 'locked' : 'todo',
-      action: 'Schedule day-7 review with evidence, not anxiety or ranking.'
+      action: 'Schedule day-7 review with confirmed evidence, not anxiety or sensitive comparison.'
     }
   ];
 }
@@ -205,6 +205,58 @@ function buildCrmExport(childRecord, primaryMode, primaryPackage, advisorQueue =
   };
 }
 
+function buildPilotReadinessChecklist(childRecord, materials = [], solutionPipeline = [], crmExport = {}) {
+  const hasMaterial = materials.length > 0;
+  const hasRealTask = childRecord.evidenceStage === 'real_task_evidence_ready';
+  const hasConsent = childRecord.parentConfirmationStatus === 'confirmed';
+  const crmSafe = !!(crmExport && Array.isArray(crmExport.blockedFields) && crmExport.blockedFields.includes('full_answer'));
+  const hasExecutablePlan = solutionPipeline.some((item) => item.id === 'family_execution' && item.status === 'ready');
+  const rows = [
+    {
+      id: 'material_intake',
+      label: 'Material intake',
+      ready: hasMaterial,
+      nextAction: hasMaterial ? 'Use the sanitized material ledger.' : 'Collect one parent-approved report or observation.'
+    },
+    {
+      id: 'real_task_evidence',
+      label: 'Real task evidence',
+      ready: hasRealTask,
+      nextAction: hasRealTask ? 'Open the 7-day family execution path.' : 'Add one real wrong question or homework stuck point.'
+    },
+    {
+      id: 'parent_confirmation',
+      label: 'Parent confirmation',
+      ready: hasConsent,
+      nextAction: hasConsent ? 'Keep the confirmed delivery scope.' : 'Confirm parent permission before service delivery.'
+    },
+    {
+      id: 'safe_partner_view',
+      label: 'Safe partner view',
+      ready: crmSafe,
+      nextAction: crmSafe ? 'Export only the allowed CRM row.' : 'Block raw material and sensitive fields before handoff.'
+    },
+    {
+      id: 'executable_family_plan',
+      label: 'Executable family plan',
+      ready: hasExecutablePlan,
+      nextAction: hasExecutablePlan ? 'Start tonight with one first-step task.' : 'Keep the offer as interpretation until evidence is ready.'
+    }
+  ];
+  const readyCount = rows.filter((item) => item.ready).length;
+  return {
+    id: 'partner_pilot_readiness_checklist',
+    title: 'Partner pilot readiness',
+    score: Math.round((readyCount / rows.length) * 100),
+    status: readyCount === rows.length ? 'ready_for_partner_pilot' : 'pilot_needs_more_evidence',
+    rows,
+    operatorScript: hasRealTask
+      ? 'We can start with one guarded 7-day family execution loop, then review evidence before any larger service offer.'
+      : 'We can interpret the report, but we need one real homework or wrong-question sample before making a service recommendation.',
+    stopRule: 'Do not sell from labels, anxiety, raw scores, or private material. Sell only from confirmed evidence and parent-approved scope.'
+  };
+}
+
 function buildPartnerDeliveryWorkbench(input = {}) {
   const materialInput = Array.isArray(input.materials)
     ? input.materials
@@ -220,6 +272,7 @@ function buildPartnerDeliveryWorkbench(input = {}) {
   const solutionPipeline = buildSolutionPipeline(childRecord, primaryMode, primaryPackage, materials);
   const advisorQueue = buildAdvisorQueue(childRecord, materials, input.servicePathway || {});
   const crmExport = buildCrmExport(childRecord, primaryMode, primaryPackage, advisorQueue);
+  const pilotReadinessChecklist = buildPilotReadinessChecklist(childRecord, materials, solutionPipeline, crmExport);
   const revenueMilestones = [
     { id: 'free_interpretation', allowed: true, gate: 'material_intake_done' },
     { id: 'paid_7_day_execution', allowed: childRecord.evidenceStage === 'real_task_evidence_ready', gate: 'real_task_evidence_ready' },
@@ -235,6 +288,7 @@ function buildPartnerDeliveryWorkbench(input = {}) {
     solutionPipeline,
     advisorQueue,
     crmExport,
+    pilotReadinessChecklist,
     revenueMilestones,
     privacyGate: {
       serverKeyOnly: true,
@@ -252,5 +306,6 @@ module.exports = {
   ALLOWED_CRM_FIELDS,
   normalizeMaterial,
   buildChildRecord,
+  buildPilotReadinessChecklist,
   buildPartnerDeliveryWorkbench
 };

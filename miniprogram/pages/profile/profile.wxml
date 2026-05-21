@@ -214,6 +214,13 @@
               <text>允许：{{learningReportSummary.partnerWorkbenchCrmExport.allowedFields}}</text>
               <text>禁止：{{learningReportSummary.partnerWorkbenchCrmExport.blockedFields}}</text>
             </view>
+            <view class="parent-brief-block" wx:if="{{learningReportSummary.partnerWorkbenchPilotReadiness}}">
+              <text class="parent-brief-label">试点就绪 {{learningReportSummary.partnerWorkbenchPilotReadiness.score}}%</text>
+              <text>{{learningReportSummary.partnerWorkbenchPilotReadiness.status}}</text>
+              <text wx:for="{{learningReportSummary.partnerWorkbenchPilotRows}}" wx:key="id">{{item.label}}｜{{item.ready ? '已就绪' : '待补证据'}}｜{{item.nextAction}}</text>
+              <text>{{learningReportSummary.partnerWorkbenchPilotReadiness.operatorScript}}</text>
+              <text>{{learningReportSummary.partnerWorkbenchPilotReadiness.stopRule}}</text>
+            </view>
             <view class="parent-brief-block" wx:if="{{learningReportSummary.partnerWorkbenchRevenueMilestones.length}}">
               <text class="parent-brief-label">服务包节点</text>
               <text wx:for="{{learningReportSummary.partnerWorkbenchRevenueMilestones}}" wx:key="id">{{item.id}}｜{{item.allowed ? '可进入' : '未放行'}}｜{{item.gate}}</text>

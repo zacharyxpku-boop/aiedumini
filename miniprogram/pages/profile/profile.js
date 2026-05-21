@@ -1962,6 +1962,10 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     partnerWorkbenchSolutionPipeline: partnerWorkbench && Array.isArray(partnerWorkbench.solutionPipeline) ? partnerWorkbench.solutionPipeline : [],
     partnerWorkbenchAdvisorQueue: partnerWorkbench && Array.isArray(partnerWorkbench.advisorQueue) ? partnerWorkbench.advisorQueue : [],
     partnerWorkbenchCrmExport: partnerWorkbench ? partnerWorkbench.crmExport : null,
+    partnerWorkbenchPilotReadiness: partnerWorkbench ? partnerWorkbench.pilotReadinessChecklist : null,
+    partnerWorkbenchPilotRows: partnerWorkbench && partnerWorkbench.pilotReadinessChecklist && Array.isArray(partnerWorkbench.pilotReadinessChecklist.rows)
+      ? partnerWorkbench.pilotReadinessChecklist.rows
+      : [],
     partnerWorkbenchRevenueMilestones: partnerWorkbench && Array.isArray(partnerWorkbench.revenueMilestones) ? partnerWorkbench.revenueMilestones : [],
     partnerWorkbenchPrivacyGate: partnerWorkbench ? partnerWorkbench.privacyGate : null,
     uploadedMaterialDecisionDossier,
