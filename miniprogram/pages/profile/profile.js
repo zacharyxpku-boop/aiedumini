@@ -1626,6 +1626,13 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     realHomeworkPublicResourceChallengeSeeds: realHomeworkCoverageMatrix && realHomeworkCoverageMatrix.publicResourceTriageBoard && Array.isArray(realHomeworkCoverageMatrix.publicResourceTriageBoard.sourceBackedChallengeSeeds)
       ? realHomeworkCoverageMatrix.publicResourceTriageBoard.sourceBackedChallengeSeeds
       : [],
+    realHomeworkLocalAiRunway: realHomeworkCoverageMatrix ? realHomeworkCoverageMatrix.localAiImplementationRunway : null,
+    realHomeworkLocalAiRunwayModules: realHomeworkCoverageMatrix && realHomeworkCoverageMatrix.localAiImplementationRunway && Array.isArray(realHomeworkCoverageMatrix.localAiImplementationRunway.moduleRows)
+      ? realHomeworkCoverageMatrix.localAiImplementationRunway.moduleRows
+      : [],
+    realHomeworkLocalAiResourceCoverage: realHomeworkCoverageMatrix && realHomeworkCoverageMatrix.localAiImplementationRunway && Array.isArray(realHomeworkCoverageMatrix.localAiImplementationRunway.resourceCoverage)
+      ? realHomeworkCoverageMatrix.localAiImplementationRunway.resourceCoverage
+      : [],
     pressureFailureTypeAudit: realHomeworkCoverageMatrix ? realHomeworkCoverageMatrix.pressureFailureTypeAudit : null,
     pressureFailureTypeRisks: realHomeworkCoverageMatrix && realHomeworkCoverageMatrix.pressureFailureTypeAudit && Array.isArray(realHomeworkCoverageMatrix.pressureFailureTypeAudit.topRiskRows)
       ? realHomeworkCoverageMatrix.pressureFailureTypeAudit.topRiskRows

@@ -962,6 +962,107 @@ function buildK12PublicResourceTriageBoard(options = {}) {
   };
 }
 
+function buildK12LocalAiImplementationRunway(options = {}) {
+  const resources = options.resources || PUBLIC_K12_OPEN_SOURCE_RESOURCE_LEDGER;
+  const moduleRows = [
+    {
+      id: 'content_scale',
+      label: '7科内容规模',
+      gap: '把公开/OER/一方资料沉淀为题型、错因、第一步和回访，不复制原题答案。',
+      localCodeOwns: ['source_registry_gate', 'grade_chapter_route', 'question_type_axis', 'sample_specific_first_step', 'answer_boundary'],
+      aiBetterFor: ['把已通过边界的第一步改写成儿童能听懂的一句话', '把家长摘要写得更低压'],
+      miniappLanding: ['/pages/module/module', '/pages/tutor/tutor', '/pages/profile/profile'],
+      acceptanceGate: ['source_url_present', 'license_signal_visible', 'no_original_text', 'no_full_answer', 'sample_specific_output']
+    },
+    {
+      id: 'socratic_depth',
+      label: '苏格拉底点拨质量',
+      gap: 'AI适合问法和解释，但追问轴、停止条件、答案边界必须本地决定。',
+      localCodeOwns: ['question_axis_route', 'hint_level', 'stop_rule', 'answer_request_block', 'parent_handoff_gate'],
+      aiBetterFor: ['追问措辞', '误区同学一句话', '孩子卡住时的鼓励语'],
+      miniappLanding: ['/pages/tutor/tutor', '/pages/review/review'],
+      acceptanceGate: ['no_final_answer', 'three_round_limit', 'child_first_step_required', 'parent_handoff_after_stuck']
+    },
+    {
+      id: 'mini_lesson_visual_board',
+      label: '3分钟小讲堂/小黑板',
+      gap: '只在连续卡住后补一个概念缺口，不开放课堂模式选择。',
+      localCodeOwns: ['mini_lesson_trigger', 'render_gate', 'visual_primitive_contract', 'exit_ticket_gate', 'review_seed_release'],
+      aiBetterFor: ['AI老师讲一句', 'AI同学暴露一个常见误区', '同一小黑板动作的口语化解释'],
+      miniappLanding: ['/pages/tutor/tutor', '/pages/profile/profile'],
+      acceptanceGate: ['router_mode_three_minute_only', 'no_full_classroom', 'no_full_solution_board', 'child_exit_ticket_before_game']
+    },
+    {
+      id: 'active_recall_game',
+      label: 'Gizmo式主动回忆游戏',
+      gap: '借鉴flashcards/quizzes/spaced repetition/active recall，但奖励只绑真实回忆证据。',
+      localCodeOwns: ['real_recall_source_gate', 'spaced_interval', 'xp_unlock', 'leech_card_rule', 'share_safe_payload'],
+      aiBetterFor: ['同一错因的轻量变式提示', '失败后的鼓励反馈', '不泄答案的提示语'],
+      miniappLanding: ['/pages/arcade/arcade', '/pages/review/review'],
+      acceptanceGate: ['real_recall_source', 'answer_hidden_before_self_grade', 'no_ranking_pk', 'next_day_revisit_scheduled']
+    },
+    {
+      id: 'family_decision_report',
+      label: '家长家庭决策书',
+      gap: '上传测评/错题/老师反馈后输出方法候选和下一证据，不贴天赋标签。',
+      localCodeOwns: ['source_type_classification', 'method_candidate_only', 'evidence_weight', 'portrait_release_gate', 'safe_share_fields'],
+      aiBetterFor: ['家长摘要', '家校沟通措辞', '学习方法候选的温和解释'],
+      miniappLanding: ['/pages/upload/upload', '/pages/profile/profile'],
+      acceptanceGate: ['talent_label_blocked', 'wrong_question_required_for_practice', 'day7_transfer_before_portrait', 'no_score_ranking']
+    },
+    {
+      id: 'community_share',
+      label: '社区化分享/同卡点接力',
+      gap: '分享错因和第一步，不分享原题、答案、完整对话、分数排名。',
+      localCodeOwns: ['relay_payload_schema', 'blocked_fields', 'receiver_own_material_gate', 'completion_evidence_contract'],
+      aiBetterFor: ['分享文案', '接收者提示语', '完成后的家长友好总结'],
+      miniappLanding: ['/pages/profile/profile', '/pages/home/home'],
+      acceptanceGate: ['no_original_question', 'no_answer_key', 'receiver_first_step_required', 'safe_fields_only']
+    },
+    {
+      id: 'partner_upload_solution',
+      label: '合作方测评报告复合方案',
+      gap: '测评报告只做学习方法候选，必须和真实作业、错题、回访证据复合。',
+      localCodeOwns: ['upload_source_gate', 'talent_method_candidate', 'wrong_paper_evidence_required', 'service_pathway_route', 'partner_boundary'],
+      aiBetterFor: ['把报告语言转成家长能理解的行动建议', '把方法候选解释成今晚怎么陪'],
+      miniappLanding: ['/pages/upload/upload', '/pages/profile/profile', '/pages/tutor/tutor'],
+      acceptanceGate: ['no_fixed_talent_type', 'no_guaranteed_improvement', 'real_wrong_question_before_game', 'private_report_only']
+    }
+  ];
+  const resourceCoverage = resources.map((item) => ({
+    id: `runway_${item.id}`,
+    sourceId: item.id,
+    label: item.label,
+    reuseLevel: item.reuseLevel || 'structure_or_reference_only',
+    localCodeFit: item.localizeAsCode || [],
+    aiFit: item.aiBetterFor || [],
+    blockedUse: item.mustNotUse || [],
+    targetModules: moduleRows
+      .filter((row) => (item.miniappLanding || []).some((route) => row.miniappLanding.includes(route)))
+      .map((row) => row.id),
+    acceptanceGate: item.acceptanceGate || []
+  }));
+  return {
+    id: 'k12_local_ai_implementation_runway',
+    title: 'K12公开资料到家庭私教的本地/AI分工路线图',
+    positioning: '借鉴公开资料和OpenMAIC/Gizmo/Khanmigo式机制，但落地为家庭晚间作业苏格拉底私教补位工具。',
+    moduleRows,
+    resourceCoverage,
+    moduleCount: moduleRows.length,
+    resourceCount: resources.length,
+    localCodeWins: moduleRows.flatMap((row) => row.localCodeOwns),
+    aiWins: moduleRows.flatMap((row) => row.aiBetterFor),
+    blockedClaims: ['full_ai_classroom', 'copied_question_bank', 'photo_search_answer', 'talent_label', 'score_ranking', 'guaranteed_improvement'],
+    stopRule: '新增资料如果不能提高题型命中、错因复现、小黑板第一步、回访证据或家长决策质量，就停止扩表，转向真实家庭试用样本。',
+    nextBuildOrder: [
+      '先补本地题型/错因/第一步样本',
+      '再补苏格拉底和小讲堂触发评估',
+      '再补主动回忆游戏回流',
+      '最后补家长报告和分享增长'
+    ]
+  };
+}
+
 function buildPressureSampleFailureTypeAudit(options = {}) {
   const samples = options.samples || getRealHomeworkPressureSamples();
   const visualTokens = ['画', '圈', '标', '线', '图', '表', '箭头', '坐标', '模型', '流程', '分成', '对照', '列'];
@@ -2100,6 +2201,7 @@ function buildRealHomeworkCoverageMatrix(options = {}) {
     ? 'real_homework_pressure_fixture_loaded'
     : 'collect_more_samples_before_claiming_runtime_coverage';
   const publicResourceTriageBoard = buildK12PublicResourceTriageBoard();
+  const localAiImplementationRunway = buildK12LocalAiImplementationRunway();
   const pressureFailureTypeAudit = buildPressureSampleFailureTypeAudit();
   const unifiedK12SourceRegistry = buildUnifiedK12SourceRegistry();
   const curriculumAssetSourceAudit = buildCurriculumAssetSourceAudit({ registry: unifiedK12SourceRegistry });
@@ -2134,6 +2236,7 @@ function buildRealHomeworkCoverageMatrix(options = {}) {
     curriculumAssetSourceAudit,
     contentExpansionQueue,
     publicResourceTriageBoard,
+    localAiImplementationRunway,
     pressureFailureTypeAudit,
     implementationDecisionMatrix: K12_PUBLIC_IMPLEMENTATION_DECISION_MATRIX,
     antiFakeThicknessGates: PUBLIC_K12_ANTI_FAKE_THICKNESS_GATES,
@@ -2158,6 +2261,8 @@ function buildRealHomeworkCoverageMatrix(options = {}) {
     totalPublicAssetPipelines: PUBLIC_K12_ASSET_PIPELINE.length,
     totalPublicCandidateAssets: PUBLIC_K12_CANDIDATE_POOL.length,
     totalOpenSourceResources: PUBLIC_K12_OPEN_SOURCE_RESOURCE_LEDGER.length,
+    totalLocalAiRunwayModules: localAiImplementationRunway.moduleCount,
+    totalLocalAiRunwayResourceCoverage: localAiImplementationRunway.resourceCoverage.length,
     totalUnifiedSourceRegistryRows: unifiedK12SourceRegistry.length,
     totalCurriculumAssetSourceReady: curriculumAssetSourceAudit.readyCount,
     totalContentExpansionQueue: contentExpansionQueue.length,
@@ -2201,6 +2306,7 @@ module.exports = {
   getRealHomeworkPressureSamples,
   buildPublicK12IntakeChallengeDeck,
   buildK12PublicResourceTriageBoard,
+  buildK12LocalAiImplementationRunway,
   normalizeUnifiedK12SourceRegistryEntry,
   buildUnifiedK12SourceRegistry,
   buildCurriculumAssetSourceAudit,

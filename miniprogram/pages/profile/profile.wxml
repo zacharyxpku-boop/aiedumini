@@ -917,6 +917,11 @@
           <text>{{learningReportSummary.realHomeworkCoverageMatrix.openSourceResourceLine}}</text>
           <text wx:if="{{learningReportSummary.realHomeworkPublicResourceTriageBoard}}">{{learningReportSummary.realHomeworkPublicResourceTriageBoard.reportLine}}</text>
           <text wx:if="{{learningReportSummary.realHomeworkPublicResourceTriageBoard}}">{{learningReportSummary.realHomeworkPublicResourceTriageBoard.marginalRule}}</text>
+          <text wx:if="{{learningReportSummary.realHomeworkLocalAiRunway}}">{{learningReportSummary.realHomeworkLocalAiRunway.positioning}}</text>
+          <text wx:if="{{learningReportSummary.realHomeworkLocalAiRunway}}">本地/AI 分工：{{learningReportSummary.realHomeworkLocalAiRunway.moduleCount}} 个模块，{{learningReportSummary.realHomeworkLocalAiRunway.resourceCount}} 类公开/OER 来源。</text>
+          <text wx:for="{{learningReportSummary.realHomeworkLocalAiRunwayModules}}" wx:key="id">本地/AI路线：{{item.label}}｜本地管：{{item.localCodeOwns[0]}}｜AI管：{{item.aiBetterFor[0]}}｜门槛：{{item.acceptanceGate[0]}}</text>
+          <text wx:for="{{learningReportSummary.realHomeworkLocalAiResourceCoverage}}" wx:key="id">来源落地：{{item.label}}｜复用级别：{{item.reuseLevel}}｜模块：{{item.targetModules[0]}}｜禁用：{{item.blockedUse[0]}}</text>
+          <text wx:if="{{learningReportSummary.realHomeworkLocalAiRunway}}">停止规则：{{learningReportSummary.realHomeworkLocalAiRunway.stopRule}}</text>
           <text>{{learningReportSummary.realHomeworkCoverageMatrix.homeworkIntakeQueueLine}}</text>
           <text>{{learningReportSummary.realHomeworkCoverageMatrix.intakeChallengeDeckLine}}</text>
           <text>{{learningReportSummary.realHomeworkCoverageMatrix.publicWorkbenchLine}}</text>
