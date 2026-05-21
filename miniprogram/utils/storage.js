@@ -1113,6 +1113,124 @@ function saveLearningReportState(nextState = {}, options = {}) {
   return saved;
 }
 
+function recordReportRevisitEvidence(reportId = '', evidence = {}) {
+  const current = loadLearningReportState();
+  const draft = current.reportDraft || {};
+  const resolvedReportId = String(reportId || evidence.reportId || current.reportId || draft.id || '').trim();
+  if (!resolvedReportId && !(current && current.reportDraft)) return null;
+  const now = new Date().toISOString();
+  const previous = current.reportRevisitEvidence && typeof current.reportRevisitEvidence === 'object'
+    ? current.reportRevisitEvidence
+    : {};
+  const events = Array.isArray(previous.events) ? previous.events.slice(0, 20) : [];
+  const nextDayIncrement = evidence.nextDayRevisit || evidence.nextDayRevisitStatus === 'passed' || evidence.status === 'review_completed' ? 1 : 0;
+  const day7Ready = !!(evidence.day7VariantResult || evidence.day7VariantStatus === 'passed' || previous.day7VariantReady);
+  const parentChecked = !!(evidence.parentChecked || evidence.parentCheck || previous.parentChecked);
+  const nextDayRevisitCount = Number(previous.nextDayRevisitCount || 0) + nextDayIncrement;
+  const validationStage = day7Ready
+    ? 'day7_candidate'
+    : nextDayRevisitCount > 0
+      ? 'method_candidate'
+      : 'tonight_action_only';
+  const longTermPortraitRelease = day7Ready && parentChecked ? 'candidate_after_day7' : 'blocked_until_day7';
+  const event = {
+    id: evidence.id || `report_revisit_${Date.now()}_${randomPart()}`,
+    type: 'report_revisit_evidence',
+    reportId: resolvedReportId,
+    status: evidence.status || 'review_completed',
+    route: evidence.route || '/pages/review/review',
+    firstStep: String(evidence.firstStep || evidence.childFirstStep || '').slice(0, 120),
+    wrongCause: String(evidence.wrongCause || '').slice(0, 120),
+    parentCheck: String(evidence.parentCheck || '').slice(0, 120),
+    createdAt: now
+  };
+  const reportRevisitEvidence = {
+    id: `report_revisit_${resolvedReportId || 'local'}`,
+    reportId: resolvedReportId,
+    nextDayRevisitCount,
+    day7VariantReady: day7Ready,
+    day7VariantResult: evidence.day7VariantResult || previous.day7VariantResult || '',
+    parentChecked,
+    validationStage,
+    longTermPortraitRelease,
+    latestStatus: event.status,
+    updatedAt: now,
+    events: [event].concat(events).slice(0, 20),
+    localRule: '回访证据只能推进方法候选和家庭行动；没有第 7 天小变式与家长确认，不升级长期画像。',
+    blockedClaims: ['talent_label', 'fixed_learning_style', 'score_ranking', 'guaranteed_result']
+  };
+  const uploadedMaterialDecisionDossier = current.uploadedMaterialDecisionDossier
+    ? Object.assign({}, current.uploadedMaterialDecisionDossier)
+    : null;
+  if (uploadedMaterialDecisionDossier) {
+    uploadedMaterialDecisionDossier.servicePathwaySummary = Object.assign({}, uploadedMaterialDecisionDossier.servicePathwaySummary || {}, {
+      revisitEvidence: reportRevisitEvidence,
+      validationProgress: validationStage,
+      longTermPortraitRelease
+    });
+    uploadedMaterialDecisionDossier.methodCandidateCards = Array.isArray(uploadedMaterialDecisionDossier.methodCandidateCards)
+      ? uploadedMaterialDecisionDossier.methodCandidateCards.map((card, index) => Object.assign({}, card, {
+        validationStatus: index === 0 ? validationStage : (card.validationStatus || 'waiting_evidence'),
+        nextEvidence: index === 0 && !day7Ready ? 'day7_variant_result' : (card.nextEvidence || card.day7Evidence || '')
+      }))
+      : uploadedMaterialDecisionDossier.methodCandidateCards;
+    if (uploadedMaterialDecisionDossier.personalizedLearningSolutionBlueprint) {
+      uploadedMaterialDecisionDossier.personalizedLearningSolutionBlueprint = Object.assign({}, uploadedMaterialDecisionDossier.personalizedLearningSolutionBlueprint, {
+        reportRevisitEvidence,
+        longTermPortraitRelease
+      });
+    }
+  }
+  const reportEvidenceReleaseGate = Object.assign({}, current.reportEvidenceReleaseGate || (draft && draft.reportEvidenceReleaseGate) || {});
+  reportEvidenceReleaseGate.actualLongitudinalEvidence = Object.assign({}, reportEvidenceReleaseGate.actualLongitudinalEvidence || {}, {
+    nextDayRevisitCount,
+    day7VariantReady: day7Ready,
+    parentChecked
+  });
+  reportEvidenceReleaseGate.revisitValidationStage = validationStage;
+  reportEvidenceReleaseGate.longTermPortraitRelease = longTermPortraitRelease;
+  const next = Object.assign({}, current, {
+    reportId: resolvedReportId || current.reportId,
+    reportRevisitEvidence,
+    reportEvidenceReleaseGate,
+    uploadedMaterialDecisionDossier,
+    behaviorSignals: Object.assign({}, current.behaviorSignals || {}, {
+      nextDayRevisitCount,
+      day7VariantReady: day7Ready,
+      parentChecked
+    })
+  });
+  if (next.reportDraft) {
+    next.reportDraft = Object.assign({}, next.reportDraft, {
+      reportRevisitEvidence,
+      reportEvidenceReleaseGate,
+      uploadedMaterialDecisionDossier
+    });
+  }
+  const saved = saveLearningReportState(next, { skipBuild: true, connectLoop: false });
+  appendReviewEvent({
+    type: 'report_revisit_evidence_recorded',
+    event: 'report_revisit_evidence_recorded',
+    reportId: resolvedReportId,
+    validationStage,
+    longTermPortraitRelease,
+    firstStep: event.firstStep,
+    wrongCause: event.wrongCause,
+    parentChecked
+  });
+  appendSyncMutation('report_revisit_evidence', {
+    id: event.id,
+    report_id: resolvedReportId,
+    validation_stage: validationStage,
+    next_day_revisit_count: nextDayRevisitCount,
+    day7_variant_ready: day7Ready,
+    parent_checked: parentChecked,
+    long_term_portrait_release: longTermPortraitRelease,
+    created_at: now
+  });
+  return saved.reportRevisitEvidence || reportRevisitEvidence;
+}
+
 function saveLearningReportSource(source = {}, options = {}) {
   const current = loadLearningReportState();
   const normalizedSource = {
@@ -12440,6 +12558,7 @@ module.exports = {
   loadLearningReportState,
   saveLearningReportState,
   saveLearningReportSource,
+  recordReportRevisitEvidence,
   buildLearningReportFromInput,
   buildReportDailyActionQueue,
   loadParentGoal,

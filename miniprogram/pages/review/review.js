@@ -1260,6 +1260,16 @@ Page({
         title: '接收者完成修卡点第一步'
       });
     }
+    if (storage.recordReportRevisitEvidence && focus && focus.reportId) {
+      storage.recordReportRevisitEvidence(focus.reportId, {
+        status: 'review_completed',
+        nextDayRevisit: true,
+        firstStep: miniActionText,
+        wrongCause: focus.wrongCauseLabel || focus.weakPoint || focus.title || '',
+        parentCheck: '家长只确认第一步和错因，不升级长期画像。',
+        route: '/pages/review/review'
+      });
+    }
     this.setData({
       todayFocus: focus || this.data.todayFocus,
       gameRunway: Object.assign({}, this.data.gameRunway || {}, { percent: 100 }),

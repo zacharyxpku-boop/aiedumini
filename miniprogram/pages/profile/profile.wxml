@@ -145,6 +145,12 @@
               <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierSolutionFusionRules}}" wx:key="id">{{item.label}}｜用于：{{item.useFor}}｜验证：{{item.mustVerifyWith}}</text>
               <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierSolutionOwnership}}" wx:key="id">{{item.label}}：{{item.reason}}</text>
             </view>
+            <view class="parent-brief-block" wx:if="{{learningReportSummary.reportRevisitEvidence}}">
+              <text class="parent-brief-label">报告回访验证</text>
+              <text>当前阶段：{{learningReportSummary.reportRevisitValidationStage}}｜次日回访 {{learningReportSummary.reportRevisitNextDayCount}} 次</text>
+              <text>长期画像：{{learningReportSummary.reportRevisitLongTermPortraitRelease}}｜第7天证据：{{learningReportSummary.reportRevisitDay7Ready ? '已就绪' : '未就绪'}}</text>
+              <text>{{learningReportSummary.reportRevisitLocalRule}}</text>
+            </view>
             <view class="parent-brief-block" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierFamilyDecisionCalendar}}">
               <text class="parent-brief-label">{{learningReportSummary.uploadedMaterialDecisionDossierFamilyDecisionCalendar.title}}</text>
               <text>{{learningReportSummary.uploadedMaterialDecisionDossierFamilyDecisionCalendar.summary}}</text>

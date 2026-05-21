@@ -1884,6 +1884,12 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     uploadedMaterialDecisionDossierDecisionHeatmap: Array.isArray(uploadedMaterialDecisionDossier.decisionHeatmap) ? uploadedMaterialDecisionDossier.decisionHeatmap : [],
     uploadedMaterialDecisionDossierFamilyActionStack: Array.isArray(uploadedMaterialDecisionDossier.familyActionStack) ? uploadedMaterialDecisionDossier.familyActionStack : [],
     uploadedMaterialDecisionDossierSolutionBlueprint: uploadedMaterialDecisionDossier.personalizedLearningSolutionBlueprint || null,
+    reportRevisitEvidence: reportState.reportRevisitEvidence || uploadedMaterialDecisionDossier.servicePathwaySummary && uploadedMaterialDecisionDossier.servicePathwaySummary.revisitEvidence || null,
+    reportRevisitValidationStage: reportState.reportRevisitEvidence ? reportState.reportRevisitEvidence.validationStage : '',
+    reportRevisitLongTermPortraitRelease: reportState.reportRevisitEvidence ? reportState.reportRevisitEvidence.longTermPortraitRelease : '',
+    reportRevisitNextDayCount: reportState.reportRevisitEvidence ? Number(reportState.reportRevisitEvidence.nextDayRevisitCount || 0) : 0,
+    reportRevisitDay7Ready: reportState.reportRevisitEvidence ? !!reportState.reportRevisitEvidence.day7VariantReady : false,
+    reportRevisitLocalRule: reportState.reportRevisitEvidence ? reportState.reportRevisitEvidence.localRule || '' : '',
     uploadedMaterialDecisionDossierSolutionModeSequence: uploadedMaterialDecisionDossier.personalizedLearningSolutionBlueprint && Array.isArray(uploadedMaterialDecisionDossier.personalizedLearningSolutionBlueprint.modeSequence)
       ? uploadedMaterialDecisionDossier.personalizedLearningSolutionBlueprint.modeSequence
       : [],
