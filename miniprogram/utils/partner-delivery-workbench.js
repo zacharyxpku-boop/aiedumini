@@ -301,14 +301,20 @@ function buildPartnerDeliveryWorkbench(input = {}) {
   const advisorQueue = buildAdvisorQueue(childRecord, materials, input.servicePathway || {});
   const crmExport = buildCrmExport(childRecord, primaryMode, primaryPackage, advisorQueue);
   const pilotReadinessChecklist = buildPilotReadinessChecklist(childRecord, materials, solutionPipeline, crmExport);
+  const hasRealTaskEvidence = childRecord.evidenceStage === 'real_task_evidence_ready';
+  const hasParentConfirmation = childRecord.parentConfirmationStatus === 'confirmed';
   const revenueMilestones = [
     { id: 'free_interpretation', allowed: materials.length > 0, gate: 'material_intake_done' },
-    { id: 'paid_7_day_execution', allowed: childRecord.evidenceStage === 'real_task_evidence_ready', gate: 'real_task_evidence_ready' },
-    { id: 'course_or_counselor_upgrade', allowed: childRecord.evidenceStage === 'real_task_evidence_ready' && childRecord.parentConfirmationStatus === 'confirmed', gate: 'day7_review_and_parent_confirmation' }
+    { id: 'paid_7_day_execution', allowed: hasRealTaskEvidence && hasParentConfirmation, gate: 'real_task_evidence_ready_and_parent_confirmation' },
+    { id: 'course_or_counselor_upgrade', allowed: hasRealTaskEvidence && hasParentConfirmation, gate: 'day7_review_and_parent_confirmation' }
   ];
   return {
     id: 'partner_delivery_workbench',
-    status: childRecord.evidenceStage === 'real_task_evidence_ready' ? 'ready_for_guarded_delivery' : 'needs_real_task_evidence',
+    status: !hasRealTaskEvidence
+      ? 'needs_real_task_evidence'
+      : !hasParentConfirmation
+        ? 'needs_parent_confirmation'
+        : 'ready_for_guarded_delivery',
     childRecord,
     materialLedger: materials,
     primaryMode,
