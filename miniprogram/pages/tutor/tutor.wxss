@@ -852,6 +852,35 @@ page {
   font-weight: 950;
 }
 
+.mini-lesson-primitive-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+  align-items: center;
+  margin-top: 8rpx;
+}
+
+.mini-lesson-primitive-chip {
+  max-width: 100%;
+  padding: 5rpx 10rpx;
+  border: 1rpx solid rgba(242, 212, 121, 0.55);
+  border-radius: 10rpx;
+  color: #F2D479;
+  font-size: 18rpx;
+  font-weight: 950;
+  line-height: 1.25;
+  word-break: break-word;
+}
+
+.mini-lesson-primitive-instruction {
+  min-width: 0;
+  color: rgba(255, 253, 248, 0.66);
+  font-size: 18rpx;
+  font-weight: 800;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
 .mini-lesson-frame-say {
   margin-top: 4rpx;
   color: rgba(255, 253, 248, 0.72);

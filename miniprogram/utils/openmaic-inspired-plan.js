@@ -928,29 +928,40 @@ function buildMiniLessonBoardFrames(visualTemplate = {}, topicCard = {}, outline
     .split(/->|→|：|:/)
     .map((item) => item.trim())
     .filter(Boolean);
+  const primitiveRenderContract = buildMiniLessonVisualPrimitiveContract(
+    Array.isArray(visualTemplate.visualPrimitives) ? visualTemplate.visualPrimitives : []
+  );
   const frameTexts = [
     layers[0] || steps[0] || '圈题目问什么',
     layers[1] || steps[1] || '找一个已知条件',
     layers[2] || steps[2] || '说出第一步动作'
   ];
-  return frameTexts.map((text, index) => ({
-    id: `frame_${index + 1}`,
-    title: `板书第 ${index + 1} 帧`,
-    draw: text,
-    say: index === 0
-      ? '先圈住题目问什么'
-      : index === 1
-        ? '再找一个已知条件'
-        : '最后只说第一步，不说完整答案',
-    evidence: index === 0
-      ? 'child_reads_task'
-      : index === 1
-        ? 'board_entry_not_full_solution'
-        : 'child_first_step_or_wrong_cause',
-    localGate: index === 2
-      ? (topicCard.localGate || 'child_can_say_first_step')
-      : 'board_layer_visible'
-  }));
+  return frameTexts.map((text, index) => {
+    const primitive = primitiveRenderContract[index] || primitiveRenderContract[primitiveRenderContract.length - 1] || {};
+    return {
+      id: `frame_${index + 1}`,
+      title: `板书第 ${index + 1} 帧`,
+      draw: text,
+      say: index === 0
+        ? '先圈住题目问什么'
+        : index === 1
+          ? '再找一个已知条件'
+          : '最后只说第一步，不说完整答案',
+      primitiveId: primitive.id || '',
+      primitiveLabel: primitive.renderRole || '',
+      primitiveClass: primitive.wxClass || '',
+      renderInstruction: primitive.childAction || '',
+      primitiveOwner: primitive.owner || 'local_code',
+      evidence: index === 0
+        ? 'child_reads_task'
+        : index === 1
+          ? 'board_entry_not_full_solution'
+          : 'child_first_step_or_wrong_cause',
+      localGate: index === 2
+        ? (topicCard.localGate || 'child_can_say_first_step')
+        : 'board_layer_visible'
+    };
+  });
 }
 
 function buildMiniLessonTrigger(input = {}) {

@@ -89,6 +89,9 @@
             </view>
             <view class="socratic-feedback-state" wx:if="{{socraticFeedbackStatus}}">已记录：{{socraticFeedbackStatus}}</view>
             <view class="socratic-feedback-next" wx:if="{{socraticFeedbackNextAction}}">下一轮：{{socraticFeedbackNextAction}}</view>
+            <view class="socratic-feedback-next" wx:if="{{miniLessonFeedbackBridge}}">
+              小讲堂补位：{{miniLessonFeedbackBridge.nextAction}}｜回访卡：{{miniLessonFeedbackBridge.reviewCardId || '已准备'}}
+            </view>
           </view>
           <view class="receipt-diagnostic" wx:if="{{thinkingReceipt.diagnostic_probe}}">
             <view class="receipt-diagnostic-title">这轮怎么追问</view>
@@ -293,6 +296,10 @@
                 <view class="mini-lesson-frame-index">{{index + 1}}</view>
                 <view class="mini-lesson-frame-copy">
                   <view class="mini-lesson-frame-draw">{{item.draw}}</view>
+                  <view class="mini-lesson-primitive-row" wx:if="{{item.primitiveId}}">
+                    <view class="mini-lesson-primitive-chip {{item.primitiveClass}}">{{item.primitiveLabel}}</view>
+                    <view class="mini-lesson-primitive-instruction">{{item.renderInstruction}}</view>
+                  </view>
                   <view class="mini-lesson-frame-say">{{item.say}}</view>
                 </view>
               </view>

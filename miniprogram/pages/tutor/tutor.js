@@ -534,11 +534,11 @@ function buildSocraticFeedbackAdjustment(item, turnState = {}) {
       status: item.status,
       nextHintLevel,
       activeStep: 'method_summary',
-      coachStepLabel: `?? ${nextHintLevel}/5`,
-      nextAction: '???????????????????',
-      nextQuestion: '??????????????????',
+      coachStepLabel: `提示 ${nextHintLevel}/5`,
+      nextAction: '进入明天回访，只保留同一个第一步。',
+      nextQuestion: '你能用自己的话再说一遍第一步吗？',
       shouldUseTwoChoice: false,
-      releaseLine: '????????????????????????????',
+      releaseLine: '孩子已说出第一步，可以转成回访卡。',
       reviewEvidence: 'child_first_step_spoken',
       reviewSeedType: 'next_day_first_step_revisit'
     };
@@ -548,13 +548,55 @@ function buildSocraticFeedbackAdjustment(item, turnState = {}) {
     status: 'still_blocked',
     nextHintLevel,
     activeStep: 'micro_choice',
-    coachStepLabel: `?? ${nextHintLevel}/5`,
-    nextAction: '?????????????????????????',
-    nextQuestion: '???????????????????????',
+    coachStepLabel: `提示 ${nextHintLevel}/5`,
+    nextAction: '连续卡住时切入 3 分钟小讲堂，只补一个概念缺口。',
+    nextQuestion: '先二选一：你卡在题目问什么，还是卡在第一步怎么写？',
     shouldUseTwoChoice: true,
-    releaseLine: '???????????????????????????',
+    releaseLine: '仍缺孩子自己的第一步，不能进入练习或分享。',
     reviewEvidence: 'socratic_still_blocked',
     reviewSeedType: 'two_choice_parent_handoff'
+  };
+}
+
+function buildMiniLessonFeedbackBridge(item = {}, receipt = {}, adjustment = {}) {
+  const miniLesson = receipt.miniLesson || {};
+  const miniLessonAudit = receipt.miniLessonAudit || {};
+  const trigger = miniLesson.trigger || {};
+  if (item.status !== 'still_blocked' || !trigger.shouldTrigger || miniLessonAudit.ok !== true) return null;
+  const evidenceThread = receipt.evidenceThread || miniLesson.evidenceThread || {};
+  const topicCard = miniLesson.topicCard || {};
+  const blackboard = miniLesson.blackboard || {};
+  const seed = {
+    source: 'socratic_feedback_still_blocked',
+    sourceSeedId: `mini_lesson_feedback_${item.turnId || item.fallbackId || Date.now()}`,
+    flowTraceId: evidenceThread.flowTraceId || item.turnId || item.fallbackId || '',
+    evidenceThread,
+    topicCardId: evidenceThread.topicCardId || topicCard.id || '',
+    topicLabel: topicCard.label || miniLesson.conceptGap || '当前概念缺口',
+    conceptGap: miniLesson.conceptGap || topicCard.conceptGap || '第一步概念缺口',
+    firstStep: blackboard.firstStep || blackboard.boardMove || '先说出第一步',
+    blackboardLine: blackboard.boardMove || blackboard.firstStep || '',
+    blackboardFrames: Array.isArray(blackboard.frames) ? blackboard.frames : [],
+    parentCheck: miniLesson.parentCheck || miniLesson.parentLine || '家长只问第一步，不追完整答案。',
+    nextDayReview: miniLesson.nextDayReview || (miniLesson.nearTransfer && miniLesson.nearTransfer.prompt) || '明天换一题，只回访第一步。',
+    exitGate: miniLesson.exitGate ? miniLesson.exitGate.passEvidence : 'child_can_say_first_step',
+    route: '/pages/tutor/tutor?from=socratic_feedback_mini_lesson',
+    subject: receipt.subject || evidenceThread.subject || '',
+    taskType: receipt.taskType || evidenceThread.taskType || '',
+    blockedFields: ['original_question', 'full_answer', 'full_dialogue', 'score', 'ranking', 'talent_label']
+  };
+  return {
+    id: 'socratic_feedback_mini_lesson_bridge',
+    title: '已切入 3 分钟小讲堂',
+    reason: trigger.reason || adjustment.nextAction,
+    route: seed.route,
+    nextAction: '看三帧小黑板，写一句退出票，再决定回访或家长协助。',
+    reviewSeed: seed,
+    evidence: {
+      triggerEvidence: trigger.triggerEvidence || {},
+      exitGate: seed.exitGate,
+      blockedFields: seed.blockedFields
+    }
   };
 }
 
@@ -822,6 +864,7 @@ Page({
     socraticFeedbackStatus: '',
     socraticFeedbackRecordedAt: '',
     socraticFeedbackNextAction: '',
+    miniLessonFeedbackBridge: null,
     miniLessonExitGateStatus: '',
     miniLessonExitGateNextRoute: '',
     miniLessonActiveFrameIndex: 0,
@@ -907,6 +950,7 @@ Page({
       socraticFeedbackStatus: '',
       socraticFeedbackRecordedAt: '',
       socraticFeedbackNextAction: '',
+      miniLessonFeedbackBridge: null,
       miniLessonExitGateStatus: '',
       miniLessonExitGateNextRoute: '',
       miniLessonActiveFrameIndex: 0,
@@ -1342,6 +1386,7 @@ Page({
       socraticFeedbackStatus: '',
       socraticFeedbackRecordedAt: '',
       socraticFeedbackNextAction: '',
+      miniLessonFeedbackBridge: null,
       miniLessonExitGateStatus: '',
       miniLessonExitGateNextRoute: '',
       miniLessonActiveFrameIndex: 0,
@@ -1364,6 +1409,7 @@ Page({
       storage.appendSyncMutation('socratic_effectiveness_feedback', item);
     }
     const adjustment = buildSocraticFeedbackAdjustment(item, turnState);
+    const miniLessonFeedbackBridge = buildMiniLessonFeedbackBridge(item, receipt, adjustment);
     const reviewSeed = {
       type: 'socratic_effectiveness_review_seed',
       event: 'socratic_effectiveness_review_seed',
@@ -1382,6 +1428,27 @@ Page({
     if (storage.appendReviewEvent) {
       storage.appendReviewEvent(reviewSeed);
     }
+    let miniLessonReturnCard = null;
+    if (miniLessonFeedbackBridge && storage.ensureMiniLessonReturnReviewCard) {
+      miniLessonReturnCard = storage.ensureMiniLessonReturnReviewCard(miniLessonFeedbackBridge.reviewSeed, {
+        source: 'socratic_feedback_still_blocked',
+        taskType: miniLessonFeedbackBridge.reviewSeed.taskType || '',
+        subject: miniLessonFeedbackBridge.reviewSeed.subject || ''
+      });
+      if (storage.appendReviewEvent) {
+        storage.appendReviewEvent({
+          type: 'socratic_feedback_mini_lesson_triggered',
+          event: 'socratic_feedback_mini_lesson_triggered',
+          route: miniLessonFeedbackBridge.route,
+          cardId: miniLessonReturnCard && miniLessonReturnCard.id ? miniLessonReturnCard.id : '',
+          evidence: miniLessonFeedbackBridge.evidence,
+          nextAction: miniLessonFeedbackBridge.nextAction,
+          blockedFields: miniLessonFeedbackBridge.evidence.blockedFields,
+          createdAt: item.createdAt,
+          created_at: item.createdAt
+        });
+      }
+    }
     if (storage.recordUnifiedNextAction) {
       storage.recordUnifiedNextAction({
         source: 'tutor_socratic_effectiveness_feedback',
@@ -1391,6 +1458,19 @@ Page({
         subject: turnState.subject || receipt.subject || '',
         taskType: turnState.taskType || receipt.taskType || ''
       });
+      if (miniLessonFeedbackBridge) {
+        storage.recordUnifiedNextAction({
+          source: 'socratic_feedback_mini_lesson_bridge',
+          sourceLabel: '苏格拉底卡住后的小讲堂补位',
+          actionLabel: miniLessonFeedbackBridge.nextAction,
+          route: miniLessonFeedbackBridge.route,
+          readiness: 'mini_lesson_triggered_after_stuck_feedback',
+          capabilityId: 'three_minute_mini_lesson',
+          evidence: ['still_blocked_feedback', 'mini_lesson_trigger', 'exit_gate_required'],
+          subject: turnState.subject || receipt.subject || '',
+          taskType: turnState.taskType || receipt.taskType || ''
+        });
+      }
     }
     if (storage.recordSurfaceDepthAction) {
       storage.recordSurfaceDepthAction({
@@ -1402,6 +1482,17 @@ Page({
         subject: turnState.subject || receipt.subject || '',
         taskType: turnState.taskType || receipt.taskType || ''
       });
+      if (miniLessonFeedbackBridge) {
+        storage.recordSurfaceDepthAction({
+          surface: 'tutor',
+          dimensionId: 'socratic_to_mini_lesson_bridge',
+          evidence: 'still_blocked_feedback_triggered_mini_lesson',
+          nextAction: miniLessonFeedbackBridge.nextAction,
+          route: miniLessonFeedbackBridge.route,
+          subject: turnState.subject || receipt.subject || '',
+          taskType: turnState.taskType || receipt.taskType || ''
+        });
+      }
     }
     const adjustedTurnState = Object.assign({}, turnState, {
       hintLevel: adjustment.nextHintLevel,
@@ -1418,7 +1509,10 @@ Page({
       activeStep: adjustment.activeStep,
       coachStepLabel: adjustment.coachStepLabel,
       nextAction: adjustment.nextAction,
-      tutorTurnState: adjustedTurnState
+      tutorTurnState: adjustedTurnState,
+      miniLessonFeedbackBridge: miniLessonFeedbackBridge ? Object.assign({}, miniLessonFeedbackBridge, {
+        reviewCardId: miniLessonReturnCard && miniLessonReturnCard.id ? miniLessonReturnCard.id : ''
+      }) : null
     });
     if (typeof wx !== 'undefined' && wx.showToast) {
       wx.showToast({
@@ -1462,16 +1556,18 @@ Page({
         taskType: selected.taskType || ''
       })
       : null;
+    const exitGatePassed = exitGateRecord && exitGateRecord.status === 'passed';
+    const exitGateNeedsSupport = !exitGatePassed;
     const nextRoute = exitGateRecord && exitGateRecord.nextRoute
       ? exitGateRecord.nextRoute
-      : passedWithChildTicket ? '/pages/review/review?from=mini_lesson_exit_passed' : '/pages/tutor/tutor?from=mini_lesson_exit_needs_support';
+      : exitGatePassed ? '/pages/review/review?from=mini_lesson_exit_passed' : '/pages/tutor/tutor?from=mini_lesson_exit_needs_support';
     if (storage.recordUnifiedNextAction) {
       storage.recordUnifiedNextAction({
         source: 'tutor_mini_lesson_exit_gate',
         sourceLabel: '3 分钟小讲堂退出门',
-        actionLabel: passedWithChildTicket ? '明天回访第一步' : '继续降级到家长协助',
+        actionLabel: exitGatePassed ? '明天回访第一步' : '继续降级到家长协助',
         route: nextRoute,
-        readiness: passedWithChildTicket ? 'exit_gate_passed' : 'exit_gate_needs_support',
+        readiness: exitGatePassed ? 'exit_gate_passed' : 'exit_gate_needs_support',
         capabilityId: 'mini_lesson_exit_gate',
         evidence: ['child_exit_ticket', 'first_step_evidence', 'next_day_revisit'],
         subject: selected.subject || receipt.subject || '',
@@ -1482,24 +1578,24 @@ Page({
       storage.recordSurfaceDepthAction({
         surface: 'tutor',
         dimensionId: 'mini_lesson_exit_gate',
-        evidence: passedWithChildTicket ? 'child_exit_ticket_text' : 'parent_support_needed',
-        nextAction: passedWithChildTicket ? 'next_day_revisit' : 'parent_handoff',
+        evidence: exitGatePassed ? 'child_exit_ticket_text' : 'parent_support_needed',
+        nextAction: exitGatePassed ? 'next_day_revisit' : 'parent_handoff',
         route: nextRoute,
         subject: selected.subject || receipt.subject || '',
         taskType: selected.taskType || receipt.taskType || ''
       });
     }
     this.setData({
-      miniLessonExitGateStatus: passedWithChildTicket
+      miniLessonExitGateStatus: exitGatePassed
         ? '已过退出门'
         : (passed ? '缺孩子自己的退出票，转家长协助' : '还不能过，转家长协助'),
       miniLessonExitGateNextRoute: nextRoute,
-      socraticFeedbackStatus: passedWithChildTicket ? 'first_step_spoken' : 'still_blocked',
-      socraticFeedbackNextAction: passedWithChildTicket ? '明天只回访同一个第一步' : '停止加提示，交给家长只问一句'
+      socraticFeedbackStatus: exitGatePassed ? 'first_step_spoken' : 'still_blocked',
+      socraticFeedbackNextAction: exitGateNeedsSupport ? '停止加提示，交给家长只问一句' : '明天只回访同一个第一步'
     });
     if (typeof wx !== 'undefined' && wx.showToast) {
       wx.showToast({
-        title: passedWithChildTicket ? '已记录退出门' : '已转家长协助',
+        title: exitGatePassed ? '已记录退出门' : '已转家长协助',
         icon: 'none'
       });
     }
@@ -1524,6 +1620,7 @@ Page({
       socraticFeedbackStatus: '',
       socraticFeedbackRecordedAt: '',
       socraticFeedbackNextAction: '',
+      miniLessonFeedbackBridge: null,
       miniLessonExitGateStatus: '',
       miniLessonExitGateNextRoute: '',
       miniLessonActiveFrameIndex: 0
