@@ -7,6 +7,7 @@ const arcadeEngine = require('../../utils/arcade-engine');
 const api = require('../../utils/api');
 const tutorLadder = require('../../utils/tutor-ladder');
 const importIntake = require('../../utils/import-intake');
+const shareRelaySchema = require('../../utils/share-relay-schema');
 const { buildHomeViewModel } = require('../../view-models/home-view-model');
 
 function safeDecodeShareParam(value) {
@@ -16,6 +17,13 @@ function safeDecodeShareParam(value) {
   } catch (error) {
     return String(value || '');
   }
+}
+
+function parseIncomingShareQuery(query = {}) {
+  const parsed = shareRelaySchema && shareRelaySchema.parseShareRelayQuery
+    ? shareRelaySchema.parseShareRelayQuery(query || {})
+    : {};
+  return Object.assign({}, query || {}, parsed || {});
 }
 
 Page({
@@ -146,6 +154,7 @@ Page({
   },
 
   onLoad(query = {}) {
+    query = parseIncomingShareQuery(query);
     if (storage.isFirstTime && storage.isFirstTime()) {
       this.setData({ showFirstRunOverlay: true });
       setTimeout(() => {

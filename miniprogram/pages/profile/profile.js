@@ -10,19 +10,84 @@ const learningReport = require('../../utils/learning-report');
 const learningReportRecognition = require('../../utils/learning-report-recognition');
 const openMaicInspiredPlan = require('../../utils/openmaic-inspired-plan');
 function createShareRelaySchemaFallback() {
+  const allowlist = [
+    'share_intent',
+    'share',
+    'share_code',
+    'from',
+    'mode',
+    'challenge',
+    'invite_code',
+    'identity_tag',
+    'tonight_action',
+    'parent_question',
+    'tomorrow_check',
+    'report_daily_action',
+    'unified_next_action',
+    'unified_next_action_route',
+    'parent_next_action',
+    'next_challenge',
+    'share_challenge_goal',
+    'share_challenge_rule',
+    'share_challenge_route',
+    'share_privacy_boundary',
+    'share_return_contract',
+    'safe_relay_allowed_fields',
+    'safe_relay_blocked_fields',
+    'relay_first_step',
+    'relay_receiver_action',
+    'relay_parent_check',
+    'relay_next_revisit',
+    'relay_allowed_fields',
+    'relay_blocked_fields',
+    'relay_completion_signal',
+    'relay_return_path',
+    'tonight_parent_question',
+    'tonight_tomorrow_revisit',
+    'tonight_release_gate',
+    'tonight_share_boundary',
+    'tonight_allowed_fields',
+    'tonight_blocked_fields',
+    'question_bank_relay_first_step',
+    'question_bank_relay_wrong_cause',
+    'question_bank_relay_next_action',
+    'course_unit_parent_decision',
+    'course_unit_share_contract',
+    'course_unit_recall_route',
+    'course_unit_game_route',
+    'relay_review',
+    'relay_spread_status',
+    'relay_season_status',
+    'wrong_cause_label',
+    'wrong_cause_first_step',
+    'wrong_cause_parent_check',
+    'wrong_cause_receiver_action',
+    'wrong_cause_next_revisit',
+    'wrong_cause_allowed_fields',
+    'wrong_cause_blocked_fields',
+    'source_challenge_route',
+    'openmaic_bridge_status',
+    'openmaic_next_action',
+    'openmaic_share_boundary',
+    'openmaic_game_gate',
+    'openmaic_blocked_fields',
+    'openmaic_evidence',
+    'openmaic_return_path'
+  ];
   const denylist = ['original_question', 'original_answer', 'photo', 'raw_text', 'full_answer', 'full_solution', 'full_dialogue', 'score', 'ranking', 'private_comment', 'classmate_comparison', 'teacher_private_comment', 'complete_transcript'];
-  function isDenied(key) {
-    return denylist.indexOf(key) >= 0 || /answer|solution|photo|score|rank|transcript/i.test(String(key || ''));
+  function isAllowed(key) {
+    return allowlist.indexOf(key) >= 0 && denylist.indexOf(key) < 0 && !/answer|solution|photo|score|rank|transcript/i.test(String(key || ''));
   }
   function toText(value) {
     return String(value == null ? '' : value).trim();
   }
   function buildSafeSharePayload(card = {}, intent = 'peer_challenge', extra = {}) {
     const source = Object.assign({}, card.payload || {}, extra || {});
-    const safe = { share_intent: intent, from: 'profile', mode: 'safe_relay' };
+    const safe = { share_intent: intent, from: 'profile', mode: 'safe_relay', allowed_fields: ['share_code', 'tonight_action', 'parent_question', 'tomorrow_check', 'safe_relay_allowed_fields'], blocked_fields: denylist.slice() };
     Object.keys(source).forEach((key) => {
-      if (!isDenied(key)) safe[key] = toText(source[key]);
+      if (isAllowed(key)) safe[key] = toText(source[key]);
     });
+    safe.sanitized = true;
     return safe;
   }
   function buildShareRelayQuery(path = '', payload = {}) {

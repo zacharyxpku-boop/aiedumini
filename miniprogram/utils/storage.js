@@ -3677,8 +3677,36 @@ function detectTaskType(text = '', extra = '') {
   return 'unknown';
 }
 
+const TASK_TYPE_ALIAS_MAP = {
+  reading_inference: 'reading_question',
+  argument_reading: 'reading_question',
+  english_grammar: 'english_sentence',
+  dictation_sentence: 'english_sentence',
+  biology_concept: 'biology_process',
+  biology_ecology_chain: 'biology_process',
+  geography_spatial: 'geography_map',
+  geography_region_analysis: 'geography_map',
+  physics_graph: 'physics_diagram',
+  physics_energy: 'physics_diagram',
+  chemistry_equation: 'chemistry_experiment',
+  chemistry_reaction: 'chemistry_experiment',
+  data_table_reasoning: 'math_word_problem'
+};
+
+function normalizeTaskType(taskType = 'unknown', subject = '') {
+  const raw = String(taskType || '').trim();
+  const lower = raw.toLowerCase();
+  if (raw && SUBJECT_SKILL_DEPTH[raw]) return raw;
+  if (lower && SUBJECT_SKILL_DEPTH[lower]) return lower;
+  if (lower && TASK_TYPE_ALIAS_MAP[lower]) return TASK_TYPE_ALIAS_MAP[lower];
+  const subjectTaskType = taskTypeForSubject(subject);
+  if (subjectTaskType) return subjectTaskType;
+  return raw || 'unknown';
+}
+
 function firstStepTemplatesForTaskType(taskType = 'unknown') {
-  return (FIRST_STEP_TEMPLATES[taskType] || FIRST_STEP_TEMPLATES.unknown).slice();
+  const normalized = normalizeTaskType(taskType);
+  return (FIRST_STEP_TEMPLATES[normalized] || FIRST_STEP_TEMPLATES.unknown).slice();
 }
 
 function suggestedStepForTaskType(taskType = 'unknown') {
@@ -3854,7 +3882,10 @@ const SOCRATIC_ASSESSMENT_MATRIX = {
 function buildSocraticAssessmentMatrix(input = {}) {
   const sourceText = input.sourceText || input.stuckPointText || input.thought || input.title || input.text || '';
   const detectedType = detectTaskType(sourceText, input.subject || input.issueType || '');
-  const taskType = input.taskType || (detectedType !== 'unknown' ? detectedType : taskTypeForSubject(input.subject)) || 'unknown';
+  const taskType = normalizeTaskType(
+    input.taskType || (detectedType !== 'unknown' ? detectedType : taskTypeForSubject(input.subject)) || 'unknown',
+    input.subject
+  );
   const spec = SOCRATIC_ASSESSMENT_MATRIX[taskType] || SOCRATIC_ASSESSMENT_MATRIX.unknown;
   return {
     id: `socratic_assessment_${taskType}`,
@@ -3913,7 +3944,10 @@ function buildSocraticAssessmentMatrix(input = {}) {
 function buildSubjectSkillDepth(input = {}) {
   const sourceText = input.sourceText || input.stuckPointText || input.thought || input.title || input.text || '';
   const detectedType = detectTaskType(sourceText, input.subject || input.issueType || '');
-  const taskType = input.taskType || (detectedType !== 'unknown' ? detectedType : taskTypeForSubject(input.subject)) || 'unknown';
+  const taskType = normalizeTaskType(
+    input.taskType || (detectedType !== 'unknown' ? detectedType : taskTypeForSubject(input.subject)) || 'unknown',
+    input.subject
+  );
   const spec = SUBJECT_SKILL_DEPTH[taskType] || SUBJECT_SKILL_DEPTH.unknown;
   const firstStep = sanitizeMiniActionText(input.childArticulatedStep || input.systemSuggestedStep || input.firstStep || suggestedStepForTaskType(taskType));
   const socraticAssessment = buildSocraticAssessmentMatrix(Object.assign({}, input, { taskType }));
@@ -8475,6 +8509,7 @@ function saveTaskTypePattern(pattern = {}) {
 }
 
 function taskTypeLabel(type) {
+  const normalized = normalizeTaskType(type);
   return {
     math_word_problem: '数学应用题',
     equation_setup: '列方程',
@@ -8489,10 +8524,11 @@ function taskTypeLabel(type) {
     daily_math: '口算',
     light_diagnosis: '手动选题型',
     unknown: '当前题型'
-  }[type] || '当前题型';
+  }[normalized] || '当前题型';
 }
 
 function deepScaffoldingTemplates(type = 'unknown') {
+  const normalized = normalizeTaskType(type);
   const map = {
     math_word_problem: ['先把题干里的已知条件圈出来。', '现在把两个条件连起来，问一句：它们有什么关系？', '最后再想：这个关系能不能写成一个式子？'],
     equation_setup: ['先把未知数写成 x。', '再找一句能表示相等关系的话。', '最后把两边分别写出来，不急着算。'],
@@ -8508,13 +8544,14 @@ function deepScaffoldingTemplates(type = 'unknown') {
     light_diagnosis: ['先判断这道题像哪一类。', '再圈出题目真正问的内容。', '最后只写准备开始的第一步。'],
     unknown: ['先说清楚题目问什么。', '再找一个能下手的位置。', '最后把这一步写成一句话。']
   };
-  return (map[type] || map.unknown).slice();
+  return (map[normalized] || map.unknown).slice();
 }
 
 function buildSecondStepHint(type = 'unknown', firstStep = '') {
+  const normalized = normalizeTaskType(type);
   const steps = deepScaffoldingTemplates(type);
   return {
-    taskType: type,
+    taskType: normalized,
     firstStep: firstStep || steps[0],
     secondStep: steps[1],
     thirdStep: steps[2],
@@ -8523,7 +8560,7 @@ function buildSecondStepHint(type = 'unknown', firstStep = '') {
 }
 
 function updateTaskTypePatternForEvent(event = {}) {
-  const type = event.taskType || 'unknown';
+  const type = normalizeTaskType(event.taskType || 'unknown', event.subject || '');
   const pattern = loadTaskTypePattern();
   const byTaskType = Object.assign({}, pattern.byTaskType || {});
   const current = Object.assign({
@@ -8918,6 +8955,8 @@ function collectCourseBindingText(options = {}) {
 }
 
 function scoreCourseUnitBinding(unit = {}, bindingText = '', activeTaskType = '', options = {}) {
+  const normalizedActiveTaskType = normalizeTaskType(activeTaskType, options.subject || unit.subjectId || unit.subjectLabel || '');
+  const normalizedUnitTaskType = normalizeTaskType(unit.taskType, unit.subjectId || unit.subjectLabel || options.subject || '');
   const raw = collectCourseBindingText(Object.assign({}, options, { text: bindingText }));
   const text = normalizeCourseBindingText(raw);
   const unitText = normalizeCourseBindingText([
@@ -8939,7 +8978,7 @@ function scoreCourseUnitBinding(unit = {}, bindingText = '', activeTaskType = ''
   let score = 0;
   if (options.activeUnitId && unit.id === options.activeUnitId) score += 160;
   if (options.courseUnitId && unit.id === options.courseUnitId) score += 160;
-  if (activeTaskType && unit.taskType === activeTaskType) score += 80;
+  if (normalizedActiveTaskType && normalizedUnitTaskType === normalizedActiveTaskType) score += 80;
   if (options.subject && (unit.subjectId === options.subject || unit.subjectLabel === options.subject)) score += 40;
   if (text && unitText) {
     [
@@ -8961,7 +9000,7 @@ function scoreCourseUnitBinding(unit = {}, bindingText = '', activeTaskType = ''
     biology_process: ['结构', '功能', '过程', '变量', '对照', '生态'],
     geography_map: ['地图', '图例', '方向', '位置', '因果', '空间', '地形']
   };
-  (taskHints[activeTaskType] || []).forEach((token) => {
+  (taskHints[normalizedActiveTaskType] || []).forEach((token) => {
     if (text.includes(token) && unitText.includes(token)) score += 30;
   });
   return score;
@@ -8972,11 +9011,11 @@ function buildCourseUnitMap(options = {}) {
   const activeSubject = options.subject ? String(options.subject) : '';
   const bindingText = collectCourseBindingText(options);
   const detectedTaskType = detectTaskType(bindingText, `${options.subject || ''} ${options.issueType || ''}`);
-  const activeTaskType = options.taskType
+  const activeTaskType = normalizeTaskType(options.taskType
     || (detectedTaskType !== 'unknown' ? detectedTaskType : '')
     || taskTypeForSubject(activeSubject)
     || (subjectLibrary.active && subjectLibrary.active.taskType)
-    || 'unknown';
+    || 'unknown', activeSubject);
   const subjects = (subjectLibrary.subjects || []).map((subject) => {
     const units = (subject.seeds || []).map((seed, index) => ({
       id: `${subject.id}_unit_${seed.id}`,
@@ -9043,7 +9082,7 @@ function buildCourseUnitMap(options = {}) {
     }))
     .sort((a, b) => b.activeBindingScore - a.activeBindingScore || a.order - b.order);
   const positiveUnits = scoredUnits.filter((unit) => unit.activeBindingScore > 0);
-  const taskMatchedUnits = scoredUnits.filter((unit) => unit.taskType === activeTaskType);
+  const taskMatchedUnits = scoredUnits.filter((unit) => normalizeTaskType(unit.taskType, unit.subjectId || unit.subjectLabel) === activeTaskType);
   const activeUnits = (positiveUnits.length ? positiveUnits : taskMatchedUnits.length ? taskMatchedUnits : scoredUnits).slice(0, 3);
   const activeUnitIds = activeUnits.map((unit) => unit.id);
   const activeBindingEvidence = activeUnits.map((unit) => ({
@@ -9286,7 +9325,7 @@ function buildPressureSampleIndex(samples = []) {
   samples.forEach((sample) => {
     if (!sample) return;
     const subjectKey = sample.subject || '';
-    const taskKey = sample.taskType || '';
+    const taskKey = normalizeTaskType(sample.taskType || '', subjectKey);
     if (subjectKey) {
       if (!bySubject[subjectKey]) bySubject[subjectKey] = [];
       bySubject[subjectKey].push(sample);
@@ -9302,8 +9341,10 @@ function buildPressureSampleIndex(samples = []) {
 }
 
 function scorePressureSampleForUnit(sample = {}, unit = {}, type = 'active_recall') {
+  const sampleTaskType = normalizeTaskType(sample.taskType || '', sample.subject || '');
+  const unitTaskType = normalizeTaskType(unit.taskType || '', unit.subjectLabel || unit.subjectId || '');
   const subjectHit = sample.subject && unit.subjectLabel && sample.subject === unit.subjectLabel ? 40 : 0;
-  const taskHit = sample.taskType && unit.taskType && sample.taskType === unit.taskType ? 35 : 0;
+  const taskHit = sampleTaskType && unitTaskType && sampleTaskType === unitTaskType ? 35 : 0;
   const gradeHit = sample.gradeBand && unit.gradeBand && normalizeCourseSampleText(sample.gradeBand) === normalizeCourseSampleText(unit.gradeBand) ? 12 : 0;
   const unitText = normalizeCourseSampleText(`${unit.unitLabel || ''} ${(unit.reusableQuestionTypes || []).join(' ')}`);
   const sampleText = normalizeCourseSampleText(`${sample.stem || ''} ${sample.expectedWrongCause || ''} ${sample.expectedFirstStep || ''}`);
@@ -9322,7 +9363,7 @@ function explainPressureSampleMatch(sample = {}, unit = {}, type = 'active_recal
   const weaknesses = [];
   if (sample.subject && unit.subjectLabel && sample.subject === unit.subjectLabel) reasons.push('subject_match');
   else weaknesses.push('subject_fallback');
-  if (sample.taskType && unit.taskType && sample.taskType === unit.taskType) reasons.push('task_type_match');
+  if (sample.taskType && unit.taskType && normalizeTaskType(sample.taskType, sample.subject || '') === normalizeTaskType(unit.taskType, unit.subjectLabel || unit.subjectId || '')) reasons.push('task_type_match');
   else weaknesses.push('task_type_fallback');
   if (sample.gradeBand && unit.gradeBand && normalizeCourseSampleText(sample.gradeBand) === normalizeCourseSampleText(unit.gradeBand)) reasons.push('grade_band_match');
   else weaknesses.push('grade_band_unverified');
@@ -9344,7 +9385,7 @@ function findPressureSampleForUnit(unit = {}, type = 'active_recall', index = 0,
   const samples = Array.isArray(samplesInput) ? samplesInput : getRealHomeworkPressureSamplePool();
   if (!samples.length) return null;
   const sampleIndex = buildPressureSampleIndex(samples);
-  const subjectTaskKey = `${unit.subjectLabel || ''}::${unit.taskType || ''}`;
+  const subjectTaskKey = `${unit.subjectLabel || ''}::${normalizeTaskType(unit.taskType || '', unit.subjectLabel || unit.subjectId || '')}`;
   const candidatePool = sampleIndex.bySubjectTask[subjectTaskKey]
     || sampleIndex.bySubject[unit.subjectLabel || '']
     || samples;
@@ -12668,6 +12709,7 @@ module.exports = {
   formatRouteStage,
   formatSourceLabel,
   formatInternalLabel,
+  normalizeTaskType,
   getGrowthMemoryLine,
   growthMemoryCopyFor,
   buildWeeklyGrowthMemory,

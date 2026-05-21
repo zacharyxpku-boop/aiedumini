@@ -66,6 +66,28 @@ const TYPE_COUNTS = [
   { id: 'writing_process', label: '写作过程', count: 24, firstStep: '先写一句朴素事实、段落中心、一个关键瞬间、一个动作语言心理细节、结尾照应、语段顺序、修改成分残缺或选一个核心材料，不追求完整成文。' }
 ];
 
+const TASK_TYPE_ALIAS_MAP = {
+  reading_inference: 'reading_question',
+  argument_reading: 'reading_question',
+  english_grammar: 'english_sentence',
+  dictation_sentence: 'english_sentence',
+  biology_concept: 'biology_process',
+  biology_ecology_chain: 'biology_process',
+  geography_spatial: 'geography_map',
+  geography_region_analysis: 'geography_map',
+  physics_graph: 'physics_diagram',
+  physics_energy: 'physics_diagram',
+  chemistry_equation: 'chemistry_experiment',
+  chemistry_reaction: 'chemistry_experiment',
+  data_table_reasoning: 'math_word_problem'
+};
+
+function normalizeTaskType(taskType = '') {
+  const raw = String(taskType || '').trim();
+  const lower = raw.toLowerCase();
+  return TASK_TYPE_ALIAS_MAP[lower] || lower || raw;
+}
+
 const SAMPLE_CLUSTERS = [
   {
     id: 'percent_ratio_inequality',
@@ -249,14 +271,14 @@ const FALLBACK_PRESSURE_SAMPLE_ATLAS = [
 ];
 
 function getRealHomeworkPressureSamples(options = {}) {
-  const taskType = String(options.taskType || '').trim();
+  const taskType = normalizeTaskType(options.taskType || '');
   const subject = String(options.subject || '').trim();
   const source = Array.isArray(REAL_HOMEWORK_PRESSURE_SAMPLES) && REAL_HOMEWORK_PRESSURE_SAMPLES.length
     ? REAL_HOMEWORK_PRESSURE_SAMPLES
     : FALLBACK_PRESSURE_SAMPLE_ATLAS;
   if (!taskType && !subject) return source;
   const matched = source.filter((sample) => {
-    const taskMatched = !taskType || sample.taskType === taskType;
+    const taskMatched = !taskType || normalizeTaskType(sample.taskType || '') === taskType;
     const subjectMatched = !subject || sample.subject === subject;
     return taskMatched && subjectMatched;
   });

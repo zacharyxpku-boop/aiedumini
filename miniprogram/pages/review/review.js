@@ -194,16 +194,17 @@ Page({
     const hasQueryContext = !!(rawQuery.reportId || rawQuery.cardId || rawQuery.sourceSchemaId || rawQuery.from === 'upload_report_ready');
     const expiresAt = handoff && handoff.expiresAt ? Date.parse(handoff.expiresAt) : 0;
     const expired = !!(expiresAt && expiresAt < (Date.now ? Date.now() : new Date().getTime()));
+    const readyHandoff = !!(handoff && !expired && handoff.status === 'ready');
     const matchesQuery = !!(handoff && !expired && hasQueryContext && (
       (rawQuery.reportId && rawQuery.reportId === handoff.reportId)
       || (rawQuery.cardId && rawQuery.cardId === handoff.cardId)
       || (rawQuery.sourceSchemaId && rawQuery.sourceSchemaId === handoff.sourceSchemaId)
       || rawQuery.from === 'upload_report_ready'
     ));
-    const context = Object.assign({}, matchesQuery ? handoff : {}, rawQuery);
-    const fromUpload = context.from === 'upload_report_ready' || matchesQuery;
+    const context = Object.assign({}, (matchesQuery || readyHandoff) ? handoff : {}, rawQuery);
+    const fromUpload = context.from === 'upload_report_ready' || matchesQuery || readyHandoff;
     if (!fromUpload && !context.cardId && !context.sourceSchemaId) return null;
-    if (matchesQuery && storage.set) {
+    if ((matchesQuery || readyHandoff) && storage.set) {
       storage.set('upload.report.handoff.v1', Object.assign({}, handoff, {
         consumedAt: new Date().toISOString(),
         status: 'consumed'
