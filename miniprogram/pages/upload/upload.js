@@ -968,6 +968,14 @@ Page({
     const reportBehaviorSignals = reportDraft.behaviorSignals || {};
     const sourceTextForMiniLesson = String(options.sourceText || reportDraft.sourceText || reportBehaviorSignals.sourceText || '').slice(0, 500);
     const guardedAiReportDraft = options.guardedAiReportDraft || null;
+    const miniLessonSubject = uploadEvidenceSignals.subjectLabel
+      || uploadEvidenceSignals.subjectKey
+      || decisionSource.subjectLabel
+      || decisionSource.subjectKey
+      || options.subject
+      || reportBehaviorSignals.subject
+      || decisionSource.sourceSchemaLabel
+      || sourceSchemaId;
     const aiMaterialAnalysisContract = importIntake.buildAiMaterialAnalysisContract
       ? importIntake.buildAiMaterialAnalysisContract(uploadEvidenceSignals.uploadIntakePacket || {
         intakeSourceSchema: { id: sourceSchemaId, label: decisionSource.sourceSchemaLabel || sourceSchemaId },
@@ -992,14 +1000,6 @@ Page({
       || decisionSource.taskType
       || uploadEvidenceSignals.questionType
       || reportBehaviorSignals.questionType
-      || sourceSchemaId;
-    const miniLessonSubject = uploadEvidenceSignals.subjectLabel
-      || uploadEvidenceSignals.subjectKey
-      || decisionSource.subjectLabel
-      || decisionSource.subjectKey
-      || options.subject
-      || reportBehaviorSignals.subject
-      || decisionSource.sourceSchemaLabel
       || sourceSchemaId;
     const openMaicTaskPlan = openMaicInspiredPlan.buildOpenMaicInspiredTaskPlan({
       taskType: miniLessonTaskType,
