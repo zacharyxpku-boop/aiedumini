@@ -5951,6 +5951,44 @@ function clearActiveMiniLessonResumeContext() {
   remove(KEYS.activeMiniLessonResumeContext);
 }
 
+function buildMiniLessonParentAssistCard(input = {}, event = {}, card = null) {
+  const evidenceThread = input.evidenceThread && typeof input.evidenceThread === 'object'
+    ? input.evidenceThread
+    : {};
+  const parentCheck = input.parentCheck
+    || input.parentLine
+    || evidenceThread.parentCheck
+    || (card && (card.parentCheck || card.parentPrompt))
+    || '家长只问：这题第一步先看哪里？';
+  const firstStep = input.firstStep
+    || evidenceThread.firstStep
+    || (card && card.firstStep)
+    || '先说出第一步';
+  const nextDayReview = input.nextDayReview
+    || input.revisit
+    || evidenceThread.nextDayReview
+    || (card && (card.nextReview || card.revisit))
+    || '明天只回访同一个第一步。';
+  return {
+    id: `parent_assist_${event.flowTraceId || event.cardId || Date.now()}`,
+    type: 'parent_handoff_required',
+    title: '家长协助卡',
+    status: 'needs_support',
+    cardId: event.cardId || (card && card.id) || '',
+    flowTraceId: event.flowTraceId || '',
+    topicCardId: event.topicCardId || '',
+    firstStep,
+    parentCheck,
+    cannotAnswerFallback: '孩子说不出来时，不讲完整答案，只让他圈一个条件、读一句题干或指出图上的一个对象。',
+    stopRule: '今晚不加题、不讲整套过程、不比较分数；只拿到一句孩子自己的第一步。',
+    nextDayReview,
+    route: '/pages/profile/profile?from=mini_lesson_parent_assist',
+    reviewRoute: '/pages/review/review?from=mini_lesson_parent_assist',
+    blockedFields: event.blockedFields || ['original_question', 'full_answer', 'full_dialogue', 'score', 'ranking', 'talent_label'],
+    allowedFields: ['first_step', 'parent_check', 'cannot_answer_fallback', 'next_day_review']
+  };
+}
+
 function recordMiniLessonExitGate(input = {}, context = {}) {
   const now = new Date();
   const childExitTicketText = String(input.childExitTicketText || input.receiverFirstStep || input.childFirstStep || '').trim();
@@ -6043,6 +6081,27 @@ function recordMiniLessonExitGate(input = {}, context = {}) {
     blocked_fields: blockedFields.join(','),
     created_at: event.created_at
   });
+  let parentAssistCard = null;
+  if (status !== 'passed') {
+    parentAssistCard = buildMiniLessonParentAssistCard(input, event, card);
+    appendReviewEvent(Object.assign({}, parentAssistCard, {
+      event: 'parent_handoff_required',
+      source: input.source || context.source || 'mini_lesson_exit_gate',
+      created_at: event.created_at
+    }));
+    appendSyncMutation('parent_handoff_required', {
+      id: parentAssistCard.id,
+      card_id: parentAssistCard.cardId,
+      flow_trace_id: parentAssistCard.flowTraceId,
+      topic_card_id: parentAssistCard.topicCardId,
+      parent_check: parentAssistCard.parentCheck,
+      next_day_review: parentAssistCard.nextDayReview,
+      route: parentAssistCard.route,
+      review_route: parentAssistCard.reviewRoute,
+      blocked_fields: parentAssistCard.blockedFields.join(','),
+      created_at: event.created_at
+    });
+  }
   if (card && card.id) {
     const cards = loadReviewCards();
     const updated = cards.map((item) => {
@@ -6063,7 +6122,7 @@ function recordMiniLessonExitGate(input = {}, context = {}) {
     });
     saveReviewCards(updated);
   }
-  return { event, card, nextRoute, status };
+  return { event, card, parentAssistCard, nextRoute, status };
 }
 
 function recordMiniLessonReviewResult(input = {}, context = {}) {

@@ -941,6 +941,15 @@ page {
   border-radius: 18rpx;
 }
 
+.mini-lesson-parent-assist {
+  display: grid;
+  gap: 6rpx;
+  padding: 14rpx 16rpx;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1rpx solid rgba(27, 67, 50, 0.12);
+  border-radius: 18rpx;
+}
+
 .mini-lesson-exit-ticket {
   box-sizing: border-box;
   width: 100%;

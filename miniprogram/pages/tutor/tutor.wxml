@@ -336,6 +336,18 @@
             </view>
             <view class="mini-lesson-check" wx:if="{{miniLessonExitGateStatus}}">已记录：{{miniLessonExitGateStatus}}</view>
             <view class="mini-lesson-check" wx:if="{{miniLessonExitGateNextRoute}}">下一步：{{miniLessonExitGateNextRoute}}</view>
+            <view class="mini-lesson-parent-assist" wx:if="{{miniLessonParentAssistCard}}">
+              <view class="mini-lesson-note-label">{{miniLessonParentAssistCard.title}}</view>
+              <view class="mini-lesson-note-text">只问一句：{{miniLessonParentAssistCard.parentCheck}}</view>
+              <view class="mini-lesson-note-text">答不上来：{{miniLessonParentAssistCard.cannotAnswerFallback}}</view>
+              <view class="mini-lesson-note-text">明天回访：{{miniLessonParentAssistCard.nextDayReview}}</view>
+              <view class="mini-lesson-note-text">停止规则：{{miniLessonParentAssistCard.stopRule}}</view>
+            </view>
+            <button
+              class="mini-lesson-exit-button primary"
+              wx:if="{{miniLessonExitGateAction}}"
+              bindtap="continueMiniLessonExitGateAction"
+            >{{miniLessonExitGateAction.label}}</button>
             <view class="mini-lesson-check" wx:if="{{thinkingReceipt.miniLesson.executionContract}}">
               本地门禁：{{thinkingReceipt.miniLesson.executionContract.releaseGates[0]}} / {{thinkingReceipt.miniLesson.executionContract.releaseGates[2]}}
             </view>

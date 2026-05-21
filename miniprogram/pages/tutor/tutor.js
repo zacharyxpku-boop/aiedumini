@@ -867,6 +867,8 @@ Page({
     miniLessonFeedbackBridge: null,
     miniLessonExitGateStatus: '',
     miniLessonExitGateNextRoute: '',
+    miniLessonExitGateAction: null,
+    miniLessonParentAssistCard: null,
     miniLessonActiveFrameIndex: 0,
     childExitTicketText: '',
     surfaceDepthPack: null,
@@ -953,6 +955,8 @@ Page({
       miniLessonFeedbackBridge: null,
       miniLessonExitGateStatus: '',
       miniLessonExitGateNextRoute: '',
+      miniLessonExitGateAction: null,
+      miniLessonParentAssistCard: null,
       miniLessonActiveFrameIndex: 0,
       childExitTicketText: '',
       tutorTurnState,
@@ -1389,6 +1393,8 @@ Page({
       miniLessonFeedbackBridge: null,
       miniLessonExitGateStatus: '',
       miniLessonExitGateNextRoute: '',
+      miniLessonExitGateAction: null,
+      miniLessonParentAssistCard: null,
       miniLessonActiveFrameIndex: 0,
       childExitTicketText: ''
     });
@@ -1590,6 +1596,12 @@ Page({
         ? '已过退出门'
         : (passed ? '缺孩子自己的退出票，转家长协助' : '还不能过，转家长协助'),
       miniLessonExitGateNextRoute: nextRoute,
+      miniLessonExitGateAction: {
+        label: exitGatePassed ? '去明天回访卡' : '打开家长协助卡',
+        route: exitGatePassed ? nextRoute : ((exitGateRecord && exitGateRecord.parentAssistCard && exitGateRecord.parentAssistCard.route) || nextRoute),
+        status: exitGatePassed ? 'exit_gate_passed' : 'parent_assist_required'
+      },
+      miniLessonParentAssistCard: exitGatePassed ? null : ((exitGateRecord && exitGateRecord.parentAssistCard) || null),
       socraticFeedbackStatus: exitGatePassed ? 'first_step_spoken' : 'still_blocked',
       socraticFeedbackNextAction: exitGateNeedsSupport ? '停止加提示，交给家长只问一句' : '明天只回访同一个第一步'
     });
@@ -1599,6 +1611,12 @@ Page({
         icon: 'none'
       });
     }
+  },
+
+  continueMiniLessonExitGateAction() {
+    const action = this.data.miniLessonExitGateAction || {};
+    const route = action.route || this.data.miniLessonExitGateNextRoute || '/pages/review/review?from=mini_lesson_exit_gate';
+    navigation.navigateLearningRoute(route);
   },
 
   clearChat() {
@@ -1623,6 +1641,8 @@ Page({
       miniLessonFeedbackBridge: null,
       miniLessonExitGateStatus: '',
       miniLessonExitGateNextRoute: '',
+      miniLessonExitGateAction: null,
+      miniLessonParentAssistCard: null,
       miniLessonActiveFrameIndex: 0
     });
   },
