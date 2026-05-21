@@ -522,6 +522,105 @@ function buildAiReportDraftAdapter(packet = {}, evidenceSignals = {}) {
   };
 }
 
+function buildPersonalizedUploadSolutionRunway(packet = {}, evidenceSignals = {}) {
+  const schema = packet.intakeSourceSchema || {};
+  const sourceSchemaId = schema.id || 'parent_report';
+  const isTalent = sourceSchemaId === 'talent_assessment';
+  const isWrongPaper = sourceSchemaId === 'wrong_question_paper' || sourceSchemaId === 'wrong_question_photo';
+  const isSchool = sourceSchemaId === 'school_material';
+  const firstStep = evidenceSignals.firstStep || evidenceSignals.stuckFirstStep || 'child_names_first_step';
+  const wrongCause = evidenceSignals.wrongCause || evidenceSignals.wrongCauseGuess || 'wrong_cause_candidate';
+  const recommendedMode = isTalent
+    ? {
+      id: 'socratic_validation_first',
+      label: 'Socratic method validation',
+      entryRoute: '/pages/tutor/tutor?from=upload_method_validation',
+      reason: 'assessment is only a method hypothesis until real homework evidence confirms it'
+    }
+    : isWrongPaper
+      ? {
+        id: 'wrong_cause_repair_loop',
+        label: 'Wrong-cause repair loop',
+        entryRoute: '/pages/review/review?from=upload_wrong_paper',
+        reason: 'wrong paper should become first-step, wrong-cause, and revisit cards, not full answers'
+      }
+      : isSchool
+        ? {
+          id: 'home_school_digest_loop',
+          label: 'Home-school digest loop',
+          entryRoute: '/pages/profile/profile?from=upload_school_material',
+          reason: 'teacher or school material should become safe parent questions and home actions'
+        }
+        : {
+          id: 'family_private_tutor_loop',
+          label: 'Family private tutor loop',
+          entryRoute: '/pages/tutor/tutor?from=upload_family_report',
+          reason: 'parent observation should become one low-pressure first-step action'
+        };
+  return {
+    id: 'personalized_upload_solution_runway',
+    sourceSchemaId,
+    recommendedMode,
+    closedLoop: [
+      {
+        id: 'intake',
+        owner: 'local_code',
+        action: 'classify source, block unsafe claims, request structured evidence',
+        route: '/pages/upload/upload'
+      },
+      {
+        id: 'first_step',
+        owner: 'ai_with_local_guardrail',
+        action: firstStep,
+        route: recommendedMode.entryRoute
+      },
+      {
+        id: 'repair_or_lesson',
+        owner: 'local_code',
+        action: isTalent ? 'validate method on one real wrong question before practice' : `repair ${wrongCause} with a small board or recall card`,
+        route: isWrongPaper ? '/pages/review/review?from=solution_runway' : '/pages/tutor/tutor?from=solution_runway'
+      },
+      {
+        id: 'game_return',
+        owner: 'local_code',
+        action: 'release 90-second recall only after a real recall source exists',
+        route: '/pages/arcade/arcade?from=solution_runway'
+      },
+      {
+        id: 'parent_report',
+        owner: 'local_code',
+        action: 'write parent-visible evidence, next revisit, and blocked claims',
+        route: '/pages/profile/profile?from=solution_runway'
+      }
+    ],
+    externalKeyUse: {
+      usefulFor: ['child_friendly_explanation', 'parent_summary_rewrite', 'socratic_question_variants', 'material_summary_candidate'],
+      mustBeGuardedByLocalCode: ['source_classification', 'evidence_release', 'reward_release', 'share_payload', 'portrait_confidence'],
+      notAllowedFor: ['talent_label', 'auto_grading', 'ocr_claim', 'full_answer', 'ranking_or_score_claim', 'guaranteed_improvement']
+    },
+    releaseGates: [
+      'real_homework_or_structured_text_before_tutor',
+      'child_first_step_before_review_card',
+      'next_day_revisit_before_portrait_confidence',
+      'day7_variant_before_method_claim',
+      'safe_share_payload_before_external_relay'
+    ],
+    blockedFields: UPLOAD_DECISION_BLOCKED_FIELDS.filter((field) => [
+      'original_answer',
+      'full_solution',
+      'photo_ocr_claim',
+      'score',
+      'ranking',
+      'talent_label',
+      'personality_label',
+      'private_comment',
+      'photo',
+      'original_question',
+      'full_dialogue'
+    ].includes(field))
+  };
+}
+
 function buildUploadIntakePacket(text = '', imagePaths = [], materialType = '') {
   const value = String(text || '').trim();
   const images = Array.isArray(imagePaths) ? imagePaths.filter(Boolean).slice(0, 4) : [];
@@ -607,6 +706,11 @@ function buildUploadIntakePacket(text = '', imagePaths = [], materialType = '') 
     reportSeed,
     kind
   });
+  const personalizedUploadSolutionRunway = buildPersonalizedUploadSolutionRunway({
+    intakeSourceSchema,
+    reportSeed,
+    kind
+  });
   return {
     id: `upload_intake_${Date.now ? Date.now() : 0}`,
     kind,
@@ -631,6 +735,7 @@ function buildUploadIntakePacket(text = '', imagePaths = [], materialType = '') 
     methodValidationChallengeChain,
     photoEvidencePolicy,
     aiReportDraftAdapter,
+    personalizedUploadSolutionRunway,
     reviewSeed,
     reportSeed,
     aiBoundary: 'AI 只负责改写提示和追问；来源识别、路线、放行、分享字段由本地规则决定。'
@@ -645,6 +750,7 @@ module.exports = {
   buildSourceReadinessBoard,
   buildMethodValidationChallengeChain,
   buildAiReportDraftAdapter,
+  buildPersonalizedUploadSolutionRunway,
   classifyImportInput,
   detectMaterialSource,
   detectIntakeSourceSchema,

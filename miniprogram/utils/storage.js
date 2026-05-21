@@ -9242,6 +9242,80 @@ function buildGradeChapterTeachingStrategyMap(options = {}) {
   };
 }
 
+function buildGradeChapterStrategyDensityAudit(options = {}) {
+  const strategyMap = options.strategyMap || buildGradeChapterTeachingStrategyMap(options);
+  const strategies = Array.isArray(strategyMap.strategies) ? strategyMap.strategies : [];
+  const samples = getRealHomeworkPressureSamplePool();
+  const bySubject = strategies.reduce((acc, item) => {
+    const key = item.subjectId || item.subjectLabel || 'unknown';
+    if (!acc[key]) {
+      acc[key] = {
+        id: key,
+        label: item.subjectLabel || key,
+        strategyCount: 0,
+        stableStrategyCount: 0,
+        sampleBackedCount: 0,
+        failureFallbackCount: 0,
+        aiBoundaryReadyCount: 0
+      };
+    }
+    const sampleHit = samples.some((sample) => sample && sample.subject === item.subjectLabel && normalizeTaskType(sample.taskType || '', sample.subject || '') === normalizeTaskType(item.taskType || '', item.subjectLabel || item.subjectId || ''));
+    const stable = Boolean(item.firstStepPrompt && item.wrongCauseLabel && item.boardMove && item.parentCheckPrompt && item.nearTransferRule);
+    const fallbackReady = Boolean(item.localGate && item.releaseGate && item.answerPolicy === 'first_step_only_no_full_answer');
+    const aiBoundaryReady = Boolean(item.aiRole && item.shareBoundary && String(item.shareBoundary).includes('full') === false);
+    acc[key].strategyCount += 1;
+    if (stable) acc[key].stableStrategyCount += 1;
+    if (sampleHit) acc[key].sampleBackedCount += 1;
+    if (fallbackReady) acc[key].failureFallbackCount += 1;
+    if (aiBoundaryReady) acc[key].aiBoundaryReadyCount += 1;
+    return acc;
+  }, {});
+  const subjectRows = Object.keys(bySubject).map((key) => {
+    const row = bySubject[key];
+    return Object.assign({}, row, {
+      stableRatio: row.strategyCount ? Number((row.stableStrategyCount / row.strategyCount).toFixed(2)) : 0,
+      sampleBackedRatio: row.strategyCount ? Number((row.sampleBackedCount / row.strategyCount).toFixed(2)) : 0,
+      failureFallbackRatio: row.strategyCount ? Number((row.failureFallbackCount / row.strategyCount).toFixed(2)) : 0,
+      aiBoundaryReadyRatio: row.strategyCount ? Number((row.aiBoundaryReadyCount / row.strategyCount).toFixed(2)) : 0
+    });
+  });
+  const total = strategies.length;
+  const stable = subjectRows.reduce((sum, row) => sum + row.stableStrategyCount, 0);
+  const sampleBacked = subjectRows.reduce((sum, row) => sum + row.sampleBackedCount, 0);
+  const fallback = subjectRows.reduce((sum, row) => sum + row.failureFallbackCount, 0);
+  const aiBoundary = subjectRows.reduce((sum, row) => sum + row.aiBoundaryReadyCount, 0);
+  return {
+    id: 'grade_chapter_strategy_density_audit',
+    title: 'Grade chapter strategy density audit',
+    subjectCount: subjectRows.length,
+    strategyCount: total,
+    stableStrategyCount: stable,
+    sampleBackedStrategyCount: sampleBacked,
+    failureFallbackStrategyCount: fallback,
+    aiBoundaryReadyStrategyCount: aiBoundary,
+    pressureSampleCount: samples.length,
+    subjectRows,
+    stable: total > 0 && stable === total && fallback === total && aiBoundary === total && sampleBacked >= Math.min(total, 63),
+    minimumCommercialBar: {
+      strategies: 63,
+      pressureSamples: 400,
+      subjectRows: 7,
+      requiredPerStrategy: ['first_step_prompt', 'wrong_cause_label', 'board_move', 'parent_check', 'near_transfer', 'local_fallback', 'ai_boundary']
+    },
+    localCodeOwns: ['strategy_density', 'sample_match', 'fallback_gate', 'answer_policy', 'release_gate'],
+    aiMayRewrite: ['prompt_wording', 'parent_copy', 'mini_lesson_copy'],
+    aiMustNotOwn: ['strategy_release', 'answer_policy', 'score_claim', 'talent_label'],
+    nextHardeningQueue: subjectRows
+      .filter((row) => row.stableRatio < 1 || row.failureFallbackRatio < 1 || row.aiBoundaryReadyRatio < 1)
+      .slice(0, 6)
+      .map((row) => ({
+        id: row.id,
+        label: row.label,
+        action: 'add_missing_first_step_wrong_cause_board_parent_transfer_or_boundary'
+      }))
+  };
+}
+
 function buildCourseUnitMasteryTrajectory(options = {}) {
   const courseUnitMap = options.courseUnitMap || buildCourseUnitMap(options);
   const active = courseUnitMap && courseUnitMap.active ? courseUnitMap.active : null;
@@ -12697,6 +12771,7 @@ module.exports = {
   buildSubjectSeedLibrary,
   buildCourseUnitMap,
   buildGradeChapterTeachingStrategyMap,
+  buildGradeChapterStrategyDensityAudit,
   buildCourseUnitMasteryTrajectory,
   buildCourseUnitQuestionBank,
   buildCourseUnitDepthExpansionAtlas,
