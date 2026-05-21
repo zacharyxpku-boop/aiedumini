@@ -298,6 +298,29 @@
               </view>
             </view>
           </view>
+          <view class="intake-action-queue" wx:if="{{lastReportCta.servicePathway.partnerServiceDeliveryLedger}}">
+            <view class="intake-action-title">合作交付账本</view>
+            <view class="intake-action-item">
+              <view class="intake-action-main">
+                <text>状态：{{lastReportCta.servicePathway.partnerServiceDeliveryLedger.status}}</text>
+                <text>门槛：{{lastReportCta.servicePathway.partnerServiceDeliveryLedger.releaseGate}}</text>
+              </view>
+              <view class="intake-action-meta">
+                <text>可见字段：{{lastReportCta.servicePathway.partnerServiceDeliveryLedger.partnerVisibleFields}}</text>
+                <text>阻断字段：{{lastReportCta.servicePathway.partnerServiceDeliveryLedger.partnerBlockedFields}}</text>
+              </view>
+            </view>
+            <view class="intake-action-item" wx:for="{{lastReportCta.servicePathway.partnerServiceDeliveryLedger.packageCards}}" wx:key="id">
+              <view class="intake-action-main">
+                <text>{{item.label}}</text>
+                <text>{{item.deliverable}}</text>
+              </view>
+              <view class="intake-action-meta">
+                <text>{{item.entryGate}}</text>
+                <text>{{item.nextRoute}}</text>
+              </view>
+            </view>
+          </view>
           <view class="intake-action-queue" wx:if="{{lastReportCta.servicePathway.quickAssessmentBridge}}">
             <view class="intake-action-title">没有现成测评时</view>
             <view class="intake-action-item">
