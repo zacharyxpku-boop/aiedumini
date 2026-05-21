@@ -229,6 +229,26 @@ Page({
     };
   },
 
+  resolveReportRevisitContext(focus = {}) {
+    const current = this.data.current || {};
+    const evidenceThread = current.evidenceThread && typeof current.evidenceThread === 'object'
+      ? current.evidenceThread
+      : {};
+    const reportSourceContext = this.data.reportSourceContext || {};
+    return {
+      reportId: focus.reportId
+        || reportSourceContext.reportId
+        || current.reportId
+        || evidenceThread.reportId
+        || '',
+      flowTraceId: focus.flowTraceId
+        || reportSourceContext.flowTraceId
+        || current.flowTraceId
+        || evidenceThread.flowTraceId
+        || ''
+    };
+  },
+
   prioritizeReportSourceCards(cards = [], context = null) {
     if (!context) return cards;
     const matched = [];
@@ -1267,14 +1287,16 @@ Page({
         title: '接收者完成修卡点第一步'
       });
     }
-    if (storage.recordReportRevisitEvidence && focus && focus.reportId) {
-      storage.recordReportRevisitEvidence(focus.reportId, {
+    const reportRevisitContext = this.resolveReportRevisitContext(focus || {});
+    if (storage.recordReportRevisitEvidence && reportRevisitContext.reportId) {
+      storage.recordReportRevisitEvidence(reportRevisitContext.reportId, {
         status: 'review_completed',
         nextDayRevisit: true,
         firstStep: miniActionText,
         wrongCause: focus.wrongCauseLabel || focus.weakPoint || focus.title || '',
         parentCheck: '家长只确认第一步和错因，不升级长期画像。',
-        route: '/pages/review/review'
+        route: '/pages/review/review',
+        flowTraceId: reportRevisitContext.flowTraceId
       });
     }
     this.setData({

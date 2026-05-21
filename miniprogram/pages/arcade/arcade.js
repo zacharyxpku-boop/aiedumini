@@ -104,7 +104,8 @@ Page({
       openMaicBridgeStatus: context.openMaicDecisionBridge && context.openMaicDecisionBridge.qualityGate
         ? context.openMaicDecisionBridge.qualityGate.status
         : '',
-      returnRoute: context.returnRoute || context.actionRoute || ''
+      returnRoute: context.returnRoute || context.actionRoute || '',
+      flowTraceId: context.flowTraceId || ''
     };
   },
 
@@ -1324,8 +1325,15 @@ Page({
     });
     const wrongAnswers = arcade.uniqueWrongAnswers(answers);
     const repairFocus = wrongAnswers.length ? arcade.buildRepairFocus(wrongAnswers[0], this.data.cards) : null;
+    const reportSourceContext = this.data.reportSourceContext || {};
     const gameRetention = storage.recordGameSessionResult
-      ? storage.recordGameSessionResult(savedResult, { gameType: savedResult.gameType })
+      ? storage.recordGameSessionResult(savedResult, {
+        gameType: savedResult.gameType,
+        reportId: reportSourceContext.reportId || '',
+        flowTraceId: reportSourceContext.flowTraceId || '',
+        route: reportSourceContext.returnRoute || '/pages/arcade/arcade',
+        parentCheck: reportSourceContext.line || ''
+      })
       : null;
     const gameRetentionLoop = gameLogic.buildGameRetentionLoop
       ? gameLogic.buildGameRetentionLoop(
@@ -2297,7 +2305,10 @@ Page({
       }, {
         gameType: 'ninety_second_recall',
         xpReason: 'ninety_second_recall_completed',
-        weakKey: evidence.weakKey
+        weakKey: evidence.weakKey,
+        reportId: (this.data.reportSourceContext && this.data.reportSourceContext.reportId) || '',
+        flowTraceId: (this.data.reportSourceContext && this.data.reportSourceContext.flowTraceId) || '',
+        route: (this.data.reportSourceContext && this.data.reportSourceContext.returnRoute) || '/pages/arcade/arcade'
       });
     }
     if (api.submitEvent) {
@@ -2472,7 +2483,10 @@ Page({
         recallEvidence: [packet],
         activeRecallEvidenceComplete: false
       }, {
-        gameType: 'daily_primary_recall_ticket'
+        gameType: 'daily_primary_recall_ticket',
+        reportId: (this.data.reportSourceContext && this.data.reportSourceContext.reportId) || '',
+        flowTraceId: (this.data.reportSourceContext && this.data.reportSourceContext.flowTraceId) || '',
+        route: (this.data.reportSourceContext && this.data.reportSourceContext.returnRoute) || '/pages/arcade/arcade'
       });
     }
     return packet;
