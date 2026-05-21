@@ -188,10 +188,21 @@
         <view class="daily-return-pill">{{dailyReturnMission.totalSeconds}} 秒</view>
       </view>
       <view class="daily-return-line">{{dailyReturnMission.promiseLine}}</view>
+      <view class="daily-return-rule" wx:if="{{ninetySecondRecallDeck.playableExperience}}">{{ninetySecondRecallDeck.playableExperience.headline}}</view>
+      <view class="daily-return-rule" wx:if="{{ninetySecondRecallDeck.playableExperience}}">{{ninetySecondRecallDeck.playableExperience.whyThisWorks}}</view>
       <view class="daily-return-rule" wx:if="{{ninetySecondRecallState}}">状态：{{ninetySecondRecallState.statusLabel}}｜当前：{{ninetySecondRecallState.currentStepLabel}}｜{{ninetySecondRecallState.completionLine}}</view>
       <view class="daily-return-rule timeout" wx:if="{{ninetySecondRecallState.failureDowngradeLine}}">{{ninetySecondRecallState.failureDowngradeLine}}</view>
       <view class="daily-return-rule" wx:if="{{ninetySecondRecallState}}">状态：{{ninetySecondRecallState.status}}｜剩余 {{ninetySecondRecallState.secondsLeft}} 秒｜当前第 {{ninetySecondRecallState.stepIndex + 1}} 步</view>
       <button class="daily-return-button" bindtap="startNinetySecondRecall">开始 90 秒</button>
+      <view class="daily-return-steps compact" wx:if="{{ninetySecondRecallDeck.playableExperience}}">
+        <view class="daily-return-step" wx:for="{{ninetySecondRecallDeck.playableExperience.loop}}" wx:key="id">
+          <view class="daily-return-step-order">{{index + 1}}</view>
+          <view class="daily-return-step-body">
+            <view class="daily-return-step-action">{{item.label}}：{{item.playerAction}}</view>
+            <view class="daily-return-step-proof">证据 {{item.proof}}</view>
+          </view>
+        </view>
+      </view>
       <view class="daily-return-steps enhanced">
         <view class="daily-return-step {{item.uiClass}}" wx:for="{{ninetySecondRecallState.interactions}}" wx:key="id" data-step-id="{{item.id}}" bindtap="completeNinetySecondRecallStep">
           <view class="daily-return-step-order">{{item.order}}</view>

@@ -1980,6 +1980,19 @@ function buildNinetySecondPlayableDeck(ninetySecondRecallComboEngine = {}, quest
     weakKey,
     status: playableReady && interactions.length >= 4 ? 'ready' : 'waiting_cards',
     totalSeconds: interactions.reduce((sum, item) => sum + item.seconds, 0),
+    playableExperience: {
+      headline: '90 秒不是刷题，是遮答案后的主动回忆连击。',
+      whyThisWorks: '借鉴 Gizmo 的主动回忆和间隔复习，但只奖励孩子说出的第一步、错因和明天回访证据。',
+      loop: [
+        { id: 'green_word', label: '补绿词', playerAction: '先补关键词，不看答案。', proof: 'green_word_cloze' },
+        { id: 'first_step', label: '说第一步', playerAction: '用自己的话写下第一步。', proof: 'student_first_step' },
+        { id: 'wrong_cause', label: '选错因', playerAction: '从两个卡点里选一个。', proof: 'wrong_cause_named' },
+        { id: 'tomorrow_lock', label: '锁回访', playerAction: '明天只复查这一张。', proof: 'next_day_revisit_locked' }
+      ],
+      releaseChecklist: ['答案未提前展示', '第一步有孩子输入', '错因已选择', '明天回访已锁定'],
+      stopRule: '任一环节没有证据，就不发 XP、不写掌握、不开放分享成绩。',
+      moatLine: '本地代码管节奏、门槛和奖励；AI 只把提示话术说得更像老师。'
+    },
     interactions,
     sourceCardIds: source.map((card) => card && card.id).filter(Boolean).slice(0, 4),
     rewardGate: rescue
