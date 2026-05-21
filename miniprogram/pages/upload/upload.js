@@ -1058,7 +1058,22 @@ Page({
     const uploadedMaterialDecisionDossier = reportState.uploadedMaterialDecisionDossier
       || reportDraft.uploadedMaterialDecisionDossier
       || null;
-    const gameRoute = sourceSchemaId === 'talent_assessment' ? '' : `/pages/arcade/arcade?from=upload_report_ready&${query}`;
+    const hasGameReleaseEvidence = !!(
+      uploadEvidenceSignals.firstStep
+      || uploadEvidenceSignals.stuckFirstStep
+      || uploadEvidenceSignals.wrongCause
+      || uploadEvidenceSignals.wrongCauseGuess
+      || cardId
+      || importedCards > 0
+    );
+    const servicePathwayAllowsGame = !!(
+      servicePathway
+      && Array.isArray(servicePathway.modeRecommendations)
+      && servicePathway.modeRecommendations.some((item) => item && item.id === 'game_recall')
+    );
+    const gameRoute = sourceSchemaId !== 'talent_assessment' && hasGameReleaseEvidence && servicePathwayAllowsGame
+      ? `/pages/arcade/arcade?from=upload_report_ready&${query}`
+      : '';
     const tonightTaskCard = this.buildTonightTaskCard(decisionSource, reportState, {
       structuredEvidenceSignals: uploadEvidenceSignals,
       openMaicTaskPlan,
