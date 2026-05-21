@@ -1998,6 +1998,18 @@ Page({
   goMiniLessonResume() {
     const card = this.data.homeViewModel && this.data.homeViewModel.miniLessonResume;
     const route = card && card.route ? card.route : '/pages/review/review?from=home_mini_lesson_resume';
+    if (storage.setActiveMiniLessonResumeContext) {
+      storage.setActiveMiniLessonResumeContext({
+        from: 'home_mini_lesson_resume',
+        cardId: card && card.id ? card.id : '',
+        flowTraceId: card && card.flowTraceId ? card.flowTraceId : '',
+        evidenceThreadId: card && card.evidenceThreadId ? card.evidenceThreadId : '',
+        topicCardId: card && card.topicCardId ? card.topicCardId : '',
+        sourceSchemaId: card && card.sourceSchemaId ? card.sourceSchemaId : '',
+        blockedFields: card && Array.isArray(card.blockedFields) ? card.blockedFields : [],
+        route
+      });
+    }
     if (route.indexOf('/pages/review/review') === 0) {
       wx.switchTab({ url: '/pages/review/review' });
       return;

@@ -414,6 +414,14 @@ function safeScoreEvidence(subject = '当前学科') {
   return `${subject} 已有成绩/资料线索；报告诊断仍以第一步、错因、回访和第 7 天小变式为准，不展示分数或排名。`;
 }
 
+function sanitizeEvidenceSnippet(text = '') {
+  const value = safeText(text, 'waiting_for_source_text_evidence');
+  if (/没天赋|天生|学渣|笨|智商|能力差|性格缺陷|不适合学习|废了|差生|低能|蠢/.test(value)) {
+    return '原文含定性说法，已转为待验证观察';
+  }
+  return value.slice(0, 64);
+}
+
 function buildMethodCandidateIsolation(parts = {}) {
   const talentSource = hasTalentAssessmentSource(parts);
   const realHomeworkEvidence = hasRealHomeworkEvidence(parts);
@@ -436,37 +444,42 @@ function buildScoreReleasePolicy(input = {}, sources = [], parsed = {}, behavior
     input.sourceText || '',
     input.scoreText || ''
   ].concat((sources || []).map((source) => `${source.type || ''}\n${source.label || ''}\n${source.text || ''}`)).join('\n');
-  const sourceTypeText = `${input.sourceType || ''}\n${input.materialType || ''}`;
+  const sourceTypeText = [
+    input.sourceType || '',
+    input.materialType || ''
+  ].concat((sources || []).map((source) => `${source.type || ''}\n${source.sourceSchemaId || ''}\n${source.releaseScope || ''}`)).join('\n');
   const typedAsThirdParty = /talent_assessment|third_party_assessment/.test(sourceTypeText);
   const parsedSubjectCount = Object.keys(parsed.parsedScores || {}).length;
-  const explicitScoreSheet = /score_sheet|成绩单|分数单|考试成绩/.test(sourceText)
-    || (!!input.scoreText && parsedSubjectCount > 0)
-    || (!typedAsThirdParty && parsedSubjectCount >= 3);
+  const explicitScoreSourceType = /score_sheet|wrong_question_paper|school_material/.test(sourceTypeText);
+  const negativeScoreSheetSignal = /没有成绩单|无成绩单|不是成绩单|未提供成绩单|no score sheet/i.test(sourceText);
+  const explicitScoreSheet = explicitScoreSourceType
+    || (!negativeScoreSheetSignal && /score_sheet|成绩单|分数单|考试成绩|试卷|错题|老师反馈|学校反馈/.test(sourceText))
+    || (!!input.scoreText && parsedSubjectCount > 0);
   const talentOrThirdParty = typedAsThirdParty
-    || /天赋|测评|学习类型|学习风格|视觉型|听觉型|动觉型|多元智能|MBTI/.test(sourceText);
-  const homeworkEvidence = explicitScoreSheet
+    || /天赋|测评|学习类型|学习风格|视觉型|听觉型|动觉型|多元智能|MBTI|澶╄祴|娴嬭瘎|瀛︿範绫诲瀷|瀛︿範椋庢牸|瑙嗚/.test(sourceText);
+  const homeworkEvidence = explicitScoreSourceType
     || !!(behaviorSignals.firstStep || behaviorSignals.childFirstStep || behaviorSignals.wrongCause || behaviorSignals.weakPoint || behaviorSignals.homeworkDelay)
-    || /错题|作业|试卷|第一步|卡住|列式|回访|小变式/.test(sourceText);
-  const methodCandidateOnly = talentOrThirdParty && !homeworkEvidence;
+    || /错题|作业|试卷|第一步|卡住|列式|回访|小变式|閿欓|浣滀笟|璇曞嵎|绗/.test(sourceText);
+  const scoreRankingReleased = explicitScoreSheet && (!talentOrThirdParty || homeworkEvidence);
+  const methodCandidateOnly = !scoreRankingReleased && (talentOrThirdParty || parsedSubjectCount > 0);
   const incomingScores = Object.assign({}, parsed.parsedScores || {}, input.parsedScores || {});
   const incomingRanks = Object.assign({}, parsed.parsedRanks || {}, input.parsedRanks || {});
   return {
     id: 'score_release_policy',
     methodCandidateOnly,
-    scoreRankingReleased: !methodCandidateOnly,
-    parsedScores: methodCandidateOnly ? {} : incomingScores,
-    parsedRanks: methodCandidateOnly ? {} : incomingRanks,
-    unreleasedScoreRankingReference: methodCandidateOnly ? {
+    scoreRankingReleased,
+    parsedScores: scoreRankingReleased ? incomingScores : {},
+    parsedRanks: scoreRankingReleased ? incomingRanks : {},
+    unreleasedScoreRankingReference: !scoreRankingReleased && (Object.keys(incomingScores).length || Object.keys(incomingRanks).length) ? {
       releaseScope: 'unreleased_reference',
       sourceType: input.sourceType || input.materialType || 'third_party_assessment',
-      reason: '天赋/第三方测评中的分数或排名不能直接进入画像、诊断或分享，必须由成绩单或真实作业证据确认。',
+      reason: '分数/排名必须来自成绩单、错题/试卷或学校材料；测评、家长观察或泛文本里的分数只作未释放参考，不能进入画像、诊断或分享。',
       scoreCount: Object.keys(incomingScores).length,
       hasRank: !!(incomingRanks.classRank || incomingRanks.totalRank || incomingRanks.totalScore)
     } : null,
-    localRule: '分数和排名只有成绩单、试卷或真实作业证据支持时才进入报告画像；天赋测评只放行学习方法候选。'
+    localRule: '分数和排名只有成绩单、试卷、错题或学校材料支持时才进入报告画像；天赋测评只放行学习方法候选。'
   };
 }
-
 function buildTendencies(parts) {
   const text = (parts.reportSources || []).map((source) => source.text).join('\n');
   const scoredAnswers = scoreAssessmentAnswers(parts.assessmentAnswers || [], text);
@@ -2444,7 +2457,7 @@ function buildUploadedMaterialDecisionDossier(input = {}, parts = {}, sourceEvid
     label: item.label,
     status: laneById.talent_assessment && laneById.talent_assessment.collected ? 'method_candidate_from_assessment' : 'method_candidate_waiting_evidence',
     sourceSchemaId: (sources[0] && sources[0].sourceSchemaId) || input.materialType || 'mixed_uploaded_material',
-    sourceTextEvidence: safeText((sources[0] && sources[0].text) || input.sourceText || parts.sourceText || '', 'waiting_for_source_text_evidence').slice(0, 64),
+    sourceTextEvidence: sanitizeEvidenceSnippet((sources[0] && sources[0].text) || input.sourceText || parts.sourceText || ''),
     confidenceReason: item.rankingEvidence && item.rankingEvidence.length
       ? item.rankingEvidence.join('；')
       : (collectedLanes.length >= 2 ? 'evidence_cross_checked' : 'needs_more_evidence'),

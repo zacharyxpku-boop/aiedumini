@@ -5,6 +5,22 @@ const IMPORT_CHIPS = [
   { id: 'similar_practice', label: '我想做同类题', text: '我想做同类题：' }
 ];
 
+const UPLOAD_DECISION_BLOCKED_FIELDS = [
+  'original_answer',
+  'full_solution',
+  'auto_link_crawl',
+  'auto_pdf_parse',
+  'photo_ocr_claim',
+  'score',
+  'ranking',
+  'talent_label',
+  'personality_label',
+  'private_comment',
+  'photo',
+  'original_question',
+  'full_dialogue'
+];
+
 const INTAKE_SOURCE_SCHEMAS = [
   {
     id: 'parent_report',
@@ -413,7 +429,18 @@ function buildMethodValidationChallengeChain(schema = {}, requiredNextEvidence =
     localCodeOwns: ['release_gate', 'evidence_order', 'report_confidence_weight', 'share_fields'],
     aiBetterFor: ['child_friendly_prompt', 'parent_summary_copy', 'method_explanation'],
     aiMustNotOwn: ['talent_label', 'mastery_claim', 'score_ranking', 'reward_release'],
-    blockedFields: ['original_answer', 'full_solution', 'score', 'ranking', 'talent_label', 'private_comment']
+    blockedFields: UPLOAD_DECISION_BLOCKED_FIELDS.filter((field) => [
+      'original_answer',
+      'full_solution',
+      'score',
+      'ranking',
+      'talent_label',
+      'personality_label',
+      'private_comment',
+      'photo',
+      'original_question',
+      'full_dialogue'
+    ].includes(field))
   };
 }
 
@@ -515,15 +542,7 @@ function buildUploadIntakePacket(text = '', imagePaths = [], materialType = '') 
       : classified.route === 'today_focus'
         ? '/pages/review/review'
         : '/pages/tutor/tutor?from=upload_intake';
-  const blockedFields = [
-    'original_answer',
-    'full_solution',
-    'auto_link_crawl',
-    'auto_pdf_parse',
-    'photo_ocr_claim',
-    'score',
-    'ranking'
-  ];
+  const blockedFields = UPLOAD_DECISION_BLOCKED_FIELDS.slice();
   const evidence = [
     { id: 'text_present', label: '文字材料', ready: !!value },
     { id: 'photo_local_only', label: '照片本地留档', ready: images.length > 0 },

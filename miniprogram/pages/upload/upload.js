@@ -25,6 +25,19 @@ const MATERIAL_TYPE_ALLOWLIST = [
   'handwriting'
 ];
 
+const UPLOAD_DECISION_BLOCKED_FIELDS = [
+  'original_answer',
+  'full_solution',
+  'score',
+  'ranking',
+  'talent_label',
+  'personality_label',
+  'private_comment',
+  'photo',
+  'original_question',
+  'full_dialogue'
+];
+
 const UPLOAD_SUBJECT_TASK_PATTERNS = [
   { subjectKey: 'math', subjectLabel: '数学', taskType: 'math_word_problem', match: /数学|应用题|等量|数量关系|方程|列式|几何|函数|面积|体积|比例/ },
   { subjectKey: 'physics', subjectLabel: '物理', taskType: 'physics_diagram', match: /物理|受力|电路|光路|速度|压强|浮力|凸透镜|运动|实验器材/ },
@@ -523,9 +536,10 @@ Page({
       nextEvidenceUnlockPlan: seed.nextEvidenceUnlockPlan || '',
       methodValidationChallengeChain: seed.methodValidationChallengeChain || packet.methodValidationChallengeChain || null,
       sourceReadinessBoard: packet.sourceReadinessBoard || null,
-      blockedFields: Array.isArray(packet.blockedFields)
-        ? packet.blockedFields
-        : ['original_answer', 'full_solution', 'score', 'ranking']
+      blockedFields: Array.from(new Set([].concat(
+        Array.isArray(packet.blockedFields) ? packet.blockedFields : [],
+        UPLOAD_DECISION_BLOCKED_FIELDS
+      )))
     };
   },
 
@@ -745,6 +759,29 @@ Page({
     };
   },
 
+  isSpecificEvidenceValue(fieldId = '', value = '', sourceSchemaId = '') {
+    const text = String(value || '').trim();
+    if (text.length < 6) return false;
+    if (/^(不知道|没有|一般|还行|待验证|看情况|需要观察|方法候选|ok|none|n\/a)$/i.test(text)) return false;
+    if (/不知道|说不清|随便|以后再说|暂无|没有证据/.test(text)) return false;
+    if (sourceSchemaId === 'talent_assessment') {
+      if (fieldId === 'method_hypothesis') {
+        return /今晚|先|第一步|作业|错题|试|复述|画图|拆步|动笔/.test(text);
+      }
+      if (fieldId === 'cross_check_gate') {
+        return /错题|作业|回访|第\s*7\s*天|小变式|第一步|验证|复述/.test(text);
+      }
+    }
+    if (sourceSchemaId === 'wrong_question_paper') {
+      if (fieldId === 'child_original_thought') return /孩子|他说|我以为|当时|原话|先/.test(text);
+      if (fieldId === 'stuck_first_step') return /第一步|卡|先|找|画|列|读题|条件|关系/.test(text);
+    }
+    if (sourceSchemaId === 'parent_report') {
+      return /晚上|作业|家长|孩子|先|明天|回访|检查|陪|问/.test(text);
+    }
+    return true;
+  },
+
   buildStructuredEvidenceCapture(uploadIntakePacket = {}, text = '', manual = {}) {
     const signals = this.buildStructuredEvidenceSignals(uploadIntakePacket, text, manual);
     const prompts = Array.isArray(uploadIntakePacket.structuredCapturePrompts)
@@ -766,9 +803,11 @@ Page({
     const values = Object.assign({}, aliasValues, signals.structuredFieldValues || {}, manual || {});
     const fields = prompts.map((prompt) => {
       const value = String(values[prompt.id] || '').trim();
+      const ready = this.isSpecificEvidenceValue(prompt.id, value, sourceSchemaId);
       return Object.assign({}, prompt, {
         value,
-        ready: !!value,
+        ready,
+        qualityIssue: value && !ready ? 'need_specific_real_task_evidence' : '',
         placeholder: prompt.prompt || '补一条真实证据，不写结论。'
       });
     });

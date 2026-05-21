@@ -235,6 +235,8 @@ Page({
     const rest = [];
     cards.forEach((card) => {
       const hit = (context.cardId && card.id === context.cardId)
+        || (context.type && card.type === context.type)
+        || (context.flowTraceId && card.flowTraceId === context.flowTraceId)
         || (context.sourceSchemaId && card.sourceSchemaId === context.sourceSchemaId)
         || (context.sourceSchemaId && String(card.source || '').includes(context.sourceSchemaId));
       (hit ? matched : rest).push(card);
@@ -246,6 +248,8 @@ Page({
     if (!context) return null;
     const matchedCount = cards.filter((card) => (
       (context.cardId && card.id === context.cardId)
+      || (context.type && card.type === context.type)
+      || (context.flowTraceId && card.flowTraceId === context.flowTraceId)
       || (context.sourceSchemaId && card.sourceSchemaId === context.sourceSchemaId)
       || (context.sourceSchemaId && String(card.source || '').includes(context.sourceSchemaId))
     )).length;
@@ -307,7 +311,10 @@ Page({
     const tonightPlan = storage.loadTonightPlan ? storage.loadTonightPlan() : null;
     const companionPreference = storage.loadCompanionPreference ? storage.loadCompanionPreference() : null;
     const limit = (summary.deck && summary.deck.dailyLimit) || 5;
-    const reportSourceContext = this.data.reportSourceContext || this.buildReportSourceContext();
+    const activeMiniLessonContext = storage.loadActiveMiniLessonResumeContext
+      ? storage.loadActiveMiniLessonResumeContext()
+      : null;
+    const reportSourceContext = activeMiniLessonContext || this.data.reportSourceContext || this.buildReportSourceContext();
     const cards = this.prioritizeReportSourceCards(reviewCards.sessionCards(this.data.sessionMode, limit), reportSourceContext);
     const current = cards[0] || null;
     const reviewEvents = storage.loadReviewEvents ? storage.loadReviewEvents() : [];

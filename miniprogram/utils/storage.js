@@ -103,6 +103,7 @@ const KEYS = {
   reviewDeck: 'ydzx.review.deck.v1',
   reviewNotes: 'ydzx.review.notes.v1',
   reviewCards: 'ydzx.review.cards.v1',
+  activeMiniLessonResumeContext: 'ydzx.mini.lesson.resume.context.v1',
   reviewEvents: 'ydzx.review.events.v1',
   gameProfile: 'ydzx.game.profile.v1',
   gamePurchases: 'ydzx.game.purchases.v1',
@@ -5915,6 +5916,39 @@ function ensureMiniLessonReturnReviewCard(seed = {}, context = {}) {
     created_at: event.created_at
   });
   return card;
+}
+
+function setActiveMiniLessonResumeContext(input = {}) {
+  const now = new Date();
+  const context = {
+    from: input.from || 'home_mini_lesson_resume',
+    type: 'three_minute_mini_lesson_return',
+    cardId: input.cardId || input.id || '',
+    flowTraceId: input.flowTraceId || '',
+    evidenceThreadId: input.evidenceThreadId || (input.evidenceThread && input.evidenceThread.id) || '',
+    topicCardId: input.topicCardId || (input.evidenceThread && input.evidenceThread.topicCardId) || '',
+    sourceSchemaId: input.sourceSchemaId || 'three_minute_mini_lesson',
+    route: input.route || '/pages/review/review?from=home_mini_lesson_resume',
+    blockedFields: Array.isArray(input.blockedFields) ? input.blockedFields : [],
+    createdAt: now.toISOString(),
+    expiresAt: new Date(now.getTime() + 20 * 60 * 1000).toISOString()
+  };
+  set(KEYS.activeMiniLessonResumeContext, context);
+  return context;
+}
+
+function loadActiveMiniLessonResumeContext() {
+  const context = get(KEYS.activeMiniLessonResumeContext, null);
+  if (!context || !context.expiresAt) return context;
+  if (Date.parse(context.expiresAt) < Date.now()) {
+    remove(KEYS.activeMiniLessonResumeContext);
+    return null;
+  }
+  return context;
+}
+
+function clearActiveMiniLessonResumeContext() {
+  remove(KEYS.activeMiniLessonResumeContext);
 }
 
 function recordMiniLessonExitGate(input = {}, context = {}) {
@@ -12640,6 +12674,9 @@ module.exports = {
   appendReviewEvent,
   recordAnswerBoundaryEvidence,
   ensureMiniLessonReturnReviewCard,
+  setActiveMiniLessonResumeContext,
+  loadActiveMiniLessonResumeContext,
+  clearActiveMiniLessonResumeContext,
   recordMiniLessonExitGate,
   recordMiniLessonReviewResult,
   loadGameProfile,
