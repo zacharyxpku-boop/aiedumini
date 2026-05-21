@@ -58,7 +58,7 @@ function buildMiniLessonResume(input = {}) {
     parentLine: safeText(source.parentLine || source.backPrompt || source.parentCheck, '家长只问这一题第一步先看什么'),
     nextDayReview: safeText(source.nextDayReview || source.revisit, '明天换一题只复述第一步'),
     route: source.route || '/pages/review/review?from=home_mini_lesson_resume',
-    blockedFields: ['原题', '完整答案', '分数', '排名', '天赋标签']
+    blockedFields: ['原题', '完整答案', '分数', '排名', '天赋标签', '孩子姓名', '家长联系方式']
   };
 }
 

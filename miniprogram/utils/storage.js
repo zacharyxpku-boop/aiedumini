@@ -54,14 +54,14 @@ function createShareRelaySchemaFallback() {
     'openmaic_evidence',
     'openmaic_return_path'
   ];
-  const denylist = ['original_question', 'original_answer', 'photo', 'raw_text', 'full_answer', 'full_solution', 'full_dialogue', 'score', 'ranking', 'private_comment', 'classmate_comparison', 'teacher_private_comment', 'complete_transcript', 'talent_label', 'personality_label', 'fixed_learning_style', 'score_ranking', 'guaranteed_result'];
+  const denylist = ['original_question', 'original_answer', 'photo', 'raw_text', 'full_answer', 'full_solution', 'full_dialogue', 'score', 'ranking', 'private_comment', 'classmate_comparison', 'teacher_private_comment', 'complete_transcript', 'talent_label', 'personality_label', 'fixed_learning_style', 'score_ranking', 'guaranteed_result', 'child_name', 'parent_phone', 'parent_wechat', 'contact_info'];
   function isAllowed(key) {
     return allowlist.indexOf(key) >= 0
       && denylist.indexOf(key) < 0
-      && !/answer|solution|photo|score|rank|transcript|talent|personality|guarantee/i.test(String(key || ''));
+      && !/answer|solution|photo|score|rank|transcript|talent|personality|guarantee|child_name|parent_phone|parent_wechat|contact/i.test(String(key || ''));
   }
   function isDenied(key) {
-    return denylist.indexOf(key) >= 0 || /answer|solution|photo|score|rank|transcript/i.test(String(key || ''));
+    return denylist.indexOf(key) >= 0 || /answer|solution|photo|score|rank|transcript|child_name|parent_phone|parent_wechat|contact/i.test(String(key || ''));
   }
   function toText(value) {
     return String(value == null ? '' : value).trim();
@@ -5901,7 +5901,7 @@ function ensureMiniLessonReturnReviewCard(seed = {}, context = {}) {
     || seed.parentLine
     || context.parentLine
     || '家长只问：这题第一步先看什么？不要追完整答案。';
-  const miniLessonDefaultBlockedFields = ['original_question', 'full_answer', 'full_solution', 'full_dialogue', 'score', 'ranking', 'talent_label'];
+  const miniLessonDefaultBlockedFields = ['original_question', 'full_answer', 'full_solution', 'full_dialogue', 'score', 'ranking', 'talent_label', 'child_name', 'parent_phone', 'parent_wechat', 'contact_info'];
   const blockedFields = Array.from(new Set(miniLessonDefaultBlockedFields.concat(
     Array.isArray(seed.blockedFields) ? seed.blockedFields : []
   )));
@@ -6632,7 +6632,11 @@ const SHARE_RELAY_BLOCKED_FIELDS = [
   'full_dialogue',
   'score',
   'ranking',
-  'private_comment'
+  'private_comment',
+  'child_name',
+  'parent_phone',
+  'parent_wechat',
+  'contact_info'
 ];
 
 function relayBlockedFieldLine(value = '') {

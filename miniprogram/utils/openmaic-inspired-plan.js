@@ -1,6 +1,8 @@
 'use strict';
 
-const SAFE_SHARE_BOUNDARY = '只分享错因、第一步、家长检查句和回访动作；不分享原题、照片、完整答案、完整对话或孩子隐私材料。';
+const SAFE_SHARE_BOUNDARY = '只分享错因、第一步、家长检查句和回访动作；不分享原题、照片、完整答案、完整对话、孩子姓名或家长联系方式。';
+const IDENTITY_CONTACT_BLOCKED_FIELDS = ['child_name', 'parent_phone', 'parent_wechat', 'contact_info'];
+const OPENMAIC_SAFE_BLOCKED_FIELDS = ['original_question', 'full_answer', 'full_dialogue', 'score', 'ranking', 'talent_label'].concat(IDENTITY_CONTACT_BLOCKED_FIELDS);
 
 const OPENMAIC_REFERENCE_POLICY = {
   id: 'openmaic_reference_policy',
@@ -177,7 +179,7 @@ const MINI_LESSON_VISUAL_PRIMITIVE_RENDER_CONTRACT = [
   aiAllowed: 'rewrite_short_hint_only',
   requiredEvidence: ['child_points_or_names_primitive', 'child_says_first_step'],
   allowedSurfaces: ['tutor_mini_lesson', 'review_return_card', 'parent_report_summary'],
-  blockedFields: ['raw_question', 'full_answer', 'score', 'ranking', 'talent_label']
+  blockedFields: ['raw_question', 'full_answer', 'score', 'ranking', 'talent_label'].concat(IDENTITY_CONTACT_BLOCKED_FIELDS)
 }));
 
 function buildMiniLessonVisualPrimitiveContract(primitives = []) {
@@ -1358,7 +1360,7 @@ function buildEvidenceThread(input = {}) {
     aiMayRewrite: ['teacherLine', 'classmateMisconception', 'parentReadableSummary'],
     aiMustNotOwn: ['final_answer', 'mastery_claim', 'talent_label', 'score', 'ranking'],
     shareSafeFields: ['topicCardId', 'firstStep', 'wrongCause', 'parentCheck', 'nextDayReview'],
-    blockedFields: ['original_question', 'photo', 'full_answer', 'full_solution', 'full_dialogue', 'score', 'ranking', 'talent_label']
+    blockedFields: ['original_question', 'photo', 'full_answer', 'full_solution', 'full_dialogue', 'score', 'ranking', 'talent_label'].concat(IDENTITY_CONTACT_BLOCKED_FIELDS)
   };
 }
 
@@ -1544,7 +1546,7 @@ function buildOpenMaicInspiredDecisionBridge(plan = {}, reportSummary = {}, revi
     },
     homeSchoolMiniLessonPacket: {
       allowedFields: ['concept_gap', 'first_step_board_move', 'parent_check', 'next_day_revisit'],
-      blockedFields: ['original_question', 'full_answer', 'full_dialogue', 'score', 'ranking', 'talent_label'],
+      blockedFields: OPENMAIC_SAFE_BLOCKED_FIELDS.slice(),
       teacherLine: `可请老师观察：孩子是否能说出 ${miniLesson.conceptGap || '第一步入口'}，而不是只看最终答案。`,
       topicLabel: miniLesson.topicCard ? miniLesson.topicCard.label : '',
       topicLocalGate: miniLesson.topicCard ? miniLesson.topicCard.localGate : '',
@@ -1567,14 +1569,14 @@ function buildOpenMaicInspiredDecisionBridge(plan = {}, reportSummary = {}, revi
       sourceUseDecision,
       evidenceThread,
       rewardGate: '只奖励第一步、错因修复和回访完成',
-      blockedFields: ['final_answer', 'ranking', 'score', 'original_question', 'full_dialogue']
+      blockedFields: ['final_answer', 'ranking', 'score', 'original_question', 'full_dialogue'].concat(IDENTITY_CONTACT_BLOCKED_FIELDS)
     },
     shareRelayPayload: {
       title: '今晚任务单',
       subtitle: reportLine,
       path: '/pages/profile/profile?from=openmaic_inspired_bridge',
       shareBoundary,
-      blockedFields: ['original_question', 'full_answer', 'full_dialogue', 'ranking', 'score'],
+      blockedFields: ['original_question', 'full_answer', 'full_dialogue', 'ranking', 'score'].concat(IDENTITY_CONTACT_BLOCKED_FIELDS),
       nextAction,
       miniLessonConceptGap: miniLesson.conceptGap || '',
       miniLessonTopicLabel: miniLesson.topicCard ? miniLesson.topicCard.label : '',
@@ -1592,6 +1594,8 @@ function buildOpenMaicInspiredDecisionBridge(plan = {}, reportSummary = {}, revi
 
 module.exports = {
   SAFE_SHARE_BOUNDARY,
+  IDENTITY_CONTACT_BLOCKED_FIELDS,
+  OPENMAIC_SAFE_BLOCKED_FIELDS,
   OPENMAIC_REFERENCE_POLICY,
   PUBLIC_K12_RESOURCE_DECISIONS,
   MINI_LESSON_VISUAL_TEMPLATES,
