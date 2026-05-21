@@ -958,14 +958,24 @@ Page({
     const cardId = options.cardId || '';
     const reportId = reportState && reportState.reportDraft ? reportState.reportDraft.id : '';
     const query = `reportId=${encodeURIComponent(reportId)}&sourceSchemaId=${encodeURIComponent(sourceSchemaId)}${cardId ? `&cardId=${encodeURIComponent(cardId)}` : ''}`;
-    const actionRoute = sourceSchemaId === 'talent_assessment'
-      ? `/pages/upload/upload?from=talent_method_candidate&materialType=wrong_question_paper&sourceSchemaId=${encodeURIComponent(sourceSchemaId)}`
-      : sourceSchemaId === 'wrong_question_paper'
-      ? `/pages/review/review?from=upload_report_ready&${query}`
-      : `/pages/tutor/tutor?from=upload_report_ready&${query}`;
     const reportDraft = reportState && reportState.reportDraft ? reportState.reportDraft : {};
     const uploadEvidenceSignals = options.structuredEvidenceSignals || {};
     const reportBehaviorSignals = reportDraft.behaviorSignals || {};
+    const hasRealTaskReleaseEvidence = !!(
+      uploadEvidenceSignals.firstStep
+      || uploadEvidenceSignals.stuckFirstStep
+      || uploadEvidenceSignals.wrongCause
+      || uploadEvidenceSignals.wrongCauseGuess
+      || cardId
+      || importedCards > 0
+    );
+    const actionRoute = sourceSchemaId === 'talent_assessment'
+      ? `/pages/upload/upload?from=talent_method_candidate&materialType=wrong_question_paper&sourceSchemaId=${encodeURIComponent(sourceSchemaId)}`
+      : sourceSchemaId === 'wrong_question_paper' && hasRealTaskReleaseEvidence
+      ? `/pages/review/review?from=upload_report_ready&${query}`
+      : sourceSchemaId === 'wrong_question_paper'
+        ? `/pages/upload/upload?from=material_evidence_gate&materialType=wrong_question_paper&${query}`
+        : `/pages/tutor/tutor?from=upload_report_ready&${query}`;
     const sourceTextForMiniLesson = String(options.sourceText || reportDraft.sourceText || reportBehaviorSignals.sourceText || '').slice(0, 500);
     const guardedAiReportDraft = options.guardedAiReportDraft || null;
     const miniLessonSubject = uploadEvidenceSignals.subjectLabel
@@ -1058,14 +1068,7 @@ Page({
     const uploadedMaterialDecisionDossier = reportState.uploadedMaterialDecisionDossier
       || reportDraft.uploadedMaterialDecisionDossier
       || null;
-    const hasGameReleaseEvidence = !!(
-      uploadEvidenceSignals.firstStep
-      || uploadEvidenceSignals.stuckFirstStep
-      || uploadEvidenceSignals.wrongCause
-      || uploadEvidenceSignals.wrongCauseGuess
-      || cardId
-      || importedCards > 0
-    );
+    const hasGameReleaseEvidence = hasRealTaskReleaseEvidence;
     const servicePathwayAllowsGame = !!(
       servicePathway
       && Array.isArray(servicePathway.modeRecommendations)
