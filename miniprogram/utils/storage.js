@@ -1,6 +1,65 @@
 const priority = require('./learning-priority');
 function createShareRelaySchemaFallback() {
-  const denylist = ['original_question', 'original_answer', 'photo', 'raw_text', 'full_answer', 'full_solution', 'full_dialogue', 'score', 'ranking', 'private_comment', 'classmate_comparison', 'teacher_private_comment', 'complete_transcript'];
+  const allowlist = [
+    'code',
+    'share_intent',
+    'share',
+    'from',
+    'mode',
+    'challenge',
+    'share_code',
+    'invite_code',
+    'identity_tag',
+    'tonight_action',
+    'parent_question',
+    'tomorrow_check',
+    'report_daily_action',
+    'unified_next_action',
+    'unified_next_action_route',
+    'parent_next_action',
+    'next_challenge',
+    'share_challenge_goal',
+    'share_challenge_rule',
+    'share_challenge_route',
+    'share_privacy_boundary',
+    'share_return_contract',
+    'safe_relay_allowed_fields',
+    'safe_relay_blocked_fields',
+    'relay_id',
+    'relay_first_step',
+    'relay_receiver_action',
+    'relay_parent_check',
+    'relay_next_revisit',
+    'relay_allowed_fields',
+    'relay_blocked_fields',
+    'relay_completion_signal',
+    'relay_return_path',
+    'wrong_cause_label',
+    'wrong_cause_first_step',
+    'wrong_cause_parent_check',
+    'wrong_cause_receiver_action',
+    'wrong_cause_next_revisit',
+    'wrong_cause_allowed_fields',
+    'wrong_cause_blocked_fields',
+    'receiver_material_required',
+    'receiver_first_step_required',
+    'receiver_wrong_cause_required',
+    'receiver_revisit_required',
+    'receiver_evidence_contract',
+    'openmaic_bridge_status',
+    'openmaic_next_action',
+    'openmaic_share_boundary',
+    'openmaic_game_gate',
+    'openmaic_blocked_fields',
+    'openmaic_evidence',
+    'openmaic_return_path'
+  ];
+  const denylist = ['original_question', 'original_answer', 'photo', 'raw_text', 'full_answer', 'full_solution', 'full_dialogue', 'score', 'ranking', 'private_comment', 'classmate_comparison', 'teacher_private_comment', 'complete_transcript', 'talent_label', 'personality_label', 'fixed_learning_style', 'score_ranking', 'guaranteed_result'];
+  function isAllowed(key) {
+    return allowlist.indexOf(key) >= 0
+      && denylist.indexOf(key) < 0
+      && !/answer|solution|photo|score|rank|transcript|talent|personality|guarantee/i.test(String(key || ''));
+  }
   function isDenied(key) {
     return denylist.indexOf(key) >= 0 || /answer|solution|photo|score|rank|transcript/i.test(String(key || ''));
   }
@@ -10,7 +69,7 @@ function createShareRelaySchemaFallback() {
   function parseShareRelayQuery(query = {}) {
     const safe = {};
     Object.keys(query || {}).forEach((key) => {
-      if (!isDenied(key)) safe[key] = toText(query[key]);
+      if (isAllowed(key) && !isDenied(key)) safe[key] = toText(query[key]);
     });
     return safe;
   }
