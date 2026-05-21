@@ -45,6 +45,15 @@ function list(value) {
   return String(value).split(/[,\n|;]+/).map((item) => text(item)).filter(Boolean);
 }
 
+function sanitizePartnerAction(value = '', fallback = '') {
+  const raw = text(value);
+  const safeFallback = text(fallback) || 'Confirm the guarded family plan and next evidence window.';
+  if (!raw) return safeFallback;
+  const unsafe = /name|phone|mobile|wechat|score|ranking|rank|percentile|photo|image|raw|answer|solution|dialogue|transcript|diagnosis|talent|personality|Ming|分数|排名|名次|照片|原图|原题|答案|解法|完整对话|聊天记录|诊断|天赋|性格|手机号|电话|微信/i.test(raw);
+  if (unsafe) return safeFallback;
+  return raw.slice(0, 140);
+}
+
 function stableChildCode(profile = {}, seed = '') {
   const raw = [
     profile.childId,
@@ -169,7 +178,10 @@ function buildAdvisorQueue(childRecord, materials = [], servicePathway = {}) {
   const needsEvidence = childRecord.evidenceStage !== 'real_task_evidence_ready';
   const nextAction = needsEvidence
     ? 'Ask parent to add one real wrong question or homework stuck point before any paid package.'
-    : text(servicePathway.nextAction) || 'Confirm the 7-day plan and start one first-step task.';
+    : sanitizePartnerAction(
+      servicePathway.nextAction,
+      'Confirm the 7-day plan and start one first-step task.'
+    );
   return [
     {
       id: 'confirm_parent_consent',
