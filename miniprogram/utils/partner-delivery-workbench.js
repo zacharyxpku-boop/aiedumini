@@ -92,9 +92,11 @@ function normalizeMaterial(material = {}, index = 0) {
 function buildChildRecord(profile = {}, materials = [], options = {}) {
   const confirmed = !!(options.parentConfirmed || profile.parentConfirmed);
   const evidenceReadyCount = materials.filter((item) => item.status === 'evidence_ready').length;
+  const childCode = stableChildCode(profile, materials.map((item) => item.id).join('|'));
   return {
-    id: stableChildCode(profile, materials.map((item) => item.id).join('|')),
-    displayName: text(profile.nickname || profile.displayName || profile.name) || 'student',
+    id: childCode,
+    displayName: childCode,
+    displayAlias: `student_${childCode.slice(-4)}`,
     gradeBand: text(profile.gradeBand || profile.grade || options.grade) || 'unknown',
     evidenceStage: evidenceReadyCount > 0 ? 'real_task_evidence_ready' : 'assessment_or_observation_only',
     parentConfirmationStatus: confirmed ? 'confirmed' : 'required_before_delivery',
