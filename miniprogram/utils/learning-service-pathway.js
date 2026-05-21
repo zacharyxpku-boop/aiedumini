@@ -279,7 +279,7 @@ function inferSignals(input = {}) {
 function pickModes(signals) {
   const ids = new Set(['socratic_private_tutor', 'parent_coaching']);
   if (signals.needsBlackboard && signals.hasRealTaskEvidence) ids.add('three_minute_mini_lesson');
-  if (signals.needsMemory || signals.hasWrongQuestion) ids.add('game_recall');
+  if (signals.hasRealTaskEvidence && (signals.needsMemory || signals.hasWrongQuestion)) ids.add('game_recall');
   if (signals.hasAssessment) ids.add('online_method_course');
   if (signals.hasWrongQuestion && signals.hasRealTaskEvidence) ids.add('wrong_question_repair_course');
   return MODE_CATALOG
