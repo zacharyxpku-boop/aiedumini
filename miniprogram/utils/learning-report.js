@@ -2168,6 +2168,62 @@ function buildPersonalizedLearningSolutionBlueprint(materialLanes = [], methodHy
       cannotClaim: '不把一次情绪或拖拉定性为长期能力问题'
     }
   ];
+  const familyLearningPlan = {
+    id: 'family_learning_plan',
+    title: '家庭学习方案',
+    status: hasWrongPaper
+      ? 'can_start_tonight'
+      : hasTalentAssessment
+        ? 'method_candidate_waiting_homework'
+        : 'collect_first_real_task',
+    sourceWeights: [
+      {
+        id: 'wrong_question_paper',
+        label: '错题/试卷',
+        weight: hasWrongPaper ? 40 : 0,
+        useFor: hasWrongPaper ? '今晚苏格拉底第一步、错因卡、明天回访' : '待补一处真实卡点'
+      },
+      {
+        id: 'talent_assessment',
+        label: '测评/学习偏好',
+        weight: hasTalentAssessment ? 20 : 0,
+        useFor: hasTalentAssessment ? '只作为学习方法候选，不进入长期画像' : '可选补充材料'
+      },
+      {
+        id: 'school_material',
+        label: '学校反馈',
+        weight: hasSchoolMaterial ? 20 : 0,
+        useFor: hasSchoolMaterial ? '生成家校安全摘要和观察问题' : '暂不生成家校结论'
+      },
+      {
+        id: 'parent_report',
+        label: '家长观察',
+        weight: hasParentObservation ? 20 : 0,
+        useFor: hasParentObservation ? '生成低压陪伴话术和今晚边界' : '待补家庭观察'
+      }
+    ],
+    tonightAction: hasWrongPaper
+      ? '只抽一处真实错题卡点：孩子先说第一步，再说错因；说不出时回到苏格拉底点拨。'
+      : hasTalentAssessment
+        ? '先把测评结论降级为方法候选：补一张真实作业卡点后再决定用哪种学习方式。'
+        : '先记录今晚真实卡点：题目类型、孩子第一步、卡住位置和家长观察。',
+    tomorrowRevisit: hasWrongPaper
+      ? '明天只回访同一错因的一张卡，不加题量，不用分数评价。'
+      : '明天先确认孩子能否复述昨天的第一步，再决定是否进入轻练习。',
+    day7Evidence: '第 7 天必须有小变式或同错因迁移证据；没有证据时不写长期画像、不贴学习类型标签。',
+    parentAssistLine: hasParentObservation
+      ? '家长只问：“你第一步想做什么？哪里卡住？明天我们只看这一点还记不记得。”'
+      : '家长先不评价能力，只帮孩子把第一步、错因和明天回访时间记下来。',
+    modeFit: {
+      socraticTutor: hasWrongPaper ? 'default' : 'waiting_real_task',
+      miniLesson: hasWrongPaper ? 'locked_until_repeated_stuck' : 'locked_until_homework_evidence',
+      gameRecall: hasWrongPaper ? 'after_first_step_evidence' : 'locked_until_wrong_cause_evidence',
+      parentReport: hasParentObservation || hasWrongPaper || hasSchoolMaterial ? 'available_as_action_summary' : 'waiting_observation'
+    },
+    prohibitedConclusions: ['天赋定性', '人格标签', '自动判分', '整卷答案', '排名解释', '结果承诺'],
+    releaseGates: ['real_homework_stuck', 'child_first_step', 'wrong_cause_replay', 'next_day_revisit', 'day7_variant_result'],
+    aiBoundary: 'AI 只改写苏格拉底追问、家长话术和一句话解释；本地代码决定材料权重、模式放行、报告状态和分享字段。'
+  };
   const localVsAiOwnership = [
     {
       id: 'local_code',
@@ -2189,6 +2245,7 @@ function buildPersonalizedLearningSolutionBlueprint(materialLanes = [], methodHy
     recommendedMode,
     modeSequence,
     evidenceFusionRules,
+    familyLearningPlan,
     localVsAiOwnership,
     servicePathwayHint: servicePathway && servicePathway.primaryMode
       ? `当前服务路径建议：${servicePathway.primaryMode.label || servicePathway.primaryMode.id || '家庭私教闭环'}`

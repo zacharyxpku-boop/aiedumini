@@ -199,6 +199,14 @@
             <view class="memory-prescription-line">{{memoryPrescriptionPanel.activeRecallProtocol.releaseGateLine}}</view>
             <view class="memory-prescription-line">{{memoryPrescriptionPanel.activeRecallProtocol.shareBoundary}}</view>
           </view>
+          <view class="memory-prescription-section" wx:if="{{memoryPrescriptionPanel.receiverShareRelayPanel}}">
+            <view class="memory-prescription-section-title">{{memoryPrescriptionPanel.receiverShareRelayPanel.title}}</view>
+            <view class="memory-prescription-line">{{memoryPrescriptionPanel.receiverShareRelayPanel.receiverMaterial}}</view>
+            <view class="memory-prescription-line">第一步：{{memoryPrescriptionPanel.receiverShareRelayPanel.receiverFirstStep}}</view>
+            <view class="memory-prescription-line">错因：{{memoryPrescriptionPanel.receiverShareRelayPanel.receiverWrongCause}}</view>
+            <view class="memory-prescription-line">明天：{{memoryPrescriptionPanel.receiverShareRelayPanel.nextRevisit}}</view>
+            <view class="memory-prescription-line">{{memoryPrescriptionPanel.receiverShareRelayPanel.localRule}}</view>
+          </view>
           <view class="memory-prescription-section" wx:if="{{memoryPrescriptionPanel.mustDo.length}}">
             <view class="memory-prescription-section-title">今天必须做</view>
             <view class="memory-prescription-line" wx:for="{{memoryPrescriptionPanel.mustDo}}" wx:key="id">{{item.label}}：{{item.action}}</view>

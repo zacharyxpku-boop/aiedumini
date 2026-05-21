@@ -224,19 +224,19 @@ const PARTNER_HANDOFF_POLICY = {
 const MODE_CHOICE_GUARDRAILS = [
   {
     id: 'socratic_stays_default',
-    rule: 'Socratic 1:1 stays the default first move when the child has a real stuck point.'
+    rule: '有真实作业卡点时，默认先走苏格拉底 1 对 1 点拨。'
   },
   {
     id: 'mini_lesson_is_rescue',
-    rule: 'Mini lesson opens only for concept, visual, or repeated-start failures; it must end with an exit ticket.'
+    rule: '小讲堂只在概念、图解或连续启动失败时补位，结束必须留下孩子退出票。'
   },
   {
     id: 'game_after_evidence',
-    rule: 'Game recall opens after a first-step or wrong-cause signal, not from assessment labels alone.'
+    rule: '轻练习必须在第一步或错因证据之后开启，不能只靠测评标签开启。'
   },
   {
     id: 'parent_confirms_service',
-    rule: 'Parent confirms before any course, camp, or partner handoff is shown as a service candidate.'
+    rule: '任何课程、训练营或合作服务候选，都要先经过家长确认。'
   }
 ];
 
@@ -278,7 +278,7 @@ function inferSignals(input = {}) {
 
 function pickModes(signals) {
   const ids = new Set(['socratic_private_tutor', 'parent_coaching']);
-  if (signals.needsBlackboard || !signals.hasRealTaskEvidence) ids.add('three_minute_mini_lesson');
+  if (signals.needsBlackboard && signals.hasRealTaskEvidence) ids.add('three_minute_mini_lesson');
   if (signals.needsMemory || signals.hasWrongQuestion) ids.add('game_recall');
   if (signals.hasAssessment) ids.add('online_method_course');
   if (signals.hasWrongQuestion && signals.hasRealTaskEvidence) ids.add('wrong_question_repair_course');
@@ -294,6 +294,32 @@ function pickModes(signals) {
     }));
 }
 
+function buildLockedModeCards(signals, modeRecommendations) {
+  const activeIds = new Set((modeRecommendations || []).map((mode) => mode.id));
+  const lockedIds = [];
+  if (!signals.hasRealTaskEvidence) {
+    lockedIds.push('three_minute_mini_lesson', 'game_recall');
+  }
+  return MODE_CATALOG
+    .filter((mode) => lockedIds.includes(mode.id) && !activeIds.has(mode.id))
+    .map((mode) => Object.assign({}, mode, {
+      childCanChoose: false,
+      parentConfirmRequired: true,
+      choiceRole: mode.id === 'three_minute_mini_lesson'
+        ? 'locked_rescue_bridge'
+        : 'locked_memory_loop',
+      lockReason: mode.id === 'three_minute_mini_lesson'
+        ? 'requires_repeated_real_homework_stuck_evidence'
+        : 'requires_real_first_step_or_wrong_cause_evidence',
+      localGate: mode.id === 'three_minute_mini_lesson'
+        ? '必须先有真实作业卡点，并在苏格拉底点拨里连续卡住'
+        : '必须先有真实第一步、错因或回访证据',
+      exitEvidenceRequired: mode.id === 'three_minute_mini_lesson'
+        ? ['real_homework_stuck', 'socratic_still_blocked', 'child_exit_ticket']
+        : ['child_first_step', 'wrong_cause_revisit', 'parent_safe_share_line']
+    }));
+}
+
 function pickTiers(signals) {
   const tiers = [];
   if (signals.hasAssessment) tiers.push('assessment_upgrade');
@@ -306,6 +332,7 @@ function pickTiers(signals) {
 function buildModeChoiceProtocol(signals, modeRecommendations, options = {}) {
   const recommended = modeRecommendations[0] || MODE_CATALOG[0];
   const hasRealTaskEvidence = !!(signals && signals.hasRealTaskEvidence);
+  const blockedModeCards = buildLockedModeCards(signals || {}, modeRecommendations || []);
   const choiceCards = modeRecommendations.map((mode) => {
     const isGame = mode.id === 'game_recall';
     const isMiniLesson = mode.id === 'three_minute_mini_lesson';
@@ -333,15 +360,16 @@ function buildModeChoiceProtocol(signals, modeRecommendations, options = {}) {
   });
   return {
     id: 'family_learning_mode_choice_protocol',
-    title: 'Family learning mode choice',
+    title: '家庭学习模式选择',
     recommendedModeId: recommended.id,
     recommendedModeLabel: recommended.label,
     childChoiceAllowed: choiceCards.some((card) => card.childCanChoose),
     parentConfirmRequired: true,
     choiceCards,
+    blockedModeCards,
     guardrails: MODE_CHOICE_GUARDRAILS,
     decisionOrder: ['socratic_private_tutor', 'three_minute_mini_lesson', 'game_recall', 'parent_coaching', 'online_method_course', 'wrong_question_repair_course'],
-    positioningLine: 'Classroom mode is a short rescue bridge; the main product remains a Socratic family tutor with evidence, review, parent action, and safe share loops.',
+    positioningLine: '小讲堂不是孩子随便选择的 AI 课堂；主线仍是苏格拉底家庭私教，只有真实作业连续卡住后才短时补位。',
     releaseGate: options.releaseGate || (hasRealTaskEvidence ? 'mode_choice_requires_parent_confirmation' : 'mode_choice_requires_real_task_evidence')
   };
 }

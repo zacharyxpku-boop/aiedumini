@@ -259,6 +259,17 @@
             </view>
             <view class="intake-packet-boundary">{{lastReportCta.servicePathway.modeChoiceProtocol.positioningLine}}</view>
             <view class="intake-packet-boundary">{{lastReportCta.servicePathway.modeChoiceProtocol.releaseGate}}</view>
+            <view class="intake-action-title" wx:if="{{lastReportCta.servicePathway.modeChoiceProtocol.blockedModeCards.length}}">暂不开启</view>
+            <view class="intake-action-item locked" wx:for="{{lastReportCta.servicePathway.modeChoiceProtocol.blockedModeCards}}" wx:key="id">
+              <view class="intake-action-main">
+                <text>{{item.label}}</text>
+                <text>{{item.lockReason}}</text>
+              </view>
+              <view class="intake-action-meta">
+                <text>{{item.localGate}}</text>
+                <text>退出证据：{{item.exitEvidenceRequired}}</text>
+              </view>
+            </view>
           </view>
           <view class="intake-action-queue">
             <view class="intake-action-item" wx:for="{{lastReportCta.servicePathway.productTiers}}" wx:key="id">

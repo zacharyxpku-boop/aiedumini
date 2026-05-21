@@ -546,6 +546,21 @@ Page({
         : '卡片不足 3 张时，先补真实错题或上传材料，不用假题充数。',
       shareBoundary: '分享只带错因、第一步、回访窗口和下一证据，不带原题、答案、照片、分数、排名或完整对话。'
     };
+    const incomingShare = storage.loadIncomingShare ? storage.loadIncomingShare() : null;
+    const receiverShareRelayPanel = incomingShare && incomingShare.share_code
+      ? {
+        id: 'receiver_own_material_share_relay',
+        title: '接力回访卡',
+        shareCode: incomingShare.share_code,
+        receiverMaterial: '用自己的作业材料，不复述对方原题',
+        receiverFirstStep: incomingShare.relay_receiver_action || incomingShare.receiver_own_challenge_line || '先写下自己这道题的第一步',
+        receiverWrongCause: '只写自己的卡点或错因，不带原题、答案、照片、分数、排名',
+        nextRevisit: incomingShare.relay_next_revisit || '明天遮住答案再说一次第一步',
+        completionEvent: 'share_relay_receiver_completion',
+        blockedFields: incomingShare.relay_blocked_fields || 'original_question,full_answer,photo,score,ranking,full_dialogue',
+        localRule: '完成时只写 receiverMaterial、receiverFirstStep、receiverWrongCause、nextRevisit；不保存发送者原题或答案。'
+      }
+      : null;
     const reviewWindows = (loop.spacedReviewPlan || [
       { id: 'tomorrow', label: '明天', action: '只回访同一张卡的第一步' },
       { id: 'day3', label: '第 3 天', action: '换一个同类小变式' },
@@ -573,6 +588,7 @@ Page({
       weakKey,
       recallCards,
       activeRecallProtocol,
+      receiverShareRelayPanel,
       mustDo,
       reviewWindows,
       releaseQueue,

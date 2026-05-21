@@ -930,7 +930,7 @@ Page({
     this.setData({
       gameBlocked: true,
       learningBoundLine: '今天的游戏奖励已经结算。继续学习请走回访卡或明天再来。',
-      feedbackText: '今天的游戏奖励已经结算。继续学习请走回访卡或明天再来，避免重复刷 XP。'
+      feedbackText: '今天的游戏奖励已经结算。继续学习请走回访卡或明天再来，避免重复刷奖励。'
     });
     if (storage.appendReviewEvent) {
       storage.appendReviewEvent({
@@ -1028,7 +1028,7 @@ Page({
       score,
       xpGained: Number(this.data.xpGained || 0) + Number(xpAccepted || 0),
       answers,
-      feedbackText: correct ? `啵，消掉一对！Combo ${combo}` : `这对没有粘住。正确关系：${answerRecord.answer}`
+      feedbackText: correct ? `啵，这一对留证成功。连续留证 ${combo}` : `这对没有粘住。正确关系：${answerRecord.answer}`
     });
   },
 
@@ -1223,7 +1223,7 @@ Page({
       score,
       xpGained: Number(this.data.xpGained || 0) + Number(xpAccepted || 0),
       answers,
-      feedbackText: correct ? `芽锤敲中！Combo ${combo}` : `参考思路：${current.answer}。这张卡会回到复习队列。`
+      feedbackText: correct ? `芽锤敲中！连续留证 ${combo}` : `参考思路：${current.answer}。这张卡会回到复习队列。`
     });
   },
 
@@ -2043,7 +2043,7 @@ Page({
     const evidenceLine = [
       `正确 ${Number(result.correct || 0)}/${Number(result.total || 0)}`,
       wrongCount ? `错因 ${wrongCount} 条` : '没有新增错因',
-      result.xp ? `写入 ${result.xp} XP` : '已写入学习记录'
+      result.xp ? `写入 ${result.xp} 条奖励证据` : '已写入学习记录'
     ].join(' · ');
     const actions = [
       {
@@ -2202,7 +2202,7 @@ Page({
         ? `已完成 ${completed.length}/${decoratedInteractions.length} 步`
         : '还没有完成证据',
       failureDowngradeLine: state.status === 'timeout'
-        ? '本轮不发 XP，自动降级为明天回访卡：只问第一步和错因，不继续加题。'
+        ? '本轮不发奖励，自动降级为明天回访卡：只问第一步和错因，不继续加题。'
         : ''
     });
   },
@@ -2494,7 +2494,7 @@ Page({
     }
     this.setData({
       dailyPrimaryRecallEvidencePacket: evidencePacket,
-      feedbackText: '已锁定明天回访。先去说第一步，完成后才释放 XP。'
+      feedbackText: '已锁定明天回访。先去说第一步，完成后才释放奖励。'
     });
     navigation.navigateLearningRoute(action.route || '/pages/review/review?mode=recall_return');
   },

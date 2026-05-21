@@ -33,8 +33,8 @@
           <view class="hero-stat-label">本局题数</view>
         </view>
         <view class="hero-stat">
-          <view class="hero-stat-num">{{score || 0}}</view>
-          <view class="hero-stat-label">本局得分</view>
+          <view class="hero-stat-num">{{xpGained || 0}}</view>
+          <view class="hero-stat-label">留证回访</view>
         </view>
       </view>
     </view>
@@ -54,7 +54,7 @@
           <view class="challenge-brief-kicker">本局目标</view>
           <view class="challenge-brief-title">{{challengeBrief.modeLabel}}</view>
         </view>
-        <view class="challenge-brief-pill">{{challengeBrief.roundSize}} 题 · {{challengeBrief.targetAccuracy}}%</view>
+        <view class="challenge-brief-pill">{{challengeBrief.roundSize}} 题 · 回访门槛</view>
       </view>
       <view class="challenge-brief-line">{{challengeBrief.questTitle}} · {{challengeBrief.questProgress}}</view>
       <view class="quest-action-row" wx:if="{{challengeBrief.questActions.length}}">
@@ -236,7 +236,7 @@
         </view>
       </view>
       <view class="daily-return-rule">家长只问：{{dailyReturnContract.parentReceipt.question}}</view>
-      <view class="daily-return-rule">AI 只改写表达；本地代码决定回访节奏、XP、画像放行和分享字段。</view>
+      <view class="daily-return-rule">AI 只改写表达；本地代码决定回访节奏、奖励放行、画像放行和分享字段。</view>
       <view class="daily-return-rule">{{dailyReturnContract.shareCard.receiverAction}}</view>
     </view>
 
@@ -442,16 +442,16 @@
       <view class="result-title">{{result.correct}} / {{result.total}} 答对</view>
       <view class="result-grid">
         <view>
-          <view class="result-num">{{result.accuracy}}%</view>
-          <view class="result-label">正确率</view>
+          <view class="result-num">{{result.correct}}</view>
+          <view class="result-label">已留证</view>
         </view>
         <view>
-          <view class="result-num">{{result.xp}}</view>
-          <view class="result-label">回访</view>
+          <view class="result-num">{{result.wrong}}</view>
+          <view class="result-label">错因</view>
         </view>
         <view>
-          <view class="result-num">{{result.bestCombo}}</view>
-          <view class="result-label">最稳连续</view>
+          <view class="result-num">{{lives}}</view>
+          <view class="result-label">回访门槛</view>
         </view>
       </view>
       <view class="answer-review" wx:if="{{wrongAnswers.length}}">
