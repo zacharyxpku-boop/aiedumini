@@ -353,6 +353,51 @@ function buildUploadAiMaterialSolutionView(contract = {}, sourceSchemaId = '', o
   };
 }
 
+function buildUploadDailyExecutionSeed(options = {}) {
+  const aiView = options.aiMaterialSolutionView || {};
+  const tonightTaskCard = options.tonightTaskCard || {};
+  const scoreSignalView = options.scoreSignalView || {};
+  const contentCoverageReceipt = options.contentCoverageReceipt || {};
+  const reportId = options.reportId || '';
+  const sourceSchemaId = options.sourceSchemaId || 'upload_material';
+  const query = `from=upload_daily_seed&reportId=${encodeURIComponent(reportId)}&sourceSchemaId=${encodeURIComponent(sourceSchemaId)}`;
+  const gameRoute = options.gameRoute || '';
+  const reviewRoute = `/pages/review/review?${query}`;
+  const tutorRoute = options.actionRoute || aiView.nextActionRoute || `/pages/tutor/tutor?${query}`;
+  const subjectLine = scoreSignalView.subjectLine || aiView.subjectLine || 'subject: pending evidence';
+  const coverageLine = contentCoverageReceipt.coverageLine || aiView.coverageLine || 'coverage: local first-step strategy';
+  const firstStep = tonightTaskCard.firstStep || aiView.firstStepLine || 'ask the child to say the first step';
+  const wrongCause = tonightTaskCard.wrongCause || aiView.wrongCauseLine || 'name one wrong-cause candidate';
+  const gameUnlocked = !!gameRoute;
+  return {
+    id: 'upload_daily_execution_seed',
+    title: '上传资料后的每日执行种子',
+    subjectLine,
+    coverageLine,
+    todayLine: `今天只做一件事：${firstStep}`,
+    tomorrowLine: '明天回来只复述第一步和错因，再决定是否放行新题。',
+    wrongCauseLine: `错因线索：${wrongCause}`,
+    reviewRoute,
+    tutorRoute,
+    gameRoute,
+    gameLine: gameUnlocked
+      ? '游戏回访已解锁：只练主动回忆，不奖励速度、分数或同伴比较。'
+      : '游戏回访暂不解锁：先补孩子第一步或错因证据。',
+    releaseLine: '放行规则：有第一步 + 错因 + 明天回访证据，才进入游戏或分享。',
+    blockedLine: '不带原题、完整答案、分数、名次、天赋标签、孩子姓名或联系方式。',
+    evidenceRequired: ['child_first_step', 'wrong_cause_named', 'next_day_revisit', 'parent_check'],
+    syncPayload: {
+      report_id: reportId,
+      source_schema_id: sourceSchemaId,
+      review_route: reviewRoute,
+      tutor_route: tutorRoute,
+      game_route: gameRoute,
+      game_unlocked: gameUnlocked,
+      evidence_required: 'child_first_step,wrong_cause_named,next_day_revisit,parent_check'
+    }
+  };
+}
+
 function uploadValidationEvidenceLine(evidence) {
   const map = {
     first_step: '证据：孩子能先说第一步，而不是等答案。',
@@ -1619,6 +1664,16 @@ Page({
       gameRoute,
       blockedFields: safeRelayPayload.blockedFields
     });
+    const dailyExecutionSeed = buildUploadDailyExecutionSeed({
+      sourceSchemaId,
+      reportId,
+      actionRoute,
+      gameRoute,
+      aiMaterialSolutionView,
+      scoreSignalView,
+      contentCoverageReceipt,
+      tonightTaskCard
+    });
     const partnerDeliveryLedgerView = buildUploadPartnerLedgerView(
       servicePathway && servicePathway.partnerServiceDeliveryLedger
     );
@@ -1697,6 +1752,7 @@ Page({
       aiMaterialSolutionView,
       scoreSignalView,
       contentCoverageReceipt,
+      dailyExecutionSeed,
       postPilotRetentionView,
       serviceHandoffPack,
       partnerDeliveryWorkbench: partnerWorkbench,
@@ -1712,6 +1768,7 @@ Page({
         : 'material_report_requires_structured_evidence_before_release'),
       safeRelayReturnLine: uploadReturnRouteLine(actionRoute),
       flowTraceId: `upload_report:${reportId || sourceSchemaId}:${cardId || 'no_card'}`,
+      dailyExecutionSeedSyncPayload: dailyExecutionSeed.syncPayload,
       cardId,
       importedCardIds: Array.isArray(options.importedCardIds) ? options.importedCardIds : [],
       blockedFields: safeRelayPayload.blockedFields,
@@ -1761,6 +1818,7 @@ Page({
       aiMaterialSolutionView: cta.aiMaterialSolutionView || null,
       scoreSignalView: cta.scoreSignalView || null,
       contentCoverageReceipt: cta.contentCoverageReceipt || null,
+      dailyExecutionSeed: cta.dailyExecutionSeed || null,
       servicePathway: cta.servicePathway || null,
       partnerDeliveryWorkbench: cta.partnerDeliveryWorkbench || null,
       serviceHandoffPack: cta.serviceHandoffPack || null,
@@ -1779,6 +1837,7 @@ Page({
         aiMaterialSolutionView: cta.aiMaterialSolutionView || null,
         scoreSignalView: cta.scoreSignalView || null,
         contentCoverageReceipt: cta.contentCoverageReceipt || null,
+        dailyExecutionSeed: cta.dailyExecutionSeed || null,
         servicePathway: cta.servicePathway || null,
         partnerDeliveryWorkbench: cta.partnerDeliveryWorkbench || null,
         serviceHandoffPack: cta.serviceHandoffPack || null,
