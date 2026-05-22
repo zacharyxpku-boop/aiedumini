@@ -235,6 +235,31 @@
         <view class="intake-packet-boundary" wx:if="{{lastReportCta.safeRelayPayload}}">{{lastReportCta.safeRelayReturnLine}}</view>
         <view class="intake-packet-boundary" wx:if="{{lastReportCta.guardedAiReportDraft}}">{{lastReportCta.guardedAiReportDraft.visibleLine}}</view>
         <view class="intake-packet-boundary" wx:if="{{lastReportCta.guardedAiReportDraft}}">AI 草案字段：摘要 / 追问 / 今晚行动 / 小讲堂候选；本地二次校验后才放行。</view>
+        <view class="intake-action-queue" wx:if="{{lastReportCta.aiMaterialSolutionView}}">
+          <view class="intake-action-title">{{lastReportCta.aiMaterialSolutionView.title}}</view>
+          <view class="intake-packet-boundary">{{lastReportCta.aiMaterialSolutionView.statusLine}}</view>
+          <view class="intake-action-item">
+            <view class="intake-action-main">
+              <text>{{lastReportCta.aiMaterialSolutionView.subjectLine}}</text>
+              <text>{{lastReportCta.aiMaterialSolutionView.wrongCauseLine}}</text>
+              <text>{{lastReportCta.aiMaterialSolutionView.firstStepLine}}</text>
+            </view>
+            <view class="intake-action-meta">
+              <text>{{lastReportCta.aiMaterialSolutionView.learningPreferenceLine}}</text>
+              <text>{{lastReportCta.aiMaterialSolutionView.confidenceLine}}</text>
+              <text>{{lastReportCta.aiMaterialSolutionView.nextActionLine}}</text>
+            </view>
+          </view>
+          <view class="intake-action-item" wx:for="{{lastReportCta.aiMaterialSolutionView.routes}}" wx:key="id">
+            <view class="intake-action-main">
+              <text>{{item.label}}</text>
+              <text>{{item.route}}</text>
+            </view>
+          </view>
+          <view class="intake-packet-boundary">{{lastReportCta.aiMaterialSolutionView.releaseLine}}</view>
+          <view class="intake-packet-boundary">{{lastReportCta.aiMaterialSolutionView.evidenceLine}}</view>
+          <view class="intake-packet-boundary">{{lastReportCta.aiMaterialSolutionView.blockedLine}}</view>
+        </view>
         <view class="upload-flow-actions">
           <button bindtap="viewLatestReport">查看家长报告</button>
           <button bindtap="runReportFollowupAction">{{lastReportCta.actionLabel}}</button>

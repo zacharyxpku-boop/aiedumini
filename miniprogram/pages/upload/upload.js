@@ -250,6 +250,47 @@ function buildUploadServiceHandoffPack(options = {}) {
   };
 }
 
+function buildUploadAiMaterialSolutionView(contract = {}, sourceSchemaId = '') {
+  const fallback = contract && contract.fallback ? contract.fallback : {};
+  const confidence = fallback.evidenceConfidence || {};
+  const nextAction = fallback.nextAction || {};
+  const executionPath = fallback.executionPath || {};
+  const blockedClaims = Array.isArray(fallback.blockedClaims) ? fallback.blockedClaims : [];
+  const releaseGates = Array.isArray(contract.releaseGates) ? contract.releaseGates : [];
+  const requiredEvidence = Array.isArray(confidence.requiredNextEvidence) && confidence.requiredNextEvidence.length
+    ? confidence.requiredNextEvidence
+    : ['structured_evidence', 'parent_confirmation'];
+  const confidenceLevel = confidence.level || 'low';
+  return {
+    id: 'upload_ai_material_solution_view',
+    title: 'AI analysis to action',
+    statusLine: contract && contract.endpointPath
+      ? `server endpoint: ${contract.endpointPath}; fallback: ${fallback.status || 'local_guarded_draft'}`
+      : 'local guarded draft until server analysis is configured',
+    subjectLine: `subject: ${fallback.subject || 'unknown'}`,
+    wrongCauseLine: `wrong-cause candidate: ${fallback.wrongCause || 'needs one real task check'}`,
+    firstStepLine: `first step: ${fallback.firstStep || 'ask the child to name the first step'}`,
+    learningPreferenceLine: `method hypothesis: ${fallback.learningPreference || 'validate before practice'}`,
+    confidenceLine: `evidence confidence: ${confidenceLevel}; ${confidence.reason || 'parent confirmation required'}`,
+    nextActionLine: `next action: ${nextAction.label || fallback.firstStep || 'go to Socratic first step'}`,
+    nextActionRoute: nextAction.route || executionPath.socraticRoute || '/pages/tutor/tutor?from=ai_material_analysis',
+    routes: [
+      { id: 'socratic', label: 'Socratic', route: executionPath.socraticRoute || '/pages/tutor/tutor?from=ai_material_analysis' },
+      { id: 'mini_lesson', label: 'Mini lesson', route: executionPath.miniLessonRoute || '/pages/tutor/tutor?from=ai_material_analysis_mini_lesson' },
+      { id: 'game_recall', label: 'Game recall', route: executionPath.gameRecallRoute || '/pages/arcade/arcade?from=ai_material_analysis' },
+      { id: 'parent_review', label: 'Parent review', route: executionPath.parentReviewRoute || '/pages/profile/profile?from=ai_material_analysis' }
+    ],
+    releaseLine: releaseGates.length
+      ? `release gates: ${releaseGates.slice(0, 4).join(' / ')}`
+      : 'release gates: sanitizer / parent confirmation / real homework evidence',
+    evidenceLine: `next evidence: ${requiredEvidence.slice(0, 4).join(' / ')}`,
+    blockedLine: blockedClaims.length
+      ? `blocked claims: ${blockedClaims.slice(0, 5).join(' / ')}`
+      : 'blocked claims: talent label / auto grading / OCR claim / full answer / ranking',
+    sourceSchemaId
+  };
+}
+
 function uploadValidationEvidenceLine(evidence) {
   const map = {
     first_step: '证据：孩子能先说第一步，而不是等答案。',
@@ -1418,6 +1459,7 @@ Page({
         subject: miniLessonSubject
       })
       : null;
+    const aiMaterialSolutionView = buildUploadAiMaterialSolutionView(aiMaterialAnalysisContract, sourceSchemaId);
     const miniLessonFirstStep = uploadEvidenceSignals.firstStep
       || uploadEvidenceSignals.stuckFirstStep
       || reportBehaviorSignals.firstStep
@@ -1584,6 +1626,7 @@ Page({
       aiLocalDeliveryView,
       publicK12BorrowView,
       quickAssessmentBridgeView,
+      aiMaterialSolutionView,
       postPilotRetentionView,
       serviceHandoffPack,
       partnerDeliveryWorkbench: partnerWorkbench,
@@ -1645,6 +1688,7 @@ Page({
       miniLessonSourceEvidence: cta.miniLessonSourceEvidence || null,
       guardedAiReportDraft: cta.guardedAiReportDraft || null,
       aiMaterialAnalysisContract: cta.aiMaterialAnalysisContract || null,
+      aiMaterialSolutionView: cta.aiMaterialSolutionView || null,
       servicePathway: cta.servicePathway || null,
       partnerDeliveryWorkbench: cta.partnerDeliveryWorkbench || null,
       serviceHandoffPack: cta.serviceHandoffPack || null,
@@ -1660,6 +1704,7 @@ Page({
         miniLessonSourceEvidence: cta.miniLessonSourceEvidence || null,
         guardedAiReportDraft: cta.guardedAiReportDraft || null,
         aiMaterialAnalysisContract: cta.aiMaterialAnalysisContract || null,
+        aiMaterialSolutionView: cta.aiMaterialSolutionView || null,
         servicePathway: cta.servicePathway || null,
         partnerDeliveryWorkbench: cta.partnerDeliveryWorkbench || null,
         serviceHandoffPack: cta.serviceHandoffPack || null,

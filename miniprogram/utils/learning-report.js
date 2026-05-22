@@ -2874,6 +2874,9 @@ function buildCommercialFamilySolutionBook(input = {}) {
   const reportEvidenceReleaseGate = input.reportEvidenceReleaseGate || {};
   const tonightDecisionBrief = input.tonightDecisionBrief || {};
   const aiMaterialAnalysisContract = input.aiMaterialAnalysisContract || {};
+  const aiMaterialFallback = aiMaterialAnalysisContract && aiMaterialAnalysisContract.fallback
+    ? aiMaterialAnalysisContract.fallback
+    : {};
   const nextEvidence = Array.isArray(parentDecisionBook.nextEvidenceQueue) && parentDecisionBook.nextEvidenceQueue.length
     ? parentDecisionBook.nextEvidenceQueue
     : (Array.isArray(sourceEvidenceLedger.nextEvidenceQueue) ? sourceEvidenceLedger.nextEvidenceQueue : []);
@@ -2976,7 +2979,21 @@ function buildCommercialFamilySolutionBook(input = {}) {
       id: aiMaterialAnalysisContract.id,
       endpointPath: aiMaterialAnalysisContract.endpointPath || '',
       releaseGates: Array.isArray(aiMaterialAnalysisContract.releaseGates) ? aiMaterialAnalysisContract.releaseGates.slice(0, 6) : [],
-      fallbackStatus: aiMaterialAnalysisContract.fallback ? aiMaterialAnalysisContract.fallback.status || '' : ''
+      fallbackStatus: aiMaterialFallback.status || '',
+      normalizedSolution: {
+        subject: aiMaterialFallback.subject || 'unknown',
+        wrongCause: aiMaterialFallback.wrongCause || 'wrong-cause candidate needs evidence',
+        firstStep: aiMaterialFallback.firstStep || 'ask the child to name the first step',
+        learningPreference: aiMaterialFallback.learningPreference || 'validate method before practice',
+        evidenceConfidence: aiMaterialFallback.evidenceConfidence || { level: 'low' },
+        nextAction: aiMaterialFallback.nextAction || { route: '/pages/tutor/tutor?from=solution_book' },
+        executionPath: aiMaterialFallback.executionPath || {
+          socraticRoute: '/pages/tutor/tutor?from=solution_book_socratic',
+          miniLessonRoute: '/pages/tutor/tutor?from=solution_book_mini_lesson',
+          gameRecallRoute: '/pages/arcade/arcade?from=solution_book_recall',
+          parentReviewRoute: '/pages/profile/profile?from=solution_book_parent'
+        }
+      }
     } : null,
     commercialLoop: [
       { id: 'partner_upload', route: '/pages/upload/upload?from=partner_material', gate: 'parent_confirmed_material' },
