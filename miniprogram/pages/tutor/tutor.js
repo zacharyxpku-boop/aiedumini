@@ -22,6 +22,43 @@ const SOCRATIC_EFFECTIVENESS_STATUS = {
   still_blocked: true
 };
 
+function tutorReadableList(label, values = []) {
+  const list = Array.isArray(values) ? values : [values];
+  const text = list.map((item) => String(item || '').trim()).filter(Boolean).join('、');
+  return `${label}：${text || '按当前题目证据补齐。'}`;
+}
+
+function tutorReadableAiLocalRows(contract = {}) {
+  const rows = Array.isArray(contract.runtimeDecisionRows) ? contract.runtimeDecisionRows : [];
+  const blocked = Array.isArray(contract.aiMustNotDecide) ? contract.aiMustNotDecide : [];
+  return rows.map((item, index) => ({
+    id: item.id || `ai_local_${index + 1}`,
+    line: `规则先守住：${item.localDecision || '安全和证据放行'}；AI 只改写：${item.aiAllowedRewrite || '一句更适合孩子的追问'}。`
+  })).concat(blocked.length ? [{
+    id: 'ai_must_not_decide',
+    line: tutorReadableList('不能交给 AI 决定', blocked)
+  }] : []);
+}
+
+function tutorReadableWorkbenchRows(rows = []) {
+  return (Array.isArray(rows) ? rows : []).map((item, index) => ({
+    id: item.id || `workbench_${index + 1}`,
+    line: `${item.label || '公开资料'}：只借结构和题型；${tutorReadableList('本地守住', item.localizeAsCode)}；${tutorReadableList('AI 辅助', item.aiBetterFor)}；${tutorReadableList('禁止', item.mustNotUse)}。`
+  }));
+}
+
+function tutorReadableEventRows(rows = []) {
+  return (Array.isArray(rows) ? rows : []).map((item, index) => ({
+    id: item.event || `event_${index + 1}`,
+    line: `第 ${item.order || index + 1} 步：${item.event || '完成一个课堂动作'}；门槛：先留下孩子第一步和回访证据。`
+  }));
+}
+
+function tutorEvidenceThreadLine(thread = {}) {
+  if (!thread || !thread.topicCardId) return '';
+  return `证据线：已绑定小讲堂回访；第 7 天复核：${thread.day7Gate || '用小变式验证'}。`;
+}
+
 const QUICK_ACTIONS = [
   { id: 'read_problem', label: '提示 1/5', desc: '先复述题意，找已知条件' },
   { id: 'write_first_step', label: '提示 2/5', desc: '追问第一步想做什么' },
@@ -399,6 +436,7 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
     socraticQualityEvaluationSuite,
     socraticPromptQualityJudge,
     socratic_ai_local_boundary_contract: socraticAiLocalBoundaryContract,
+    socraticAiLocalReadableRows: tutorReadableAiLocalRows(socraticAiLocalBoundaryContract),
     socraticAiLocalBoundaryContract,
     socraticPromptEffectivePrompts: socraticPromptQualityJudge && Array.isArray(socraticPromptQualityJudge.effectivePrompts)
       ? socraticPromptQualityJudge.effectivePrompts.slice(0, 4)
@@ -414,8 +452,15 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
     miniLesson,
     miniLessonAudit,
     evidenceThread,
+    evidenceThreadLine: tutorEvidenceThreadLine(evidenceThread),
     openMaicInspiredScenes: openMaicInspiredTaskPlan.scenes.slice(0, 6),
     openMaicInspiredEventFlow: openMaicInspiredTaskPlan.eventFlow.slice(0, 6),
+    openMaicInspiredReadableEventFlow: tutorReadableEventRows(openMaicInspiredTaskPlan.eventFlow.slice(0, 6)),
+    realHomeworkUseReadableWorkbench: tutorReadableWorkbenchRows(
+      realHomeworkCoverageMatrix && Array.isArray(realHomeworkCoverageMatrix.publicK12UseWorkbench)
+        ? realHomeworkCoverageMatrix.publicK12UseWorkbench.slice(0, 4)
+        : []
+    ),
     openMaicPublicK12Decisions: openMaicInspiredTaskPlan.publicK12ResourceDecisions.slice(0, 4),
     sevenSubjectMasterySprint,
     handoffPlan,

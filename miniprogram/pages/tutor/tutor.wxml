@@ -213,8 +213,7 @@
             <view class="receipt-board-avoid">只借公开结构做题型路由，不复制题文、不输出完整答案。</view>
             <view class="receipt-board-line">{{thinkingReceipt.socratic_ai_local_boundary_contract.parentLine}}</view>
             <view class="receipt-board-parent">{{thinkingReceipt.socratic_ai_local_boundary_contract.fallbackLine}}</view>
-            <view class="receipt-board-line" wx:for="{{thinkingReceipt.socratic_ai_local_boundary_contract.runtimeDecisionRows}}" wx:key="id">本地规则：{{item.localDecision}}｜AI改写：{{item.aiAllowedRewrite}}</view>
-            <view class="receipt-board-parent" wx:for="{{thinkingReceipt.socratic_ai_local_boundary_contract.aiMustNotDecide}}" wx:key="*this">禁止交给AI：{{item}}</view>
+            <view class="receipt-board-line" wx:for="{{thinkingReceipt.socraticAiLocalReadableRows}}" wx:key="id">{{item.line}}</view>
             <view class="receipt-board-avoid">{{thinkingReceipt.socratic_ai_local_boundary_contract.reportLine}}</view>
           </view>
           <view class="receipt-first-step-board" wx:if="{{thinkingReceipt.visualSocraticMatrix}}">
@@ -251,7 +250,7 @@
             <view class="receipt-board-line">{{thinkingReceipt.realHomeworkCoverageMatrix.publicSourceLine}}</view>
             <view class="receipt-board-line">{{thinkingReceipt.realHomeworkCoverageMatrix.publicWorkbenchLine}}</view>
             <view class="receipt-board-line">{{thinkingReceipt.realHomeworkCoverageMatrix.clusterRunwayLine}}</view>
-            <view class="receipt-board-parent" wx:for="{{thinkingReceipt.realHomeworkUseWorkbench}}" wx:key="id">{{item.label}}：可直接用{{item.directUse[0]}}，本地代码管{{item.localizeAsCode[0]}}，AI 管{{item.aiBetterFor[0]}}，禁用{{item.mustNotUse[0]}}</view>
+            <view class="receipt-board-parent" wx:for="{{thinkingReceipt.realHomeworkUseReadableWorkbench}}" wx:key="id">{{item.line}}</view>
             <view class="receipt-board-parent" wx:for="{{thinkingReceipt.realHomeworkQuestionTypeClusters}}" wx:key="id">{{item.subject}} · {{item.pressureFamily}}：{{item.firstStepRule}}</view>
             <view class="receipt-board-parent" wx:for="{{thinkingReceipt.realHomeworkPublicSources}}" wx:key="id">{{item.label}}：本地规则管{{item.localRuleUse[0]}}，AI 只管{{item.aiUse[0]}}</view>
             <view class="receipt-board-parent" wx:for="{{thinkingReceipt.realHomeworkImplementationDecisions}}" wx:key="id">实现判断：{{item.productQuestion}}｜{{item.decision}}</view>
@@ -266,7 +265,7 @@
             <view class="receipt-board-line">第一步：{{thinkingReceipt.openMaicInspiredTaskPlan.outline.firstStep}}</view>
             <view class="receipt-board-parent">家长只问：{{thinkingReceipt.openMaicInspiredTaskPlan.outline.parentCheck}}</view>
             <view class="receipt-board-line" wx:for="{{thinkingReceipt.openMaicInspiredScenes}}" wx:key="id">{{item.label}}：{{item.action}}</view>
-            <view class="receipt-board-parent" wx:for="{{thinkingReceipt.openMaicInspiredEventFlow}}" wx:key="event">事件{{item.order}}：{{item.event}}｜{{item.localGate}}</view>
+            <view class="receipt-board-parent" wx:for="{{thinkingReceipt.openMaicInspiredReadableEventFlow}}" wx:key="id">{{item.line}}</view>
             <view class="receipt-board-line" wx:for="{{thinkingReceipt.openMaicPublicK12Decisions}}" wx:key="id">{{item.label}}：系统先定第一步，AI 只把提示说得更容易懂。</view>
             <view class="receipt-board-avoid">{{thinkingReceipt.openMaicInspiredTaskPlan.shareBoundary}}</view>
           </view>
@@ -354,8 +353,8 @@
             <view class="mini-lesson-check" wx:for="{{thinkingReceipt.miniLesson.recoveryBranches}}" wx:key="id">
               卡住分支：{{item.trigger}} → {{item.localAction}}
             </view>
-            <view class="mini-lesson-thread" wx:if="{{thinkingReceipt.evidenceThread.topicCardId}}">
-              证据主键：{{thinkingReceipt.evidenceThread.topicCardId}} · 第 7 天：{{thinkingReceipt.evidenceThread.day7Gate}}
+            <view class="mini-lesson-thread" wx:if="{{thinkingReceipt.evidenceThreadLine}}">
+              {{thinkingReceipt.evidenceThreadLine}}
             </view>
           </view>
           <view class="receipt-contract" wx:if="{{thinkingReceipt.socratic_contract}}">
