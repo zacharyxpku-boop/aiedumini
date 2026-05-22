@@ -527,7 +527,7 @@
             <text>{{item.rule}}</text>
           </view>
           <view class="retention-loop-step">{{highFrequencyPracticeLoop.recallIntensityPlan.stopRule}}</view>
-          <view class="retention-loop-step">{{highFrequencyPracticeLoop.recallIntensityPlan.releaseRule}}</view>
+          <view class="retention-loop-step">过关条件：{{highFrequencyPracticeLoop.recallIntensityPlan.releaseRule}}</view>
         </view>
         <view class="high-frequency-section" wx:if="{{highFrequencyPracticeLoop.wrongCauseReplayDeck}}">
           <view class="high-frequency-label">{{highFrequencyPracticeLoop.wrongCauseReplayDeck.title}}</view>

@@ -2376,7 +2376,9 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     portraitDecisionReleaseScore: portraitDecisionReleaseSystem ? Number(portraitDecisionReleaseSystem.releaseScore || 0) : 0,
     portraitDecisionReleaseSummary: portraitDecisionReleaseSystem ? portraitDecisionReleaseSystem.summary : '',
     portraitDecisionReleaseLanes: portraitDecisionReleaseSystem && Array.isArray(portraitDecisionReleaseSystem.releaseLanes)
-      ? portraitDecisionReleaseSystem.releaseLanes
+      ? portraitDecisionReleaseSystem.releaseLanes.map((item) => Object.assign({}, item, {
+        readableLine: `${item.label || '家庭动作'}：${item.status === 'released' ? '可以今晚执行' : item.status === 'candidate' ? '作为候选继续验证' : '暂时锁住'}；依据：${item.releaseRule || '等孩子第一步、错因和回访证据补齐'}；不做：${item.blockedRule || '不贴长期标签'}`
+      }))
       : [],
     portraitDecisionReleaseLocks: portraitDecisionReleaseSystem && Array.isArray(portraitDecisionReleaseSystem.releaseLocks)
       ? portraitDecisionReleaseSystem.releaseLocks

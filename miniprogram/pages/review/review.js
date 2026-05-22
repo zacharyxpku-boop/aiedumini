@@ -44,6 +44,12 @@ function reviewEvidenceThreadLine(id = '') {
   return '证据线：已绑定小讲堂回访卡，不展示内部编号。';
 }
 
+function reviewReadableDay7GateLine(gate = '') {
+  const value = String(gate || '').trim();
+  if (!value) return '';
+  return '第 7 天复核：只看孩子能不能换一道小变式说第一步。';
+}
+
 Page({
   data: {
     summary: null,
@@ -337,6 +343,7 @@ Page({
       topicCardId: evidenceThread ? evidenceThread.topicCardId : '',
       topicCardLine: reviewEvidenceThreadLine(evidenceThread ? evidenceThread.topicCardId : ''),
       day7Gate: evidenceThread ? evidenceThread.day7Gate : '',
+      day7GateLine: reviewReadableDay7GateLine(evidenceThread ? evidenceThread.day7Gate : ''),
       frames,
       blockedFields,
       boundary: '不展示原题、不展示完整答案、不做分数/排名/天赋结论；只放行第一步、错因和明天回访。'

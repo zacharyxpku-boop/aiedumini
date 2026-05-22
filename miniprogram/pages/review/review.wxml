@@ -108,7 +108,7 @@
             </view>
           </view>
           <view class="repair-contract-boundary">放行门槛：{{miniLessonReturnPanel.exitGate}}</view>
-          <view class="repair-contract-boundary" wx:if="{{miniLessonReturnPanel.day7Gate}}">第 7 天复核：{{miniLessonReturnPanel.day7Gate}}</view>
+          <view class="repair-contract-boundary" wx:if="{{miniLessonReturnPanel.day7GateLine}}">{{miniLessonReturnPanel.day7GateLine}}</view>
           <view class="repair-contract-boundary">{{miniLessonReturnPanel.boundary}}</view>
         </view>
         <view class="repair-contract-card" wx:if="{{reviewViewModel.repairContract}}">

@@ -175,7 +175,7 @@
           <view class="public-k12-lane-label">{{item.label}}</view>
           <view class="public-k12-lane-body">输入：{{item.acceptedInput}}</view>
           <view class="public-k12-lane-body">输出：{{item.output}}</view>
-          <view class="public-k12-lane-body">放行：{{item.releaseRule}}</view>
+          <view class="public-k12-lane-body">交付边界：{{item.releaseLine}}</view>
         </view>
       </view>
       <view class="public-k12-next" wx:for="{{competitiveMoatWorkbench.nextOneDayBuild}}" wx:key="*this">{{item}}</view>

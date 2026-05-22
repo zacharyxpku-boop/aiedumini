@@ -12743,6 +12743,9 @@ function buildCompetitiveMoatWorkbench(options = {}) {
       releaseRule: '只带观察问题和下一步动作，不带原题照片、答案、分数或完整对话。'
     }
   ];
+  const reportInputReadableLanes = reportInputLanes.map((item) => Object.assign({}, item, {
+    releaseLine: item.releaseRule || '先补齐孩子自己的第一步、错因和回访证据，再生成家庭方案。'
+  }));
   return {
     id: 'competitive_moat_workbench',
     title: '竞品级加厚工作台',
@@ -12756,7 +12759,7 @@ function buildCompetitiveMoatWorkbench(options = {}) {
     sourceLicenseGateRows,
     openMaicScenePack,
     competitiveExecutionBoard,
-    reportInputLanes,
+    reportInputLanes: reportInputReadableLanes,
     highLeverageLanes,
     aiLocalDecision: {
       id: 'ai_local_decision',

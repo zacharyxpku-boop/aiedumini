@@ -1231,7 +1231,7 @@
           <text>放行等级：{{learningReportSummary.portraitDecisionReleaseLevel}}｜放行分：{{learningReportSummary.portraitDecisionReleaseScore}}</text>
           <text>{{learningReportSummary.portraitDecisionReleaseSummary}}</text>
           <text>{{learningReportSummary.portraitDecisionReleaseParentLine}}</text>
-          <text wx:for="{{learningReportSummary.portraitDecisionReleaseLanes}}" wx:key="id">放行层：{{item.label}}｜{{item.status}}｜{{item.releaseRule}}｜挡板：{{item.blockedRule}}</text>
+          <text wx:for="{{learningReportSummary.portraitDecisionReleaseLanes}}" wx:key="id">{{item.readableLine}}</text>
           <text wx:for="{{learningReportSummary.portraitDecisionReleaseLocks}}" wx:key="*this">画像锁：{{item}}</text>
           <text wx:for="{{learningReportSummary.portraitDecisionReleaseQueue}}" wx:key="id">下一步：{{item.label}}｜证据 {{item.evidence}}</text>
           <text wx:if="{{learningReportSummary.portraitDecisionReleaseXpLine}}">{{learningReportSummary.portraitDecisionReleaseXpLine}}</text>
