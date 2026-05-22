@@ -47,7 +47,7 @@
         <view class="story-mission-rule" wx:if="{{reportSourcePanel.firstQuestion}}">本局先练：{{reportSourcePanel.firstQuestion}}</view>
         <view class="story-mission-rule">来源卡：{{reportSourcePanel.matchedCount}} 张；原题、答案和分数不会进入分享。</view>
         <view class="story-mission-rule" wx:if="{{reportSourcePanel.openMaicBridgeStatus}}">小讲堂回流：先说第一步，再锁明天回访。</view>
-        <view class="story-mission-rule" wx:if="{{reportSourcePanel.returnRoute}}">练后回流：{{reportSourcePanel.returnRoute}}</view>
+        <view class="story-mission-rule" wx:if="{{reportSourcePanel.returnRoute}}">{{reportSourcePanel.returnRouteLine}}</view>
       </view>
       <view class="challenge-brief-top">
         <view>
@@ -490,7 +490,7 @@
       <view class="next-day-return-card" wx:if="{{nextDayReturnEvidence}}">
         <view class="next-day-return-kicker">次日回访证据</view>
         <view class="next-day-return-title">明天回访已约定</view>
-        <view class="next-day-return-line">路线：{{nextDayReturnEvidence.route}}</view>
+        <view class="next-day-return-line">{{nextDayReturnEvidence.routeLine}}</view>
         <view class="next-day-return-line">到期：{{nextDayReturnEvidence.dueAt}}</view>
         <view class="next-day-return-line">安全字段：{{nextDayReturnEvidence.blockedFields.length}} 项已拦截</view>
       </view>

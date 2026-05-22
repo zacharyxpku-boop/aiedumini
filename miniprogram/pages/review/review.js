@@ -29,6 +29,21 @@ const DEFAULT_MISTAKE_HUB = {
   repairItems: []
 };
 
+function reviewReadableRouteLine(route = '') {
+  const value = String(route || '');
+  if (value.indexOf('/pages/arcade/') >= 0) return '下一步：练后回到 90 秒主动回忆，继续同一个错因。';
+  if (value.indexOf('/pages/tutor/') >= 0) return '下一步：回到一对一点拨，只问第一步。';
+  if (value.indexOf('/pages/profile/') >= 0) return '下一步：回到家长报告查看证据。';
+  if (value.indexOf('/pages/upload/') >= 0) return '下一步：继续补材料证据。';
+  return '下一步：完成本张卡后再决定是否继续。';
+}
+
+function reviewEvidenceThreadLine(id = '') {
+  const value = String(id || '').trim();
+  if (!value) return '';
+  return '证据线：已绑定小讲堂回访卡，不展示内部编号。';
+}
+
 Page({
   data: {
     summary: null,
@@ -285,6 +300,7 @@ Page({
       blockedFields: context.blockedFields || [],
       openMaicBridgeStatus: context.openMaicBridgeStatus || '',
       returnRoute: context.returnRoute || '',
+      returnRouteLine: reviewReadableRouteLine(context.returnRoute || ''),
       miniLessonReport: context.miniLessonReport || null,
       miniLessonCheckQuestion: context.miniLessonReport ? context.miniLessonReport.checkQuestion : '',
       miniLessonBlackboardLine: context.miniLessonReport ? context.miniLessonReport.blackboardLine : '',
@@ -319,6 +335,7 @@ Page({
       flowTraceId: current.flowTraceId || '',
       evidenceThreadId: evidenceThread ? evidenceThread.id : '',
       topicCardId: evidenceThread ? evidenceThread.topicCardId : '',
+      topicCardLine: reviewEvidenceThreadLine(evidenceThread ? evidenceThread.topicCardId : ''),
       day7Gate: evidenceThread ? evidenceThread.day7Gate : '',
       frames,
       blockedFields,

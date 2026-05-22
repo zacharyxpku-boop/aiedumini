@@ -66,7 +66,7 @@
           <view class="repair-contract-boundary">安全边界：不带原题、完整结果、分数或比较信息。</view>
           <view class="repair-contract-boundary" wx:if="{{reportSourcePanel.openMaicBridgeStatus}}">小讲堂回流：先说第一步，再锁明天回访。</view>
           <view class="repair-contract-boundary" wx:if="{{reportSourcePanel.miniLessonTopicGate}}">小讲堂门槛：{{reportSourcePanel.miniLessonTopicGate}}</view>
-          <view class="repair-contract-boundary" wx:if="{{reportSourcePanel.returnRoute}}">回流动作：{{reportSourcePanel.returnRoute}}</view>
+          <view class="repair-contract-boundary" wx:if="{{reportSourcePanel.returnRoute}}">{{reportSourcePanel.returnRouteLine}}</view>
         </view>
         <view class="repair-contract-card mini-lesson-return-card" wx:if="{{miniLessonReturnPanel}}">
           <view class="repair-contract-head">
@@ -77,9 +77,9 @@
             <text class="repair-contract-label">概念缺口</text>
             <text class="repair-contract-text">{{miniLessonReturnPanel.conceptGap}}</text>
           </view>
-          <view class="repair-contract-row" wx:if="{{miniLessonReturnPanel.topicCardId}}">
-            <text class="repair-contract-label">证据主键</text>
-            <text class="repair-contract-text">{{miniLessonReturnPanel.topicCardId}}</text>
+          <view class="repair-contract-row" wx:if="{{miniLessonReturnPanel.topicCardLine}}">
+            <text class="repair-contract-label">证据线</text>
+            <text class="repair-contract-text">{{miniLessonReturnPanel.topicCardLine}}</text>
           </view>
           <view class="repair-contract-row">
             <text class="repair-contract-label">第一步</text>

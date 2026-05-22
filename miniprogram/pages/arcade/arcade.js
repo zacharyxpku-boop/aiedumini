@@ -8,6 +8,15 @@ const tutorLadder = require('../../utils/tutor-ladder');
 const realHomeworkCoverage = require('../../utils/real-homework-coverage');
 const shareRelaySchema = require('../../utils/share-relay-schema');
 
+function arcadeReadableRouteLine(route = '') {
+  const value = String(route || '');
+  if (value.indexOf('/pages/review/') >= 0) return '下一步：练后回到错因复盘，锁定明天回访。';
+  if (value.indexOf('/pages/tutor/') >= 0) return '下一步：练后回到一对一点拨，只问第一步。';
+  if (value.indexOf('/pages/profile/') >= 0) return '下一步：练后回到家长报告查看证据。';
+  if (value.indexOf('/pages/upload/') >= 0) return '下一步：练后继续补材料证据。';
+  return '下一步：练后回到同一条学习证据。';
+}
+
 Page({
   data: {
     summary: null,
@@ -155,7 +164,8 @@ Page({
       matchedCount,
       blockedFields: context.blockedFields || [],
       openMaicBridgeStatus: context.openMaicBridgeStatus || '',
-      returnRoute: context.returnRoute || ''
+      returnRoute: context.returnRoute || '',
+      returnRouteLine: arcadeReadableRouteLine(context.returnRoute || '')
     };
   },
 
@@ -1938,8 +1948,18 @@ Page({
         ? highFrequencyPracticeLoop.reviewReturnSeed
         : this.data.reviewReturnSeed,
       nextDayReturnEvidence: highFrequencyPracticeLoop && highFrequencyPracticeLoop.nextDayReturnEvidence
-        ? highFrequencyPracticeLoop.nextDayReturnEvidence
-        : (dailyReturnContract && dailyReturnContract.nextDayReturnEvidence ? dailyReturnContract.nextDayReturnEvidence : this.data.nextDayReturnEvidence),
+        ? Object.assign({}, highFrequencyPracticeLoop.nextDayReturnEvidence, {
+          routeLine: arcadeReadableRouteLine(highFrequencyPracticeLoop.nextDayReturnEvidence.route)
+        })
+        : (dailyReturnContract && dailyReturnContract.nextDayReturnEvidence
+          ? Object.assign({}, dailyReturnContract.nextDayReturnEvidence, {
+            routeLine: arcadeReadableRouteLine(dailyReturnContract.nextDayReturnEvidence.route)
+          })
+          : (this.data.nextDayReturnEvidence
+            ? Object.assign({}, this.data.nextDayReturnEvidence, {
+              routeLine: arcadeReadableRouteLine(this.data.nextDayReturnEvidence.route)
+            })
+            : null)),
       spacedRecallPolicy: highFrequencyPracticeLoop && highFrequencyPracticeLoop.spacedRecallPolicy
         ? highFrequencyPracticeLoop.spacedRecallPolicy
         : this.data.spacedRecallPolicy,
