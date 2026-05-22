@@ -153,6 +153,13 @@
               <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierSolutionFusionRules}}" wx:key="id">{{item.label}}｜用于：{{item.useFor}}｜验证：{{item.mustVerifyWith}}</text>
               <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierSolutionOwnership}}" wx:key="id">{{item.label}}：{{item.reason}}</text>
             </view>
+            <view class="parent-brief-block" wx:if="{{learningReportSummary.uploadedMaterialServiceHandoffPack}}">
+              <text class="parent-brief-label">{{learningReportSummary.uploadedMaterialServiceHandoffTitle}}</text>
+              <text>{{learningReportSummary.uploadedMaterialServiceHandoffSummary}}</text>
+              <text wx:for="{{learningReportSummary.uploadedMaterialServiceHandoffCards}}" wx:key="id">{{item.label}}｜{{item.line}}｜{{item.evidenceLine}}</text>
+              <text>{{learningReportSummary.uploadedMaterialServiceHandoffReleaseLine}}</text>
+              <text>{{learningReportSummary.uploadedMaterialServiceHandoffBlockedLine}}</text>
+            </view>
             <view class="parent-brief-block" wx:if="{{learningReportSummary.reportRevisitEvidence}}">
               <text class="parent-brief-label">报告回访验证</text>
               <text>当前阶段：{{learningReportSummary.reportRevisitValidationStage}}｜次日回访 {{learningReportSummary.reportRevisitNextDayCount}} 次</text>

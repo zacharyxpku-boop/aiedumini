@@ -158,6 +158,26 @@ function profileListLine(label, values = []) {
   return `${label}：${text || '按当前报告补齐后显示。'}`;
 }
 
+function normalizeProfileServiceHandoffPack(pack = null) {
+  if (!pack || typeof pack !== 'object') return null;
+  const cards = Array.isArray(pack.cards)
+    ? pack.cards.map((item, index) => ({
+      id: item.id || `profile_service_handoff_${index + 1}`,
+      label: item.label || '交付步骤',
+      line: item.line || '先把资料转成家庭能执行的一步。',
+      evidenceLine: item.evidenceLine || '证据不足时只补证据，不下结论。'
+    }))
+    : [];
+  return {
+    id: pack.id || 'profile_uploaded_material_service_handoff_pack',
+    title: pack.title || '家庭解决方案交付包',
+    summaryLine: pack.summaryLine || '把上传材料、今晚动作、7 天验证和合作交付收成一张可执行卡。',
+    cards,
+    releaseLine: pack.releaseLine || '放行标准：必须有孩子自己的第一步、错因、回访或家长确认。',
+    blockedLine: pack.blockedLine || '不交付：原题、完整答案、分数排名、天赋定性和隐私信息。'
+  };
+}
+
 function buildProfileDossierDeliveryView(dossier = {}, servicePathway = {}) {
   const modeOrchestration = dossier.familyPrivateTutorSolutionPack && Array.isArray(dossier.familyPrivateTutorSolutionPack.modeOrchestration)
     ? dossier.familyPrivateTutorSolutionPack.modeOrchestration
@@ -1426,6 +1446,13 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
       servicePathway,
       parentConfirmed: !!(reportState.parentConfirmed || draft.parentConfirmed)
     }) : null);
+  const uploadedMaterialServiceHandoffPack = normalizeProfileServiceHandoffPack(
+    reportState.serviceHandoffPack
+    || draft.serviceHandoffPack
+    || uploadedMaterialDecisionDossier.serviceHandoffPack
+    || (uploadedMaterialReportHandoff && uploadedMaterialReportHandoff.serviceHandoffPack)
+    || null
+  );
   const parentDecisionBook = reportState.parentDecisionBook || draft.parentDecisionBook || {};
   const matrix = Array.isArray(draft.diagnosisMatrix) ? draft.diagnosisMatrix : [];
   const tendencies = Array.isArray(draft.capabilityTendencies) ? draft.capabilityTendencies : [];
@@ -2144,6 +2171,12 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     partnerWorkbenchRevenueDisplayRows: partnerWorkbench && Array.isArray(partnerWorkbench.revenueMilestones) ? formatRevenueMilestones(partnerWorkbench.revenueMilestones) : [],
     partnerWorkbenchPrivacyGate: partnerWorkbench ? partnerWorkbench.privacyGate : null,
     uploadedMaterialDeliveryView,
+    uploadedMaterialServiceHandoffPack,
+    uploadedMaterialServiceHandoffTitle: uploadedMaterialServiceHandoffPack ? uploadedMaterialServiceHandoffPack.title : '',
+    uploadedMaterialServiceHandoffSummary: uploadedMaterialServiceHandoffPack ? uploadedMaterialServiceHandoffPack.summaryLine : '',
+    uploadedMaterialServiceHandoffCards: uploadedMaterialServiceHandoffPack ? uploadedMaterialServiceHandoffPack.cards : [],
+    uploadedMaterialServiceHandoffReleaseLine: uploadedMaterialServiceHandoffPack ? uploadedMaterialServiceHandoffPack.releaseLine : '',
+    uploadedMaterialServiceHandoffBlockedLine: uploadedMaterialServiceHandoffPack ? uploadedMaterialServiceHandoffPack.blockedLine : '',
     uploadedMaterialDecisionDossier,
     uploadedMaterialDecisionDossierHandoff: uploadedMaterialReportHandoff || null,
     uploadedMaterialDecisionDossierHandoffTitle: uploadedMaterialReportHandoff && uploadedMaterialReportHandoff.title ? uploadedMaterialReportHandoff.title : '',
