@@ -2886,6 +2886,46 @@ function buildCommercialFamilySolutionBook(input = {}) {
   const validationPlan = servicePathway && Array.isArray(servicePathway.validationPlan)
     ? servicePathway.validationPlan.slice(0, 7)
     : [];
+  const modeChoice = servicePathway && servicePathway.modeChoiceProtocol ? servicePathway.modeChoiceProtocol : {};
+  const recommendedModeId = modeChoice.recommendedModeId || (servicePathway.primaryMode && servicePathway.primaryMode.id) || 'socratic_first_step';
+  const executionPathMap = [
+    {
+      id: 'socratic_first_step',
+      label: '苏格拉底私教',
+      role: '卡住时先问第一步，验证孩子是否真的能启动。',
+      route: '/pages/tutor/tutor?from=solution_book_socratic',
+      openWhen: '已有真实作业、错题或家长观察中的一个具体卡点。',
+      evidenceGate: 'child_first_step_before_hint',
+      recommended: recommendedModeId === 'socratic_first_step'
+    },
+    {
+      id: 'three_minute_mini_lesson',
+      label: '三分钟小课堂',
+      role: '概念断层或看不懂题意时，先用小黑板式解释搭桥。',
+      route: '/pages/tutor/tutor?from=solution_book_mini_lesson',
+      openWhen: '孩子说不出第一步，且错因更像概念或图像理解断层。',
+      evidenceGate: 'mini_lesson_returns_to_first_step',
+      recommended: recommendedModeId === 'three_minute_mini_lesson'
+    },
+    {
+      id: 'game_recall',
+      label: '游戏化回访',
+      role: '只在已有真实回忆卡后开放，每天回来修一个最该修的错因。',
+      route: '/pages/arcade/arcade?from=solution_book_recall',
+      openWhen: '已经产生第一步、错因和明天回访卡。',
+      evidenceGate: 'real_recall_card_before_xp',
+      recommended: recommendedModeId === 'game_recall'
+    },
+    {
+      id: 'parent_decision_report',
+      label: '家长决策书',
+      role: '把今晚动作、7 天证据和下一次服务建议交付给家长。',
+      route: '/pages/profile/profile?from=solution_book_parent',
+      openWhen: '家长确认交付范围，且分享字段通过白名单。',
+      evidenceGate: 'safe_handoff_and_parent_confirmation',
+      recommended: recommendedModeId === 'parent_decision_report'
+    }
+  ];
   return {
     id: 'commercial_family_solution_book',
     title: 'Family solution book',
@@ -2945,12 +2985,19 @@ function buildCommercialFamilySolutionBook(input = {}) {
       { id: 'parent_report', route: '/pages/profile/profile?from=solution_book_report', gate: 'safe_share_payload' },
       { id: 'service_conversion', route: '/pages/profile/profile?from=solution_book_service', gate: 'evidence_based_offer' }
     ],
+    executionPathMap,
+    modeChoiceSummary: {
+      recommendedModeId,
+      recommendedModeLabel: executionPathMap.find((item) => item.recommended)?.label || '',
+      releaseGate: modeChoice.releaseGate || 'mode_choice_requires_real_task_evidence',
+      positioningLine: modeChoice.positioningLine || '课堂、小课堂、游戏和家长报告都只服务家庭私教闭环。'
+    },
     sharePolicy: parentDecisionBook.sharePolicy || {
       allowedFields: ['tonight_action', 'parent_question', 'next_day_revisit_status'],
       blockedFields: ['original_question', 'full_answer', 'score', 'ranking', 'full_dialogue', 'child_name', 'parent_phone', 'parent_wechat', 'contact_info']
     },
     blockedClaims: ['talent_label', 'personality_label', 'auto_grading', 'ocr_claim', 'full_answer', 'ranking', 'guaranteed_improvement'],
-    evidenceRequired: ['one_page_diagnosis', 'method_candidates', 'seven_day_action', 'parent_script', 'review_evidence', 'next_service_suggestion', 'safe_share_policy']
+    evidenceRequired: ['one_page_diagnosis', 'method_candidates', 'seven_day_action', 'parent_script', 'review_evidence', 'next_service_suggestion', 'execution_path_map', 'safe_share_policy']
   };
 }
 
