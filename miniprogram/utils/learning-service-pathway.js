@@ -449,6 +449,69 @@ function buildPartnerServiceDeliveryLedger(signals = {}, modeRecommendations = [
   };
 }
 
+function buildPostPilotRetentionLoop(signals = {}, partnerLedger = {}, validationPlan = [], productTiers = []) {
+  const hasRealTaskEvidence = !!(signals && signals.hasRealTaskEvidence);
+  const parentConfirmed = !!(signals && signals.parentConfirmed);
+  const canStartPilot = hasRealTaskEvidence && parentConfirmed;
+  const primaryTier = productTiers[0] || PRODUCT_TIERS[1] || {};
+  const day7 = (Array.isArray(validationPlan) ? validationPlan : []).find((item) => Number(item.day || 0) >= 7) || {};
+  const day7Evidence = day7.evidence || 'family_decision';
+  return {
+    id: 'post_pilot_retention_loop',
+    status: canStartPilot ? 'ready_after_day7_evidence' : 'locked_until_evidence_and_parent_confirmation',
+    title: '7-day pilot retention loop',
+    decisionOwner: 'local_rules_before_operator_offer',
+    day7Evidence,
+    stages: [
+      {
+        id: 'retain_current_mode',
+        label: 'retain current mode',
+        condition: 'day7 evidence shows lower friction and the child can repeat the first step',
+        action: 'keep the current mode for another 7-day loop',
+        gate: 'day7_evidence_ready'
+      },
+      {
+        id: 'downgrade_to_parent_script',
+        label: 'downgrade pressure',
+        condition: 'parent reports pressure rising or child cannot produce a first step',
+        action: 'reduce to one parent question and one revisit card',
+        gate: 'pressure_safe_before_more_service'
+      },
+      {
+        id: 'upgrade_to_service_pack',
+        label: primaryTier.label || 'upgrade service pack',
+        condition: 'same wrong cause repeats and parent has confirmed the handoff scope',
+        action: 'offer the smallest evidence-based service pack',
+        gate: canStartPilot ? 'evidence_based_offer_allowed' : 'locked_until_parent_confirmation'
+      },
+      {
+        id: 'renew_next_gap',
+        label: 'renew from next evidence gap',
+        condition: 'new evidence gap is visible in the report',
+        action: 'renew only around the next gap, not labels or anxiety',
+        gate: 'next_evidence_gap_required'
+      }
+    ],
+    operatorScript: canStartPilot
+      ? 'Review day-7 evidence first: retain, downgrade, or offer the smallest next service pack.'
+      : 'Do not sell the pilot yet. Collect real task evidence and parent confirmation first.',
+    crmFollowup: {
+      day: canStartPilot ? 7 : 1,
+      reason: canStartPilot ? 'day7_evidence_review' : 'evidence_or_consent_missing',
+      allowedFields: ['evidence_stage', 'primary_mode', 'next_evidence_gap', 'parent_confirmation_status'],
+      blockedFields: PARTNER_HANDOFF_POLICY.blockedFields.slice()
+    },
+    safetyRules: [
+      'no score guarantee',
+      'no talent label',
+      'no raw question or full answer in partner handoff',
+      'no upgrade before day-7 evidence'
+    ],
+    evidenceRequired: ['real_task_evidence', 'parent_confirmation', 'day7_validation', 'next_evidence_gap', 'safe_partner_handoff'],
+    ledgerStatus: partnerLedger.status || ''
+  };
+}
+
 function buildLearningServicePathway(input = {}) {
   const signals = inferSignals(input);
   const modeRecommendations = pickModes(signals);
@@ -492,6 +555,12 @@ function buildLearningServicePathway(input = {}) {
     safeProductTiers,
     validationPlan
   );
+  const postPilotRetentionLoop = buildPostPilotRetentionLoop(
+    signals,
+    partnerServiceDeliveryLedger,
+    validationPlan,
+    safeProductTiers
+  );
   return {
     id: 'learning_service_pathway',
     status: requiresEvidenceBeforeCommercialPush ? 'needs_real_task_validation' : 'ready_for_family_plan',
@@ -522,6 +591,7 @@ function buildLearningServicePathway(input = {}) {
     publicK12BorrowPlaybook,
     validationPlan,
     partnerServiceDeliveryLedger,
+    postPilotRetentionLoop,
     partnerHandoffPolicy: Object.assign({}, PARTNER_HANDOFF_POLICY),
     moatLine: '护城河不在“生成一份测评结论”，而在测评、错题、回访、游戏和家长决策反复闭环后的家庭证据账本。',
     safetyBoundary: {
@@ -544,5 +614,6 @@ module.exports = {
   inferSignals,
   buildModeChoiceProtocol,
   buildPartnerServiceDeliveryLedger,
+  buildPostPilotRetentionLoop,
   buildLearningServicePathway
 };

@@ -408,6 +408,24 @@
             </view>
             <view class="intake-packet-boundary">{{lastReportCta.validationPlanView.successLine}}</view>
           </view>
+          <view class="intake-action-queue" wx:if="{{lastReportCta.postPilotRetentionView}}">
+            <view class="intake-action-title">{{lastReportCta.postPilotRetentionView.title}}</view>
+            <view class="intake-packet-boundary">{{lastReportCta.postPilotRetentionView.statusLine}}</view>
+            <view class="intake-action-item" wx:for="{{lastReportCta.postPilotRetentionView.cards}}" wx:key="id">
+              <view class="intake-action-main">
+                <text>{{item.label}}</text>
+                <text>{{item.conditionLine}}</text>
+              </view>
+              <view class="intake-action-meta">
+                <text>{{item.actionLine}}</text>
+                <text>{{item.gateLine}}</text>
+              </view>
+            </view>
+            <view class="intake-packet-boundary">{{lastReportCta.postPilotRetentionView.operatorLine}}</view>
+            <view class="intake-packet-boundary">{{lastReportCta.postPilotRetentionView.crmLine}}</view>
+            <view class="intake-packet-boundary">{{lastReportCta.postPilotRetentionView.evidenceLine}}</view>
+            <view class="intake-packet-boundary">{{lastReportCta.postPilotRetentionView.safetyLine}}</view>
+          </view>
           <view class="intake-packet-boundary">{{lastReportCta.servicePathway.moatLine}}</view>
           <view class="intake-packet-boundary">商业闭环：学习偏好/测评资料 → AI 辅助学习方法候选 → 7 天验证 → 30 天训练营 / 高阶规划。</view>
         </view>

@@ -157,6 +157,43 @@ function buildUploadPartnerLedgerView(ledger = {}) {
   };
 }
 
+function buildUploadPostPilotRetentionView(loop = {}) {
+  if (!loop || !loop.id) return null;
+  const statusMap = {
+    ready_after_day7_evidence: '7 天后可按证据做保留、降阶或升级判断。',
+    locked_until_evidence_and_parent_confirmation: '续航判断先锁住：还缺真实任务证据或家长确认。'
+  };
+  const stageGateMap = {
+    day7_evidence_ready: '门槛：第 7 天证据已完成。',
+    pressure_safe_before_more_service: '门槛：先确认压力没有升高。',
+    evidence_based_offer_allowed: '门槛：允许基于证据给最小服务建议。',
+    locked_until_parent_confirmation: '门槛：家长确认前不推荐服务包。',
+    next_evidence_gap_required: '门槛：必须看见下一条证据缺口。'
+  };
+  return {
+    id: 'upload_post_pilot_retention_view',
+    title: '7 天后怎么继续',
+    statusLine: statusMap[loop.status] || '7 天后只按证据决定下一步。',
+    operatorLine: loop.operatorScript || '',
+    crmLine: loop.crmFollowup
+      ? `CRM 回访：第 ${loop.crmFollowup.day || 7} 天，原因 ${loop.crmFollowup.reason || 'day7_evidence_review'}。`
+      : '',
+    cards: (Array.isArray(loop.stages) ? loop.stages : []).map((item) => ({
+      id: item.id,
+      label: item.label || '',
+      conditionLine: item.condition || '',
+      actionLine: item.action || '',
+      gateLine: stageGateMap[item.gate] || `门槛：${item.gate || '证据足够后再继续'}`
+    })),
+    safetyLine: Array.isArray(loop.safetyRules) && loop.safetyRules.length
+      ? `不做：${loop.safetyRules.join(' / ')}`
+      : '不做结果承诺、天赋标签、原题答案外传或无证据升级。',
+    evidenceLine: Array.isArray(loop.evidenceRequired) && loop.evidenceRequired.length
+      ? `需要证据：${loop.evidenceRequired.join(' / ')}`
+      : '需要真实任务、家长确认、第 7 天验证和下一证据缺口。'
+  };
+}
+
 function buildUploadServiceHandoffPack(options = {}) {
   const sourceSchemaId = options.sourceSchemaId || '';
   const servicePathway = options.servicePathway || {};
@@ -1497,6 +1534,9 @@ Page({
     const quickAssessmentBridgeView = buildUploadQuickAssessmentBridgeView(
       servicePathway && servicePathway.quickAssessmentBridge
     );
+    const postPilotRetentionView = buildUploadPostPilotRetentionView(
+      servicePathway && servicePathway.postPilotRetentionLoop
+    );
     const serviceHandoffPack = buildUploadServiceHandoffPack({
       sourceSchemaId,
       servicePathway,
@@ -1544,6 +1584,7 @@ Page({
       aiLocalDeliveryView,
       publicK12BorrowView,
       quickAssessmentBridgeView,
+      postPilotRetentionView,
       serviceHandoffPack,
       partnerDeliveryWorkbench: partnerWorkbench,
       uploadedMaterialDecisionDossier,
