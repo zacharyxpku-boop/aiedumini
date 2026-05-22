@@ -250,13 +250,71 @@ function buildUploadServiceHandoffPack(options = {}) {
   };
 }
 
-function buildUploadAiMaterialSolutionView(contract = {}, sourceSchemaId = '') {
+function buildUploadScoreSignalView(reportState = {}, reportDraft = {}, decisionSource = {}) {
+  const parsedScores = Object.assign({},
+    reportState.parsedScores || {},
+    reportDraft.parsedScores || {},
+    decisionSource.parsedScores || {}
+  );
+  const parsedRanks = Object.assign({},
+    reportState.parsedRanks || {},
+    reportDraft.parsedRanks || {},
+    decisionSource.parsedRanks || {}
+  );
+  const subjectRows = Object.keys(parsedScores).map((key) => parsedScores[key]).filter(Boolean).slice(0, 5);
+  const released = subjectRows.length > 0;
+  return {
+    id: 'upload_score_signal_view',
+    status: released ? 'confirmed_score_reference' : 'no_confirmed_score_reference',
+    confirmedScores: released ? { parsedScores, parsedRanks } : null,
+    subjectLine: released
+      ? `confirmed subjects: ${subjectRows.map((item) => `${item.subject || ''}${item.score ? ` ${item.score}` : ''}`).join(' / ')}`
+      : 'confirmed subjects: none; do not infer scores from assessment or parent observation',
+    rankLine: parsedRanks && (parsedRanks.classRank || parsedRanks.totalScore)
+      ? `rank/total only as confirmed reference: ${parsedRanks.classRank || '-'} / ${parsedRanks.totalScore || '-'}`
+      : 'rank/total: not released unless explicit score sheet exists',
+    useLine: released
+      ? 'use scores only to choose next evidence and weak subject, not to promise score improvement'
+      : 'ask for one score sheet or one real wrong question before score-based planning',
+    blockedLine: 'blocked: score comparison, ranking marketing, guaranteed improvement'
+  };
+}
+
+function buildUploadContentCoverageReceipt(decisionSource = {}, evidenceSignals = {}) {
+  let matrix = null;
+  try {
+    matrix = storage.buildRealHomeworkCoverageMatrix ? storage.buildRealHomeworkCoverageMatrix() : null;
+  } catch (_) {
+    matrix = null;
+  }
+  const subject = evidenceSignals.subjectLabel || evidenceSignals.subjectKey || decisionSource.subjectLabel || decisionSource.subjectKey || '';
+  const taskType = evidenceSignals.taskType || decisionSource.taskType || evidenceSignals.questionType || '';
+  const sampleCount = Number(matrix && (matrix.totalSamples || matrix.loadedSampleCount || matrix.sampleCount) || 0);
+  const subjectCount = Number(matrix && (matrix.totalSubjects || (Array.isArray(matrix.subjectRows) ? matrix.subjectRows.length : 0)) || 0);
+  const typeCount = Number(matrix && (matrix.totalTypes || (Array.isArray(matrix.typeRows) ? matrix.typeRows.length : 0)) || 0);
+  return {
+    id: 'upload_content_coverage_receipt',
+    status: matrix && matrix.coverageConfidence === 'fixture_verified' ? 'fixture_verified' : 'local_rule_only',
+    coverageLine: sampleCount
+      ? `coverage: ${sampleCount} verified homework samples / ${subjectCount || 7} subjects / ${typeCount || 9} task types`
+      : 'coverage: local strategy only; needs more verified homework samples',
+    matchLine: subject || taskType
+      ? `current match: ${subject || 'unknown subject'} / ${taskType || 'unknown task type'}`
+      : 'current match: collect subject and task type before stronger recommendation',
+    weakLine: 'weak area remains real content scale: expand verified chapter-task samples before claiming Khan/Gizmo-level breadth',
+    fallbackLine: 'fallback: first-step Socratic question, mini blackboard, next-day revisit; no full answer or answer bank'
+  };
+}
+
+function buildUploadAiMaterialSolutionView(contract = {}, sourceSchemaId = '', options = {}) {
   const fallback = contract && contract.fallback ? contract.fallback : {};
   const confidence = fallback.evidenceConfidence || {};
   const nextAction = fallback.nextAction || {};
   const executionPath = fallback.executionPath || {};
   const blockedClaims = Array.isArray(fallback.blockedClaims) ? fallback.blockedClaims : [];
   const releaseGates = Array.isArray(contract.releaseGates) ? contract.releaseGates : [];
+  const scoreSignalView = options.scoreSignalView || {};
+  const contentCoverageReceipt = options.contentCoverageReceipt || {};
   const requiredEvidence = Array.isArray(confidence.requiredNextEvidence) && confidence.requiredNextEvidence.length
     ? confidence.requiredNextEvidence
     : ['structured_evidence', 'parent_confirmation'];
@@ -274,6 +332,10 @@ function buildUploadAiMaterialSolutionView(contract = {}, sourceSchemaId = '') {
     confidenceLine: `evidence confidence: ${confidenceLevel}; ${confidence.reason || 'parent confirmation required'}`,
     nextActionLine: `next action: ${nextAction.label || fallback.firstStep || 'go to Socratic first step'}`,
     nextActionRoute: nextAction.route || executionPath.socraticRoute || '/pages/tutor/tutor?from=ai_material_analysis',
+    scoreLine: scoreSignalView.subjectLine || 'confirmed subjects: none; score sheet not yet released',
+    scoreUseLine: scoreSignalView.useLine || 'scores can guide evidence collection only after explicit confirmation',
+    coverageLine: contentCoverageReceipt.coverageLine || 'coverage: local first-step strategy until verified content match is available',
+    coverageFallbackLine: contentCoverageReceipt.fallbackLine || 'fallback: Socratic first step and next-day revisit',
     routes: [
       { id: 'socratic', label: 'Socratic', route: executionPath.socraticRoute || '/pages/tutor/tutor?from=ai_material_analysis' },
       { id: 'mini_lesson', label: 'Mini lesson', route: executionPath.miniLessonRoute || '/pages/tutor/tutor?from=ai_material_analysis_mini_lesson' },
@@ -1450,16 +1512,22 @@ Page({
       || reportBehaviorSignals.subject
       || decisionSource.sourceSchemaLabel
       || sourceSchemaId;
+    const scoreSignalView = buildUploadScoreSignalView(reportState, reportDraft, decisionSource);
+    const contentCoverageReceipt = buildUploadContentCoverageReceipt(decisionSource, uploadEvidenceSignals);
     const aiMaterialAnalysisContract = importIntake.buildAiMaterialAnalysisContract
       ? importIntake.buildAiMaterialAnalysisContract(uploadEvidenceSignals.uploadIntakePacket || {
         intakeSourceSchema: { id: sourceSchemaId, label: decisionSource.sourceSchemaLabel || sourceSchemaId },
         reportSeed: { sourceSchemaId, sourceSchemaLabel: decisionSource.sourceSchemaLabel || sourceSchemaId }
       }, uploadEvidenceSignals, {
         sourceText: sourceTextForMiniLesson,
-        subject: miniLessonSubject
+        subject: miniLessonSubject,
+        confirmedScores: scoreSignalView.confirmedScores || null
       })
       : null;
-    const aiMaterialSolutionView = buildUploadAiMaterialSolutionView(aiMaterialAnalysisContract, sourceSchemaId);
+    const aiMaterialSolutionView = buildUploadAiMaterialSolutionView(aiMaterialAnalysisContract, sourceSchemaId, {
+      scoreSignalView,
+      contentCoverageReceipt
+    });
     const miniLessonFirstStep = uploadEvidenceSignals.firstStep
       || uploadEvidenceSignals.stuckFirstStep
       || reportBehaviorSignals.firstStep
@@ -1627,6 +1695,8 @@ Page({
       publicK12BorrowView,
       quickAssessmentBridgeView,
       aiMaterialSolutionView,
+      scoreSignalView,
+      contentCoverageReceipt,
       postPilotRetentionView,
       serviceHandoffPack,
       partnerDeliveryWorkbench: partnerWorkbench,
@@ -1689,6 +1759,8 @@ Page({
       guardedAiReportDraft: cta.guardedAiReportDraft || null,
       aiMaterialAnalysisContract: cta.aiMaterialAnalysisContract || null,
       aiMaterialSolutionView: cta.aiMaterialSolutionView || null,
+      scoreSignalView: cta.scoreSignalView || null,
+      contentCoverageReceipt: cta.contentCoverageReceipt || null,
       servicePathway: cta.servicePathway || null,
       partnerDeliveryWorkbench: cta.partnerDeliveryWorkbench || null,
       serviceHandoffPack: cta.serviceHandoffPack || null,
@@ -1705,6 +1777,8 @@ Page({
         guardedAiReportDraft: cta.guardedAiReportDraft || null,
         aiMaterialAnalysisContract: cta.aiMaterialAnalysisContract || null,
         aiMaterialSolutionView: cta.aiMaterialSolutionView || null,
+        scoreSignalView: cta.scoreSignalView || null,
+        contentCoverageReceipt: cta.contentCoverageReceipt || null,
         servicePathway: cta.servicePathway || null,
         partnerDeliveryWorkbench: cta.partnerDeliveryWorkbench || null,
         serviceHandoffPack: cta.serviceHandoffPack || null,
