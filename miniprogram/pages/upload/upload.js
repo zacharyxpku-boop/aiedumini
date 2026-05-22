@@ -199,6 +199,31 @@ function buildUploadValidationPlanView(plan = [], sourceSchemaId = '') {
   };
 }
 
+function buildUploadProductTierView(tiers = []) {
+  const cards = (Array.isArray(tiers) ? tiers : []).map((tier) => {
+    const blockedClaims = Array.isArray(tier.blockedClaims) ? tier.blockedClaims : [];
+    return {
+      id: tier.id || tier.label || 'service_tier',
+      label: tier.label || '行动交付包',
+      promise: tier.promise || '围绕真实学习证据安排下一步。',
+      entryGateLine: tier.entryGate
+        ? `准入条件：${tier.entryGate}`
+        : '准入条件：先有真实学习证据和家长确认。',
+      deliverableLine: `交付内容：${tier.promise || '今晚行动、回访证据和下一阶段建议。'}`,
+      blockedClaimsLine: blockedClaims.length
+        ? `禁止承诺：${blockedClaims.slice(0, 4).join('、')}`
+        : '禁止承诺：不承诺提分、不贴标签、不替代老师判断。',
+      evidenceLine: '转化依据：只看真实作业、回访和第 7 天小变式，不看焦虑话术。'
+    };
+  });
+  return {
+    id: 'upload_product_tier_delivery_view',
+    title: '可交付服务包',
+    summaryLine: '服务包只从证据放行，不从测评标签或焦虑承诺放行。',
+    cards
+  };
+}
+
 function normalizeMaterialType(query = {}, fallback = 'class_notes') {
   const raw = safeQueryText(query.type || query.materialType || query.sourceSchemaId || query.source || '');
   const normalized = raw.replace(/^material_/, '');
@@ -1208,6 +1233,9 @@ Page({
       servicePathway && servicePathway.validationPlan,
       sourceSchemaId
     );
+    const productTierView = buildUploadProductTierView(
+      servicePathway && servicePathway.productTiers
+    );
     return {
       title: sourceSchemaId === 'talent_assessment'
         ? '方法候选已入证据账本'
@@ -1239,6 +1267,7 @@ Page({
       servicePathway,
       partnerDeliveryLedgerView,
       validationPlanView,
+      productTierView,
       partnerDeliveryWorkbench: partnerWorkbench,
       uploadedMaterialDecisionDossier,
       needsParentConfirmation: servicePathway && servicePathway.partnerServiceDeliveryLedger

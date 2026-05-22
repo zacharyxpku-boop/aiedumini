@@ -286,15 +286,18 @@
               </view>
             </view>
           </view>
-          <view class="intake-action-queue">
-            <view class="intake-action-item" wx:for="{{lastReportCta.servicePathway.productTiers}}" wx:key="id">
+          <view class="intake-action-queue" wx:if="{{lastReportCta.productTierView.cards.length}}">
+            <view class="intake-action-title">{{lastReportCta.productTierView.title}}</view>
+            <view class="intake-packet-boundary">{{lastReportCta.productTierView.summaryLine}}</view>
+            <view class="intake-action-item" wx:for="{{lastReportCta.productTierView.cards}}" wx:key="id">
               <view class="intake-action-main">
                 <text>{{item.label}}</text>
-                <text>{{item.promise}}</text>
+                <text>{{item.deliverableLine}}</text>
               </view>
               <view class="intake-action-meta">
-                <text>{{item.entryGate}}</text>
-                <text>{{item.id}}</text>
+                <text>{{item.entryGateLine}}</text>
+                <text>{{item.blockedClaimsLine}}</text>
+                <text>{{item.evidenceLine}}</text>
               </view>
             </view>
           </view>
