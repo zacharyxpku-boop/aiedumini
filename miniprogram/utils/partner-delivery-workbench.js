@@ -297,6 +297,77 @@ function buildPilotReadinessChecklist(childRecord, materials = [], solutionPipel
   };
 }
 
+function buildPartnerPilotDeliveryPacket(childRecord, primaryMode, primaryPackage, solutionPipeline = [], advisorQueue = [], pilotReadinessChecklist = {}, revenueMilestones = []) {
+  const hasRealTask = childRecord && childRecord.evidenceStage === 'real_task_evidence_ready';
+  const hasConsent = childRecord && childRecord.parentConfirmationStatus === 'confirmed';
+  const executionReady = solutionPipeline.some((item) => item.id === 'family_execution' && item.status === 'ready');
+  const paidAllowed = revenueMilestones.some((item) => item.id === 'paid_7_day_execution' && item.allowed);
+  const upgradeAllowed = revenueMilestones.some((item) => item.id === 'course_or_counselor_upgrade' && item.allowed);
+  const nextTodo = advisorQueue.find((item) => item.status === 'todo') || advisorQueue[0] || {};
+  const status = executionReady && paidAllowed
+    ? 'pilot_packet_ready'
+    : hasRealTask && !hasConsent
+      ? 'needs_parent_scope'
+      : 'needs_real_task_evidence';
+  const deliveryRows = [
+    {
+      id: 'day0_scope',
+      label: 'Day 0 scope',
+      owner: 'advisor',
+      action: hasConsent ? 'Use the confirmed family scope.' : 'Confirm parent-approved scope before delivery.',
+      releaseGate: 'parent_confirmation_status'
+    },
+    {
+      id: 'day1_first_step',
+      label: 'Day 1 first-step task',
+      owner: 'family',
+      action: executionReady ? `Start ${primaryMode.label} with one first-step task.` : 'Collect one real wrong-question or homework stuck point.',
+      releaseGate: 'real_task_evidence_ready'
+    },
+    {
+      id: 'day2_revisit',
+      label: 'Day 2 revisit',
+      owner: 'miniapp',
+      action: 'Run one near-transfer revisit before changing the method.',
+      releaseGate: 'next_day_revisit_evidence'
+    },
+    {
+      id: 'day7_review',
+      label: 'Day 7 review',
+      owner: 'advisor',
+      action: upgradeAllowed ? 'Review retain, downgrade, or upgrade with evidence.' : 'Review evidence before any upgrade discussion.',
+      releaseGate: 'day7_evidence_before_upgrade'
+    }
+  ];
+  return {
+    id: 'partner_pilot_delivery_packet',
+    title: 'Partner pilot delivery packet',
+    status,
+    statusLine: status === 'pilot_packet_ready'
+      ? 'Ready: start a guarded 7-day family execution pilot.'
+      : status === 'needs_parent_scope'
+        ? 'Hold: parent scope must be confirmed before delivery.'
+        : 'Hold: add one real homework or wrong-question evidence sample first.',
+    offerLine: paidAllowed
+      ? `${primaryPackage.label}: sell a 7-day execution loop, not a result promise.`
+      : 'Offer only interpretation and evidence collection until the pilot gates are ready.',
+    deliveryRows,
+    partnerTalkTrack: [
+      'We combine the assessment with real homework evidence before recommending a service.',
+      'The first paid unit is a 7-day family execution loop with parent-approved scope.',
+      'The miniapp records first step, wrong cause, revisit, and parent confirmation.',
+      'Upgrade is discussed only after day-7 evidence, not from labels or anxiety.'
+    ],
+    blockedPromises: ['score_ranking', 'guaranteed_improvement', 'talent_label', 'full_answer', 'raw_photo', 'full_dialogue'],
+    closeNextAction: sanitizePartnerAction(nextTodo.action, 'Confirm scope, add evidence, then start the 7-day pilot.'),
+    readinessScore: Number(pilotReadinessChecklist.score || 0),
+    crmSafe: true,
+    revenueGateLine: paidAllowed
+      ? 'Paid pilot allowed after real task evidence and parent confirmation.'
+      : 'Paid pilot locked until real task evidence and parent confirmation are both ready.'
+  };
+}
+
 function buildPartnerDeliveryWorkbench(input = {}) {
   const materialInput = Array.isArray(input.materials)
     ? input.materials
@@ -322,6 +393,15 @@ function buildPartnerDeliveryWorkbench(input = {}) {
     { id: 'paid_7_day_execution', allowed: hasRealTaskEvidence && hasParentConfirmation, gate: 'real_task_evidence_ready_and_parent_confirmation' },
     { id: 'course_or_counselor_upgrade', allowed: hasRealTaskEvidence && hasParentConfirmation, gate: 'day7_review_and_parent_confirmation' }
   ];
+  const pilotDeliveryPacket = buildPartnerPilotDeliveryPacket(
+    childRecord,
+    primaryMode,
+    primaryPackage,
+    solutionPipeline,
+    advisorQueue,
+    pilotReadinessChecklist,
+    revenueMilestones
+  );
   return {
     id: 'partner_delivery_workbench',
     status: !hasRealTaskEvidence
@@ -337,6 +417,7 @@ function buildPartnerDeliveryWorkbench(input = {}) {
     advisorQueue,
     crmExport,
     pilotReadinessChecklist,
+    pilotDeliveryPacket,
     revenueMilestones,
     privacyGate: {
       serverKeyOnly: true,
@@ -355,5 +436,6 @@ module.exports = {
   normalizeMaterial,
   buildChildRecord,
   buildPilotReadinessChecklist,
+  buildPartnerPilotDeliveryPacket,
   buildPartnerDeliveryWorkbench
 };

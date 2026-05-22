@@ -1428,6 +1428,16 @@ function formatPartnerPilotRows(rows = []) {
   }));
 }
 
+function formatPartnerDeliveryRows(rows = []) {
+  return (Array.isArray(rows) ? rows : []).map((item) => ({
+    id: item.id,
+    label: item.label || item.id,
+    owner: item.owner || '',
+    action: item.action || '',
+    releaseGate: item.releaseGate || ''
+  }));
+}
+
 function formatRevenueMilestones(rows = []) {
   const labelMap = {
     free_interpretation: '免费报告解读',
@@ -2280,6 +2290,14 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
       : [],
     partnerWorkbenchRevenueMilestones: partnerWorkbench && Array.isArray(partnerWorkbench.revenueMilestones) ? partnerWorkbench.revenueMilestones : [],
     partnerWorkbenchRevenueDisplayRows: partnerWorkbench && Array.isArray(partnerWorkbench.revenueMilestones) ? formatRevenueMilestones(partnerWorkbench.revenueMilestones) : [],
+    partnerPilotDeliveryPacket: partnerWorkbench ? partnerWorkbench.pilotDeliveryPacket : null,
+    partnerPilotDeliveryRows: partnerWorkbench && partnerWorkbench.pilotDeliveryPacket ? formatPartnerDeliveryRows(partnerWorkbench.pilotDeliveryPacket.deliveryRows) : [],
+    partnerPilotTalkTrack: partnerWorkbench && partnerWorkbench.pilotDeliveryPacket && Array.isArray(partnerWorkbench.pilotDeliveryPacket.partnerTalkTrack)
+      ? partnerWorkbench.pilotDeliveryPacket.partnerTalkTrack
+      : [],
+    partnerPilotBlockedPromises: partnerWorkbench && partnerWorkbench.pilotDeliveryPacket && Array.isArray(partnerWorkbench.pilotDeliveryPacket.blockedPromises)
+      ? formatPartnerFieldList(partnerWorkbench.pilotDeliveryPacket.blockedPromises)
+      : '',
     partnerWorkbenchPrivacyGate: partnerWorkbench ? partnerWorkbench.privacyGate : null,
     partnerServiceReviewCard,
     partnerServiceReviewTitle: partnerServiceReviewCard ? partnerServiceReviewCard.title : '',

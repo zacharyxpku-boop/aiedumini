@@ -235,6 +235,16 @@
               <text class="parent-brief-label">服务包节点</text>
               <text wx:for="{{learningReportSummary.partnerWorkbenchRevenueDisplayRows}}" wx:key="id">{{item.label}}｜{{item.statusText}}｜{{item.gate}}</text>
             </view>
+            <view class="parent-brief-block" wx:if="{{learningReportSummary.partnerPilotDeliveryPacket}}">
+              <text class="parent-brief-label">{{learningReportSummary.partnerPilotDeliveryPacket.title}}</text>
+              <text>{{learningReportSummary.partnerPilotDeliveryPacket.statusLine}}</text>
+              <text>{{learningReportSummary.partnerPilotDeliveryPacket.offerLine}}</text>
+              <text wx:for="{{learningReportSummary.partnerPilotDeliveryRows}}" wx:key="id">{{item.label}}｜{{item.owner}}｜{{item.action}}｜{{item.releaseGate}}</text>
+              <text wx:for="{{learningReportSummary.partnerPilotTalkTrack}}" wx:key="*this">合作话术：{{item}}</text>
+              <text>禁止承诺：{{learningReportSummary.partnerPilotBlockedPromises}}</text>
+              <text>{{learningReportSummary.partnerPilotDeliveryPacket.revenueGateLine}}</text>
+              <text>下一步：{{learningReportSummary.partnerPilotDeliveryPacket.closeNextAction}}</text>
+            </view>
             <view class="parent-brief-block" wx:if="{{learningReportSummary.partnerServiceReviewCard}}">
               <text class="parent-brief-label">{{learningReportSummary.partnerServiceReviewTitle}}</text>
               <text>{{learningReportSummary.partnerServiceReviewStatusLine}}</text>
