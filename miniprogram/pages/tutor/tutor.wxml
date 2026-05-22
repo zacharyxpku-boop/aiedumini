@@ -169,6 +169,14 @@
             <view class="receipt-board-avoid">{{thinkingReceipt.socraticPromptQualityJudge.parentDecisionLine}}</view>
             <view class="receipt-board-avoid">{{thinkingReceipt.socraticPromptQualityJudge.shareBoundary}}</view>
           </view>
+          <view class="receipt-first-step-board" wx:if="{{thinkingReceipt.socratic_quality_release_audit}}">
+            <view class="receipt-diagnostic-title">{{thinkingReceipt.socratic_quality_release_audit.title}} · {{thinkingReceipt.socratic_quality_release_audit.statusText}}</view>
+            <view class="receipt-board-avoid">本轮得分：{{thinkingReceipt.socratic_quality_release_audit.score}}</view>
+            <view class="receipt-board-line" wx:for="{{thinkingReceipt.socratic_quality_release_audit.releaseGates}}" wx:key="id">{{item.statusText}}｜{{item.label}}｜{{item.evidence}}</view>
+            <view class="receipt-board-parent">{{thinkingReceipt.socratic_quality_release_audit.parentSummary}}</view>
+            <view class="receipt-board-line">下一步：{{thinkingReceipt.socratic_quality_release_audit.childNextAction}}</view>
+            <view class="receipt-board-avoid">{{thinkingReceipt.socratic_quality_release_audit.reportLine}}</view>
+          </view>
           <view class="receipt-first-step-board" wx:if="{{thinkingReceipt.three_round_socratic_protocol}}">
             <view class="receipt-diagnostic-title">{{thinkingReceipt.three_round_socratic_protocol.title}}</view>
             <view class="receipt-board-avoid">{{thinkingReceipt.three_round_socratic_protocol.parentLine}}</view>

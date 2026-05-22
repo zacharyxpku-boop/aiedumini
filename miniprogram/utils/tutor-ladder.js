@@ -595,6 +595,10 @@ function buildThreeRoundSocraticProtocol(taskType, signal) {
 }
 
 const SENSITIVE_OUTPUT_REPLACEMENTS = [
+  ['完整答案', '整题结论'],
+  ['完整对话', '对话摘要'],
+  ['完整解法', '全程思路'],
+  ['原题照片', '题目图片'],
   ['完整解法', '全程思路展开'],
   ['最终答案', '末尾结论'],
   ['原题照片', '题目图片'],
@@ -902,6 +906,85 @@ function evaluateSocraticTurnQuality(turn = {}, context = {}) {
   };
 }
 
+function buildSocraticQualityReleaseAudit(input = {}) {
+  const scorecard = input.scorecard || {};
+  const checks = scorecard.checks || {};
+  const protocol = input.threeRoundProtocol || {};
+  const promptJudge = input.promptJudge || {};
+  const contract = input.aiLocalBoundaryContract || {};
+  const signal = input.pressureSignal || {};
+  const releaseGates = [
+    {
+      id: 'first_step_only',
+      label: '只问第一步',
+      passed: !!checks.firstStepOnly,
+      evidence: signal.firstStep || '本轮只保留入口动作',
+      nextFix: '替换为本地第一步追问'
+    },
+    {
+      id: 'no_final_answer',
+      label: '不泄露整题答案',
+      passed: !!checks.noEarlyAnswer && Array.isArray(contract.aiMustNotDecide) && contract.aiMustNotDecide.includes('final_answer'),
+      evidence: 'AI 只能改写话术，不能决定答案',
+      nextFix: '拦截答案式回复并回退到本地追问'
+    },
+    {
+      id: 'wrong_cause_fit',
+      label: '贴合错因',
+      passed: !!checks.wrongCauseFit,
+      evidence: signal.wrongCause || '记录本轮错因轴',
+      nextFix: '先补错因二选一，不继续讲解'
+    },
+    {
+      id: 'child_can_continue',
+      label: '孩子能继续动手',
+      passed: !!checks.childCanContinue,
+      evidence: '保留 A/B 微动作或复述入口',
+      nextFix: '降级为二选一微动作'
+    },
+    {
+      id: 'fallback_ready',
+      label: '失败有兜底',
+      passed: !!checks.fallbackReady && protocol.roundCount === 3,
+      evidence: '三轮后转小讲堂、家长复盘或明日回访',
+      nextFix: '补齐三轮兜底协议'
+    },
+    {
+      id: 'share_parent_safe',
+      label: '家长可安全接手',
+      passed: !!checks.parentSafe && Array.isArray(promptJudge.evidenceRequired) && promptJudge.evidenceRequired.includes('safe_share_boundary'),
+      evidence: '分享只带行动和证据，不带原题全文与完整对话',
+      nextFix: '移除原题、完整答案、完整对话字段'
+    }
+  ];
+  const failed = releaseGates.filter((item) => !item.passed);
+  const status = failed.length === 0 && scorecard.status === 'pass'
+    ? 'release_ready'
+    : failed.length <= 1
+      ? 'needs_coach_review'
+      : 'route_to_mini_lesson_or_parent';
+  return {
+    id: 'socratic_quality_release_audit',
+    title: '苏格拉底点拨发布验收卡',
+    taskType: input.taskType || scorecard.taskType || 'unknown',
+    score: Number(scorecard.score || 0),
+    status,
+    statusText: status === 'release_ready' ? '可继续本轮点拨' : status === 'needs_coach_review' ? '需要教练复核' : '转小讲堂或家长接手',
+    releaseGates: releaseGates.map((item) => Object.assign({
+      statusText: item.passed ? '通过' : '未过'
+    }, item)),
+    failedGateIds: failed.map((item) => item.id),
+    parentSummary: failed.length === 0
+      ? '本轮只保留第一步和错因证据，可进入轻练习或明日回访。'
+      : `本轮先不继续加题，优先修复：${failed.map((item) => item.label).join('、')}。`,
+    childNextAction: failed.length === 0
+      ? (signal.parentCheck || '把第一步说出来，再做一题近迁移。')
+      : failed[0].nextFix,
+    reportLine: '报告只记录第一步、错因、兜底去向和家长接手动作，不把一次答对写成长期掌握。',
+    evidenceRequired: ['first_step_only', 'no_final_answer', 'wrong_cause_fit', 'child_can_continue', 'fallback_ready', 'safe_share_boundary']
+  };
+}
+
 function buildTutorReply(text, options = {}) {
   const messages = options.messages || [];
   const currentHintLevel = options.currentHintLevel || 1;
@@ -920,6 +1003,7 @@ function buildTutorReply(text, options = {}) {
   const qualitySuite = buildSocraticQualityEvaluationSuite(taskType, pressureSignal);
   const promptJudge = buildSocraticPromptQualityJudge(taskType, qualitySuite, pressureSignal);
   const aiLocalBoundaryContract = buildSocraticAiLocalBoundaryContract(taskType, pressureSignal);
+  const threeRoundProtocol = buildThreeRoundSocraticProtocol(taskType, pressureSignal);
   const replyWithIntro = withStepIntro(item, reply);
   const qualityScorecard = evaluateSocraticTurnQuality({
     reply: replyWithIntro,
@@ -979,7 +1063,15 @@ function buildTutorReply(text, options = {}) {
     socraticTurnQualityScorecard: qualityScorecard,
     socratic_prompt_quality_judge: promptJudge,
     socraticPromptQualityJudge: promptJudge,
-    three_round_socratic_protocol: buildThreeRoundSocraticProtocol(taskType, pressureSignal),
+    three_round_socratic_protocol: threeRoundProtocol,
+    socratic_quality_release_audit: buildSocraticQualityReleaseAudit({
+      taskType,
+      scorecard: qualityScorecard,
+      promptJudge,
+      threeRoundProtocol,
+      aiLocalBoundaryContract,
+      pressureSignal
+    }),
     socratic_ai_local_boundary_contract: aiLocalBoundaryContract,
     socraticAiLocalBoundaryContract: aiLocalBoundaryContract,
     answer_boundary_evidence: answerRequest ? buildAnswerBoundaryEvidence(text, pressureSignal, { taskType, selected }) : null,
@@ -1033,6 +1125,7 @@ module.exports = {
   buildSocraticQualityEvaluationSuite,
   buildSocraticPromptQualityJudge,
   evaluateSocraticTurnQuality,
+  buildSocraticQualityReleaseAudit,
   buildThreeRoundSocraticProtocol,
   buildSocraticAiLocalBoundaryContract,
   buildAnswerBoundaryEvidence,
