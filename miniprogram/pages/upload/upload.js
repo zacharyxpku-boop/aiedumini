@@ -224,6 +224,75 @@ function buildUploadProductTierView(tiers = []) {
   };
 }
 
+function uploadModeEntryLine(route = '') {
+  const value = String(route || '');
+  if (value.indexOf('/pages/tutor/') >= 0) return '进入方式：先回到一对一点拨，孩子说第一步。';
+  if (value.indexOf('/pages/review/') >= 0) return '进入方式：先修复一张错因卡，再安排回访。';
+  if (value.indexOf('/pages/arcade/') >= 0) return '进入方式：做 90 秒主动回忆，不新增题量。';
+  if (value.indexOf('/pages/profile/') >= 0) return '进入方式：家长先看报告和证据，不直接给孩子贴标签。';
+  return '进入方式：从当前材料继续下一步。';
+}
+
+function uploadModeEvidenceLine(mode = {}) {
+  const id = mode.id || '';
+  if (id === 'three_minute_mini_lesson') return '退出证据：孩子能用自己的话说出口袋小结。';
+  if (id === 'game_recall') return '退出证据：隔天还能回忆第一步或错因。';
+  if (id === 'wrong_question_repair_course') return '退出证据：同类错因少一次，且能说出修正动作。';
+  if (id === 'online_method_course') return '退出证据：方法候选必须被真实错题验证。';
+  return '退出证据：留下孩子第一步、家长一句话和下一次回访。';
+}
+
+function buildUploadModeRecommendationView(modes = []) {
+  const cards = (Array.isArray(modes) ? modes : []).map((mode, index) => ({
+    id: mode.id || `mode_${index + 1}`,
+    label: mode.label || '学习模式',
+    roleLine: index === 0 ? '推荐角色：今晚默认优先。' : '推荐角色：作为补充路径。',
+    actionLine: mode.action || '先完成一个低压动作。',
+    reasonLine: mode.localGate ? `为什么推荐：${mode.localGate}` : '为什么推荐：当前材料已有可执行证据。',
+    entryLine: uploadModeEntryLine(mode.route),
+    evidenceLine: uploadModeEvidenceLine(mode),
+    boundaryLine: '边界：不直接给答案、不承诺提分、不替代老师判断。'
+  }));
+  return {
+    id: 'upload_mode_recommendation_delivery_view',
+    title: '今晚学习模式',
+    summaryLine: '默认仍是一对一苏格拉底点拨；小课堂、游戏和课程只在证据满足时补位。',
+    cards
+  };
+}
+
+function uploadModeReleaseGateLine(gate = '') {
+  const value = String(gate || '');
+  if (value.indexOf('real_task_evidence') >= 0) return '放行门槛：先补一条真实作业证据。';
+  if (value.indexOf('parent_confirmation') >= 0) return '放行门槛：家长确认范围后再进入服务交付。';
+  return '放行门槛：先完成孩子第一步和下一条回访证据。';
+}
+
+function buildUploadModeChoiceProtocolView(protocol = {}) {
+  if (!protocol || !protocol.id) return null;
+  return {
+    id: 'upload_mode_choice_protocol_view',
+    title: protocol.title || '学习模式选择',
+    positioningLine: protocol.positioningLine || '默认是一对一点拨，其他模式只做补位。',
+    releaseGateLine: uploadModeReleaseGateLine(protocol.releaseGate),
+    choiceCards: (Array.isArray(protocol.choiceCards) ? protocol.choiceCards : []).map((item, index) => ({
+      id: item.id || `choice_${index + 1}`,
+      label: item.label || '学习模式',
+      roleLine: item.recommended ? '推荐：今晚优先使用。' : '可选：有证据后再补充。',
+      childChoiceLine: item.childCanChoose ? '孩子可选择，但必须留下退出证据。' : (item.lockReason || '暂不让孩子直接选择。'),
+      exitLine: `退出证据：${item.exitEvidenceRequired || '孩子第一步和一次回访。'}`,
+      parentLine: item.parentConfirmRequired ? '家长确认后再进入交付。' : '先完成孩子第一步。'
+    })),
+    blockedModeCards: (Array.isArray(protocol.blockedModeCards) ? protocol.blockedModeCards : []).map((item, index) => ({
+      id: item.id || `blocked_${index + 1}`,
+      label: item.label || '暂不开启模式',
+      lockLine: item.lockReason || '证据不足，暂不开启。',
+      unlockLine: item.localGate ? `开启条件：${item.localGate}` : '开启条件：补足真实作业卡点和回访证据。',
+      exitLine: `退出证据：${item.exitEvidenceRequired || '孩子能说明第一步。'}`
+    }))
+  };
+}
+
 function normalizeMaterialType(query = {}, fallback = 'class_notes') {
   const raw = safeQueryText(query.type || query.materialType || query.sourceSchemaId || query.source || '');
   const normalized = raw.replace(/^material_/, '');
@@ -1236,6 +1305,12 @@ Page({
     const productTierView = buildUploadProductTierView(
       servicePathway && servicePathway.productTiers
     );
+    const modeRecommendationView = buildUploadModeRecommendationView(
+      servicePathway && servicePathway.modeRecommendations
+    );
+    const modeChoiceProtocolView = buildUploadModeChoiceProtocolView(
+      servicePathway && servicePathway.modeChoiceProtocol
+    );
     return {
       title: sourceSchemaId === 'talent_assessment'
         ? '方法候选已入证据账本'
@@ -1268,6 +1343,8 @@ Page({
       partnerDeliveryLedgerView,
       validationPlanView,
       productTierView,
+      modeRecommendationView,
+      modeChoiceProtocolView,
       partnerDeliveryWorkbench: partnerWorkbench,
       uploadedMaterialDecisionDossier,
       needsParentConfirmation: servicePathway && servicePathway.partnerServiceDeliveryLedger

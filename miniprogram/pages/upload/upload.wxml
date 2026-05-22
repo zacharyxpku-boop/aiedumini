@@ -248,41 +248,46 @@
           <view class="intake-packet-feedback">{{lastReportCta.servicePathway.summary}}</view>
           <view class="intake-packet-line">{{lastReportCta.servicePathway.nextAction}}</view>
           <view class="intake-packet-boundary">{{lastReportCta.servicePathway.familyVisibleLine}}</view>
-          <view class="intake-action-queue">
-            <view class="intake-action-item" wx:for="{{lastReportCta.servicePathway.modeRecommendations}}" wx:key="id">
+          <view class="intake-action-queue" wx:if="{{lastReportCta.modeRecommendationView.cards.length}}">
+            <view class="intake-action-title">{{lastReportCta.modeRecommendationView.title}}</view>
+            <view class="intake-packet-boundary">{{lastReportCta.modeRecommendationView.summaryLine}}</view>
+            <view class="intake-action-item" wx:for="{{lastReportCta.modeRecommendationView.cards}}" wx:key="id">
               <view class="intake-action-main">
                 <text>{{item.label}}</text>
-                <text>{{item.action}}</text>
+                <text>{{item.actionLine}}</text>
               </view>
               <view class="intake-action-meta">
-                <text>{{item.localGate}}</text>
-                <text>{{item.route}}</text>
+                <text>{{item.roleLine}}</text>
+                <text>{{item.reasonLine}}</text>
+                <text>{{item.entryLine}}</text>
+                <text>{{item.evidenceLine}}</text>
+                <text>{{item.boundaryLine}}</text>
               </view>
             </view>
           </view>
-          <view class="intake-action-queue" wx:if="{{lastReportCta.servicePathway.modeChoiceProtocol}}">
-            <view class="intake-action-title">{{lastReportCta.servicePathway.modeChoiceProtocol.title}}</view>
-            <view class="intake-action-item" wx:for="{{lastReportCta.servicePathway.modeChoiceProtocol.choiceCards}}" wx:key="id">
+          <view class="intake-action-queue" wx:if="{{lastReportCta.modeChoiceProtocolView}}">
+            <view class="intake-action-title">{{lastReportCta.modeChoiceProtocolView.title}}</view>
+            <view class="intake-action-item" wx:for="{{lastReportCta.modeChoiceProtocolView.choiceCards}}" wx:key="id">
               <view class="intake-action-main">
-                <text>{{item.recommended ? '推荐：' : '可选：'}}{{item.label}}</text>
-                <text>{{item.choiceRole}}｜{{item.childCanChoose ? '孩子可选' : item.lockReason}}</text>
+                <text>{{item.roleLine}}{{item.label}}</text>
+                <text>{{item.childChoiceLine}}</text>
               </view>
               <view class="intake-action-meta">
-                <text>退出证据：{{item.exitEvidenceRequired}}</text>
-                <text>{{item.parentConfirmRequired ? '家长确认后进入服务' : '先做孩子第一步'}}</text>
+                <text>{{item.exitLine}}</text>
+                <text>{{item.parentLine}}</text>
               </view>
             </view>
-            <view class="intake-packet-boundary">{{lastReportCta.servicePathway.modeChoiceProtocol.positioningLine}}</view>
-            <view class="intake-packet-boundary">{{lastReportCta.servicePathway.modeChoiceProtocol.releaseGate}}</view>
-            <view class="intake-action-title" wx:if="{{lastReportCta.servicePathway.modeChoiceProtocol.blockedModeCards.length}}">暂不开启</view>
-            <view class="intake-action-item locked" wx:for="{{lastReportCta.servicePathway.modeChoiceProtocol.blockedModeCards}}" wx:key="id">
+            <view class="intake-packet-boundary">{{lastReportCta.modeChoiceProtocolView.positioningLine}}</view>
+            <view class="intake-packet-boundary">{{lastReportCta.modeChoiceProtocolView.releaseGateLine}}</view>
+            <view class="intake-action-title" wx:if="{{lastReportCta.modeChoiceProtocolView.blockedModeCards.length}}">暂不开启</view>
+            <view class="intake-action-item locked" wx:for="{{lastReportCta.modeChoiceProtocolView.blockedModeCards}}" wx:key="id">
               <view class="intake-action-main">
                 <text>{{item.label}}</text>
-                <text>{{item.lockReason}}</text>
+                <text>{{item.lockLine}}</text>
               </view>
               <view class="intake-action-meta">
-                <text>{{item.localGate}}</text>
-                <text>退出证据：{{item.exitEvidenceRequired}}</text>
+                <text>{{item.unlockLine}}</text>
+                <text>{{item.exitLine}}</text>
               </view>
             </view>
           </view>
