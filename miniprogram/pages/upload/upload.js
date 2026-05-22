@@ -1055,7 +1055,8 @@ Page({
       reportDraft,
       structuredEvidenceSignals: uploadEvidenceSignals,
       importedCards,
-      cardId
+      cardId,
+      parentConfirmed: !!(reportState.parentConfirmed || reportDraft.parentConfirmed)
     });
     const partnerWorkbench = partnerDeliveryWorkbench.buildPartnerDeliveryWorkbench({
       childProfile: reportState.childProfile || reportDraft.childProfile || {},
@@ -1120,6 +1121,10 @@ Page({
       servicePathway,
       partnerDeliveryWorkbench: partnerWorkbench,
       uploadedMaterialDecisionDossier,
+      needsParentConfirmation: servicePathway && servicePathway.partnerServiceDeliveryLedger
+        ? servicePathway.partnerServiceDeliveryLedger.status === 'needs_parent_confirmation'
+        : false,
+      parentConfirmation: (reportState.parentConfirmation || reportDraft.parentConfirmation || null),
       sourceSchemaId,
       reportId,
       flowTraceId: `upload_report:${reportId || sourceSchemaId}:${cardId || 'no_card'}`,
@@ -1193,6 +1198,68 @@ Page({
     }
     storage.saveLearningReportState(nextState, { skipBuild: true });
     return nextState;
+  },
+
+  markCtaParentConfirmed(cta = {}, confirmedAt = '') {
+    const servicePathway = cta.servicePathway || {};
+    const ledger = servicePathway.partnerServiceDeliveryLedger || null;
+    const nextLedger = ledger ? Object.assign({}, ledger, {
+      status: ledger.status === 'pre_sale_needs_real_task_evidence'
+        ? ledger.status
+        : 'deliverable_after_parent_confirmation',
+      releaseGate: ledger.status === 'pre_sale_needs_real_task_evidence'
+        ? ledger.releaseGate
+        : 'parent_confirmed_private_fields_removed',
+      packageCards: Array.isArray(ledger.packageCards)
+        ? ledger.packageCards.map((item) => item && item.id === 'seven_day_execution'
+          ? Object.assign({}, item, {
+            entryGate: 'real_task_evidence_ready_and_parent_confirmed'
+          })
+          : item)
+        : []
+    }) : null;
+    const nextPathway = servicePathway && servicePathway.id ? Object.assign({}, servicePathway, {
+      signals: Object.assign({}, servicePathway.signals || {}, { parentConfirmed: true }),
+      modeChoiceProtocol: servicePathway.modeChoiceProtocol ? Object.assign({}, servicePathway.modeChoiceProtocol, {
+        releaseGate: 'mode_choice_parent_confirmed'
+      }) : servicePathway.modeChoiceProtocol,
+      partnerServiceDeliveryLedger: nextLedger || servicePathway.partnerServiceDeliveryLedger
+    }) : servicePathway;
+    return Object.assign({}, cta, {
+      servicePathway: nextPathway,
+      needsParentConfirmation: false,
+      parentConfirmation: {
+        status: 'confirmed',
+        confirmedAt,
+        evidenceLine: '家长已确认：只按本页可见字段交付，不外发原题、答案、分数、排名、孩子姓名或联系方式。'
+      }
+    });
+  },
+
+  confirmReportParentConsent() {
+    const cta = this.data.lastReportCta || {};
+    const confirmedAt = new Date().toISOString();
+    const nextCta = this.markCtaParentConfirmed(cta, confirmedAt);
+    const reportState = storage.loadLearningReportState ? storage.loadLearningReportState() : {};
+    const nextState = Object.assign({}, reportState, {
+      parentConfirmed: true,
+      parentConfirmation: nextCta.parentConfirmation,
+      servicePathway: nextCta.servicePathway || reportState.servicePathway || null,
+      partnerDeliveryWorkbench: nextCta.partnerDeliveryWorkbench || reportState.partnerDeliveryWorkbench || null,
+      uploadReportHandoff: nextCta,
+      flowTraceId: nextCta.flowTraceId || reportState.flowTraceId || `upload_parent_confirm:${confirmedAt}`
+    });
+    if (nextState.reportDraft) {
+      nextState.reportDraft = Object.assign({}, nextState.reportDraft, {
+        parentConfirmed: true,
+        parentConfirmation: nextCta.parentConfirmation,
+        servicePathway: nextCta.servicePathway || null,
+        uploadReportHandoff: nextCta
+      });
+    }
+    if (storage.saveLearningReportState) storage.saveLearningReportState(nextState, { skipBuild: true });
+    this.setData({ lastReportCta: nextCta });
+    wx.showToast({ title: '已确认交付范围', icon: 'none' });
   },
 
   attachServicePathwayToUploadedDossier(dossier = null, servicePathway = null) {

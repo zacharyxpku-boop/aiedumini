@@ -320,6 +320,8 @@
                 <text>{{item.nextRoute}}</text>
               </view>
             </view>
+            <view class="intake-packet-boundary" wx:if="{{lastReportCta.parentConfirmation}}">{{lastReportCta.parentConfirmation.evidenceLine}}</view>
+            <button class="material-import" wx:if="{{lastReportCta.needsParentConfirmation}}" bindtap="confirmReportParentConsent">家长确认交付范围</button>
           </view>
           <view class="intake-action-queue" wx:if="{{lastReportCta.servicePathway.quickAssessmentBridge}}">
             <view class="intake-action-title">没有现成测评时</view>
