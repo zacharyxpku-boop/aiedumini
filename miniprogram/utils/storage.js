@@ -962,6 +962,62 @@ function firstReportWeakSubject(reportState = {}) {
     || {};
 }
 
+function safeScoreSubjectId(subject = '') {
+  return String(subject || 'subject').replace(/[^\w\u4e00-\u9fa5]+/g, '_').slice(0, 28) || 'subject';
+}
+
+function buildScoreReportReturnDeck(reportState = {}) {
+  const draft = reportState.reportDraft || {};
+  const parsedScores = reportState.parsedScores || draft.parsedScores || {};
+  const scoreCards = Object.keys(parsedScores || {})
+    .map((key) => {
+      const row = parsedScores[key] || {};
+      const score = Number(row.score);
+      if (!Number.isFinite(score)) return null;
+      return {
+        subject: row.subject || key,
+        score,
+        scoreBand: score < 60 ? 'urgent_repair' : score < 75 ? 'weak_foundation' : score < 90 ? 'needs_stability' : 'maintenance',
+        source: 'confirmed_score_sheet'
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => a.score - b.score);
+  const matrix = (draft.diagnosisMatrix || reportState.diagnosisMatrix || [])
+    .filter((item) => item && item.subject);
+  const base = scoreCards.length
+    ? scoreCards
+    : matrix.slice(0, 3).map((item) => ({
+      subject: item.subject,
+      score: null,
+      scoreBand: 'diagnosis_weak_signal',
+      source: 'diagnosis_matrix',
+      mainCause: item.mainCause || '',
+      evidence: item.evidence || ''
+    }));
+  return base.slice(0, 3).map((item, index) => {
+    const subject = item.subject || '\u5f53\u524d\u5361\u70b9';
+    const weakCause = item.mainCause || (index === 0 ? '\u6700\u9700\u5148\u56de\u6765\u7684\u5b66\u79d1\u5361\u70b9' : '\u9700\u8981\u7a33\u5b9a\u56de\u8bbf\u7684\u5b66\u79d1\u5361\u70b9');
+    return {
+      id: `score_return_${safeScoreSubjectId(subject)}_${index + 1}`,
+      subject,
+      source: item.source,
+      priority: index + 1,
+      scoreBand: item.scoreBand,
+      privateParentScore: Number.isFinite(item.score) ? item.score : null,
+      weakCause,
+      dailyTask: `\u5148\u56de\u6765\u505a${subject}\u4e00\u5f20\u9519\u56e0\u56de\u8bbf\u5361`,
+      publicSignalLine: `\u4eca\u5929\u5148\u4fee${subject}\u7684\u4e00\u4e2a\u9519\u56e0\uff0c\u4e0d\u6652\u5206\u3001\u4e0d\u6392\u540d\u3001\u4e0d\u7528\u5206\u6570\u53d1 XP\u3002`,
+      parentLine: `\u5bb6\u957f\u53ea\u95ee\uff1a${subject}\u8fd9\u5f20\u5361\u7b2c\u4e00\u6b65\u5148\u770b\u54ea\u91cc\uff1f`,
+      route: `/pages/review/review?from=score_report_return&subject=${safeScoreSubjectId(subject)}`,
+      evidenceRequired: ['child_first_step', 'wrong_cause_named', 'next_day_revisit'],
+      xpGate: 'XP only releases after first-step recall, wrong-cause naming, and next-day revisit; score/ranking never drives reward.',
+      blockedFields: ['score', 'ranking', 'full_answer', 'original_question', 'full_dialogue'],
+      shareSafeFields: ['subject', 'wrong_cause_label', 'first_step', 'next_day_revisit_window']
+    };
+  });
+}
+
 function reportFirstStepText(reportState = {}) {
   const plan = reportState.recommendationPlan
     || (reportState.reportDraft && reportState.reportDraft.recommendationPlan)
@@ -996,6 +1052,8 @@ function buildReportDailyActionQueue(options = {}) {
   const nextEvidence = Array.isArray(solutionMap.nextEvidenceRequired) && solutionMap.nextEvidenceRequired.length
     ? solutionMap.nextEvidenceRequired
     : ['child_first_step', 'focus_or_review_record', 'next_day_revisit'];
+  const scoreReportReturnDeck = buildScoreReportReturnDeck(reportState);
+  const scoreReportReturnCard = scoreReportReturnDeck[0] || null;
   const queue = sevenDayPlan.map((item, index) => {
     const day = Number(item.day || index + 1);
     const route = item.path || fallbackRoute;
@@ -1007,7 +1065,10 @@ function buildReportDailyActionQueue(options = {}) {
       module: item.module || plan.primaryModule || reportSolution.primaryModule || reportRouteTarget(route),
       route,
       checkpoint: item.checkpoint || item.parentPrompt || solutionMap.parentScript || plan.parentLine || '家长只问一句：这一步你准备先看哪里？',
-      evidenceRequired: nextEvidence,
+      evidenceRequired: scoreReportReturnCard && day === dayIndex
+        ? Array.from(new Set([].concat(nextEvidence, scoreReportReturnCard.evidenceRequired || [])))
+        : nextEvidence,
+      scoreReportReturnCard: scoreReportReturnCard && day === dayIndex ? scoreReportReturnCard : null,
       status: day < dayIndex ? 'done' : day === dayIndex ? 'active' : 'next'
     };
   });
@@ -1024,10 +1085,15 @@ function buildReportDailyActionQueue(options = {}) {
     tomorrow,
     finalReview,
     queue,
-    actionLine: active ? active.task : '先生成学习画像，再进入 7 天行动板。',
-    parentLine: active ? active.checkpoint : '家长先问一句：这一步你准备先看哪里？',
-    evidenceLine: nextEvidence.join(' / '),
-    route: active && active.route ? active.route : fallbackRoute
+    scoreReportReturnDeck,
+    scoreReportReturnCard,
+    scoreReportReturnLine: scoreReportReturnCard
+      ? scoreReportReturnCard.publicSignalLine
+      : '\u6682\u65e0\u6210\u7ee9\u5355\u56de\u8bbf\u5361\uff1b\u7ee7\u7eed\u6309\u7b2c\u4e00\u6b65\u548c\u9519\u56e0\u8bc1\u636e\u63a8\u8fdb\u3002',
+    actionLine: active ? active.task : (scoreReportReturnCard ? scoreReportReturnCard.dailyTask : '先生成学习画像，再进入 7 天行动板。'),
+    parentLine: active ? active.checkpoint : (scoreReportReturnCard ? scoreReportReturnCard.parentLine : '家长先问一句：这一步你准备先看哪里？'),
+    evidenceLine: Array.from(new Set([].concat(nextEvidence, scoreReportReturnCard ? scoreReportReturnCard.evidenceRequired : []))).join(' / '),
+    route: scoreReportReturnCard && scoreReportReturnCard.route ? scoreReportReturnCard.route : (active && active.route ? active.route : fallbackRoute)
   };
 }
 
@@ -1133,6 +1199,8 @@ function connectLearningReportToLocalLoop(reportState = {}, options = {}) {
     active_day: dailyQueue.active && dailyQueue.active.day,
     active_task: dailyQueue.active && dailyQueue.active.task,
     route: dailyQueue.route,
+    score_return_subject: dailyQueue.scoreReportReturnCard && dailyQueue.scoreReportReturnCard.subject,
+    score_return_gate: dailyQueue.scoreReportReturnCard && dailyQueue.scoreReportReturnCard.xpGate,
     evidence_required: dailyQueue.evidenceLine,
     created_at: new Date().toISOString()
   });

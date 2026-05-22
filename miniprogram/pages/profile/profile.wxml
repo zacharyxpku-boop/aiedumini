@@ -1489,6 +1489,11 @@
             <text class="report-action-label">今日队列</text>
             <text>{{learningReportSummary.reportTodayActionLine}}</text>
           </view>
+          <view class="report-action-row" wx:if="{{learningReportSummary.reportScoreReturnCard}}">
+            <text class="report-action-label">成绩回访卡</text>
+            <text>{{learningReportSummary.reportScoreReturnLine}}</text>
+            <text>{{learningReportSummary.reportScoreReturnXpGate}}</text>
+          </view>
           <view class="report-action-row">
             <text class="report-action-label">今天</text>
             <text>{{learningReportSummary.sevenDayActionBoard.today}}</text>
