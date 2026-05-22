@@ -96,7 +96,7 @@
           <text>{{homeViewModel.primaryCta}}</text>
           <view class="coach-arrow">→</view>
         </view>
-        <view class="route-next-lite" wx:if="{{homeViewModel.nextStep}}" catchtap="goReview">
+        <view class="route-next-lite" wx:if="{{homeViewModel.nextStep}}" catchtap="runHomeNextStep">
           <text>{{homeViewModel.nextStep.text}}</text>
           <text class="route-next-link">{{homeViewModel.nextStep.cta}}</text>
         </view>

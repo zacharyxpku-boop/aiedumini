@@ -2009,6 +2009,20 @@ Page({
     wx.switchTab({ url: '/pages/review/review' });
   },
 
+  runHomeNextStep() {
+    const nextStep = this.data.homeViewModel && this.data.homeViewModel.nextStep;
+    const action = nextStep && nextStep.action ? nextStep.action : 'review';
+    if (action === 'miniLesson') {
+      this.goMiniLessonResume();
+      return;
+    }
+    if (action === 'first' || action === 'tutor') {
+      this.goTutor();
+      return;
+    }
+    this.goReview();
+  },
+
   goMiniLessonResume() {
     const card = this.data.homeViewModel && this.data.homeViewModel.miniLessonResume;
     const route = card && card.route ? card.route : '/pages/review/review?from=home_mini_lesson_resume';
