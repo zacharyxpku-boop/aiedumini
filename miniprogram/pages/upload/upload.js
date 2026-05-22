@@ -88,6 +88,75 @@ function safeQueryText(value) {
   }
 }
 
+function uploadPartnerStatusLine(status) {
+  const map = {
+    pre_sale_needs_real_task_evidence: '待补真实作业证据：只能做报告解读，不能进入合作交付。',
+    needs_parent_confirmation: '待家长确认：已有真实证据，交付前必须确认范围。',
+    deliverable_after_parent_confirmation: '可受保护交付：只交付行动、家长问题和下一条证据。'
+  };
+  return map[status] || '待确认交付状态：先补证据和家长确认。';
+}
+
+function uploadPartnerGateLine(gate) {
+  const map = {
+    real_task_evidence_required_before_sales: '放行门槛：先补一条真实错题、作业卡点或家长观察。',
+    parent_confirmation_required_before_partner_delivery: '放行门槛：家长确认后才可交付给合作方。',
+    parent_confirmed_private_fields_removed: '放行门槛：家长已确认，敏感字段已移除。',
+    real_task_evidence_ready_and_parent_confirmed: '放行门槛：真实证据和家长确认均已满足。',
+    parent_confirmation_required: '放行门槛：待家长确认交付范围。'
+  };
+  return map[gate] || String(gate || '').replace(/_/g, ' ');
+}
+
+function uploadPartnerFieldLabel(field) {
+  const map = {
+    tonight_action: '今晚行动',
+    parent_question: '家长问题',
+    next_evidence: '下一条证据',
+    service_candidate: '服务候选',
+    original_question: '原题',
+    original_answer: '原始答案',
+    photo: '照片',
+    full_answer: '完整答案',
+    full_solution: '完整解法',
+    score: '分数',
+    ranking: '排名',
+    score_ranking: '分数/排名解释',
+    talent_label: '天赋定性标签',
+    full_dialogue: '完整对话',
+    child_name: '孩子姓名',
+    parent_phone: '家长手机号',
+    parent_wechat: '家长微信',
+    contact_info: '联系方式'
+  };
+  return map[field] || String(field || '').replace(/_/g, ' ');
+}
+
+function uploadPartnerFieldLine(fields = []) {
+  return (Array.isArray(fields) ? fields : [])
+    .map(uploadPartnerFieldLabel)
+    .filter(Boolean)
+    .join('、');
+}
+
+function buildUploadPartnerLedgerView(ledger = {}) {
+  if (!ledger || !ledger.id) return null;
+  return {
+    id: 'upload_partner_delivery_readable_ledger',
+    statusLine: uploadPartnerStatusLine(ledger.status),
+    releaseGateLine: uploadPartnerGateLine(ledger.releaseGate),
+    visibleFieldLine: uploadPartnerFieldLine(ledger.partnerVisibleFields),
+    blockedFieldLine: uploadPartnerFieldLine(ledger.partnerBlockedFields),
+    packageCards: (Array.isArray(ledger.packageCards) ? ledger.packageCards : []).map((item) => ({
+      id: item.id,
+      label: item.label || '',
+      deliverable: item.deliverable || '',
+      entryGateLine: uploadPartnerGateLine(item.entryGate),
+      routeLine: item.nextRoute ? '下一步入口已准备，确认后可继续。' : '下一步入口待补证据。'
+    }))
+  };
+}
+
 function normalizeMaterialType(query = {}, fallback = 'class_notes') {
   const raw = safeQueryText(query.type || query.materialType || query.sourceSchemaId || query.source || '');
   const normalized = raw.replace(/^material_/, '');
@@ -1090,6 +1159,9 @@ Page({
       gameRoute,
       blockedFields: safeRelayPayload.blockedFields
     });
+    const partnerDeliveryLedgerView = buildUploadPartnerLedgerView(
+      servicePathway && servicePathway.partnerServiceDeliveryLedger
+    );
     return {
       title: sourceSchemaId === 'talent_assessment'
         ? '方法候选已入证据账本'
@@ -1119,6 +1191,7 @@ Page({
       aiMaterialAnalysisContract,
       tonightTaskCard,
       servicePathway,
+      partnerDeliveryLedgerView,
       partnerDeliveryWorkbench: partnerWorkbench,
       uploadedMaterialDecisionDossier,
       needsParentConfirmation: servicePathway && servicePathway.partnerServiceDeliveryLedger
