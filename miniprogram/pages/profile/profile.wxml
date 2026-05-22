@@ -235,6 +235,17 @@
               <text class="parent-brief-label">服务包节点</text>
               <text wx:for="{{learningReportSummary.partnerWorkbenchRevenueDisplayRows}}" wx:key="id">{{item.label}}｜{{item.statusText}}｜{{item.gate}}</text>
             </view>
+            <view class="parent-brief-block" wx:if="{{learningReportSummary.partnerServiceReviewCard}}">
+              <text class="parent-brief-label">{{learningReportSummary.partnerServiceReviewTitle}}</text>
+              <text>{{learningReportSummary.partnerServiceReviewStatusLine}}</text>
+              <text>{{learningReportSummary.partnerServiceReviewDecisionLine}}</text>
+              <text>{{learningReportSummary.partnerServiceReviewEvidenceLine}}</text>
+              <text>{{learningReportSummary.partnerServiceReviewNextActionLine}}</text>
+              <text>{{learningReportSummary.partnerServiceReviewReleaseLine}}</text>
+              <view class="profile-action-row" wx:if="{{learningReportSummary.partnerServiceReviewActions.length}}">
+                <button class="profile-small-primary" wx:for="{{learningReportSummary.partnerServiceReviewActions}}" wx:key="id" data-id="{{item.id}}" data-label="{{item.label}}" data-route="{{item.route}}" data-reason="{{item.reason}}" bindtap="runUploadedMaterialDossierAction">{{item.label}}</button>
+              </view>
+            </view>
             <view class="parent-brief-reason" wx:if="{{learningReportSummary.partnerWorkbenchPrivacyGate}}">合作方只看脱敏交付视图；原题、照片、完整对话、敏感比较信息、天赋标签不出本机/服务端安全域。</view>
           </view>
         </view>

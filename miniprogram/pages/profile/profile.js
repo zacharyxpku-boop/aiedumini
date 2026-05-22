@@ -1442,6 +1442,70 @@ function formatRevenueMilestones(rows = []) {
   }));
 }
 
+function buildPartnerServiceReviewCard(partnerWorkbench = null, servicePathway = null, revisitEvidence = null) {
+  if (!partnerWorkbench) return null;
+  const revenueRows = Array.isArray(partnerWorkbench.revenueMilestones) ? partnerWorkbench.revenueMilestones : [];
+  const paid7Day = revenueRows.find((item) => item.id === 'paid_7_day_execution') || {};
+  const counselorUpgrade = revenueRows.find((item) => item.id === 'course_or_counselor_upgrade') || {};
+  const advisorNext = Array.isArray(partnerWorkbench.advisorQueue)
+    ? (partnerWorkbench.advisorQueue.find((item) => item.status === 'todo') || partnerWorkbench.advisorQueue[0] || {})
+    : {};
+  const validationPlan = servicePathway && Array.isArray(servicePathway.validationPlan) ? servicePathway.validationPlan : [];
+  const day7Ready = !!(revisitEvidence && revisitEvidence.day7VariantReady);
+  const canStartPaidLoop = !!paid7Day.allowed;
+  const canReviewUpgrade = !!(day7Ready && counselorUpgrade.allowed);
+  const stage = !canStartPaidLoop
+    ? 'need_evidence'
+    : canReviewUpgrade
+      ? 'ready_for_review'
+      : 'run_7_day_loop';
+  return {
+    id: 'partner_service_review_card',
+    title: stage === 'need_evidence'
+      ? '下一次服务：先补证据'
+      : stage === 'ready_for_review'
+        ? '下一次服务：安排顾问复盘'
+        : '下一次服务：启动 7 天陪跑',
+    statusLine: stage === 'need_evidence'
+      ? '当前只适合做报告解读或补材料，不从测评标签直接销售服务包。'
+      : stage === 'ready_for_review'
+        ? '第 7 天小变式和家长确认已满足，可以整理一次顾问复盘建议。'
+        : '真实作业证据和家长确认已具备，可以进入受保护的 7 天执行闭环。',
+    decisionLine: stage === 'ready_for_review'
+      ? '复盘只判断保留、降级或更换学习方法，不承诺提分。'
+      : stage === 'run_7_day_loop'
+        ? '先跑 7 天：今晚动作、隔天回访、第 7 天小变式，再决定是否升级。'
+        : '先补真实错题、孩子第一步、隔天回访或家长确认，再讨论服务。',
+    evidenceLine: validationPlan.length
+      ? `已准备 ${validationPlan.length} 个验证节点；第 7 天证据：${day7Ready ? '已就绪' : '未就绪'}。`
+      : `第 7 天证据：${day7Ready ? '已就绪' : '未就绪'}。`,
+    nextActionLine: advisorNext.action || partnerWorkbench.nextBestAction || '按证据补齐情况决定下一步。',
+    releaseLine: '放行标准：只交付行动、问题、下一条证据和家长确认范围；不交付原题、完整答案、排名或天赋定性。',
+    actions: [
+      {
+        id: 'partner_service_review_primary',
+        label: stage === 'need_evidence' ? '补一条证据' : stage === 'ready_for_review' ? '申请顾问复盘' : '进入 7 天验证',
+        route: stage === 'need_evidence'
+          ? '/pages/upload/upload?from=partner_service_review&type=wrong_question_paper'
+          : stage === 'ready_for_review'
+            ? '/pages/profile/profile?from=partner_service_review&panel=lead'
+            : '/pages/review/review?from=partner_service_review&stage=day7',
+        reason: stage === 'need_evidence'
+          ? '补真实作业或错题证据后再进入服务建议。'
+          : stage === 'ready_for_review'
+            ? '把 7 天证据整理成一次顾问复盘，不承诺结果。'
+            : '用 7 天执行结果决定是否升级服务。'
+      },
+      {
+        id: 'partner_service_review_parent',
+        label: '确认交付范围',
+        route: '/pages/upload/upload?from=partner_service_review&type=parent_report',
+        reason: '合作或顾问交付前，先由家长确认可使用范围。'
+      }
+    ]
+  };
+}
+
 function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, subjectSkillDepth, curriculumSpine, visualSocraticMatrix, courseUnitMap, latestThinkingReceipt = null) {
   const globalEvidenceBrief = storage.buildGlobalEvidenceBrief ? storage.buildGlobalEvidenceBrief() : null;
   const capabilityLedger = capabilityEvidenceLedger || (storage.buildCapabilityEvidenceLedger ? storage.buildCapabilityEvidenceLedger({ globalEvidenceBrief }) : null);
@@ -1775,6 +1839,8 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     route: '/pages/upload/upload?from=openmaic_k12_workbench&type=parent_report'
   });
   const uploadedMaterialDeliveryView = buildProfileDossierDeliveryView(uploadedMaterialDecisionDossier, servicePathway);
+  const reportRevisitEvidence = reportState.reportRevisitEvidence || uploadedMaterialDecisionDossier.servicePathwaySummary && uploadedMaterialDecisionDossier.servicePathwaySummary.revisitEvidence || null;
+  const partnerServiceReviewCard = buildPartnerServiceReviewCard(partnerWorkbench, servicePathway, reportRevisitEvidence);
   return {
     title: draft.title || '学习画像',
     modeLabel: reportState.reportProgress && reportState.reportProgress.label ? reportState.reportProgress.label : '0% · 快速版',
@@ -2215,6 +2281,14 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     partnerWorkbenchRevenueMilestones: partnerWorkbench && Array.isArray(partnerWorkbench.revenueMilestones) ? partnerWorkbench.revenueMilestones : [],
     partnerWorkbenchRevenueDisplayRows: partnerWorkbench && Array.isArray(partnerWorkbench.revenueMilestones) ? formatRevenueMilestones(partnerWorkbench.revenueMilestones) : [],
     partnerWorkbenchPrivacyGate: partnerWorkbench ? partnerWorkbench.privacyGate : null,
+    partnerServiceReviewCard,
+    partnerServiceReviewTitle: partnerServiceReviewCard ? partnerServiceReviewCard.title : '',
+    partnerServiceReviewStatusLine: partnerServiceReviewCard ? partnerServiceReviewCard.statusLine : '',
+    partnerServiceReviewDecisionLine: partnerServiceReviewCard ? partnerServiceReviewCard.decisionLine : '',
+    partnerServiceReviewEvidenceLine: partnerServiceReviewCard ? partnerServiceReviewCard.evidenceLine : '',
+    partnerServiceReviewNextActionLine: partnerServiceReviewCard ? partnerServiceReviewCard.nextActionLine : '',
+    partnerServiceReviewReleaseLine: partnerServiceReviewCard ? partnerServiceReviewCard.releaseLine : '',
+    partnerServiceReviewActions: partnerServiceReviewCard ? partnerServiceReviewCard.actions : [],
     uploadedMaterialDeliveryView,
     uploadedMaterialServiceHandoffPack,
     uploadedMaterialServiceHandoffTitle: uploadedMaterialServiceHandoffPack ? uploadedMaterialServiceHandoffPack.title : '',
@@ -2254,7 +2328,7 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
       ? uploadedMaterialDecisionDossier.familyPrivateTutorSolutionPack.moatSignals
       : [],
     uploadedMaterialDecisionDossierSolutionBlueprint: uploadedMaterialDecisionDossier.personalizedLearningSolutionBlueprint || null,
-    reportRevisitEvidence: reportState.reportRevisitEvidence || uploadedMaterialDecisionDossier.servicePathwaySummary && uploadedMaterialDecisionDossier.servicePathwaySummary.revisitEvidence || null,
+    reportRevisitEvidence,
     reportRevisitValidationStage: reportState.reportRevisitEvidence ? reportState.reportRevisitEvidence.validationStage : '',
     reportRevisitLongTermPortraitRelease: reportState.reportRevisitEvidence ? reportState.reportRevisitEvidence.longTermPortraitRelease : '',
     reportRevisitNextDayCount: reportState.reportRevisitEvidence ? Number(reportState.reportRevisitEvidence.nextDayRevisitCount || 0) : 0,
