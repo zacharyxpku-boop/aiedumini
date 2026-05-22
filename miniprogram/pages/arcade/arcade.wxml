@@ -738,6 +738,17 @@
           <view class="retention-loop-step">{{highFrequencyPracticeLoop.dailyMemorySeasonPlan.sharePayload.receiverRule}}</view>
           <view class="retention-loop-step">{{highFrequencyPracticeLoop.dailyMemorySeasonPlan.aiBoundary}}</view>
         </view>
+        <view class="high-frequency-section" wx:if="{{highFrequencyPracticeLoop.healthyCommercialReturnGuard}}">
+          <view class="high-frequency-label">{{highFrequencyPracticeLoop.healthyCommercialReturnGuard.title}}</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.healthyCommercialReturnGuard.parentDecisionLine}}</view>
+          <view class="retention-loop-step" wx:for="{{highFrequencyPracticeLoop.healthyCommercialReturnGuard.stopRules}}" wx:key="*this">停止条件：{{item}}</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.healthyCommercialReturnGuard.serviceHandoffLine}}</view>
+          <view class="high-frequency-item" wx:for="{{highFrequencyPracticeLoop.healthyCommercialReturnGuard.actionCards}}" wx:key="id">
+            <text>{{item.label}}</text>
+            <text>放行：{{item.releaseGate}}</text>
+          </view>
+          <view class="retention-loop-step">禁止奖励：{{highFrequencyPracticeLoop.healthyCommercialReturnGuard.blockedRewards.length}} 项</view>
+        </view>
         <view class="retention-loop-foot">{{highFrequencyPracticeLoop.parentShareLine}}</view>
       </view>
       <view class="next-action-card" wx:if="{{challengeBrief.resultLine}}">

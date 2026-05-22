@@ -2589,6 +2589,39 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
     result,
     { weakKey }
   );
+  const healthyCommercialReturnGuard = {
+    id: 'healthy_commercial_return_guard',
+    title: '健康回访与服务边界',
+    parentDecisionLine: hasRealRecallSource
+      ? `今天只回「${weakKey}」这一条证据：孩子能说第一步、能命名错因、能约定明天回访，就收口。`
+      : '没有真实回忆卡时，只补作业或错题证据，不开放 XP、分享或 90 秒回忆。',
+    stopRules: [
+      '同一错因连续卡住 2 次，停止加题，转第一步小黑板或苏格拉底点拨。',
+      '单次回忆不超过 10 分钟；超过后只记录家长观察，不继续刷题。',
+      '不使用排名、速度、分数刺激回访；只看第一步、错因、次日回访和第 7 天迁移。'
+    ],
+    serviceHandoffLine: '连续 7 天证据齐全后，才允许整理顾问复盘或服务包建议；复盘只判断保留、降级或更换方法，不承诺结果。',
+    actionCards: [
+      {
+        id: 'return_today',
+        label: hasRealRecallSource ? '做今日回访' : '先补真实卡',
+        route: hasRealRecallSource ? dailyPrimaryRecallAction.route : '/pages/upload/upload?from=healthy_return_guard&type=wrong_question_paper',
+        releaseGate: hasRealRecallSource ? 'student_first_step_and_wrong_cause_named' : 'real_recall_source_required'
+      },
+      {
+        id: 'day7_service_review',
+        label: '第 7 天再复盘',
+        route: '/pages/profile/profile?from=healthy_return_guard',
+        releaseGate: 'day7_variant_and_parent_confirmation'
+      }
+    ],
+    blockedRewards: ['leaderboard', 'speed_ranking', 'raw_volume', 'score_pressure', 'infinite_return_trigger'],
+    localAiBoundary: {
+      localCodeOwns: ['daily_cap', 'xp_gate', 'share_denylist', 'service_review_release_gate'],
+      aiMayHelp: ['parent_copy', 'child_friendly_prompt', 'wrong_cause_rewording'],
+      aiMustNotOwn: ['reward_release', 'ranking', 'service_upgrade_decision', 'guaranteed_result']
+    }
+  };
   return {
     title: needsRepair ? '高频修复循环' : '高频巩固循环',
     mode: needsRepair ? 'repair_recall' : 'mastery_recall',
@@ -2627,6 +2660,7 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
     healthyReturnHabitEngine,
     dailyPrimaryRecallAction,
     familyCoCreationReturnLoop,
+    healthyCommercialReturnGuard,
     hasRealRecallSource,
     greenWordClozeProtocol: gizmoLikeMemoryProtocol.greenWordClozeProtocol || null,
     nextDayReturnEvidence: dailyReturnContract.nextDayReturnEvidence || null,
@@ -2636,7 +2670,7 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
       : '连续 2 次说清第一步，才进入变式练习。',
     parentShareLine: `家长复盘只看：孩子能否自己说出「${weakKey}」的第一步。`,
     nextRoute: needsRepair ? '/pages/review/review' : '/pages/tutor/tutor',
-    evidenceRequired: ['active_recall_cards', 'spaced_review_plan', 'review_return_seed', 'spaced_recall_policy', 'wrong_cause_return', 'quest_cadence', 'memory_feedback_controller', 'recall_intensity_plan', 'wrong_cause_replay_deck', 'xp_feedback_policy', 'quest_arc_runway', 'gizmo_like_memory_protocol', 'green_word_cloze_protocol', 'socratic_quality_memory_bridge', 'question_bank_memory_bridge', 'question_bank_recall_workout', 'daily_memory_sprint_deck', 'adaptive_recall_scheduler', 'memory_risk_release_model', 'memory_comeback_loop', 'daily_memory_prescription', 'question_type_cluster_memory_protocol', 'peer_memory_relay_league', 'daily_memory_season_plan', 'micro_recall_prescription_engine', 'ninety_second_recall_combo_engine', 'ninety_second_playable_deck', 'real_homework_pressure_memory_prescription', 'daily_return_mission', 'daily_return_contract', 'healthy_return_habit_engine', 'daily_primary_recall_action', 'family_co_creation_return_loop', 'next_day_return_evidence', 'parent_share_line'],
+    evidenceRequired: ['active_recall_cards', 'spaced_review_plan', 'review_return_seed', 'spaced_recall_policy', 'wrong_cause_return', 'quest_cadence', 'memory_feedback_controller', 'recall_intensity_plan', 'wrong_cause_replay_deck', 'xp_feedback_policy', 'quest_arc_runway', 'gizmo_like_memory_protocol', 'green_word_cloze_protocol', 'socratic_quality_memory_bridge', 'question_bank_memory_bridge', 'question_bank_recall_workout', 'daily_memory_sprint_deck', 'adaptive_recall_scheduler', 'memory_risk_release_model', 'memory_comeback_loop', 'daily_memory_prescription', 'question_type_cluster_memory_protocol', 'peer_memory_relay_league', 'daily_memory_season_plan', 'micro_recall_prescription_engine', 'ninety_second_recall_combo_engine', 'ninety_second_playable_deck', 'real_homework_pressure_memory_prescription', 'daily_return_mission', 'daily_return_contract', 'healthy_return_habit_engine', 'daily_primary_recall_action', 'family_co_creation_return_loop', 'healthy_commercial_return_guard', 'next_day_return_evidence', 'parent_share_line'],
     weakKey
   };
 }
