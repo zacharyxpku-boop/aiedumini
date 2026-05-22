@@ -2340,6 +2340,11 @@ function rankMethodHypotheses(methodHypotheses = [], context = {}) {
 
 function buildUploadedMaterialDecisionDossier(input = {}, parts = {}, sourceEvidenceLedger = {}, reportEvidenceReleaseGate = {}, portraitConfidenceSystem = {}, servicePathway = {}) {
   const sources = Array.isArray(parts.reportSources) ? parts.reportSources : [];
+  const aiMaterialAnalysisContract = input.aiMaterialAnalysisContract || {};
+  const aiMaterialFallback = aiMaterialAnalysisContract && aiMaterialAnalysisContract.fallback
+    ? aiMaterialAnalysisContract.fallback
+    : {};
+  const aiAnalysisQualityGate = aiMaterialFallback.analysisQuality || input.aiAnalysisQuality || null;
   const lanes = Array.isArray(sourceEvidenceLedger.lanes) ? sourceEvidenceLedger.lanes : [];
   const laneById = lanes.reduce((acc, lane) => {
     acc[lane.id] = lane;
@@ -2540,6 +2545,29 @@ function buildUploadedMaterialDecisionDossier(input = {}, parts = {}, sourceEvid
       gate: '能迁移第一步，才把方法候选写入阶段画像。'
     }
   ];
+  const aiQualityValidationPlan = aiAnalysisQualityGate ? [
+    {
+      id: 'quality_first_step',
+      label: 'AI解析第一步核验',
+      status: aiAnalysisQualityGate.missingEvidence && aiAnalysisQualityGate.missingEvidence.indexOf('first_step') >= 0 ? 'needs_child_evidence' : 'ready',
+      action: '让孩子先说出这一份材料对应的第一步，不进入完整答案。',
+      evidence: 'child_first_step'
+    },
+    {
+      id: 'quality_wrong_cause',
+      label: 'AI解析错因核验',
+      status: aiAnalysisQualityGate.missingEvidence && aiAnalysisQualityGate.missingEvidence.indexOf('wrong_cause') >= 0 ? 'needs_wrong_cause' : 'ready',
+      action: '只命名一个错因候选，再用一道真实错题验证。',
+      evidence: 'wrong_cause_named'
+    },
+    {
+      id: 'quality_revisit',
+      label: 'AI解析隔天回访',
+      status: aiAnalysisQualityGate.status === 'draft_can_enter_local_execution' ? 'scheduled' : 'fallback_required',
+      action: '明天只回访同一个第一步和错因，仍不释放长期结论。',
+      evidence: 'next_day_revisit'
+    }
+  ] : [];
   const familyDecisionCalendar = buildFamilyDecisionCalendar(input, methodCandidateCards, wrongPaperDiagnosisCards, reportEvidenceReleaseGate);
   const personalizedLearningSolutionBlueprint = buildPersonalizedLearningSolutionBlueprint(
     materialLanes,
@@ -2678,6 +2706,11 @@ function buildUploadedMaterialDecisionDossier(input = {}, parts = {}, sourceEvid
     methodCandidateCards,
     decisionHeatmap,
     familyActionStack,
+    aiAnalysisQualityGate,
+    aiQualityValidationPlan,
+    aiQualityLine: aiAnalysisQualityGate
+      ? `AI解析质量：${aiAnalysisQualityGate.status || 'pending'}，分数 ${Number(aiAnalysisQualityGate.score || 0)}，缺口 ${(aiAnalysisQualityGate.missingEvidence || []).join(' / ') || 'none'}`
+      : 'AI解析质量：等待上传材料分析或本地兜底。',
     familyDecisionCalendar,
     familyPrivateTutorSolutionPack,
     personalizedLearningSolutionBlueprint,
@@ -2758,7 +2791,7 @@ function buildUploadedMaterialDecisionDossier(input = {}, parts = {}, sourceEvid
       reason: stage.releaseRule || stage.requiredEvidence || '按证据链验证方法候选，不贴标签。'
     }))),
     collectedSourceIds: collectedLanes.map((lane) => lane.id),
-    evidenceRequired: ['source_type', 'method_candidate', 'child_first_step', 'wrong_cause_card', 'next_day_revisit', 'day7_variant_result', 'safe_share_fields']
+    evidenceRequired: ['source_type', 'method_candidate', 'child_first_step', 'wrong_cause_card', 'next_day_revisit', 'day7_variant_result', 'safe_share_fields', 'ai_analysis_quality_gate']
   };
 }
 
@@ -2980,6 +3013,7 @@ function buildCommercialFamilySolutionBook(input = {}) {
       endpointPath: aiMaterialAnalysisContract.endpointPath || '',
       releaseGates: Array.isArray(aiMaterialAnalysisContract.releaseGates) ? aiMaterialAnalysisContract.releaseGates.slice(0, 6) : [],
       fallbackStatus: aiMaterialFallback.status || '',
+      analysisQuality: aiMaterialFallback.analysisQuality || null,
       normalizedSolution: {
         subject: aiMaterialFallback.subject || 'unknown',
         wrongCause: aiMaterialFallback.wrongCause || 'wrong-cause candidate needs evidence',

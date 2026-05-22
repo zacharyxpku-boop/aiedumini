@@ -2332,6 +2332,9 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     uploadedMaterialDecisionDossierMethodCandidateCards: Array.isArray(uploadedMaterialDecisionDossier.methodCandidateCards) ? uploadedMaterialDecisionDossier.methodCandidateCards : [],
     uploadedMaterialDecisionDossierDecisionHeatmap: Array.isArray(uploadedMaterialDecisionDossier.decisionHeatmap) ? uploadedMaterialDecisionDossier.decisionHeatmap : [],
     uploadedMaterialDecisionDossierFamilyActionStack: Array.isArray(uploadedMaterialDecisionDossier.familyActionStack) ? uploadedMaterialDecisionDossier.familyActionStack : [],
+    uploadedMaterialDecisionDossierAiQualityGate: uploadedMaterialDecisionDossier.aiAnalysisQualityGate || null,
+    uploadedMaterialDecisionDossierAiQualityLine: uploadedMaterialDecisionDossier.aiQualityLine || '',
+    uploadedMaterialDecisionDossierAiQualityPlan: Array.isArray(uploadedMaterialDecisionDossier.aiQualityValidationPlan) ? uploadedMaterialDecisionDossier.aiQualityValidationPlan : [],
     uploadedMaterialDecisionDossierPrivateTutorSolutionPack: uploadedMaterialDecisionDossier.familyPrivateTutorSolutionPack || null,
     uploadedMaterialDecisionDossierPrivateTutorModeOrchestration: uploadedMaterialDecisionDossier.familyPrivateTutorSolutionPack && Array.isArray(uploadedMaterialDecisionDossier.familyPrivateTutorSolutionPack.modeOrchestration)
       ? uploadedMaterialDecisionDossier.familyPrivateTutorSolutionPack.modeOrchestration

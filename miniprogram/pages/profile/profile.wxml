@@ -137,6 +137,11 @@
               <text class="parent-brief-label">家庭行动栈</text>
               <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierFamilyActionStack}}" wx:key="id">{{item.label}}｜{{item.action}}｜门槛：{{item.gate}}</text>
             </view>
+            <view class="parent-brief-block" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierAiQualityGate}}">
+              <text class="parent-brief-label">AI解析质量门控</text>
+              <text>{{learningReportSummary.uploadedMaterialDecisionDossierAiQualityLine}}</text>
+              <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierAiQualityPlan}}" wx:key="id">{{item.label}}｜{{item.status}}｜{{item.action}}｜证据：{{item.evidence}}</text>
+            </view>
             <view class="parent-brief-block" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierPrivateTutorSolutionPack}}">
               <text class="parent-brief-label">家庭私教方案｜{{learningReportSummary.uploadedMaterialDecisionDossierPrivateTutorSolutionPack.title}}</text>
               <text>{{learningReportSummary.uploadedMaterialDecisionDossierPrivateTutorSolutionPack.positioning}}</text>
@@ -1331,6 +1336,8 @@
           <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierHowToLearnBetter}}" wx:key="id">怎么学候选：{{item.label}}｜证据：{{item.evidence}}｜验证：{{item.verifyWith}}</text>
           <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierDecisionHeatmap}}" wx:key="id">决策热区：{{item.label}}｜{{item.status}}｜{{item.nextAction}}</text>
           <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierFamilyActionStack}}" wx:key="id">家庭行动：{{item.label}}｜{{item.action}}｜{{item.gate}}</text>
+          <text wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierAiQualityGate}}">AI解析质量：{{learningReportSummary.uploadedMaterialDecisionDossierAiQualityLine}}</text>
+          <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierAiQualityPlan}}" wx:key="id">质量核验：{{item.label}}｜{{item.status}}｜{{item.evidence}}</text>
           <text wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierSolutionBlueprint}}">个性化学习方案：{{learningReportSummary.uploadedMaterialDecisionDossierSolutionBlueprint.recommendedMode.label}}｜{{learningReportSummary.uploadedMaterialDecisionDossierSolutionBlueprint.recommendedMode.why}}</text>
           <text wx:for="{{learningReportSummary.uploadedMaterialDeliveryView.solutionCards}}" wx:key="id">方案流转：{{item.label}}｜{{item.triggerLine}}｜{{item.gateLine}}</text>
           <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierSolutionFusionRules}}" wx:key="id">材料融合：{{item.label}}｜{{item.useFor}}｜{{item.mustVerifyWith}}</text>
