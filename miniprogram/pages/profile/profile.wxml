@@ -141,7 +141,7 @@
               <text class="parent-brief-label">家庭私教方案｜{{learningReportSummary.uploadedMaterialDecisionDossierPrivateTutorSolutionPack.title}}</text>
               <text>{{learningReportSummary.uploadedMaterialDecisionDossierPrivateTutorSolutionPack.positioning}}</text>
               <text>{{learningReportSummary.uploadedMaterialDecisionDossierPrivateTutorSolutionPack.primaryPromise}}</text>
-              <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierPrivateTutorModeOrchestration}}" wx:key="id">{{item.label}}｜{{item.when}}｜门槛：{{item.localGate}}</text>
+              <text wx:for="{{learningReportSummary.uploadedMaterialDeliveryView.modeCards}}" wx:key="id">{{item.label}}｜{{item.whenLine}}｜{{item.gateLine}}</text>
               <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierPrivateTutorDeliveryLoop}}" wx:key="day">{{item.label}}｜{{item.action}}｜证据：{{item.evidence}}</text>
               <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierPrivateTutorMoatSignals}}" wx:key="*this">护城河：{{item}}</text>
             </view>
@@ -149,7 +149,7 @@
               <text class="parent-brief-label">个性化学习方案蓝图</text>
               <text>{{learningReportSummary.uploadedMaterialDecisionDossierSolutionBlueprint.recommendedMode.label}}：{{learningReportSummary.uploadedMaterialDecisionDossierSolutionBlueprint.recommendedMode.why}}</text>
               <text>{{learningReportSummary.uploadedMaterialDecisionDossierSolutionBlueprint.servicePathwayHint}}</text>
-              <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierSolutionModeSequence}}" wx:key="id">{{item.label}}｜触发：{{item.trigger}}｜本地门槛：{{item.localGate}}｜AI：{{item.aiRole}}</text>
+              <text wx:for="{{learningReportSummary.uploadedMaterialDeliveryView.solutionCards}}" wx:key="id">{{item.label}}｜{{item.triggerLine}}｜{{item.gateLine}}｜{{item.aiLine}}</text>
               <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierSolutionFusionRules}}" wx:key="id">{{item.label}}｜用于：{{item.useFor}}｜验证：{{item.mustVerifyWith}}</text>
               <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierSolutionOwnership}}" wx:key="id">{{item.label}}：{{item.reason}}</text>
             </view>
@@ -178,8 +178,8 @@
             <view class="parent-brief-reason" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierReleaseGate}}">放行门槛：{{learningReportSummary.uploadedMaterialDecisionDossierReleaseGate.status}}</view>
             <view class="parent-brief-block" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierMethodValidationStages.length}}">
               <text class="parent-brief-label">方法验证链</text>
-              <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierMethodValidationStages}}" wx:key="id">{{item.label}}｜{{item.owner}}｜{{item.unlocks}}</text>
-              <text wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierMethodValidationReleaseRule}}">放行规则：{{learningReportSummary.uploadedMaterialDecisionDossierMethodValidationReleaseRule}}</text>
+              <text wx:for="{{learningReportSummary.uploadedMaterialDeliveryView.methodValidationCards}}" wx:key="id">{{item.label}}｜{{item.ownerLine}}｜{{item.unlockLine}}</text>
+              <text wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierMethodValidationReleaseRule}}">{{learningReportSummary.uploadedMaterialDeliveryView.releaseLine}}</text>
               <text wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierMethodValidationNextAction}}">下一步：{{learningReportSummary.uploadedMaterialDecisionDossierMethodValidationNextAction}}</text>
             </view>
             <view class="profile-action-row" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierRouteActions.length}}">
@@ -1301,7 +1301,7 @@
           <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierDecisionHeatmap}}" wx:key="id">决策热区：{{item.label}}｜{{item.status}}｜{{item.nextAction}}</text>
           <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierFamilyActionStack}}" wx:key="id">家庭行动：{{item.label}}｜{{item.action}}｜{{item.gate}}</text>
           <text wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierSolutionBlueprint}}">个性化学习方案：{{learningReportSummary.uploadedMaterialDecisionDossierSolutionBlueprint.recommendedMode.label}}｜{{learningReportSummary.uploadedMaterialDecisionDossierSolutionBlueprint.recommendedMode.why}}</text>
-          <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierSolutionModeSequence}}" wx:key="id">方案流转：{{item.label}}｜{{item.trigger}}｜{{item.localGate}}</text>
+          <text wx:for="{{learningReportSummary.uploadedMaterialDeliveryView.solutionCards}}" wx:key="id">方案流转：{{item.label}}｜{{item.triggerLine}}｜{{item.gateLine}}</text>
           <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierSolutionFusionRules}}" wx:key="id">材料融合：{{item.label}}｜{{item.useFor}}｜{{item.mustVerifyWith}}</text>
           <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierSolutionOwnership}}" wx:key="id">AI/本地：{{item.label}}｜{{item.reason}}</text>
           <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierFamilyDecisionWeeks}}" wx:key="id">决策日历：{{item.label}}｜{{item.parentDecision}}｜{{item.releaseGate}}</text>
@@ -1309,21 +1309,21 @@
           <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierWrongPaperDiagnosisCards}}" wx:key="id">错题诊断：{{item.label}}｜{{item.rule}}｜{{item.nextAction}}</text>
           <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierDetailedSections}}" wx:key="id">详细章节：{{item.label}}｜{{item.status}}｜{{item.body}}</text>
           <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierParentDecisionSections}}" wx:key="id">报告章节：{{item.label}}｜{{item.body}}</text>
-          <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierAiLocalSplit}}" wx:key="id">AI/本地分工：{{item.label}}｜{{item.owns}}</text>
+          <text wx:for="{{learningReportSummary.uploadedMaterialDeliveryView.aiLocalCards}}" wx:key="id">AI/本地分工：{{item.label}}｜{{item.ownsLine}}｜{{item.boundaryLine}}</text>
           <text wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierReleaseGate}}">放行门槛：{{learningReportSummary.uploadedMaterialDecisionDossierReleaseGate.status}}</text>
           <text wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierShareSafePayload}}">分享安全：只带第一步、错因和回访动作，不带原题、完整结果、分数或比较信息。</text>
           <view class="parent-brief-block" wx:if="{{learningReportSummary.servicePathway}}">
             <text class="parent-brief-label">{{learningReportSummary.servicePathwayTitle}}</text>
             <text>路径状态：{{learningReportSummary.servicePathwayStatus}}｜{{learningReportSummary.servicePathwayNextAction}}</text>
-            <text wx:for="{{learningReportSummary.servicePathwayModes}}" wx:key="id">模式：{{item.label}}｜{{item.localGate}}</text>
+            <text wx:for="{{learningReportSummary.uploadedMaterialDeliveryView.serviceModeCards}}" wx:key="id">模式：{{item.label}}｜{{item.actionLine}}｜{{item.gateLine}}</text>
             <text wx:if="{{learningReportSummary.servicePathwayModeChoiceProtocol}}">家庭模式选择：{{learningReportSummary.servicePathwayModeChoicePositioning}}</text>
             <text wx:for="{{learningReportSummary.servicePathwayModeChoiceCards}}" wx:key="id">路径卡：{{item.recommended ? '推荐' : '可选'}}｜{{item.label}}｜{{item.choiceRole}}｜{{item.childCanChoose ? '孩子可选' : item.lockReason}}</text>
             <text wx:for="{{learningReportSummary.servicePathwayModeChoiceGuardrails}}" wx:key="id">护栏：{{item.rule}}</text>
             <text wx:if="{{learningReportSummary.servicePathwayModeChoiceReleaseGate}}">模式放行：{{learningReportSummary.servicePathwayModeChoiceReleaseGate}}</text>
             <text wx:for="{{learningReportSummary.servicePathwayTiers}}" wx:key="id">服务：{{item.label}}｜{{item.entryGate}}</text>
             <text wx:for="{{learningReportSummary.servicePathwayValidationPlan}}" wx:key="day">7天验证：{{item.label}}｜{{item.action}}｜证据 {{item.evidence}}</text>
-            <text wx:for="{{learningReportSummary.servicePathwayAiLocalSplit}}" wx:key="id">AI/本地：{{item.label}}｜{{item.owns}}</text>
-            <text wx:if="{{learningReportSummary.servicePathwayReleaseGate}}">服务放行：{{learningReportSummary.servicePathwayReleaseGate}}</text>
+            <text wx:for="{{learningReportSummary.uploadedMaterialDeliveryView.aiLocalCards}}" wx:key="id">AI/本地：{{item.label}}｜{{item.ownsLine}}</text>
+            <text wx:if="{{learningReportSummary.servicePathwayReleaseGate}}">{{learningReportSummary.uploadedMaterialDeliveryView.releaseLine}}</text>
             <text wx:if="{{learningReportSummary.servicePathwayMoatLine}}">{{learningReportSummary.servicePathwayMoatLine}}</text>
           </view>
           <view class="parent-brief-block" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierHandoff}}">

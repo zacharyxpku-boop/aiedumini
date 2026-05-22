@@ -133,6 +133,94 @@ function safeNumber(value, fallback = 0) {
   return Number.isFinite(number) ? number : fallback;
 }
 
+function profileReadableGate(raw = '') {
+  const value = String(raw || '');
+  if (!value) return '放行门槛：先补真实学习证据。';
+  if (/real|homework|wrong|task|错题|作业/.test(value)) return '放行门槛：必须有真实作业或错题证据。';
+  if (/day.?7|7/.test(value)) return '放行门槛：必须完成第 7 天小变式验证。';
+  if (/parent|confirm|家长/.test(value)) return '放行门槛：家长确认范围后再进入交付。';
+  if (/answer|solution|score|ranking|talent/.test(value)) return '放行门槛：不放答案、分数、排名或天赋标签。';
+  return `放行门槛：${value}`;
+}
+
+function profileReadableOwner(raw = '') {
+  const value = String(raw || '');
+  if (!value) return '负责方：家庭和本地规则共同确认。';
+  if (/ai/i.test(value)) return '负责方：AI 只负责表达、追问和总结。';
+  if (/local|rule|code|本地|规则/.test(value)) return '负责方：本地规则负责安全、证据和放行。';
+  if (/parent|family|家长|家庭/.test(value)) return '负责方：家长只确认范围和观察证据。';
+  return `负责方：${value}`;
+}
+
+function profileListLine(label, values = []) {
+  const list = Array.isArray(values) ? values : [values];
+  const text = list.map((item) => String(item || '').trim()).filter(Boolean).join('、');
+  return `${label}：${text || '按当前报告补齐后显示。'}`;
+}
+
+function buildProfileDossierDeliveryView(dossier = {}, servicePathway = {}) {
+  const modeOrchestration = dossier.familyPrivateTutorSolutionPack && Array.isArray(dossier.familyPrivateTutorSolutionPack.modeOrchestration)
+    ? dossier.familyPrivateTutorSolutionPack.modeOrchestration
+    : [];
+  const solutionSequence = dossier.personalizedLearningSolutionBlueprint && Array.isArray(dossier.personalizedLearningSolutionBlueprint.modeSequence)
+    ? dossier.personalizedLearningSolutionBlueprint.modeSequence
+    : [];
+  const serviceModes = servicePathway && Array.isArray(servicePathway.modeRecommendations)
+    ? servicePathway.modeRecommendations
+    : [];
+  const aiLocalSplit = Array.isArray(dossier.aiLocalSplit)
+    ? dossier.aiLocalSplit
+    : [];
+  const serviceAiLocalSplit = servicePathway && Array.isArray(servicePathway.aiLocalDeliverySplit)
+    ? servicePathway.aiLocalDeliverySplit
+    : [];
+  return {
+    id: 'profile_uploaded_material_delivery_view',
+    modeCards: modeOrchestration.map((item, index) => ({
+      id: item.id || `private_mode_${index + 1}`,
+      label: item.label || '学习模式',
+      whenLine: item.when || item.trigger || '有真实学习证据时使用。',
+      gateLine: profileReadableGate(item.localGate),
+      boundaryLine: '边界：默认仍是一对一苏格拉底点拨，小课堂和游戏只做补位。'
+    })),
+    solutionCards: solutionSequence.map((item, index) => ({
+      id: item.id || `solution_mode_${index + 1}`,
+      label: item.label || '方案步骤',
+      triggerLine: item.trigger || '根据当前材料选择下一步。',
+      gateLine: profileReadableGate(item.localGate),
+      aiLine: item.aiRole ? `AI 辅助：${item.aiRole}` : 'AI 辅助：改写成孩子和家长能执行的话。'
+    })),
+    methodValidationCards: (Array.isArray(dossier.methodValidationStages) ? dossier.methodValidationStages : []).map((item, index) => ({
+      id: item.id || `method_validation_${index + 1}`,
+      label: item.label || '方法验证',
+      ownerLine: profileReadableOwner(item.owner),
+      unlockLine: item.unlocks ? `通过后解锁：${item.unlocks}` : '通过后解锁：下一次回访或服务建议。'
+    })),
+    aiLocalCards: aiLocalSplit.concat(serviceAiLocalSplit).map((item, index) => ({
+      id: item.id || `ai_local_${index + 1}`,
+      label: item.label || 'AI/规则分工',
+      ownsLine: profileListLine('负责内容', item.owns),
+      boundaryLine: '边界：AI 不决定答案、奖励、标签、隐私和商业放行。'
+    })),
+    serviceModeCards: serviceModes.map((item, index) => ({
+      id: item.id || `service_mode_${index + 1}`,
+      label: item.label || '服务模式',
+      actionLine: item.action || '先完成一个低压动作。',
+      gateLine: profileReadableGate(item.localGate),
+      entryLine: item.route && item.route.indexOf('/pages/tutor/') >= 0
+        ? '进入方式：回到一对一点拨。'
+        : item.route && item.route.indexOf('/pages/review/') >= 0
+          ? '进入方式：回到错因复盘。'
+          : '进入方式：从当前报告继续。'
+    })),
+    releaseLine: profileReadableGate(
+      dossier.methodValidationReleaseRule
+      || (dossier.releaseGate && dossier.releaseGate.status)
+      || (servicePathway && servicePathway.safetyBoundary && servicePathway.safetyBoundary.releaseGate)
+    )
+  };
+}
+
 function visibleLearningState() {
   return storage.loadState();
 }
@@ -1614,6 +1702,7 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     label: '家长观察',
     route: '/pages/upload/upload?from=openmaic_k12_workbench&type=parent_report'
   });
+  const uploadedMaterialDeliveryView = buildProfileDossierDeliveryView(uploadedMaterialDecisionDossier, servicePathway);
   return {
     title: draft.title || '学习画像',
     modeLabel: reportState.reportProgress && reportState.reportProgress.label ? reportState.reportProgress.label : '0% · 快速版',
@@ -2054,6 +2143,7 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     partnerWorkbenchRevenueMilestones: partnerWorkbench && Array.isArray(partnerWorkbench.revenueMilestones) ? partnerWorkbench.revenueMilestones : [],
     partnerWorkbenchRevenueDisplayRows: partnerWorkbench && Array.isArray(partnerWorkbench.revenueMilestones) ? formatRevenueMilestones(partnerWorkbench.revenueMilestones) : [],
     partnerWorkbenchPrivacyGate: partnerWorkbench ? partnerWorkbench.privacyGate : null,
+    uploadedMaterialDeliveryView,
     uploadedMaterialDecisionDossier,
     uploadedMaterialDecisionDossierHandoff: uploadedMaterialReportHandoff || null,
     uploadedMaterialDecisionDossierHandoffTitle: uploadedMaterialReportHandoff && uploadedMaterialReportHandoff.title ? uploadedMaterialReportHandoff.title : '',
