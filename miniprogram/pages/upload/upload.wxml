@@ -331,42 +331,49 @@
             <view class="intake-packet-boundary" wx:if="{{lastReportCta.parentConfirmation}}">{{lastReportCta.parentConfirmation.evidenceLine}}</view>
             <button class="material-import" wx:if="{{lastReportCta.needsParentConfirmation}}" bindtap="confirmReportParentConsent">家长确认交付范围</button>
           </view>
-          <view class="intake-action-queue" wx:if="{{lastReportCta.servicePathway.quickAssessmentBridge}}">
+          <view class="intake-action-queue" wx:if="{{lastReportCta.quickAssessmentBridgeView}}">
             <view class="intake-action-title">没有现成测评时</view>
             <view class="intake-action-item">
               <view class="intake-action-main">
-                <text>{{lastReportCta.servicePathway.quickAssessmentBridge.label}}</text>
-                <text>{{lastReportCta.servicePathway.quickAssessmentBridge.useWhen}}</text>
+                <text>{{lastReportCta.quickAssessmentBridgeView.label}}</text>
+                <text>{{lastReportCta.quickAssessmentBridgeView.useWhenLine}}</text>
               </view>
               <view class="intake-action-meta">
-                <text>{{lastReportCta.servicePathway.quickAssessmentBridge.releaseRule}}</text>
-                <text>{{lastReportCta.servicePathway.quickAssessmentBridge.route}}</text>
+                <text>{{lastReportCta.quickAssessmentBridgeView.gateLine}}</text>
+                <text>{{lastReportCta.quickAssessmentBridgeView.entryLine}}</text>
+                <text>{{lastReportCta.quickAssessmentBridgeView.evidenceLine}}</text>
+                <text>{{lastReportCta.quickAssessmentBridgeView.boundaryLine}}</text>
               </view>
             </view>
           </view>
-          <view class="intake-action-queue" wx:if="{{lastReportCta.servicePathway.aiLocalDeliverySplit.length}}">
-            <view class="intake-action-title">AI / 本地分工</view>
-            <view class="intake-action-item" wx:for="{{lastReportCta.servicePathway.aiLocalDeliverySplit}}" wx:key="id">
+          <view class="intake-action-queue" wx:if="{{lastReportCta.aiLocalDeliveryView.cards.length}}">
+            <view class="intake-action-title">{{lastReportCta.aiLocalDeliveryView.title}}</view>
+            <view class="intake-packet-boundary">{{lastReportCta.aiLocalDeliveryView.summaryLine}}</view>
+            <view class="intake-action-item" wx:for="{{lastReportCta.aiLocalDeliveryView.cards}}" wx:key="id">
               <view class="intake-action-main">
                 <text>{{item.label}}</text>
-                <text>{{item.reason}}</text>
+                <text>{{item.reasonLine}}</text>
               </view>
               <view class="intake-action-meta">
-                <text>{{item.owns}}</text>
+                <text>{{item.ownsLine}}</text>
+                <text>{{item.familyLine}}</text>
+                <text>{{item.boundaryLine}}</text>
               </view>
             </view>
           </view>
-          <view class="intake-action-queue" wx:if="{{lastReportCta.servicePathway.publicK12BorrowPlaybook.length}}">
-            <view class="intake-action-title">公开资料借力表</view>
-            <view class="intake-action-item" wx:for="{{lastReportCta.servicePathway.publicK12BorrowPlaybook}}" wx:key="id">
+          <view class="intake-action-queue" wx:if="{{lastReportCta.publicK12BorrowView.cards.length}}">
+            <view class="intake-action-title">{{lastReportCta.publicK12BorrowView.title}}</view>
+            <view class="intake-packet-boundary">{{lastReportCta.publicK12BorrowView.summaryLine}}</view>
+            <view class="intake-action-item" wx:for="{{lastReportCta.publicK12BorrowView.cards}}" wx:key="id">
               <view class="intake-action-main">
                 <text>{{item.label}}</text>
-                <text>{{item.bestUse}}</text>
+                <text>{{item.bestUseLine}}</text>
               </view>
               <view class="intake-action-meta">
-                <text>本地守：{{item.localCodeOwns}}</text>
-                <text>AI 做：{{item.aiBetterFor}}</text>
-                <text>不做：{{item.mustNotUse}}</text>
+                <text>{{item.localGuardLine}}</text>
+                <text>{{item.aiUseLine}}</text>
+                <text>{{item.blockedLine}}</text>
+                <text>{{item.entryLine}}</text>
               </view>
             </view>
           </view>

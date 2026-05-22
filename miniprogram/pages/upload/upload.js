@@ -293,6 +293,89 @@ function buildUploadModeChoiceProtocolView(protocol = {}) {
   };
 }
 
+function uploadQuickAssessmentGateLine(releaseRule = '') {
+  const value = String(releaseRule || '');
+  if (value.indexOf('real_task') >= 0 || value.indexOf('day_7') >= 0) {
+    return '放行门槛：15 题只给方法候选；必须补真实错题，并完成第 7 天小变式验证。';
+  }
+  return '放行门槛：先补一条真实学习证据，再决定是否进入下一步。';
+}
+
+function uploadQuickAssessmentEntryLine(route = '') {
+  const value = String(route || '');
+  if (value.indexOf('/pages/upload/') >= 0) return '进入方式：回到资料入口补充观察、错题或学校反馈。';
+  if (value.indexOf('/pages/tutor/') >= 0) return '进入方式：回到一对一点拨，让孩子先说第一步。';
+  return '进入方式：从当前报告继续补齐证据。';
+}
+
+function buildUploadQuickAssessmentBridgeView(bridge = {}) {
+  if (!bridge || !bridge.id) return null;
+  return {
+    id: 'upload_quick_assessment_bridge_view',
+    title: '没有现成测评时',
+    label: bridge.label || '15 题快速了解学习偏好',
+    useWhenLine: bridge.useWhen || '当家长没有完整测评资料时，用短问题先形成方法候选。',
+    gateLine: uploadQuickAssessmentGateLine(bridge.releaseRule),
+    entryLine: uploadQuickAssessmentEntryLine(bridge.route),
+    evidenceLine: '需要补的证据：一条真实错题、一次孩子第一步、一条家长观察。',
+    boundaryLine: '边界：不贴天赋标签，不做长期定性，不把问卷结果当作提分承诺。'
+  };
+}
+
+function uploadReadableListLine(label, values = []) {
+  const list = Array.isArray(values) ? values : [values];
+  const text = list.map((item) => String(item || '').trim()).filter(Boolean).join('、');
+  return `${label}：${text || '按当前材料补齐后再显示。'}`;
+}
+
+function buildUploadAiLocalDeliveryView(split = []) {
+  const cards = (Array.isArray(split) ? split : []).map((item, index) => ({
+    id: item.id || `ai_local_${index + 1}`,
+    label: item.label || '交付边界',
+    reasonLine: item.reason || '这一步需要明确谁负责，避免把安全判断交给临场生成。',
+    ownsLine: uploadReadableListLine('负责内容', item.owns),
+    familyLine: item.id === 'ai_expression_layer'
+      ? '家长可期待：表达更自然、追问更贴近孩子，但不替孩子完成题目。'
+      : item.id === 'local_release_gate'
+        ? '家长可期待：隐私、放行、奖励和分享都先过规则闸门。'
+        : '家长可期待：AI 给方法候选，本地证据决定是否继续。',
+    boundaryLine: '边界：AI 不负责贴标签、放答案、发奖励或决定商业转化。'
+  }));
+  return {
+    id: 'upload_ai_local_delivery_readable_view',
+    title: 'AI / 规则分工',
+    summaryLine: 'AI 负责把话说清楚；本地规则负责安全、放行和证据闭环。',
+    cards
+  };
+}
+
+function uploadPublicAssetEntryLine(route = '') {
+  const value = String(route || '');
+  if (value.indexOf('/pages/tutor/') >= 0) return '进入方式：转成第一步点拨或小黑板。';
+  if (value.indexOf('/pages/profile/') >= 0) return '进入方式：沉淀到家长报告和复盘证据。';
+  if (value.indexOf('/pages/arcade/') >= 0) return '进入方式：转成主动回忆卡，不复制原题。';
+  if (value.indexOf('/pages/upload/') >= 0) return '进入方式：先补材料来源和家长确认。';
+  return '进入方式：先登记来源，再决定是否进入学习任务。';
+}
+
+function buildUploadPublicK12BorrowView(playbook = []) {
+  const cards = (Array.isArray(playbook) ? playbook : []).map((item, index) => ({
+    id: item.id || `public_asset_${index + 1}`,
+    label: item.label || '公开资料',
+    bestUseLine: `适合怎么借力：${item.bestUse || '只做结构参考，不直接复制内容。'}`,
+    localGuardLine: uploadReadableListLine('本地规则守住', item.localCodeOwns),
+    aiUseLine: uploadReadableListLine('AI 可辅助', item.aiBetterFor),
+    blockedLine: uploadReadableListLine('禁止做', item.mustNotUse),
+    entryLine: uploadPublicAssetEntryLine(item.route)
+  }));
+  return {
+    id: 'upload_public_k12_borrow_readable_view',
+    title: '公开资料借力边界',
+    summaryLine: '公开资料只借结构、题型和表达方式；不复制原文、不包装成自有题库、不输出整套答案。',
+    cards
+  };
+}
+
 function normalizeMaterialType(query = {}, fallback = 'class_notes') {
   const raw = safeQueryText(query.type || query.materialType || query.sourceSchemaId || query.source || '');
   const normalized = raw.replace(/^material_/, '');
@@ -1311,6 +1394,15 @@ Page({
     const modeChoiceProtocolView = buildUploadModeChoiceProtocolView(
       servicePathway && servicePathway.modeChoiceProtocol
     );
+    const aiLocalDeliveryView = buildUploadAiLocalDeliveryView(
+      servicePathway && servicePathway.aiLocalDeliverySplit
+    );
+    const publicK12BorrowView = buildUploadPublicK12BorrowView(
+      servicePathway && servicePathway.publicK12BorrowPlaybook
+    );
+    const quickAssessmentBridgeView = buildUploadQuickAssessmentBridgeView(
+      servicePathway && servicePathway.quickAssessmentBridge
+    );
     return {
       title: sourceSchemaId === 'talent_assessment'
         ? '方法候选已入证据账本'
@@ -1345,6 +1437,9 @@ Page({
       productTierView,
       modeRecommendationView,
       modeChoiceProtocolView,
+      aiLocalDeliveryView,
+      publicK12BorrowView,
+      quickAssessmentBridgeView,
       partnerDeliveryWorkbench: partnerWorkbench,
       uploadedMaterialDecisionDossier,
       needsParentConfirmation: servicePathway && servicePathway.partnerServiceDeliveryLedger
