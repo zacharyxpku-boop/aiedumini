@@ -111,6 +111,40 @@ function safeAiText(value, fallback) {
   return text || fallback;
 }
 
+function buildAiMaterialAnalysisQualityGate(candidate = {}, context = {}) {
+  const evidence = candidate.evidenceConfidence || candidate.evidence_confidence || {};
+  const blocked = Array.isArray(candidate.blockedClaims)
+    ? candidate.blockedClaims
+    : normalizeAiList(candidate.blocked_claims);
+  const required = normalizeAiList(evidence.requiredNextEvidence || evidence.required_next_evidence);
+  const hasSubject = !!String(candidate.subject || context.subject || '').trim();
+  const hasFirstStep = !!String(candidate.firstStep || candidate.first_step || context.firstStep || '').trim();
+  const hasWrongCause = !!String(candidate.wrongCause || candidate.wrong_cause || context.wrongCause || '').trim();
+  const confidenceLevel = String(evidence.level || '').toLowerCase();
+  const blocksRelease = blocked.length > 0 || !hasFirstStep || !hasWrongCause || confidenceLevel === 'low';
+  const missing = [];
+  if (!hasSubject) missing.push('subject');
+  if (!hasFirstStep) missing.push('first_step');
+  if (!hasWrongCause) missing.push('wrong_cause');
+  if (!required.length) missing.push('required_next_evidence');
+  if (confidenceLevel === 'low') missing.push('stronger_evidence');
+  return {
+    id: 'ai_material_analysis_quality_gate',
+    status: blocksRelease ? 'fallback_or_manual_confirm' : 'draft_can_enter_local_execution',
+    score: Math.max(0, Math.min(100,
+      (hasSubject ? 20 : 0)
+      + (hasFirstStep ? 25 : 0)
+      + (hasWrongCause ? 25 : 0)
+      + (required.length ? 15 : 0)
+      + (!blocked.length ? 15 : 0)
+    )),
+    missingEvidence: Array.from(new Set(missing)),
+    blockedClaims: blocked,
+    fallbackRoute: '/pages/tutor/tutor?from=ai_material_quality_fallback',
+    releaseRule: 'local code releases only first-step, wrong-cause, next-day revisit, and parent-confirmed actions'
+  };
+}
+
 function buildAiMaterialExecutionPath(raw = {}, sourceSchemaId = 'parent_report') {
   const path = raw.executionPath || raw.execution_path || {};
   const socraticRoute = sourceSchemaId === 'talent_assessment'
@@ -204,6 +238,13 @@ function sanitizeAiMaterialAnalysisResult(raw = {}, context = {}) {
     owner: safeAiText(nextAction.owner, 'ai_with_local_guardrail'),
     evidenceGate: safeAiText(nextAction.evidenceGate || nextAction.evidence_gate, 'parent_manual_confirmation')
   };
+  const qualityGate = buildAiMaterialAnalysisQualityGate({
+    subject: raw.subject || context.subject,
+    wrongCause,
+    firstStep,
+    evidenceConfidence,
+    blockedClaims: blockedClaimIds
+  }, context);
   return {
     id: 'sanitized_ai_material_analysis_result',
     status: blockedClaimIds.length ? 'sanitized_requires_manual_confirmation' : 'safe_draft_requires_manual_confirmation',
@@ -217,6 +258,7 @@ function sanitizeAiMaterialAnalysisResult(raw = {}, context = {}) {
       reason: safeAiText(evidenceConfidence.reason, 'structured evidence and parent confirmation are required before release'),
       requiredNextEvidence: normalizeAiList(evidenceConfidence.requiredNextEvidence || evidenceConfidence.required_next_evidence).slice(0, 4)
     },
+    analysisQuality: qualityGate,
     nextAction: normalizedNextAction,
     executionPath,
     studentProfileSignals: raw.student_profile_signals || {},
@@ -1060,6 +1102,7 @@ module.exports = {
   buildMethodValidationChallengeChain,
   buildAiReportDraftAdapter,
   buildAiMaterialAnalysisRequest,
+  buildAiMaterialAnalysisQualityGate,
   sanitizeAiMaterialAnalysisResult,
   buildAiMaterialAnalysisFallback,
   buildAiMaterialAnalysisContract,

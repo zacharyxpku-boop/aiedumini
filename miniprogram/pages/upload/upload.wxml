@@ -247,6 +247,7 @@
             <view class="intake-action-meta">
               <text>{{lastReportCta.aiMaterialSolutionView.learningPreferenceLine}}</text>
               <text>{{lastReportCta.aiMaterialSolutionView.confidenceLine}}</text>
+              <text>{{lastReportCta.aiMaterialSolutionView.qualityLine}}</text>
               <text>{{lastReportCta.aiMaterialSolutionView.nextActionLine}}</text>
               <text>{{lastReportCta.aiMaterialSolutionView.scoreLine}}</text>
               <text>{{lastReportCta.aiMaterialSolutionView.scoreUseLine}}</text>

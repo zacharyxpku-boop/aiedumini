@@ -309,6 +309,7 @@ function buildUploadContentCoverageReceipt(decisionSource = {}, evidenceSignals 
 function buildUploadAiMaterialSolutionView(contract = {}, sourceSchemaId = '', options = {}) {
   const fallback = contract && contract.fallback ? contract.fallback : {};
   const confidence = fallback.evidenceConfidence || {};
+  const analysisQuality = fallback.analysisQuality || {};
   const nextAction = fallback.nextAction || {};
   const executionPath = fallback.executionPath || {};
   const blockedClaims = Array.isArray(fallback.blockedClaims) ? fallback.blockedClaims : [];
@@ -330,6 +331,9 @@ function buildUploadAiMaterialSolutionView(contract = {}, sourceSchemaId = '', o
     firstStepLine: `first step: ${fallback.firstStep || 'ask the child to name the first step'}`,
     learningPreferenceLine: `method hypothesis: ${fallback.learningPreference || 'validate before practice'}`,
     confidenceLine: `evidence confidence: ${confidenceLevel}; ${confidence.reason || 'parent confirmation required'}`,
+    qualityLine: analysisQuality.status
+      ? `quality gate: ${analysisQuality.status}; score ${Number(analysisQuality.score || 0)}; missing ${(analysisQuality.missingEvidence || []).join(' / ') || 'none'}`
+      : 'quality gate: local fallback until server analysis is verified',
     nextActionLine: `next action: ${nextAction.label || fallback.firstStep || 'go to Socratic first step'}`,
     nextActionRoute: nextAction.route || executionPath.socraticRoute || '/pages/tutor/tutor?from=ai_material_analysis',
     scoreLine: scoreSignalView.subjectLine || 'confirmed subjects: none; score sheet not yet released',
