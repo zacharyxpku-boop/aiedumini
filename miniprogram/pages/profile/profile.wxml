@@ -159,6 +159,9 @@
               <text wx:for="{{learningReportSummary.uploadedMaterialServiceHandoffCards}}" wx:key="id">{{item.label}}｜{{item.line}}｜{{item.evidenceLine}}</text>
               <text>{{learningReportSummary.uploadedMaterialServiceHandoffReleaseLine}}</text>
               <text>{{learningReportSummary.uploadedMaterialServiceHandoffBlockedLine}}</text>
+              <view class="profile-action-row" wx:if="{{learningReportSummary.uploadedMaterialServiceHandoffActions.length}}">
+                <button class="profile-small-primary" wx:for="{{learningReportSummary.uploadedMaterialServiceHandoffActions}}" wx:key="id" data-id="{{item.id}}" data-label="{{item.label}}" data-route="{{item.route}}" data-reason="{{item.reason}}" bindtap="runUploadedMaterialDossierAction">{{item.label}}</button>
+              </view>
             </view>
             <view class="parent-brief-block" wx:if="{{learningReportSummary.reportRevisitEvidence}}">
               <text class="parent-brief-label">报告回访验证</text>

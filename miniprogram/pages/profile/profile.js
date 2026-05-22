@@ -178,6 +178,46 @@ function normalizeProfileServiceHandoffPack(pack = null) {
   };
 }
 
+function buildProfileServiceHandoffActions(pack = null, servicePathway = null, handoff = null) {
+  if (!pack) return [];
+  const validationPlan = servicePathway && Array.isArray(servicePathway.validationPlan)
+    ? servicePathway.validationPlan
+    : [];
+  const hasDay7Plan = validationPlan.some((item) => Number(item.day || 0) >= 7 || /7|小变式|迁移/.test(`${item.label || ''}${item.action || ''}${item.evidence || ''}`));
+  const actionRoute = handoff && handoff.actionRoute
+    ? handoff.actionRoute
+    : '/pages/tutor/tutor?from=profile_service_handoff';
+  const actions = [
+    {
+      id: 'service_handoff_tonight',
+      label: '今晚先做一步',
+      route: actionRoute,
+      reason: '把交付包落到孩子今晚能说出的第一步。'
+    },
+    {
+      id: 'service_handoff_day7',
+      label: hasDay7Plan ? '进入 7 天验证' : '先补验证证据',
+      route: '/pages/review/review?from=profile_service_handoff&stage=day7',
+      reason: hasDay7Plan
+        ? '用隔天回访和第 7 天小变式验证方法是否真的适合。'
+        : '先补真实错题、回访和小变式，再进入长期画像。'
+    },
+    {
+      id: 'service_handoff_parent_confirm',
+      label: '补家长确认',
+      route: '/pages/upload/upload?from=profile_service_handoff&type=parent_report',
+      reason: '合作交付前先确认范围，只交付行动、问题和下一条证据。'
+    }
+  ];
+  const seen = {};
+  return actions.filter((item) => {
+    const key = `${item.id}:${item.route}`;
+    if (seen[key]) return false;
+    seen[key] = true;
+    return true;
+  });
+}
+
 function buildProfileDossierDeliveryView(dossier = {}, servicePathway = {}) {
   const modeOrchestration = dossier.familyPrivateTutorSolutionPack && Array.isArray(dossier.familyPrivateTutorSolutionPack.modeOrchestration)
     ? dossier.familyPrivateTutorSolutionPack.modeOrchestration
@@ -1453,6 +1493,11 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     || (uploadedMaterialReportHandoff && uploadedMaterialReportHandoff.serviceHandoffPack)
     || null
   );
+  const uploadedMaterialServiceHandoffActions = buildProfileServiceHandoffActions(
+    uploadedMaterialServiceHandoffPack,
+    servicePathway,
+    uploadedMaterialReportHandoff
+  );
   const parentDecisionBook = reportState.parentDecisionBook || draft.parentDecisionBook || {};
   const matrix = Array.isArray(draft.diagnosisMatrix) ? draft.diagnosisMatrix : [];
   const tendencies = Array.isArray(draft.capabilityTendencies) ? draft.capabilityTendencies : [];
@@ -2177,6 +2222,7 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     uploadedMaterialServiceHandoffCards: uploadedMaterialServiceHandoffPack ? uploadedMaterialServiceHandoffPack.cards : [],
     uploadedMaterialServiceHandoffReleaseLine: uploadedMaterialServiceHandoffPack ? uploadedMaterialServiceHandoffPack.releaseLine : '',
     uploadedMaterialServiceHandoffBlockedLine: uploadedMaterialServiceHandoffPack ? uploadedMaterialServiceHandoffPack.blockedLine : '',
+    uploadedMaterialServiceHandoffActions,
     uploadedMaterialDecisionDossier,
     uploadedMaterialDecisionDossierHandoff: uploadedMaterialReportHandoff || null,
     uploadedMaterialDecisionDossierHandoffTitle: uploadedMaterialReportHandoff && uploadedMaterialReportHandoff.title ? uploadedMaterialReportHandoff.title : '',
