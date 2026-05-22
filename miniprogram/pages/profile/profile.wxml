@@ -193,7 +193,7 @@
           <view class="family-summary-body family-readable">
             <view class="parent-brief-block">
               <text class="parent-brief-label">交付状态</text>
-              <text>{{learningReportSummary.partnerWorkbenchStatus}}</text>
+              <text>{{learningReportSummary.partnerWorkbenchStatusLine}}</text>
               <text wx:if="{{learningReportSummary.partnerWorkbenchChildRecord}}">孩子档案：{{learningReportSummary.partnerWorkbenchChildRecord.id}}｜{{learningReportSummary.partnerWorkbenchChildRecord.gradeBand}}｜{{learningReportSummary.partnerWorkbenchChildRecord.evidenceStage}}</text>
               <text>{{learningReportSummary.partnerWorkbenchNextAction}}</text>
             </view>
@@ -211,19 +211,19 @@
             </view>
             <view class="parent-brief-block" wx:if="{{learningReportSummary.partnerWorkbenchCrmExport}}">
               <text class="parent-brief-label">CRM 安全字段</text>
-              <text>允许：{{learningReportSummary.partnerWorkbenchCrmExport.allowedFields}}</text>
-              <text>禁止：{{learningReportSummary.partnerWorkbenchCrmExport.blockedFields}}</text>
+              <text>允许：{{learningReportSummary.partnerWorkbenchCrmAllowedLine}}</text>
+              <text>禁止：{{learningReportSummary.partnerWorkbenchCrmBlockedLine}}</text>
             </view>
             <view class="parent-brief-block" wx:if="{{learningReportSummary.partnerWorkbenchPilotReadiness}}">
               <text class="parent-brief-label">试点就绪 {{learningReportSummary.partnerWorkbenchPilotReadiness.score}}%</text>
-              <text>{{learningReportSummary.partnerWorkbenchPilotReadiness.status}}</text>
-              <text wx:for="{{learningReportSummary.partnerWorkbenchPilotRows}}" wx:key="id">{{item.label}}｜{{item.ready ? '已就绪' : '待补证据'}}｜{{item.nextAction}}</text>
+              <text>{{learningReportSummary.partnerWorkbenchPilotStatusLine}}</text>
+              <text wx:for="{{learningReportSummary.partnerWorkbenchPilotDisplayRows}}" wx:key="id">{{item.label}}｜{{item.readyText}}｜{{item.nextAction}}</text>
               <text>{{learningReportSummary.partnerWorkbenchPilotReadiness.operatorScript}}</text>
               <text>{{learningReportSummary.partnerWorkbenchPilotReadiness.stopRule}}</text>
             </view>
-            <view class="parent-brief-block" wx:if="{{learningReportSummary.partnerWorkbenchRevenueMilestones.length}}">
+            <view class="parent-brief-block" wx:if="{{learningReportSummary.partnerWorkbenchRevenueDisplayRows.length}}">
               <text class="parent-brief-label">服务包节点</text>
-              <text wx:for="{{learningReportSummary.partnerWorkbenchRevenueMilestones}}" wx:key="id">{{item.id}}｜{{item.allowed ? '可进入' : '未放行'}}｜{{item.gate}}</text>
+              <text wx:for="{{learningReportSummary.partnerWorkbenchRevenueDisplayRows}}" wx:key="id">{{item.label}}｜{{item.statusText}}｜{{item.gate}}</text>
             </view>
             <view class="parent-brief-reason" wx:if="{{learningReportSummary.partnerWorkbenchPrivacyGate}}">合作方只看脱敏交付视图；原题、照片、完整对话、敏感比较信息、天赋标签不出本机/服务端安全域。</view>
           </view>

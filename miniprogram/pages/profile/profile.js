@@ -1216,6 +1216,84 @@ function buildTonightParentDecisionCard(input = {}) {
   };
 }
 
+function partnerStatusLine(status) {
+  const map = {
+    needs_real_task_evidence: '待补真实作业证据：只可解释报告，不进入服务交付。',
+    needs_parent_confirmation: '待家长确认：已有证据，但合作交付前必须确认范围。',
+    ready_for_guarded_delivery: '可进入受保护交付：只交付行动、问题和下一条证据。'
+  };
+  return map[status] || '待确认交付状态：先补证据和家长确认。';
+}
+
+function partnerFieldLabel(field) {
+  const map = {
+    child_code: '匿名孩子编号',
+    grade_band: '学段',
+    evidence_stage: '证据阶段',
+    primary_mode: '建议学习模式',
+    primary_package: '服务包候选',
+    next_action: '下一步动作',
+    parent_confirmation_status: '家长确认状态',
+    followup_due_day: '回访日',
+    full_answer: '完整答案',
+    full_solution: '完整解法',
+    original_question: '原题',
+    raw_text: '原始材料',
+    photo: '照片',
+    score_ranking: '分数/排名解释',
+    talent_label: '天赋定性标签',
+    guaranteed_result: '提分或结果承诺',
+    child_name: '孩子姓名',
+    parent_phone: '家长手机号',
+    parent_wechat: '家长微信',
+    contact_info: '联系方式'
+  };
+  return map[field] || String(field || '').replace(/_/g, ' ');
+}
+
+function formatPartnerFieldList(fields = []) {
+  return (Array.isArray(fields) ? fields : [])
+    .map(partnerFieldLabel)
+    .filter(Boolean)
+    .join('、');
+}
+
+function pilotStatusLine(checklist = {}) {
+  if (!checklist) return '';
+  if (checklist.status === 'ready_for_partner_pilot') return '试点就绪：可以从一个7天家庭执行闭环开始。';
+  return '试点待补证据：先补材料、真实作业证据或家长确认。';
+}
+
+function formatPartnerPilotRows(rows = []) {
+  const labelMap = {
+    material_intake: '材料已接收',
+    real_task_evidence: '真实作业证据',
+    parent_confirmation: '家长确认',
+    safe_partner_view: '合作方安全视图',
+    executable_family_plan: '可执行家庭方案'
+  };
+  return (Array.isArray(rows) ? rows : []).map((item) => ({
+    id: item.id,
+    label: labelMap[item.id] || item.label || item.id,
+    readyText: item.ready ? '已就绪' : '待补证据',
+    nextAction: item.nextAction || ''
+  }));
+}
+
+function formatRevenueMilestones(rows = []) {
+  const labelMap = {
+    free_interpretation: '免费报告解读',
+    paid_7_day_execution: '7天陪跑服务',
+    course_or_counselor_upgrade: '课程/顾问升级'
+  };
+  return (Array.isArray(rows) ? rows : []).map((item) => ({
+    id: item.id,
+    label: labelMap[item.id] || item.id,
+    statusText: item.allowed ? '可进入' : '未放行',
+    gate: item.gate || ''
+  }));
+}
+
 function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, subjectSkillDepth, curriculumSpine, visualSocraticMatrix, courseUnitMap, latestThinkingReceipt = null) {
   const globalEvidenceBrief = storage.buildGlobalEvidenceBrief ? storage.buildGlobalEvidenceBrief() : null;
   const capabilityLedger = capabilityEvidenceLedger || (storage.buildCapabilityEvidenceLedger ? storage.buildCapabilityEvidenceLedger({ globalEvidenceBrief }) : null);
@@ -1956,17 +2034,25 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     partnerDeliveryWorkbench: partnerWorkbench,
     partnerWorkbenchTitle: partnerWorkbench ? '合作交付工作台' : '',
     partnerWorkbenchStatus: partnerWorkbench ? partnerWorkbench.status : '',
+    partnerWorkbenchStatusLine: partnerWorkbench ? partnerStatusLine(partnerWorkbench.status) : '',
     partnerWorkbenchNextAction: partnerWorkbench ? partnerWorkbench.nextBestAction : '',
     partnerWorkbenchChildRecord: partnerWorkbench ? partnerWorkbench.childRecord : null,
     partnerWorkbenchMaterialLedger: partnerWorkbench && Array.isArray(partnerWorkbench.materialLedger) ? partnerWorkbench.materialLedger : [],
     partnerWorkbenchSolutionPipeline: partnerWorkbench && Array.isArray(partnerWorkbench.solutionPipeline) ? partnerWorkbench.solutionPipeline : [],
     partnerWorkbenchAdvisorQueue: partnerWorkbench && Array.isArray(partnerWorkbench.advisorQueue) ? partnerWorkbench.advisorQueue : [],
     partnerWorkbenchCrmExport: partnerWorkbench ? partnerWorkbench.crmExport : null,
+    partnerWorkbenchCrmAllowedLine: partnerWorkbench && partnerWorkbench.crmExport ? formatPartnerFieldList(partnerWorkbench.crmExport.allowedFields) : '',
+    partnerWorkbenchCrmBlockedLine: partnerWorkbench && partnerWorkbench.crmExport ? formatPartnerFieldList(partnerWorkbench.crmExport.blockedFields) : '',
     partnerWorkbenchPilotReadiness: partnerWorkbench ? partnerWorkbench.pilotReadinessChecklist : null,
+    partnerWorkbenchPilotStatusLine: partnerWorkbench && partnerWorkbench.pilotReadinessChecklist ? pilotStatusLine(partnerWorkbench.pilotReadinessChecklist) : '',
     partnerWorkbenchPilotRows: partnerWorkbench && partnerWorkbench.pilotReadinessChecklist && Array.isArray(partnerWorkbench.pilotReadinessChecklist.rows)
       ? partnerWorkbench.pilotReadinessChecklist.rows
       : [],
+    partnerWorkbenchPilotDisplayRows: partnerWorkbench && partnerWorkbench.pilotReadinessChecklist && Array.isArray(partnerWorkbench.pilotReadinessChecklist.rows)
+      ? formatPartnerPilotRows(partnerWorkbench.pilotReadinessChecklist.rows)
+      : [],
     partnerWorkbenchRevenueMilestones: partnerWorkbench && Array.isArray(partnerWorkbench.revenueMilestones) ? partnerWorkbench.revenueMilestones : [],
+    partnerWorkbenchRevenueDisplayRows: partnerWorkbench && Array.isArray(partnerWorkbench.revenueMilestones) ? formatRevenueMilestones(partnerWorkbench.revenueMilestones) : [],
     partnerWorkbenchPrivacyGate: partnerWorkbench ? partnerWorkbench.privacyGate : null,
     uploadedMaterialDecisionDossier,
     uploadedMaterialDecisionDossierHandoff: uploadedMaterialReportHandoff || null,
