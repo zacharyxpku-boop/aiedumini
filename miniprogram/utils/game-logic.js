@@ -641,6 +641,82 @@ function buildFamilyCoCreationReturnLoop(healthyReturnHabitEngine = {}, dailyPri
   };
 }
 
+function buildDailyComebackDecisionEngine(healthyReturnHabitEngine = {}, familyCoCreationReturnLoop = {}, dailyPrimaryRecallAction = {}, result = {}, options = {}) {
+  const weakKey = options.weakKey || dailyPrimaryRecallAction.weakKey || 'first_step';
+  const hasRealRecallSource = dailyPrimaryRecallAction.status !== 'waiting_real_recall_source';
+  const wrong = Number(result.wrong || 0);
+  const accuracy = Number.isFinite(Number(result.accuracy)) ? Number(result.accuracy) : 0;
+  const rescue = healthyReturnHabitEngine.mode === 'rescue_first' || wrong > 0 || accuracy < Number(options.targetAccuracy || 80);
+  const loops = Array.isArray(healthyReturnHabitEngine.returnLoops) ? healthyReturnHabitEngine.returnLoops : [];
+  const story = Array.isArray(familyCoCreationReturnLoop.returnStory) ? familyCoCreationReturnLoop.returnStory : [];
+  const candidateCards = [
+    {
+      id: 'real_recall_source_gate',
+      label: 'Add one real recall source',
+      priority: hasRealRecallSource ? 4 : 1,
+      locked: hasRealRecallSource,
+      action: 'Add one real wrong-question or homework stuck point before XP, 90-second recall, or peer relay.',
+      route: '/pages/upload/upload?from=daily_comeback&type=wrong_question_paper',
+      proof: 'real_recall_source'
+    },
+    {
+      id: 'rescue_wrong_cause',
+      label: 'Rescue one wrong-cause card',
+      priority: rescue ? 1 : 3,
+      locked: !hasRealRecallSource,
+      action: `Repair one ${weakKey} card: first step, wrong cause, tomorrow revisit.`,
+      route: dailyPrimaryRecallAction.route || '/pages/review/review?from=daily_comeback',
+      proof: 'wrong_cause_named'
+    },
+    {
+      id: 'steady_first_step',
+      label: 'One steady first-step recall',
+      priority: rescue ? 3 : 1,
+      locked: !hasRealRecallSource,
+      action: `Recall one ${weakKey} first step and stop before fatigue.`,
+      route: (loops[0] && loops[0].route) || '/pages/review/review?from=daily_comeback',
+      proof: 'student_first_step'
+    },
+    {
+      id: 'family_receipt',
+      label: 'Parent 20-second receipt',
+      priority: 2,
+      locked: false,
+      action: (story[0] && story[0].parentAction) || 'Parent asks one first-step question, not a score question.',
+      route: '/pages/profile/profile?from=daily_comeback',
+      proof: 'parent_receipt'
+    }
+  ].sort((a, b) => a.priority - b.priority);
+  const primary = candidateCards.find((item) => !item.locked) || candidateCards[0];
+  return {
+    id: 'daily_comeback_decision_engine',
+    title: 'Daily comeback decision',
+    status: hasRealRecallSource ? 'ready' : 'waiting_real_recall_source',
+    mode: rescue ? 'rescue_first' : 'steady_return',
+    primaryCard: primary,
+    candidateCards,
+    decisionLine: primary
+      ? `Today return for: ${primary.label}.`
+      : 'Add real evidence before returning.',
+    stopRule: 'One comeback action per visit: stop after first-step, wrong-cause, next-day revisit, or parent receipt evidence.',
+    rewardGate: hasRealRecallSource
+      ? 'XP can release only after child-authored first step, wrong-cause naming, and revisit lock.'
+      : 'No XP, share, 90-second recall, or peer relay before a real recall source exists.',
+    parentLine: 'Parent sees the comeback reason and next proof, not ranking, speed, or raw volume.',
+    antiAddictionPolicy: {
+      onePrimaryCardOnly: true,
+      noInfiniteScroll: true,
+      noLeaderboard: true,
+      maxMinutes: rescue ? 8 : 6
+    },
+    localCodeOwns: ['primary_card_selection', 'daily_cap', 'reward_gate', 'blocked_fields', 'route'],
+    aiMayRewrite: ['child_copy', 'parent_copy'],
+    aiMustNotOwn: ['reward_release', 'ranking', 'service_upgrade', 'mastery_claim'],
+    blockedFields: ['original_question', 'full_answer', 'score', 'ranking', 'full_dialogue', 'raw_volume'],
+    evidenceRequired: ['daily_primary_card', 'real_recall_source_gate', 'reward_gate', 'anti_addiction_policy', 'parent_receipt']
+  };
+}
+
 function buildMemoryFeedbackController(cards = [], events = [], result = {}, retention = {}, options = {}) {
   const safeCards = Array.isArray(cards) ? cards : [];
   const safeEvents = Array.isArray(events) ? events : [];
@@ -2589,6 +2665,13 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
     result,
     { weakKey }
   );
+  const dailyComebackDecisionEngine = buildDailyComebackDecisionEngine(
+    healthyReturnHabitEngine,
+    familyCoCreationReturnLoop,
+    dailyPrimaryRecallAction,
+    result,
+    { weakKey, targetAccuracy: challenge.targetAccuracy || 80 }
+  );
   const healthyCommercialReturnGuard = {
     id: 'healthy_commercial_return_guard',
     title: '健康回访与服务边界',
@@ -2660,6 +2743,7 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
     healthyReturnHabitEngine,
     dailyPrimaryRecallAction,
     familyCoCreationReturnLoop,
+    dailyComebackDecisionEngine,
     healthyCommercialReturnGuard,
     hasRealRecallSource,
     greenWordClozeProtocol: gizmoLikeMemoryProtocol.greenWordClozeProtocol || null,
@@ -2670,7 +2754,7 @@ function buildHighFrequencyPracticeLoop(profile = {}, cards = [], events = [], r
       : '连续 2 次说清第一步，才进入变式练习。',
     parentShareLine: `家长复盘只看：孩子能否自己说出「${weakKey}」的第一步。`,
     nextRoute: needsRepair ? '/pages/review/review' : '/pages/tutor/tutor',
-    evidenceRequired: ['active_recall_cards', 'spaced_review_plan', 'review_return_seed', 'spaced_recall_policy', 'wrong_cause_return', 'quest_cadence', 'memory_feedback_controller', 'recall_intensity_plan', 'wrong_cause_replay_deck', 'xp_feedback_policy', 'quest_arc_runway', 'gizmo_like_memory_protocol', 'green_word_cloze_protocol', 'socratic_quality_memory_bridge', 'question_bank_memory_bridge', 'question_bank_recall_workout', 'daily_memory_sprint_deck', 'adaptive_recall_scheduler', 'memory_risk_release_model', 'memory_comeback_loop', 'daily_memory_prescription', 'question_type_cluster_memory_protocol', 'peer_memory_relay_league', 'daily_memory_season_plan', 'micro_recall_prescription_engine', 'ninety_second_recall_combo_engine', 'ninety_second_playable_deck', 'real_homework_pressure_memory_prescription', 'daily_return_mission', 'daily_return_contract', 'healthy_return_habit_engine', 'daily_primary_recall_action', 'family_co_creation_return_loop', 'healthy_commercial_return_guard', 'next_day_return_evidence', 'parent_share_line'],
+    evidenceRequired: ['active_recall_cards', 'spaced_review_plan', 'review_return_seed', 'spaced_recall_policy', 'wrong_cause_return', 'quest_cadence', 'memory_feedback_controller', 'recall_intensity_plan', 'wrong_cause_replay_deck', 'xp_feedback_policy', 'quest_arc_runway', 'gizmo_like_memory_protocol', 'green_word_cloze_protocol', 'socratic_quality_memory_bridge', 'question_bank_memory_bridge', 'question_bank_recall_workout', 'daily_memory_sprint_deck', 'adaptive_recall_scheduler', 'memory_risk_release_model', 'memory_comeback_loop', 'daily_memory_prescription', 'question_type_cluster_memory_protocol', 'peer_memory_relay_league', 'daily_memory_season_plan', 'micro_recall_prescription_engine', 'ninety_second_recall_combo_engine', 'ninety_second_playable_deck', 'real_homework_pressure_memory_prescription', 'daily_return_mission', 'daily_return_contract', 'healthy_return_habit_engine', 'daily_primary_recall_action', 'family_co_creation_return_loop', 'daily_comeback_decision_engine', 'healthy_commercial_return_guard', 'next_day_return_evidence', 'parent_share_line'],
     weakKey
   };
 }
@@ -2908,6 +2992,7 @@ module.exports = {
   buildDailyReturnContract,
   buildHealthyReturnHabitEngine,
   buildFamilyCoCreationReturnLoop,
+  buildDailyComebackDecisionEngine,
   buildQuestionTypeClusterMemoryProtocol,
   buildRealHomeworkPressureMemoryPrescription,
   buildMemoryFeedbackController,

@@ -738,6 +738,19 @@
           <view class="retention-loop-step">{{highFrequencyPracticeLoop.dailyMemorySeasonPlan.sharePayload.receiverRule}}</view>
           <view class="retention-loop-step">{{highFrequencyPracticeLoop.dailyMemorySeasonPlan.aiBoundary}}</view>
         </view>
+        <view class="high-frequency-section" wx:if="{{highFrequencyPracticeLoop.dailyComebackDecisionEngine}}">
+          <view class="high-frequency-label">{{highFrequencyPracticeLoop.dailyComebackDecisionEngine.title}}</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.dailyComebackDecisionEngine.decisionLine}}</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.dailyComebackDecisionEngine.rewardGate}}</view>
+          <view class="high-frequency-item" wx:if="{{highFrequencyPracticeLoop.dailyComebackDecisionEngine.primaryCard}}">
+            <text>{{highFrequencyPracticeLoop.dailyComebackDecisionEngine.primaryCard.label}}</text>
+            <text>{{highFrequencyPracticeLoop.dailyComebackDecisionEngine.primaryCard.action}}</text>
+            <text>证据：{{highFrequencyPracticeLoop.dailyComebackDecisionEngine.primaryCard.proof}}</text>
+          </view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.dailyComebackDecisionEngine.stopRule}}</view>
+          <view class="retention-loop-step">{{highFrequencyPracticeLoop.dailyComebackDecisionEngine.parentLine}}</view>
+          <view class="retention-loop-step">每日上限：{{highFrequencyPracticeLoop.dailyComebackDecisionEngine.antiAddictionPolicy.maxMinutes}} 分钟，不做比较展示、不无限下滑。</view>
+        </view>
         <view class="high-frequency-section" wx:if="{{highFrequencyPracticeLoop.healthyCommercialReturnGuard}}">
           <view class="high-frequency-label">{{highFrequencyPracticeLoop.healthyCommercialReturnGuard.title}}</view>
           <view class="retention-loop-step">{{highFrequencyPracticeLoop.healthyCommercialReturnGuard.parentDecisionLine}}</view>
