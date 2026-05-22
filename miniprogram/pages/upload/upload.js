@@ -157,6 +157,62 @@ function buildUploadPartnerLedgerView(ledger = {}) {
   };
 }
 
+function buildUploadServiceHandoffPack(options = {}) {
+  const sourceSchemaId = options.sourceSchemaId || '';
+  const servicePathway = options.servicePathway || {};
+  const tonightTaskCard = options.tonightTaskCard || {};
+  const validationPlanView = options.validationPlanView || {};
+  const productTierView = options.productTierView || {};
+  const partnerWorkbench = options.partnerWorkbench || {};
+  const hasRealTaskEvidence = !!options.hasRealTaskEvidence;
+  const parentConfirmed = !!options.parentConfirmed;
+  const primaryTier = servicePathway.primaryTier || (productTierView.cards && productTierView.cards[0]) || {};
+  const validationCount = Array.isArray(validationPlanView.cards) ? validationPlanView.cards.length : 0;
+  const advisorNext = Array.isArray(partnerWorkbench.advisorQueue)
+    ? (partnerWorkbench.advisorQueue.find((item) => item.status === 'todo') || partnerWorkbench.advisorQueue[0] || {})
+    : {};
+  const assessmentOnly = sourceSchemaId === 'talent_assessment';
+  return {
+    id: 'upload_family_solution_handoff_pack',
+    title: '家庭解决方案交付包',
+    summaryLine: assessmentOnly
+      ? '当前只放行“学习方法候选”，需要用真实错题和回访验证后再进入训练。'
+      : '当前可以从材料进入“今晚动作 -> 7 天验证 -> 家长复盘/合作交付”的闭环。',
+    cards: [
+      {
+        id: 'diagnosis_basis',
+        label: '诊断依据',
+        line: hasRealTaskEvidence
+          ? '已有孩子自己的第一步、错因或错题材料，可以进入低压执行。'
+          : '证据还偏薄，先补一条真实作业卡点，避免用测评或观察直接下结论。',
+        evidenceLine: assessmentOnly ? '测评只作为方法候选，不贴天赋标签。' : '只使用本次材料里的可复核线索。'
+      },
+      {
+        id: 'tonight_execution',
+        label: '今晚执行',
+        line: tonightTaskCard.firstStep || '先让孩子说出第一步，不追完整答案。',
+        evidenceLine: tonightTaskCard.parentCheck || '家长只问一个可观察问题。'
+      },
+      {
+        id: 'seven_day_validation',
+        label: '7 天验证',
+        line: validationCount ? `已生成 ${validationCount} 天验证动作。` : '先补第一步和错因，再开放 7 天验证。',
+        evidenceLine: validationPlanView.successLine || '隔天回访和第 7 天小变式齐全后，才进入长期画像。'
+      },
+      {
+        id: 'partner_delivery',
+        label: '合作交付',
+        line: parentConfirmed
+          ? '家长已确认交付范围，可以只交付行动、问题和下一证据。'
+          : '合作方交付前需要家长确认范围，并移除原题、答案、分数、隐私信息。',
+        evidenceLine: advisorNext.action || primaryTier.promise || '下一步按证据补齐情况决定服务包。'
+      }
+    ],
+    releaseLine: '放行标准：不靠单次测评定性；必须有孩子自己的第一步、错因、回访或家长确认。',
+    blockedLine: '不交付：原题照片、完整答案、分数排名、天赋定性、完整对话和联系方式。'
+  };
+}
+
 function uploadValidationEvidenceLine(evidence) {
   const map = {
     first_step: '证据：孩子能先说第一步，而不是等答案。',
@@ -1441,6 +1497,16 @@ Page({
     const quickAssessmentBridgeView = buildUploadQuickAssessmentBridgeView(
       servicePathway && servicePathway.quickAssessmentBridge
     );
+    const serviceHandoffPack = buildUploadServiceHandoffPack({
+      sourceSchemaId,
+      servicePathway,
+      tonightTaskCard,
+      validationPlanView,
+      productTierView,
+      partnerWorkbench,
+      hasRealTaskEvidence: hasRealTaskReleaseEvidence,
+      parentConfirmed: !!(reportState.parentConfirmed || reportDraft.parentConfirmed)
+    });
     return {
       title: sourceSchemaId === 'talent_assessment'
         ? '方法候选已入证据账本'
@@ -1478,6 +1544,7 @@ Page({
       aiLocalDeliveryView,
       publicK12BorrowView,
       quickAssessmentBridgeView,
+      serviceHandoffPack,
       partnerDeliveryWorkbench: partnerWorkbench,
       uploadedMaterialDecisionDossier,
       needsParentConfirmation: servicePathway && servicePathway.partnerServiceDeliveryLedger
@@ -1539,6 +1606,7 @@ Page({
       aiMaterialAnalysisContract: cta.aiMaterialAnalysisContract || null,
       servicePathway: cta.servicePathway || null,
       partnerDeliveryWorkbench: cta.partnerDeliveryWorkbench || null,
+      serviceHandoffPack: cta.serviceHandoffPack || null,
       tonightTaskCard: cta.tonightTaskCard || null,
       uploadedMaterialDecisionDossier,
       uploadReportHandoff: cta,
@@ -1553,6 +1621,7 @@ Page({
         aiMaterialAnalysisContract: cta.aiMaterialAnalysisContract || null,
         servicePathway: cta.servicePathway || null,
         partnerDeliveryWorkbench: cta.partnerDeliveryWorkbench || null,
+        serviceHandoffPack: cta.serviceHandoffPack || null,
         tonightTaskCard: cta.tonightTaskCard || null,
         uploadedMaterialDecisionDossier,
         uploadReportHandoff: cta,

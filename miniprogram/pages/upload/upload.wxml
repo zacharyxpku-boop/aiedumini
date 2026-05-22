@@ -248,6 +248,21 @@
           <view class="intake-packet-feedback">{{lastReportCta.servicePathway.summary}}</view>
           <view class="intake-packet-line">{{lastReportCta.servicePathway.nextAction}}</view>
           <view class="intake-packet-boundary">{{lastReportCta.servicePathway.familyVisibleLine}}</view>
+          <view class="intake-action-queue" wx:if="{{lastReportCta.serviceHandoffPack}}">
+            <view class="intake-action-title">{{lastReportCta.serviceHandoffPack.title}}</view>
+            <view class="intake-packet-boundary">{{lastReportCta.serviceHandoffPack.summaryLine}}</view>
+            <view class="intake-action-item" wx:for="{{lastReportCta.serviceHandoffPack.cards}}" wx:key="id">
+              <view class="intake-action-main">
+                <text>{{item.label}}</text>
+                <text>{{item.line}}</text>
+              </view>
+              <view class="intake-action-meta">
+                <text>{{item.evidenceLine}}</text>
+              </view>
+            </view>
+            <view class="intake-packet-boundary">{{lastReportCta.serviceHandoffPack.releaseLine}}</view>
+            <view class="intake-packet-boundary">{{lastReportCta.serviceHandoffPack.blockedLine}}</view>
+          </view>
           <view class="intake-action-queue" wx:if="{{lastReportCta.modeRecommendationView.cards.length}}">
             <view class="intake-action-title">{{lastReportCta.modeRecommendationView.title}}</view>
             <view class="intake-packet-boundary">{{lastReportCta.modeRecommendationView.summaryLine}}</view>
