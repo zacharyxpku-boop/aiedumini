@@ -157,6 +157,48 @@ function buildUploadPartnerLedgerView(ledger = {}) {
   };
 }
 
+function uploadValidationEvidenceLine(evidence) {
+  const map = {
+    first_step: '证据：孩子能先说第一步，而不是等答案。',
+    parent_observation: '证据：家长只记录一次可观察动作。',
+    tomorrow_recall: '证据：隔天仍能复述同一张卡的第一步。',
+    near_transfer: '证据：换一个小变式也能开口。',
+    review_result: '证据：复盘中能说明错因是否减少。',
+    family_feedback: '证据：家长确认压力没有升高。',
+    next_service_decision: '证据：用 7 天记录决定是否进入服务包。'
+  };
+  return map[evidence] || `证据：${String(evidence || '补一条可复核证据').replace(/_/g, ' ')}`;
+}
+
+function buildUploadValidationPlanView(plan = [], sourceSchemaId = '') {
+  const cards = (Array.isArray(plan) ? plan : []).slice(0, 7).map((item, index) => {
+    const day = Number(item.day || index + 1);
+    return {
+      id: item.id || `day_${day}`,
+      label: item.label || `第 ${day} 天`,
+      action: item.action || '完成一个低压学习动作。',
+      evidenceLine: uploadValidationEvidenceLine(item.evidence),
+      gateLine: item.locked
+        ? '放行状态：先补真实作业卡点，再继续后续验证。'
+        : (item.unlockRule ? `放行状态：${item.unlockRule}` : '放行状态：可执行。'),
+      acceptanceLine: day >= 7 || item.evidence === 'near_transfer'
+        ? '通过标准：能迁移到小变式，才进入长期画像或服务建议。'
+        : '通过标准：孩子能自己说出第一步，家长不需要代做。',
+      stopLine: '停止条件：一旦变成要答案、排名或焦虑承诺，退回第一步点拨。'
+    };
+  });
+  const assessmentOnly = sourceSchemaId === 'talent_assessment';
+  return {
+    id: 'upload_seven_day_validation_delivery_view',
+    title: '7 天验证交付单',
+    summaryLine: assessmentOnly
+      ? '测评只生成方法候选；必须用真实错题和第 7 天小变式验证。'
+      : '本次材料进入 7 天验证；每天只留一条可复核证据。',
+    successLine: '交付标准：今晚动作、隔天回访、第 7 天小变式三项齐全，才允许进入下一阶段服务。',
+    cards
+  };
+}
+
 function normalizeMaterialType(query = {}, fallback = 'class_notes') {
   const raw = safeQueryText(query.type || query.materialType || query.sourceSchemaId || query.source || '');
   const normalized = raw.replace(/^material_/, '');
@@ -1162,6 +1204,10 @@ Page({
     const partnerDeliveryLedgerView = buildUploadPartnerLedgerView(
       servicePathway && servicePathway.partnerServiceDeliveryLedger
     );
+    const validationPlanView = buildUploadValidationPlanView(
+      servicePathway && servicePathway.validationPlan,
+      sourceSchemaId
+    );
     return {
       title: sourceSchemaId === 'talent_assessment'
         ? '方法候选已入证据账本'
@@ -1192,6 +1238,7 @@ Page({
       tonightTaskCard,
       servicePathway,
       partnerDeliveryLedgerView,
+      validationPlanView,
       partnerDeliveryWorkbench: partnerWorkbench,
       uploadedMaterialDecisionDossier,
       needsParentConfirmation: servicePathway && servicePathway.partnerServiceDeliveryLedger
