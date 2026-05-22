@@ -322,6 +322,43 @@ function buildUploadQuickAssessmentBridgeView(bridge = {}) {
   };
 }
 
+function uploadReleaseRuleLine(rule = '') {
+  const value = String(rule || '');
+  if (/talent|assessment/.test(value)) {
+    return '放行门槛：测评只给方法候选，必须补真实错题后再进入练习。';
+  }
+  if (/structured|evidence|material/.test(value)) {
+    return '放行门槛：先补孩子第一步、错因猜测和下一条回访证据。';
+  }
+  if (/parent|confirm/.test(value)) {
+    return '放行门槛：家长确认交付范围后再继续。';
+  }
+  return '放行门槛：先补一条真实学习证据。';
+}
+
+function uploadReturnRouteLine(route = '') {
+  const value = String(route || '');
+  if (value.indexOf('/pages/profile/') >= 0) return '下一步：查看家长报告和证据边界。';
+  if (value.indexOf('/pages/tutor/') >= 0) return '下一步：回到一对一点拨，让孩子先说第一步。';
+  if (value.indexOf('/pages/review/') >= 0) return '下一步：回到错因复盘，锁定明天回访。';
+  if (value.indexOf('/pages/arcade/') >= 0) return '下一步：做 90 秒主动回忆，不新增压力。';
+  if (value.indexOf('/pages/upload/') >= 0) return '下一步：继续补材料证据。';
+  return '下一步入口已准备，确认后继续。';
+}
+
+function buildUploadSourceReadinessView(board = {}) {
+  if (!board) return null;
+  const nextEvidence = Array.isArray(board.nextEvidence) ? board.nextEvidence : [];
+  return {
+    id: 'upload_source_readiness_readable_view',
+    gateLine: uploadReleaseRuleLine(board.releaseRule),
+    nextEvidence,
+    aiLine: board.aiBetterLine ? `AI 负责：${board.aiBetterLine}` : 'AI 负责：把方法候选改写成孩子能听懂的话。',
+    localLine: board.localCodeBetterLine ? `本地规则负责：${board.localCodeBetterLine}` : '本地规则负责：证据、隐私、放行和回访。',
+    blockedLine: board.mustNotDoLine ? `不能做：${board.mustNotDoLine}` : '不能做：贴标签、自动判分、输出完整答案。'
+  };
+}
+
 function uploadReadableListLine(label, values = []) {
   const list = Array.isArray(values) ? values : [values];
   const text = list.map((item) => String(item || '').trim()).filter(Boolean).join('、');
@@ -665,6 +702,7 @@ Page({
       cards,
       readiness: Math.min(100, Math.round((covered / coreTypes.length) * 80) + Math.min(20, cards.length * 3)),
       sourceReadinessBoard: intakePacket.sourceReadinessBoard || null,
+      sourceReadinessView: buildUploadSourceReadinessView(intakePacket.sourceReadinessBoard || null),
       nextAction: cards.length
         ? `已预览 ${cards.length} 张卡，可以导入长期复习。`
         : '再补一点具体步骤、易错陷阱或例题，卡片会更有用。'
@@ -1448,6 +1486,10 @@ Page({
       parentConfirmation: (reportState.parentConfirmation || reportDraft.parentConfirmation || null),
       sourceSchemaId,
       reportId,
+      aiLocalReleaseLine: uploadReleaseRuleLine(sourceSchemaId === 'talent_assessment'
+        ? 'talent_assessment_requires_real_wrong_question_before_practice'
+        : 'material_report_requires_structured_evidence_before_release'),
+      safeRelayReturnLine: uploadReturnRouteLine(actionRoute),
       flowTraceId: `upload_report:${reportId || sourceSchemaId}:${cardId || 'no_card'}`,
       cardId,
       importedCardIds: Array.isArray(options.importedCardIds) ? options.importedCardIds : [],
