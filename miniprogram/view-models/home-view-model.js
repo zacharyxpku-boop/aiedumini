@@ -62,9 +62,54 @@ function buildMiniLessonResume(input = {}) {
   };
 }
 
+function buildReportServiceResume(input = {}) {
+  if (input.reportServiceResume) return input.reportServiceResume;
+  const reportState = input.learningReportState || {};
+  const handoff = input.uploadReportHandoff || {};
+  const servicePathway = input.servicePathway || reportState.servicePathway || handoff.servicePathway || null;
+  const ledger = servicePathway && servicePathway.partnerServiceDeliveryLedger
+    ? servicePathway.partnerServiceDeliveryLedger
+    : null;
+  const parentConfirmed = !!(
+    reportState.parentConfirmed ||
+    handoff.parentConfirmed ||
+    input.parentConfirmed ||
+    (ledger && ledger.status === 'deliverable_after_parent_confirmation')
+  );
+  if (!servicePathway && !handoff.title && !reportState.reportDraft) return null;
+  const primaryMode = servicePathway && servicePathway.primaryMode ? servicePathway.primaryMode : {};
+  const validationPlan = servicePathway && Array.isArray(servicePathway.validationPlan)
+    ? servicePathway.validationPlan
+    : [];
+  const firstValidation = validationPlan[0] || {};
+  return {
+    id: 'home_report_service_resume',
+    title: safeText(handoff.title || '继续家庭方案验证', '继续家庭方案验证'),
+    statusLine: parentConfirmed
+      ? '家长已确认交付范围，可以进入7天验证。'
+      : '家长还未确认交付范围，先确认再进入合作交付。',
+    modeLine: primaryMode.label
+      ? `建议模式：${safeText(primaryMode.label, '苏格拉底1对1')}`
+      : '建议模式：先用苏格拉底1对1，必要时补小讲堂。',
+    actionLine: safeText(
+      firstValidation.action || (servicePathway && servicePathway.nextAction) || handoff.line,
+      '今晚只做一个最小动作，并留下孩子自己的第一步证据。'
+    ),
+    parentGateLine: parentConfirmed
+      ? '放行：只交付行动、家长问题和下一条证据。'
+      : '待确认：不向合作方交付原题、答案、分数、排名、姓名或联系方式。',
+    cta: parentConfirmed ? '继续7天验证' : '去确认交付范围',
+    route: parentConfirmed
+      ? '/pages/profile/profile?from=home_report_service_resume'
+      : '/pages/upload/upload?from=home_report_service_resume',
+    blockedFields: ['原题', '完整答案', '照片', '分数', '排名', '天赋标签', '姓名', '联系方式']
+  };
+}
+
 function buildHomeViewModel(input = {}) {
   const hasPlanOrFocus = !!(input.tonightPlan || input.todayFocus);
   const miniLessonResume = buildMiniLessonResume(input);
+  const reportServiceResume = buildReportServiceResume(input);
   return {
     routePill: '今晚路线 · 第 1 步：排顺序',
     companionStrip: companionStrip(input.companionPreference),
@@ -85,6 +130,7 @@ function buildHomeViewModel(input = {}) {
     emptyState: hasPlanOrFocus ? null : '还没有今晚路线。咕点在旁边，先说一句卡在哪里。',
     nextStep: buildNextStep(Object.assign({}, input, { miniLessonResume })),
     miniLessonResume,
+    reportServiceResume,
     debugWarnings: []
   };
 }

@@ -107,6 +107,15 @@
           <view class="mini-lesson-resume-line">家长只问：{{homeViewModel.miniLessonResume.parentLine}}</view>
           <view class="mini-lesson-resume-guard">只带下一步动作，不带原题、完整答案、分数、竞争比较或评价标签</view>
         </view>
+        <view class="mini-lesson-resume-card report-service-resume-card" wx:if="{{homeViewModel.reportServiceResume}}" catchtap="goReportServiceResume">
+          <view class="mini-lesson-resume-kicker">家庭方案</view>
+          <view class="mini-lesson-resume-title">{{homeViewModel.reportServiceResume.title}}</view>
+          <view class="mini-lesson-resume-line">{{homeViewModel.reportServiceResume.statusLine}}</view>
+          <view class="mini-lesson-resume-line">{{homeViewModel.reportServiceResume.modeLine}}</view>
+          <view class="mini-lesson-resume-line">{{homeViewModel.reportServiceResume.actionLine}}</view>
+          <view class="mini-lesson-resume-guard">{{homeViewModel.reportServiceResume.parentGateLine}}</view>
+          <view class="route-next-link">{{homeViewModel.reportServiceResume.cta}}</view>
+        </view>
         <view class="focus-entry-lite" wx:if="{{todayFocus}}" catchtap="goFocus">
           <text>咕点陪你把这一小步做完</text>
           <text class="route-next-link">进专注舱</text>

@@ -594,6 +594,8 @@ Page({
     const tonightPlan = storage.loadTonightPlan ? storage.loadTonightPlan() : null;
     const todayFocus = storage.loadTodayFocus ? storage.loadTodayFocus() : null;
     const miniLessonResume = this.buildMiniLessonResumeCard(storage.loadReviewCards ? storage.loadReviewCards() : []);
+    const learningReportState = storage.loadLearningReportState ? storage.loadLearningReportState() : null;
+    const uploadReportHandoff = storage.get ? storage.get('upload.report.handoff.v1', null) : null;
     const todaySession = storage.getTodaySession ? storage.getTodaySession() : null;
     const focusEntryReady = storage.canStartFocusFromTodaySession
       ? storage.canStartFocusFromTodaySession(todaySession)
@@ -697,6 +699,8 @@ Page({
         tonightPlan,
         todayFocus,
         miniLessonResume,
+        learningReportState,
+        uploadReportHandoff,
         growthMemory: growthMemoryLine
       }),
       growthMemory: {
@@ -1809,6 +1813,7 @@ Page({
         companionPreference,
         tonightPlan: this.data.tonightPlan,
         todayFocus: this.data.todayFocus,
+        reportServiceResume: this.data.homeViewModel && this.data.homeViewModel.reportServiceResume,
         growthMemory: growthMemoryLine
       }),
       companionCopy: {
@@ -2023,6 +2028,12 @@ Page({
       wx.switchTab({ url: '/pages/review/review' });
       return;
     }
+    navigation.navigateLearningRoute(route);
+  },
+
+  goReportServiceResume() {
+    const card = this.data.homeViewModel && this.data.homeViewModel.reportServiceResume;
+    const route = card && card.route ? card.route : '/pages/upload/upload?from=home_report_service_resume';
     navigation.navigateLearningRoute(route);
   },
 
