@@ -36,6 +36,13 @@ const AI_MATERIAL_ANALYSIS_SCHEMA = {
   ],
   responseFields: [
     'source_type',
+    'subject',
+    'wrongCause',
+    'firstStep',
+    'learningPreference',
+    'evidenceConfidence',
+    'nextAction',
+    'executionPath',
     'student_profile_signals',
     'score_signals',
     'wrong_question_signals',
@@ -97,6 +104,24 @@ function findBlockedClaims(value) {
   return AI_MATERIAL_BLOCKED_CLAIM_PATTERNS
     .filter((rule) => rule.pattern.test(text))
     .map((rule) => rule.id);
+}
+
+function safeAiText(value, fallback) {
+  const text = String(value || '').trim();
+  return text || fallback;
+}
+
+function buildAiMaterialExecutionPath(raw = {}, sourceSchemaId = 'parent_report') {
+  const path = raw.executionPath || raw.execution_path || {};
+  const socraticRoute = sourceSchemaId === 'talent_assessment'
+    ? '/pages/tutor/tutor?from=ai_material_method_validation'
+    : '/pages/tutor/tutor?from=ai_material_analysis';
+  return {
+    socraticRoute: safeAiText(path.socraticRoute || path.socratic_route, socraticRoute),
+    miniLessonRoute: safeAiText(path.miniLessonRoute || path.mini_lesson_route, '/pages/tutor/tutor?from=ai_material_analysis_mini_lesson'),
+    gameRecallRoute: safeAiText(path.gameRecallRoute || path.game_recall_route, '/pages/arcade/arcade?from=ai_material_analysis'),
+    parentReviewRoute: safeAiText(path.parentReviewRoute || path.parent_review_route, '/pages/profile/profile?from=ai_material_analysis')
+  };
 }
 
 function buildAiMaterialAnalysisRequest(packet = {}, evidenceSignals = {}, options = {}) {
@@ -163,10 +188,37 @@ function sanitizeAiMaterialAnalysisResult(raw = {}, context = {}) {
     '如果只验证一个方法，应该拿哪一道真实错题来试？',
     '明天回访时，怎样判断这个方法真的帮到了孩子？'
   ];
+  const executionPath = buildAiMaterialExecutionPath(raw, sourceSchemaId);
+  const evidenceConfidence = raw.evidenceConfidence || raw.evidence_confidence || {};
+  const nextAction = raw.nextAction || raw.next_action || {};
+  const firstStep = safeAiText(raw.firstStep || raw.first_step || context.firstStep, safeQuestions[0]);
+  const wrongCause = safeAiText(raw.wrongCause || raw.wrong_cause || context.wrongCause, sourceSchemaId === 'talent_assessment'
+    ? 'method_hypothesis_requires_real_wrong_question'
+    : 'wrong_cause_candidate_requires_first_step_evidence');
+  const learningPreference = safeAiText(raw.learningPreference || raw.learning_preference || context.learningPreference, sourceSchemaId === 'talent_assessment'
+    ? 'method hypothesis only; validate with one real task, next-day revisit, and day-7 variant'
+    : 'start with Socratic first-step validation, then release mini lesson or recall only after evidence');
+  const normalizedNextAction = {
+    label: safeAiText(nextAction.label, firstStep),
+    route: safeAiText(nextAction.route, executionPath.socraticRoute),
+    owner: safeAiText(nextAction.owner, 'ai_with_local_guardrail'),
+    evidenceGate: safeAiText(nextAction.evidenceGate || nextAction.evidence_gate, 'parent_manual_confirmation')
+  };
   return {
     id: 'sanitized_ai_material_analysis_result',
     status: blockedClaimIds.length ? 'sanitized_requires_manual_confirmation' : 'safe_draft_requires_manual_confirmation',
     sourceSchemaId,
+    subject: safeAiText(raw.subject || context.subject, 'unknown'),
+    wrongCause,
+    firstStep,
+    learningPreference,
+    evidenceConfidence: {
+      level: safeAiText(evidenceConfidence.level, 'low'),
+      reason: safeAiText(evidenceConfidence.reason, 'structured evidence and parent confirmation are required before release'),
+      requiredNextEvidence: normalizeAiList(evidenceConfidence.requiredNextEvidence || evidenceConfidence.required_next_evidence).slice(0, 4)
+    },
+    nextAction: normalizedNextAction,
+    executionPath,
     studentProfileSignals: raw.student_profile_signals || {},
     scoreSignals: raw.score_signals || {},
     wrongQuestionSignals: raw.wrong_question_signals || {},
@@ -209,6 +261,25 @@ function buildAiMaterialAnalysisFallback(packet = {}, evidenceSignals = {}, reas
   const sourceSchemaId = schema.id || 'parent_report';
   return sanitizeAiMaterialAnalysisResult({
     source_type: sourceSchemaId,
+    subject: evidenceSignals.subjectLabel || evidenceSignals.subjectKey || 'unknown',
+    wrongCause: evidenceSignals.wrongCause || evidenceSignals.wrongCauseGuess || (sourceSchemaId === 'talent_assessment' ? 'method_hypothesis_requires_real_wrong_question' : 'wrong_cause_candidate_requires_first_step_evidence'),
+    firstStep: evidenceSignals.firstStep || evidenceSignals.stuckFirstStep || 'ask_child_to_name_first_step',
+    learningPreference: sourceSchemaId === 'talent_assessment'
+      ? 'method hypothesis only; validate with one real task and day-7 variant'
+      : 'Socratic first-step first, then mini lesson or recall after evidence',
+    evidenceConfidence: {
+      level: 'low',
+      reason,
+      requiredNextEvidence: ['source_text_excerpt', 'structured_evidence', 'parent_confirmation']
+    },
+    nextAction: {
+      label: evidenceSignals.firstStep || evidenceSignals.stuckFirstStep || 'ask_child_to_name_first_step',
+      route: sourceSchemaId === 'talent_assessment'
+        ? '/pages/tutor/tutor?from=ai_material_method_validation'
+        : '/pages/tutor/tutor?from=ai_material_analysis',
+      owner: 'local_code',
+      evidenceGate: 'parent_manual_confirmation'
+    },
     learning_method_candidates: sourceSchemaId === 'talent_assessment'
       ? ['先用一张真实错题验证学习方法候选', '先复述题意再动笔', '用小黑板写第一步']
       : ['先定位错因候选', '只追问第一步', '明天回访同一类卡点'],
