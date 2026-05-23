@@ -512,6 +512,113 @@ function buildPostPilotRetentionLoop(signals = {}, partnerLedger = {}, validatio
   };
 }
 
+function buildPersonalizedClosureBridge(signals = {}, modeRecommendations = [], validationPlan = [], partnerLedger = {}, postPilotRetentionLoop = {}, input = {}) {
+  const hasRealTaskEvidence = !!(signals && signals.hasRealTaskEvidence);
+  const parentConfirmed = !!(signals && signals.parentConfirmed);
+  const primaryMode = modeRecommendations[0] || MODE_CATALOG[0];
+  const questionType = signals.questionType || (input.structuredEvidenceSignals && input.structuredEvidenceSignals.questionType) || 'unknown';
+  const subject = (input.structuredEvidenceSignals && (input.structuredEvidenceSignals.subjectLabel || input.structuredEvidenceSignals.subjectKey))
+    || input.subject
+    || 'unknown';
+  const sourceSchemaId = signals.schemaId || input.sourceSchemaId || 'unknown';
+  const sourceTextReady = !!String(signals.sourceText || input.sourceText || '').trim();
+  const contentDensity = hasRealTaskEvidence ? 'sample_backed_execution' : sourceTextReady ? 'needs_real_task_anchor' : 'needs_material_excerpt';
+  const openedModes = new Set((modeRecommendations || []).map((item) => item && item.id).filter(Boolean));
+  const day7Ready = Array.isArray(validationPlan) && validationPlan.some((item) => Number(item.day || 0) >= 7);
+  const lockedBecause = [];
+  if (!hasRealTaskEvidence) lockedBecause.push('real_task_evidence_missing');
+  if (!parentConfirmed) lockedBecause.push('parent_confirmation_missing');
+  if (!day7Ready) lockedBecause.push('day7_validation_missing');
+  return {
+    id: 'personalized_upload_score_closure_bridge',
+    status: hasRealTaskEvidence ? 'ready_for_guided_execution' : 'blocked_until_real_task_evidence',
+    sourceSchemaId,
+    subject,
+    questionType,
+    contentScalePlan: {
+      id: 'content_scale_plan',
+      density: contentDensity,
+      stableStrategyRequired: true,
+      sourceMaterialReady: sourceTextReady,
+      sampleAnchorRequired: !hasRealTaskEvidence,
+      nextExpansionQueue: [
+        { id: 'grade_chapter_type', action: 'map subject, grade/chapter, and task type before lesson or game release' },
+        { id: 'first_step_bank', action: 'pick a first-step strategy from sample-backed or local fallback cards' },
+        { id: 'near_transfer_variant', action: 'create one day-7 variant only after child first-step evidence' }
+      ]
+    },
+    socraticStressFallback: {
+      id: 'socratic_stress_fallback',
+      defaultMode: 'socratic_private_tutor',
+      openedMiniLesson: openedModes.has('three_minute_mini_lesson'),
+      fallbackOrder: [
+        'first_step_probe',
+        'two_choice_micro_prompt',
+        'blackboard_one_frame',
+        'parent_one_question',
+        'next_day_revisit'
+      ],
+      stopRule: 'after three stuck turns, stop prompting and downgrade to parent handoff plus next-day revisit',
+      aiMayRewrite: ['child_friendly_prompt_wording', 'parent_readable_explanation'],
+      localCodeOwns: ['answer_boundary', 'fallback_order', 'mini_lesson_release', 'report_release_gate']
+    },
+    gameRetentionPlan: {
+      id: 'healthy_game_retention_plan',
+      openedGameRecall: openedModes.has('game_recall'),
+      dailyReturnCard: hasRealTaskEvidence ? 'most_worth_return_card_from_wrong_cause' : 'locked_until_first_step_or_wrong_cause',
+      xpGate: 'child_first_step + wrong_cause_named + next_day_revisit_locked',
+      antiAddiction: ['one_primary_card_only', 'no_ranking_pressure', 'no_infinite_scroll', 'no_score_reward'],
+      comebackRoute: openedModes.has('game_recall') ? '/pages/arcade/arcade?from=personalized_closure_bridge' : '/pages/review/review?from=personalized_closure_bridge'
+    },
+    scoreReportBridge: {
+      id: 'score_report_bridge',
+      useScoreFor: ['priority_only', 'weak_subject_selection', 'parent_private_review'],
+      neverUseScoreFor: ['xp', 'ranking', 'share_payload', 'talent_label'],
+      route: '/pages/profile/profile?from=personalized_closure_bridge',
+      releaseGate: 'score_is_private_parent_signal'
+    },
+    uploadMaterialBridge: {
+      id: 'upload_material_bridge',
+      route: sourceSchemaId === 'wrong_question_paper'
+        ? '/pages/review/review?from=personalized_closure_bridge'
+        : '/pages/tutor/tutor?from=personalized_closure_bridge',
+      aiContractRequired: true,
+      manualConfirmationRequired: true,
+      localFallback: 'local_family_solution_draft_requires_manual_confirmation'
+    },
+    endToEndRoutes: [
+      { id: 'upload', route: '/pages/upload/upload?from=personalized_closure_bridge', gate: 'material_excerpt_or_structured_evidence' },
+      { id: 'tutor', route: '/pages/tutor/tutor?from=personalized_closure_bridge', gate: 'first_step_only' },
+      { id: 'review', route: '/pages/review/review?from=personalized_closure_bridge', gate: 'wrong_cause_named' },
+      { id: 'game', route: '/pages/arcade/arcade?from=personalized_closure_bridge', gate: 'next_day_revisit_locked' },
+      { id: 'parent', route: '/pages/profile/profile?from=personalized_closure_bridge', gate: 'parent_confirmation_and_private_fields_removed' }
+    ],
+    releaseGates: [
+      'real_task_evidence_before_game',
+      'three_round_socratic_fallback_before_mini_lesson',
+      'score_private_parent_signal_only',
+      'ai_material_analysis_sanitized',
+      'parent_confirmation_before_partner_delivery',
+      'day7_variant_before_method_claim'
+    ],
+    blockedFields: PARTNER_HANDOFF_POLICY.blockedFields.concat(['full_solution', 'reward_release', 'service_upgrade_without_evidence']),
+    evidenceRequired: [
+      'source_material_excerpt',
+      'subject_task_type',
+      'child_first_step',
+      'wrong_cause_named',
+      'next_day_revisit',
+      'day7_variant',
+      'parent_confirmation',
+      'safe_partner_handoff'
+    ],
+    lockedBecause,
+    partnerLedgerStatus: partnerLedger.status || '',
+    postPilotStatus: postPilotRetentionLoop.status || '',
+    localDeterministic: true
+  };
+}
+
 function buildLearningServicePathway(input = {}) {
   const signals = inferSignals(input);
   const modeRecommendations = pickModes(signals);
@@ -561,6 +668,14 @@ function buildLearningServicePathway(input = {}) {
     validationPlan,
     safeProductTiers
   );
+  const personalizedClosureBridge = buildPersonalizedClosureBridge(
+    signals,
+    modeRecommendations,
+    validationPlan,
+    partnerServiceDeliveryLedger,
+    postPilotRetentionLoop,
+    input
+  );
   return {
     id: 'learning_service_pathway',
     status: requiresEvidenceBeforeCommercialPush ? 'needs_real_task_validation' : 'ready_for_family_plan',
@@ -592,6 +707,7 @@ function buildLearningServicePathway(input = {}) {
     validationPlan,
     partnerServiceDeliveryLedger,
     postPilotRetentionLoop,
+    personalizedClosureBridge,
     partnerHandoffPolicy: Object.assign({}, PARTNER_HANDOFF_POLICY),
     moatLine: '护城河不在“生成一份测评结论”，而在测评、错题、回访、游戏和家长决策反复闭环后的家庭证据账本。',
     safetyBoundary: {
@@ -615,5 +731,6 @@ module.exports = {
   buildModeChoiceProtocol,
   buildPartnerServiceDeliveryLedger,
   buildPostPilotRetentionLoop,
+  buildPersonalizedClosureBridge,
   buildLearningServicePathway
 };

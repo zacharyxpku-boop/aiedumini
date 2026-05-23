@@ -194,6 +194,40 @@ function buildUploadPostPilotRetentionView(loop = {}) {
   };
 }
 
+function buildUploadPersonalizedClosureView(bridge = {}) {
+  if (!bridge || !bridge.id) return null;
+  const routeLine = (Array.isArray(bridge.endToEndRoutes) ? bridge.endToEndRoutes : [])
+    .map((item) => `${item.id}:${item.gate}`)
+    .join(' -> ');
+  return {
+    id: 'upload_personalized_closure_view',
+    title: '个性化闭环执行桥',
+    statusLine: bridge.status === 'ready_for_guided_execution'
+      ? '已具备真实任务证据：可以进入私教、修卡点、回访和家长报告。'
+      : '先补真实任务证据：资料/成绩只能生成方法候选，不能直接放行游戏或服务。',
+    contentLine: `内容密度：${bridge.contentScalePlan ? bridge.contentScalePlan.density : 'pending'}；题型：${bridge.questionType || 'unknown'}；学科：${bridge.subject || 'unknown'}`,
+    socraticLine: bridge.socraticStressFallback
+      ? `苏格拉底兜底：${bridge.socraticStressFallback.fallbackOrder.join(' / ')}`
+      : '',
+    gameLine: bridge.gameRetentionPlan
+      ? `游戏留存：${bridge.gameRetentionPlan.openedGameRecall ? '可进入回访练习' : '先锁定，等第一步/错因/隔天回访'}；XP 门槛 ${bridge.gameRetentionPlan.xpGate}`
+      : '',
+    scoreLine: bridge.scoreReportBridge
+      ? `成绩报告：只用于 ${bridge.scoreReportBridge.useScoreFor.join(' / ')}，不用于 ${bridge.scoreReportBridge.neverUseScoreFor.join(' / ')}`
+      : '',
+    uploadLine: bridge.uploadMaterialBridge
+      ? `上传资料：${bridge.uploadMaterialBridge.aiContractRequired ? '需要 AI 合同+本地兜底' : '本地兜底'}；${bridge.uploadMaterialBridge.localFallback}`
+      : '',
+    routeLine,
+    releaseLine: Array.isArray(bridge.releaseGates) ? `放行门槛：${bridge.releaseGates.join(' / ')}` : '',
+    evidenceLine: Array.isArray(bridge.evidenceRequired) ? `证据：${bridge.evidenceRequired.join(' / ')}` : '',
+    blockedLine: Array.isArray(bridge.blockedFields) ? `不外显：${bridge.blockedFields.slice(0, 8).map(uploadPartnerFieldLabel).join('、')}` : '',
+    lockedLine: Array.isArray(bridge.lockedBecause) && bridge.lockedBecause.length
+      ? `待补：${bridge.lockedBecause.join(' / ')}`
+      : '当前没有阻断项，但仍需按本地规则放行。'
+  };
+}
+
 function buildUploadServiceHandoffPack(options = {}) {
   const sourceSchemaId = options.sourceSchemaId || '';
   const servicePathway = options.servicePathway || {};
@@ -1706,6 +1740,9 @@ Page({
     const postPilotRetentionView = buildUploadPostPilotRetentionView(
       servicePathway && servicePathway.postPilotRetentionLoop
     );
+    const personalizedClosureView = buildUploadPersonalizedClosureView(
+      servicePathway && servicePathway.personalizedClosureBridge
+    );
     const serviceHandoffPack = buildUploadServiceHandoffPack({
       sourceSchemaId,
       servicePathway,
@@ -1758,6 +1795,7 @@ Page({
       contentCoverageReceipt,
       dailyExecutionSeed,
       postPilotRetentionView,
+      personalizedClosureView,
       serviceHandoffPack,
       partnerDeliveryWorkbench: partnerWorkbench,
       uploadedMaterialDecisionDossier,
@@ -1823,6 +1861,7 @@ Page({
       scoreSignalView: cta.scoreSignalView || null,
       contentCoverageReceipt: cta.contentCoverageReceipt || null,
       dailyExecutionSeed: cta.dailyExecutionSeed || null,
+      personalizedClosureView: cta.personalizedClosureView || null,
       servicePathway: cta.servicePathway || null,
       partnerDeliveryWorkbench: cta.partnerDeliveryWorkbench || null,
       serviceHandoffPack: cta.serviceHandoffPack || null,
@@ -1842,6 +1881,7 @@ Page({
         scoreSignalView: cta.scoreSignalView || null,
         contentCoverageReceipt: cta.contentCoverageReceipt || null,
         dailyExecutionSeed: cta.dailyExecutionSeed || null,
+        personalizedClosureView: cta.personalizedClosureView || null,
         servicePathway: cta.servicePathway || null,
         partnerDeliveryWorkbench: cta.partnerDeliveryWorkbench || null,
         serviceHandoffPack: cta.serviceHandoffPack || null,
