@@ -156,6 +156,13 @@ try {
   openMaicInspiredPlanUtils = null;
 }
 
+let familyReportEngine = null;
+try {
+  familyReportEngine = require('./family-report-engine');
+} catch (error) {
+  familyReportEngine = null;
+}
+
 function nowIso(nowInput) {
   const date = nowInput instanceof Date ? nowInput : new Date(nowInput || Date.now());
   return Number.isNaN(date.getTime()) ? new Date().toISOString() : date.toISOString();
@@ -3262,6 +3269,96 @@ function buildOpenMaicInspiredReportDecisionBridge(input = {}) {
   });
 }
 
+function buildFamilyDecisionReportInput(input = {}, parts = {}, parsed = {}) {
+  const profileBasics = parts.profileBasics || {};
+  const behaviorSignals = parts.behaviorSignals || {};
+  const assessment = input.assessmentData || input.assessment || input.talentAssessment || {};
+  const parsedScores = parts.parsedScores || {};
+  const parsedRanks = parts.parsedRanks || {};
+  const sourceEvidence = (parts.reportSources || [])
+    .map((source) => safeText(source.label || source.type || source.sourceSchemaLabel || source.id))
+    .filter(Boolean);
+  const studentName = safeText(
+    input.studentName
+    || profileBasics.studentName
+    || profileBasics.name
+    || parsed.studentName
+    || ''
+  );
+  const scoreRecords = asArray(input.scoreRecords).length
+    ? asArray(input.scoreRecords)
+    : [{
+      examName: parsedRanks.examName || input.examName || '待确认考试',
+      examDate: parsedRanks.examDate || input.examDate || '',
+      totalScore: Number.isFinite(Number(parsedRanks.totalScore)) ? Number(parsedRanks.totalScore) : null,
+      classRank: Number.isFinite(Number(parsedRanks.classRank)) ? Number(parsedRanks.classRank) : null,
+      gradeRank: Number.isFinite(Number(parsedRanks.totalRank)) ? Number(parsedRanks.totalRank) : null,
+      sourceEvidence: sourceEvidence.length ? sourceEvidence : ['上传资料/成绩识别'],
+      subjects: Object.keys(parsedScores).map((key) => {
+        const item = parsedScores[key] || {};
+        return {
+          name: item.subject || key,
+          score: Number.isFinite(Number(item.score)) ? Number(item.score) : null,
+          fullScore: Number.isFinite(Number(item.fullScore)) ? Number(item.fullScore) : null,
+          classRank: Number.isFinite(Number(item.rank)) ? Number(item.rank) : null,
+          trend: item.trend || '',
+          sourceEvidence: [item.evidence || item.status || '成绩字段需家长确认'].filter(Boolean)
+        };
+      })
+    }];
+  return {
+    profile: {
+      studentName,
+      gender: input.gender || profileBasics.gender || '',
+      grade: input.grade || profileBasics.grade || profileBasics.gradeBand || '',
+      schoolStage: input.schoolStage || profileBasics.schoolStage || profileBasics.stage || '',
+      sourceConfidence: studentName || profileBasics.grade ? 'medium' : 'low',
+      missingFields: []
+    },
+    profileCandidates: asArray(input.profileCandidates),
+    assessment: {
+      trc: assessment.trc || assessment.TRC || behaviorSignals.trc || '',
+      atd: assessment.atd || assessment.ATD || behaviorSignals.atd || '',
+      brainPreference: assessment.brainPreference || assessment.brainType || behaviorSignals.brainPreference || '',
+      persistenceIndex: assessment.persistenceIndex || assessment.persistence || behaviorSignals.persistenceIndex || '',
+      behaviorMode: assessment.behaviorMode || behaviorSignals.behaviorMode || '',
+      learningChannel: assessment.learningChannel || assessment.learningStyle || behaviorSignals.learningChannel || '',
+      intelligenceRanks: asArray(assessment.intelligenceRanks || assessment.multipleIntelligenceRanks),
+      rawEvidence: sourceEvidence
+    },
+    scoreRecords,
+    parentInput: {
+      observation: safeText(
+        input.parentObservation
+        || behaviorSignals.parentObservation
+        || behaviorSignals.sourceText
+        || input.sourceText
+        || ''
+      ).slice(0, 500),
+      goals: asArray(input.parentGoals || behaviorSignals.parentGoals),
+      concerns: asArray(input.parentConcerns || behaviorSignals.parentConcerns),
+      sourceEvidence
+    },
+    teacherInput: {
+      observation: safeText(input.teacherObservation || behaviorSignals.teacherObservation || ''),
+      sourceEvidence
+    }
+  };
+}
+
+function buildFamilyLearningDecisionReport(input = {}, parts = {}, parsed = {}) {
+  if (!familyReportEngine || !familyReportEngine.buildParentDecisionReport) return null;
+  const engineInput = buildFamilyDecisionReportInput(input, parts, parsed);
+  const report = familyReportEngine.buildParentDecisionReport(engineInput);
+  return Object.assign({}, report, {
+    engineVersion: 'family-report-engine.v1',
+    sourceMode: 'local_guarded_template',
+    inputGuard: familyReportEngine.validateReportInputs
+      ? familyReportEngine.validateReportInputs(engineInput)
+      : null
+  });
+}
+
 function buildLearningReportDraft(input = {}) {
   const sources = normalizeReportSources(input);
   const allText = [input.sourceText || '', input.scoreText || ''].concat(sources.map((source) => source.text || '')).join('\n');
@@ -3378,6 +3475,7 @@ function buildLearningReportDraft(input = {}) {
     parentDecisionBook,
     commercialFamilySolutionBook
   });
+  const familyLearningDecisionReport = buildFamilyLearningDecisionReport(input, parts, parsed);
   const missing = missingItems(parts);
   const reportDraft = {
     id: input.id || `learning_report_${String(nowIso(input.now)).slice(0, 10).replace(/-/g, '')}`,
@@ -3433,6 +3531,8 @@ function buildLearningReportDraft(input = {}) {
     parentDecisionBook,
     commercialFamilySolutionBook,
     aiLocalImplementationMatrix,
+    familyLearningDecisionReport,
+    familyReportQualityCheck: familyLearningDecisionReport ? familyLearningDecisionReport.qualityCheck : null,
     generatedAt: nowIso(input.now),
     missingItems: missing,
     sourceIntegrity: {
@@ -3494,6 +3594,8 @@ function buildLearningReportDraft(input = {}) {
     parentDecisionBook,
     commercialFamilySolutionBook,
     aiLocalImplementationMatrix,
+    familyLearningDecisionReport,
+    familyReportQualityCheck: familyLearningDecisionReport ? familyLearningDecisionReport.qualityCheck : null,
     reportCompleteness: completeness,
     reportStatus: {
       state: completeness >= 30 ? 'ready' : 'draft',
@@ -3532,6 +3634,8 @@ module.exports = {
   buildUploadedMaterialDecisionDossier,
   buildParentDecisionBook,
   buildCommercialFamilySolutionBook,
+  buildFamilyDecisionReportInput,
+  buildFamilyLearningDecisionReport,
   buildGameReturnEvidence,
   buildOpenMaicInspiredReportDecisionBridge,
   buildCrossWeekTrendBoard,

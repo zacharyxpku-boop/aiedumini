@@ -1626,6 +1626,33 @@ Page({
         : `/pages/tutor/tutor?from=upload_report_ready&${query}`;
     const sourceTextForMiniLesson = String(options.sourceText || reportDraft.sourceText || reportBehaviorSignals.sourceText || '').slice(0, 500);
     const guardedAiReportDraft = options.guardedAiReportDraft || null;
+    const familyLearningDecisionReport = reportDraft.familyLearningDecisionReport || null;
+    const familyLearningDecisionView = familyLearningDecisionReport ? {
+      title: familyLearningDecisionReport.executiveSummary && familyLearningDecisionReport.executiveSummary.title
+        ? familyLearningDecisionReport.executiveSummary.title
+        : '家庭学习诊断与7天验证方案',
+      oneLine: familyLearningDecisionReport.executiveSummary && familyLearningDecisionReport.executiveSummary.oneLine
+        ? familyLearningDecisionReport.executiveSummary.oneLine
+        : '先确认孩子卡住的位置，再做7天小闭环验证。',
+      p0Line: familyLearningDecisionReport.p0Subject
+        ? `优先验证：${familyLearningDecisionReport.p0Subject}`
+        : '',
+      anchorLine: familyLearningDecisionReport.anchorSubject
+        ? `信心支点：${familyLearningDecisionReport.anchorSubject}`
+        : '',
+      qualityLine: familyLearningDecisionReport.qualityCheck
+        ? `质量门：${familyLearningDecisionReport.qualityCheck.score}/100 · ${familyLearningDecisionReport.qualityCheck.status}`
+        : '质量门：待评分',
+      guardLine: familyLearningDecisionReport.inputGuard && familyLearningDecisionReport.inputGuard.requiresConfirmation
+        ? '存在缺失或冲突字段，需家长/老师确认后再作正式结论。'
+        : '事实字段已进入本地校验，报告不编造成绩、性别或年级。',
+      tonightLine: familyLearningDecisionReport.parentTonightCard && familyLearningDecisionReport.parentTonightCard.canSay
+        ? familyLearningDecisionReport.parentTonightCard.canSay[0]
+        : '',
+      dayOneLine: familyLearningDecisionReport.sevenDayPlan && familyLearningDecisionReport.sevenDayPlan[0]
+        ? `Day 1：${familyLearningDecisionReport.sevenDayPlan[0].task}`
+        : ''
+    } : null;
     const miniLessonSubject = uploadEvidenceSignals.subjectLabel
       || uploadEvidenceSignals.subjectKey
       || decisionSource.subjectLabel
@@ -1843,6 +1870,7 @@ Page({
       postPilotRetentionView,
       personalizedClosureView,
       serviceHandoffPack,
+      familyLearningDecisionView,
       partnerDeliveryWorkbench: partnerWorkbench,
       uploadedMaterialDecisionDossier,
       needsParentConfirmation: servicePathway && servicePathway.partnerServiceDeliveryLedger
@@ -1908,6 +1936,7 @@ Page({
       contentCoverageReceipt: cta.contentCoverageReceipt || null,
       dailyExecutionSeed: cta.dailyExecutionSeed || null,
       personalizedClosureView: cta.personalizedClosureView || null,
+      familyLearningDecisionView: cta.familyLearningDecisionView || null,
       servicePathway: cta.servicePathway || null,
       partnerDeliveryWorkbench: cta.partnerDeliveryWorkbench || null,
       serviceHandoffPack: cta.serviceHandoffPack || null,
@@ -1928,6 +1957,7 @@ Page({
         contentCoverageReceipt: cta.contentCoverageReceipt || null,
         dailyExecutionSeed: cta.dailyExecutionSeed || null,
         personalizedClosureView: cta.personalizedClosureView || null,
+        familyLearningDecisionView: cta.familyLearningDecisionView || null,
         servicePathway: cta.servicePathway || null,
         partnerDeliveryWorkbench: cta.partnerDeliveryWorkbench || null,
         serviceHandoffPack: cta.serviceHandoffPack || null,

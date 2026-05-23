@@ -265,6 +265,22 @@
           <view class="intake-packet-boundary">{{lastReportCta.aiMaterialSolutionView.evidenceLine}}</view>
           <view class="intake-packet-boundary">{{lastReportCta.aiMaterialSolutionView.blockedLine}}</view>
         </view>
+        <view class="intake-action-queue family-decision-report-card" wx:if="{{lastReportCta.familyLearningDecisionView}}">
+          <view class="intake-action-title">{{lastReportCta.familyLearningDecisionView.title}}</view>
+          <view class="intake-packet-boundary">{{lastReportCta.familyLearningDecisionView.oneLine}}</view>
+          <view class="intake-action-item">
+            <view class="intake-action-main">
+              <text>{{lastReportCta.familyLearningDecisionView.p0Line}}</text>
+              <text>{{lastReportCta.familyLearningDecisionView.anchorLine}}</text>
+              <text>{{lastReportCta.familyLearningDecisionView.dayOneLine}}</text>
+            </view>
+            <view class="intake-action-meta">
+              <text>{{lastReportCta.familyLearningDecisionView.qualityLine}}</text>
+              <text>{{lastReportCta.familyLearningDecisionView.guardLine}}</text>
+              <text>{{lastReportCta.familyLearningDecisionView.tonightLine}}</text>
+            </view>
+          </view>
+        </view>
         <view class="intake-action-queue" wx:if="{{lastReportCta.dailyExecutionSeed}}">
           <view class="intake-action-title">{{lastReportCta.dailyExecutionSeed.title}}</view>
           <view class="intake-action-item">
