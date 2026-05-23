@@ -13,6 +13,7 @@ const WRONG_QUESTION_RE = /错题|订正|错因|卡住|不会|总错|做错|漏|
 const MATERIAL_TYPE_ALLOWLIST = [
   'parent_report',
   'talent_assessment',
+  'score_sheet',
   'school_material',
   'wrong_question_paper',
   'wrong_question_photo',
@@ -597,7 +598,7 @@ function buildUploadQuickAssessmentBridgeView(bridge = {}) {
     gateLine: uploadQuickAssessmentGateLine(bridge.releaseRule),
     entryLine: uploadQuickAssessmentEntryLine(bridge.route),
     evidenceLine: '需要补的证据：一条真实错题、一次孩子第一步、一条家长观察。',
-    boundaryLine: '边界：不贴天赋标签，不做长期定性，不把问卷结果当作提分承诺。'
+    boundaryLine: '边界：不贴天赋标签，不做长期定性，不把问卷结果当作固定分数预期。'
   };
 }
 
@@ -706,6 +707,12 @@ function buildMaterialTypeGuide(type) {
       modeLine: '验证方式：今晚一题试方法，明天问一句，第 7 天再看小变式。',
       blockedClaimsLine: '不能做：天赋定性、性格判断、排名解释、长期能力结论。'
     },
+    score_sheet: {
+      examplePlaceholder: '粘贴成绩单/周测文字即可：\n六年级数学 82，应用题扣 10 分，计算扣 3 分；\n英语阅读慢，完形错 4 个；\n家长想知道先补哪一类题、今晚先做什么。',
+      statusLine: '当前只把成绩作为家长私有优先级信号；不做公开排名、不发 XP、不承诺提分。',
+      modeLine: '验证方式：用分数定位弱学科，再用一张真实错题确认错因和第一步。',
+      blockedClaimsLine: '不能做：排名营销、分数刺激、不承诺分数结果、把成绩写进分享卡。'
+    },
     wrong_question_paper: {
       examplePlaceholder: '粘贴错题摘要即可：\n题型：六年级应用题，等量关系；\n孩子原想法：看到“多 3 倍”就直接乘；\n卡住第一步：不知道先设谁；\n错因猜测：条件顺序和单位混在一起。',
       statusLine: '当前生成错因报告、第一步小黑板和近迁移，不自动判分、不给整卷答案。',
@@ -743,10 +750,10 @@ function buildMaterialTypeGuide(type) {
       blockedClaimsLine: '不能做：自动抓网页、生成全文搬运、越过来源边界。'
     },
     pdf_excerpt: {
-      examplePlaceholder: '粘贴 PDF 摘录：\n牛顿第一定律：合外力为零时保持静止或匀速直线运动；\n孩子卡在“受力平衡”和“没有力”混淆。',
-      statusLine: '当前只处理 PDF 文字摘录，不解析 PDF 文件。',
-      modeLine: '验证方式：摘成概念差异卡和第一步判断卡。',
-      blockedClaimsLine: '不能做：自动解析文件、还原整本资料、直接输出题解。'
+      examplePlaceholder: '粘贴 PDF / 图片报告里已经提取出来的文字：\n报告摘要：孩子更依赖图像线索，遇到长题容易跳读；\n成绩：数学 82，应用题扣分集中；\n错题：列式前没有先圈条件。',
+      statusLine: 'PDF/OCR 只作为文字提取前置；提取后必须进入 AI 分析 + 本地安全校验，不直接给结论。',
+      modeLine: '验证方式：AI 生成报告草案，本地只放行方法候选、第一步、7 天行动和家长确认。',
+      blockedClaimsLine: '不能做：承诺自动读完整 PDF、OCR 秒判、整卷解析、直接输出题解。'
     }
   };
   return guides[type] || {
@@ -803,6 +810,7 @@ function buildUploadEntryDeck(activeMode = 'homework') {
 Page({
   data: {
     imagePaths: [],
+    materialFiles: [],
     homeworkText: '',
     materialText: '',
     materialType: 'class_notes',
@@ -925,6 +933,7 @@ Page({
     const labels = {
       parent_report: '家长观察',
       talent_assessment: '天赋/学习偏好测评',
+      score_sheet: '成绩单/周测',
       school_material: '学校/老师材料',
       wrong_question_paper: '错题/试卷',
       wrong_question_photo: '错题照片留档',
@@ -934,13 +943,13 @@ Page({
       handwriting: '手写整理',
       wechat_article: '公众号摘录',
       web_article: '网页摘录',
-      pdf_excerpt: 'PDF 摘录',
+      pdf_excerpt: 'PDF/图片报告文字',
       manual_notes: '手动整理'
     };
     const sourceLine = `来源：${labels[type] || '课堂笔记'}`;
     const importBoundary = '只处理你粘贴的文字摘录，不自动抓取链接、不解析 PDF 文件，也不生成现成答案。';
     if (!value) {
-      const methodMode = type === 'talent_assessment' || type === 'school_material' || type === 'wrong_question_paper' || type === 'parent_report';
+      const methodMode = type === 'talent_assessment' || type === 'score_sheet' || type === 'school_material' || type === 'wrong_question_paper' || type === 'parent_report' || type === 'pdf_excerpt';
       return {
         title: '学习材料变复习卡',
         label: methodMode
@@ -1449,7 +1458,7 @@ Page({
   },
 
   requiresStructuredEvidenceGate(sourceSchemaId = '') {
-    return ['wrong_question_paper', 'parent_report', 'talent_assessment', 'school_material'].includes(sourceSchemaId);
+    return ['wrong_question_paper', 'parent_report', 'talent_assessment', 'score_sheet', 'school_material'].includes(sourceSchemaId);
   },
 
   buildBlockedMaterialCta(decisionSource = {}, structuredEvidenceCapture = {}) {
@@ -1487,6 +1496,36 @@ Page({
       blockedFields,
       safeForReport: !blockedFields.some((field) => ['full_answer', 'auto_grading', 'talent_label'].includes(field))
     });
+  },
+
+  requestAiMaterialAnalysis(uploadIntakePacket = {}, structuredEvidenceSignals = {}, options = {}) {
+    const packet = uploadIntakePacket || {};
+    const contract = importIntake.buildAiMaterialAnalysisContract
+      ? importIntake.buildAiMaterialAnalysisContract(packet, structuredEvidenceSignals, {
+        sourceText: options.sourceText || '',
+        subject: structuredEvidenceSignals.subjectLabel || structuredEvidenceSignals.subjectKey || options.subject || '',
+        confirmedScores: options.confirmedScores || null,
+        parentObservation: options.parentObservation || ''
+      })
+      : null;
+    const fallback = contract && contract.fallback
+      ? contract.fallback
+      : importIntake.buildAiMaterialAnalysisFallback(packet, structuredEvidenceSignals, 'local_fallback_no_contract');
+    const payload = contract && contract.request ? contract.request.payload : null;
+    if (!api.analyzeMiniappMaterial || !payload || !String(payload.source_text_excerpt || '').trim()) {
+      return Promise.resolve(fallback);
+    }
+    return api.analyzeMiniappMaterial(payload).then((response) => {
+      const raw = response && response.result ? response.result : response;
+      return importIntake.sanitizeAiMaterialAnalysisResult
+        ? importIntake.sanitizeAiMaterialAnalysisResult(raw || {}, {
+          sourceSchemaId: payload.source_schema_id,
+          subject: payload.subject,
+          firstStep: structuredEvidenceSignals.firstStep || structuredEvidenceSignals.stuckFirstStep || '',
+          wrongCause: structuredEvidenceSignals.wrongCause || structuredEvidenceSignals.wrongCauseGuess || ''
+        })
+        : (raw || fallback);
+    }).catch(() => fallback);
   },
 
   buildTonightTaskCard(decisionSource = {}, reportState = {}, options = {}) {
@@ -1597,7 +1636,8 @@ Page({
       || sourceSchemaId;
     const scoreSignalView = buildUploadScoreSignalView(reportState, reportDraft, decisionSource);
     const contentCoverageReceipt = buildUploadContentCoverageReceipt(decisionSource, uploadEvidenceSignals);
-    const aiMaterialAnalysisContract = importIntake.buildAiMaterialAnalysisContract
+    const serverAiMaterialAnalysis = options.aiMaterialAnalysisResult || null;
+    const aiMaterialAnalysisContractBase = importIntake.buildAiMaterialAnalysisContract
       ? importIntake.buildAiMaterialAnalysisContract(uploadEvidenceSignals.uploadIntakePacket || {
         intakeSourceSchema: { id: sourceSchemaId, label: decisionSource.sourceSchemaLabel || sourceSchemaId },
         reportSeed: { sourceSchemaId, sourceSchemaLabel: decisionSource.sourceSchemaLabel || sourceSchemaId }
@@ -1607,6 +1647,12 @@ Page({
         confirmedScores: scoreSignalView.confirmedScores || null
       })
       : null;
+    const aiMaterialAnalysisContract = serverAiMaterialAnalysis && aiMaterialAnalysisContractBase
+      ? Object.assign({}, aiMaterialAnalysisContractBase, {
+        fallback: serverAiMaterialAnalysis,
+        serverAnalysisStatus: serverAiMaterialAnalysis.status || 'server_ai_analysis_ready'
+      })
+      : aiMaterialAnalysisContractBase;
     const aiMaterialSolutionView = buildUploadAiMaterialSolutionView(aiMaterialAnalysisContract, sourceSchemaId, {
       scoreSignalView,
       contentCoverageReceipt
@@ -2152,6 +2198,32 @@ Page({
     }).catch(() => {});
   },
 
+  chooseMaterialFile() {
+    if (!wx.chooseMessageFile) {
+      wx.showToast({ title: '当前微信版本不支持选文件，请先粘贴文字', icon: 'none' });
+      return;
+    }
+    wx.chooseMessageFile({
+      count: 3,
+      type: 'file',
+      extension: ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'],
+      success: (res) => {
+        const files = (res.tempFiles || []).map((item) => ({
+          name: item.name || 'material_file',
+          path: item.path || item.tempFilePath || '',
+          size: item.size || 0
+        })).filter((item) => item.path || item.name).slice(0, 3);
+        this.setData({
+          materialFiles: files,
+          materialType: 'pdf_excerpt',
+          showMaterialPanel: true
+        });
+        this.updateMaterialPreview(this.data.materialText, 'pdf_excerpt');
+        wx.showToast({ title: '文件已留档，请粘贴提取文字', icon: 'none' });
+      }
+    });
+  },
+
   onInput(event) {
     const homeworkText = event.detail.value;
     this.setData({ homeworkText });
@@ -2197,7 +2269,11 @@ Page({
     this.updateMaterialPreview(this.data.materialText, materialType);
   },
 
-  importMaterialPack() {
+  openQuickAssessment() {
+    navigation.navigateLearningRoute('/pages/profile/profile?from=upload_no_assessment&panel=report&quick_assessment=1');
+  },
+
+  async importMaterialPack() {
     const text = String(this.data.materialText || '').trim();
     if (!text) {
       wx.showToast({ title: '先粘贴学习材料', icon: 'none' });
@@ -2226,10 +2302,17 @@ Page({
       return;
     }
     const profile = storage.loadProfile();
-    const shouldImportCards = decisionSource.sourceSchemaId !== 'talent_assessment';
+    const shouldImportCards = !['talent_assessment', 'score_sheet'].includes(decisionSource.sourceSchemaId);
     let latestReportCta = null;
     let reportState = null;
+    let aiMaterialAnalysisResult = null;
     if (storage.buildLearningReportFromInput && storage.saveLearningReportState) {
+      aiMaterialAnalysisResult = await this.requestAiMaterialAnalysis(uploadIntakePacket, structuredEvidenceSignals, {
+        sourceText: evidenceText,
+        subject: structuredEvidenceSignals.subjectLabel || decisionSource.subjectLabel || profile.subject || '',
+        confirmedScores: null,
+        parentObservation: decisionSource.sourceSchemaId === 'parent_report' ? evidenceText : ''
+      });
       reportState = storage.buildLearningReportFromInput({
         mode: decisionSource.sourceSchemaId === 'wrong_question_paper' ? 'full' : 'standard',
         sourceText: evidenceText,
@@ -2266,7 +2349,8 @@ Page({
           structuredEvidenceCapture,
           structuredEvidenceReady: structuredEvidenceCapture.ready,
           structuredEvidenceMissing: structuredEvidenceCapture.missing,
-          guardedAiReportDraft: this.buildGuardedAiReportDraft(uploadIntakePacket, structuredEvidenceSignals)
+          guardedAiReportDraft: this.buildGuardedAiReportDraft(uploadIntakePacket, structuredEvidenceSignals),
+          aiMaterialAnalysisResult
         })
       });
       storage.saveLearningReportState(reportState, { skipBuild: true });
@@ -2294,6 +2378,7 @@ Page({
         sourceText: evidenceText,
         structuredEvidenceSignals,
         guardedAiReportDraft: this.buildGuardedAiReportDraft(uploadIntakePacket, structuredEvidenceSignals),
+        aiMaterialAnalysisResult,
         subject: structuredEvidenceSignals.subjectLabel || decisionSource.subjectLabel || profile.subject || ''
       });
       reportState = this.persistReportCtaToReportState(reportState, latestReportCta);

@@ -551,22 +551,27 @@
 
       <view class="secondary-row">
         <button class="secondary-button" bindtap="chooseImage">拍照留档，补一句错因</button>
+        <button class="secondary-button" bindtap="chooseMaterialFile">选 PDF/报告文件</button>
       </view>
 
       <view class="image-list" wx:if="{{imagePaths.length}}">
         <image class="thumb" mode="aspectFill" wx:for="{{imagePaths}}" wx:key="*this" src="{{item}}" />
       </view>
       <view class="photo-hint" wx:if="{{imagePaths.length}}">照片先保存在本机；请在上方补一句“错因/卡住点”，咕点再整理成可回访的错题卡。</view>
+      <view class="photo-hint" wx:if="{{materialFiles.length}}">文件已留档；当前不会假装自动读完整 PDF，请先粘贴 OCR/复制出来的关键文字，再生成 AI 分析草案。</view>
 
       <view class="material-report-hero">
         <view class="material-report-kicker">家长资料入口</view>
         <view class="material-report-title">上传测评 / 错题试卷 / 学校反馈，先生成家庭决策报告</view>
-        <view class="material-report-desc">只做方法候选、错因修复和下一证据；不贴天赋标签，不自动判分，不输出整卷结果。</view>
+        <view class="material-report-desc">支持测评、成绩、PDF/图片报告文字、错题和学校反馈；先提取文字，再由 AI 生成草案，本地规则只放行方法候选、错因修复和下一证据。</view>
         <view class="material-report-actions">
           <button class="material-report-chip" data-type="talent_assessment" bindtap="openMaterialReportPanel">学习偏好/测评资料</button>
+          <button class="material-report-chip" data-type="score_sheet" bindtap="openMaterialReportPanel">成绩单/周测</button>
+          <button class="material-report-chip" data-type="pdf_excerpt" bindtap="openMaterialReportPanel">PDF/图片报告文字</button>
           <button class="material-report-chip" data-type="wrong_question_paper" bindtap="openMaterialReportPanel">错题试卷</button>
           <button class="material-report-chip" data-type="school_material" bindtap="openMaterialReportPanel">学校反馈</button>
           <button class="material-report-chip" data-type="parent_report" bindtap="openMaterialReportPanel">家长观察</button>
+          <button class="material-report-chip" bindtap="openQuickAssessment">没有测评，做 15 题快测</button>
         </view>
       </view>
 
@@ -585,6 +590,7 @@
           <button class="material-source-chip {{materialType === 'wechat_article' ? 'active' : ''}}" data-type="wechat_article" bindtap="setMaterialType">公众号摘录</button>
           <button class="material-source-chip {{materialType === 'web_article' ? 'active' : ''}}" data-type="web_article" bindtap="setMaterialType">网页摘录</button>
           <button class="material-source-chip {{materialType === 'pdf_excerpt' ? 'active' : ''}}" data-type="pdf_excerpt" bindtap="setMaterialType">PDF 摘录</button>
+          <button class="material-source-chip {{materialType === 'score_sheet' ? 'active' : ''}}" data-type="score_sheet" bindtap="setMaterialType">成绩单/周测</button>
           <button class="material-source-chip {{materialType === 'class_notes' ? 'active' : ''}}" data-type="class_notes" bindtap="setMaterialType">课堂笔记</button>
           <button class="material-source-chip {{materialType === 'wrong_question_paper' ? 'active' : ''}}" data-type="wrong_question_paper" bindtap="setMaterialType">错题/试卷</button>
           <button class="material-source-chip {{materialType === 'talent_assessment' ? 'active' : ''}}" data-type="talent_assessment" bindtap="setMaterialType">学习偏好/测评资料</button>
@@ -592,6 +598,7 @@
           <button class="material-source-chip {{materialType === 'parent_report' ? 'active' : ''}}" data-type="parent_report" bindtap="setMaterialType">家长观察</button>
         </view>
         <view class="material-source-line">{{materialPreview.sourceLine}}</view>
+        <view class="material-source-line" wx:if="{{materialFiles.length}}">已选文件：{{materialFiles[0].name}}</view>
         <view class="material-boundary">{{materialPreview.importBoundary}}</view>
         <view class="material-source-line" wx:if="{{materialPreview.statusLine}}">{{materialPreview.statusLine}}</view>
         <view class="material-source-line" wx:if="{{materialPreview.modeLine}}">{{materialPreview.modeLine}}</view>

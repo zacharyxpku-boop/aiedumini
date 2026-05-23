@@ -386,6 +386,16 @@ const INTAKE_SOURCE_SCHEMAS = [
     aiBlocked: ['天赋定性', '升学结论', '人格标签']
   },
   {
+    id: 'score_sheet',
+    label: '成绩单/周测',
+    match: /成绩单|成绩|分数|周测|月考|单元测|期中|期末|扣分|得分|排名|名次|总分/,
+    localFields: ['score_subjects', 'weak_subject_candidate', 'wrong_question_anchor', 'parent_private_confirm'],
+    evidenceGap: ['一张真实错题', '孩子自己的第一步', '错因回访'],
+    reportUse: '进入家长私有优先级：只判断先补哪类题，再用真实错题验证错因和学习方法。',
+    aiAllowed: ['成绩摘要改写', '薄弱学科优先级建议', '家长可读行动计划'],
+    aiBlocked: ['排名营销', '分数刺激', '不承诺分数结果', '公开分享成绩']
+  },
+  {
     id: 'school_material',
     label: '学校/老师材料',
     match: /老师|学校|课堂|评语|批注|作业反馈|家校|班主任|错题本|试卷讲评/,
@@ -410,6 +420,7 @@ const INTAKE_SOURCE_SCHEMAS = [
 const MATERIAL_TYPE_LABELS = {
   parent_report: '家长观察',
   talent_assessment: '天赋/学习偏好测评',
+  score_sheet: '成绩单/周测',
   school_material: '学校/老师材料',
   wrong_question_paper: '错题/试卷',
   wrong_question_photo: '错题照片留档',
@@ -433,6 +444,9 @@ function detectIntakeSourceSchema(text = '', materialType = '') {
   if (/talent|assessment|preference/.test(String(materialType || ''))) {
     return INTAKE_SOURCE_SCHEMAS.find((schema) => schema.id === 'talent_assessment');
   }
+  if (/score|grade|exam/.test(String(materialType || ''))) {
+    return INTAKE_SOURCE_SCHEMAS.find((schema) => schema.id === 'score_sheet');
+  }
   if (/wrong|paper|exam|question/.test(String(materialType || ''))) {
     return INTAKE_SOURCE_SCHEMAS.find((schema) => schema.id === 'wrong_question_paper');
   }
@@ -448,6 +462,10 @@ const STRUCTURED_CAPTURE_PROMPT_BY_FIELD = {
   method_hypothesis: { label: '方法假设', prompt: '把测评结论改写成可验证假设：今晚试哪一个具体动作？' },
   cross_check_gate: { label: '交叉验证门槛', prompt: '需要哪条真实错题、作业或回访证据，才能继续相信这个方法？' },
   review_window: { label: '回访窗口', prompt: '明天或第 7 天要回看什么，才能判断方法是否真的适合？' },
+  score_subjects: { label: '成绩科目', prompt: '只摘录家长确认过的学科和分数/扣分点；没有明确成绩就写“待确认”。' },
+  weak_subject_candidate: { label: '薄弱候选', prompt: '从成绩里只提出一个优先关注学科或题型，不做排名刺激或固定分数预期。' },
+  wrong_question_anchor: { label: '错题锚点', prompt: '这份成绩需要哪一张真实错题来确认错因？没有错题就写需要补。' },
+  parent_private_confirm: { label: '家长确认', prompt: '家长确认哪些成绩字段可以进入私有报告；分数、排名不能进入分享或奖励。' },
   teacher_observation: { label: '老师观察', prompt: '老师反馈里可引用的一句事实是什么？不加入排名或评价。' },
   classroom_signal: { label: '课堂信号', prompt: '课堂/作业中出现的具体信号是什么，例如听懂但列式慢。' },
   home_school_question: { label: '家校问题', prompt: '家长下一次跟老师确认的一个安全问题是什么？' },
@@ -696,6 +714,11 @@ function buildRequiredNextEvidence(schema = {}, kind = '') {
       { id: 'real_homework_stuck_point', label: base[0] || '真实作业卡点', route: '/pages/upload/upload', owner: 'local_rule', unlocks: 'method_cross_check' },
       { id: 'two_revisit_records', label: base[1] || '两次以上回访证据', route: '/pages/review/review', owner: 'local_rule', unlocks: 'portrait_candidate' },
       { id: 'day7_variant_result', label: base[2] || '第 7 天小变式', route: '/pages/arcade/arcade', owner: 'local_rule', unlocks: 'weekly_method_signal' }
+    ],
+    score_sheet: [
+      { id: 'confirmed_score_subjects', label: base[0] || '家长确认成绩字段', route: '/pages/profile/profile?from=score_sheet_evidence', owner: 'local_rule', unlocks: 'private_parent_priority' },
+      { id: 'wrong_question_anchor', label: base[1] || '一张真实错题锚点', route: '/pages/upload/upload?materialType=wrong_question_paper', owner: 'local_rule', unlocks: 'wrong_cause_validation' },
+      { id: 'next_day_revisit', label: base[2] || '隔天回访结果', route: '/pages/review/review', owner: 'local_rule', unlocks: 'score_plan_confidence' }
     ],
     wrong_question_paper: [
       { id: 'child_original_thought', label: base[0] || '孩子原想法', route: '/pages/tutor/tutor?from=wrong_question_evidence', owner: 'ai_with_local_guardrail', unlocks: 'socratic_first_step' },
@@ -1032,11 +1055,17 @@ function buildUploadIntakePacket(text = '', imagePaths = [], materialType = '') 
     evidenceGap: intakeSourceSchema.evidenceGap,
     requiredNextEvidence,
     nextEvidenceUnlockPlan: requiredNextEvidence.map((item) => `${item.id}:${item.unlocks}`).join(' -> '),
-    releaseScope: intakeSourceSchema.id === 'talent_assessment' ? 'method_candidate_only' : 'tonight_action_first',
+    releaseScope: intakeSourceSchema.id === 'talent_assessment'
+      ? 'method_candidate_only'
+      : intakeSourceSchema.id === 'score_sheet'
+        ? 'parent_private_priority_only'
+        : 'tonight_action_first',
     portraitConfidenceWeight: intakeSourceSchema.id === 'talent_assessment' ? 0 : 1,
     scoreRankingPolicy: intakeSourceSchema.id === 'talent_assessment'
       ? 'degrade_to_unreleased_reference'
-      : 'release_only_with_confirmed_score_sheet_or_homework_evidence',
+      : intakeSourceSchema.id === 'score_sheet'
+        ? 'private_parent_priority_only_no_share_no_reward'
+        : 'release_only_with_confirmed_score_sheet_or_homework_evidence',
     requiredTextFields,
     structuredCapturePrompts,
     methodValidationChallengeChain,

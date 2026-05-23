@@ -119,7 +119,7 @@ const AI_LOCAL_DECISION_MATRIX = [
     module: '学习偏好/测评资料报告',
     betterOwner: 'hybrid',
     aiUse: '把测评摘要改写成家长能理解的学习方法候选。',
-    localRule: '本地代码阻断天赋定性、分数排名、提分承诺，并生成 7 天验证计划。',
+    localRule: '本地代码阻断天赋定性、分数排名、固定分数预期，并生成 7 天验证计划。',
     releaseGate: 'assessment_requires_real_homework_evidence'
   },
   {
@@ -202,8 +202,8 @@ const SEVEN_DAY_VALIDATION_PLAN = [
 ];
 
 const COMMERCIAL_CLAIM_BLOCKLIST = [
-  '提分承诺',
-  '保证成绩提升',
+  '固定分数预期',
+  '固定成绩提升预期',
   '保分',
   '升学承诺',
   '天赋定性',

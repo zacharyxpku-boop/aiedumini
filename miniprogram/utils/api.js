@@ -349,6 +349,16 @@ function recognizeLearningReport(payload) {
   });
 }
 
+function analyzeMiniappMaterial(payload) {
+  const session = storage.get(storage.KEYS.session, {});
+  return request('/api/miniapp-material-analysis', {
+    method: 'POST',
+    data: payload || {},
+    header: session.session_id ? { 'x-mini-session': session.session_id } : {},
+    timeout: 22000
+  });
+}
+
 module.exports = {
   request,
   initSession,
@@ -371,5 +381,6 @@ module.exports = {
   purchaseShopItem,
   fetchLeaderboard,
   fetchGameReport,
-  recognizeLearningReport
+  recognizeLearningReport,
+  analyzeMiniappMaterial
 };
