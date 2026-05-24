@@ -1607,6 +1607,18 @@ Page({
     const reportId = reportState && reportState.reportDraft ? reportState.reportDraft.id : '';
     const query = `reportId=${encodeURIComponent(reportId)}&sourceSchemaId=${encodeURIComponent(sourceSchemaId)}${cardId ? `&cardId=${encodeURIComponent(cardId)}` : ''}`;
     const reportDraft = reportState && reportState.reportDraft ? reportState.reportDraft : {};
+    const personalizedPreview = reportState.personalizedParentReportPreview
+      || reportDraft.personalizedParentReportPreview
+      || null;
+    const reportStandard = personalizedPreview && personalizedPreview.standard ? personalizedPreview.standard : null;
+    const reportExportPolicy = personalizedPreview && personalizedPreview.exportPolicy
+      ? personalizedPreview.exportPolicy
+      : {
+        htmlFirst: true,
+        pdfAfterParentReview: true,
+        printRule: 'HTML 预览优先；确认后用浏览器或服务端 print/export 转 PDF。',
+        miniappLine: '小程序内展示摘要，完整 HTML/PDF 走 H5 WebView 或服务端临时文件。'
+      };
     const uploadEvidenceSignals = options.structuredEvidenceSignals || {};
     const reportBehaviorSignals = reportDraft.behaviorSignals || {};
     const hasRealTaskReleaseEvidence = !!(
@@ -1871,6 +1883,21 @@ Page({
       personalizedClosureView,
       serviceHandoffPack,
       familyLearningDecisionView,
+      personalizedParentReportPreviewMeta: personalizedPreview ? {
+        id: personalizedPreview.id,
+        title: personalizedPreview.title,
+        format: personalizedPreview.format,
+        htmlLength: personalizedPreview.htmlLength,
+        standardId: personalizedPreview.standardId,
+        standardVersion: personalizedPreview.standardVersion,
+        printRule: personalizedPreview.printRule,
+        miniappExportLine: personalizedPreview.miniappExportLine,
+        parentTopLine: personalizedPreview.parentTopLine
+      } : null,
+      reportStandard,
+      reportExportPolicy,
+      reportExportLine: reportExportPolicy.miniappLine || reportExportPolicy.printRule || 'HTML 预览确认后再导出 PDF。',
+      reportPreviewRoute: `/pages/profile/profile?from=upload_report_preview&panel=assessment&${query}`,
       partnerDeliveryWorkbench: partnerWorkbench,
       uploadedMaterialDecisionDossier,
       needsParentConfirmation: servicePathway && servicePathway.partnerServiceDeliveryLedger
@@ -1937,6 +1964,10 @@ Page({
       dailyExecutionSeed: cta.dailyExecutionSeed || null,
       personalizedClosureView: cta.personalizedClosureView || null,
       familyLearningDecisionView: cta.familyLearningDecisionView || null,
+      personalizedParentReportPreviewMeta: cta.personalizedParentReportPreviewMeta || null,
+      reportStandard: cta.reportStandard || null,
+      reportExportPolicy: cta.reportExportPolicy || null,
+      reportExportLine: cta.reportExportLine || '',
       servicePathway: cta.servicePathway || null,
       partnerDeliveryWorkbench: cta.partnerDeliveryWorkbench || null,
       serviceHandoffPack: cta.serviceHandoffPack || null,
@@ -1958,6 +1989,10 @@ Page({
         dailyExecutionSeed: cta.dailyExecutionSeed || null,
         personalizedClosureView: cta.personalizedClosureView || null,
         familyLearningDecisionView: cta.familyLearningDecisionView || null,
+        personalizedParentReportPreviewMeta: cta.personalizedParentReportPreviewMeta || null,
+        reportStandard: cta.reportStandard || null,
+        reportExportPolicy: cta.reportExportPolicy || null,
+        reportExportLine: cta.reportExportLine || '',
         servicePathway: cta.servicePathway || null,
         partnerDeliveryWorkbench: cta.partnerDeliveryWorkbench || null,
         serviceHandoffPack: cta.serviceHandoffPack || null,

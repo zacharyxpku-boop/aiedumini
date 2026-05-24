@@ -11,6 +11,13 @@ const SUBJECTS = [
   { key: 'science', label: '科学', aliases: ['科学'] }
 ];
 
+let personalizedReportTemplate = null;
+try {
+  personalizedReportTemplate = require('./personalized-report-template');
+} catch (error) {
+  personalizedReportTemplate = null;
+}
+
 const QUICK_ASSESSMENT_QUESTIONS = [
   {
     id: 'start_mode',
@@ -2152,6 +2159,26 @@ function buildEvidenceBasedMethodologyGuide(methodCandidateCards = [], materialL
       sourceBasis: '降低工作记忆负荷，配合自我解释验证。'
     },
     {
+      id: 'elaboration_concrete_example',
+      label: '解释性追问/具体例子',
+      principle: '用“为什么这一步成立”“能不能举一个同类小例子”让孩子把规则说成自己的理解。',
+      useWhen: '概念会背但不会用、公式套错、语文阅读答不到点、英语语法只记规则时。',
+      reportLine: '报告会写成“今晚只追问一个为什么和一个小例子”，不把问题扩大成整章重学。',
+      productRoute: '/pages/tutor/tutor?from=methodology_elaboration',
+      evidenceGate: 'one_why_and_one_concrete_example',
+      sourceBasis: '精细加工、具体例子和自我解释能帮助家长判断孩子是真懂还是只会复述。'
+    },
+    {
+      id: 'interleaving_variant_transfer',
+      label: '交错练习/小变式迁移',
+      principle: '在同一错因稳定后混入一题小变式，验证孩子能否识别变化而不是背步骤。',
+      useWhen: hasWrongPaper ? '已有同一错因的错题或回访记录，可以做第 7 天小变式。' : '只有测评或成绩时先不放行，先补真实错题证据。',
+      reportLine: '报告会把它写成“第 7 天换一个条件试一下”，不是立刻加难度或刷综合卷。',
+      productRoute: hasWrongPaper ? '/pages/review/review?from=methodology_interleaving' : '/pages/upload/upload?from=methodology_interleaving_locked&type=wrong_question_paper',
+      evidenceGate: 'day7_variant_transfer_result',
+      sourceBasis: '交错练习、变式迁移和近迁移验证，用来判断方法是否能迁移。'
+    },
+    {
       id: 'retrieval_spaced_recall',
       label: '主动回忆/间隔复习',
       principle: '隔天和第 7 天回访同一错因，用回忆而不是重看答案验证。',
@@ -2183,9 +2210,16 @@ function buildEvidenceBasedMethodologyGuide(methodCandidateCards = [], materialL
       ? `当前产品路径优先承接到：${serviceMode.label}。`
       : '默认产品路径：苏格拉底私教先行，小讲堂和游戏化只在证据满足后补位。',
     cards,
+    parentTrustContract: {
+      promise: '先降低家长焦虑，再给一个今晚能做的小动作。',
+      evidenceLine: '所有结论都必须落到上传材料、孩子第一步、错因、隔天回访或第 7 天小变式。',
+      productLoop: '报告 -> 苏格拉底私教 -> 小黑板/小课堂兜底 -> 错因卡 -> 间隔回访/游戏化 -> 家长 5 秒复盘。',
+      serviceBoundary: '可以自然引导到原点方法论，但不做硬营销、不承诺提分、不输出固定天赋标签。'
+    },
     reportWritingRules: [
       '写“方法候选”，不写“固定天赋类型”。',
       '每条建议必须有今晚动作、明天回访和第 7 天验证。',
+      '至少覆盖一种理解方法、一种记忆方法、一种迁移验证方法，并说明进入哪个产品页面。',
       '家长能看到原因和下一步，但看不到原题照片、完整答案、分数排名或隐私字段。',
       '轻营销只落在产品方法论：苏格拉底私教、错因卡、间隔回访、游戏化复习和家长 5 秒复盘。'
     ],
@@ -3489,6 +3523,230 @@ function buildFamilyLearningDecisionReport(input = {}, parts = {}, parsed = {}) 
   });
 }
 
+function buildPersonalizedParentReportPreview(input = {}, parts = {}, parsed = {}) {
+  if (!personalizedReportTemplate || !personalizedReportTemplate.buildPersonalizedReportModel) return null;
+  const engineInput = buildFamilyDecisionReportInput(input, parts, parsed);
+  const assessment = engineInput.assessment || {};
+  const profile = engineInput.profile || {};
+  const modelInput = {
+    studentName: profile.studentName || input.studentName || '',
+    stage: profile.grade || profile.schoolStage || input.grade || input.stage || '',
+    generatedAt: nowIso(input.now).slice(0, 10),
+    assessmentProfile: {
+      learningChannel: assessment.learningChannel || '待补充学习输入偏好',
+      brainPreference: assessment.brainPreference || '待补充信息处理偏好',
+      behaviorMode: assessment.behaviorMode || '待补充行为启动方式',
+      persistenceIndex: assessment.persistenceIndex || '待补充坚持与节奏信号',
+      strengths: []
+        .concat(asArray(assessment.intelligenceRanks).slice(0, 3))
+        .concat(asArray(input.assessmentStrengths || input.strengths).slice(0, 3))
+        .filter(Boolean),
+      risks: [
+        '测评只作为学习方法候选，不写成固定天赋标签',
+        '成绩和排名只用于家庭内部优先级，不用于承诺提分或对外比较',
+        '每条建议必须落到今晚动作、明天回访和第 7 天变式验证'
+      ]
+    },
+    scoreRecords: engineInput.scoreRecords
+  };
+  const model = personalizedReportTemplate.buildPersonalizedReportModel(modelInput);
+  const html = personalizedReportTemplate.renderPersonalizedReportHtml(model);
+  const standard = buildPersonalizedReportStandard(input, parts, parsed, model, engineInput);
+  const preview = {
+    id: model.id,
+    title: model.title,
+    format: 'html_preview_printable_pdf',
+    standardId: standard.id,
+    standardVersion: standard.version,
+    standard,
+    model,
+    html,
+    htmlLength: html.length,
+    parentTopLine: model.prioritySubjects && model.prioritySubjects.length
+      ? `先看 ${model.prioritySubjects.map((item) => item.name).join(' / ')}，用今晚动作和 7 天回访验证方法是否真的适合。`
+      : '先补一份可确认成绩单或错题证据，再生成正式家长报告。',
+    prioritySubjects: model.prioritySubjects || [],
+    stableSubjects: model.stableSubjects || [],
+    methodology: model.methodology || [],
+    guardrails: model.guardrails || [],
+    routes: Array.from(new Set((model.subjects || []).map((item) => item.route).filter(Boolean))),
+    exportPolicy: standard.exportPolicy,
+    printRule: standard.exportPolicy.printRule,
+    miniappExportLine: standard.exportPolicy.miniappLine
+  };
+  return preview;
+}
+
+function buildPersonalizedReportStandard(input = {}, parts = {}, parsed = {}, model = {}, engineInput = {}) {
+  const sources = Array.isArray(parts.reportSources) ? parts.reportSources : [];
+  const sourceIds = new Set(sources.map((source) => source.sourceSchemaId || source.type).filter(Boolean));
+  const hasScore = Object.keys(parts.parsedScores || {}).length > 0
+    || (engineInput.scoreRecords || []).some((record) => Array.isArray(record.subjects) && record.subjects.length);
+  const hasQuickAssessment = Array.isArray(parts.assessmentAnswers) && parts.assessmentAnswers.length >= 8;
+  const hasTalentReport = sourceIds.has('talent_assessment') || !!(input.assessmentData || input.assessment || input.talentAssessment);
+  const hasWrongQuestion = sourceIds.has('wrong_question_paper') || sourceIds.has('wrong_question_photo') || /错题|订正|卡住|第一步/.test(String(input.sourceText || input.scoreText || ''));
+  const hasParentObservation = sourceIds.has('parent_report') || !!(input.parentObservation || (parts.behaviorSignals && Object.keys(parts.behaviorSignals).length));
+  const collected = [
+    hasTalentReport ? 'talent_assessment' : '',
+    hasQuickAssessment ? 'quick_questionnaire' : '',
+    hasScore ? 'score_sheet' : '',
+    hasWrongQuestion ? 'wrong_question' : '',
+    hasParentObservation ? 'parent_observation' : ''
+  ].filter(Boolean);
+  const materialCases = [
+    {
+      id: 'talent_report_uploaded',
+      label: '上传天赋/学习偏好报告',
+      when: '已有第三方测评、学习偏好报告或家长上传的 PDF/图片文字摘录。',
+      output: '只输出方法候选、潜能释放条件和验证门槛。',
+      mustPairWith: ['真实错题第一步', '隔天回访', '第 7 天小变式'],
+      blocked: ['固定天赋标签', '人格定性', '升学/提分承诺']
+    },
+    {
+      id: 'no_talent_report_questionnaire',
+      label: '没有测评，走 15 题快测',
+      when: '家长没有现成报告，或者报告信息不足。',
+      output: '用问卷形成学习入口假设，再等待真实作业交叉验证。',
+      mustPairWith: ['至少 8 题问卷', '孩子/家长观察', '一条真实学习任务'],
+      blocked: ['把问卷当诊断', '直接生成长期画像']
+    },
+    {
+      id: 'score_sheet_only',
+      label: '只有成绩单/周测',
+      when: '只有分数、排名或学科表现。',
+      output: '只给学科优先级和下一证据队列。',
+      mustPairWith: ['对应错题', '孩子第一步', '错因命名'],
+      blocked: ['排名营销', '保分', '只按分数推荐训练']
+    },
+    {
+      id: 'wrong_question_uploaded',
+      label: '上传错题/试卷/订正',
+      when: '有错题、订正痕迹、孩子原想法或卡住描述。',
+      output: '生成第一步、小黑板、错因卡、隔天回访和轻练习入口。',
+      mustPairWith: ['孩子原想法', '卡住第一步', '错因猜测'],
+      blocked: ['整题答案', '整卷解析', '替孩子完成作业']
+    },
+    {
+      id: 'mixed_materials',
+      label: '多材料混合',
+      when: '测评、成绩、错题、学校反馈、家长观察同时存在。',
+      output: '统一进入同一份家长 HTML 报告：先决策页，再证据边界，再成绩河流，再方法推理图。',
+      mustPairWith: ['证据分级', '材料来源台账', '本地放行门'],
+      blocked: ['不同材料互相替代', '把 AI 草案当事实']
+    }
+  ];
+  const selectedCaseIds = materialCases
+    .filter((item) => {
+      if (item.id === 'talent_report_uploaded') return hasTalentReport;
+      if (item.id === 'no_talent_report_questionnaire') return !hasTalentReport;
+      if (item.id === 'score_sheet_only') return hasScore && !hasWrongQuestion;
+      if (item.id === 'wrong_question_uploaded') return hasWrongQuestion;
+      if (item.id === 'mixed_materials') return collected.length >= 3;
+      return false;
+    })
+    .map((item) => item.id);
+  return {
+    id: 'parent_personalized_report_standard',
+    version: '2026-05-24.visible-decision-v1',
+    title: '家长个性化学习报告标准',
+    visualStandard: {
+      firstPages: [
+        '封面',
+        '家长决策页',
+        '测评画像与证据边界',
+        '成绩证据河流',
+        '方法论推理图'
+      ],
+      requiredSections: [
+        '材料信号',
+        '教育学解释',
+        '学习动作',
+        '验证门槛',
+        '今晚/明天/第 7 天闭环'
+      ],
+      avoidLayout: ['目录前置', '大段 AI 文案', '方框堆叠', '产品先行营销']
+    },
+    evidenceProtocol: {
+      collected,
+      selectedCaseIds,
+      sourceOfTruth: '本地规则决定证据分级、字段放行、下一步入口和 PDF 导出；AI 只负责解释、追问和家长可读改写。',
+      minimumReportEvenWhenSparse: '材料不足时仍输出同一版式，但明确标注“方法候选/待补证据”，不升级长期画像。',
+      releaseChain: ['材料分类', '证据等级', '方法假设', '真实任务验证', '7 天回访', '长期画像候选']
+    },
+    reportSop: {
+      intake: '先按材料类型入库：测评/问卷、成绩、错题、学校反馈、家长观察，各自保留来源和放行范围。',
+      normalize: '把非标材料统一转成五类字段：孩子优势信号、当前卡点、学科证据、方法候选、下一条待补证据。',
+      analyze: '先解释“为什么这个孩子更适合这种学习路径”，再给今晚动作；先客观判断，后自然连接产品入口。',
+      validate: '任何测评或问卷结论都必须经过真实任务、隔天回访和第 7 天小变式验证。',
+      deliver: '输出同一套 HTML 报告结构；家长确认后再导出 PDF 或进入小程序行动闭环。'
+    },
+    methodologyBackbone: [
+      { id: 'socratic', label: '苏格拉底追问', useWhen: '孩子知道知识点但卡在第一步、不会解释为什么这样做。', evidenceGate: '孩子能说出第一步和判断依据。' },
+      { id: 'feynman', label: '费曼复述', useWhen: '孩子会做但讲不清，或家长需要确认是否真懂。', evidenceGate: '孩子能用自己的话讲给家长听。' },
+      { id: 'retrieval_spaced', label: '提取练习与间隔复习', useWhen: '当天会、隔天忘，或错题反复出现。', evidenceGate: '次日和第 7 天能不看答案说出关键步骤。' },
+      { id: 'dual_coding', label: '图像化/双编码', useWhen: '测评或表现显示更依赖图像、结构、关系图。', evidenceGate: '孩子能把题意画成关系图或流程图。' },
+      { id: 'interleaving', label: '交错练习与变式迁移', useWhen: '单题会，换问法就错。', evidenceGate: '第 7 天小变式能迁移同一个方法。' }
+    ],
+    competitorClosureBenchmarks: [
+      {
+        id: 'khanmigo_private_tutor',
+        benchmark: 'Khanmigo 的强项是苏格拉底式 AI 私教、不给答案、过程可追踪。',
+        productAnswer: '原点要把上传报告后的第一步直接送到 AI 私教，只追问第一步、错因和判断依据。',
+        route: '/pages/tutor/tutor?from=parent_report_standard',
+        evidenceReturn: 'child_first_step + socratic_receipt + no_full_answer'
+      },
+      {
+        id: 'synthesis_game_loop',
+        benchmark: 'Synthesis 的强项是把挑战做成游戏化任务，靠参与感和可见进展留住孩子。',
+        productAnswer: '原点不做泛娱乐游戏，只在真实错因通过门槛后开放轻练习/回忆挑战。',
+        route: '/pages/arcade/arcade?from=parent_report_standard',
+        evidenceReturn: 'retrieval_result + xp_gate + parent_receipt'
+      },
+      {
+        id: 'alpha_visible_progress',
+        benchmark: 'Alpha School 的强项是高频反馈、个性化节奏和家长能看见的进展。',
+        productAnswer: '原点用今晚、明天、第 7 天三个窗口让家长看到方法是否真的有效。',
+        route: '/pages/review/review?from=parent_report_standard',
+        evidenceReturn: 'next_day_revisit + day7_variant + confidence_update'
+      },
+      {
+        id: 'parent_trust_report',
+        benchmark: '多数竞品报告偏数据或练习结果，家长很难知道为什么这个方法适合孩子。',
+        productAnswer: '原点报告先讲天赋/材料证据边界，再讲方法匹配，再给产品动作，避免硬营销。',
+        route: '/pages/profile/profile?from=parent_report_standard',
+        evidenceReturn: 'source_ledger + method_gate + export_policy'
+      }
+    ],
+    miniappOperationalPlan: {
+      primarySurface: '小程序先承接上传、摘要、行动闭环；完整 HTML/PDF 走 H5 WebView 或服务端临时文件。',
+      lightAppSurface: '轻量 APP 可以复用同一套标准对象：上传材料、生成 HTML、父母确认、打印 PDF、回流行动。',
+      nextBuildOrder: [
+        '上传页：材料分类和证据门槛',
+        '报告页：标准 HTML 报告入口和导出说明',
+        '私教页：第一步追问与小课堂补位',
+        '复习/游戏页：次日和第 7 天验证',
+        '家长页：报告证据、方法匹配、下一动作汇总'
+      ],
+      blockedShortcut: '不要在小程序内承诺直接解析任意 PDF、直接一键下载 PDF、或把测评报告写成固定天赋结论。'
+    },
+    materialCases,
+    exportPolicy: {
+      htmlFirst: true,
+      pdfAfterParentReview: true,
+      printRule: 'HTML 预览优先；确认后用浏览器或服务端 print/export 转 PDF。',
+      miniappLine: '小程序内展示家长摘要与报告入口；完整 HTML/PDF 建议通过服务端生成临时文件或 H5 WebView 打开后打印。',
+      blocked: ['在小程序端假装直接解析完整 PDF', '无服务端能力时承诺一键下载 PDF', '把原题照片或隐私字段写进导出文件']
+    },
+    qualityGates: [
+      '不出现固定天赋标签',
+      '不承诺提分/保分',
+      '不展示原题照片、完整答案、完整对话、联系方式',
+      '每条方法必须有验证门槛',
+      '材料不足时降级为方法候选'
+    ]
+  };
+}
+
 function buildLearningReportDraft(input = {}) {
   const sources = normalizeReportSources(input);
   const allText = [input.sourceText || '', input.scoreText || ''].concat(sources.map((source) => source.text || '')).join('\n');
@@ -3606,6 +3864,7 @@ function buildLearningReportDraft(input = {}) {
     commercialFamilySolutionBook
   });
   const familyLearningDecisionReport = buildFamilyLearningDecisionReport(input, parts, parsed);
+  const personalizedParentReportPreview = buildPersonalizedParentReportPreview(input, parts, parsed);
   const missing = missingItems(parts);
   const reportDraft = {
     id: input.id || `learning_report_${String(nowIso(input.now)).slice(0, 10).replace(/-/g, '')}`,
@@ -3662,6 +3921,7 @@ function buildLearningReportDraft(input = {}) {
     commercialFamilySolutionBook,
     aiLocalImplementationMatrix,
     familyLearningDecisionReport,
+    personalizedParentReportPreview,
     familyReportQualityCheck: familyLearningDecisionReport ? familyLearningDecisionReport.qualityCheck : null,
     generatedAt: nowIso(input.now),
     missingItems: missing,
@@ -3725,6 +3985,7 @@ function buildLearningReportDraft(input = {}) {
     commercialFamilySolutionBook,
     aiLocalImplementationMatrix,
     familyLearningDecisionReport,
+    personalizedParentReportPreview,
     familyReportQualityCheck: familyLearningDecisionReport ? familyLearningDecisionReport.qualityCheck : null,
     reportCompleteness: completeness,
     reportStatus: {
@@ -3766,6 +4027,8 @@ module.exports = {
   buildCommercialFamilySolutionBook,
   buildFamilyDecisionReportInput,
   buildFamilyLearningDecisionReport,
+  buildPersonalizedParentReportPreview,
+  buildPersonalizedReportStandard,
   buildGameReturnEvidence,
   buildOpenMaicInspiredReportDecisionBridge,
   buildCrossWeekTrendBoard,

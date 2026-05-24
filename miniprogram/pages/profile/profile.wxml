@@ -114,6 +114,33 @@
         <view class="family-summary-card profile-material-decision-snapshot" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossier}}">
           <view class="family-summary-title">测评/错题资料决策卡</view>
           <view class="family-summary-body family-readable">
+            <view class="parent-brief-block" wx:if="{{learningReportSummary.personalizedParentReportPreview}}">
+              <text class="parent-brief-label">标准版 HTML 报告</text>
+              <text>{{learningReportSummary.personalizedParentReportTitle}}</text>
+              <text>标准版本：{{learningReportSummary.personalizedParentReportStandardVersion}}｜格式：{{learningReportSummary.personalizedParentReportFormat}}</text>
+              <text>导出规则：{{learningReportSummary.personalizedParentReportExportLine}}</text>
+              <text wx:if="{{learningReportSummary.personalizedParentReportPrintRule}}">PDF：{{learningReportSummary.personalizedParentReportPrintRule}}</text>
+              <text wx:for="{{learningReportSummary.personalizedParentReportQualityGates}}" wx:key="*this">质量门槛：{{item}}</text>
+            </view>
+            <view class="parent-brief-block" wx:if="{{learningReportSummary.personalizedParentReportSop && showAdvancedProfile}}">
+              <text class="parent-brief-label">报告 SOP</text>
+              <text>录入：{{learningReportSummary.personalizedParentReportSop.intake}}</text>
+              <text>归一：{{learningReportSummary.personalizedParentReportSop.normalize}}</text>
+              <text>分析：{{learningReportSummary.personalizedParentReportSop.analyze}}</text>
+              <text>验证：{{learningReportSummary.personalizedParentReportSop.validate}}</text>
+              <text>交付：{{learningReportSummary.personalizedParentReportSop.deliver}}</text>
+            </view>
+            <view class="parent-brief-block" wx:if="{{learningReportSummary.personalizedParentReportCompetitorBenchmarks.length && showAdvancedProfile}}">
+              <text class="parent-brief-label">外部优秀做法后的闭环动作</text>
+              <text wx:for="{{learningReportSummary.personalizedParentReportCompetitorBenchmarks}}" wx:key="id">{{item.outsideLine}}｜我们承接：{{item.productAnswer}}｜入口：{{item.route}}｜回流：{{item.evidenceReturn}}</text>
+            </view>
+            <view class="parent-brief-block" wx:if="{{learningReportSummary.personalizedParentReportMiniappPlan && showAdvancedProfile}}">
+              <text class="parent-brief-label">小程序/轻量 APP 承接</text>
+              <text>{{learningReportSummary.personalizedParentReportMiniappPlan.primarySurface}}</text>
+              <text>{{learningReportSummary.personalizedParentReportMiniappPlan.lightAppSurface}}</text>
+              <text wx:for="{{learningReportSummary.personalizedParentReportMiniappPlan.nextBuildOrder}}" wx:key="*this">顺序：{{item}}</text>
+              <text>禁止捷径：{{learningReportSummary.personalizedParentReportMiniappPlan.blockedShortcut}}</text>
+            </view>
             <view class="parent-brief-block">
               <text class="parent-brief-label">{{learningReportSummary.uploadedMaterialDecisionDossierTitle}}</text>
               <text>{{learningReportSummary.uploadedMaterialDecisionDossierSummary}}</text>
@@ -129,7 +156,8 @@
               <text class="parent-brief-label">方法候选卡</text>
               <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierMethodCandidateCards}}" wx:key="id">{{item.label}}｜今晚：{{item.tonightTry}}｜明天：{{item.parentQuestionTomorrow}}｜第7天：{{item.day7Evidence}}</text>
             </view>
-            <view class="parent-brief-block" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierMethodologyGuide}}">
+            <button class="copy-action family-decision-primary" wx:if="{{!showAdvancedProfile}}" bindtap="toggleAdvancedProfile">查看更多证据和方法依据</button>
+            <view class="parent-brief-block" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierMethodologyGuide && showAdvancedProfile}}">
               <text class="parent-brief-label">{{learningReportSummary.uploadedMaterialDecisionDossierMethodologyGuideTitle}}</text>
               <text>{{learningReportSummary.uploadedMaterialDecisionDossierMethodologyGuideSummary}}</text>
               <text>{{learningReportSummary.uploadedMaterialDecisionDossierMethodologyGuidePrimary}}</text>
@@ -137,20 +165,20 @@
               <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierMethodologyCards}}" wx:key="id">{{item.label}}｜适用：{{item.useWhen}}｜报告写法：{{item.reportLine}}｜验证：{{item.evidenceGate}}</text>
               <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierMethodologyRules}}" wx:key="*this">报告规则：{{item}}</text>
             </view>
-            <view class="parent-brief-block" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierDecisionHeatmap.length}}">
+            <view class="parent-brief-block" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierDecisionHeatmap.length && showAdvancedProfile}}">
               <text class="parent-brief-label">决策热区</text>
               <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierDecisionHeatmap}}" wx:key="id">{{item.label}}｜{{item.status}}｜证据：{{item.evidence}}｜下一步：{{item.nextAction}}</text>
             </view>
-            <view class="parent-brief-block" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierFamilyActionStack.length}}">
+            <view class="parent-brief-block" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierFamilyActionStack.length && showAdvancedProfile}}">
               <text class="parent-brief-label">家庭行动栈</text>
               <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierFamilyActionStack}}" wx:key="id">{{item.label}}｜{{item.action}}｜门槛：{{item.gate}}</text>
             </view>
-            <view class="parent-brief-block" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierAiQualityGate}}">
+            <view class="parent-brief-block" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierAiQualityGate && showAdvancedProfile}}">
               <text class="parent-brief-label">AI解析质量门控</text>
               <text>{{learningReportSummary.uploadedMaterialDecisionDossierAiQualityLine}}</text>
               <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierAiQualityPlan}}" wx:key="id">{{item.label}}｜{{item.status}}｜{{item.action}}｜证据：{{item.evidence}}</text>
             </view>
-            <view class="parent-brief-block" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierPrivateTutorSolutionPack}}">
+            <view class="parent-brief-block" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierPrivateTutorSolutionPack && showAdvancedProfile}}">
               <text class="parent-brief-label">家庭私教方案｜{{learningReportSummary.uploadedMaterialDecisionDossierPrivateTutorSolutionPack.title}}</text>
               <text>{{learningReportSummary.uploadedMaterialDecisionDossierPrivateTutorSolutionPack.positioning}}</text>
               <text>{{learningReportSummary.uploadedMaterialDecisionDossierPrivateTutorSolutionPack.primaryPromise}}</text>
@@ -158,7 +186,7 @@
               <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierPrivateTutorDeliveryLoop}}" wx:key="day">{{item.label}}｜{{item.action}}｜证据：{{item.evidence}}</text>
               <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierPrivateTutorMoatSignals}}" wx:key="*this">护城河：{{item}}</text>
             </view>
-            <view class="parent-brief-block" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierSolutionBlueprint}}">
+            <view class="parent-brief-block" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierSolutionBlueprint && showAdvancedProfile}}">
               <text class="parent-brief-label">个性化学习方案蓝图</text>
               <text>{{learningReportSummary.uploadedMaterialDecisionDossierSolutionBlueprint.recommendedMode.label}}：{{learningReportSummary.uploadedMaterialDecisionDossierSolutionBlueprint.recommendedMode.why}}</text>
               <text>{{learningReportSummary.uploadedMaterialDecisionDossierSolutionBlueprint.servicePathwayHint}}</text>
@@ -166,7 +194,7 @@
               <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierSolutionFusionRules}}" wx:key="id">{{item.label}}｜用于：{{item.useFor}}｜验证：{{item.mustVerifyWith}}</text>
               <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierSolutionOwnership}}" wx:key="id">{{item.label}}：{{item.reason}}</text>
             </view>
-            <view class="parent-brief-block" wx:if="{{learningReportSummary.uploadedMaterialServiceHandoffPack}}">
+            <view class="parent-brief-block" wx:if="{{learningReportSummary.uploadedMaterialServiceHandoffPack && showAdvancedProfile}}">
               <text class="parent-brief-label">{{learningReportSummary.uploadedMaterialServiceHandoffTitle}}</text>
               <text>{{learningReportSummary.uploadedMaterialServiceHandoffSummary}}</text>
               <text wx:for="{{learningReportSummary.uploadedMaterialServiceHandoffCards}}" wx:key="id">{{item.label}}｜{{item.line}}｜{{item.evidenceLine}}</text>
@@ -176,19 +204,19 @@
                 <button class="profile-small-primary" wx:for="{{learningReportSummary.uploadedMaterialServiceHandoffActions}}" wx:key="id" data-id="{{item.id}}" data-label="{{item.label}}" data-route="{{item.route}}" data-reason="{{item.reason}}" bindtap="runUploadedMaterialDossierAction">{{item.label}}</button>
               </view>
             </view>
-            <view class="parent-brief-block" wx:if="{{learningReportSummary.reportRevisitEvidence}}">
+            <view class="parent-brief-block" wx:if="{{learningReportSummary.reportRevisitEvidence && showAdvancedProfile}}">
               <text class="parent-brief-label">报告回访验证</text>
               <text>当前阶段：{{learningReportSummary.reportRevisitValidationStage}}｜次日回访 {{learningReportSummary.reportRevisitNextDayCount}} 次</text>
               <text>长期画像：{{learningReportSummary.reportRevisitLongTermPortraitRelease}}｜第7天证据：{{learningReportSummary.reportRevisitDay7Ready ? '已就绪' : '未就绪'}}</text>
               <text>{{learningReportSummary.reportRevisitLocalRule}}</text>
             </view>
-            <view class="parent-brief-block" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierFamilyDecisionCalendar}}">
+            <view class="parent-brief-block" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierFamilyDecisionCalendar && showAdvancedProfile}}">
               <text class="parent-brief-label">{{learningReportSummary.uploadedMaterialDecisionDossierFamilyDecisionCalendar.title}}</text>
               <text>{{learningReportSummary.uploadedMaterialDecisionDossierFamilyDecisionCalendar.summary}}</text>
               <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierFamilyDecisionWeeks}}" wx:key="id">{{item.label}}｜家长判断：{{item.parentDecision}}｜孩子证据：{{item.childEvidence}}｜门槛：{{item.releaseGate}}</text>
               <text wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierMonthlyReview}}">月度复盘：{{learningReportSummary.uploadedMaterialDecisionDossierMonthlyReview.decision}}</text>
             </view>
-            <view class="parent-brief-block" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierDetailedSections.length}}">
+            <view class="parent-brief-block" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierDetailedSections.length && showAdvancedProfile}}">
               <text class="parent-brief-label">详细报告章节</text>
               <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierDetailedSections}}" wx:key="id">{{item.label}}｜{{item.status}}｜{{item.body}}</text>
             </view>
@@ -199,19 +227,19 @@
             <view class="parent-brief-reason">{{learningReportSummary.uploadedMaterialDecisionDossierTalentRule}}</view>
             <view class="parent-brief-reason">{{learningReportSummary.uploadedMaterialDecisionDossierWrongPaperRule}}</view>
             <view class="parent-brief-reason" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierReleaseGate}}">放行门槛：{{learningReportSummary.uploadedMaterialDecisionDossierReleaseGate.status}}</view>
-            <view class="parent-brief-block" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierMethodValidationStages.length}}">
+            <view class="parent-brief-block" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierMethodValidationStages.length && showAdvancedProfile}}">
               <text class="parent-brief-label">方法验证链</text>
               <text wx:for="{{learningReportSummary.uploadedMaterialDeliveryView.methodValidationCards}}" wx:key="id">{{item.label}}｜{{item.ownerLine}}｜{{item.unlockLine}}</text>
               <text wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierMethodValidationReleaseRule}}">{{learningReportSummary.uploadedMaterialDeliveryView.releaseLine}}</text>
               <text wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierMethodValidationNextAction}}">下一步：{{learningReportSummary.uploadedMaterialDecisionDossierMethodValidationNextAction}}</text>
             </view>
-            <view class="profile-action-row" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierRouteActions.length}}">
+            <view class="profile-action-row" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierRouteActions.length && showAdvancedProfile}}">
               <button class="profile-small-primary" wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierRouteActions}}" wx:key="id" data-id="{{item.id}}" data-label="{{item.label}}" data-route="{{item.route}}" data-reason="{{item.reason}}" bindtap="runUploadedMaterialDossierAction">{{item.label}}</button>
             </view>
           </view>
         </view>
 
-        <view class="family-summary-card profile-partner-workbench" wx:if="{{learningReportSummary.partnerDeliveryWorkbench}}">
+        <view class="family-summary-card profile-partner-workbench" wx:if="{{learningReportSummary.partnerDeliveryWorkbench && showAdvancedProfile}}">
           <view class="family-summary-title">{{learningReportSummary.partnerWorkbenchTitle}}</view>
           <view class="family-summary-body family-readable">
             <view class="parent-brief-block">

@@ -2,7 +2,7 @@
   "sourceRepo": "zacharyxpku-boop/ai-edu-platform",
   "sourcePath": "miniprogram",
   "sourceCommit": "0fbca04",
-  "syncedAt": "2026-05-24T00:17:44.336Z",
+  "syncedAt": "2026-05-24T12:09:45.086Z",
   "files": [
     "miniprogram/app.js",
     "miniprogram/app.json",
@@ -97,6 +97,7 @@
     "miniprogram/utils/navigation.js",
     "miniprogram/utils/openmaic-inspired-plan.js",
     "miniprogram/utils/partner-delivery-workbench.js",
+    "miniprogram/utils/personalized-report-template.js",
     "miniprogram/utils/privacy.js",
     "miniprogram/utils/product-readiness.js",
     "miniprogram/utils/real-homework-coverage.js",

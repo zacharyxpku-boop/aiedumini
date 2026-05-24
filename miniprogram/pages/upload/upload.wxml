@@ -235,6 +235,21 @@
         <view class="intake-packet-boundary" wx:if="{{lastReportCta.safeRelayPayload}}">{{lastReportCta.safeRelayReturnLine}}</view>
         <view class="intake-packet-boundary" wx:if="{{lastReportCta.guardedAiReportDraft}}">{{lastReportCta.guardedAiReportDraft.visibleLine}}</view>
         <view class="intake-packet-boundary" wx:if="{{lastReportCta.guardedAiReportDraft}}">AI 草案字段：摘要 / 追问 / 今晚行动 / 小讲堂候选；本地二次校验后才放行。</view>
+        <view class="intake-action-queue" wx:if="{{lastReportCta.personalizedParentReportPreviewMeta}}">
+          <view class="intake-action-title">标准版家长 HTML 报告</view>
+          <view class="intake-action-item">
+            <view class="intake-action-main">
+              <text>{{lastReportCta.personalizedParentReportPreviewMeta.title}}</text>
+              <text>{{lastReportCta.personalizedParentReportPreviewMeta.parentTopLine}}</text>
+            </view>
+            <view class="intake-action-meta">
+              <text>标准：{{lastReportCta.personalizedParentReportPreviewMeta.standardVersion}}</text>
+              <text>格式：{{lastReportCta.personalizedParentReportPreviewMeta.format}}</text>
+              <text>{{lastReportCta.reportExportLine}}</text>
+            </view>
+          </view>
+          <view class="intake-packet-boundary">导出规则：先在家长端确认 HTML 预览；PDF 由 H5/服务端打印导出，不能把原题照片、完整答案和隐私字段写入文件。</view>
+        </view>
         <view class="intake-action-queue" wx:if="{{lastReportCta.aiMaterialSolutionView}}">
           <view class="intake-action-title">{{lastReportCta.aiMaterialSolutionView.title}}</view>
           <view class="intake-packet-boundary">{{lastReportCta.aiMaterialSolutionView.statusLine}}</view>
@@ -300,6 +315,7 @@
         </view>
         <view class="upload-flow-actions">
           <button bindtap="viewLatestReport">查看家长报告</button>
+          <button bindtap="viewLatestReport">预览 HTML/PDF</button>
           <button bindtap="runReportFollowupAction">{{lastReportCta.actionLabel}}</button>
           <button wx:if="{{lastReportCta.gameRoute}}" bindtap="runReportGameAction">去轻练习</button>
         </view>

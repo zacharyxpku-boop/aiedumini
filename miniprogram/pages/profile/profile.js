@@ -1851,6 +1851,20 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
   const uploadedMaterialDeliveryView = buildProfileDossierDeliveryView(uploadedMaterialDecisionDossier, servicePathway);
   const reportRevisitEvidence = reportState.reportRevisitEvidence || uploadedMaterialDecisionDossier.servicePathwaySummary && uploadedMaterialDecisionDossier.servicePathwaySummary.revisitEvidence || null;
   const partnerServiceReviewCard = buildPartnerServiceReviewCard(partnerWorkbench, servicePathway, reportRevisitEvidence);
+  const personalizedParentReportPreview = reportState.personalizedParentReportPreview
+    || draft.personalizedParentReportPreview
+    || (uploadedMaterialReportHandoff && uploadedMaterialReportHandoff.personalizedParentReportPreviewMeta)
+    || null;
+  const personalizedParentReportStandard = reportState.reportStandard
+    || draft.reportStandard
+    || (personalizedParentReportPreview && personalizedParentReportPreview.standard)
+    || (uploadedMaterialReportHandoff && uploadedMaterialReportHandoff.reportStandard)
+    || null;
+  const personalizedParentReportExportPolicy = reportState.reportExportPolicy
+    || draft.reportExportPolicy
+    || (personalizedParentReportPreview && personalizedParentReportPreview.exportPolicy)
+    || (uploadedMaterialReportHandoff && uploadedMaterialReportHandoff.reportExportPolicy)
+    || null;
   return {
     title: draft.title || '学习画像',
     modeLabel: reportState.reportProgress && reportState.reportProgress.label ? reportState.reportProgress.label : '0% · 快速版',
@@ -2321,6 +2335,47 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     uploadedMaterialDecisionDossierHandoffLine: uploadedMaterialReportHandoff && uploadedMaterialReportHandoff.line ? uploadedMaterialReportHandoff.line : '',
     uploadedMaterialDecisionDossierHandoffReportId: uploadedMaterialReportHandoff && uploadedMaterialReportHandoff.reportId ? uploadedMaterialReportHandoff.reportId : '',
     uploadedMaterialDecisionDossierHandoffSourceSchemaId: uploadedMaterialReportHandoff && uploadedMaterialReportHandoff.sourceSchemaId ? uploadedMaterialReportHandoff.sourceSchemaId : '',
+    personalizedParentReportPreview,
+    personalizedParentReportTitle: personalizedParentReportPreview ? personalizedParentReportPreview.title || '家长个性化学习报告' : '',
+    personalizedParentReportStandardVersion: personalizedParentReportPreview
+      ? personalizedParentReportPreview.standardVersion || (personalizedParentReportStandard && personalizedParentReportStandard.version) || ''
+      : '',
+    personalizedParentReportFormat: personalizedParentReportPreview ? personalizedParentReportPreview.format || 'html_preview_printable_pdf' : '',
+    personalizedParentReportHtmlLength: personalizedParentReportPreview ? Number(personalizedParentReportPreview.htmlLength || 0) : 0,
+    personalizedParentReportExportLine: reportState.reportExportLine
+      || draft.reportExportLine
+      || (uploadedMaterialReportHandoff && uploadedMaterialReportHandoff.reportExportLine)
+      || (personalizedParentReportExportPolicy && (personalizedParentReportExportPolicy.miniappLine || personalizedParentReportExportPolicy.printRule))
+      || '',
+    personalizedParentReportPrintRule: personalizedParentReportExportPolicy ? personalizedParentReportExportPolicy.printRule || '' : '',
+    personalizedParentReportStandardCases: personalizedParentReportStandard && Array.isArray(personalizedParentReportStandard.materialCases)
+      ? personalizedParentReportStandard.materialCases.map((item) => ({
+        id: item.id,
+        label: item.label,
+        output: item.output
+      }))
+      : [],
+    personalizedParentReportSelectedCaseIds: personalizedParentReportStandard && personalizedParentReportStandard.evidenceProtocol && Array.isArray(personalizedParentReportStandard.evidenceProtocol.selectedCaseIds)
+      ? personalizedParentReportStandard.evidenceProtocol.selectedCaseIds
+      : [],
+    personalizedParentReportQualityGates: personalizedParentReportStandard && Array.isArray(personalizedParentReportStandard.qualityGates)
+      ? personalizedParentReportStandard.qualityGates
+      : [],
+    personalizedParentReportSop: personalizedParentReportStandard && personalizedParentReportStandard.reportSop
+      ? personalizedParentReportStandard.reportSop
+      : null,
+    personalizedParentReportCompetitorBenchmarks: personalizedParentReportStandard && Array.isArray(personalizedParentReportStandard.competitorClosureBenchmarks)
+      ? personalizedParentReportStandard.competitorClosureBenchmarks.map((item) => ({
+        id: item.id,
+        outsideLine: item.benchmark || '',
+        productAnswer: item.productAnswer || '',
+        route: item.route || '',
+        evidenceReturn: item.evidenceReturn || ''
+      }))
+      : [],
+    personalizedParentReportMiniappPlan: personalizedParentReportStandard && personalizedParentReportStandard.miniappOperationalPlan
+      ? personalizedParentReportStandard.miniappOperationalPlan
+      : null,
     uploadedMaterialDecisionDossierTitle: uploadedMaterialDecisionDossier.title || '',
     uploadedMaterialDecisionDossierSummary: uploadedMaterialDecisionDossier.summary || '',
     uploadedMaterialDecisionDossierReportUseRule: uploadedMaterialDecisionDossier.reportUseRule || '',
@@ -3724,12 +3779,7 @@ Page({
         readiness: 'learning_report_cta'
       });
     }
-    const cleanPath = path.split('?')[0];
-    if (['/pages/home/home', '/pages/review/review', '/pages/focus/focus', '/pages/tools/tools', '/pages/profile/profile'].indexOf(cleanPath) >= 0) {
-      wx.switchTab({ url: cleanPath });
-      return;
-    }
-    wx.navigateTo({ url: path });
+    navigation.navigateLearningRoute(path);
   },
 
   runFamilyDecisionHomepageAction() {
@@ -3746,11 +3796,7 @@ Page({
         evidenceLine: summary.familyDecisionHomepageSourceLine || ''
       });
     }
-    if (route.indexOf('/pages/profile/profile') >= 0 || route.indexOf('/pages/home/home') >= 0 || route.indexOf('/pages/review/review') >= 0 || route.indexOf('/pages/tools/tools') >= 0 || route.indexOf('/pages/focus/focus') >= 0) {
-      wx.switchTab({ url: route.split('?')[0] });
-      return;
-    }
-    wx.navigateTo({ url: route });
+    navigation.navigateLearningRoute(route);
   },
 
   runBorrowWorkbenchAction(event) {
