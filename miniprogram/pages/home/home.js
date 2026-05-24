@@ -612,6 +612,7 @@ Page({
     );
     const todayActions = this.buildTodayActions(topMust, reviewSummary, modulePath);
     const incomingShare = (storage.loadIncomingShare && storage.loadIncomingShare()) || this.data.incomingShare || null;
+    const incomingShareRelay = this.buildIncomingShareRelay(incomingShare);
     this.setData({
       state,
       weakPoints: (state.weak_points || []).slice(0, 2),
@@ -650,7 +651,7 @@ Page({
       parentHandoff: this.buildParentHandoff(topMust, reviewSummary, state),
       quickDock: this.buildQuickDock(topMust, reviewSummary, modulePath),
       incomingShare,
-      incomingShareRelay: this.buildIncomingShareRelay(incomingShare),
+      incomingShareRelay,
       todaySession,
       focusEntryReady,
       yesterdayReviewCard: yesterdayReviewCard ? Object.assign({}, yesterdayReviewCard, {
@@ -701,6 +702,8 @@ Page({
         miniLessonResume,
         learningReportState,
         uploadReportHandoff,
+        yesterdayReviewCard,
+        incomingShareRelay,
         growthMemory: growthMemoryLine
       }),
       growthMemory: {
@@ -2021,6 +2024,32 @@ Page({
       return;
     }
     this.goReview();
+  },
+
+  runPrimaryNextAction() {
+    const next = this.data.homeViewModel && this.data.homeViewModel.primaryNextAction;
+    if (!next) return;
+    if (next.dispatchCode === 1) {
+      this.goReportServiceResume();
+      return;
+    }
+    if (next.dispatchCode === 2) {
+      this.goMiniLessonResume();
+      return;
+    }
+    if (next.dispatchCode === 3) {
+      this.continueYesterdayReview();
+      return;
+    }
+    if (next.dispatchCode === 4) {
+      navigation.navigateLearningRoute('/pages/review/review?from=home_share_return');
+      return;
+    }
+    if (next.dispatchCode === 5) {
+      this.goFocus();
+      return;
+    }
+    this.openTutorFromHome(next.route || '/pages/tutor/tutor?from=home_primary_next');
   },
 
   goMiniLessonResume() {

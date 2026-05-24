@@ -129,6 +129,14 @@
               <text class="parent-brief-label">方法候选卡</text>
               <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierMethodCandidateCards}}" wx:key="id">{{item.label}}｜今晚：{{item.tonightTry}}｜明天：{{item.parentQuestionTomorrow}}｜第7天：{{item.day7Evidence}}</text>
             </view>
+            <view class="parent-brief-block" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierMethodologyGuide}}">
+              <text class="parent-brief-label">{{learningReportSummary.uploadedMaterialDecisionDossierMethodologyGuideTitle}}</text>
+              <text>{{learningReportSummary.uploadedMaterialDecisionDossierMethodologyGuideSummary}}</text>
+              <text>{{learningReportSummary.uploadedMaterialDecisionDossierMethodologyGuidePrimary}}</text>
+              <text>{{learningReportSummary.uploadedMaterialDecisionDossierMethodologyGuideServiceMode}}</text>
+              <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierMethodologyCards}}" wx:key="id">{{item.label}}｜适用：{{item.useWhen}}｜报告写法：{{item.reportLine}}｜验证：{{item.evidenceGate}}</text>
+              <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierMethodologyRules}}" wx:key="*this">报告规则：{{item}}</text>
+            </view>
             <view class="parent-brief-block" wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierDecisionHeatmap.length}}">
               <text class="parent-brief-label">决策热区</text>
               <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierDecisionHeatmap}}" wx:key="id">{{item.label}}｜{{item.status}}｜证据：{{item.evidence}}｜下一步：{{item.nextAction}}</text>
@@ -1334,6 +1342,7 @@
           <text wx:else>方法候选：先用真实错题、隔天回访和第 7 天小变式验证，不贴天赋或人格标签。</text>
           <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierMaterialLanes}}" wx:key="id">上传链路：{{item.label}}｜{{item.collected ? '已接入' : '待补充'}}｜可说：{{item.canSay}}｜不可说：{{item.cannotSay}}｜产出：{{item.output}}</text>
           <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierHowToLearnBetter}}" wx:key="id">怎么学候选：{{item.label}}｜证据：{{item.evidence}}｜验证：{{item.verifyWith}}</text>
+          <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierMethodologyCards}}" wx:key="id">方法论：{{item.label}}｜{{item.principle}}｜验证：{{item.evidenceGate}}</text>
           <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierDecisionHeatmap}}" wx:key="id">决策热区：{{item.label}}｜{{item.status}}｜{{item.nextAction}}</text>
           <text wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierFamilyActionStack}}" wx:key="id">家庭行动：{{item.label}}｜{{item.action}}｜{{item.gate}}</text>
           <text wx:if="{{learningReportSummary.uploadedMaterialDecisionDossierAiQualityGate}}">AI解析质量：{{learningReportSummary.uploadedMaterialDecisionDossierAiQualityLine}}</text>

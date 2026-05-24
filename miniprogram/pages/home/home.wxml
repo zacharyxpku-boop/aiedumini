@@ -61,6 +61,12 @@
 
       <view class="composer-shell">
       <view class="rc14-home-first-screen-card friend-safe-shell">
+      <view class="primary-next-action-card" wx:if="{{homeViewModel.primaryNextAction}}" catchtap="runPrimaryNextAction">
+        <view class="primary-next-action-kicker">{{homeViewModel.primaryNextAction.kicker}}</view>
+        <view class="primary-next-action-title">{{homeViewModel.primaryNextAction.title}}</view>
+        <view class="primary-next-action-body">{{homeViewModel.primaryNextAction.body}}</view>
+        <view class="primary-next-action-cta">{{homeViewModel.primaryNextAction.cta}}</view>
+      </view>
       <view class="yesterday-review-card" wx:if="{{yesterdayReviewCard}}" bindtap="continueYesterdayReview">
         <view class="yesterday-review-kicker">轻回访</view>
         <view class="yesterday-review-title">{{yesterdayReviewCard.noticeText}}</view>

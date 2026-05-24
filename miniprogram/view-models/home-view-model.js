@@ -106,10 +106,92 @@ function buildReportServiceResume(input = {}) {
   };
 }
 
+function buildPrimaryHomeNextAction(input = {}) {
+  const candidates = [];
+  if (input.reportServiceResume) {
+    candidates.push({
+      type: 'report_action',
+      priority: 10,
+      dispatchCode: 1,
+      kicker: '报告建议',
+      title: safeText(input.reportServiceResume.title, '继续家庭方案验证'),
+      body: safeText(input.reportServiceResume.actionLine || input.reportServiceResume.statusLine, '今晚只做一个最小动作。'),
+      cta: safeText(input.reportServiceResume.cta, '继续行动')
+    });
+  }
+  if (input.miniLessonResume) {
+    candidates.push({
+      type: 'mini_lesson',
+      priority: 20,
+      dispatchCode: 2,
+      kicker: '3 分钟小课堂',
+      title: safeText(input.miniLessonResume.topicLabel || input.miniLessonResume.title, '继续小课堂'),
+      body: `小黑板：${safeText(input.miniLessonResume.blackboardLine, '先说出第一步')}`,
+      cta: '继续小课堂'
+    });
+  }
+  if (input.yesterdayReviewCard) {
+    candidates.push({
+      type: 'review_return',
+      priority: 30,
+      dispatchCode: 3,
+      kicker: '轻回访',
+      title: safeText(input.yesterdayReviewCard.noticeText, '接上昨天那一步'),
+      body: safeText(input.yesterdayReviewCard.childArticulatedStep, '先复述昨天的第一步。'),
+      cta: '继续回访'
+    });
+  }
+  if (input.incomingShareRelay) {
+    const receiverAction = input.incomingShareRelay.defaultReceiverAction || {};
+    candidates.push({
+      type: 'share_return',
+      priority: 40,
+      dispatchCode: 4,
+      kicker: '学习复盘卡',
+      title: safeText(input.incomingShareRelay.title || input.incomingShareRelay.defaultReceiverActionTitle, '接住一个学习动作'),
+      body: safeText(input.incomingShareRelay.defaultReceiverActionLine || input.incomingShareRelay.summary, '只接第一步、错因和回访动作。'),
+      cta: safeText(receiverAction.displayLabel, '接力这一小步')
+    });
+  }
+  if (input.todayFocus) {
+    candidates.push({
+      type: 'first_step',
+      priority: 50,
+      dispatchCode: 5,
+      kicker: '今晚路线',
+      title: '接上已经确认的第一步',
+      body: safeText(input.todayFocus.systemSuggestedStep || input.todayFocus.childArticulatedStep, '先把这一小步做完。'),
+      cta: '去专注舱'
+    });
+  }
+  const selected = candidates.sort((a, b) => a.priority - b.priority)[0];
+  const fallback = selected || {
+    type: 'first_step',
+    priority: 90,
+    dispatchCode: 6,
+    kicker: '今晚路线',
+    title: '今晚作业先从哪一步开始？',
+    body: '发作业清单，或者说一句你卡在哪里。',
+    cta: '帮我安排今晚学习'
+  };
+  return {
+    priority: fallback.priority,
+    dispatchCode: fallback.dispatchCode,
+    kicker: fallback.kicker,
+    title: fallback.title,
+    body: fallback.body,
+    cta: fallback.cta
+  };
+}
+
 function buildHomeViewModel(input = {}) {
   const hasPlanOrFocus = !!(input.tonightPlan || input.todayFocus);
   const miniLessonResume = buildMiniLessonResume(input);
   const reportServiceResume = buildReportServiceResume(input);
+  const primaryNextAction = buildPrimaryHomeNextAction(Object.assign({}, input, {
+    miniLessonResume,
+    reportServiceResume
+  }));
   return {
     routePill: '今晚路线 · 第 1 步：排顺序',
     companionStrip: companionStrip(input.companionPreference),
@@ -128,6 +210,7 @@ function buildHomeViewModel(input = {}) {
     teacherPickerHint: '我懂你卡住了，我陪你先迈出第一步。',
     selectedCompanionLabel: safeText((companionPreference(input.companionPreference) || {}).selectedLabel, '咕点'),
     emptyState: hasPlanOrFocus ? null : '还没有今晚路线。咕点在旁边，先说一句卡在哪里。',
+    primaryNextAction,
     nextStep: buildNextStep(Object.assign({}, input, { miniLessonResume })),
     miniLessonResume,
     reportServiceResume,
@@ -136,5 +219,6 @@ function buildHomeViewModel(input = {}) {
 }
 
 module.exports = {
-  buildHomeViewModel
+  buildHomeViewModel,
+  buildPrimaryHomeNextAction
 };

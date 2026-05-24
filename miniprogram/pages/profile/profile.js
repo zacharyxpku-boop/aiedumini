@@ -2371,6 +2371,17 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     uploadedMaterialDecisionDossierMonthlyReview: uploadedMaterialDecisionDossier.familyDecisionCalendar && uploadedMaterialDecisionDossier.familyDecisionCalendar.monthlyReview
       ? uploadedMaterialDecisionDossier.familyDecisionCalendar.monthlyReview
       : null,
+    uploadedMaterialDecisionDossierMethodologyGuide: uploadedMaterialDecisionDossier.evidenceBasedMethodologyGuide || null,
+    uploadedMaterialDecisionDossierMethodologyGuideTitle: uploadedMaterialDecisionDossier.evidenceBasedMethodologyGuide ? uploadedMaterialDecisionDossier.evidenceBasedMethodologyGuide.title || '' : '',
+    uploadedMaterialDecisionDossierMethodologyGuideSummary: uploadedMaterialDecisionDossier.evidenceBasedMethodologyGuide ? uploadedMaterialDecisionDossier.evidenceBasedMethodologyGuide.summary || '' : '',
+    uploadedMaterialDecisionDossierMethodologyGuidePrimary: uploadedMaterialDecisionDossier.evidenceBasedMethodologyGuide ? uploadedMaterialDecisionDossier.evidenceBasedMethodologyGuide.primaryRecommendation || '' : '',
+    uploadedMaterialDecisionDossierMethodologyGuideServiceMode: uploadedMaterialDecisionDossier.evidenceBasedMethodologyGuide ? uploadedMaterialDecisionDossier.evidenceBasedMethodologyGuide.serviceModeLine || '' : '',
+    uploadedMaterialDecisionDossierMethodologyCards: uploadedMaterialDecisionDossier.evidenceBasedMethodologyGuide && Array.isArray(uploadedMaterialDecisionDossier.evidenceBasedMethodologyGuide.cards)
+      ? uploadedMaterialDecisionDossier.evidenceBasedMethodologyGuide.cards
+      : [],
+    uploadedMaterialDecisionDossierMethodologyRules: uploadedMaterialDecisionDossier.evidenceBasedMethodologyGuide && Array.isArray(uploadedMaterialDecisionDossier.evidenceBasedMethodologyGuide.reportWritingRules)
+      ? uploadedMaterialDecisionDossier.evidenceBasedMethodologyGuide.reportWritingRules
+      : [],
     uploadedMaterialDecisionDossierWrongPaperDiagnosisCards: Array.isArray(uploadedMaterialDecisionDossier.wrongPaperDiagnosisCards) ? uploadedMaterialDecisionDossier.wrongPaperDiagnosisCards : [],
     uploadedMaterialDecisionDossierMethodValidationStages: Array.isArray(uploadedMaterialDecisionDossier.methodValidationStages) ? uploadedMaterialDecisionDossier.methodValidationStages : [],
     uploadedMaterialDecisionDossierMethodValidationReleaseRule: uploadedMaterialDecisionDossier.methodValidationReleaseRule || '',

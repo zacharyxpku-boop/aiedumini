@@ -1992,6 +1992,17 @@ function buildSourceEvidenceLedger(input = {}, parts = {}, familyDecisionMemo = 
       nextAction: '抽一题做第一步，不做整张卷自动答案。',
       aiAllowed: '苏格拉底追问、小黑板话术、同错因变式表达',
       aiBlocked: '完整答案、自动判分、分数排名解释'
+    },
+    {
+      id: 'score_sheet',
+      label: '成绩单/周测',
+      pattern: /成绩|分数|周测|单元测|期中|期末|测验|考试|数学\s*\d+|语文\s*\d+|英语\s*\d+/,
+      localFields: ['学科优先级', '趋势线索', '待验证弱项', '家长私密查看'],
+      canProduce: '学科优先级和下一证据队列',
+      missing: ['对应错题样本', '孩子第一步', '隔天回访结果'],
+      nextAction: '只用成绩决定先看哪一科，不用来排名、刺激或承诺提分。',
+      aiAllowed: '把分数翻译成家长能执行的优先级建议',
+      aiBlocked: '公开排名、保分承诺、天赋定性、羞辱性比较'
     }
   ].map((lane) => {
     const matchedSource = sources.find((source) => sourceTextHas(source, lane.pattern));
@@ -2099,6 +2110,90 @@ function buildFamilyDecisionCalendar(input = {}, methodCandidateCards = [], wron
   };
 }
 
+function buildEvidenceBasedMethodologyGuide(methodCandidateCards = [], materialLanes = [], servicePathway = {}) {
+  const primaryMethod = methodCandidateCards[0] || {};
+  const laneById = materialLanes.reduce((acc, lane) => {
+    if (lane && lane.id) acc[lane.id] = lane;
+    return acc;
+  }, {});
+  const hasAssessment = !!(laneById.talent_assessment && laneById.talent_assessment.collected);
+  const hasWrongPaper = !!(laneById.wrong_question_paper && laneById.wrong_question_paper.collected);
+  const hasParentReport = !!(laneById.parent_report && laneById.parent_report.collected);
+  const serviceMode = servicePathway && servicePathway.primaryMode ? servicePathway.primaryMode : {};
+  const cards = [
+    {
+      id: 'socratic_first_step',
+      label: '苏格拉底第一步',
+      principle: '先追问孩子的第一步和理由，不直接给完整答案。',
+      useWhen: hasWrongPaper ? '已有真实错题、试卷或卡住表达。' : '孩子能说出一点想法，但还没有形成稳定步骤。',
+      reportLine: '报告会把它写成“今晚先问哪一句”，而不是写成“孩子不会”。',
+      productRoute: '/pages/tutor/tutor?from=methodology_guide',
+      evidenceGate: 'child_first_step',
+      sourceBasis: '1 对 1 针对性支持、元认知自我解释、Khanmigo 式不直接给答案。'
+    },
+    {
+      id: 'feynman_retell',
+      label: '费曼复述',
+      principle: '让孩子用自己的话复述题意、条件和第一步，暴露卡点。',
+      useWhen: primaryMethod.id && /verbal|retell/.test(primaryMethod.id) ? '当前最高候选是先复述题意。' : '阅读理解、应用题、概念题里“看过但说不清”。',
+      reportLine: '报告会给家长一句低压提问：这题问什么、已知什么、第一步看哪里。',
+      productRoute: '/pages/tutor/tutor?from=methodology_retell',
+      evidenceGate: 'parent_one_question',
+      sourceBasis: '精细加工、自我解释和元认知监控。'
+    },
+    {
+      id: 'dual_coding_blackboard',
+      label: '图文双编码/小黑板',
+      principle: '把文字、数量关系或概念缺口画成一帧图，再让孩子说第一步。',
+      useWhen: primaryMethod.id && /visual/.test(primaryMethod.id) ? '当前最高候选是先看图或先画关系。' : '几何、应用题、实验、长题干或条件很多时。',
+      reportLine: '报告只建议“先画条件关系”，不把孩子贴成固定视觉型。',
+      productRoute: '/pages/tutor/tutor?from=methodology_blackboard',
+      evidenceGate: 'one_blackboard_frame',
+      sourceBasis: '降低工作记忆负荷，配合自我解释验证。'
+    },
+    {
+      id: 'retrieval_spaced_recall',
+      label: '主动回忆/间隔复习',
+      principle: '隔天和第 7 天回访同一错因，用回忆而不是重看答案验证。',
+      useWhen: hasWrongPaper ? '已有错因卡或回访卡。' : '还缺真实错因时先锁住，不能只靠测评开启游戏。',
+      reportLine: '报告会把它写成“明天回访哪张卡”，不是加题量或排行榜。',
+      productRoute: hasWrongPaper ? '/pages/arcade/arcade?from=methodology_recall' : '/pages/review/review?from=methodology_recall_locked',
+      evidenceGate: 'next_day_revisit_and_day7_variant',
+      sourceBasis: '检索练习、间隔练习和近迁移验证。'
+    },
+    {
+      id: 'gamified_attention_support',
+      label: '游戏化专注支持',
+      principle: '只奖励第一步、错因命名和回访完成，不奖励速度、排名或刷题量。',
+      useWhen: hasParentReport ? '家长观察到拖拉、分心或启动困难。' : '孩子已经有可回访卡，但需要更轻的坚持机制。',
+      reportLine: '报告会建议“小局轻练习”，但要先有真实卡片来源。',
+      productRoute: '/pages/arcade/arcade?from=methodology_attention',
+      evidenceGate: 'real_recall_source_and_no_answer_leak',
+      sourceBasis: '自我调节、即时反馈和低压力动机设计。'
+    }
+  ];
+  return {
+    id: 'evidence_based_methodology_guide',
+    title: '报告方法论底座',
+    summary: '把主流学习法沉淀为可执行、可验证、可回到产品闭环的建议；不用学习风格当固定天赋标签。',
+    primaryRecommendation: primaryMethod.label
+      ? `${primaryMethod.label}：先试一晚，再用明天回访和第 7 天小变式验证。`
+      : '先收集孩子第一步，再选择方法候选。',
+    serviceModeLine: serviceMode.label
+      ? `当前产品路径优先承接到：${serviceMode.label}。`
+      : '默认产品路径：苏格拉底私教先行，小讲堂和游戏化只在证据满足后补位。',
+    cards,
+    reportWritingRules: [
+      '写“方法候选”，不写“固定天赋类型”。',
+      '每条建议必须有今晚动作、明天回访和第 7 天验证。',
+      '家长能看到原因和下一步，但看不到原题照片、完整答案、分数排名或隐私字段。',
+      '轻营销只落在产品方法论：苏格拉底私教、错因卡、间隔回访、游戏化复习和家长 5 秒复盘。'
+    ],
+    blockedClaims: ['固定学习风格标签', '天赋定性', '人格判断', '诊断注意力问题', '保分提分承诺', '排名刺激'],
+    evidenceRequired: ['child_first_step', 'wrong_cause_named', 'next_day_revisit', 'day7_variant_result', 'parent_confirmation']
+  };
+}
+
 function buildPersonalizedLearningSolutionBlueprint(materialLanes = [], methodHypotheses = [], wrongPaperDiagnosisCards = [], servicePathway = {}) {
   const laneById = materialLanes.reduce((acc, lane) => {
     if (lane && lane.id) acc[lane.id] = lane;
@@ -2106,6 +2201,7 @@ function buildPersonalizedLearningSolutionBlueprint(materialLanes = [], methodHy
   }, {});
   const hasTalentAssessment = !!(laneById.talent_assessment && laneById.talent_assessment.collected);
   const hasWrongPaper = !!(laneById.wrong_question_paper && laneById.wrong_question_paper.collected);
+  const hasScoreSheet = !!(laneById.score_sheet && laneById.score_sheet.collected);
   const hasSchoolMaterial = !!(laneById.school_material && laneById.school_material.collected);
   const hasParentObservation = !!(laneById.parent_report && laneById.parent_report.collected);
   const recommendedMode = hasWrongPaper
@@ -2178,6 +2274,13 @@ function buildPersonalizedLearningSolutionBlueprint(materialLanes = [], methodHy
       cannotClaim: '不生成整卷答案、不自动判分、不做竞争比较'
     },
     {
+      id: 'score_sheet_rule',
+      label: '成绩/周测',
+      useFor: hasScoreSheet ? '私密学科优先级和待验证弱项' : '待补充',
+      mustVerifyWith: '对应错题样本、孩子第一步、隔天回访',
+      cannotClaim: '不做公开排名、保分承诺、固定提分预期或天赋定性'
+    },
+    {
       id: 'school_material_rule',
       label: '学校反馈',
       useFor: hasSchoolMaterial ? '家校安全摘要和观察问题' : '待补充',
@@ -2206,6 +2309,12 @@ function buildPersonalizedLearningSolutionBlueprint(materialLanes = [], methodHy
         label: '错题/试卷',
         weight: hasWrongPaper ? 40 : 0,
         useFor: hasWrongPaper ? '今晚苏格拉底第一步、错因卡、明天回访' : '待补一处真实卡点'
+      },
+      {
+        id: 'score_sheet',
+        label: '成绩/周测',
+        weight: hasScoreSheet ? 10 : 0,
+        useFor: hasScoreSheet ? '只决定学科优先级和下一条证据，不进入排名或奖励' : '待补成绩或趋势资料'
       },
       {
         id: 'talent_assessment',
@@ -2271,6 +2380,16 @@ function buildPersonalizedLearningSolutionBlueprint(materialLanes = [], methodHy
     evidenceFusionRules,
     familyLearningPlan,
     localVsAiOwnership,
+    methodologyGuide: buildEvidenceBasedMethodologyGuide(
+      methodHypotheses.map((item, index) => Object.assign({}, item, {
+        rank: index + 1,
+        tonightTry: item.childLine || item.method,
+        parentQuestionTomorrow: item.parentCheck || '',
+        day7Evidence: item.verifyWith || ''
+      })),
+      materialLanes,
+      servicePathway
+    ),
     servicePathwayHint: servicePathway && servicePathway.primaryMode
       ? `当前服务路径建议：${servicePathway.primaryMode.label || servicePathway.primaryMode.id || '家庭私教闭环'}`
       : '默认路径：苏格拉底私教优先，小讲堂只在连续卡住后补位。',
@@ -2446,6 +2565,15 @@ function buildUploadedMaterialDecisionDossier(input = {}, parts = {}, sourceEvid
       nextEvidence: '让孩子留下原想法和卡住的第一步。'
     },
     {
+      id: 'score_sheet',
+      label: '成绩单/周测',
+      collected: !!(laneById.score_sheet && laneById.score_sheet.collected),
+      canSay: '可以说哪一科、哪类题优先补证据。',
+      cannotSay: '不能说排名、保分、固定提分预期或天赋定性。',
+      output: '私密优先级和下一证据队列',
+      nextEvidence: '补一题对应错题、孩子第一步和隔天回访结果。'
+    },
+    {
       id: 'school_material',
       label: '学校/老师材料',
       collected: !!(laneById.school_material && laneById.school_material.collected),
@@ -2576,6 +2704,7 @@ function buildUploadedMaterialDecisionDossier(input = {}, parts = {}, sourceEvid
     }
   ] : [];
   const familyDecisionCalendar = buildFamilyDecisionCalendar(input, methodCandidateCards, wrongPaperDiagnosisCards, reportEvidenceReleaseGate);
+  const evidenceBasedMethodologyGuide = buildEvidenceBasedMethodologyGuide(methodCandidateCards, materialLanes, servicePathway);
   const personalizedLearningSolutionBlueprint = buildPersonalizedLearningSolutionBlueprint(
     materialLanes,
     methodHypotheses,
@@ -2719,6 +2848,7 @@ function buildUploadedMaterialDecisionDossier(input = {}, parts = {}, sourceEvid
       ? `AI解析质量：${aiAnalysisQualityGate.status || 'pending'}，分数 ${Number(aiAnalysisQualityGate.score || 0)}，缺口 ${(aiAnalysisQualityGate.missingEvidence || []).join(' / ') || 'none'}`
       : 'AI解析质量：等待上传材料分析或本地兜底。',
     familyDecisionCalendar,
+    evidenceBasedMethodologyGuide,
     familyPrivateTutorSolutionPack,
     personalizedLearningSolutionBlueprint,
     wrongPaperDiagnosisCards,
