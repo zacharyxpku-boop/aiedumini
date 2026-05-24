@@ -1235,7 +1235,6 @@
           <text wx:for="{{learningReportSummary.homeSchoolHandoffCadence}}" wx:key="id">交接节奏：{{item.label}}｜{{item.action}}</text>
           <text wx:if="{{learningReportSummary.homeSchoolShareBoundary}}">分享边界：{{learningReportSummary.homeSchoolShareBoundary}}</text>
         </view>
-        <view class="parent-brief-block" wx:if="{{learningReportSummary.socraticPromptQualityJudge}}">
         <view class="parent-brief-block" wx:if="{{learningReportSummary.homeSchoolConferenceKit}}">
           <text class="parent-brief-label">{{learningReportSummary.homeSchoolConferenceTitle}}</text>
           <text wx:for="{{learningReportSummary.homeSchoolConferenceTeacherQuestions}}" wx:key="id">问老师：{{item.question}}｜证据：{{item.evidenceNeeded}}</text>
@@ -1626,6 +1625,7 @@
           <button data-action="review" bindtap="runParentReportAction">去修卡点</button>
         </view>
       </view>
+      </block>
       <block wx:if="{{profilePanel === 'teacher'}}">
       <view class="parent-section-card teacher-card" wx:if="{{parentReport}}">
         <view class="section-title-row compact">
