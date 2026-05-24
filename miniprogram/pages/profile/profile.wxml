@@ -1626,8 +1626,6 @@
           <button data-action="review" bindtap="runParentReportAction">去修卡点</button>
         </view>
       </view>
-      </block>
-
       <block wx:if="{{profilePanel === 'teacher'}}">
       <view class="parent-section-card teacher-card" wx:if="{{parentReport}}">
         <view class="section-title-row compact">
