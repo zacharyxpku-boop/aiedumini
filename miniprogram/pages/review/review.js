@@ -1683,11 +1683,11 @@ Page({
       });
       storage.set(storage.KEYS.selectedHomeworkSource, `review:${current.id}`);
     }
-    wx.navigateTo({ url: '/pages/tutor/tutor' });
+    navigation.navigateLearningRoute('/pages/tutor/tutor?from=review');
   },
 
   goUpload() {
-    wx.navigateTo({ url: '/pages/upload/upload' });
+    navigation.navigateLearningRoute('/pages/upload/upload?from=review');
   },
 
   goHome() {
@@ -1695,11 +1695,11 @@ Page({
   },
 
   goTools() {
-    wx.switchTab({ url: '/pages/tools/tools' });
+    navigation.navigateLearningRoute('/pages/tools/tools?from=review');
   },
 
   goFocus() {
-    wx.switchTab({ url: '/pages/focus/focus' });
+    navigation.navigateLearningRoute('/pages/focus/focus?from=review');
   },
 
   goProfile() {

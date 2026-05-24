@@ -19,6 +19,36 @@
   </view>
 
   <scroll-view scroll-y enhanced show-scrollbar="{{false}}" class="home-scroll">
+    <view class="ux-entry ux-entry-today ux-kit-screen ux-kit-home">
+      <view class="ux-kit-top">
+        <view class="ux-kit-logo"><view class="ux-kit-logo-dot"></view><text>原点智学</text></view>
+        <view class="ux-kit-pill">今晚任务规划</view>
+      </view>
+      <view class="ux-kit-hero">
+        <view class="ux-kit-copy">
+          <view class="ux-kit-title">今晚先做哪一步？</view>
+          <view class="ux-kit-sub">不用一下子做完。咕点帮你排优先级，把最容易开始的第一步先挑出来。</view>
+        </view>
+        <image class="ux-kit-mascot" mode="aspectFit" src="/assets/brand/gudian-mascot.png" />
+      </view>
+      <view class="ux-kit-jump-grid">
+        <view class="ux-kit-jump-card primary" data-scene="today" bindtap="openEntryDetail">
+          <text>今晚主线</text>
+          <text>先排优先级</text>
+        </view>
+        <view class="ux-kit-jump-card" data-scene="tutor" bindtap="openEntryDetail">
+          <text>作业点拨</text>
+          <text>只追问第一步</text>
+        </view>
+        <view class="ux-kit-jump-card" data-scene="review" bindtap="openEntryDetail">
+          <text>复习小关</text>
+          <text>验证记忆迁移</text>
+        </view>
+      </view>
+      <view class="ux-kit-primary" data-scene="today" bindtap="openEntryDetail">开始规划今晚任务</view>
+      <view class="ux-kit-secondary" data-scene="upload" bindtap="openEntryDetail">上传材料生成学习包</view>
+    </view>
+    <block wx:if="{{showLegacyEntryContent}}">
     <view class="rc14-home-first-screen-top">
     <view class="flow-pill compact" aria-label="作业点拨流程">
       <view class="flow-dot"></view>
@@ -562,5 +592,6 @@
     </view>
 
     <view class="home-spacer"></view>
+    </block>
   </scroll-view>
 </view>

@@ -891,6 +891,32 @@ Page({
     this.updateMaterialPreview(routeMaterialText, routeMaterialType);
   },
 
+  onShow() {
+    const pendingRoute = navigation.consumePendingTabRouteContext
+      ? navigation.consumePendingTabRouteContext('/pages/upload/upload')
+      : null;
+    if (!pendingRoute) {
+      this.setData({ showLegacyEntryContent: false });
+      return;
+    }
+    const options = pendingRoute.options || {};
+    const routeMaterialType = normalizeMaterialType(options, this.data.materialType);
+    const routeMaterialText = safeQueryText(options.materialText || options.text || '');
+    const shouldOpenMaterialPanel = !!(options.type || options.materialType || options.sourceSchemaId || routeMaterialText);
+    this.setData({
+      showLegacyEntryContent: !!navigation.shouldOpenFunctionalTab(options),
+      uploadEntryMode: shouldOpenMaterialPanel ? 'material' : this.data.uploadEntryMode,
+      uploadEntryDeck: buildUploadEntryDeck(shouldOpenMaterialPanel ? 'material' : this.data.uploadEntryMode),
+      homeworkPlaceholder: buildUploadEntryDeck(shouldOpenMaterialPanel ? 'material' : this.data.uploadEntryMode).placeholder,
+      materialType: routeMaterialType,
+      materialText: routeMaterialText,
+      showMaterialPanel: shouldOpenMaterialPanel || this.data.showMaterialPanel
+    });
+    if (shouldOpenMaterialPanel) {
+      this.updateMaterialPreview(routeMaterialText, routeMaterialType);
+    }
+  },
+
   buildUploadPlaybook(plan, state, minutes) {
     const weak = ((state && state.weak_points) || [])[0] || null;
     const summary = (plan && plan.summary) || {};
@@ -2546,12 +2572,19 @@ Page({
     wx.switchTab({ url: '/pages/home/home' });
   },
 
+  openEntryDetail(event) {
+    const scene = event && event.currentTarget && event.currentTarget.dataset
+      ? event.currentTarget.dataset.scene
+      : 'upload';
+    wx.navigateTo({ url: `/pages/entry-detail/entry-detail?scene=${scene || 'upload'}` });
+  },
+
   goReview() {
-    wx.switchTab({ url: '/pages/review/review' });
+    navigation.navigateLearningRoute('/pages/review/review');
   },
 
   goTools() {
-    wx.switchTab({ url: '/pages/tools/tools' });
+    navigation.navigateLearningRoute('/pages/tools/tools');
   },
 
   viewLatestReport() {

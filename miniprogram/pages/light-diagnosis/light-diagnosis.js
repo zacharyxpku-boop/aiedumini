@@ -179,7 +179,7 @@ Page({
     }) : null;
     if (storage.saveChildArticulatedStep && result.childStep) storage.saveChildArticulatedStep(result.childStep);
     this.setData({ result: Object.assign({}, result, { focus }) });
-    wx.switchTab({ url: '/pages/focus/focus' });
+    navigation.navigateLearningRoute('/pages/focus/focus?from=light_diagnosis');
   },
 
   runSurfaceDepthAction(event) {

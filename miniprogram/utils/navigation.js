@@ -2,10 +2,10 @@
 
 const TAB_ROUTES = [
   '/pages/home/home',
-  '/pages/review/review',
-  '/pages/focus/focus',
-  '/pages/tools/tools',
-  '/pages/profile/profile'
+  '/pages/tutor/tutor',
+  '/pages/arcade/arcade',
+  '/pages/profile/profile',
+  '/pages/upload/upload'
 ];
 
 function normalizeRoute(route) {
@@ -41,6 +41,46 @@ function rememberTabRouteContext(route) {
   }
 }
 
+function parseQuery(query = '') {
+  return String(query || '').split('&').filter(Boolean).reduce((acc, pair) => {
+    const index = pair.indexOf('=');
+    const rawKey = index >= 0 ? pair.slice(0, index) : pair;
+    const rawValue = index >= 0 ? pair.slice(index + 1) : '';
+    if (!rawKey) return acc;
+    try {
+      acc[decodeURIComponent(rawKey)] = decodeURIComponent(rawValue || '');
+    } catch (error) {
+      acc[rawKey] = rawValue || '';
+    }
+    return acc;
+  }, {});
+}
+
+function consumePendingTabRouteContext(route) {
+  const base = baseRoute(route);
+  if (!base || typeof wx === 'undefined' || !wx.getStorageSync) return null;
+  let pending = null;
+  try {
+    pending = wx.getStorageSync('navigation.pendingTabRoute.v1');
+  } catch (error) {
+    return null;
+  }
+  if (!pending || pending.base !== base) return null;
+  if (Date.now() - Number(pending.createdAt || 0) > 5 * 60 * 1000) {
+    if (wx.removeStorageSync) wx.removeStorageSync('navigation.pendingTabRoute.v1');
+    return null;
+  }
+  if (wx.removeStorageSync) wx.removeStorageSync('navigation.pendingTabRoute.v1');
+  return Object.assign({}, pending, {
+    options: parseQuery(pending.query || '')
+  });
+}
+
+function shouldOpenFunctionalTab(options = {}) {
+  const from = String(options.from || '');
+  return from.indexOf('entry_') === 0 || options.open === 'flow' || options.panel || options.type || options.mode;
+}
+
 function navigateLearningRoute(route) {
   const url = normalizeRoute(route);
   if (!url || typeof wx === 'undefined') return false;
@@ -59,5 +99,8 @@ module.exports = {
   normalizeRoute,
   baseRoute,
   routeQuery,
-  rememberTabRouteContext
+  parseQuery,
+  rememberTabRouteContext,
+  consumePendingTabRouteContext,
+  shouldOpenFunctionalTab
 };

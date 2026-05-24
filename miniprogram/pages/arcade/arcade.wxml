@@ -1,5 +1,5 @@
 <view class="page arcade-page safe-bottom">
-  <view class="page-positioning arcade-positioning">
+  <view class="page-positioning arcade-positioning" wx:if="{{showLegacyEntryContent}}">
     <view class="positioning-kicker">游戏化轻练习</view>
     <view class="positioning-title">玩一小局，错的卡回到复习队列</view>
     <view class="positioning-flow">游戏负责让孩子愿意再练一下；错题和模糊点会回到修卡点，不做排行。</view>
@@ -11,6 +11,35 @@
   </view>
 
   <scroll-view class="arcade-scroll" scroll-y enhanced show-scrollbar="{{false}}">
+    <view class="ux-entry ux-entry-island ux-kit-screen ux-kit-review">
+      <view class="ux-kit-top">
+        <view class="ux-kit-logo"><view class="ux-kit-logo-dot"></view><text>原点智学</text></view>
+        <view class="ux-kit-pill">复习小关</view>
+      </view>
+      <view class="ux-kit-hero compact">
+        <view class="ux-kit-copy">
+          <view class="ux-kit-title">5 分钟复习小关</view>
+          <view class="ux-kit-sub">每天 5 分钟，先回忆，再核对，把错因留到明天再看。</view>
+        </view>
+        <image class="ux-kit-sprout" mode="aspectFit" src="/assets/brand/review-sprout.png" />
+      </view>
+      <view class="ux-kit-jump-grid">
+        <view class="ux-kit-jump-card primary" data-scene="review" bindtap="openEntryDetail">
+          <text>90 秒回忆</text>
+          <text>先想再核对</text>
+        </view>
+        <view class="ux-kit-jump-card" data-scene="tutor" bindtap="openEntryDetail">
+          <text>卡住求助</text>
+          <text>回到私教追问</text>
+        </view>
+        <view class="ux-kit-jump-card" data-scene="parent" bindtap="openEntryDetail">
+          <text>给家长看</text>
+          <text>只看证据进展</text>
+        </view>
+      </view>
+      <view class="ux-kit-primary" data-scene="review" bindtap="openEntryDetail">开始这一关</view>
+      <view class="ux-kit-secondary" data-scene="tutor" bindtap="openEntryDetail">换一张卡片</view>
+    </view>
     <view class="arcade-hero">
       <view class="hero-art">
         <view class="hero-orbit">
@@ -22,7 +51,7 @@
       </view>
       <view class="hero-kicker">学科 × 知识类型 × 游戏类型</view>
       <view class="hero-title">今天把知识打一小关</view>
-      <view class="hero-copy">不是把复习换皮，而是让短回忆、概念和步骤各自进入最合适的玩法。</view>
+      <view class="hero-copy">不是把复习换皮，而是让短回忆、概念和步骤进入合适玩法。</view>
       <view class="hero-stats">
         <view class="hero-stat">
           <view class="hero-stat-num">{{cards.length || 0}}</view>
@@ -40,7 +69,8 @@
     </view>
 
     <view class="challenge-brief-card" wx:if="{{challengeBrief}}">
-      <view class="story-mission" wx:if="{{reportSourcePanel}}">
+      <block wx:if="{{showLegacyEntryContent}}">
+    <view class="story-mission" wx:if="{{reportSourcePanel}}">
         <view class="story-mission-title">{{reportSourcePanel.title}}</view>
         <view class="story-mission-line">{{reportSourcePanel.line}}</view>
         <view class="story-mission-rule">来源：已接入家长报告 / 错题回访 / 今日轻练</view>
@@ -56,7 +86,7 @@
         </view>
         <view class="challenge-brief-pill">{{challengeBrief.roundSize}} 题 · 回访门槛</view>
       </view>
-      <view class="challenge-brief-line">{{challengeBrief.questTitle}} · {{challengeBrief.questProgress}}</view>
+      <view class="challenge-brief-line">{{challengeBrief.questTitle}} 路 {{challengeBrief.questProgress}}</view>
       <view class="quest-action-row" wx:if="{{challengeBrief.questActions.length}}">
         <button
           class="quest-action-btn"
@@ -133,7 +163,7 @@
           <view class="story-mission-line">{{challengeBrief.ruleRetestChallengeLine}}</view>
           <view class="story-mission-rule">{{challengeBrief.ruleRetestChallengeXpGate}}</view>
           <view class="story-mission-rule">{{challengeBrief.ruleRetestChallengeParentLine}}</view>
-          <view class="story-mission-rule" wx:for="{{challengeBrief.ruleRetestChallengeCards}}" wx:key="id">复测卡：{{item.title}}｜{{item.prompt}}｜{{item.releaseGate}}</view>
+          <view class="story-mission-rule" wx:for="{{challengeBrief.ruleRetestChallengeCards}}" wx:key="id">复测卡：{{item.title}} · {{item.prompt}} · {{item.releaseGate}}</view>
         </view>
       </view>
         <view class="story-mission-rule" wx:for="{{challengeBrief.courseUnitQuestionBankCards}}" wx:key="id">样例：{{item.sampleStem}}｜第一步：{{item.firstStepHint}}｜近迁移：{{item.nearTransferStem}}</view>
@@ -161,6 +191,7 @@
         <view class="story-mission-rule">{{challengeBrief.sevenSubjectMasterySprintMoat}}</view>
       </view>
       <view class="challenge-brief-sub" wx:if="{{challengeBrief.evidenceBiasLine}}">为什么开这局：{{challengeBrief.evidenceBiasLine}}</view>
+      </block>
     </view>
 
     <view class="daily-return-card primary-recall-card" wx:if="{{dailyPrimaryRecallAction}}">
@@ -174,7 +205,7 @@
       <view class="daily-return-line">{{dailyPrimaryRecallAction.oneActionLine}}</view>
       <view class="daily-return-rule">{{dailyPrimaryRecallAction.xpGate}}</view>
       <view class="daily-return-rule">明天回访：{{dailyPrimaryRecallAction.nextReturnWindow}}｜{{dailyPrimaryRecallAction.parentLine}}</view>
-      <view class="daily-return-rule" wx:if="{{dailyPrimaryRecallEvidencePacket}}">已写入：明天回访已锁定｜待补：第一步和错因回放</view>
+      <view class="daily-return-rule" wx:if="{{dailyPrimaryRecallEvidencePacket}}">已写入：明天回访已锁定，待补第一步和错因回放。</view>
       <view class="daily-return-rule">{{dailyPrimaryRecallAction.shareBoundary}}</view>
       <button class="daily-return-button" bindtap="runDailyPrimaryRecallAction">开始主回忆</button>
     </view>
@@ -182,17 +213,17 @@
     <view class="daily-return-card" wx:if="{{dailyReturnMission}}">
       <view class="daily-return-top">
         <view>
-          <view class="daily-return-kicker">每日回流</view>
+          <view class="daily-return-kicker">今日主回忆</view>
           <view class="daily-return-title">{{dailyReturnMission.title}}</view>
         </view>
-        <view class="daily-return-pill">{{dailyReturnMission.totalSeconds}} 秒</view>
+        <view class="daily-return-pill">只做这一件</view>
       </view>
       <view class="daily-return-line">{{dailyReturnMission.promiseLine}}</view>
       <view class="daily-return-rule" wx:if="{{ninetySecondRecallDeck.playableExperience}}">{{ninetySecondRecallDeck.playableExperience.headline}}</view>
       <view class="daily-return-rule" wx:if="{{ninetySecondRecallDeck.playableExperience}}">{{ninetySecondRecallDeck.playableExperience.whyThisWorks}}</view>
-      <view class="daily-return-rule" wx:if="{{ninetySecondRecallState}}">状态：{{ninetySecondRecallState.statusLabel}}｜当前：{{ninetySecondRecallState.currentStepLabel}}｜{{ninetySecondRecallState.completionLine}}</view>
+      <view class="daily-return-rule" wx:if="{{ninetySecondRecallState}}">状态：{{ninetySecondRecallState.statusLabel}} · 当前：{{ninetySecondRecallState.currentStepLabel}} · {{ninetySecondRecallState.completionLine}}</view>
       <view class="daily-return-rule timeout" wx:if="{{ninetySecondRecallState.failureDowngradeLine}}">{{ninetySecondRecallState.failureDowngradeLine}}</view>
-      <view class="daily-return-rule" wx:if="{{ninetySecondRecallState}}">状态：{{ninetySecondRecallState.status}}｜剩余 {{ninetySecondRecallState.secondsLeft}} 秒｜当前第 {{ninetySecondRecallState.stepIndex + 1}} 步</view>
+      <view class="daily-return-rule" wx:if="{{ninetySecondRecallState}}">状态：{{ninetySecondRecallState.status}} · 剩余 {{ninetySecondRecallState.secondsLeft}} 秒 · 当前第 {{ninetySecondRecallState.stepIndex + 1}} 步</view>
       <button class="daily-return-button" bindtap="startNinetySecondRecall">开始 90 秒</button>
       <view class="daily-return-steps compact" wx:if="{{ninetySecondRecallDeck.playableExperience}}">
         <view class="daily-return-step" wx:for="{{ninetySecondRecallDeck.playableExperience.loop}}" wx:key="id">
@@ -208,12 +239,12 @@
           <view class="daily-return-step-order">{{item.order}}</view>
           <view class="daily-return-step-body">
             <view class="daily-return-step-action">{{item.prompt}}</view>
-            <input wx:if="{{item.inputType === 'short_text' && item.isCurrent}}" class="daily-return-step-input" placeholder="写孩子自己的第一步" value="{{item.inputValue}}" data-step-id="{{item.id}}" bindinput="handleNinetySecondRecallInput" />
+            <input wx:if="{{item.inputType === 'short_text' && item.isCurrent}}" class="daily-return-step-input" placeholder="写下孩子自己的第一步" value="{{item.inputValue}}" data-step-id="{{item.id}}" bindinput="handleNinetySecondRecallInput" />
             <view wx:if="{{item.inputType === 'two_choice' && item.isCurrent}}" class="daily-return-choice-row">
               <button class="daily-return-choice {{choice.id === item.selectedChoiceId ? 'selected' : ''}}" wx:for="{{item.choices}}" wx:for-item="choice" wx:key="id" data-step-id="{{item.id}}" data-choice-id="{{choice.id}}" bindtap="selectNinetySecondRecallChoice">{{choice.label}}</button>
             </view>
             <view class="daily-return-step-state" wx:if="{{item.isCurrent}}">当前只做这一步</view>
-            <view class="daily-return-step-state done" wx:if="{{item.isCompleted}}">已留下证据</view>
+            <view class="daily-return-step-state done" wx:if="{{item.isCompleted}}">已留证</view>
             <view class="daily-return-step-proof">{{item.seconds}} 秒 · 证据 {{item.passEvidence}}</view>
           </view>
         </view>
@@ -231,10 +262,10 @@
     <view class="daily-return-card" wx:if="{{dailyReturnContract}}">
       <view class="daily-return-top">
         <view>
-          <view class="daily-return-kicker">回流合约</view>
+          <view class="daily-return-kicker">今日主回忆</view>
           <view class="daily-return-title">{{dailyReturnContract.title}}</view>
         </view>
-        <view class="daily-return-pill">{{dailyReturnContract.mode}}</view>
+        <view class="daily-return-pill">只做这一件</view>
       </view>
       <view class="daily-return-line">{{dailyReturnContract.comebackCopy}}</view>
       <view class="daily-return-steps">
@@ -284,14 +315,14 @@
           <text class="game-chip-title">{{item.shortName}}</text>
           <text class="game-chip-meta">{{item.available ? item.readyCount + ' 张可玩' : '先补材料'}}</text>
           <text class="game-chip-pitch">{{item.pitch}}</text>
-          <text class="game-chip-lock" wx:if="{{!item.available}}">{{item.lockedReason}}</text>
+          <text class="game-chip-lock" wx:if="{{!item.available}}">先补材料 · {{item.lockedReason}}</text>
         </button>
       </view>
     </view>
 
     <view class="mode-brief" wx:if="{{activeGame}}">
       <view>
-        <view class="mode-brief-kicker">当前玩法</view>
+        <view class="mode-brief-kicker">褰撳墠鐜╂硶</view>
         <view class="mode-brief-title">{{activeGame.name}}</view>
       </view>
       <view class="mode-brief-pill">{{activeGame.knowledgeType}}</view>
@@ -344,15 +375,15 @@
     <view class="quest-stage" wx:if="{{gameMode === 'quiz' && currentQuestion && !result}}">
       <view class="quest-map">
         <view
-          wx:for="{{round.questions}}"
+          wx:for="{{questNodes}}"
           wx:key="id"
-          class="quest-node {{index < currentIndex ? 'done' : ''}} {{index === currentIndex ? 'active' : ''}}"
-        >{{index + 1}}</view>
+          class="quest-node {{item.stateClass}}"
+        >{{item.label}}</view>
       </view>
       <view class="quest-card">
         <view class="stage-top">
           <view>
-            <view class="stage-kicker">轻练答题 · {{currentQuestion.knowledgeType}}</view>
+            <view class="stage-kicker">杞荤粌绛旈 路 {{currentQuestion.knowledgeType}}</view>
             <view class="quest-checkpoint">{{currentQuestion.checkpoint}}</view>
           </view>
           <view class="life-pill">可回访 {{lives}}</view>
@@ -368,9 +399,9 @@
           <view class="answer-review-title">参考思路</view>
           <view class="quest-answer-text">{{currentQuestion.answer}}</view>
           <view class="grade-row">
-            <button class="grade-btn weak" data-rating="again" bindtap="gradeQuest">忘记</button>
-            <button class="grade-btn mid" data-rating="good" bindtap="gradeQuest">模糊</button>
-            <button class="grade-btn strong" data-rating="easy" bindtap="gradeQuest">记得</button>
+            <button class="grade-btn weak" data-rating="again" bindtap="gradeQuest">蹇樿</button>
+            <button class="grade-btn mid" data-rating="good" bindtap="gradeQuest">妯＄硦</button>
+            <button class="grade-btn strong" data-rating="easy" bindtap="gradeQuest">璁板緱</button>
           </view>
         </view>
       </view>
@@ -380,19 +411,19 @@
       <view class="snake-board">
         <view class="stage-top">
           <view>
-            <view class="stage-kicker">贪吃蛇顺序关 · {{snakeTrack.knowledgeType}}</view>
+            <view class="stage-kicker">璐悆铔囬『搴忓叧 路 {{snakeTrack.knowledgeType}}</view>
             <view class="snake-title">{{snakeTrack.question}}</view>
           </view>
           <view class="life-pill">可回访 {{lives}}</view>
         </view>
         <view class="snake-path">
           <view
-            wx:for="{{snakeTrack.correctOrder}}"
-            wx:key="*this"
-            class="snake-segment {{index < snakeNextOrder ? 'eaten' : ''}}"
-          >{{index + 1}}</view>
+            wx:for="{{snakeSegments}}"
+            wx:key="id"
+            class="snake-segment {{item.stateClass}}"
+          >{{item.label}}</view>
         </view>
-        <view class="snake-body" wx:if="{{snakeNextOrder > 0}}">
+        <view class="snake-body" wx:if="{{showSnakeBody}}">
           <view class="snake-body-title">已经吃掉</view>
           <view class="snake-body-track">
             <text wx:for="{{snakeTiles}}" wx:key="id" wx:if="{{item.eaten}}" class="snake-body-chip">{{item.text}}</text>
@@ -417,7 +448,7 @@
       <view class="bubble-board">
         <view class="stage-top">
           <view>
-            <view class="bubble-kicker">泡泡消消乐 · {{currentQuestion.knowledgeType}}</view>
+            <view class="bubble-kicker">娉℃场娑堟秷涔?路 {{currentQuestion.knowledgeType}}</view>
             <view class="bubble-title">点一颗题泡泡，再点对应泡泡</view>
           </view>
           <view class="life-pill bubble-life">可回访 {{lives}}</view>
@@ -450,7 +481,7 @@
 
     <view class="result-card" wx:if="{{result}}">
       <view class="result-kicker">{{result.passed ? '通关完成' : '继续练这一组'}}</view>
-      <view class="result-title">{{result.correct}} / {{result.total}} 答对</view>
+      <view class="result-title">{{result.correct}} / {{result.total}} 绛斿</view>
       <view class="result-grid">
         <view>
           <view class="result-num">{{result.correct}}</view>
@@ -468,7 +499,7 @@
       <view class="answer-review" wx:if="{{wrongAnswers.length}}">
         <view class="answer-review-title">本局错题</view>
         <view class="answer-row" wx:for="{{wrongAnswers}}" wx:key="cardId">
-          <view class="answer-selected">你选：{{item.selected}}</view>
+          <view class="answer-selected">浣犻€夛細{{item.selected}}</view>
           <view class="answer-correct">应选：{{item.answer}}</view>
         </view>
       </view>
@@ -506,7 +537,7 @@
           </view>
         </view>
         <view class="high-frequency-section">
-          <view class="high-frequency-label">间隔回访</view>
+          <view class="high-frequency-label">间隔复习</view>
           <view class="high-frequency-item" wx:for="{{highFrequencyPracticeLoop.spacedReviewPlan}}" wx:key="id">
             <text>{{item.label}}：{{item.action}}</text>
           </view>
@@ -546,7 +577,7 @@
         <view class="high-frequency-section" wx:if="{{highFrequencyPracticeLoop.questArcRunway}}">
           <view class="high-frequency-label">{{highFrequencyPracticeLoop.questArcRunway.title}}</view>
           <view class="high-frequency-item" wx:for="{{highFrequencyPracticeLoop.questArcRunway.stages}}" wx:key="id">
-            <text>{{item.order}}. {{item.label}} · {{item.status}}</text>
+            <text>{{item.order}}. {{item.label}} 路 {{item.status}}</text>
             <text>{{item.nextAction}}</text>
           </view>
           <view class="retention-loop-step">{{highFrequencyPracticeLoop.questArcRunway.bossLine}}</view>
@@ -556,7 +587,7 @@
           <view class="high-frequency-label">{{highFrequencyPracticeLoop.gizmoLikeMemoryProtocol.title}}</view>
           <view class="retention-loop-step">{{highFrequencyPracticeLoop.gizmoLikeMemoryProtocol.parentContract.line}}</view>
           <view class="high-frequency-item" wx:for="{{highFrequencyPracticeLoop.gizmoLikeMemoryProtocol.dailyMinimumRounds}}" wx:key="id">
-            <text>{{item.label}} · {{item.target}}</text>
+            <text>{{item.label}} 路 {{item.target}}</text>
             <text>{{item.rule}}</text>
           </view>
           <view class="high-frequency-item" wx:for="{{highFrequencyPracticeLoop.gizmoLikeMemoryProtocol.returnWindows}}" wx:key="id">
@@ -569,7 +600,7 @@
         </view>
         <view class="high-frequency-section" wx:if="{{highFrequencyPracticeLoop.socraticQualityMemoryBridge}}">
           <view class="high-frequency-label">{{highFrequencyPracticeLoop.socraticQualityMemoryBridge.title}}</view>
-          <view class="retention-loop-step">覆盖 {{highFrequencyPracticeLoop.socraticQualityMemoryBridge.scenarioCount}} 个点拨质量场景</view>
+          <view class="retention-loop-step">点拨质量场景：覆盖 {{highFrequencyPracticeLoop.socraticQualityMemoryBridge.scenarioCount}} 个。</view>
           <view class="retention-loop-step">{{highFrequencyPracticeLoop.socraticQualityMemoryBridge.reviewDeckRule}}</view>
           <view class="high-frequency-item" wx:for="{{highFrequencyPracticeLoop.socraticQualityMemoryBridge.memoryActions}}" wx:key="id">
             <text>{{item.title}}</text>
@@ -640,14 +671,14 @@
           </view>
           <view class="high-frequency-item" wx:for="{{highFrequencyPracticeLoop.ninetySecondRecallComboEngine.rewardLadder}}" wx:key="id">
             <text>{{item.reward}}</text>
-            <text>门槛 {{item.threshold}}｜{{item.release ? '已放行' : '待证据'}}</text>
+            <text>门槛 {{item.threshold}} · {{item.release ? '已放行' : '待证据'}}</text>
           </view>
           <view class="retention-loop-step">{{highFrequencyPracticeLoop.ninetySecondRecallComboEngine.parentEvidenceLine}}</view>
           <view class="retention-loop-step">{{highFrequencyPracticeLoop.ninetySecondRecallComboEngine.shareBoundary}}</view>
         </view>
         <view class="high-frequency-section" wx:if="{{highFrequencyPracticeLoop.realHomeworkPressureMemoryPrescription}}">
           <view class="high-frequency-label">{{highFrequencyPracticeLoop.realHomeworkPressureMemoryPrescription.title}}</view>
-          <view class="retention-loop-step">真实样本：{{highFrequencyPracticeLoop.realHomeworkPressureMemoryPrescription.totalSamples}} 个｜本轮队列 {{highFrequencyPracticeLoop.realHomeworkPressureMemoryPrescription.reviewQueue.length}} 张｜{{highFrequencyPracticeLoop.realHomeworkPressureMemoryPrescription.xpReleaseGate}}</view>
+          <view class="retention-loop-step">真实样本：{{highFrequencyPracticeLoop.realHomeworkPressureMemoryPrescription.totalSamples}} 个；本轮队列 {{highFrequencyPracticeLoop.realHomeworkPressureMemoryPrescription.reviewQueue.length}} 张；{{highFrequencyPracticeLoop.realHomeworkPressureMemoryPrescription.xpReleaseGate}}</view>
           <view class="high-frequency-item" wx:for="{{highFrequencyPracticeLoop.realHomeworkPressureMemoryPrescription.reviewQueue}}" wx:key="id">
             <text>{{item.subject}}｜{{item.taskType}}｜{{item.dueWindow}}</text>
             <text>第一步：{{item.firstStep}}</text>
@@ -678,7 +709,7 @@
         <view class="high-frequency-section" wx:if="{{highFrequencyPracticeLoop.adaptiveRecallScheduler}}">
           <view class="high-frequency-label">{{highFrequencyPracticeLoop.adaptiveRecallScheduler.title}}</view>
           <view class="high-frequency-item" wx:for="{{highFrequencyPracticeLoop.adaptiveRecallScheduler.schedulerBoxes}}" wx:key="id">
-            <text>{{item.label}} · {{item.window}}</text>
+            <text>{{item.label}} 路 {{item.window}}</text>
             <text>{{item.unlockRule}}</text>
           </view>
           <view class="high-frequency-item" wx:for="{{highFrequencyPracticeLoop.adaptiveRecallScheduler.reviewQueue}}" wx:key="id">
@@ -696,7 +727,7 @@
           <view class="high-frequency-label">{{highFrequencyPracticeLoop.memoryRiskReleaseModel.title}}</view>
           <view class="retention-loop-step">{{highFrequencyPracticeLoop.memoryRiskReleaseModel.summary}}</view>
           <view class="high-frequency-item" wx:for="{{highFrequencyPracticeLoop.memoryRiskReleaseModel.riskSignals}}" wx:key="id">
-            <text>{{item.label}} · {{item.level}}</text>
+            <text>{{item.label}} 路 {{item.level}}</text>
             <text>{{item.evidence}}</text>
           </view>
           <view class="high-frequency-item" wx:for="{{highFrequencyPracticeLoop.memoryRiskReleaseModel.forgettingWarnings}}" wx:key="id">
@@ -726,7 +757,7 @@
           <view class="high-frequency-label">{{highFrequencyPracticeLoop.dailyMemorySeasonPlan.title}}</view>
           <view class="retention-loop-step">{{highFrequencyPracticeLoop.dailyMemorySeasonPlan.retentionLine}}</view>
           <view class="high-frequency-item" wx:for="{{highFrequencyPracticeLoop.dailyMemorySeasonPlan.missions}}" wx:key="id">
-            <text>{{item.label}} 路 {{item.locked ? '先锁住' : '可执行'}}</text>
+            <text>{{item.label}} · {{item.locked ? '先锁住' : '可执行'}}</text>
             <text>{{item.action}}</text>
             <text>证据：{{item.proof}}</text>
           </view>
@@ -749,7 +780,7 @@
           </view>
           <view class="retention-loop-step">{{highFrequencyPracticeLoop.dailyComebackDecisionEngine.stopRule}}</view>
           <view class="retention-loop-step">{{highFrequencyPracticeLoop.dailyComebackDecisionEngine.parentLine}}</view>
-          <view class="retention-loop-step">每日上限：{{highFrequencyPracticeLoop.dailyComebackDecisionEngine.antiAddictionPolicy.maxMinutes}} 分钟，不做比较展示、不无限下滑。</view>
+          <view class="retention-loop-step">每日上限：{{highFrequencyPracticeLoop.dailyComebackDecisionEngine.antiAddictionPolicy.maxMinutes}} 分钟，不做比较展示，不无限下滑。</view>
         </view>
         <view class="high-frequency-section" wx:if="{{highFrequencyPracticeLoop.healthyCommercialReturnGuard}}">
           <view class="high-frequency-label">{{highFrequencyPracticeLoop.healthyCommercialReturnGuard.title}}</view>
@@ -760,7 +791,7 @@
             <text>{{item.label}}</text>
             <text>放行：{{item.releaseGate}}</text>
           </view>
-          <view class="retention-loop-step">禁止奖励：{{highFrequencyPracticeLoop.healthyCommercialReturnGuard.blockedRewards.length}} 项</view>
+          <view class="retention-loop-step">禁止奖励：{{highFrequencyPracticeLoop.healthyCommercialReturnGuard.blockedRewards.length}} 项。</view>
         </view>
         <view class="retention-loop-foot">{{highFrequencyPracticeLoop.parentShareLine}}</view>
       </view>

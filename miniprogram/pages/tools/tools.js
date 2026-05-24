@@ -565,7 +565,7 @@ Page({
   runChallengeHubAction() {
     const hub = this.data.challengeHub || {};
     if (hub.primaryAction === 'arcade') {
-      wx.navigateTo({ url: '/pages/arcade/arcade' });
+      navigation.navigateLearningRoute('/pages/arcade/arcade?from=tools_challenge_hub');
       return;
     }
     if (!String(this.data.factoryStudioInput || '').trim()) {
@@ -907,7 +907,7 @@ Page({
         text: `开始轻练习：${item.title}。${item.tutorPrompt}`
       }
     ]);
-    wx.navigateTo({ url: '/pages/tutor/tutor' });
+    navigation.navigateLearningRoute('/pages/tutor/tutor?from=tools_module');
   },
 
   addCurrentReviewPack() {
@@ -1121,7 +1121,7 @@ Page({
     if (text) {
       this.importFactoryStudioPreview();
     }
-    wx.switchTab({ url: '/pages/review/review' });
+    navigation.navigateLearningRoute('/pages/review/review?from=tools');
   },
 
   importFactoryStudioAndArcade() {
@@ -1129,7 +1129,7 @@ Page({
     if (text) {
       this.importFactoryStudioPreview();
     }
-    wx.navigateTo({ url: '/pages/arcade/arcade?from=tools_pack' });
+    navigation.navigateLearningRoute('/pages/arcade/arcade?from=tools_pack');
   },
 
   runRevolutionAction(event) {
@@ -1139,11 +1139,11 @@ Page({
       return;
     }
     if (action === 'review') {
-      wx.switchTab({ url: '/pages/review/review' });
+      navigation.navigateLearningRoute('/pages/review/review?from=tools');
       return;
     }
     if (action === 'tutor') {
-      wx.navigateTo({ url: '/pages/tutor/tutor' });
+      navigation.navigateLearningRoute('/pages/tutor/tutor?from=tools_revolution');
       return;
     }
     if (action === 'focus_factory_input') {
@@ -1158,15 +1158,15 @@ Page({
   },
 
   goReview() {
-    wx.switchTab({ url: '/pages/review/review' });
+    navigation.navigateLearningRoute('/pages/review/review?from=tools');
   },
 
   goArcade() {
-    wx.navigateTo({ url: '/pages/arcade/arcade?from=tools' });
+    navigation.navigateLearningRoute('/pages/arcade/arcade?from=tools');
   },
 
   goFirstStep() {
-    wx.navigateTo({ url: '/pages/tutor/tutor?from=tools_empty_revisit' });
+    navigation.navigateLearningRoute('/pages/tutor/tutor?from=tools_empty_revisit');
   },
 
   goHome() {
@@ -1174,7 +1174,7 @@ Page({
   },
 
   goTools() {
-    wx.switchTab({ url: '/pages/tools/tools' });
+    navigation.navigateLearningRoute('/pages/tools/tools');
   },
 
   goProfile() {

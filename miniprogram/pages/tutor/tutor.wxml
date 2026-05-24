@@ -1,6 +1,6 @@
 <view class="tutor-page safe-bottom">
   <view class="tutor-shell">
-    <view class="page-positioning socratic-positioning">
+    <view class="page-positioning socratic-positioning" wx:if="{{showLegacyEntryContent}}">
       <view class="positioning-kicker">作业点拨</view>
       <view class="positioning-title">咕点用追问陪你说第一步，不直接讲答案</view>
       <view class="positioning-flow">先说你准备怎么开始，咕点再给下一句提示；说清以后去专注舱坐一段。</view>
@@ -20,6 +20,36 @@
 
     <scroll-view class="tutor-main" scroll-y enhanced show-scrollbar="{{false}}">
       <view class="main-inner">
+        <view class="ux-entry ux-entry-tutor ux-kit-screen ux-kit-tutor">
+          <view class="ux-kit-top">
+            <view class="ux-kit-logo"><view class="ux-kit-logo-dot"></view><text>原点智学</text></view>
+            <view class="ux-kit-pill">只问第一步</view>
+          </view>
+          <view class="ux-kit-hero">
+            <view class="ux-kit-copy">
+              <view class="ux-kit-title">你先说第一步</view>
+              <view class="ux-kit-sub">咕点不会直接替你写答案。你说题目或卡点，它只给下一句最小提示。</view>
+            </view>
+            <image class="ux-kit-mascot" mode="aspectFit" src="/assets/brand/gudian-mascot-study.png" />
+          </view>
+          <view class="ux-kit-jump-grid">
+            <view class="ux-kit-jump-card primary" data-scene="tutor" bindtap="openEntryDetail">
+              <text>发题目</text>
+              <text>先说卡在哪里</text>
+            </view>
+            <view class="ux-kit-jump-card" data-scene="today" bindtap="openEntryDetail">
+              <text>排顺序</text>
+              <text>今晚先做哪题</text>
+            </view>
+            <view class="ux-kit-jump-card" data-scene="review" bindtap="openEntryDetail">
+              <text>沉淀卡</text>
+              <text>说完加入复习</text>
+            </view>
+          </view>
+          <view class="ux-kit-primary" data-scene="tutor" bindtap="openEntryDetail">发送第一步</view>
+          <view class="ux-kit-secondary" data-scene="review" bindtap="openEntryDetail">说完后加入复习卡</view>
+        </view>
+        <block wx:if="{{showLegacyEntryContent}}">
         <view class="chat-card">
           <view class="chat-head">
             <view class="chat-avatar">
@@ -507,10 +537,11 @@
         </block>
 
         <view hidden>{{pedagogy.title}}{{pasteRisk.title}}{{coachConsole.title}}</view>
+        </block>
       </view>
     </scroll-view>
 
-    <view class="composer-area">
+    <view class="composer-area" wx:if="{{showLegacyEntryContent}}">
       <view class="composer-inner">
         <textarea
           class="composer-input"

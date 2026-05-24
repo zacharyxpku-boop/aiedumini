@@ -1,5 +1,5 @@
 <view class="upload-page">
-  <view class="page-positioning upload-positioning">
+  <view class="page-positioning upload-positioning" wx:if="{{showLegacyEntryContent}}">
     <view class="positioning-kicker">材料入口</view>
     <view class="positioning-title">把作业、错题、材料变成今晚路线和可回访卡</view>
     <view class="positioning-flow">先分清必须做什么；错题会进修卡点，材料会变成轻练习，不散在各处。</view>
@@ -14,6 +14,36 @@
 
   <scroll-view class="upload-scroll" scroll-y enhanced show-scrollbar="{{false}}">
     <view class="upload-content">
+      <view class="ux-entry ux-entry-upload ux-kit-screen ux-kit-upload">
+        <view class="ux-kit-top">
+          <view class="ux-kit-logo"><view class="ux-kit-logo-dot"></view><text>原点智学</text></view>
+          <view class="ux-kit-pill">学习包</view>
+        </view>
+        <view class="ux-kit-hero">
+          <view class="ux-kit-copy">
+            <view class="ux-kit-title">把材料变成学习包</view>
+            <view class="ux-kit-sub">一键生成知识卡、小测和复习计划，学习更有结构。</view>
+          </view>
+          <image class="ux-kit-mascot" mode="aspectFit" src="/assets/brand/gudian-mascot-study.png" />
+        </view>
+        <view class="ux-kit-jump-grid">
+          <view class="ux-kit-jump-card primary" data-scene="upload" bindtap="openEntryDetail">
+            <text>上传材料</text>
+            <text>作业/错题/成绩</text>
+          </view>
+          <view class="ux-kit-jump-card" data-scene="parent" bindtap="openEntryDetail">
+            <text>家长报告</text>
+            <text>证据与方法匹配</text>
+          </view>
+          <view class="ux-kit-jump-card" data-scene="today" bindtap="openEntryDetail">
+            <text>今晚路线</text>
+            <text>直接生成任务</text>
+          </view>
+        </view>
+        <view class="ux-kit-primary" data-scene="upload" bindtap="openEntryDetail">生成学习包 ✨</view>
+        <view class="ux-kit-safe-line">内容仅用于生成学习包，不会公开分享</view>
+      </view>
+      <block wx:if="{{showLegacyEntryContent}}">
       <view class="upload-brand-row">
         <view class="upload-brand">
           <view class="upload-logo"><view class="upload-logo-leaf"></view></view>
@@ -680,6 +710,7 @@
         <view class="material-source-line" wx:if="{{materialPreview.sourceReadinessView}}">{{materialPreview.sourceReadinessView.localLine}}</view>
         <view class="material-source-line" wx:if="{{materialPreview.sourceReadinessView}}">{{materialPreview.sourceReadinessView.blockedLine}}</view>
       </view>
-    </view>
+      </block>
+      </view>
   </scroll-view>
 </view>

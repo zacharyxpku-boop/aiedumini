@@ -126,7 +126,7 @@ Page({
     storage.recordCoreLoopEntry && storage.recordCoreLoopEntry('dictation_transition', {
       feature: 'dictation'
     });
-    wx.navigateTo({ url: '/pages/upload/upload?from=dictation' });
+    navigation.navigateLearningRoute('/pages/upload/upload?from=dictation');
   },
 
   dismissDictationTransition() {

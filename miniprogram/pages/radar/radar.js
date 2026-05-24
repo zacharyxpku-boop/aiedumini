@@ -322,7 +322,7 @@ Page({
     if (!item) return;
     storage.set(storage.KEYS.selectedHomework, item);
     storage.set(storage.KEYS.selectedHomeworkSource, bucket);
-    wx.navigateTo({ url: '/pages/tutor/tutor' });
+    navigation.navigateLearningRoute('/pages/tutor/tutor?from=radar_select_homework');
   },
 
   markFeedback(event) {
@@ -388,12 +388,12 @@ Page({
   startFirstMust() {
     const item = (this.data.plan.must_do || [])[0];
     if (!item) {
-      wx.navigateTo({ url: '/pages/upload/upload' });
+      navigation.navigateLearningRoute('/pages/upload/upload?from=radar_empty');
       return;
     }
     storage.set(storage.KEYS.selectedHomework, item);
     storage.set(storage.KEYS.selectedHomeworkSource, 'radar_first_must');
-    wx.navigateTo({ url: '/pages/tutor/tutor' });
+    navigation.navigateLearningRoute('/pages/tutor/tutor?from=radar_first_must');
   },
 
   runDecisionAction(event) {
@@ -410,15 +410,15 @@ Page({
   },
 
   goUpload() {
-    wx.navigateTo({ url: '/pages/upload/upload' });
+    navigation.navigateLearningRoute('/pages/upload/upload?from=radar');
   },
 
   goReview() {
-    wx.switchTab({ url: '/pages/review/review' });
+    navigation.navigateLearningRoute('/pages/review/review?from=radar');
   },
 
   goTools() {
-    wx.switchTab({ url: '/pages/tools/tools' });
+    navigation.navigateLearningRoute('/pages/tools/tools?from=radar');
   },
 
   goProfile() {

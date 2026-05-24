@@ -1,5 +1,5 @@
 <view class="page safe-bottom profile-page">
-  <view class="page-positioning profile-positioning">
+  <view class="page-positioning profile-positioning" wx:if="{{showLegacyEntryContent}}">
     <view class="positioning-kicker">家长复盘</view>
     <view class="positioning-title">家长今晚只问一句：刚才你第一步先看了哪里？</view>
     <view class="positioning-flow">先看今晚真实证据，再决定去修卡点、专注舱或轻回访；不是报表墙。</view>
@@ -9,6 +9,36 @@
 
   <scroll-view class="profile-scroll" scroll-y enhanced show-scrollbar="{{false}}">
     <view class="profile-shell">
+      <view class="ux-entry ux-entry-parent ux-kit-screen ux-kit-parent">
+        <view class="ux-kit-top">
+          <view class="ux-kit-logo"><view class="ux-kit-logo-dot"></view><text>原点智学</text></view>
+          <view class="ux-kit-pill">家长视图</view>
+        </view>
+        <view class="ux-kit-hero">
+          <view class="ux-kit-copy">
+            <view class="ux-kit-title">家长只看关键进展</view>
+            <view class="ux-kit-sub">不用盯全过程。今晚先看优先级、结束后看一句话进展。</view>
+          </view>
+          <image class="ux-kit-family" mode="aspectFit" src="/assets/brand/family-report.png" />
+        </view>
+        <view class="ux-kit-jump-grid">
+          <view class="ux-kit-jump-card primary" data-scene="parent" bindtap="openEntryDetail">
+            <text>今晚安排</text>
+            <text>看下一步</text>
+          </view>
+          <view class="ux-kit-jump-card" data-scene="upload" bindtap="openEntryDetail">
+            <text>补材料</text>
+            <text>成绩/错题/测评</text>
+          </view>
+          <view class="ux-kit-jump-card" data-scene="review" bindtap="openEntryDetail">
+            <text>看回访</text>
+            <text>复习是否有效</text>
+          </view>
+        </view>
+        <view class="ux-kit-primary" data-scene="parent" bindtap="openEntryDetail">看今晚安排</view>
+        <view class="ux-kit-primary secondary-green" data-scene="parent" bindtap="openEntryDetail">生成周报</view>
+      </view>
+      <block wx:if="{{showLegacyEntryContent}}">
       <view class="v1-topbar">
         <view class="profile-brand">
           <view class="profile-logo"><view class="profile-logo-leaf"></view></view>
@@ -2020,6 +2050,7 @@
           <button class="primary-button" bindtap="initSession">{{loginText}}</button>
           <button class="secondary-button" bindtap="syncNow">同步本地记录</button>
         </view>
+      </block>
       </block>
     </view>
   </scroll-view>

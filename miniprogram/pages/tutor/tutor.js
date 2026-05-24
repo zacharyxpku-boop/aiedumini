@@ -943,6 +943,12 @@ Page({
   trackedMasteryStatus: '',
 
   onShow() {
+    const pendingRoute = navigation.consumePendingTabRouteContext
+      ? navigation.consumePendingTabRouteContext('/pages/tutor/tutor')
+      : null;
+    this.setData({
+      showLegacyEntryContent: !!(pendingRoute && navigation.shouldOpenFunctionalTab(pendingRoute.options))
+    });
     const state = storage.loadState();
     const routeOptions = currentRouteOptions();
     const publicK12Challenge = findPublicK12Challenge(routeOptions);
@@ -1732,6 +1738,13 @@ Page({
     wx.switchTab({ url: '/pages/home/home' });
   },
 
+  openEntryDetail(event) {
+    const scene = event && event.currentTarget && event.currentTarget.dataset
+      ? event.currentTarget.dataset.scene
+      : 'tutor';
+    wx.navigateTo({ url: `/pages/entry-detail/entry-detail?scene=${scene || 'tutor'}` });
+  },
+
   goFocus() {
     const session = storage.getTodaySession ? storage.getTodaySession() : null;
     const canStart = storage.canStartFocusFromTodaySession
@@ -1741,11 +1754,11 @@ Page({
       wx.showToast({ title: '先回咕点确认今晚第一步，才能进专注舱。', icon: 'none' });
       return;
     }
-    wx.switchTab({ url: '/pages/focus/focus' });
+    navigation.navigateLearningRoute('/pages/focus/focus');
   },
 
   goReview() {
-    wx.switchTab({ url: '/pages/review/review' });
+    navigation.navigateLearningRoute('/pages/review/review');
   },
 
   runTutorHandoffAction(event) {

@@ -29,11 +29,14 @@ Page({
     round: null,
     currentIndex: 0,
     currentQuestion: null,
+    questNodes: [],
     revealed: false,
     quizRecallEvidence: null,
     snakeTrack: null,
     snakeTiles: [],
     snakeNextOrder: 0,
+    snakeSegments: [],
+    showSnakeBody: false,
     matchTiles: [],
     matchSelectedTile: null,
     matchPairsDone: 0,
@@ -87,6 +90,12 @@ Page({
   },
 
   onShow() {
+    const pendingRoute = navigation.consumePendingTabRouteContext
+      ? navigation.consumePendingTabRouteContext('/pages/arcade/arcade')
+      : null;
+    this.setData({
+      showLegacyEntryContent: !!(pendingRoute && navigation.shouldOpenFunctionalTab(pendingRoute.options))
+    });
     this.refresh();
   },
 
@@ -292,10 +301,13 @@ Page({
       round,
       currentIndex: 0,
       currentQuestion: this.firstQuestionForRound(round, selectedGame),
+      questNodes: this.buildQuestNodes(round, 0),
       revealed: false,
       snakeTrack: selectedGame === 'snake' ? this.firstQuestionForRound(round, selectedGame) : null,
       snakeTiles: selectedGame === 'snake' && round.tracks && round.tracks[0] ? round.tracks[0].tiles : [],
       snakeNextOrder: 0,
+      snakeSegments: this.buildSnakeSegments(selectedGame === 'snake' && round.tracks && round.tracks[0], 0),
+      showSnakeBody: false,
       matchTiles: selectedGame === 'match' && round.tiles ? round.tiles : [],
       matchSelectedTile: null,
       matchPairsDone: 0,
@@ -852,6 +864,22 @@ Page({
     return (round.questions && round.questions[0]) || null;
   },
 
+  buildQuestNodes(round, currentIndex = 0) {
+    return ((round && round.questions) || []).map((question, index) => ({
+      id: question.id || question.cardId || `quest_${index}`,
+      label: index + 1,
+      stateClass: index < currentIndex ? 'done' : (index === currentIndex ? 'active' : '')
+    }));
+  },
+
+  buildSnakeSegments(track, snakeNextOrder = 0) {
+    return ((track && track.correctOrder) || []).map((item, index) => ({
+      id: `${item}_${index}`,
+      label: index + 1,
+      stateClass: index < snakeNextOrder ? 'eaten' : ''
+    }));
+  },
+
   visibleRecommendations(recommendations, expanded) {
     const limit = expanded ? 9 : 4;
     const list = recommendations || [];
@@ -901,11 +929,14 @@ Page({
       round,
       currentIndex: 0,
       currentQuestion: this.firstQuestionForRound(round, gameId),
+      questNodes: this.buildQuestNodes(round, 0),
       revealed: false,
       quizRecallEvidence: null,
       snakeTrack: gameId === 'snake' ? this.firstQuestionForRound(round, gameId) : null,
       snakeTiles: gameId === 'snake' && round.tracks && round.tracks[0] ? round.tracks[0].tiles : [],
       snakeNextOrder: 0,
+      snakeSegments: this.buildSnakeSegments(gameId === 'snake' && round.tracks && round.tracks[0], 0),
+      showSnakeBody: false,
       matchTiles: gameId === 'match' && round.tiles ? round.tiles : [],
       matchSelectedTile: null,
       matchPairsDone: 0,
@@ -1110,6 +1141,7 @@ Page({
     this.setData({
       currentIndex: nextIndex,
       currentQuestion: nextQuestion,
+      questNodes: this.buildQuestNodes(this.data.round, nextIndex),
       revealed: false,
       quizRecallEvidence: null,
       lives,
@@ -1171,6 +1203,8 @@ Page({
         snakeTrack: nextTrack,
         snakeTiles: nextTrack.tiles,
         snakeNextOrder: 0,
+        snakeSegments: this.buildSnakeSegments(nextTrack, 0),
+        showSnakeBody: false,
         lives,
         combo,
         bestCombo,
@@ -1185,6 +1219,8 @@ Page({
     this.setData({
       snakeTiles: nextTiles,
       snakeNextOrder: Number(this.data.snakeNextOrder || 0) + 1,
+      snakeSegments: this.buildSnakeSegments(this.data.snakeTrack, Number(this.data.snakeNextOrder || 0) + 1),
+      showSnakeBody: true,
       lives,
       combo,
       bestCombo,
@@ -1227,6 +1263,7 @@ Page({
     this.setData({
       currentIndex: nextIndex,
       currentQuestion: nextQuestion,
+      questNodes: this.buildQuestNodes(this.data.round, nextIndex),
       moleHoles: this.buildHoles(nextQuestion, this.data.round.holes),
       lives,
       combo,
@@ -2023,11 +2060,14 @@ Page({
       round,
       currentIndex: 0,
       currentQuestion: next,
+      questNodes: this.buildQuestNodes(round, 0),
       revealed: false,
       quizRecallEvidence: null,
       snakeTrack: this.data.selectedGame === 'snake' ? next : null,
       snakeTiles: this.data.selectedGame === 'snake' && next ? next.tiles : [],
       snakeNextOrder: 0,
+      snakeSegments: this.buildSnakeSegments(this.data.selectedGame === 'snake' ? next : null, 0),
+      showSnakeBody: false,
       matchTiles: this.data.selectedGame === 'match' && round.tiles ? round.tiles : [],
       matchSelectedTile: null,
       matchPairsDone: 0,
@@ -2150,12 +2190,19 @@ Page({
     wx.switchTab({ url: '/pages/home/home' });
   },
 
+  openEntryDetail(event) {
+    const scene = event && event.currentTarget && event.currentTarget.dataset
+      ? event.currentTarget.dataset.scene
+      : 'review';
+    wx.navigateTo({ url: `/pages/entry-detail/entry-detail?scene=${scene || 'review'}` });
+  },
+
   goTools() {
-    wx.switchTab({ url: '/pages/tools/tools' });
+    navigation.navigateLearningRoute('/pages/tools/tools');
   },
 
   goReview() {
-    wx.switchTab({ url: '/pages/review/review' });
+    navigation.navigateLearningRoute('/pages/review/review');
   },
 
   clearNinetySecondRecallTimer() {
@@ -2660,7 +2707,7 @@ Page({
       selected: focus.selected,
       answer: focus.correctAnswer
     });
-    wx.navigateTo({ url: '/pages/tutor/tutor?from=arcade' });
+    navigation.navigateLearningRoute('/pages/tutor/tutor?from=arcade');
   },
   runSurfaceDepthAction(event) {
     const dataset = event.currentTarget.dataset || {};

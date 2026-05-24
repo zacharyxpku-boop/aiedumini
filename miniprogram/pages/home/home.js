@@ -450,6 +450,12 @@ Page({
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().setData({ selected: 0 });
     }
+    const pendingRoute = navigation.consumePendingTabRouteContext
+      ? navigation.consumePendingTabRouteContext('/pages/home/home')
+      : null;
+    this.setData({
+      showLegacyEntryContent: !!(pendingRoute && navigation.shouldOpenFunctionalTab(pendingRoute.options))
+    });
     setTimeout(() => {
       this.refresh();
     }, 0);
@@ -1738,7 +1744,7 @@ Page({
   },
 
   openScenarioReview() {
-    wx.switchTab({ url: '/pages/review/review' });
+    navigation.navigateLearningRoute('/pages/review/review?from=home_scenario');
   },
 
   openScenarioProfile() {
@@ -1962,15 +1968,18 @@ Page({
   },
 
   openTutorFromHome(url = '/pages/tutor/tutor?from=home') {
-    if (url === '/pages/tutor/tutor?from=home') {
-      wx.navigateTo({ url: '/pages/tutor/tutor?from=home' });
-      return;
-    }
-    wx.navigateTo({ url });
+    navigation.navigateLearningRoute(url);
+  },
+
+  openEntryDetail(event) {
+    const scene = event && event.currentTarget && event.currentTarget.dataset
+      ? event.currentTarget.dataset.scene
+      : 'today';
+    wx.navigateTo({ url: `/pages/entry-detail/entry-detail?scene=${scene || 'today'}` });
   },
 
   goUpload() {
-    wx.navigateTo({ url: '/pages/upload/upload' });
+    navigation.navigateLearningRoute('/pages/upload/upload');
   },
 
   goDiagnosis() {
@@ -1978,7 +1987,7 @@ Page({
   },
 
   goReviewInput() {
-    wx.navigateTo({ url: '/pages/upload/upload' });
+    navigation.navigateLearningRoute('/pages/upload/upload?from=home_review_input');
   },
 
   goTutor() {
@@ -1989,7 +1998,7 @@ Page({
     this.trackShareActivation('challenge_started', {
       next: 'tools'
     });
-    wx.switchTab({ url: '/pages/tools/tools' });
+    navigation.navigateLearningRoute('/pages/tools/tools');
   },
 
   goDailyMath() {
@@ -2009,7 +2018,7 @@ Page({
   },
 
   goReview() {
-    wx.switchTab({ url: '/pages/review/review' });
+    navigation.navigateLearningRoute('/pages/review/review');
   },
 
   runHomeNextStep() {
@@ -2068,7 +2077,7 @@ Page({
       });
     }
     if (route.indexOf('/pages/review/review') === 0) {
-      wx.switchTab({ url: '/pages/review/review' });
+      navigation.navigateLearningRoute('/pages/review/review?from=home_mini_lesson_resume');
       return;
     }
     navigation.navigateLearningRoute(route);
@@ -2089,13 +2098,13 @@ Page({
       wx.showToast({ title: '先回咕点确认今晚第一步，才能进专注舱。', icon: 'none' });
       return;
     }
-    wx.switchTab({ url: '/pages/focus/focus' });
+    navigation.navigateLearningRoute('/pages/focus/focus');
   },
 
   continueYesterdayReview() {
     const card = this.data.yesterdayReviewCard || (storage.getYesterdayReview && storage.getYesterdayReview());
     if (card && storage.markReviewCardRevisited) storage.markReviewCardRevisited(card.id);
-    wx.switchTab({ url: '/pages/review/review' });
+    navigation.navigateLearningRoute('/pages/review/review?from=yesterday_review');
   },
 
   goArcade() {
@@ -2112,7 +2121,7 @@ Page({
     const query = incoming.share_code
       ? `?from=share&share=${incoming.share_code}&mode=${incoming.mode || ''}&identity=${encodeURIComponent(incoming.identity_tag || '')}&action=${incoming.parent_next_action || ''}&capability_gap=${encodeURIComponent(incoming.capability_gap || '')}&capability_label=${encodeURIComponent(incoming.capability_label || '')}&challenge_goal=${encodeURIComponent(incoming.challenge_goal || '')}&challenge_rule=${encodeURIComponent(incoming.challenge_rule || '')}${socraticReportQuery}${visualBoardRelayQuery}`
       : '';
-    wx.navigateTo({ url: `/pages/arcade/arcade${query}` });
+    navigation.navigateLearningRoute(`/pages/arcade/arcade${query}`);
   },
 
   goSharedChallenge() {
@@ -2162,9 +2171,7 @@ Page({
       visual_board_relay_exit: incoming.visual_board_relay_exit || '',
       visual_board_relay_boundary: incoming.visual_board_relay_boundary || ''
     });
-    if (!navigation.navigateLearningRoute(target)) {
-      wx.navigateTo({ url: '/pages/arcade/arcade' });
-    }
+    if (!navigation.navigateLearningRoute(target)) navigation.navigateLearningRoute('/pages/arcade/arcade');
   },
 
   runIncomingShareRelayAction(event) {
@@ -2241,9 +2248,7 @@ Page({
       wrong_cause_receiver_action: incoming.wrong_cause_receiver_action || '',
       wrong_cause_blocked_fields: incoming.wrong_cause_blocked_fields || ''
     });
-    if (!navigation.navigateLearningRoute(target)) {
-      wx.navigateTo({ url: '/pages/arcade/arcade' });
-    }
+    if (!navigation.navigateLearningRoute(target)) navigation.navigateLearningRoute('/pages/arcade/arcade');
   },
 
   startTopMust() {

@@ -370,7 +370,7 @@ Page({
   },
 
   goReview() {
-    wx.switchTab({ url: '/pages/review/review' });
+    navigation.navigateLearningRoute('/pages/review/review?from=focus');
   },
 
   goProfile() {

@@ -3090,6 +3090,12 @@ Page({
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().setData({ selected: 4 });
     }
+    const pendingRoute = navigation.consumePendingTabRouteContext
+      ? navigation.consumePendingTabRouteContext('/pages/profile/profile')
+      : null;
+    this.setData({
+      showLegacyEntryContent: !!(pendingRoute && navigation.shouldOpenFunctionalTab(pendingRoute.options))
+    });
     this.refresh();
   },
 
@@ -4166,12 +4172,19 @@ Page({
     wx.switchTab({ url: '/pages/home/home' });
   },
 
+  openEntryDetail(event) {
+    const scene = event && event.currentTarget && event.currentTarget.dataset
+      ? event.currentTarget.dataset.scene
+      : 'parent';
+    wx.navigateTo({ url: `/pages/entry-detail/entry-detail?scene=${scene || 'parent'}` });
+  },
+
   goTools() {
-    wx.switchTab({ url: '/pages/tools/tools' });
+    navigation.navigateLearningRoute('/pages/tools/tools');
   },
 
   goFocus() {
-    wx.switchTab({ url: '/pages/focus/focus' });
+    navigation.navigateLearningRoute('/pages/focus/focus');
   },
 
   goProfile() {

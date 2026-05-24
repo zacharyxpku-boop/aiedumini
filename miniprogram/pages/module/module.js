@@ -92,7 +92,7 @@ Page({
         text: `开始这个学习局：${item.title}。${item.tutorPrompt}`
       }
     ]);
-    wx.navigateTo({ url: '/pages/tutor/tutor' });
+    navigation.navigateLearningRoute('/pages/tutor/tutor?from=module');
   },
 
   markModule(event) {
@@ -170,7 +170,7 @@ Page({
   },
 
   goReview() {
-    wx.switchTab({ url: '/pages/review/review' });
+    navigation.navigateLearningRoute('/pages/review/review?from=module');
   },
 
   trackEvent(eventName, item, props = {}) {
