@@ -4,7 +4,7 @@
     <view class="positioning-title">玩一小局，错的卡回到复习队列</view>
     <view class="positioning-flow">游戏负责让孩子愿意再练一下；错题和模糊点会回到修卡点，不做排行。</view>
   </view>
-  <view class="arcade-topbar">
+  <view class="arcade-topbar" wx:if="{{showLegacyEntryContent}}">
     <button class="nav-back" bindtap="goBack">‹</button>
     <view class="nav-title">轻练习</view>
     <button class="nav-home" bindtap="goHome">首页</button>

@@ -9,7 +9,7 @@
         <button bindtap="goReview">把卡点整理成错题卡</button>
       </view>
     </view>
-    <view class="top-nav">
+    <view class="top-nav" wx:if="{{showLegacyEntryContent}}">
       <button class="home-back" bindtap="goHome">首页</button>
       <view class="nav-brand">
         <view class="brand-title">原点智学</view>

@@ -4,7 +4,7 @@
     <view class="positioning-title">把作业、错题、材料变成今晚路线和可回访卡</view>
     <view class="positioning-flow">先分清必须做什么；错题会进修卡点，材料会变成轻练习，不散在各处。</view>
   </view>
-  <view class="upload-nav">
+  <view class="upload-nav" wx:if="{{showLegacyEntryContent}}">
     <button class="nav-back" bindtap="goHome" aria-label="返回">
       <text class="nav-back-icon">‹</text>
     </button>

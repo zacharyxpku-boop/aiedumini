@@ -1518,6 +1518,19 @@ button::after {
   height: 112rpx;
 }
 
+.ux-kit-parent .ux-kit-hero {
+  grid-template-columns: minmax(0, 1fr) 116rpx;
+}
+
+.ux-kit-parent .ux-kit-title {
+  font-size: 39rpx;
+}
+
+.ux-kit-parent .ux-kit-family {
+  width: 112rpx;
+  height: 92rpx;
+}
+
 .ux-kit-input-card,
 .ux-kit-upload-box {
   display: grid;
