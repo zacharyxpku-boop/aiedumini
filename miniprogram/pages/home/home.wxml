@@ -47,6 +47,18 @@
       </view>
       <view class="ux-kit-primary" data-scene="today" bindtap="openEntryDetail">开始规划今晚任务</view>
       <view class="ux-kit-secondary" data-scene="upload" bindtap="openEntryDetail">上传材料生成学习包</view>
+      <view class="ux-kit-floor ux-kit-floor-home">
+        <view class="ux-kit-floor-line">
+          <view class="ux-kit-path-dot active"></view>
+          <view class="ux-kit-path-dot"></view>
+          <view class="ux-kit-path-dot"></view>
+        </view>
+        <view class="ux-kit-floor-card">
+          <text>今晚只推进一小步</text>
+          <text>规划 → 私教 → 复习</text>
+        </view>
+        <view class="ux-kit-floor-object desk"></view>
+      </view>
     </view>
     <block wx:if="{{showLegacyEntryContent}}">
     <view class="rc14-home-first-screen-top">

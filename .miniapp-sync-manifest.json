@@ -2,7 +2,7 @@
   "sourceRepo": "zacharyxpku-boop/ai-edu-platform",
   "sourcePath": "miniprogram",
   "sourceCommit": "0fbca04",
-  "syncedAt": "2026-05-25T02:05:04.134Z",
+  "syncedAt": "2026-05-25T14:22:44.970Z",
   "files": [
     "miniprogram/app.js",
     "miniprogram/app.json",
@@ -88,6 +88,7 @@
     "miniprogram/pages/upload/upload.wxml",
     "miniprogram/pages/upload/upload.wxss",
     "miniprogram/project.config.json",
+    "miniprogram/README.md",
     "miniprogram/sitemap.json",
     "miniprogram/utils/api.js",
     "miniprogram/utils/arcade-engine.js",

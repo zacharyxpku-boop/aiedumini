@@ -39,6 +39,18 @@
       </view>
       <view class="ux-kit-primary" data-scene="review" bindtap="openEntryDetail">开始这一关</view>
       <view class="ux-kit-secondary" data-scene="tutor" bindtap="openEntryDetail">换一张卡片</view>
+      <view class="ux-kit-floor ux-kit-floor-review">
+        <view class="ux-kit-floor-line">
+          <view class="ux-kit-path-dot active"></view>
+          <view class="ux-kit-path-dot active"></view>
+          <view class="ux-kit-path-dot active"></view>
+        </view>
+        <view class="ux-kit-floor-card">
+          <text>先回忆再核对</text>
+          <text>错因留到明天</text>
+        </view>
+        <view class="ux-kit-floor-object island"></view>
+      </view>
     </view>
     <view class="arcade-hero">
       <view class="hero-art">

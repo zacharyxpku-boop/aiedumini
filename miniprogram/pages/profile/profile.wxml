@@ -37,6 +37,18 @@
         </view>
         <view class="ux-kit-primary" data-scene="parent" bindtap="openEntryDetail">看今晚安排</view>
         <view class="ux-kit-primary secondary-green" data-scene="parent" bindtap="openEntryDetail">生成周报</view>
+        <view class="ux-kit-floor ux-kit-floor-parent">
+          <view class="ux-kit-floor-line">
+            <view class="ux-kit-path-dot active"></view>
+            <view class="ux-kit-path-dot"></view>
+            <view class="ux-kit-path-dot active"></view>
+          </view>
+          <view class="ux-kit-floor-card">
+            <text>证据先行</text>
+            <text>只给家长下一步</text>
+          </view>
+          <view class="ux-kit-floor-object report"></view>
+        </view>
       </view>
       <block wx:if="{{showLegacyEntryContent}}">
       <view class="v1-topbar">

@@ -42,6 +42,18 @@
         </view>
         <view class="ux-kit-primary" data-scene="upload" bindtap="openEntryDetail">生成学习包 ✨</view>
         <view class="ux-kit-safe-line">内容仅用于生成学习包，不会公开分享</view>
+        <view class="ux-kit-floor ux-kit-floor-upload">
+          <view class="ux-kit-floor-line">
+            <view class="ux-kit-path-dot active"></view>
+            <view class="ux-kit-path-dot"></view>
+            <view class="ux-kit-path-dot"></view>
+          </view>
+          <view class="ux-kit-floor-card">
+            <text>材料先进盒子</text>
+            <text>再生成今晚路线</text>
+          </view>
+          <view class="ux-kit-floor-object folder"></view>
+        </view>
       </view>
       <block wx:if="{{showLegacyEntryContent}}">
       <view class="upload-brand-row">

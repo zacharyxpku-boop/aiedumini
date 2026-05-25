@@ -48,6 +48,18 @@
           </view>
           <view class="ux-kit-primary" data-scene="tutor" bindtap="openEntryDetail">发送第一步</view>
           <view class="ux-kit-secondary" data-scene="review" bindtap="openEntryDetail">说完后加入复习卡</view>
+          <view class="ux-kit-floor ux-kit-floor-tutor">
+            <view class="ux-kit-floor-line">
+              <view class="ux-kit-path-dot active"></view>
+              <view class="ux-kit-path-dot active"></view>
+              <view class="ux-kit-path-dot"></view>
+            </view>
+            <view class="ux-kit-floor-card">
+              <text>先说卡点</text>
+              <text>AI 只追问下一句</text>
+            </view>
+            <view class="ux-kit-floor-object board"></view>
+          </view>
         </view>
         <block wx:if="{{showLegacyEntryContent}}">
         <view class="chat-card">
