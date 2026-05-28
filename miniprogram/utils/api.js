@@ -359,6 +359,14 @@ function analyzeMiniappMaterial(payload) {
   });
 }
 
+function fetchReportJobStatus(caseId) {
+  const safeCaseId = String(caseId || 'default').replace(/[^a-zA-Z0-9_-]/g, '-').slice(0, 64) || 'default';
+  return request(`/api/report-job-status?case_id=${encodeURIComponent(safeCaseId)}`, {
+    method: 'GET',
+    timeout: 12000
+  });
+}
+
 module.exports = {
   request,
   initSession,
@@ -382,5 +390,6 @@ module.exports = {
   fetchLeaderboard,
   fetchGameReport,
   recognizeLearningReport,
-  analyzeMiniappMaterial
+  analyzeMiniappMaterial,
+  fetchReportJobStatus
 };
