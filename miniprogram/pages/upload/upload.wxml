@@ -14,46 +14,55 @@
 
   <scroll-view class="upload-scroll" scroll-y enhanced show-scrollbar="{{false}}">
     <view class="upload-content">
-      <view class="ux-entry ux-entry-upload ux-kit-screen ux-kit-upload">
-        <view class="ux-kit-top">
-          <view class="ux-kit-logo"><view class="ux-kit-logo-dot"></view><text>原点智学</text></view>
-          <view class="ux-kit-pill">学习包</view>
-        </view>
-        <view class="ux-kit-hero">
-          <view class="ux-kit-copy">
-            <view class="ux-kit-title">把材料变成学习包</view>
-            <view class="ux-kit-sub">一键生成知识卡、小测和复习计划，学习更有结构。</view>
+      <view class="upload-hero-shell ux-entry ux-entry-upload ux-kit-screen ux-kit-upload">
+        <view class="upload-dash-top">
+          <view class="upload-dash-brand">
+            <view class="upload-dash-mark">↑</view>
+            <view>
+              <text>原点智学</text>
+              <text>资料进入证据链</text>
+            </view>
           </view>
-          <image class="ux-kit-mascot" mode="aspectFit" src="/assets/brand/gudian-mascot-study.png" />
+          <view class="upload-dash-pill">学习包</view>
         </view>
-        <view class="ux-kit-jump-grid">
-          <view class="ux-kit-jump-card primary" data-scene="upload" bindtap="openEntryDetail">
+
+        <view class="upload-dash-hero">
+          <view class="upload-dash-copy">
+            <view class="upload-dash-title">先把材料分清楚</view>
+            <view class="upload-dash-sub">测评、成绩、错题和家长观察会进入不同证据位，再生成报告和今晚路线。</view>
+            <view class="upload-dash-proof">
+              <text>不公开分享</text>
+              <text>先分类再分析</text>
+            </view>
+          </view>
+          <image class="upload-dash-mascot" mode="aspectFit" src="/assets/reference/entry-upload.png" />
+        </view>
+
+        <view class="upload-material-grid ux-kit-jump-grid">
+          <view class="upload-material-card ux-kit-jump-card primary" data-scene="upload" bindtap="openEntryDetail">
+            <view class="upload-material-icon">📁</view>
             <text>上传材料</text>
             <text>作业/错题/成绩</text>
           </view>
-          <view class="ux-kit-jump-card" data-scene="parent" bindtap="openEntryDetail">
+          <view class="upload-material-card ux-kit-jump-card" data-scene="parent" bindtap="openEntryDetail">
+            <view class="upload-material-icon blue">📋</view>
             <text>家长报告</text>
             <text>证据与方法匹配</text>
           </view>
-          <view class="ux-kit-jump-card" data-scene="today" bindtap="openEntryDetail">
+          <view class="upload-material-card ux-kit-jump-card" data-scene="today" bindtap="openEntryDetail">
+            <view class="upload-material-icon yellow">🧭</view>
             <text>今晚路线</text>
             <text>直接生成任务</text>
           </view>
         </view>
-        <view class="ux-kit-primary" data-scene="upload" bindtap="openEntryDetail">生成学习包 ✨</view>
-        <view class="ux-kit-safe-line">内容仅用于生成学习包，不会公开分享</view>
-        <view class="ux-kit-floor ux-kit-floor-upload">
-          <view class="ux-kit-floor-line">
-            <view class="ux-kit-path-dot active"></view>
-            <view class="ux-kit-path-dot"></view>
-            <view class="ux-kit-path-dot"></view>
-          </view>
-          <view class="ux-kit-floor-card">
-            <text>材料先进盒子</text>
-            <text>再生成今晚路线</text>
-          </view>
-          <view class="ux-kit-floor-object folder"></view>
+
+        <view class="upload-dash-pipeline">
+          <view class="done"><text>1</text><text>分类材料</text></view>
+          <view><text>2</text><text>提取证据</text></view>
+          <view><text>3</text><text>生成报告</text></view>
+          <view><text>4</text><text>进入私教</text></view>
         </view>
+        <view class="upload-dash-primary" data-scene="upload" bindtap="openEntryDetail">生成学习包</view>
       </view>
       <block wx:if="{{showLegacyEntryContent}}">
       <view class="upload-brand-row">

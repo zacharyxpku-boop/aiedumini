@@ -11,48 +11,71 @@
   </view>
 
   <scroll-view class="arcade-scroll" scroll-y enhanced show-scrollbar="{{false}}">
-    <view class="ux-entry ux-entry-island ux-kit-screen ux-kit-review">
-      <view class="ux-kit-top">
-        <view class="ux-kit-logo"><view class="ux-kit-logo-dot"></view><text>原点智学</text></view>
-        <view class="ux-kit-pill">复习小关</view>
-      </view>
-      <view class="ux-kit-hero compact">
-        <view class="ux-kit-copy">
-          <view class="ux-kit-title">5 分钟复习小关</view>
-          <view class="ux-kit-sub">每天 5 分钟，先回忆，再核对，把错因留到明天再看。</view>
+    <view class="ux-entry ux-entry-island ux-kit-screen ux-kit-review arcade-hero-shell">
+      <view class="arcade-dash-top">
+        <view class="arcade-dash-brand">
+          <view class="arcade-dash-mark">岛</view>
+          <view>
+            <text>轻练习岛</text>
+            <text>5 分钟迁移验证</text>
+          </view>
         </view>
-        <image class="ux-kit-sprout" mode="aspectFit" src="/assets/brand/review-sprout.png" />
+        <view class="arcade-dash-pill">不排行</view>
+      </view>
+      <view class="arcade-dash-hero">
+        <view class="arcade-dash-copy">
+          <view class="arcade-dash-kicker">先回忆，再核对</view>
+          <view class="arcade-dash-title">把一个卡点玩成可验证的小关</view>
+          <view class="arcade-dash-sub">每局只练一个知识点：说出第一步、核对过程、做一张变式卡，最后把证据回流给家长。</view>
+        </view>
+        <image class="arcade-dash-art" mode="aspectFit" src="/assets/reference/entry-map.png" />
+      </view>
+      <view class="arcade-map-card">
+        <view class="arcade-map-head">
+          <text>本局路线</text>
+          <text>短、轻、可回访</text>
+        </view>
+        <view class="arcade-map-line">
+          <view class="arcade-map-node active"><text>1</text><text>回忆</text></view>
+          <view class="arcade-map-node active"><text>2</text><text>核对</text></view>
+          <view class="arcade-map-node"><text>3</text><text>变式</text></view>
+          <view class="arcade-map-node"><text>4</text><text>回流</text></view>
+        </view>
+      </view>
+      <view class="arcade-stats-grid">
+        <view>
+          <text>{{cards.length || 0}}</text>
+          <text>可用卡片</text>
+        </view>
+        <view>
+          <text>{{round.total || 0}}</text>
+          <text>本局题数</text>
+        </view>
+        <view>
+          <text>{{xpGained || 0}}</text>
+          <text>留证回访</text>
+        </view>
       </view>
       <view class="ux-kit-jump-grid">
-        <view class="ux-kit-jump-card primary" data-scene="review" bindtap="openEntryDetail">
+        <view class="ux-kit-jump-card primary arcade-jump-card" data-scene="review" bindtap="openEntryDetail">
           <text>90 秒回忆</text>
-          <text>先想再核对</text>
+          <text>先说第一步</text>
         </view>
-        <view class="ux-kit-jump-card" data-scene="tutor" bindtap="openEntryDetail">
+        <view class="ux-kit-jump-card arcade-jump-card" data-scene="tutor" bindtap="openEntryDetail">
           <text>卡住求助</text>
-          <text>回到私教追问</text>
+          <text>回私教追问</text>
         </view>
-        <view class="ux-kit-jump-card" data-scene="parent" bindtap="openEntryDetail">
+        <view class="ux-kit-jump-card arcade-jump-card" data-scene="parent" bindtap="openEntryDetail">
           <text>给家长看</text>
-          <text>只看证据进展</text>
+          <text>只看证据</text>
         </view>
       </view>
-      <view class="ux-kit-primary" data-scene="review" bindtap="openEntryDetail">开始这一关</view>
-      <view class="ux-kit-secondary" data-scene="tutor" bindtap="openEntryDetail">换一张卡片</view>
-      <view class="ux-kit-floor ux-kit-floor-review">
-        <view class="ux-kit-floor-line">
-          <view class="ux-kit-path-dot active"></view>
-          <view class="ux-kit-path-dot active"></view>
-          <view class="ux-kit-path-dot active"></view>
-        </view>
-        <view class="ux-kit-floor-card">
-          <text>先回忆再核对</text>
-          <text>错因留到明天</text>
-        </view>
-        <view class="ux-kit-floor-object island"></view>
+      <view class="arcade-dash-action-row">
+        <view class="ux-kit-primary arcade-primary" data-scene="review" bindtap="openEntryDetail">开始这一关</view>
+        <view class="ux-kit-secondary arcade-secondary" data-scene="tutor" bindtap="openEntryDetail">卡住就追问</view>
       </view>
     </view>
-    <view class="arcade-hero">
+    <view class="arcade-hero" wx:if="{{showLegacyEntryContent}}">
       <view class="hero-art">
         <view class="hero-orbit">
           <view class="hero-core"></view>

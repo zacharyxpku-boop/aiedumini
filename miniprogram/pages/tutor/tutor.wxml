@@ -20,45 +20,64 @@
 
     <scroll-view class="tutor-main" scroll-y enhanced show-scrollbar="{{false}}">
       <view class="main-inner">
-        <view class="ux-entry ux-entry-tutor ux-kit-screen ux-kit-tutor">
-          <view class="ux-kit-top">
-            <view class="ux-kit-logo"><view class="ux-kit-logo-dot"></view><text>原点智学</text></view>
-            <view class="ux-kit-pill">只问第一步</view>
-          </view>
-          <view class="ux-kit-hero">
-            <view class="ux-kit-copy">
-              <view class="ux-kit-title">你先说第一步</view>
-              <view class="ux-kit-sub">咕点不会直接替你写答案。你说题目或卡点，它只给下一句最小提示。</view>
+        <view class="tutor-hero-shell ux-entry ux-entry-tutor ux-kit-screen ux-kit-tutor">
+          <view class="tutor-dash-top">
+            <view class="tutor-dash-brand">
+              <view class="tutor-dash-mark">🤖</view>
+              <view>
+                <text>AI私教</text>
+                <text>只追问第一步</text>
+              </view>
             </view>
-            <image class="ux-kit-mascot" mode="aspectFit" src="/assets/brand/gudian-mascot-study.png" />
+            <view class="tutor-dash-pill" bindtap="goRadar">看报告</view>
           </view>
-          <view class="ux-kit-jump-grid">
-            <view class="ux-kit-jump-card primary" data-scene="tutor" bindtap="openEntryDetail">
+
+          <view class="tutor-dash-hero">
+            <image class="tutor-dash-mascot" mode="aspectFit" src="/assets/reference/entry-tutor.png" />
+            <view class="tutor-dash-bubble">
+              <view>你先说第一步</view>
+              <text>咕点不会替你写答案。你说题目或卡点，它只问下一句最小提示。</text>
+              <view class="tutor-chip-row">
+                <text>不给完整答案</text>
+                <text>只问依据</text>
+              </view>
+            </view>
+          </view>
+
+          <view class="tutor-flow-card">
+            <view class="tutor-section-head">
+              <text>私教对话边界</text>
+              <text>先启动，再迁移</text>
+            </view>
+            <view class="tutor-ladder">
+              <view class="active"><text>1</text><text>说卡点</text></view>
+              <view><text>2</text><text>问依据</text></view>
+              <view><text>3</text><text>小提示</text></view>
+              <view><text>4</text><text>进复习</text></view>
+            </view>
+          </view>
+
+          <view class="tutor-entry-grid ux-kit-jump-grid">
+            <view class="tutor-entry-card ux-kit-jump-card primary" data-scene="tutor" bindtap="openEntryDetail">
+              <image mode="aspectFit" src="/assets/reference/entry-tutor.png" />
               <text>发题目</text>
               <text>先说卡在哪里</text>
             </view>
-            <view class="ux-kit-jump-card" data-scene="today" bindtap="openEntryDetail">
+            <view class="tutor-entry-card ux-kit-jump-card" data-scene="today" bindtap="openEntryDetail">
+              <image mode="aspectFit" src="/assets/reference/entry-map.png" />
               <text>排顺序</text>
               <text>今晚先做哪题</text>
             </view>
-            <view class="ux-kit-jump-card" data-scene="review" bindtap="openEntryDetail">
+            <view class="tutor-entry-card ux-kit-jump-card" data-scene="review" bindtap="openEntryDetail">
+              <image mode="aspectFit" src="/assets/reference/entry-review.png" />
               <text>沉淀卡</text>
               <text>说完加入复习</text>
             </view>
           </view>
-          <view class="ux-kit-primary" data-scene="tutor" bindtap="openEntryDetail">发送第一步</view>
-          <view class="ux-kit-secondary" data-scene="review" bindtap="openEntryDetail">说完后加入复习卡</view>
-          <view class="ux-kit-floor ux-kit-floor-tutor">
-            <view class="ux-kit-floor-line">
-              <view class="ux-kit-path-dot active"></view>
-              <view class="ux-kit-path-dot active"></view>
-              <view class="ux-kit-path-dot"></view>
-            </view>
-            <view class="ux-kit-floor-card">
-              <text>先说卡点</text>
-              <text>AI 只追问下一句</text>
-            </view>
-            <view class="ux-kit-floor-object board"></view>
+
+          <view class="tutor-action-row">
+            <view class="tutor-primary" data-scene="tutor" bindtap="openEntryDetail">发送第一步</view>
+            <view class="tutor-secondary" data-scene="review" bindtap="openEntryDetail">加入复习卡</view>
           </view>
         </view>
         <block wx:if="{{showLegacyEntryContent}}">
