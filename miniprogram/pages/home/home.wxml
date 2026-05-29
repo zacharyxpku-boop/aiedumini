@@ -25,7 +25,7 @@
     <view class="mini-home-shell ux-kit-screen ux-kit-home">
       <view class="mini-topline">
         <view class="mini-brand">
-          <view class="mini-brand-mark">◆</view>
+          <image class="mini-brand-mark" mode="aspectFit" src="/assets/reference/brand-house.png" />
           <view>
             <text>原点智学</text>
             <text>小明（四年级）</text>
@@ -61,37 +61,37 @@
 
       <view class="mini-entry-grid ux-kit-jump-grid">
         <view class="mini-entry-card ux-kit-jump-card green" data-scene="upload" bindtap="openEntryDetail">
-          <image class="mini-entry-visual" mode="aspectFit" src="/assets/reference/entry-upload.png" />
+          <image class="mini-entry-visual" mode="aspectFill" src="/assets/reference/entry-upload.png" />
           <text>上传资料</text>
           <text>文档、试卷、错题</text>
           <view class="mini-entry-arrow">›</view>
         </view>
         <view class="mini-entry-card blue" bindtap="goRadar">
-          <image class="mini-entry-visual" mode="aspectFit" src="/assets/reference/entry-report.png" />
+          <image class="mini-entry-visual" mode="aspectFill" src="/assets/reference/entry-report.png" />
           <text>个性化报告</text>
           <text>待提升点与建议</text>
           <view class="mini-entry-arrow blue">›</view>
         </view>
         <view class="mini-entry-card ux-kit-jump-card green" data-scene="tutor" bindtap="openEntryDetail">
-          <image class="mini-entry-visual" mode="aspectFit" src="/assets/reference/entry-tutor.png" />
+          <image class="mini-entry-visual" mode="aspectFill" src="/assets/reference/entry-tutor.png" />
           <text>AI私教</text>
           <text>智能答疑与讲解</text>
           <view class="mini-entry-arrow">›</view>
         </view>
         <view class="mini-entry-card ux-kit-jump-card yellow" data-scene="review" bindtap="openEntryDetail">
-          <image class="mini-entry-visual" mode="aspectFit" src="/assets/reference/entry-review.png" />
+          <image class="mini-entry-visual" mode="aspectFill" src="/assets/reference/entry-review.png" />
           <text>复习游戏</text>
           <text>趣味挑战练习</text>
           <view class="mini-entry-arrow orange">›</view>
         </view>
         <view class="mini-entry-card orange" bindtap="goProfile">
-          <image class="mini-entry-visual" mode="aspectFit" src="/assets/reference/entry-parent.png" />
+          <image class="mini-entry-visual" mode="aspectFill" src="/assets/reference/entry-parent.png" />
           <text>家长中心</text>
           <text>一起见证成长</text>
           <view class="mini-entry-arrow orange">›</view>
         </view>
         <view class="mini-entry-card map" bindtap="goTools">
-          <image class="mini-entry-visual" mode="aspectFit" src="/assets/reference/entry-map.png" />
+          <image class="mini-entry-visual" mode="aspectFill" src="/assets/reference/entry-map.png" />
           <text>学习地图</text>
           <text>任务进度与目标</text>
           <view class="mini-entry-arrow">›</view>

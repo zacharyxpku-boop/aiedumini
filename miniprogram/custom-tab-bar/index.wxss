@@ -19,6 +19,7 @@
 }
 
 .v1-tab-item {
+  position: relative;
   display: grid;
   grid-template-rows: 44rpx 34rpx;
   row-gap: 4rpx;
@@ -42,17 +43,20 @@
 
 .v1-tab-item.active {
   color: #0C4A3B;
-  background: #F4FBED;
+  background: #F1FAEF;
   border-color: transparent;
 }
 
 .v1-tab-item.active::after {
   content: "";
-  width: 22rpx;
-  height: 5rpx;
-  margin: -2rpx auto 0;
+  position: absolute;
+  left: 50%;
+  bottom: 6rpx;
+  width: 24rpx;
+  height: 6rpx;
   border-radius: 999rpx;
-  background: #F4B63F;
+  background: #22B95C;
+  transform: translateX(-50%);
 }
 
 .v1-tab-text {
@@ -64,8 +68,6 @@
   text-align: center;
   text-overflow: ellipsis;
   white-space: nowrap;
-  transform: scale(0.88);
-  transform-origin: center center;
 }
 
 .v1-tab-icon-wrap {
@@ -75,6 +77,14 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
+}
+
+.v1-tab-item.active .v1-tab-icon-wrap {
+  width: 52rpx;
+  height: 44rpx;
+  justify-self: center;
+  border-radius: 18rpx;
+  background: rgba(34, 185, 92, 0.12);
 }
 
 .v1-tab-icon {

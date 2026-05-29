@@ -151,17 +151,14 @@
 }
 
 .mini-brand-mark {
-  width: 52rpx;
-  height: 52rpx;
-  flex: 0 0 auto;
-  border-radius: 18rpx;
-  color: #ffffff;
-  background: linear-gradient(180deg, #2ac45f 0%, #16a34a 100%);
-  box-shadow: 0 14rpx 26rpx rgba(34, 185, 92, 0.24);
-  font-size: 34rpx;
-  font-weight: 950;
-  line-height: 52rpx;
-  text-align: center;
+  display: block;
+  width: 58rpx;
+  height: 58rpx;
+  flex: 0 0 58rpx;
+  overflow: hidden;
+  border-radius: 20rpx;
+  background: #22b95c;
+  box-shadow: 0 14rpx 26rpx rgba(34, 185, 92, 0.20);
 }
 
 .mini-brand text {
@@ -427,6 +424,9 @@
   height: 136rpx;
   margin: 2rpx auto 14rpx;
   flex: 0 0 auto;
+  overflow: hidden;
+  border-radius: 26rpx;
+  background: rgba(255, 255, 255, 0.78);
 }
 
 .mini-art-folder::before {
@@ -802,6 +802,9 @@
   width: 158rpx;
   height: 130rpx;
   margin: 0 auto 16rpx;
+  overflow: hidden;
+  border-radius: 26rpx;
+  background: rgba(255, 255, 255, 0.78);
 }
 
 .mini-entry-card text:first-child {

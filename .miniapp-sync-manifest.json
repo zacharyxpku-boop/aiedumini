@@ -2,7 +2,7 @@
   "sourceRepo": "zacharyxpku-boop/ai-edu-platform",
   "sourcePath": "miniprogram",
   "sourceCommit": "87c3aa1",
-  "syncedAt": "2026-05-29T04:06:24.509Z",
+  "syncedAt": "2026-05-29T10:04:17.563Z",
   "files": [
     "miniprogram/app.js",
     "miniprogram/app.json",
@@ -10,6 +10,7 @@
     "miniprogram/assets/brand/family-report.png",
     "miniprogram/assets/brand/gudian-mascot-study.png",
     "miniprogram/assets/brand/gudian-mascot.png",
+    "miniprogram/assets/brand/gudian-reader.png",
     "miniprogram/assets/brand/review-sprout.png",
     "miniprogram/assets/focus/cafe.mp3",
     "miniprogram/assets/focus/campfire.mp3",

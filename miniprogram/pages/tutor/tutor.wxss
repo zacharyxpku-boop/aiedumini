@@ -144,12 +144,12 @@ page {
   width: 52rpx;
   height: 52rpx;
   flex: 0 0 auto;
+  display: block;
+  padding: 7rpx;
   border-radius: 18rpx;
   background: #eef7ff;
+  border: 1rpx solid rgba(76, 159, 255, 0.16);
   box-shadow: 0 14rpx 26rpx rgba(76, 159, 255, 0.12);
-  font-size: 30rpx;
-  line-height: 52rpx;
-  text-align: center;
 }
 
 .tutor-dash-brand text {
@@ -1687,4 +1687,105 @@ page {
   color: #6B7280;
   font-size: 19rpx;
   line-height: 1.35;
+}
+
+/* Later-tab visual pass: keep the first tutor screen dense and card-like. */
+.main-inner {
+  padding: calc(108rpx + env(safe-area-inset-top)) 34rpx calc(138rpx + env(safe-area-inset-bottom));
+}
+
+.tutor-hero-shell {
+  margin-top: 0;
+  padding: 18rpx 18rpx 20rpx;
+  border-radius: 34rpx;
+}
+
+.tutor-dash-hero {
+  grid-template-columns: 176rpx minmax(0, 1fr);
+  gap: 12rpx;
+  margin-top: 18rpx;
+}
+
+.tutor-dash-mascot {
+  width: 176rpx;
+  height: 168rpx;
+  overflow: hidden;
+  border: 6rpx solid rgba(255, 255, 255, 0.78);
+  border-radius: 36rpx;
+}
+
+.tutor-dash-bubble {
+  min-height: 168rpx;
+  padding: 16rpx;
+}
+
+.tutor-dash-bubble view:first-child {
+  font-size: 30rpx;
+  line-height: 1.12;
+}
+
+.tutor-dash-bubble > text {
+  display: -webkit-box;
+  margin-top: 8rpx;
+  overflow: hidden;
+  font-size: 22rpx;
+  line-height: 1.42;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.tutor-chip-row {
+  gap: 8rpx;
+  margin-top: 12rpx;
+}
+
+.tutor-chip-row text {
+  padding: 7rpx 12rpx;
+  font-size: 19rpx;
+}
+
+.tutor-flow-card {
+  margin-top: 14rpx;
+  padding: 14rpx;
+  border-radius: 24rpx;
+}
+
+.tutor-ladder {
+  gap: 8rpx;
+  margin-top: 14rpx;
+}
+
+.tutor-ladder view {
+  min-height: 70rpx;
+  padding: 10rpx 4rpx;
+  border-radius: 16rpx;
+}
+
+.tutor-entry-grid {
+  gap: 12rpx;
+  margin-top: 16rpx;
+}
+
+.tutor-entry-card {
+  min-height: 132rpx;
+  padding: 11rpx 9rpx;
+  border-radius: 22rpx;
+}
+
+.tutor-entry-card image {
+  width: 72rpx;
+  height: 56rpx;
+  overflow: hidden;
+  border-radius: 18rpx;
+}
+
+.tutor-action-row {
+  margin-top: 16rpx;
+}
+
+.tutor-primary,
+.tutor-secondary {
+  height: 70rpx;
+  font-size: 24rpx;
+  line-height: 70rpx;
 }

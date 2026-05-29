@@ -12,7 +12,7 @@
       <view class="ux-entry ux-entry-parent ux-kit-screen ux-kit-parent parent-hero-shell">
         <view class="parent-dash-top">
           <view class="parent-dash-brand">
-            <view class="parent-dash-mark">家</view>
+            <image class="parent-dash-mark" mode="aspectFit" src="/assets/reference/brand-house.png" />
             <view>
               <text>原点智学</text>
               <text>证据与下一步</text>
@@ -26,7 +26,7 @@
             <view class="parent-dash-title">只看孩子有没有走出第一步</view>
             <view class="parent-dash-sub">把测评、成绩、错题和复习回访合成一张家长行动卡：先看证据，再问一句，明天再验证。</view>
           </view>
-          <image class="parent-dash-art" mode="aspectFit" src="/assets/reference/entry-parent.png" />
+          <image class="parent-dash-art" mode="aspectFill" src="/assets/reference/entry-parent.png" />
         </view>
         <view class="parent-dash-proof-grid">
           <view class="parent-dash-proof primary">
@@ -46,6 +46,14 @@
           <view class="parent-dash-section-head">
             <text>证据来源</text>
             <text>不靠感觉判断</text>
+          </view>
+          <view class="parent-report-preview" data-scene="parent" bindtap="openEntryDetail">
+            <image class="parent-report-thumb" mode="aspectFill" src="/assets/reference/entry-report.png" />
+            <view class="parent-report-copy">
+              <text>个性化报告预览</text>
+              <text>把天赋画像、成绩波动、错题卡点合成一张家长能看懂的下一步。</text>
+            </view>
+            <view class="parent-report-badge">查看</view>
           </view>
           <view class="parent-dash-evidence-grid">
             <view><text>测评报告</text><text>天赋画像</text></view>
@@ -80,6 +88,19 @@
         <view class="parent-dash-action-row">
           <view class="ux-kit-primary parent-primary" data-scene="parent" bindtap="openEntryDetail">看今晚行动卡</view>
           <view class="ux-kit-secondary parent-secondary" data-scene="upload" bindtap="openEntryDetail">补一份材料</view>
+        </view>
+      </view>
+      <view class="parent-subcheck ux-kit-subcheck">
+        <view class="subcheck-main" data-scene="parent" bindtap="openEntryDetail">
+          <view class="subcheck-copy">
+            <text>家长今晚只看三件事</text>
+            <text>证据从哪来、孩子卡在哪、明天怎么验证。</text>
+          </view>
+          <image class="subcheck-art" mode="aspectFill" src="/assets/reference/entry-parent.png" />
+        </view>
+        <view class="subcheck-side">
+          <view data-scene="upload" bindtap="openEntryDetail"><text>材料缺口</text><text>补测评/错题</text></view>
+          <view data-scene="review" bindtap="openEntryDetail"><text>明天回访</text><text>90 秒复述</text></view>
         </view>
       </view>
       <block wx:if="{{showLegacyEntryContent}}">
