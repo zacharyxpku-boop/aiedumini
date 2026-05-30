@@ -410,7 +410,6 @@
   line-height: 1.45;
 }
 
-.hero-stats,
 .result-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -418,7 +417,6 @@
   margin-top: 26rpx;
 }
 
-.hero-stat,
 .result-grid > view {
   min-width: 0;
   padding: 18rpx 12rpx;
@@ -427,14 +425,12 @@
   text-align: center;
 }
 
-.hero-stat-num,
 .result-num {
   color: #F2D479;
   font-size: 32rpx;
   font-weight: 1000;
 }
 
-.hero-stat-label,
 .result-label {
   margin-top: 6rpx;
   color: rgba(255, 255, 255, 0.68);
