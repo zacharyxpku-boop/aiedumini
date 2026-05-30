@@ -7,4 +7,4 @@
 - `project.private.config.json` 不同步，避免把本机开发配置带入独立仓库
 - 上传前仍需把 `touristappid` 替换为真实小程序 AppID
 
-来源提交：adf7c32
+来源提交：8d2b247
