@@ -1,10 +1,7 @@
 <view class="review-page">
-
   <view class="review-bg dots"></view>
   <view class="review-glow amber"></view>
   <view class="review-glow mint"></view>
-
-
 
   <scroll-view class="content-area" scroll-y enhanced show-scrollbar="{{false}}">
     <view class="content-inner">
@@ -12,7 +9,7 @@
         <view class="review-dash-pill">小讲堂回流</view>
         <view class="review-dash-top">
           <view class="review-dash-brand">
-            <image class="review-dash-mark" mode="aspectFit" src="/assets/reference/entry-review.png" />
+            <image class="review-dash-mark" mode="aspectFit" src="/assets/reference/brand-house.png" />
             <view>
               <text>复习游戏</text>
               <text>主动回忆和迁移验证</text>
@@ -23,13 +20,13 @@
 
         <view class="review-dash-hero">
           <view class="review-dash-copy">
-            <view class="review-dash-title">把错因变成挑战</view>
-            <view class="review-dash-sub">不抄结果，先说出错因和下一次第一步，再用小变式验证是否真的会了。</view>
-            <view class="review-dash-sub companion-route-strip route-note short">{{reviewViewModel.companionStrip}}</view>
+            <view class="review-dash-title">{{reviewViewModel.title}}</view>
+            <view class="review-dash-sub">{{reviewViewModel.companionStrip}}</view>
+            <view class="review-dash-sub companion-route-strip route-note short">先说错因，再做一张变式，明天只回看真正卡住的点。</view>
             <view class="review-chip-row">
               <text>主动回忆</text>
-              <text>小变式</text>
-              <text>家长确认</text>
+              <text>错因回放</text>
+              <text>明天回访</text>
             </view>
           </view>
           <image class="review-dash-art" mode="aspectFit" src="/assets/reference/entry-review.png" />
@@ -38,7 +35,7 @@
         <view class="review-map-card">
           <view class="review-section-head">
             <text>今日挑战地图</text>
-            <text>奖励来自真实回忆</text>
+            <text>奖励来自真实回忆，不奖励速度或分数比较</text>
           </view>
           <view class="review-map-line">
             <view class="done"><text>1</text><text>错因</text></view>
@@ -49,27 +46,28 @@
         </view>
 
         <view class="review-challenge-grid">
-          <view class="review-challenge-card primary" data-action="review" bindtap="runPlaybookAction">
+          <view class="review-challenge-card primary" data-scene="review" bindtap="openEntryDetail">
             <image mode="aspectFit" src="/assets/reference/entry-review.png" />
             <text>开始挑战</text>
-            <text>先做 3 张回忆卡</text>
+            <text>3 张回忆卡</text>
           </view>
-          <view class="review-challenge-card" bindtap="goTutor">
+          <view class="review-challenge-card" data-scene="tutor" bindtap="openEntryDetail">
             <image mode="aspectFit" src="/assets/reference/entry-tutor.png" />
             <text>回到私教</text>
-            <text>卡住再问第一步</text>
+            <text>卡住先问第一步</text>
           </view>
-          <view class="review-challenge-card" bindtap="goTools">
+          <view class="review-challenge-card" data-scene="today" bindtap="openEntryDetail">
             <image mode="aspectFit" src="/assets/reference/entry-map.png" />
-            <text>轻练习</text>
-            <text>用变式验迁移</text>
+            <text>换一题验证</text>
+            <text>看是否真的迁移</text>
           </view>
         </view>
 
         <view class="review-main-cta" data-action="review" bindtap="runPlaybookAction">{{reviewViewModel.primaryCta.text}}</view>
       </view>
+
       <view class="review-subcheck ux-kit-subcheck">
-        <view class="subcheck-main" data-action="review" bindtap="runPlaybookAction">
+        <view class="subcheck-main" data-scene="review" bindtap="openEntryDetail">
           <view class="subcheck-copy">
             <text>先修一个真实卡点</text>
             <text>从错因、回忆、变式到家长确认，先闭环一张卡，不把任务铺满。</text>
@@ -77,8 +75,8 @@
           <image class="subcheck-art" mode="aspectFill" src="/assets/reference/entry-review.png" />
         </view>
         <view class="subcheck-side">
-          <view bindtap="goTutor"><text>回到私教</text><text>卡住再说第一步</text></view>
-          <view bindtap="goTools"><text>换一道变式</text><text>验证是否迁移</text></view>
+          <view data-scene="tutor" bindtap="openEntryDetail"><text>回到私教</text><text>卡住再说第一步</text></view>
+          <view data-scene="today" bindtap="openEntryDetail"><text>换一题变式</text><text>验证是否迁移</text></view>
         </view>
       </view>
 
@@ -96,13 +94,14 @@
           <view class="review-evidence-note">{{miniLessonReturnPanel.parentLine}}</view>
         </view>
       </view>
+
       <view class="review-evidence-panel" wx:if="{{memoryPrescriptionPanel}}">
         <view class="review-evidence-card">
           <view class="review-evidence-title">{{memoryPrescriptionPanel.title}}</view>
-          <view class="review-evidence-line">90 秒</view>
+          <view class="review-evidence-line">90 秒：先主动回忆，再核对思路</view>
           <view class="review-evidence-line" wx:for="{{memoryPrescriptionPanel.recallCards}}" wx:key="id">{{item.question}}</view>
-          <view class="review-evidence-line">回访窗口</view>
-          <view class="review-evidence-line">新卡放行</view>
+          <view class="review-evidence-line">回访窗口：只推今天该回看的卡</view>
+          <view class="review-evidence-line">新卡放行：先完成第一步和错因复述</view>
           <view class="review-evidence-line" wx:for="{{memoryPrescriptionPanel.activeRecallProtocol.todayMustCards}}" wx:key="id">{{item.label}}</view>
           <view class="review-evidence-line" wx:for="{{memoryPrescriptionPanel.activeRecallProtocol.ratingScale}}" wx:key="id">{{item.label}}</view>
           <view class="review-evidence-note">{{memoryPrescriptionPanel.activeRecallProtocol.releaseGateLine}}</view>
@@ -114,6 +113,7 @@
           </view>
         </view>
       </view>
+
       <view class="review-evidence-panel" wx:if="{{reviewViewModel.miniAction}}">
         <view class="review-evidence-card">
           <view class="review-evidence-title">{{reviewViewModel.title}}</view>
@@ -123,80 +123,18 @@
           <view class="review-evidence-line" wx:for="{{reviewViewModel.blackboard.layers}}" wx:key="id">{{item.label}} {{item.text}}</view>
           <view class="review-evidence-line" wx:for="{{reviewViewModel.primaryCard.sections}}" wx:key="id">{{item.label}} {{item.text}}</view>
           <view class="review-evidence-title">{{reviewViewModel.miniAction.question}}</view>
-          <textarea class="mini-repair-input" value="{{miniActionText}}" maxlength="80" auto-height bindinput="onMiniActionInput" placeholder="{{reviewViewModel.miniAction.placeholder}}" />
+          <textarea class="mini-repair-input" value="{{miniActionText}}" maxlength="80" auto-height bindinput="onMiniActionInput" placeholder="{{reviewViewModel.miniAction.placeholder}}"></textarea>
           <button class="mini-repair-button" bindtap="markMiniActionDone">{{reviewViewModel.miniAction.saveCta}}</button>
         </view>
       </view>
 
       <view class="hero review-secondary-hero">
-        <view class="focus-status-pill" wx:if="{{todayFocus}}">{{mistakeHub.weakSpot && mistakeHub.weakSpot.statusText ? mistakeHub.weakSpot.statusText : '未开始'}}</view>
-        <view class="repair-complete-note" wx:if="{{todayFocus && todayFocus.repairStatus === 'completed'}}">已生成明天回访卡。下一步：去轻轻回访。</view>
+        <view class="focus-status-pill" wx:if="{{todayFocus}}">{{mistakeHub.weakSpot.statusText || '未开始'}}</view>
+        <view class="repair-complete-note" wx:if="{{todayFocus && todayFocus.repairStatus === 'completed'}}">已生成明天回访卡。下一步：去轻回访。</view>
         <view class="mini-action route-next-action" wx:if="{{todayFocus && todayFocus.repairStatus === 'completed'}}" bindtap="goTools">去轻回访</view>
         <view class="review-progress-line review-secondary-progress" wx:if="{{todayFocus && todayFocus.repairStatus === 'completed'}}">
           <view class="review-progress-track"><view class="review-progress-fill" style="width: {{gameRunway.percent || 0}}%;"></view></view>
           <view class="review-progress-copy">今日闭环进度 {{gameRunway.percent || 0}}%</view>
-        </view>
-
-        <view class="loop-rail soft review-secondary-rail" wx:if="{{showAdvancedReview}}">
-          <view class="loop-line"></view>
-          <view class="loop-step active">
-            <view class="loop-dot collect"></view>
-            <text>收错题</text>
-          </view>
-          <view class="loop-step">
-            <view class="loop-dot inspect"></view>
-            <text>找卡点</text>
-          </view>
-          <view class="loop-step">
-            <view class="loop-dot transfer"></view>
-            <text>举一反三</text>
-          </view>
-          <view class="loop-step">
-            <view class="loop-dot quest"></view>
-            <text>轻回访</text>
-          </view>
-        </view>
-
-        <view class="hero-stats soft review-secondary-stats" wx:if="{{todayFocus && showAdvancedReview}}">
-          <view class="hero-stat strong">
-            <view class="hero-stat-value">{{mistakeHub.totalMistakes || 0}}</view>
-            <view class="hero-stat-label">卡点卡</view>
-          </view>
-          <view class="hero-stat">
-            <view class="hero-stat-value">{{mistakeHub.repairReady || 0}}</view>
-            <view class="hero-stat-label">待修</view>
-          </view>
-          <view class="hero-stat">
-            <view class="hero-stat-value">{{gameRunway.streak || 0}}</view>
-            <view class="hero-stat-label">连续天</view>
-          </view>
-        </view>
-      </view>
-
-      <view class="weakspot-panel rc-sunk" wx:if="{{showAdvancedReview && mistakeHub.weakSpot}}">
-        <view class="panel-head compact">
-          <view>
-            <view class="panel-title">今晚先修这个卡点</view>
-            <view class="panel-subtitle">来自今天卡住的地方和复习记录。</view>
-          </view>
-          <view class="weakspot-score">{{mistakeHub.weakSpot.confidence}}%</view>
-        </view>
-        <view class="weakspot-name">{{mistakeHub.weakSpot.name}}</view>
-        <view class="weakspot-row">
-          <view class="weakspot-label">为什么修它</view>
-          <view class="weakspot-text">{{mistakeHub.weakSpot.evidence}}</view>
-        </view>
-        <view class="weakspot-row">
-          <view class="weakspot-label">孩子原话</view>
-          <view class="weakspot-text">{{mistakeHub.weakSpot.cause}}</view>
-        </view>
-        <view class="weakspot-row highlight">
-          <view class="weakspot-label">怎么修</view>
-          <view class="weakspot-text">{{mistakeHub.weakSpot.next}}</view>
-        </view>
-        <view class="weakspot-row">
-          <view class="weakspot-label">谁来帮</view>
-          <view class="weakspot-text">{{mistakeHub.weakSpot.helper}}</view>
         </view>
       </view>
 
@@ -216,7 +154,7 @@
 
         <view class="progress-wrap">
           <view class="progress-track">
-            <view class="progress-fill" style="width: {{gameRunway.percent}}%;"></view>
+            <view class="progress-fill" style="width: {{gameRunway.percent || 0}}%;"></view>
           </view>
           <view class="progress-copy">进度 {{cards.length ? index + 1 : 0}} / {{cards.length || 0}}</view>
         </view>
@@ -225,100 +163,27 @@
           <view class="card-label">先自己想，再核对</view>
           <view class="question-text">{{current.question}}</view>
           <view class="hint-text"><text class="hint-icon">i</text>卡住会回到卡点和同类题</view>
-
           <view class="answer-panel" wx:if="{{showAnswer}}">
             <view class="answer-label">核对思路</view>
             <view class="answer-text">{{current.answer}}</view>
           </view>
-
           <view class="options-group">
             <view class="option-btn selected" wx:if="{{!showAnswer}}" bindtap="reveal">
               <text class="letter">A</text>
-              我先回忆，点这里核对思路
+              <text>我先回忆，点这里核对思路</text>
             </view>
             <view class="option-btn" wx:if="{{showAnswer}}" data-rating="again" bindtap="rate">
               <text class="letter">A</text>
-              没想起来，回卡点再练
+              <text>没想起来，回卡点再练</text>
             </view>
             <view class="option-btn" wx:if="{{showAnswer}}" data-rating="good" bindtap="rate">
               <text class="letter">B</text>
-              记住了，下一张
+              <text>记住了，下一张</text>
             </view>
             <view class="option-btn" wx:if="{{showAnswer}}" data-rating="easy" bindtap="rate">
               <text class="letter">C</text>
-              很熟了，晚点再出现
+              <text>很熟了，晚点再出现</text>
             </view>
-          </view>
-        </view>
-
-        <view class="rule-retest-card" wx:if="{{ruleRetestPanel}}">
-          <view class="card-label">{{ruleRetestPanel.title}}</view>
-          <view class="rule-retest-badge">{{ruleRetestPanel.badge}}</view>
-          <view class="rule-retest-line">{{ruleRetestPanel.line}}</view>
-          <view class="rule-retest-line">小黑板：{{ruleRetestPanel.blackboardLine}}</view>
-          <view class="rule-retest-line">家长只问：{{ruleRetestPanel.parentLine}}</view>
-          <view class="rule-retest-cadence">
-            <view class="rule-retest-step" wx:for="{{ruleRetestPanel.cadence}}" wx:key="id">{{item.label}}｜{{item.action}}</view>
-          </view>
-          <view class="rule-retest-gate">{{ruleRetestPanel.releaseGate}}</view>
-          <button class="rule-retest-action" bindtap="runRuleRetestAction">去做复测挑战</button>
-        </view>
-
-        <view class="transfer-practice-card" wx:if="{{current && transferPractice}}">
-          <view class="card-label">{{transferPractice.title}}</view>
-          <view class="transfer-status">{{transferPractice.statusLine}}</view>
-          <view class="transfer-safety">{{transferPractice.subtitle}}</view>
-          <view
-            class="transfer-step {{item.done ? 'done' : ''}}"
-            wx:for="{{transferPractice.prompts}}"
-            wx:key="id"
-          >
-            <view class="transfer-copy">
-              <view class="transfer-label">{{item.label}}</view>
-              <view class="transfer-prompt">{{item.prompt}}</view>
-              <view class="transfer-check">{{item.check}}</view>
-            </view>
-            <button
-              class="transfer-action"
-              data-prompt-id="{{item.id}}"
-              bindtap="recordTransferPractice"
-            >{{item.actionLabel}}</button>
-          </view>
-          <view class="transfer-parent" wx:if="{{transferPractice.parentPrompt}}">家长只问：{{transferPractice.parentPrompt}}</view>
-        </view>
-
-        <view class="outcome-check-card" wx:if="{{current && outcomeCheck}}">
-          <view class="card-label">{{outcomeCheck.title}}</view>
-          <view class="outcome-score">掌握 {{outcomeCheck.score}}% · 下一层：{{outcomeCheck.nextLevel}}</view>
-          <view class="outcome-line">{{outcomeCheck.line}}</view>
-          <view class="outcome-actions">
-            <button
-              class="outcome-action"
-              wx:for="{{outcomeCheck.actions}}"
-              wx:key="id"
-              data-field="{{item.field}}"
-              bindtap="recordOutcomeCheck"
-            >{{item.label}}</button>
-          </view>
-        </view>
-
-        <view class="post-repair-bridge-card" wx:if="{{postRepairBridge}}">
-          <view class="card-label">{{postRepairBridge.title}}</view>
-          <view class="post-repair-title">{{postRepairBridge.headline}}</view>
-          <view class="post-repair-line">{{postRepairBridge.evidenceLine}}</view>
-          <view class="post-repair-line">{{postRepairBridge.parentLine}}</view>
-          <view class="post-repair-actions">
-            <button
-              class="post-repair-action"
-              wx:for="{{postRepairBridge.actions}}"
-              wx:key="id"
-              data-id="{{item.id}}"
-              data-label="{{item.label}}"
-              data-route="{{item.route}}"
-              data-reason="{{item.reason}}"
-              data-capability-id="{{item.capabilityId}}"
-              bindtap="runPostRepairBridgeAction"
-            >{{item.label}}</button>
           </view>
         </view>
 
@@ -332,101 +197,11 @@
           <view class="pack-primary review-main-cta" wx:if="{{current && !showAnswer}}" bindtap="reveal">开始这一关</view>
           <view class="pack-primary review-main-cta" wx:elif="{{current && showAnswer}}" data-rating="good" bindtap="rate">下一张</view>
           <view class="pack-primary review-main-cta" wx:else data-action="{{gameRunway.primaryAction}}" bindtap="runPlaybookAction">{{gameRunway.primaryLabel}}</view>
-          <view class="mini-action" bindtap="goTutor">卡住了，再看关键一步</view>
+          <view class="mini-action" bindtap="goTutor">卡住了，再看关键第一步</view>
         </view>
       </view>
-
-      <view class="review-more-toggle">
-        <view>
-          <view class="review-more-title">错题本管理</view>
-          <view class="review-more-subtitle">录入本子错题、看来源、生成同类题</view>
-        </view>
-        <button class="review-more-button" bindtap="toggleAdvancedReview">{{showAdvancedReview ? '收起' : '展开'}}</button>
-      </view>
-
-      <block wx:if="{{showAdvancedReview}}">
-        <view class="source-panel">
-          <view class="panel-head">
-            <view>
-              <view class="panel-title">错题从哪里来</view>
-              <view class="panel-subtitle">自动收集 App 内错题，也能手动录入本子上的错题。</view>
-            </view>
-          </view>
-
-          <view class="source-grid">
-            <view class="source-card app">
-              <view class="source-icon auto"></view>
-              <view class="source-copy">
-                <view class="source-title">App 里做错</view>
-                <view class="source-body">{{mistakeHub.appMistakes || 0}} 张来自复习、测验、作业点拨和学习任务</view>
-              </view>
-            </view>
-            <view class="source-card offline" bindtap="openImportPanel">
-              <view class="source-icon book"></view>
-              <view class="source-copy">
-                <view class="source-title">本子上做错</view>
-                <view class="source-body">{{mistakeHub.manualMistakes || 0}} 张已手动录入，点这里继续补</view>
-              </view>
-            </view>
-          </view>
-        </view>
-
-        <view class="repair-panel">
-          <view class="panel-head">
-            <view>
-              <view class="panel-title">先抓一个关键卡点</view>
-              <view class="panel-subtitle">不是把错题堆起来，而是找出下次先检查哪一步。</view>
-            </view>
-            <view class="panel-count">{{mistakeHub.repairReady || 0}}</view>
-          </view>
-
-          <view class="repair-list" wx:if="{{mistakeHub.repairItems && mistakeHub.repairItems.length}}">
-            <view
-              class="repair-card"
-              wx:for="{{mistakeHub.repairItems}}"
-              wx:key="noteId"
-            >
-              <view class="repair-reason">{{item.reason}}</view>
-              <view class="repair-question">{{item.question}}</view>
-              <view class="repair-preview" wx:if="{{item.repairPreviewQuestion}}">{{item.repairPreviewQuestion}}</view>
-              <view class="repair-action" data-note-id="{{item.noteId}}" bindtap="editQueueItem">生成同类题</view>
-            </view>
-          </view>
-
-          <view class="repair-empty" wx:else>
-            <view class="repair-empty-title">暂时没有急着修的卡点</view>
-            <view class="repair-empty-body">继续复习或录入新错题后，这里会自动出现需要举一反三的题。</view>
-          </view>
-        </view>
-
-        <view class="import-panel">
-          <view class="panel-head compact">
-            <view>
-              <view class="panel-title">录入一道线下错题</view>
-              <view class="panel-subtitle">把题目、孩子写错的一步、老师批注放进来。</view>
-            </view>
-          </view>
-          <textarea
-            class="import-textarea"
-            value="{{importText}}"
-            placeholder="例：题目 + 我写到哪一步 + 错在哪里..."
-            maxlength="3000"
-            bindinput="onImportInput"
-          />
-          <view class="preview-list" wx:if="{{importPreview && importPreview.length}}">
-            <view class="preview-chip" wx:for="{{importPreview}}" wx:key="id">{{item.type || '卡点卡'}}</view>
-          </view>
-          <view class="import-actions">
-            <view class="mini-action" bindtap="goUpload">贴题/本子</view>
-            <view class="primary-action" bindtap="importCards">整理进错题本</view>
-          </view>
-        </view>
-      </block>
 
       <view class="feedback-line" wx:if="{{feedbackText}}">{{feedbackText}}</view>
-
-      <view hidden>{{showAdvancedReview ? 'advanced open' : 'advanced closed'}}</view>
-      <button hidden bindtap="toggleAdvancedReview">toggleAdvancedReview</button>
       <button hidden bindtap="reveal">先回忆，再选择</button>
       <button hidden data-rating="good" bindtap="rate">记住了</button>
     </view>
