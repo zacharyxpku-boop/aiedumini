@@ -102,7 +102,6 @@ Page({
     incomingShare: null,
     incomingShareRelay: null,
     updatedText: '',
-    legacyStuckAnchor: { title: '卡住了，先说想法' },
     showFirstRunOverlay: false,
     showLightTools: false,
     yesterdayReviewCard: null,

@@ -186,7 +186,7 @@
         <view class="panel-pill">轻量选择</view>
       </view>
       <view class="game-loop-note">小游戏只是激励：玩一小局，错的卡会回到复习队列。</view>
-      <view class="legacy-game-title">今天轻练哪一步</view>
+      <view class="play-game-title">今天轻练哪一步</view>
 
       <view class="game-grid">
         <view

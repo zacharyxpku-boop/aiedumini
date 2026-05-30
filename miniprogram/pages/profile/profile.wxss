@@ -1765,14 +1765,6 @@ page {
   padding: 2rpx 4rpx 0;
 }
 
-.legacy-growth-anchor {
-  height: 0;
-  overflow: hidden;
-  color: transparent;
-  font-size: 1rpx;
-  line-height: 0;
-}
-
 .parent-hero-badge {
   min-height: 46rpx;
   padding: 0 18rpx;

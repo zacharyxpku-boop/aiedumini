@@ -2179,10 +2179,9 @@ button::after {
 }
 
 /*
- * Main tab contract: the first tab viewport is an entry screen, not a long
- * report. Detailed legacy panels stay in code for current tests and later
- * subpage extraction, but they do not render under the five primary tab
- * launch screens.
+ * Main tab contract: each primary tab opens with a compact launch screen.
+ * Detailed workflows live in routed child sections instead of the first
+ * viewport, so the tab surface stays navigable and presentation-ready.
  */
 .ux-kit-screen ~ view,
 .ux-kit-screen ~ button,
