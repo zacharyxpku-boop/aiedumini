@@ -2171,6 +2171,27 @@ Page({
     if (!navigation.navigateLearningRoute(target)) navigation.navigateLearningRoute('/pages/arcade/arcade');
   },
 
+  continueShareRelay() {
+    const relay = this.data.incomingShareRelay || {};
+    const firstCard = Array.isArray(relay.relayPackCards) && relay.relayPackCards.length
+      ? relay.relayPackCards[0]
+      : null;
+    const route = navigation.normalizeRoute(
+      (firstCard && firstCard.route) || relay.receiverOwnMaterialChallengeRoute || relay.challengeRoute || '/pages/arcade/arcade',
+      '/pages/arcade/arcade'
+    );
+    if (storage.recordSurfaceDepthAction) {
+      storage.recordSurfaceDepthAction({
+        surface: 'home',
+        dimensionId: (firstCard && firstCard.id) || 'incoming_share_relay_continue',
+        label: (firstCard && firstCard.title) || '同伴接力继续',
+        route,
+        readiness: 'incoming_share_relay'
+      });
+    }
+    if (!navigation.navigateLearningRoute(route)) this.goSharedChallenge();
+  },
+
   runIncomingShareRelayAction(event) {
     const dataset = event.currentTarget.dataset || {};
     const incoming = this.data.incomingShare || (storage.loadIncomingShare && storage.loadIncomingShare()) || {};

@@ -1,5 +1,5 @@
 <view class="page diagnosis-page safe-bottom">
-  <view class="v1-page v1-shell">
+  <view class="yd-page yd-shell">
     <view class="app-subpage-topbar">
       <view class="app-subpage-brand">
         <view class="app-subpage-logo"><view class="app-subpage-logo-core"></view></view>

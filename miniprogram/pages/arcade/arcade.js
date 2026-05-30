@@ -63,6 +63,7 @@ Page({
     highFrequencyPracticeLoop: null,
     publicK12IntakeChallengeDeck: [],
     publicK12IntakeExecutableCards: [],
+    publicK12ChallengeCards: [],
     dailyReturnMission: null,
     dailyReturnContract: null,
     dailyPrimaryRecallAction: null,
@@ -340,6 +341,7 @@ Page({
       highFrequencyPracticeLoop: previewHighFrequencyPracticeLoop,
       publicK12IntakeChallengeDeck,
       publicK12IntakeExecutableCards,
+      publicK12ChallengeCards: publicK12IntakeChallengeDeck.slice(0, 3),
       dailyReturnMission: previewHighFrequencyPracticeLoop && previewHighFrequencyPracticeLoop.dailyReturnMission
         ? previewHighFrequencyPracticeLoop.dailyReturnMission
         : null,
@@ -738,8 +740,9 @@ Page({
   },
 
   goQuestRoute(event) {
-    const route = event.currentTarget.dataset.route || '/pages/tutor/tutor';
-    const questId = event.currentTarget.dataset.questId || 'daily_quest';
+    const dataset = event.currentTarget.dataset || {};
+    const route = dataset.route || '/pages/tutor/tutor';
+    const questId = dataset.questId || 'daily_quest';
     if (storage.recordSurfaceDepthAction) {
       storage.recordSurfaceDepthAction({
         surface: 'arcade',
@@ -807,6 +810,32 @@ Page({
       }
     }
     navigation.navigateLearningRoute(route);
+  },
+
+  selectPublicK12Challenge(event) {
+    const dataset = event.currentTarget.dataset || {};
+    const publicK12 = this.data.challengeBrief && this.data.challengeBrief.publicK12IntakeChallenge
+      ? this.data.challengeBrief.publicK12IntakeChallenge
+      : {};
+    const challengeId = dataset.challengeId || '';
+    const selectedCard = Array.isArray(publicK12.cards)
+      ? publicK12.cards.find((card) => card.id === challengeId) || publicK12.cards[0]
+      : null;
+    const route = (selectedCard && selectedCard.route) || publicK12.route || '/pages/tutor/tutor?from=public_k12_intake';
+    this.goQuestRoute({
+      currentTarget: {
+        dataset: {
+          route,
+          questId: challengeId || 'public_k12_intake',
+          challengeId: challengeId || (selectedCard && selectedCard.id) || '',
+          subject: (selectedCard && selectedCard.subject) || '',
+          taskType: (selectedCard && selectedCard.taskType) || '',
+          reviewRoute: (selectedCard && selectedCard.reviewRoute) || publicK12.reviewRoute || '',
+          firstStep: (selectedCard && selectedCard.observableFirstMove) || publicK12.observableFirstMove || '',
+          fallback: (selectedCard && selectedCard.fallbackIfNoChildInput) || publicK12.fallbackIfNoChildInput || ''
+        }
+      }
+    });
   },
 
   openingHint(gameId) {

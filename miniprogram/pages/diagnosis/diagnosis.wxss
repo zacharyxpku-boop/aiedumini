@@ -20,7 +20,7 @@
   background: transparent;
 }
 
-.diagnosis-page .v1-brand-sub {
+.diagnosis-page .yd-brand-sub {
   max-width: 260rpx;
 }
 

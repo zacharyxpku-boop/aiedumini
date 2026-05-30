@@ -50,23 +50,23 @@ button::after {
   padding-bottom: calc(170rpx + env(safe-area-inset-bottom));
 }
 
-.v1-page,
-.v1-shell {
+.yd-page,
+.yd-shell {
   position: relative;
   min-height: 100vh;
 }
 
-.v1-brand {
+.yd-brand {
   display: flex;
   align-items: center;
 }
 
-.v1-brand {
+.yd-brand {
   min-width: 0;
   gap: 14rpx;
 }
 
-.v1-logo {
+.yd-logo {
   position: relative;
   width: 52rpx;
   height: 52rpx;
@@ -76,7 +76,7 @@ button::after {
   box-shadow: 0 8rpx 18rpx rgba(12, 74, 59, 0.16);
 }
 
-.v1-logo::before {
+.yd-logo::before {
   content: "";
   position: absolute;
   inset: 13rpx;
@@ -84,8 +84,8 @@ button::after {
   border-radius: 50%;
 }
 
-.v1-logo-core::before,
-.v1-logo-core::after {
+.yd-logo-core::before,
+.yd-logo-core::after {
   content: "";
   position: absolute;
   top: 23rpx;
@@ -96,21 +96,21 @@ button::after {
   border-radius: 50%;
 }
 
-.v1-logo-core::before { left: 20rpx; }
-.v1-logo-core::after { right: 20rpx; }
+.yd-logo-core::before { left: 20rpx; }
+.yd-logo-core::after { right: 20rpx; }
 
-.v1-brand-copy {
+.yd-brand-copy {
   min-width: 0;
 }
 
-.v1-brand-name {
+.yd-brand-name {
   color: #10231c;
   font-size: 34rpx;
   font-weight: 1000;
   line-height: 1.02;
 }
 
-.v1-brand-sub {
+.yd-brand-sub {
   max-width: 340rpx;
   margin-top: 4rpx;
   color: #6b665d;
@@ -121,7 +121,7 @@ button::after {
   white-space: nowrap;
 }
 
-.v1-pill {
+.yd-pill {
   min-height: 48rpx;
   padding: 0 22rpx;
   flex: 0 0 auto;
@@ -134,7 +134,7 @@ button::after {
   line-height: 48rpx;
 }
 
-.v1-card,
+.yd-card,
 .panel,
 .panel-quiet,
 .mini-card {
@@ -144,7 +144,7 @@ button::after {
   box-shadow: 0 14rpx 30rpx rgba(65, 48, 28, 0.065);
 }
 
-.v1-card,
+.yd-card,
 .panel,
 .panel-quiet {
   padding: 22rpx;
@@ -154,7 +154,7 @@ button::after {
   background: #fbf4e8;
 }
 
-.v1-section-title,
+.yd-section-title,
 .title-md {
   color: #10231c;
   font-size: 28rpx;
@@ -162,7 +162,7 @@ button::after {
   line-height: 1.2;
 }
 
-.v1-section-subtitle,
+.yd-section-subtitle,
 .muted {
   margin-top: 8rpx;
   color: #6b6257;
@@ -194,7 +194,7 @@ button::after {
 }
 
 .eyebrow,
-.v1-secondary-chip {
+.yd-secondary-chip {
   display: inline-flex;
   min-height: 42rpx;
   align-items: center;
@@ -206,8 +206,8 @@ button::after {
   font-weight: 900;
 }
 
-.v1-primary,
-.v1-secondary,
+.yd-primary,
+.yd-secondary,
 .primary-button,
 .secondary-button,
 .ghost-button {
@@ -221,14 +221,14 @@ button::after {
   line-height: 1.1;
 }
 
-.v1-primary,
+.yd-primary,
 .primary-button {
   color: #fffdf8;
   background: linear-gradient(180deg, #155746 0%, #0c4a3b 100%);
   box-shadow: 0 16rpx 28rpx rgba(12, 74, 59, 0.18);
 }
 
-.v1-secondary,
+.yd-secondary,
 .secondary-button,
 .ghost-button {
   color: #0c4a3b;
@@ -310,13 +310,13 @@ button::after {
   background: #eadfce;
 }
 
-.v1-chip-row {
+.yd-chip-row {
   display: flex;
   flex-wrap: wrap;
   gap: 10rpx;
 }
 
-.v1-chip {
+.yd-chip {
   min-height: 44rpx;
   padding: 0 16rpx;
   color: #0c4a3b;

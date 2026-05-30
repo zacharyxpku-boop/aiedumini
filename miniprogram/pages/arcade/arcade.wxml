@@ -294,9 +294,9 @@
           <view class="answer-review-title">参考思路</view>
           <view class="quest-answer-text">{{currentQuestion.answer}}</view>
           <view class="grade-row">
-            <button class="grade-btn weak" data-rating="again" bindtap="gradeQuest">蹇樿</button>
-            <button class="grade-btn mid" data-rating="good" bindtap="gradeQuest">妯＄硦</button>
-            <button class="grade-btn strong" data-rating="easy" bindtap="gradeQuest">璁板緱</button>
+            <button class="grade-btn weak" data-rating="again" bindtap="gradeQuest">忘记</button>
+            <button class="grade-btn mid" data-rating="good" bindtap="gradeQuest">模糊</button>
+            <button class="grade-btn strong" data-rating="easy" bindtap="gradeQuest">记得</button>
           </view>
         </view>
       </view>
@@ -394,7 +394,7 @@
       <view class="answer-review" wx:if="{{wrongAnswers.length}}">
         <view class="answer-review-title">本局错题</view>
         <view class="answer-row" wx:for="{{wrongAnswers}}" wx:key="cardId">
-          <view class="answer-selected">浣犻€夛細{{item.selected}}</view>
+          <view class="answer-selected">你选：{{item.selected}}</view>
           <view class="answer-correct">应选：{{item.answer}}</view>
         </view>
       </view>

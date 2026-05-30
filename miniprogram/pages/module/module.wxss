@@ -1,10 +1,10 @@
-.module-page-v1 {
+.module-play-page {
   min-height: 100vh;
   padding: 20rpx 28rpx 140rpx;
   background: transparent;
 }
 
-.module-page-v1 .v1-brand-sub {
+.module-play-page .yd-brand-sub {
   max-width: 260rpx;
 }
 
@@ -25,7 +25,7 @@
   line-height: 48rpx;
 }
 
-.module-v1-hero {
+.module-play-hero {
   position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr) 140rpx;
@@ -41,7 +41,7 @@
   box-shadow: 0 22rpx 42rpx rgba(65, 48, 28, 0.08);
 }
 
-.module-v1-badge {
+.module-play-badge {
   display: inline-flex;
   min-height: 44rpx;
   align-items: center;
@@ -53,7 +53,7 @@
   font-weight: 900;
 }
 
-.module-v1-title {
+.module-play-title {
   margin-top: 16rpx;
   color: #101915;
   font-size: 50rpx;
@@ -61,7 +61,7 @@
   line-height: 1.06;
 }
 
-.module-v1-subtitle {
+.module-play-subtitle {
   margin-top: 12rpx;
   color: #665e53;
   font-size: 24rpx;
@@ -69,7 +69,7 @@
   line-height: 1.5;
 }
 
-.module-v1-art {
+.module-play-art {
   position: relative;
   width: 140rpx;
   height: 140rpx;
@@ -77,7 +77,7 @@
   border-radius: 28rpx;
 }
 
-.module-v1-art-badge {
+.module-play-art-badge {
   position: absolute;
   right: 10rpx;
   top: 4rpx;
@@ -89,7 +89,7 @@
   box-shadow: 0 12rpx 22rpx rgba(32, 45, 38, 0.10);
 }
 
-.module-v1-art-sheet {
+.module-play-art-sheet {
   position: absolute;
   left: 4rpx;
   bottom: 4rpx;
@@ -101,8 +101,8 @@
   box-shadow: 0 16rpx 28rpx rgba(32, 45, 38, 0.10);
 }
 
-.module-v1-art-sheet::before,
-.module-v1-art-sheet::after {
+.module-play-art-sheet::before,
+.module-play-art-sheet::after {
   content: "";
   position: absolute;
   left: 20rpx;
@@ -112,10 +112,10 @@
   border-radius: 999rpx;
 }
 
-.module-v1-art-sheet::before { top: 34rpx; }
-.module-v1-art-sheet::after { top: 58rpx; }
+.module-play-art-sheet::before { top: 34rpx; }
+.module-play-art-sheet::after { top: 58rpx; }
 
-.module-v1-card {
+.module-yd-card {
   margin-top: 16rpx;
   padding: 22rpx;
   background: #FFFDF8;
@@ -124,30 +124,30 @@
   box-shadow: 0 12rpx 28rpx rgba(54, 42, 24, 0.055);
 }
 
-.module-v1-card.quiet {
+.module-yd-card.quiet {
   background: #FBF6EC;
 }
 
-.module-v1-card-title {
+.module-yd-card-title {
   color: #101915;
   font-size: 28rpx;
   font-weight: 950;
 }
 
-.module-v1-card-body {
+.module-yd-card-body {
   margin-top: 10rpx;
   color: #665E53;
   font-size: 23rpx;
   line-height: 1.48;
 }
 
-.module-v1-steps {
+.module-play-steps {
   display: grid;
   gap: 12rpx;
   margin-top: 16rpx;
 }
 
-.module-v1-step {
+.module-play-step {
   display: grid;
   grid-template-columns: 48rpx minmax(0, 1fr);
   gap: 12rpx;
@@ -156,7 +156,7 @@
   border-radius: 18rpx;
 }
 
-.module-v1-step-index {
+.module-play-step-index {
   width: 48rpx;
   height: 48rpx;
   color: #0F4F3D;
@@ -168,26 +168,26 @@
   text-align: center;
 }
 
-.module-v1-step-title {
+.module-play-step-title {
   color: #17231D;
   font-size: 24rpx;
   font-weight: 900;
 }
 
-.module-v1-step-body,
-.module-v1-step-proof {
+.module-play-step-body,
+.module-play-step-proof {
   margin-top: 6rpx;
   color: #665E53;
   font-size: 22rpx;
   line-height: 1.42;
 }
 
-.module-v1-step-proof {
+.module-play-step-proof {
   color: #0F4F3D;
   font-weight: 800;
 }
 
-.module-v1-input {
+.module-play-input {
   width: 100%;
   min-height: 140rpx;
   margin-top: 16rpx;
@@ -200,15 +200,15 @@
   line-height: 1.5;
 }
 
-.module-v1-actions {
+.module-play-actions {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12rpx;
   margin-top: 16rpx;
 }
 
-.module-v1-primary,
-.module-v1-secondary {
+.module-yd-primary,
+.module-yd-secondary {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -218,49 +218,49 @@
   font-weight: 950;
 }
 
-.module-v1-primary {
+.module-yd-primary {
   color: #FFFDF8;
   background: #0C4A3B;
 }
 
-.module-v1-secondary {
+.module-yd-secondary {
   color: #0F4F3D;
   background: #F3FAF7;
   border: 1rpx solid #D8E5DE;
 }
 
-.module-v1-divider {
+.module-play-divider {
   height: 1rpx;
   margin: 18rpx 0;
   background: #E8E1D5;
 }
 
-.module-v1-preview-list {
+.module-play-preview-list {
   display: grid;
   gap: 12rpx;
   margin-top: 16rpx;
 }
 
-.module-v1-preview-card {
+.module-play-preview-card {
   padding: 16rpx 18rpx;
   background: #F8F4EC;
   border-radius: 18rpx;
 }
 
-.module-v1-preview-title {
+.module-play-preview-title {
   color: #17231D;
   font-size: 24rpx;
   font-weight: 900;
   line-height: 1.42;
 }
 
-.module-v1-preview-meta {
+.module-play-preview-meta {
   margin-top: 6rpx;
   color: #665E53;
   font-size: 21rpx;
 }
 
-.module-v1-link {
+.module-play-link {
   width: 100%;
   min-height: 72rpx;
   margin-top: 16rpx;

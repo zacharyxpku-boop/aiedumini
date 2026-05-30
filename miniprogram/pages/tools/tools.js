@@ -962,6 +962,16 @@ Page({
     this.setData({ factoryStudioMode });
   },
 
+  chooseMaterialMode(event) {
+    const mode = event.currentTarget.dataset.mode || 'text';
+    if (mode === 'upload') {
+      this.setData({ factoryStudioMode: 'upload' });
+      this.chooseFactoryMaterial();
+      return;
+    }
+    this.setFactoryStudioMode({ currentTarget: { dataset: { mode } } });
+  },
+
   chooseFactoryMaterial() {
     const applyFiles = (files) => {
       const count = (files || []).length;

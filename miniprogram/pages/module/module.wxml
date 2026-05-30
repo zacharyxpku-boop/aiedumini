@@ -1,5 +1,5 @@
-<view class="page module-page-v1 safe-bottom" wx:if="{{module}}">
-  <view class="v1-page v1-shell">
+<view class="page module-play-page safe-bottom" wx:if="{{module}}">
+  <view class="yd-page yd-shell">
     <view class="app-subpage-topbar">
       <view class="app-subpage-brand">
         <view class="app-subpage-logo"><view class="app-subpage-logo-core"></view></view>
@@ -12,43 +12,43 @@
       <button class="subpage-home" bindtap="goHome">首页</button>
     </view>
 
-    <view class="module-v1-hero">
-      <view class="module-v1-copy">
-        <view class="module-v1-badge">{{module.subject}} · {{module.type}}</view>
-        <view class="module-v1-title">{{module.title}}</view>
-        <view class="module-v1-subtitle">{{module.scene}}</view>
+    <view class="module-play-hero">
+      <view class="module-play-copy">
+        <view class="module-play-badge">{{module.subject}} · {{module.type}}</view>
+        <view class="module-play-title">{{module.title}}</view>
+        <view class="module-play-subtitle">{{module.scene}}</view>
       </view>
-      <view class="module-v1-art">
-        <view class="module-v1-art-badge"></view>
-        <view class="module-v1-art-sheet"></view>
+      <view class="module-play-art">
+        <view class="module-play-art-badge"></view>
+        <view class="module-play-art-sheet"></view>
       </view>
     </view>
 
-    <view class="module-v1-card">
-      <view class="module-v1-card-title">现在就做这一小局</view>
-      <view class="module-v1-steps">
-        <view class="module-v1-step" wx:for="{{sessionSteps}}" wx:key="id">
-            <view class="module-v1-step-index">{{index + 1}}</view>
-            <view class="module-v1-step-copy">
-              <view class="module-v1-step-title">{{item.title}}</view>
-              <view class="module-v1-step-body">{{item.desc}}</view>
-              <view class="module-v1-step-proof">这一步留下什么证据：{{item.evidence}}</view>
+    <view class="module-yd-card">
+      <view class="module-yd-card-title">现在就做这一小局</view>
+      <view class="module-play-steps">
+        <view class="module-play-step" wx:for="{{sessionSteps}}" wx:key="id">
+            <view class="module-play-step-index">{{index + 1}}</view>
+            <view class="module-play-step-copy">
+              <view class="module-play-step-title">{{item.title}}</view>
+              <view class="module-play-step-body">{{item.desc}}</view>
+              <view class="module-play-step-proof">这一步留下什么证据：{{item.evidence}}</view>
             </view>
           </view>
         </view>
-      <textarea class="module-v1-input" value="{{evidenceText}}" bindinput="onEvidenceInput" placeholder="写一句你已经会了什么，或这类题下次先检查什么。" />
-      <view class="module-v1-actions">
-        <button class="module-v1-primary" bindtap="startModule">进入作业点拨</button>
-        <button class="module-v1-secondary" bindtap="completeAndReview">完成并加入复习</button>
+      <textarea class="module-play-input" value="{{evidenceText}}" bindinput="onEvidenceInput" placeholder="写一句你已经会了什么，或这类题下次先检查什么。" />
+      <view class="module-play-actions">
+        <button class="module-yd-primary" bindtap="startModule">进入作业点拨</button>
+        <button class="module-yd-secondary" bindtap="completeAndReview">完成并加入复习</button>
       </view>
     </view>
 
-    <view class="module-v1-card quiet">
-      <view class="module-v1-card-title">掌握标准</view>
-      <view class="module-v1-card-body">{{module.mastery}}</view>
-      <view class="module-v1-divider"></view>
-      <view class="module-v1-card-title">收尾复述一句话</view>
-      <view class="module-v1-card-body">{{module.parentScript}}</view>
+    <view class="module-yd-card quiet">
+      <view class="module-yd-card-title">掌握标准</view>
+      <view class="module-yd-card-body">{{module.mastery}}</view>
+      <view class="module-play-divider"></view>
+      <view class="module-yd-card-title">收尾复述一句话</view>
+      <view class="module-yd-card-body">{{module.parentScript}}</view>
     </view>
 
 
@@ -70,15 +70,15 @@
       <view class="global-depth-note">{{surfaceDepthPack.familyLine}}</view>
     </view>
 
-    <view class="module-v1-card" wx:if="{{reviewPreview.length}}">
-      <view class="module-v1-card-title">把这个方法变成复习卡</view>
-      <view class="module-v1-preview-list">
-        <view class="module-v1-preview-card" wx:for="{{reviewPreview}}" wx:key="id">
-          <view class="module-v1-preview-title">{{item.question}}</view>
-          <view class="module-v1-preview-meta">{{item.cardType}} / Q{{item.quality}}</view>
+    <view class="module-yd-card" wx:if="{{reviewPreview.length}}">
+      <view class="module-yd-card-title">把这个方法变成复习卡</view>
+      <view class="module-play-preview-list">
+        <view class="module-play-preview-card" wx:for="{{reviewPreview}}" wx:key="id">
+          <view class="module-play-preview-title">{{item.question}}</view>
+          <view class="module-play-preview-meta">{{item.cardType}} / Q{{item.quality}}</view>
         </view>
       </view>
-      <button class="module-v1-link" bindtap="goReview">打开轻回访</button>
+      <button class="module-play-link" bindtap="goReview">打开轻回访</button>
     </view>
   </view>
 </view>
