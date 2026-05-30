@@ -123,7 +123,7 @@ function buildNextPracticePlan(input = {}) {
     parentPrompt: cause.parentPrompt,
     nextPracticeText: `${subject}${source}：${cause.practice}`,
     appRoute: cause.id === 'habit_focus'
-      ? '/pages/focus/focus'
+      ? '/pages/entry-detail/entry-detail?scene=today'
       : cause.id === 'expression_planning'
         ? '/pages/tutor/tutor'
         : '/pages/review/review'
