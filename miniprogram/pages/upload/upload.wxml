@@ -40,17 +40,17 @@
 
         <view class="upload-material-grid ux-kit-jump-grid">
           <view class="upload-material-card ux-kit-jump-card primary" data-scene="upload" bindtap="openEntryDetail">
-            <view class="upload-material-icon">📁</view>
+            <image class="upload-material-icon" mode="aspectFit" src="/assets/reference/entry-upload.png" />
             <text>上传材料</text>
             <text>作业/错题/成绩</text>
           </view>
           <view class="upload-material-card ux-kit-jump-card" data-scene="parent" bindtap="openEntryDetail">
-            <view class="upload-material-icon blue">📋</view>
+            <image class="upload-material-icon blue" mode="aspectFit" src="/assets/reference/entry-report.png" />
             <text>家长报告</text>
             <text>证据与方法匹配</text>
           </view>
           <view class="upload-material-card ux-kit-jump-card" data-scene="today" bindtap="openEntryDetail">
-            <view class="upload-material-icon yellow">🧭</view>
+            <image class="upload-material-icon yellow" mode="aspectFit" src="/assets/reference/entry-map.png" />
             <text>今晚路线</text>
             <text>直接生成任务</text>
           </view>
@@ -90,7 +90,7 @@
           </view>
         </view>
         <view class="upload-soft-pill">
-          <text class="pill-spark">✦</text>
+          <text class="pill-spark"></text>
           <text>三行也能开始</text>
         </view>
       </view>
@@ -110,7 +110,7 @@
               <view class="paper-line short"></view>
               <view class="paper-line full bottom"></view>
             </view>
-            <view class="paper-spark">✦</view>
+            <view class="paper-spark"></view>
           </view>
         </view>
       </view>
@@ -194,7 +194,7 @@
 
         <view class="soft-card">
           <view class="card-title-row compact">
-            <view class="card-title-icon">✎</view>
+            <view class="card-title-icon">写</view>
             <view class="card-title">作业清单</view>
           </view>
           <view class="textarea-box">
@@ -247,7 +247,7 @@
             <view class="intake-packet-boundary">{{uploadIntakePacket.aiBoundary}}</view>
           </view>
           <view class="quick-wrap">
-            <view class="quick-label">💡 快捷补充常见项</view>
+            <view class="quick-label"><text class="quick-label-dot"></text>快捷补充常见项</view>
             <view class="quick-row">
               <button class="quick-chip" wx:for="{{quickChips}}" wx:key="label" data-index="{{index}}" bindtap="useQuickChip">
                 <text class="quick-plus">＋</text>{{item.label}}
@@ -624,7 +624,7 @@
             <view class="plan-count" wx:if="{{previewPlan}}">{{previewPlan.flexible.length}} 项</view>
           </view>
           <view class="plan-cell skip">
-            <view class="plan-icon">✓</view>
+            <view class="plan-icon">后</view>
             <view class="plan-title">可以后置</view>
             <view class="plan-lines">
               <view class="line long"></view>

@@ -232,13 +232,12 @@ page {
 .upload-material-icon {
   width: 62rpx;
   height: 62rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: block;
+  box-sizing: border-box;
+  padding: 8rpx;
   border: 1rpx solid rgba(232, 238, 230, 0.95);
   border-radius: 20rpx;
   background: #effaf0;
-  font-size: 33rpx;
 }
 
 .upload-material-icon.blue { background: #eef7ff; }
@@ -404,7 +403,11 @@ page {
 }
 
 .pill-spark {
-  color: #9E9685;
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 999rpx;
+  background: #22b95c;
+  box-shadow: 0 0 0 8rpx rgba(34, 185, 92, 0.1);
 }
 
 .upload-hero {
@@ -522,9 +525,11 @@ page {
   position: absolute;
   top: -18rpx;
   right: -16rpx;
-  color: #E2CDA6;
-  font-size: 28rpx;
-  font-weight: 900;
+  width: 28rpx;
+  height: 28rpx;
+  border-radius: 999rpx;
+  background: #f8c622;
+  box-shadow: 0 0 0 10rpx rgba(248, 198, 34, 0.16);
 }
 
 .upload-stack {
@@ -879,10 +884,21 @@ page {
 }
 
 .quick-label {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
   margin-bottom: 14rpx;
   color: #8A857D;
   font-size: 22rpx;
   font-weight: 750;
+}
+
+.quick-label-dot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 999rpx;
+  background: #f8c622;
+  box-shadow: 0 0 0 8rpx rgba(248, 198, 34, 0.14);
 }
 
 .quick-row {

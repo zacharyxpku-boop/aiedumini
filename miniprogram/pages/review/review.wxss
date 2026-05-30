@@ -141,12 +141,11 @@ page {
   width: 52rpx;
   height: 52rpx;
   flex: 0 0 auto;
+  box-sizing: border-box;
+  padding: 6rpx;
   border-radius: 18rpx;
   background: #fff7df;
   box-shadow: 0 14rpx 26rpx rgba(248, 198, 34, 0.12);
-  font-size: 30rpx;
-  line-height: 52rpx;
-  text-align: center;
 }
 
 .review-dash-brand text {

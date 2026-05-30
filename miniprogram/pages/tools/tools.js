@@ -469,7 +469,7 @@ Page({
         id: 'match',
         name: '配对泡泡',
         fit: '概念和含义，先配一配',
-        tone: 'purple',
+        tone: 'orange',
         icon: 'lab'
       }
     ];
@@ -579,7 +579,7 @@ Page({
     const id = event.currentTarget.dataset.id;
     const game = (this.data.playgroundGames || []).find((item) => item.id === id);
     if (game && game.available) {
-      wx.navigateTo({ url: `/pages/arcade/arcade?game=${id}&from=tools` });
+      navigation.navigateLearningRoute(`/pages/arcade/arcade?game=${id}&from=tools`);
       return;
     }
     wx.showToast({ title: '先补一条真实材料，再开始轻练习', icon: 'none' });
@@ -605,11 +605,7 @@ Page({
       wx.pageScrollTo({ scrollTop: 0, duration: 220 });
       return;
     }
-    if (item.tab && item.path === '/pages/tools/tools') {
-      wx.switchTab({ url: item.path });
-    } else {
-      wx.navigateTo({ url: item.path });
-    }
+    navigation.navigateLearningRoute(item.path);
   },
 
   openPrecisionMode(event) {
@@ -617,7 +613,7 @@ Page({
     const item = (this.data.precisionModes || []).find((entry) => entry.key === key);
     if (!item) return;
     if (item.path) {
-      wx.navigateTo({ url: item.path });
+      navigation.navigateLearningRoute(item.path);
       return;
     }
     const state = visibleLearningState();
@@ -868,11 +864,7 @@ Page({
     const index = event.currentTarget.dataset.index;
     const item = this.data.tools[index];
     if (!item) return;
-    if (item.tab && item.path === '/pages/tools/tools') {
-      wx.switchTab({ url: item.path });
-    } else {
-      wx.navigateTo({ url: item.path });
-    }
+    navigation.navigateLearningRoute(item.path);
   },
 
   setFilter(event) {

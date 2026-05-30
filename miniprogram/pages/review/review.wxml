@@ -21,7 +21,7 @@
       <view class="review-hero-shell">
         <view class="review-dash-top">
           <view class="review-dash-brand">
-            <view class="review-dash-mark">🎮</view>
+            <image class="review-dash-mark" mode="aspectFit" src="/assets/reference/entry-review.png" />
             <view>
               <text>复习游戏</text>
               <text>主动回忆和迁移验证</text>

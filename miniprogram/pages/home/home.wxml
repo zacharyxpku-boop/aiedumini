@@ -38,7 +38,7 @@
         <view class="mini-hero-copy">
           <view class="mini-title">晚上好，小明！</view>
           <view class="mini-subtitle">今天坚持学习，就能离目标更近一步！</view>
-          <view class="mini-streak-pill"><text>🔥</text><text>连续学习</text><text>7</text><text>天</text></view>
+          <view class="mini-streak-pill"><text class="mini-streak-dot"></text><text>连续学习</text><text>7</text><text>天</text></view>
         </view>
         <image class="mini-hero-mascot" mode="aspectFit" src="/assets/reference/hero-mascot.png" />
       </view>
@@ -118,7 +118,7 @@
             <view>
               <text>今日目标</text>
               <text>3 / 5 步</text>
-              <text>🔥 连续学习 7 天</text>
+              <text>连续学习 7 天</text>
             </view>
           </view>
         </view>

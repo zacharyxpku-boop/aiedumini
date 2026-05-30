@@ -4100,22 +4100,16 @@ Page({
       }).catch(() => {});
       return;
     }
-    const tabTargets = {
+    const routeTargets = {
       tools: '/pages/tools/tools',
-      review: '/pages/review/review'
-    };
-    const pageTargets = {
+      review: '/pages/review/review',
       upload: '/pages/upload/upload',
       radar: '/pages/radar/radar',
       arcade: '/pages/arcade/arcade',
       tutor: '/pages/tutor/tutor'
     };
-    if (tabTargets[action]) {
-      wx.switchTab({ url: tabTargets[action] });
-      return;
-    }
-    if (pageTargets[action]) {
-      wx.navigateTo({ url: pageTargets[action] });
+    if (routeTargets[action]) {
+      navigation.navigateLearningRoute(routeTargets[action]);
     }
   },
 

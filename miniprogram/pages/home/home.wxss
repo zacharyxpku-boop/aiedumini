@@ -280,6 +280,14 @@
   font-weight: 850;
 }
 
+.mini-streak-dot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 999rpx;
+  background: #f8c622;
+  box-shadow: 0 0 0 8rpx rgba(248, 198, 34, 0.14);
+}
+
 .mini-streak-pill text:nth-child(3) {
   color: #f5b300;
   font-size: 34rpx;

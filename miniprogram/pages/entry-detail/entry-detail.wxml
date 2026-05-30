@@ -25,6 +25,16 @@
     </view>
   </view>
 
+  <view class="entry-jump-section">
+    <view class="entry-jump-title">继续看其他入口</view>
+    <view class="entry-jump-grid">
+      <button class="entry-jump-card" wx:for="{{sceneLinks}}" wx:key="key" data-scene="{{item.key}}" bindtap="openScene">
+        <image mode="aspectFit" src="{{item.image}}" />
+        <text>{{item.label}}</text>
+      </button>
+    </view>
+  </view>
+
   <view class="entry-proof-strip">
     <view><text>1</text><text>先看依据</text></view>
     <view><text>2</text><text>再做一步</text></view>

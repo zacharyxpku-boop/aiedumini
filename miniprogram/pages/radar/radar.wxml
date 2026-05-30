@@ -25,7 +25,7 @@
       <view class="report-dashboard">
         <view class="report-dash-top">
           <view class="report-dash-brand">
-            <view class="report-dash-mark">📊</view>
+            <image class="report-dash-mark" mode="aspectFit" src="/assets/reference/entry-report.png" />
             <view>
               <text>个性化报告</text>
               <text>证据、天赋和方法匹配</text>

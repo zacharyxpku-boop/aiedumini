@@ -596,7 +596,7 @@
           placeholder="说第一步，或把题目贴过来。"
         />
         <button class="composer-btn" bindtap="send" loading="{{loading}}" aria-label="发送">
-          <text class="send-arrow">➤</text>
+          <text class="send-arrow">发</text>
         </button>
       </view>
     </view>

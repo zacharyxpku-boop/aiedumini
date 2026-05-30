@@ -1586,26 +1586,44 @@ button::after {
 
 .ux-kit-jump-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12rpx;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14rpx;
   margin-top: 22rpx;
 }
 
 .ux-kit-jump-card {
   display: grid;
-  min-height: 128rpx;
+  min-height: 156rpx;
   align-content: center;
-  gap: 8rpx;
-  padding: 18rpx 14rpx;
-  border: 1rpx solid #eee7d9;
-  border-radius: 24rpx;
-  background: rgba(255, 255, 255, .9);
-  box-shadow: 0 10rpx 22rpx rgba(84, 59, 28, .05);
+  justify-items: center;
+  gap: 10rpx;
+  padding: 18rpx 16rpx;
+  border: 1rpx solid #e8eee6;
+  border-radius: 28rpx;
+  background: linear-gradient(180deg, #ffffff 0%, #f5fbf1 100%);
+  box-shadow: 0 14rpx 30rpx rgba(34, 58, 42, .07);
 }
 
 .ux-kit-jump-card.primary {
-  border-color: rgba(104, 184, 111, .45);
-  background: #eff8ed;
+  grid-column: span 2;
+  min-height: 176rpx;
+  grid-template-columns: 150rpx minmax(0, 1fr);
+  justify-items: start;
+  align-items: center;
+  border-color: rgba(34, 185, 92, .32);
+  background: linear-gradient(135deg, #ffffff 0%, #eef9e9 100%);
+}
+
+.ux-kit-jump-card image {
+  width: 104rpx;
+  height: 104rpx;
+  justify-self: center;
+  filter: drop-shadow(0 12rpx 16rpx rgba(34, 68, 48, .12));
+}
+
+.ux-kit-jump-card.primary image {
+  width: 132rpx;
+  height: 132rpx;
 }
 
 .ux-kit-jump-card text {
@@ -1618,14 +1636,18 @@ button::after {
 
 .ux-kit-jump-card text:first-child {
   color: #123f31;
-  font-size: 25rpx;
+  font-size: 27rpx;
   font-weight: 950;
 }
 
 .ux-kit-jump-card text:last-child {
   color: #657069;
-  font-size: 20rpx;
+  font-size: 21rpx;
   font-weight: 780;
+}
+
+.ux-kit-jump-card.primary text {
+  text-align: left;
 }
 
 .ux-kit-primary {

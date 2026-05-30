@@ -809,12 +809,7 @@ Page({
         storage.set('publicK12.reviewContext.v1', reviewContext);
       }
     }
-    const cleanPath = route.split('?')[0];
-    if (['/pages/home/home', '/pages/review/review', '/pages/focus/focus', '/pages/tools/tools', '/pages/profile/profile', '/pages/arcade/arcade'].indexOf(cleanPath) >= 0) {
-      wx.switchTab({ url: cleanPath });
-      return;
-    }
-    wx.navigateTo({ url: route });
+    navigation.navigateLearningRoute(route);
   },
 
   openingHint(gameId) {
