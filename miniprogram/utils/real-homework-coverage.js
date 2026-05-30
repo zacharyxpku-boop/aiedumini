@@ -1849,7 +1849,7 @@ function buildPublicK12AssetBoundaryAudit(options = {}) {
   };
 }
 
-function buildPublicK12IntakeChallengeDeckLegacy(options = {}) {
+function buildPublicK12IntakeChallengeDeckCurrent(options = {}) {
   const limit = Number(options.limit || PUBLIC_K12_HOMEWORK_INTAKE_QUEUE.length);
   return PUBLIC_K12_HOMEWORK_INTAKE_QUEUE.slice(0, limit).map((item, index) => ({
     id: `public_k12_intake_${item.id || index + 1}`,

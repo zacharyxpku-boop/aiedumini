@@ -6440,7 +6440,7 @@ function normalizeXpEvidenceGate(evidence = {}) {
   const hasFirstStep = !!(safe.student_first_step || safe.first_step_recall || safe.child_first_step || safe.childArticulatedStep);
   const hasWrongCause = !!(safe.wrong_cause_named || safe.wrong_cause_replay || safe.wrongCauseLabel || safe.wrongCause);
   const hasRevisit = !!(safe.next_day_revisit_locked || safe.next_day_revisit || safe.revisit_locked || safe.revisitWindow);
-  const pass = !!safe.allowUnsafeLegacyXp || (hasFirstStep && hasWrongCause && hasRevisit);
+  const pass = !!safe.allowEvidenceGateBypass || (hasFirstStep && hasWrongCause && hasRevisit);
   return {
     pass,
     hasFirstStep,
