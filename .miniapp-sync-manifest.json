@@ -1,8 +1,8 @@
 {
   "sourceRepo": "zacharyxpku-boop/ai-edu-platform",
   "sourcePath": "miniprogram",
-  "sourceCommit": "5c8914d",
-  "syncedAt": "2026-05-30T18:23:11.506Z",
+  "sourceCommit": "a03b6cf",
+  "syncedAt": "2026-05-30T18:32:20.351Z",
   "files": [
     "miniprogram/app.js",
     "miniprogram/app.json",
