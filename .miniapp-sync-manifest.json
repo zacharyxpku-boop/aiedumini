@@ -1,8 +1,8 @@
 {
   "sourceRepo": "zacharyxpku-boop/ai-edu-platform",
   "sourcePath": "miniprogram",
-  "sourceCommit": "529292e",
-  "syncedAt": "2026-05-30T19:10:38.020Z",
+  "sourceCommit": "495dc0e",
+  "syncedAt": "2026-05-30T19:39:50.851Z",
   "files": [
     "miniprogram/app.js",
     "miniprogram/app.json",
@@ -97,7 +97,7 @@
     "miniprogram/view-models/home-view-model.js",
     "miniprogram/view-models/profile-view-model.js",
     "miniprogram/view-models/review-view-model.js",
-    "miniprogram/view-models/tools-view-model.js",
+    "miniprogram/view-models/revisit-view-model.js",
     "README.md",
     ".miniapp-sync-manifest.json"
   ]
