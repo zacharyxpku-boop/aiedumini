@@ -22,6 +22,11 @@
               <text>不公开分享</text>
               <text>先分类再分析</text>
             </view>
+            <view class="upload-type-strip">
+              <text>学习偏好/测评资料</text>
+              <text>成绩单/周测</text>
+              <text>错题试卷</text>
+            </view>
           </view>
           <image class="upload-dash-mascot" mode="aspectFill" src="/assets/reference/entry-upload.png" />
         </view>

@@ -56,7 +56,7 @@
             <view><text>测评报告</text><text>天赋画像</text></view>
             <view><text>成绩单</text><text>科目波动</text></view>
             <view><text>错题</text><text>真实卡点</text></view>
-            <view><text>回访</text><text>方法有效性</text></view>
+            <view><text>下一证据</text><text>回访验证方法有效性</text></view>
           </view>
         </view>
         <view class="ux-kit-jump-grid">
