@@ -18,7 +18,7 @@
 
   <scroll-view class="content-area" scroll-y enhanced show-scrollbar="{{false}}">
     <view class="content-inner">
-      <view class="review-hero-shell">
+      <view class="review-hero-shell ux-entry ux-entry-review ux-kit-screen ux-kit-review">
         <view class="review-dash-top">
           <view class="review-dash-brand">
             <image class="review-dash-mark" mode="aspectFit" src="/assets/reference/entry-review.png" />
@@ -75,6 +75,19 @@
         </view>
 
         <view class="review-main-cta" data-action="review" bindtap="runPlaybookAction">开始今日复习挑战</view>
+      </view>
+      <view class="review-subcheck ux-kit-subcheck">
+        <view class="subcheck-main" data-action="review" bindtap="runPlaybookAction">
+          <view class="subcheck-copy">
+            <text>先修一个真实卡点</text>
+            <text>从错因、回忆、变式到家长确认，先闭环一张卡，不把任务铺满。</text>
+          </view>
+          <image class="subcheck-art" mode="aspectFill" src="/assets/reference/entry-review.png" />
+        </view>
+        <view class="subcheck-side">
+          <view bindtap="goTutor"><text>回到私教</text><text>卡住再说第一步</text></view>
+          <view bindtap="goTools"><text>换一道变式</text><text>验证是否迁移</text></view>
+        </view>
       </view>
       <view class="rc14-review-first-screen">
       <view class="hero">

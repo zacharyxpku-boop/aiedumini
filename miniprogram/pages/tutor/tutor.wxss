@@ -1789,3 +1789,12 @@ page {
   font-size: 24rpx;
   line-height: 70rpx;
 }
+
+/* Child-flow polish: entry-detail jumps should not show the older capsule row. */
+.top-nav {
+  display: none;
+}
+
+.tutor-main {
+  height: 100vh;
+}

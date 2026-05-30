@@ -1511,3 +1511,12 @@ page {
   font-size: 25rpx;
   line-height: 72rpx;
 }
+
+/* Child-flow polish: new upload surface owns its own safe area. */
+.upload-nav {
+  display: none;
+}
+
+.upload-scroll {
+  height: 100vh;
+}
