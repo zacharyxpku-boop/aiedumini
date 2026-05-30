@@ -1,14 +1,14 @@
 <view class="page diagnosis-page safe-bottom">
   <view class="v1-page v1-shell">
-    <view class="v1-topbar">
-      <view class="v1-brand">
-        <view class="v1-logo"><view class="v1-logo-core"></view></view>
-        <view class="v1-brand-copy">
-          <view class="v1-brand-name">原点智学</view>
-          <view class="v1-brand-sub">3 个问题先看今晚第一步</view>
+    <view class="app-subpage-topbar">
+      <view class="app-subpage-brand">
+        <view class="app-subpage-logo"><view class="app-subpage-logo-core"></view></view>
+        <view class="app-subpage-brand-copy">
+          <view class="app-subpage-brand-name">原点智学</view>
+          <view class="app-subpage-brand-sub">3 个问题先看今晚第一步</view>
         </view>
       </view>
-      <view class="v1-pill">先定位</view>
+      <view class="app-subpage-pill">先定位</view>
       <button class="subpage-home" bindtap="goHome">首页</button>
     </view>
 

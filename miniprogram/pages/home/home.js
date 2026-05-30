@@ -450,12 +450,9 @@ Page({
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().setData({ selected: 0 });
     }
-    const pendingRoute = navigation.consumePendingTabRouteContext
-      ? navigation.consumePendingTabRouteContext('/pages/home/home')
-      : null;
-    this.setData({
-      showLegacyEntryContent: false
-    });
+    if (navigation.consumePendingTabRouteContext) {
+      navigation.consumePendingTabRouteContext('/pages/home/home');
+    }
     setTimeout(() => {
       this.refresh();
     }, 0);

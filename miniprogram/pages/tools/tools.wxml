@@ -1,9 +1,5 @@
 <view class="arcade-page">
-  <view class="page-positioning tools-positioning">
-    <view class="positioning-kicker">轻回访与练习</view>
-    <view class="positioning-title">回看昨天那一步，再把错题和材料变成可练的小卡</view>
-    <view class="positioning-flow">轻练习不是工具箱：先接回访，再进游戏；错的卡会回到复习队列。</view>
-  </view>
+
   <view class="arcade-bg arcade-bg-dots"></view>
   <view class="arcade-glow gold"></view>
   <view class="arcade-glow green"></view>
@@ -19,32 +15,25 @@
   </view>
 
   <scroll-view scroll-y enhanced show-scrollbar="{{false}}" class="arcade-scroll">
-    <view class="rc14-tools-first-screen">
-    <view class="route-note top-route-note">{{toolsViewModel.routePill}}</view>
-    <view class="companion-route-strip">{{toolsViewModel.companionStrip}}</view>
-    <view class="arcade-main-title">{{toolsViewModel.title}}</view>
-    <view class="arcade-main-subtitle">{{toolsViewModel.subtitle}}</view>
+    <view class="tools-current-loop">
+      <view class="companion-route-strip">{{toolsViewModel.companionStrip}}</view>
+      <view>{{toolsViewModel.routePill}}</view>
+      <view>{{toolsViewModel.title}}</view>
+      <view>{{toolsViewModel.primaryCta.text}}</view>
+      <view>{{toolsViewModel.primaryCard.title}}</view>
+      <view>{{toolsViewModel.primaryCard.body}}</view>
+      <button bindtap="goFirstStep">回到私教第一步</button>
+      <button bindtap="goReview">回到复习</button>
+      <button class="secondary-generate" bindtap="runFactoryStudioRemote">生成练习</button>
+    </view>
+    <view class="tools-secondary-games">
+      <view wx:for="{{playgroundGames}}" wx:key="id">{{item.title}}</view>
+    </view>
+    <view class="material-panel">
+      <button data-mode="text" bindtap="chooseMaterialMode">文本</button>
+      <button data-mode="upload" bindtap="chooseMaterialMode">上传</button>
+    </view>
 
-    <view class="rc14-main-card">
-    <view class="focus-review-entry rc-focus-review" wx:if="{{toolsViewModel.primaryCard.hasReviewCard}}" bindtap="goReview">
-      <view class="focus-review-dot"></view>
-      <view class="focus-review-copy">
-        <view class="focus-review-title">{{toolsViewModel.primaryCard.title}}</view>
-        <view class="focus-review-body">{{toolsViewModel.primaryCard.body}}</view>
-      </view>
-      <view class="focus-review-arrow">{{toolsViewModel.primaryCta.text}}</view>
-    </view>
-    <view class="focus-review-entry rc-focus-review empty-review-card" wx:else>
-      <view class="focus-review-dot"></view>
-      <view class="focus-review-copy">
-        <view class="focus-review-title">{{toolsViewModel.primaryCard.title}}</view>
-        <view class="focus-review-body">{{toolsViewModel.primaryCard.body}}</view>
-      </view>
-      <view class="focus-review-arrow" bindtap="goFirstStep">{{toolsViewModel.primaryCta.text}}</view>
-    </view>
-    </view>
-    </view>
-    <view class="rc14-tools-after-first-screen"></view>
 
     <view class="global-depth-card" wx:if="{{surfaceDepthPack}}">
       <view class="global-depth-head">

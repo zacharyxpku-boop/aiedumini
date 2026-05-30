@@ -20,13 +20,6 @@
   background: transparent;
 }
 
-.diagnosis-page .v1-topbar {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
-  align-items: center;
-  gap: 14rpx;
-}
-
 .diagnosis-page .v1-brand-sub {
   max-width: 260rpx;
 }

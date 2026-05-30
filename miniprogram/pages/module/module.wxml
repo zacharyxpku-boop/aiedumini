@@ -1,14 +1,14 @@
 <view class="page module-page-v1 safe-bottom" wx:if="{{module}}">
   <view class="v1-page v1-shell">
-    <view class="v1-topbar">
-      <view class="v1-brand">
-        <view class="v1-logo"><view class="v1-logo-core"></view></view>
-        <view class="v1-brand-copy">
-          <view class="v1-brand-name">原点智学</view>
-          <view class="v1-brand-sub">学习小局</view>
+    <view class="app-subpage-topbar">
+      <view class="app-subpage-brand">
+        <view class="app-subpage-logo"><view class="app-subpage-logo-core"></view></view>
+        <view class="app-subpage-brand-copy">
+          <view class="app-subpage-brand-name">原点智学</view>
+          <view class="app-subpage-brand-sub">学习小局</view>
         </view>
       </view>
-      <view class="v1-pill">{{module.minutes}} 分钟</view>
+      <view class="app-subpage-pill">{{module.minutes}} 分钟</view>
       <button class="subpage-home" bindtap="goHome">首页</button>
     </view>
 

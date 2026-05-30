@@ -93,12 +93,9 @@ Page({
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().setData({ selected: 2 });
     }
-    const pendingRoute = navigation.consumePendingTabRouteContext
-      ? navigation.consumePendingTabRouteContext('/pages/arcade/arcade')
-      : null;
-    this.setData({
-      showLegacyEntryContent: false
-    });
+    if (navigation.consumePendingTabRouteContext) {
+      navigation.consumePendingTabRouteContext('/pages/arcade/arcade');
+    }
     this.refresh();
   },
 

@@ -3090,12 +3090,9 @@ Page({
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().setData({ selected: 3 });
     }
-    const pendingRoute = navigation.consumePendingTabRouteContext
-      ? navigation.consumePendingTabRouteContext('/pages/profile/profile')
-      : null;
-    this.setData({
-      showLegacyEntryContent: false
-    });
+    if (navigation.consumePendingTabRouteContext) {
+      navigation.consumePendingTabRouteContext('/pages/profile/profile');
+    }
     this.refresh();
   },
 

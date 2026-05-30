@@ -49,17 +49,6 @@ page {
   background: rgba(26, 83, 54, 0.08);
 }
 
-.v1-topbar {
-  position: relative;
-  z-index: 3;
-  display: flex;
-  min-height: calc(118rpx + env(safe-area-inset-top));
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 18rpx;
-  padding: calc(42rpx + env(safe-area-inset-top)) 40rpx 22rpx;
-}
-
 .review-brand-text {
   color: #1a5336;
   font-size: 44rpx;
@@ -1805,12 +1794,6 @@ page {
 }
 
 /* RC0.6 visual reduction: one repair card above the fold, old management below. */
-.v1-topbar {
-  min-height: calc(118rpx + env(safe-area-inset-top));
-  padding-top: calc(44rpx + env(safe-area-inset-top));
-  padding-bottom: 20rpx;
-}
-
 .review-brand-text {
   font-size: 40rpx;
 }
@@ -2083,10 +2066,6 @@ page {
 }
 
 /* Focused review entry: keep child-flow screenshots on the new visual system. */
-.v1-topbar {
-  display: none;
-}
-
 .content-area {
   height: 100vh;
 }
@@ -2170,4 +2149,39 @@ page {
   margin-top: 16rpx;
   font-size: 24rpx;
   line-height: 70rpx;
+}
+.review-evidence-panel {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18rpx;
+  margin: 18rpx 0;
+}
+
+.review-evidence-card {
+  padding: 22rpx;
+  border-radius: 26rpx;
+  background: rgba(255, 255, 255, 0.86);
+  border: 2rpx solid rgba(232, 238, 230, 0.95);
+  box-shadow: 0 14rpx 34rpx rgba(36, 72, 46, 0.08);
+}
+
+.review-evidence-title {
+  font-size: 28rpx;
+  font-weight: 800;
+  color: #1f3828;
+  margin-bottom: 12rpx;
+}
+
+.review-evidence-line {
+  font-size: 24rpx;
+  line-height: 1.45;
+  color: #31513b;
+  margin-top: 8rpx;
+}
+
+.review-evidence-note {
+  margin-top: 12rpx;
+  font-size: 22rpx;
+  line-height: 1.45;
+  color: #6a7a6c;
 }

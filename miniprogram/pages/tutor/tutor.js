@@ -946,12 +946,9 @@ Page({
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().setData({ selected: 1 });
     }
-    const pendingRoute = navigation.consumePendingTabRouteContext
-      ? navigation.consumePendingTabRouteContext('/pages/tutor/tutor')
-      : null;
-    this.setData({
-      showLegacyEntryContent: false
-    });
+    if (navigation.consumePendingTabRouteContext) {
+      navigation.consumePendingTabRouteContext('/pages/tutor/tutor');
+    }
     const state = storage.loadState();
     const routeOptions = currentRouteOptions();
     const publicK12Challenge = findPublicK12Challenge(routeOptions);

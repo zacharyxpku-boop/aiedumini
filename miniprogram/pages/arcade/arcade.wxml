@@ -1,17 +1,8 @@
 <view class="page arcade-page safe-bottom">
-  <view class="page-positioning arcade-positioning" wx:if="{{showLegacyEntryContent}}">
-    <view class="positioning-kicker">游戏化轻练习</view>
-    <view class="positioning-title">玩一小局，错的卡回到复习队列</view>
-    <view class="positioning-flow">游戏负责让孩子愿意再练一下；错题和模糊点会回到修卡点，不做排行。</view>
-  </view>
-  <view class="arcade-topbar" wx:if="{{showLegacyEntryContent}}">
-    <button class="nav-back" bindtap="goBack">‹</button>
-    <view class="nav-title">轻练习</view>
-    <button class="nav-home" bindtap="goHome">首页</button>
-  </view>
 
   <scroll-view class="arcade-scroll" scroll-y enhanced show-scrollbar="{{false}}">
     <view class="ux-entry ux-entry-island ux-kit-screen ux-kit-review arcade-hero-shell">
+      <view class="arcade-evidence-panel">小讲堂回流</view>
       <view class="arcade-dash-top">
         <view class="arcade-dash-brand">
           <image class="arcade-dash-mark" mode="aspectFit" src="/assets/reference/brand-house.png" />
@@ -88,158 +79,14 @@
         <view data-scene="parent" bindtap="openEntryDetail"><text>完成后</text><text>给家长看证据</text></view>
       </view>
     </view>
-    <view class="arcade-hero" wx:if="{{showLegacyEntryContent}}">
-      <view class="hero-art">
-        <view class="hero-orbit">
-          <view class="hero-core"></view>
-          <view class="hero-dot one"></view>
-          <view class="hero-dot two"></view>
-          <view class="hero-dot three"></view>
-        </view>
-      </view>
-      <view class="hero-kicker">学科 × 知识类型 × 游戏类型</view>
-      <view class="hero-title">今天把知识打一小关</view>
-      <view class="hero-copy">不是把复习换皮，而是让短回忆、概念和步骤进入合适玩法。</view>
-      <view class="hero-stats">
-        <view class="hero-stat">
-          <view class="hero-stat-num">{{cards.length || 0}}</view>
-          <view class="hero-stat-label">可用卡片</view>
-        </view>
-        <view class="hero-stat">
-          <view class="hero-stat-num">{{round.total || 0}}</view>
-          <view class="hero-stat-label">本局题数</view>
-        </view>
-        <view class="hero-stat">
-          <view class="hero-stat-num">{{xpGained || 0}}</view>
-          <view class="hero-stat-label">留证回访</view>
-        </view>
-      </view>
+
+    <view class="arcade-evidence-panel">
+      <view wx:if="{{reportSourcePanel}}">{{reportSourcePanel.returnRouteLine}}</view>
+      <view wx:if="{{nextDayReturnEvidence}}">{{nextDayReturnEvidence.routeLine}}</view>
+      <view class="public-k12-card-action" wx:for="{{publicK12ChallengeCards}}" wx:key="id" data-challenge-id="{{item.id}}" bindtap="selectPublicK12Challenge">{{item.title}}</view>
     </view>
 
     <view class="challenge-brief-card" wx:if="{{challengeBrief}}">
-      <block wx:if="{{showLegacyEntryContent}}">
-    <view class="story-mission" wx:if="{{reportSourcePanel}}">
-        <view class="story-mission-title">{{reportSourcePanel.title}}</view>
-        <view class="story-mission-line">{{reportSourcePanel.line}}</view>
-        <view class="story-mission-rule">来源：已接入家长报告 / 错题回访 / 今日轻练</view>
-        <view class="story-mission-rule" wx:if="{{reportSourcePanel.firstQuestion}}">本局先练：{{reportSourcePanel.firstQuestion}}</view>
-        <view class="story-mission-rule">来源卡：{{reportSourcePanel.matchedCount}} 张；原题、答案和分数不会进入分享。</view>
-        <view class="story-mission-rule" wx:if="{{reportSourcePanel.openMaicBridgeStatus}}">小讲堂回流：先说第一步，再锁明天回访。</view>
-        <view class="story-mission-rule" wx:if="{{reportSourcePanel.returnRoute}}">{{reportSourcePanel.returnRouteLine}}</view>
-      </view>
-      <view class="challenge-brief-top">
-        <view>
-          <view class="challenge-brief-kicker">本局目标</view>
-          <view class="challenge-brief-title">{{challengeBrief.modeLabel}}</view>
-        </view>
-        <view class="challenge-brief-pill">{{challengeBrief.roundSize}} 题 · 回访门槛</view>
-      </view>
-      <view class="challenge-brief-line">{{challengeBrief.questTitle}} 路 {{challengeBrief.questProgress}}</view>
-      <view class="quest-action-row" wx:if="{{challengeBrief.questActions.length}}">
-        <button
-          class="quest-action-btn"
-          wx:for="{{challengeBrief.questActions}}"
-          wx:key="id"
-          data-route="{{item.route}}"
-          data-quest-id="{{item.id}}"
-          data-label="{{item.label}}"
-          bindtap="goQuestRoute"
-        >{{item.label}} {{item.progressText}}</button>
-      </view>
-      <view class="story-mission first-step-sprint-card" wx:if="{{challengeBrief.firstStepSprint}}">
-        <view class="story-mission-title">{{challengeBrief.firstStepSprint.title}}</view>
-        <view class="story-mission-line">{{challengeBrief.firstStepSprint.sourceLine}}</view>
-        <view class="story-mission-rule">本局只练：{{challengeBrief.firstStepSprint.weakKey}}</view>
-        <view class="story-mission-rule">{{challengeBrief.firstStepSprint.goalLine}}</view>
-        <view class="story-mission-rule">{{challengeBrief.firstStepSprint.rewardLine}}</view>
-        <view class="story-mission-rule">{{challengeBrief.firstStepSprint.parentLine}}</view>
-        <view class="story-mission-rule">{{challengeBrief.firstStepSprint.nextDayLine}}</view>
-        <view class="story-mission-rule">{{challengeBrief.firstStepSprint.safetyLine}}</view>
-        <view class="quest-action-row">
-          <button class="quest-action-btn" bindtap="startNinetySecondRecall">开始 90 秒第一步</button>
-          <button class="quest-action-btn" data-route="{{challengeBrief.firstStepSprint.reviewRoute}}" data-quest-id="first_step_sprint_review" data-label="明天回访" bindtap="goQuestRoute">明天回访</button>
-        </view>
-        <view class="story-mission-rule" wx:for="{{challengeBrief.firstStepSprintCheckpoints}}" wx:key="id">{{item.label}}：{{item.evidence}}</view>
-      </view>
-      <view class="story-mission public-k12-challenge-mission" wx:if="{{challengeBrief.publicK12IntakeChallenge}}">
-        <view class="story-mission-title">{{challengeBrief.publicK12IntakeChallenge.title}}</view>
-        <view class="story-mission-line">公开 K12 挑战卡 {{challengeBrief.publicK12IntakeChallenge.challengeCount}} 张，可执行 {{challengeBrief.publicK12IntakeChallenge.executableCardCount}} 张；必须用自己的作业材料说第一步。</view>
-        <view class="story-mission-rule">第一步：{{challengeBrief.publicK12IntakeChallenge.observableFirstMove}}</view>
-        <view class="story-mission-rule">不会说时：{{challengeBrief.publicK12IntakeChallenge.fallbackIfNoChildInput}}</view>
-        <view class="story-mission-rule">安全分享字段：{{challengeBrief.publicK12IntakeChallenge.shareSafeFields}}</view>
-        <view class="story-mission-rule">安全边界：不带原题、完整答案、分数和同伴比较。</view>
-        <view class="quest-action-row">
-          <button class="quest-action-btn" data-route="{{challengeBrief.publicK12IntakeChallenge.route}}" data-quest-id="public_k12_arcade" data-label="开始挑战" bindtap="goQuestRoute">开始挑战</button>
-          <button class="quest-action-btn" data-route="{{challengeBrief.publicK12IntakeChallenge.reviewRoute}}" data-quest-id="public_k12_review" data-label="明天回访" bindtap="goQuestRoute">明天回访</button>
-        </view>
-        <view class="story-mission-rule public-k12-card-action" wx:for="{{challengeBrief.publicK12IntakeChallenge.cards}}" wx:key="id" data-route="{{item.route}}" data-review-route="{{item.reviewRoute}}" data-challenge-id="{{item.id}}" data-subject="{{item.subject}}" data-task-type="{{item.taskType}}" data-first-step="{{item.observableFirstMove}}" data-fallback="{{item.fallbackIfNoChildInput}}" data-quest-id="public_k12_card" data-label="{{item.subject}} · {{item.taskType}}" bindtap="goQuestRoute">{{item.subject}} · {{item.taskType}}：{{item.observableFirstMove}}</view>
-      </view>
-      <view class="challenge-brief-sub">{{challengeBrief.bossLine}}</view>
-      <view class="challenge-brief-sub">{{challengeBrief.rewardLine}}</view>
-      <view class="story-mission" wx:if="{{challengeBrief.storyTitle}}">
-        <view class="story-mission-title">{{challengeBrief.storyTitle}}</view>
-        <view class="story-mission-line">{{challengeBrief.storyLine}}</view>
-        <view class="story-mission-rule">{{challengeBrief.storyRule}}</view>
-      </view>
-      <view class="story-mission" wx:if="{{challengeBrief.subjectDepthLine}}">
-        <view class="story-mission-title">{{challengeBrief.subjectDepthLabel}}</view>
-        <view class="story-mission-line">题型第一步：{{challengeBrief.subjectDepthLine}}</view>
-        <view class="story-mission-rule" wx:if="{{challengeBrief.subjectDepthGameLine}}">本局练：{{challengeBrief.subjectDepthGameLine}}</view>
-        <view class="story-mission-rule" wx:if="{{challengeBrief.subjectDepthEvidenceLine}}">留下证据：{{challengeBrief.subjectDepthEvidenceLine}}</view>
-      </view>
-      <view class="story-mission" wx:if="{{challengeBrief.curriculumLine}}">
-        <view class="story-mission-title">{{challengeBrief.curriculumTitle}}</view>
-        <view class="story-mission-line">{{challengeBrief.curriculumLine}}</view>
-        <view class="story-mission-rule" wx:for="{{challengeBrief.curriculumProgression}}" wx:key="id">{{item.order}}. {{item.label}}：{{item.evidence}}</view>
-        <view class="story-mission-rule">{{challengeBrief.curriculumScaleLine}}</view>
-      </view>
-      <view class="story-mission" wx:if="{{challengeBrief.courseUnitTitle}}">
-        <view class="story-mission-title">{{challengeBrief.courseUnitTitle}}</view>
-        <view class="story-mission-line">{{challengeBrief.courseUnitLine}}</view>
-        <view class="story-mission-rule">错因谱：{{challengeBrief.courseUnitWrongCauseLine}}</view>
-        <view class="story-mission-rule" wx:for="{{challengeBrief.courseUnitQuestionTypes}}" wx:key="*this">本局题型：{{item}}</view>
-        <view class="story-mission-rule">{{challengeBrief.courseUnitReportContract}}</view>
-        <view class="story-mission-rule">{{challengeBrief.courseUnitShareContract}}</view>
-        <view class="story-mission-rule" wx:if="{{challengeBrief.courseUnitPracticeDeckTitle}}">{{challengeBrief.courseUnitPracticeDeckTitle}}：{{challengeBrief.courseUnitPracticeDeckLine}}</view>
-        <view class="story-mission-rule" wx:for="{{challengeBrief.courseUnitPracticeDeck}}" wx:key="id">{{item.label}} · 掌握度 {{item.masteryScore}} · 风险 {{item.risk}} · {{item.action}} · {{item.nextEvidence}}</view>
-        <view class="story-mission-rule" wx:if="{{challengeBrief.courseUnitQuestionBankTitle}}">{{challengeBrief.courseUnitQuestionBankTitle}}：{{challengeBrief.courseUnitQuestionBankLine}}</view>
-        <view class="story-mission-rule" wx:for="{{challengeBrief.courseUnitQuestionBankCards}}" wx:key="id">题库卡：{{item.label}}｜{{item.prompt}}｜{{item.evidenceRequired}}</view>
-        <view class="story-mission-rule" wx:if="{{challengeBrief.questionBankPlayableLine}}">{{challengeBrief.questionBankPlayableLine}}</view>
-        <view class="story-mission-rule" wx:for="{{challengeBrief.questionBankPlayableCards}}" wx:key="id">本局卡：{{item.question}}｜第一步：{{item.answer}}｜{{item.revisitWindow}}</view>
-        <view class="story-mission rule-retest-mission" wx:if="{{challengeBrief.ruleRetestChallengeTitle}}">
-          <view class="story-mission-title">{{challengeBrief.ruleRetestChallengeTitle}}</view>
-          <view class="story-mission-line">{{challengeBrief.ruleRetestChallengeLine}}</view>
-          <view class="story-mission-rule">{{challengeBrief.ruleRetestChallengeXpGate}}</view>
-          <view class="story-mission-rule">{{challengeBrief.ruleRetestChallengeParentLine}}</view>
-          <view class="story-mission-rule" wx:for="{{challengeBrief.ruleRetestChallengeCards}}" wx:key="id">复测卡：{{item.title}} · {{item.prompt}} · {{item.releaseGate}}</view>
-        </view>
-      </view>
-        <view class="story-mission-rule" wx:for="{{challengeBrief.courseUnitQuestionBankCards}}" wx:key="id">样例：{{item.sampleStem}}｜第一步：{{item.firstStepHint}}｜近迁移：{{item.nearTransferStem}}</view>
-        <view class="story-mission-rule" wx:for="{{challengeBrief.courseUnitQuestionBankCards}}" wx:key="id">进阶路径：{{item.progression.entryTask}}｜明天：{{item.progression.nextDayRevisit}}</view>
-        <view class="story-mission-rule" wx:for="{{challengeBrief.courseUnitQuestionBankCards}}" wx:key="id">掌握门槛：{{item.progression.masteryGate}}</view>
-      <view class="story-mission" wx:if="{{challengeBrief.questionBankShareRelayDeckTitle}}">
-        <view class="story-mission-title">{{challengeBrief.questionBankShareRelayDeckTitle}}</view>
-        <view class="story-mission-line">{{challengeBrief.questionBankShareRelayDeckLine}}</view>
-        <view class="story-mission-rule">{{challengeBrief.questionBankShareRelayParentLine}}</view>
-        <view class="story-mission-rule" wx:for="{{challengeBrief.questionBankShareRelayCards}}" wx:key="id">接力卡：{{item.label}}｜第一步：{{item.firstStep}}｜{{item.parentCheck}}</view>
-        <view class="story-mission-rule" wx:for="{{challengeBrief.questionBankShareRelayWindows}}" wx:key="id">{{item.label}}：{{item.action}}</view>
-      </view>
-      <view class="story-mission" wx:if="{{challengeBrief.commercialDepthRunwayTitle}}">
-        <view class="story-mission-title">{{challengeBrief.commercialDepthRunwayTitle}}</view>
-        <view class="story-mission-line">{{challengeBrief.commercialDepthRunwayLine}}</view>
-        <view class="story-mission-rule">{{challengeBrief.commercialDepthRunwayBoundary}}</view>
-        <view class="story-mission-rule" wx:for="{{challengeBrief.commercialDepthRunwayLanes}}" wx:key="id">{{item.label}}：{{item.evidenceLine}}｜下一步：{{item.nextAction}}</view>
-        <view class="story-mission-rule" wx:for="{{challengeBrief.commercialDepthMemoryCadence}}" wx:key="id">{{item.label}}：{{item.action}}</view>
-      </view>
-      <view class="story-mission" wx:if="{{challengeBrief.sevenSubjectMasterySprintTitle}}">
-        <view class="story-mission-title">{{challengeBrief.sevenSubjectMasterySprintTitle}}</view>
-        <view class="story-mission-line">{{challengeBrief.sevenSubjectMasterySprintLine}}</view>
-        <view class="story-mission-rule" wx:for="{{challengeBrief.sevenSubjectMasterySprintLanes}}" wx:key="id">{{item.label}}：{{item.target}}</view>
-        <view class="story-mission-rule" wx:for="{{challengeBrief.sevenSubjectMasterySprintSubjects}}" wx:key="id">{{item.label}}：{{item.memoryGameTarget}}</view>
-        <view class="story-mission-rule">{{challengeBrief.sevenSubjectMasterySprintMoat}}</view>
-      </view>
-      <view class="challenge-brief-sub" wx:if="{{challengeBrief.evidenceBiasLine}}">为什么开这局：{{challengeBrief.evidenceBiasLine}}</view>
-      </block>
     </view>
 
     <view class="daily-return-card primary-recall-card" wx:if="{{dailyPrimaryRecallAction}}">

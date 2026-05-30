@@ -1,9 +1,5 @@
 <view class="focus-page {{cabin.selectedScene.gradient}}">
-  <view class="page-positioning focus-positioning">
-    <view class="positioning-kicker">专注舱</view>
-    <view class="positioning-title">围绕这一小步坐一段，留下孩子真的开始过的证据</view>
-    <view class="positioning-flow">不是单纯计时；专注目标绑定孩子说出的第一步，结束后给家长一行复盘。</view>
-  </view>
+
   <view class="focus-shade"></view>
   <view class="focus-star one"></view>
   <view class="focus-star two"></view>
