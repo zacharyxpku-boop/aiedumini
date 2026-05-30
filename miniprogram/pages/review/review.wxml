@@ -6,7 +6,7 @@
   <scroll-view class="content-area" scroll-y enhanced show-scrollbar="{{false}}">
     <view class="content-inner">
       <view class="review-hero-shell ux-entry ux-entry-review ux-kit-screen ux-kit-review">
-        <view class="review-dash-pill">小讲堂回流</view>
+        <view class="review-dash-pill">小课堂回流</view>
         <view class="review-dash-top">
           <view class="review-dash-brand">
             <image class="review-dash-mark" mode="aspectFit" src="/assets/reference/brand-house.png" />
@@ -80,128 +80,6 @@
         </view>
       </view>
 
-      <view class="review-evidence-panel" wx:if="{{reportSourcePanel || miniLessonReturnPanel}}">
-        <view class="review-evidence-card" wx:if="{{reportSourcePanel}}">
-          <view class="review-evidence-title">{{reportSourcePanel.title}}</view>
-          <view class="review-evidence-line" wx:if="{{reportSourcePanel.miniLessonBlackboardLine}}">{{reportSourcePanel.miniLessonBlackboardLine}}</view>
-          <view class="review-evidence-line" wx:if="{{reportSourcePanel.miniLessonCheckQuestion}}">{{reportSourcePanel.miniLessonCheckQuestion}}</view>
-          <view class="review-evidence-note">{{reportSourcePanel.line}}</view>
-        </view>
-        <view class="review-evidence-card" wx:if="{{miniLessonReturnPanel}}">
-          <view class="review-evidence-title">{{miniLessonReturnPanel.title}}</view>
-          <view class="review-evidence-line">概念缺口：{{miniLessonReturnPanel.conceptGap}}</view>
-          <view class="review-evidence-line">放行门槛：{{miniLessonReturnPanel.exitGate}}</view>
-          <view class="review-evidence-note">{{miniLessonReturnPanel.parentLine}}</view>
-        </view>
-      </view>
-
-      <view class="review-evidence-panel" wx:if="{{memoryPrescriptionPanel}}">
-        <view class="review-evidence-card">
-          <view class="review-evidence-title">{{memoryPrescriptionPanel.title}}</view>
-          <view class="review-evidence-line">90 秒：先主动回忆，再核对思路</view>
-          <view class="review-evidence-line" wx:for="{{memoryPrescriptionPanel.recallCards}}" wx:key="id">{{item.question}}</view>
-          <view class="review-evidence-line">回访窗口：只推今天该回看的卡</view>
-          <view class="review-evidence-line">新卡放行：先完成第一步和错因复述</view>
-          <view class="review-evidence-line" wx:for="{{memoryPrescriptionPanel.activeRecallProtocol.todayMustCards}}" wx:key="id">{{item.label}}</view>
-          <view class="review-evidence-line" wx:for="{{memoryPrescriptionPanel.activeRecallProtocol.ratingScale}}" wx:key="id">{{item.label}}</view>
-          <view class="review-evidence-note">{{memoryPrescriptionPanel.activeRecallProtocol.releaseGateLine}}</view>
-          <view wx:if="{{memoryPrescriptionPanel.receiverShareRelayPanel}}">
-            <view>{{memoryPrescriptionPanel.receiverShareRelayPanel.title}}</view>
-            <view>第一步：{{memoryPrescriptionPanel.receiverShareRelayPanel.firstStep}}</view>
-            <view>错因：{{memoryPrescriptionPanel.receiverShareRelayPanel.wrongCause}}</view>
-            <view>明天：{{memoryPrescriptionPanel.receiverShareRelayPanel.revisit}}</view>
-          </view>
-        </view>
-      </view>
-
-      <view class="review-evidence-panel" wx:if="{{reviewViewModel.miniAction}}">
-        <view class="review-evidence-card">
-          <view class="review-evidence-title">{{reviewViewModel.title}}</view>
-          <view class="review-evidence-line" wx:if="{{reviewViewModel.emptyState}}">{{reviewViewModel.emptyState.text}}</view>
-          <view class="review-evidence-note" wx:if="{{reviewViewModel.emptyState}}" bindtap="goTutor">{{reviewViewModel.emptyState.cta}}</view>
-          <view class="review-evidence-line" wx:if="{{reviewViewModel.blackboard}}">{{reviewViewModel.blackboard.intro}}</view>
-          <view class="review-evidence-line" wx:for="{{reviewViewModel.blackboard.layers}}" wx:key="id">{{item.label}} {{item.text}}</view>
-          <view class="review-evidence-line" wx:for="{{reviewViewModel.primaryCard.sections}}" wx:key="id">{{item.label}} {{item.text}}</view>
-          <view class="review-evidence-title">{{reviewViewModel.miniAction.question}}</view>
-          <textarea class="mini-repair-input" value="{{miniActionText}}" maxlength="80" auto-height bindinput="onMiniActionInput" placeholder="{{reviewViewModel.miniAction.placeholder}}"></textarea>
-          <button class="mini-repair-button" bindtap="markMiniActionDone">{{reviewViewModel.miniAction.saveCta}}</button>
-        </view>
-      </view>
-
-      <view class="hero review-secondary-hero">
-        <view class="focus-status-pill" wx:if="{{todayFocus}}">{{mistakeHub.weakSpot.statusText || '未开始'}}</view>
-        <view class="repair-complete-note" wx:if="{{todayFocus && todayFocus.repairStatus === 'completed'}}">已生成明天回访卡。下一步：去轻回访。</view>
-        <view class="mini-action route-next-action" wx:if="{{todayFocus && todayFocus.repairStatus === 'completed'}}" bindtap="goTools">去轻回访</view>
-        <view class="review-progress-line review-secondary-progress" wx:if="{{todayFocus && todayFocus.repairStatus === 'completed'}}">
-          <view class="review-progress-track"><view class="review-progress-fill" style="width: {{gameRunway.percent || 0}}%;"></view></view>
-          <view class="review-progress-copy">今日闭环进度 {{gameRunway.percent || 0}}%</view>
-        </view>
-      </view>
-
-      <view class="quest-panel rc-after-repair" wx:if="{{todayFocus && todayFocus.repairStatus === 'completed'}}">
-        <view class="panel-head compact">
-          <view>
-            <view class="panel-title">5 分钟轻回访</view>
-            <view class="panel-subtitle">{{gameRunway.due ? '按记忆间隔，只推今天该回忆的卡。' : '今天没有到期卡，可以先录入或生成新错题。'}}</view>
-          </view>
-          <view class="xp-pill">回访中</view>
-        </view>
-
-        <view class="quest-badges">
-          <view class="quest-badge flame">连续 {{gameRunway.streak || 0}} 天</view>
-          <view class="quest-badge target">今日 {{gameRunway.percent || 0}}%</view>
-        </view>
-
-        <view class="progress-wrap">
-          <view class="progress-track">
-            <view class="progress-fill" style="width: {{gameRunway.percent || 0}}%;"></view>
-          </view>
-          <view class="progress-copy">进度 {{cards.length ? index + 1 : 0}} / {{cards.length || 0}}</view>
-        </view>
-
-        <view class="review-question-card" wx:if="{{current}}">
-          <view class="card-label">先自己想，再核对</view>
-          <view class="question-text">{{current.question}}</view>
-          <view class="hint-text"><text class="hint-icon">i</text>卡住会回到卡点和同类题</view>
-          <view class="answer-panel" wx:if="{{showAnswer}}">
-            <view class="answer-label">核对思路</view>
-            <view class="answer-text">{{current.answer}}</view>
-          </view>
-          <view class="options-group">
-            <view class="option-btn selected" wx:if="{{!showAnswer}}" bindtap="reveal">
-              <text class="letter">A</text>
-              <text>我先回忆，点这里核对思路</text>
-            </view>
-            <view class="option-btn" wx:if="{{showAnswer}}" data-rating="again" bindtap="rate">
-              <text class="letter">A</text>
-              <text>没想起来，回卡点再练</text>
-            </view>
-            <view class="option-btn" wx:if="{{showAnswer}}" data-rating="good" bindtap="rate">
-              <text class="letter">B</text>
-              <text>记住了，下一张</text>
-            </view>
-            <view class="option-btn" wx:if="{{showAnswer}}" data-rating="easy" bindtap="rate">
-              <text class="letter">C</text>
-              <text>很熟了，晚点再出现</text>
-            </view>
-          </view>
-        </view>
-
-        <view class="review-question-card done-card" wx:if="{{done}}">
-          <view class="card-label">今日完成</view>
-          <view class="question-text">今天这轮结束了。</view>
-          <view class="hint-text">可以录入一道新错题，或者用作业点拨拆一个关键卡点。</view>
-        </view>
-
-        <view class="quest-actions">
-          <view class="pack-primary review-main-cta" wx:if="{{current && !showAnswer}}" bindtap="reveal">开始这一关</view>
-          <view class="pack-primary review-main-cta" wx:elif="{{current && showAnswer}}" data-rating="good" bindtap="rate">下一张</view>
-          <view class="pack-primary review-main-cta" wx:else data-action="{{gameRunway.primaryAction}}" bindtap="runPlaybookAction">{{gameRunway.primaryLabel}}</view>
-          <view class="mini-action" bindtap="goTutor">卡住了，再看关键第一步</view>
-        </view>
-      </view>
-
-      <view class="feedback-line" wx:if="{{feedbackText}}">{{feedbackText}}</view>
       <button hidden bindtap="reveal">先回忆，再选择</button>
       <button hidden data-rating="good" bindtap="rate">记住了</button>
     </view>

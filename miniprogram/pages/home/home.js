@@ -1979,7 +1979,7 @@ Page({
   },
 
   goDiagnosis() {
-    wx.navigateTo({ url: '/pages/diagnosis/diagnosis' });
+    wx.navigateTo({ url: '/pages/entry-detail/entry-detail?scene=upload&from=diagnosis' });
   },
 
   goReviewInput() {
@@ -1992,21 +1992,21 @@ Page({
 
   goTools() {
     this.trackShareActivation('challenge_started', {
-      next: 'tools'
+      next: 'entry-detail'
     });
-    navigation.navigateLearningRoute('/pages/tools/tools');
+    wx.navigateTo({ url: '/pages/entry-detail/entry-detail?scene=today' });
   },
 
   goDailyMath() {
-    wx.navigateTo({ url: '/pages/daily-math/daily-math' });
+    wx.navigateTo({ url: '/pages/entry-detail/entry-detail?scene=today&from=daily_math' });
   },
 
   goDictation() {
-    wx.navigateTo({ url: '/pages/dictation/dictation' });
+    wx.navigateTo({ url: '/pages/entry-detail/entry-detail?scene=today&from=dictation' });
   },
 
   goLightDiagnosis() {
-    wx.navigateTo({ url: '/pages/light-diagnosis/light-diagnosis' });
+    wx.navigateTo({ url: '/pages/entry-detail/entry-detail?scene=today&from=light_diagnosis' });
   },
 
   goHome() {
@@ -2094,7 +2094,7 @@ Page({
       wx.showToast({ title: '先回咕点确认今晚第一步，才能进专注舱。', icon: 'none' });
       return;
     }
-    navigation.navigateLearningRoute('/pages/focus/focus');
+    wx.navigateTo({ url: '/pages/entry-detail/entry-detail?scene=today&from=focus_cabin' });
   },
 
   continueYesterdayReview() {
@@ -2277,7 +2277,7 @@ Page({
   },
 
   goRadar() {
-    wx.navigateTo({ url: '/pages/radar/radar' });
+    wx.navigateTo({ url: '/pages/entry-detail/entry-detail?scene=parent&from=report_preview' });
   },
 
   goProfile() {

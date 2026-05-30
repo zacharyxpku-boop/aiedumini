@@ -1691,11 +1691,11 @@ Page({
   },
 
   goTools() {
-    navigation.navigateLearningRoute('/pages/tools/tools?from=review');
+    wx.navigateTo({ url: '/pages/entry-detail/entry-detail?scene=today&from=review' });
   },
 
   goFocus() {
-    navigation.navigateLearningRoute('/pages/focus/focus?from=review');
+    wx.navigateTo({ url: '/pages/entry-detail/entry-detail?scene=today&from=review_focus' });
   },
 
   goProfile() {

@@ -26,18 +26,9 @@
           <image class="parent-dash-art" mode="aspectFill" src="/assets/reference/entry-parent.png" />
         </view>
         <view class="parent-dash-proof-grid">
-          <view class="parent-dash-proof primary">
-            <text>今晚结论</text>
-            <text>先稳住一个真实卡点</text>
-          </view>
-          <view class="parent-dash-proof">
-            <text>第一步证据</text>
-            <text>孩子能说出从哪看起</text>
-          </view>
-          <view class="parent-dash-proof">
-            <text>明天回访</text>
-            <text>用 90 秒复述验证</text>
-          </view>
+          <view class="parent-dash-proof primary"><text>今晚结论</text><text>先稳住一个真实卡点</text></view>
+          <view class="parent-dash-proof"><text>第一步证据</text><text>孩子能说出从哪看起</text></view>
+          <view class="parent-dash-proof"><text>明天回访</text><text>用 90 秒复述验证</text></view>
         </view>
         <view class="parent-dash-evidence">
           <view class="parent-dash-section-head">
@@ -87,6 +78,7 @@
           <view class="ux-kit-secondary parent-secondary" data-scene="upload" bindtap="openEntryDetail">补一份材料</view>
         </view>
       </view>
+
       <view class="parent-subcheck ux-kit-subcheck">
         <view class="subcheck-main" data-scene="parent" bindtap="openEntryDetail">
           <view class="subcheck-copy">
@@ -99,71 +91,6 @@
           <view data-scene="upload" bindtap="openEntryDetail"><text>材料缺口</text><text>补测评/错题</text></view>
           <view data-scene="review" bindtap="openEntryDetail"><text>明天回访</text><text>90 秒复述</text></view>
         </view>
-      </view>
-      <view class="growth-memory-card">{{profileViewModel.growthMemoryCard.title}} {{profileViewModel.growthMemoryCard.body}}</view>
-      <view class="growth-memory-card" wx:if="{{profileViewModel.nextStep}}">{{profileViewModel.nextStep}}</view>
-      <view class="growth-memory-card" wx:if="{{focusCabinSummary}}">今晚专注痕迹 {{focusCabinSummary.totalMinutes || 0}} 分钟</view>
-      <view class="growth-memory-card" wx:if="{{threeNightSummary || sevenNightSummary}}">{{threeNightSummary}} {{sevenNightSummary}}</view>
-      <view class="growth-memory-card">服务状态：作业点拨、专注舱、错题修复、轻回访和家长复盘已经连成闭环。</view>
-      <view class="parent-report-capability-panel" wx:if="{{learningReportSummary}}">
-        <view class="parent-report-capability-title">学习报告证据链</view>
-        <view class="parent-report-capability-row">标准版 HTML 报告</view>
-        <view class="parent-report-capability-row">报告回访验证 {{reportRevisitEvidence.validationStage}}</view>
-        <view class="parent-report-capability-row">报告 SOP</view>
-        <view class="parent-report-capability-row">导出规则</view>
-        <view class="parent-report-capability-row">外部优秀做法后的闭环动作</view>
-        <view class="parent-report-capability-row">小程序/轻量 APP 承接</view>
-        <view class="parent-report-capability-grid">
-          <view wx:for="{{learningReportSummary.crossWeekTrendRows}}" wx:key="id">
-            <text>{{item.label}}</text>
-            <text>{{item.value}}</text>
-          </view>
-          <view wx:for="{{learningReportSummary.homeSchoolEvidencePacket}}" wx:key="id">
-            <text>{{item.label}}</text>
-            <text>{{item.evidence}}</text>
-          </view>
-          <view wx:for="{{learningReportSummary.homeSchoolConferenceTeacherQuestions}}" wx:key="*this">
-            <text>家校沟通</text>
-            <text>{{item}}</text>
-          </view>
-          <view wx:for="{{learningReportSummary.familyDecisionIntakeSourcePlan}}" wx:key="id">
-            <text>{{item.label}}</text>
-            <text>{{item.nextAction}}</text>
-          </view>
-          <view wx:for="{{learningReportSummary.sourceEvidenceLanes}}" wx:key="id">
-            <text>{{item.label}}</text>
-            <text>{{item.status}}</text>
-          </view>
-        </view>
-        <view class="parent-report-capability-row" wx:for="{{familyDecisionAiLocalWorkSplit}}" wx:key="id">{{item.label}}</view>
-        <view class="parent-report-capability-row" wx:for="{{learningReportSummary.uploadedMaterialDecisionDossierMaterialLanes}}" wx:key="id">{{item.label}}</view>
-        <view class="parent-report-capability-row" wx:for="{{learningReportSummary.servicePathwayValidationPlan}}" wx:key="id">{{item.label}}</view>
-        <view class="parent-report-capability-row">方法候选卡</view>
-        <view class="parent-report-capability-row" wx:for="{{uploadedMaterialDecisionDossierMethodCandidateCards}}" wx:key="id">{{item.title}}</view>
-        <view class="parent-report-capability-row" wx:for="{{uploadedMaterialDecisionDossierMethodValidationStages}}" wx:key="id">{{item.label}} {{item.status}}</view>
-        <view class="parent-report-capability-row">{{uploadedMaterialDecisionDossierMethodValidationReleaseRule}}</view>
-        <view class="parent-report-capability-row" wx:for="{{uploadedMaterialDecisionDossierMethodologyCards}}" wx:key="id">{{item.title}}</view>
-        <view class="parent-report-capability-row">决策日历</view>
-        <view class="parent-report-capability-row" wx:for="{{uploadedMaterialDecisionDossierFamilyDecisionCalendar}}" wx:key="id">{{item.label}}</view>
-        <view class="parent-report-capability-row">详细报告章节</view>
-        <view class="parent-report-capability-row" wx:for="{{uploadedMaterialDecisionDossierDetailedSections}}" wx:key="id">{{item.title}}</view>
-        <view class="parent-report-capability-row">个性化学习方案蓝图</view>
-        <view class="parent-report-capability-row" wx:for="{{uploadedMaterialDecisionDossierSolutionBlueprint}}" wx:key="id">{{item.label}}</view>
-        <view class="parent-report-capability-row">家庭私教方案</view>
-        <view class="parent-report-capability-row" wx:for="{{uploadedMaterialDecisionDossierPrivateTutorSolutionPack}}" wx:key="id">{{item.label}}</view>
-        <view class="parent-report-capability-row">错题诊断</view>
-        <view class="parent-report-capability-row" wx:for="{{uploadedMaterialDecisionDossierWrongPaperDiagnosisCards}}" wx:key="id">{{item.rule}}</view>
-        <view class="parent-report-capability-row" wx:for="{{learningReportSummary.gameReturnEvidenceNextDayCardIds}}" wx:key="*this">{{item}}</view>
-        <view class="parent-report-capability-row" wx:for="{{learningReportSummary.gameReturnEvidenceBlockedFields}}" wx:key="*this">{{item}}</view>
-        <view class="parent-report-capability-row" wx:for="{{learningReportSummary.gameReturnEvidenceLocalCodeOwns}}" wx:key="*this">{{item}}</view>
-        <view class="parent-report-capability-row">能力分工</view>
-        <view class="parent-report-capability-row" wx:for="{{learningReportSummary.aiLocalImplementationRows}}" wx:key="id">{{item.label}}</view>
-        <view class="parent-report-capability-row">下一加厚</view>
-        <view class="tonight-parent-decision-card" wx:if="{{tonightParentDecisionCardRows}}">
-          <view wx:for="{{tonightParentDecisionCardRows}}" wx:key="id">{{item.label}} {{item.value}}</view>
-        </view>
-        <view class="parent-report-capability-row">{{learningReportSummary.familyDecisionHomepageHeadline}}</view>
-        <view class="parent-report-capability-row" wx:for="{{learningReportSummary.familyDecisionHomepageBlockedFields}}" wx:key="*this">{{item}}</view>
       </view>
     </view>
   </scroll-view>

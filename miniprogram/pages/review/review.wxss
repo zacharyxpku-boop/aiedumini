@@ -1,4 +1,4 @@
-page {
+﻿page {
   background: #f9f8f5;
 }
 
@@ -353,13 +353,6 @@ page {
 
 .hero,
 .repair-panel,
-.quest-panel {
-  position: relative;
-  background: rgba(255, 255, 255, 0.94);
-  border: 1rpx solid rgba(255, 255, 255, 0.78);
-  border-radius: 40rpx;
-  box-shadow: 0 16rpx 52rpx rgba(26, 83, 54, 0.052);
-}
 
 .weakspot-score {
   flex: 0 0 auto;
@@ -774,25 +767,8 @@ page {
 }
 
 .repair-panel,
-.quest-panel {
-  margin-top: 24rpx;
-  padding: 28rpx;
-}
 
-.quest-panel {
-  overflow: hidden;
-}
 
-.quest-panel::before {
-  content: "";
-  position: absolute;
-  right: -80rpx;
-  top: 120rpx;
-  width: 220rpx;
-  height: 220rpx;
-  background: rgba(26, 83, 54, 0.04);
-  border-radius: 50%;
-}
 
 .panel-head {
   display: flex;
@@ -1852,3 +1828,4 @@ page {
   line-height: 1.45;
   color: #6a7a6c;
 }
+

@@ -76,12 +76,6 @@
             <view data-scene="parent" bindtap="openEntryDetail"><text>家长看证据</text><text>只问一句</text></view>
           </view>
         </view>
-        <view class="tutor-proof-panel">
-          <view>TUTOR PEDAGOGY LAYER</view>
-          <view>THINKING RECEIPT</view>
-          <view>SOCRATIC COACH CONSOLE</view>
-          <view>COPY-PASTE RISK GATE</view>
-        </view>
       </view>
     </scroll-view>
 

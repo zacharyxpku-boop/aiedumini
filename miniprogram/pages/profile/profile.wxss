@@ -1,4 +1,4 @@
-page {
+﻿page {
   background: #F9F8F4;
 }
 
@@ -3582,47 +3582,10 @@ page {
   border-radius: 999rpx;
   font-size: 24rpx;
 }
-.parent-report-capability-panel {
-  margin-top: 18rpx;
-  padding: 22rpx;
-  border-radius: 28rpx;
-  background: rgba(255, 255, 255, 0.88);
-  border: 2rpx solid rgba(232, 238, 230, 0.95);
-  box-shadow: 0 16rpx 36rpx rgba(36, 72, 46, 0.08);
-}
 
-.parent-report-capability-title {
-  font-size: 28rpx;
-  font-weight: 850;
-  color: #1f3828;
-  margin-bottom: 14rpx;
-}
 
-.parent-report-capability-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12rpx;
-}
 
-.parent-report-capability-grid > view,
-.parent-report-capability-row {
-  padding: 14rpx 16rpx;
-  border-radius: 18rpx;
-  background: #f7faf3;
-  color: #31513b;
-  font-size: 22rpx;
-  line-height: 1.4;
-}
 
-.parent-report-capability-grid text {
-  display: block;
-}
 
-.parent-report-capability-grid text:first-child {
-  font-weight: 800;
-  color: #1f3828;
-}
 
-.parent-report-capability-row {
-  margin-top: 10rpx;
-}
+

@@ -2222,7 +2222,7 @@ Page({
   },
 
   goTools() {
-    navigation.navigateLearningRoute('/pages/tools/tools');
+    wx.navigateTo({ url: '/pages/entry-detail/entry-detail?scene=today&from=arcade' });
   },
 
   goReview() {

@@ -69,7 +69,7 @@ const SCENES = {
     primaryLabel: '选择文件/图片',
     primaryRoute: '/pages/upload/upload?from=entry_upload_file&open=flow',
     secondaryLabel: '没有报告，做快测',
-    secondaryRoute: '/pages/diagnosis/diagnosis?from=entry_upload_quiz',
+    secondaryRoute: '/pages/entry-detail/entry-detail?scene=upload&from=entry_upload_quiz',
     cards: [
       { label: '天赋/测评', value: '提取学习偏好、注意力和优势通道。' },
       { label: '成绩/错题', value: '提取学科卡点、错因和回访优先级。' },
