@@ -555,7 +555,7 @@ Page({
       tomorrowLine: nextEvidence.dueAt
         ? `明天已锁定回访：${String(nextEvidence.dueAt).slice(5, 10)}`
         : '明天回访已进入规则：没有次日回访，不更新长期画像。',
-      xpRule: xpRule && xpRule.rule ? xpRule.rule : 'XP 只奖励主动回忆、错因修复和次日回访，不奖励速度、分数或排名。',
+      xpRule: xpRule && xpRule.rule ? String(xpRule.rule).replace(/XP/g, '行为反馈') : '行为反馈只记录主动回忆、错因修复和次日回访，不奖励速度、分数或排名。',
       shareLine: season.sharePayload && season.sharePayload.receiverRule
         ? season.sharePayload.receiverRule
         : '可分享 90 秒回忆接力，只带动作和回访时间，不带原题、答案、分数或排名。',

@@ -211,7 +211,7 @@ function buildUploadPersonalizedClosureView(bridge = {}) {
       ? `苏格拉底兜底：${bridge.socraticStressFallback.fallbackOrder.join(' / ')}`
       : '',
     gameLine: bridge.gameRetentionPlan
-      ? `游戏留存：${bridge.gameRetentionPlan.openedGameRecall ? '可进入回访练习' : '先锁定，等第一步/错因/隔天回访'}；XP 门槛 ${bridge.gameRetentionPlan.xpGate}`
+      ? `回访练习：${bridge.gameRetentionPlan.openedGameRecall ? '可进入回访练习' : '先锁定，等第一步/错因/隔天回访'}；证据门槛 ${String(bridge.gameRetentionPlan.xpGate || '').replace(/XP/g, '行为反馈')}`
       : '',
     scoreLine: bridge.scoreReportBridge
       ? `成绩报告：只用于 ${bridge.scoreReportBridge.useScoreFor.join(' / ')}，不用于 ${bridge.scoreReportBridge.neverUseScoreFor.join(' / ')}`
@@ -706,7 +706,7 @@ function buildMaterialTypeGuide(type) {
     },
     score_sheet: {
       examplePlaceholder: '粘贴成绩单/周测文字即可：\n六年级数学 82，应用题扣 10 分，计算扣 3 分；\n英语阅读慢，完形错 4 个；\n家长想知道先补哪一类题、今晚先做什么。',
-      statusLine: '当前只把成绩作为家长私有优先级信号；不做公开排名、不发 XP、不承诺提分。',
+      statusLine: '当前只把成绩作为家长私有优先级信号；不做公开排名、不发行为奖励、不承诺提分。',
       modeLine: '验证方式：用分数定位弱学科，再用一张真实错题确认错因和第一步。',
       blockedClaimsLine: '不能做：排名营销、分数刺激、不承诺分数结果、把成绩写进分享卡。'
     },

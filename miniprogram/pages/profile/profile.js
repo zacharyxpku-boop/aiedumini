@@ -1824,7 +1824,7 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
         id: 'local',
         label: '本地代码更适合',
         owner: '确定性规则',
-        action: '负责题型路由、XP 门禁、间隔复习、分享字段、报告放行和隐私拒绝清单。',
+        action: '负责题型路由、行为反馈门禁、间隔复习、分享字段、报告放行和隐私拒绝清单。',
         route: '/pages/review/review?from=openmaic_k12_workbench'
       },
       {
@@ -2897,7 +2897,7 @@ function buildProfileReadinessSnapshot(input = {}) {
     {
       id: 'local_rule',
       label: '必须本地稳定',
-      body: `复习调度、XP、分享隐私、家长结论和安全边界共 ${localRuleRows.length || 6} 类必须规则可跑，不能交给模型临场决定。`
+      body: `复习调度、行为反馈、分享隐私、家长结论和安全边界共 ${localRuleRows.length || 6} 类必须规则可跑，不能交给模型临场决定。`
     }
   ];
   const aiBoundaryReleaseRule = '即使暂时不用大模型，入口、点拨兜底、错因卡、复习、家长复盘和安全分享也必须能跑。';

@@ -643,7 +643,7 @@ Page({
       reviewWindows,
       releaseQueue,
       comboLine: combo.totalSeconds ? `${combo.totalSeconds} 秒主动回忆：先说第一步，再说错因，最后核对。` : '90 秒主动回忆：先说第一步，再说错因，最后核对。',
-      xpRule: daily.antiCramRule || 'XP 只奖励主动回忆、错因回放和明天回访，不奖励速度或分数比较。',
+      xpRule: daily.antiCramRule ? String(daily.antiCramRule).replace(/XP/g, '行为反馈') : '行为反馈只记录主动回忆、错因回放和明天回访，不奖励速度或分数比较。',
       parentLine: daily.parentLine || `家长只问一句：这张卡第一步为什么先做「${weakKey}」？`,
       shareLine: daily.shareLine || '分享只带错因和下一步，不带原题、答案、分数或完整对话。',
       nextRoute: '/pages/review/review?from=memory_prescription'
