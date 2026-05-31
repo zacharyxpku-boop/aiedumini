@@ -78,6 +78,19 @@
             <view class="tutor-primary" data-scene="tutor" bindtap="openEntryDetail">发送第一步</view>
             <view class="tutor-secondary" data-scene="parent" bindtap="openEntryDetail">家长看证据</view>
           </view>
+
+          <view class="tutor-support-grid">
+            <view class="tutor-support-card warm" data-scene="report" bindtap="openEntryDetail">
+              <view class="tutor-support-kicker">先看依据</view>
+              <view class="tutor-support-title">为什么先追问？</view>
+              <text>报告会把测评、错题和成绩里的卡点连起来，避免一上来直接讲答案。</text>
+            </view>
+            <view class="tutor-support-card blue" data-scene="review" bindtap="openEntryDetail">
+              <view class="tutor-support-kicker">说完回流</view>
+              <view class="tutor-support-title">形成复习卡</view>
+              <text>孩子讲出的第一步会沉淀为明天的短回访，验证是不是真会迁移。</text>
+            </view>
+          </view>
         </view>
       </view>
     </scroll-view>

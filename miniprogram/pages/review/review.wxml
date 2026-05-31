@@ -84,6 +84,29 @@
           <button bindtap="reveal">先回忆，再选择</button>
           <button data-rating="good" bindtap="rate">记住了</button>
         </view>
+
+        <view class="review-proof-panel">
+          <view class="review-proof-head">
+            <text>今天验证什么</text>
+            <text>不是刷量，是看迁移</text>
+          </view>
+          <view class="review-proof-grid">
+            <view class="review-proof-card" data-scene="report" bindtap="openEntryDetail">
+              <image mode="aspectFit" src="/assets/reference/entry-report.png" />
+              <view>
+                <text>错因证据</text>
+                <text>从报告里找最常复发的一类错</text>
+              </view>
+            </view>
+            <view class="review-proof-card yellow" data-scene="parent" bindtap="openEntryDetail">
+              <image mode="aspectFit" src="/assets/reference/entry-parent.png" />
+              <view>
+                <text>家长只看结果</text>
+                <text>今晚是否讲清楚、明天是否还记得</text>
+              </view>
+            </view>
+          </view>
+        </view>
       </view>
     </view>
   </scroll-view>

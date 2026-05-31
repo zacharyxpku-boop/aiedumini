@@ -69,6 +69,23 @@
           <text>家长看回访</text>
         </view>
 
+        <view class="yd-parent-evidence-grid">
+          <view data-scene="report" bindtap="openEntryDetail">
+            <image mode="aspectFit" src="/assets/reference/entry-report.png" />
+            <view>
+              <text>报告依据</text>
+              <text>天赋、成绩、错题交叉验证</text>
+            </view>
+          </view>
+          <view data-scene="tutor" bindtap="openEntryDetail">
+            <image mode="aspectFit" src="/assets/reference/entry-tutor.png" />
+            <view>
+              <text>孩子行动</text>
+              <text>今晚只追问第一步</text>
+            </view>
+          </view>
+        </view>
+
         <view class="yd-parent-action-row">
           <view class="ux-kit-primary parent-primary" data-scene="parent" bindtap="openEntryDetail">{{profileViewModel.primaryCta}}</view>
           <view class="ux-kit-secondary parent-secondary" data-scene="upload" bindtap="openEntryDetail">补一份材料</view>

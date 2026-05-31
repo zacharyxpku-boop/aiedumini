@@ -454,3 +454,74 @@ page {
   font-size: 25rpx;
   line-height: 72rpx;
 }
+
+.upload-proof-board {
+  margin-top: 14rpx;
+  padding: 14rpx;
+  border: 1rpx solid rgba(232, 238, 230, 0.95);
+  border-radius: 24rpx;
+  background:
+    radial-gradient(circle at 96% 12%, rgba(76, 159, 255, 0.12), transparent 30%),
+    rgba(255, 255, 255, 0.94);
+  box-shadow: 0 12rpx 28rpx rgba(38, 58, 43, 0.05);
+}
+
+.upload-proof-title {
+  color: #18211d;
+  font-size: 25rpx;
+  font-weight: 950;
+}
+
+.upload-proof-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10rpx;
+  margin-top: 12rpx;
+}
+
+.upload-proof-list > view {
+  display: grid;
+  grid-template-columns: 42rpx minmax(0, 1fr);
+  gap: 10rpx;
+  min-height: 112rpx;
+  padding: 12rpx;
+  border: 1rpx solid rgba(232, 238, 230, 0.95);
+  border-radius: 20rpx;
+  background: linear-gradient(180deg, #ffffff 0%, #f6fbf3 100%);
+}
+
+.upload-proof-list > view > text {
+  width: 42rpx;
+  height: 42rpx;
+  color: #ffffff;
+  background: #16a34a;
+  border-radius: 50%;
+  font-size: 18rpx;
+  font-weight: 950;
+  line-height: 42rpx;
+  text-align: center;
+}
+
+.upload-proof-list view view text {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.upload-proof-list view view text:first-child {
+  color: #17211d;
+  font-size: 21rpx;
+  font-weight: 950;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.upload-proof-list view view text:last-child {
+  display: -webkit-box;
+  margin-top: 5rpx;
+  color: #66746d;
+  font-size: 18rpx;
+  line-height: 1.28;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
