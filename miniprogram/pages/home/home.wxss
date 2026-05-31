@@ -153,9 +153,7 @@
 }
 
 .mini-relay-card,
-.mini-route-card,
-.mini-progress-card,
-.mini-sticker-card {
+.mini-route-card {
   border: 1rpx solid #e8eee6;
   border-radius: 28rpx;
   background: #ffffff;
@@ -239,13 +237,3 @@
 
 .route-next-lite { color: #0d7a3d; font-weight: 900; }
 .mini-main-cta { height: 70rpx; margin-top: 14rpx; border-radius: 22rpx; background: linear-gradient(180deg, #22b95c 0%, #16a34a 100%); color: #fff; font-size: 24rpx; font-weight: 950; line-height: 70rpx; text-align: center; box-shadow: 0 16rpx 28rpx rgba(34,185,92,.2); }
-
-.mini-bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12rpx; margin-top: 14rpx; }
-.mini-progress-card, .mini-sticker-card { min-height: 170rpx; padding: 16rpx; }
-.mini-progress-body { display: grid; grid-template-columns: 92rpx minmax(0,1fr); gap: 12rpx; align-items: center; margin-top: 12rpx; }
-.mini-progress-ring { width: 82rpx; height: 82rpx; border: 10rpx solid #22b95c; border-right-color: #e8eee6; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #17342b; font-size: 19rpx; font-weight: 950; }
-.mini-progress-body text { display: block; color: #657069; font-size: 19rpx; line-height: 1.35; }
-.mini-progress-body text:first-child { color: #17211d; font-weight: 950; }
-.mini-sticker-card { position: relative; overflow: hidden; }
-.mini-sticker-card > text { display: -webkit-box; margin-top: 12rpx; overflow: hidden; color: #66746d; font-size: 20rpx; line-height: 1.32; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
-.mini-sticker-card image { position: absolute; right: 10rpx; bottom: 6rpx; width: 88rpx; height: 88rpx; }

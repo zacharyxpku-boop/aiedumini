@@ -156,8 +156,7 @@ page {
   background: #f3fbef;
 }
 
-.review-map-card,
-.review-proof-panel {
+.review-map-card {
   margin-top: 12rpx;
   padding: 12rpx;
   border: 1rpx solid rgba(232, 238, 230, 0.95);
@@ -166,15 +165,13 @@ page {
   box-shadow: 0 12rpx 28rpx rgba(38, 58, 43, 0.05);
 }
 
-.review-section-head text:first-child,
-.review-proof-head text:first-child {
+.review-section-head text:first-child {
   color: #18211d;
   font-size: 25rpx;
   font-weight: 950;
 }
 
-.review-section-head text:last-child,
-.review-proof-head text:last-child {
+.review-section-head text:last-child {
   color: #738077;
   font-size: 19rpx;
   font-weight: 780;
@@ -358,68 +355,4 @@ page {
   border-color: rgba(248, 198, 34, 0.28);
   color: #9a6b00;
   background: #fff8df;
-}
-
-.review-proof-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12rpx;
-}
-
-.review-proof-head text:first-child {
-  white-space: nowrap;
-}
-
-.review-proof-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10rpx;
-  margin-top: 12rpx;
-}
-
-.review-proof-card {
-  display: grid;
-  grid-template-columns: 52rpx minmax(0, 1fr);
-  gap: 10rpx;
-  align-items: center;
-  min-height: 88rpx;
-  padding: 10rpx;
-  border: 1rpx solid rgba(232, 238, 230, 0.95);
-  border-radius: 20rpx;
-  background: linear-gradient(180deg, #ffffff 0%, #eef7ff 100%);
-}
-
-.review-proof-card.yellow {
-  background: linear-gradient(180deg, #ffffff 0%, #fff8df 100%);
-}
-
-.review-proof-card image {
-  width: 52rpx;
-  height: 52rpx;
-  border-radius: 18rpx;
-}
-
-.review-proof-card text {
-  display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.review-proof-card text:first-child {
-  color: #17211d;
-  font-size: 22rpx;
-  font-weight: 950;
-  line-height: 1.2;
-  white-space: nowrap;
-}
-
-.review-proof-card text:last-child {
-  display: -webkit-box;
-  margin-top: 5rpx;
-  color: #66746d;
-  font-size: 18rpx;
-  line-height: 1.28;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
 }

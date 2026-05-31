@@ -72,25 +72,6 @@
         </view>
         <view class="yd-upload-primary" data-scene="upload" bindtap="openEntryDetail">生成学习包</view>
 
-        <view class="upload-proof-board">
-          <view class="upload-proof-title">材料进入后会生成什么</view>
-          <view class="upload-proof-list">
-            <view data-scene="report" bindtap="openEntryDetail">
-              <text>01</text>
-              <view>
-                <text>天赋/学习偏好证据</text>
-                <text>先说明孩子适合怎样学，再匹配方法。</text>
-              </view>
-            </view>
-            <view data-scene="tutor" bindtap="openEntryDetail">
-              <text>02</text>
-              <view>
-                <text>AI私教第一问</text>
-                <text>从错题卡点出发，只追问下一步。</text>
-              </view>
-            </view>
-          </view>
-        </view>
       </view>
     </view>
   </scroll-view>

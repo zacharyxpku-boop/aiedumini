@@ -115,24 +115,6 @@
         <view class="mini-subtitle" bindtap="submitAiDraft">{{homeViewModel.secondaryAction}}</view>
       </view>
 
-      <view class="mini-bottom-grid">
-        <view class="mini-progress-card">
-          <view class="mini-section-head"><text>今日进度</text><text bindtap="goReview">去学习 ›</text></view>
-          <view class="mini-progress-body">
-            <view class="mini-progress-ring"><text>60%</text></view>
-            <view>
-              <text>今日目标</text>
-              <text>3 / 5 步</text>
-              <text>连续学习 7 天</text>
-            </view>
-          </view>
-        </view>
-        <view class="mini-sticker-card" bindtap="goProfile">
-          <view class="mini-section-head"><text>咕点小贴士</text></view>
-          <text>完成今天的学习目标，咕点会给你一枚成长星星哦！</text>
-          <image mode="aspectFit" src="/assets/reference/gudian-sticker.png" />
-        </view>
-      </view>
     </view>
   </scroll-view>
 </view>

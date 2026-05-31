@@ -304,54 +304,6 @@ page {
   font-size: 18rpx;
 }
 
-.yd-parent-evidence-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10rpx;
-  margin-top: 10rpx;
-}
-
-.yd-parent-evidence-grid > view {
-  display: grid;
-  grid-template-columns: 52rpx minmax(0, 1fr);
-  gap: 10rpx;
-  align-items: center;
-  min-height: 86rpx;
-  padding: 10rpx;
-  border: 1rpx solid rgba(232, 238, 230, 0.95);
-  border-radius: 19rpx;
-  background:
-    radial-gradient(circle at 92% 12%, rgba(248, 198, 34, 0.15), transparent 34%),
-    #ffffff;
-}
-
-.yd-parent-evidence-grid image {
-  width: 52rpx;
-  height: 52rpx;
-  border-radius: 18rpx;
-}
-
-.yd-parent-evidence-grid text {
-  display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.yd-parent-evidence-grid text:first-child {
-  color: #17211d;
-  font-size: 22rpx;
-  font-weight: 950;
-  white-space: nowrap;
-}
-
-.yd-parent-evidence-grid text:last-child {
-  margin-top: 5rpx;
-  color: #66746d;
-  font-size: 18rpx;
-  line-height: 1.25;
-  white-space: nowrap;
-}
-
 .yd-parent-action-row {
   margin-top: 12rpx;
 }
