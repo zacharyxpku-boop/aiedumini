@@ -274,58 +274,70 @@ page {
   background: #fff1bd;
 }
 
-.tutor-entry-grid {
+.tutor-chat-card {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10rpx;
+  gap: 12rpx;
   margin-top: 12rpx;
-}
-
-.tutor-entry-card {
-  display: grid;
-  min-width: 0;
-  min-height: 124rpx;
-  align-content: start;
-  justify-items: center;
-  gap: 8rpx;
-  padding: 11rpx 9rpx;
+  padding: 14rpx;
   border: 1rpx solid rgba(232, 238, 230, 0.95);
-  border-radius: 22rpx;
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 14rpx 34rpx rgba(38, 58, 43, 0.055);
+  border-radius: 24rpx;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 12rpx 28rpx rgba(38, 58, 43, 0.05);
 }
 
-.tutor-entry-card.primary {
-  background: linear-gradient(180deg, #ffffff 0%, #f0fbf0 100%);
-}
-
-.tutor-entry-card image {
-  width: 72rpx;
-  height: 56rpx;
-  overflow: hidden;
-  border-radius: 18rpx;
-}
-
-.tutor-entry-card text {
-  display: block;
-  max-width: 100%;
-  overflow: hidden;
-  text-align: center;
-  text-overflow: ellipsis;
-}
-
-.tutor-entry-card text:nth-child(2) {
-  color: #17211d;
-  font-size: 24rpx;
+.tutor-chat-title {
+  color: #18211d;
+  font-size: 25rpx;
   font-weight: 950;
-  line-height: 1.2;
+}
+
+.tutor-chat-card .tutor-bubble {
+  max-width: 82%;
+  padding: 13rpx 16rpx;
+  border-radius: 20rpx;
+  color: #31423a;
+  background: #f1f7ef;
+  font-size: 21rpx;
+  font-weight: 760;
+  line-height: 1.42;
+}
+
+.tutor-chat-card .tutor-bubble.me {
+  justify-self: end;
+  background: #eaf3ff;
+}
+
+.tutor-input-bar {
+  display: flex;
+  min-height: 58rpx;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12rpx;
+  padding: 0 8rpx 0 18rpx;
+  border: 1rpx solid rgba(232, 238, 230, 0.95);
+  border-radius: 999rpx;
+  background: #ffffff;
+}
+
+.tutor-input-bar text {
+  min-width: 0;
+  overflow: hidden;
+  color: #8a958f;
+  font-size: 21rpx;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.tutor-entry-card text:nth-child(3) {
-  color: #66746d;
-  font-size: 19rpx;
-  line-height: 1.35;
+.tutor-input-bar view {
+  flex: 0 0 auto;
+  height: 46rpx;
+  padding: 0 18rpx;
+  border-radius: 999rpx;
+  color: #1d261f;
+  background: linear-gradient(180deg, #ffd84f 0%, #f5b300 100%);
+  font-size: 20rpx;
+  font-weight: 950;
+  line-height: 46rpx;
 }
 
 .tutor-action-row {
