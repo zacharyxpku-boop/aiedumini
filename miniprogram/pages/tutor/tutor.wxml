@@ -16,7 +16,7 @@
           </view>
 
           <view class="yd-tutor-hero">
-            <image class="yd-tutor-mascot" mode="aspectFill" src="/assets/brand/gudian-reader.png" />
+            <image class="yd-tutor-mascot" mode="aspectFit" src="/assets/reference/tutor-socratic-board-transparent.png" />
             <view class="yd-tutor-bubble">
               <view>你先说第一步</view>
               <text>咕点不会替你写答案。你说题目或卡点，它只问下一句最小提示。</text>

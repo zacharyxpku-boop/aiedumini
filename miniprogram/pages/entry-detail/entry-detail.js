@@ -19,7 +19,7 @@ const SCENES = {
     badge: '今晚主线',
     title: '先把今晚任务变成 3 个可执行动作',
     subtitle: '入口页只负责决定从哪开始。这里承接任务拆解、证据记录和下一步跳转。',
-    heroImage: '/assets/reference/entry-map.png',
+    heroImage: '/assets/reference/learning-route-map-transparent.png',
     primaryLabel: '去AI私教说第一步',
     primaryRoute: '/pages/tutor/tutor?from=entry_today_first_step&open=flow',
     secondaryLabel: '先补材料',
@@ -32,7 +32,7 @@ const SCENES = {
     spotlight: {
       kicker: '今晚路线板',
       title: '入口只做一件事：决定从哪一步开始',
-      image: '/assets/reference/entry-map.png',
+      image: '/assets/reference/learning-route-map-transparent.png',
       metrics: [
         { label: '任务拆解', value: '3步' },
         { label: '预计用时', value: '15分' },
@@ -50,7 +50,7 @@ const SCENES = {
     badge: 'AI私教提示',
     title: '先问一句，不替孩子做完',
     subtitle: '把题目、卡点或第一步发进来，系统只给最小提示，并把可复习的点沉淀下来。',
-    heroImage: '/assets/reference/entry-tutor.png',
+    heroImage: '/assets/reference/tutor-socratic-board-transparent.png',
     primaryLabel: '进入追问对话',
     primaryRoute: '/pages/tutor/tutor?from=entry_tutor_first_step&open=flow',
     secondaryLabel: '说完去复习卡',
@@ -63,7 +63,7 @@ const SCENES = {
     spotlight: {
       kicker: '私教追问板',
       title: '不直接给答案，只追问下一小步',
-      image: '/assets/reference/entry-tutor.png',
+      image: '/assets/reference/tutor-socratic-board-transparent.png',
       metrics: [
         { label: '提示层级', value: '3层' },
         { label: '答案边界', value: '守住' },
@@ -81,7 +81,7 @@ const SCENES = {
     badge: '短回访',
     title: '5 分钟验证记忆和迁移',
     subtitle: '不在入口页铺满玩法。先选今天要验证的一张卡，再进入 90 秒回忆或错因复盘。',
-    heroImage: '/assets/reference/entry-review.png',
+    heroImage: '/assets/reference/review-world-map-transparent.png',
     primaryLabel: '开始 90 秒回忆',
     primaryRoute: '/pages/review/review?mode=recall_return&from=entry_review',
     secondaryLabel: '回到AI私教',
@@ -94,7 +94,7 @@ const SCENES = {
     spotlight: {
       kicker: '回访验证板',
       title: '先回忆，再迁移，最后回流证据',
-      image: '/assets/reference/entry-review.png',
+      image: '/assets/reference/review-world-map-transparent.png',
       metrics: [
         { label: '单局长度', value: '90秒' },
         { label: '验证目标', value: '迁移' },
@@ -112,7 +112,7 @@ const SCENES = {
     badge: '个性化报告',
     title: '先讲清楚证据，再匹配学习方法',
     subtitle: '报告页不是营销页。它要说明材料从哪里来、天赋信号和成绩表现是否互相支持，以及为什么推荐这一组学习方法。',
-    heroImage: '/assets/reference/entry-report.png',
+    heroImage: '/assets/reference/report-radar-card-illustration.png',
     primaryLabel: '查看证据报告',
     primaryRoute: '/pages/profile/profile?from=entry_report_evidence&open=flow',
     secondaryLabel: '补充测评/错题',
@@ -125,7 +125,7 @@ const SCENES = {
     spotlight: {
       kicker: '报告决策板',
       title: '证据先分层，结论才可信',
-      image: '/assets/reference/entry-report.png',
+      image: '/assets/reference/report-radar-card-illustration.png',
       metrics: [
         { label: '材料完整度', value: '4类' },
         { label: '交叉验证', value: '3步' },
@@ -143,7 +143,7 @@ const SCENES = {
     badge: '家长视图',
     title: '家长只看该问什么和下一步',
     subtitle: '家长不需要替孩子学习，也不需要被制造焦虑。这里把报告结论、第一步证据和明天回访动作收成一张家庭行动卡。',
-    heroImage: '/assets/reference/entry-parent.png',
+    heroImage: '/assets/reference/family-avatar-group-transparent.png',
     primaryLabel: '打开家长中心',
     primaryRoute: '/pages/profile/profile?from=entry_parent_report&open=flow',
     secondaryLabel: '补一条证据',
@@ -156,7 +156,7 @@ const SCENES = {
     spotlight: {
       kicker: '家长行动卡',
       title: '今晚只问一个低压问题',
-      image: '/assets/reference/entry-parent.png',
+      image: '/assets/reference/family-avatar-group-transparent.png',
       metrics: [
         { label: '今晚目标', value: '一句话' },
         { label: '家长角色', value: '观察者' },
@@ -174,7 +174,7 @@ const SCENES = {
     badge: '材料入口',
     title: '先分类，再生成学习包',
     subtitle: '材料不一致也要输出稳定 SOP：识别材料类型、提取证据、生成下一步。',
-    heroImage: '/assets/reference/entry-upload.png',
+    heroImage: '/assets/reference/upload-folder-stack-transparent.png',
     primaryLabel: '选择文件/图片',
     primaryRoute: '/pages/upload/upload?from=entry_upload_file&open=flow',
     secondaryLabel: '没有报告，做快测',
@@ -187,7 +187,7 @@ const SCENES = {
     spotlight: {
       kicker: '材料分类板',
       title: '先识别材料类型，再进入报告 SOP',
-      image: '/assets/reference/entry-upload.png',
+      image: '/assets/reference/upload-folder-stack-transparent.png',
       metrics: [
         { label: '可上传', value: '6类' },
         { label: '弱证据', value: '待确认' },

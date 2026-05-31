@@ -27,7 +27,7 @@
               <text>错题试卷</text>
             </view>
           </view>
-          <image class="yd-upload-mascot" mode="aspectFill" src="/assets/reference/entry-upload.png" />
+          <image class="yd-upload-mascot" mode="aspectFit" src="/assets/reference/upload-folder-stack-transparent.png" />
         </view>
 
         <view class="upload-material-grid yd-jump-grid">

@@ -24,7 +24,7 @@
               <text>明天回访</text>
             </view>
           </view>
-          <image class="yd-review-art" mode="aspectFit" src="/assets/reference/entry-review.png" />
+          <image class="yd-review-art" mode="aspectFit" src="/assets/reference/review-world-map-transparent.png" />
         </view>
 
         <view class="review-map-card">

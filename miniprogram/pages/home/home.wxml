@@ -26,7 +26,7 @@
           <view class="mini-subtitle">{{homeViewModel.subtitle}}</view>
           <view class="mini-streak-pill"><text class="mini-streak-dot"></text><text>连续学习</text><text>7</text><text>天</text></view>
         </view>
-        <image class="yd-home-hero-mascot" mode="aspectFit" src="/assets/reference/hero-mascot.png" />
+        <image class="yd-home-hero-mascot" mode="aspectFit" src="/assets/reference/gudian-fullbody-transparent.png" />
       </view>
 
       <view class="mini-relay-card" wx:if="{{incomingShareRelay}}">

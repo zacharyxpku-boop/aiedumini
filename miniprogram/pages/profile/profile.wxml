@@ -19,11 +19,11 @@
             <view class="yd-parent-title">{{profileViewModel.title}}</view>
             <view class="yd-parent-sub">把测评、成绩、错题和复习回访合成一张家长行动卡：先看证据，再问一句，明天再验证。</view>
           </view>
-          <image class="yd-parent-art" mode="aspectFill" src="/assets/reference/entry-parent.png" />
+          <image class="yd-parent-art" mode="aspectFit" src="/assets/reference/family-avatar-group-transparent.png" />
         </view>
 
         <view class="yd-parent-decision" data-scene="parent" bindtap="openEntryDetail">
-          <image class="yd-parent-decision-img" mode="aspectFill" src="/assets/reference/entry-report.png" />
+          <image class="yd-parent-decision-img" mode="aspectFit" src="/assets/reference/report-radar-card-illustration.png" />
           <view class="yd-parent-decision-copy">
             <text>今晚结论</text>
             <text>先稳住一个真实卡点，让孩子说出第一步，明天用 90 秒复述验证。</text>
