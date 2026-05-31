@@ -37,10 +37,10 @@
             <text>不靠感觉下结论</text>
           </view>
           <view class="yd-parent-source-row">
-            <view><image mode="aspectFit" src="/assets/reference/entry-upload.png" /><text>资料</text></view>
-            <view><image mode="aspectFit" src="/assets/reference/entry-report.png" /><text>报告</text></view>
-            <view><image mode="aspectFit" src="/assets/reference/entry-review.png" /><text>回访</text></view>
-            <view><image mode="aspectFit" src="/assets/reference/entry-parent.png" /><text>行动</text></view>
+            <view data-scene="upload" bindtap="openEntryDetail"><image mode="aspectFit" src="/assets/reference/entry-upload.png" /><text>资料</text></view>
+            <view data-scene="report" bindtap="openEntryDetail"><image mode="aspectFit" src="/assets/reference/entry-report.png" /><text>报告</text></view>
+            <view data-scene="review" bindtap="openEntryDetail"><image mode="aspectFit" src="/assets/reference/entry-review.png" /><text>回访</text></view>
+            <view data-scene="parent" bindtap="openEntryDetail"><image mode="aspectFit" src="/assets/reference/entry-parent.png" /><text>行动</text></view>
           </view>
         </view>
 

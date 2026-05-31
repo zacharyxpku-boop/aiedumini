@@ -49,22 +49,22 @@
         </view>
 
         <view class="yd-upload-pipeline">
-          <view class="upload-pipeline-node done">
+          <view class="upload-pipeline-node done" data-scene="upload" bindtap="openEntryDetail">
             <image class="upload-pipeline-icon" mode="aspectFit" src="/assets/reference/entry-upload.png" />
             <text>已分类</text>
             <text>材料入库</text>
           </view>
-          <view class="upload-pipeline-node active">
+          <view class="upload-pipeline-node active" data-scene="report" bindtap="openEntryDetail">
             <image class="upload-pipeline-icon" mode="aspectFit" src="/assets/reference/entry-report.png" />
             <text>提证据</text>
             <text>置信度</text>
           </view>
-          <view class="upload-pipeline-node">
+          <view class="upload-pipeline-node" data-scene="parent" bindtap="openEntryDetail">
             <image class="upload-pipeline-icon" mode="aspectFit" src="/assets/reference/entry-parent.png" />
             <text>出报告</text>
             <text>给家长</text>
           </view>
-          <view class="upload-pipeline-node next">
+          <view class="upload-pipeline-node next" data-scene="tutor" bindtap="openEntryDetail">
             <image class="upload-pipeline-icon" mode="aspectFit" src="/assets/reference/entry-tutor.png" />
             <text>进入AI私教</text>
             <text>说第一步</text>

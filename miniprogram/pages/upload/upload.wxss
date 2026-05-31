@@ -245,6 +245,11 @@ page {
   box-shadow: 0 12rpx 24rpx rgba(41, 65, 52, 0.07);
 }
 
+.upload-pipeline-node:active {
+  transform: translateY(1rpx);
+  box-shadow: 0 8rpx 18rpx rgba(41, 65, 52, 0.05);
+}
+
 .upload-pipeline-node::after {
   content: "";
   position: absolute;

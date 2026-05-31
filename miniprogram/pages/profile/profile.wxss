@@ -250,6 +250,11 @@ page {
   background: #f8fbf3;
 }
 
+.yd-parent-source-row view:active {
+  transform: translateY(1rpx);
+  background: #effaf0;
+}
+
 .yd-parent-source-row image {
   width: 34rpx;
   height: 34rpx;
