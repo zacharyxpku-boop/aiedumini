@@ -963,13 +963,6 @@ Page({
     this.refresh();
   },
 
-  openEntryDetail(event) {
-    const scene = event && event.currentTarget && event.currentTarget.dataset
-      ? event.currentTarget.dataset.scene
-      : 'review';
-    wx.navigateTo({ url: `/pages/entry-detail/entry-detail?scene=${scene || 'review'}` });
-  },
-
   copyChallengeCard() {
     const card = this.data.challengeCard;
     if (!card) return;

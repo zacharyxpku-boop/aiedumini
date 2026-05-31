@@ -27,7 +27,7 @@ const SCENES = {
     cards: [
       { label: '先定优先级', value: '把必须做、可放后、明天回访分开。', icon: '/assets/reference/entry-upload.png' },
       { label: '再说第一步', value: '孩子先说准备从哪里开始，私教只追问下一句。', icon: '/assets/reference/entry-tutor.png' },
-      { label: '最后留证据', value: '完成后进入复习小关或家长进展卡。', icon: '/assets/reference/entry-review.png' }
+      { label: '最后留证据', value: '完成后进入短回访或家长进展卡。', icon: '/assets/reference/entry-review.png' }
     ],
     spotlight: {
       kicker: '今晚路线板',
@@ -208,7 +208,7 @@ const SCENE_NAV = {
   upload: { label: '上传材料', image: '/assets/reference/entry-upload.png' },
   report: { label: '个性化报告', image: '/assets/reference/entry-report.png' },
   tutor: { label: 'AI私教', image: '/assets/reference/entry-tutor.png' },
-  review: { label: '复习小关', image: '/assets/reference/entry-review.png' },
+  review: { label: '回访验证', image: '/assets/reference/entry-review.png' },
   parent: { label: '家长中心', image: '/assets/reference/entry-parent.png' }
 };
 
