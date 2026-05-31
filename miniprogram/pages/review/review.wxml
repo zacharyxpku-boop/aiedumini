@@ -2,7 +2,7 @@
   <scroll-view class="content-area" scroll-y enhanced show-scrollbar="{{false}}">
     <view class="content-inner">
       <view class="yd-review-screen yd-app-screen yd-review-app">
-        <view class="yd-review-pill">3分钟回访</view>
+        <view class="yd-review-pill">3 分钟回访</view>
         <view class="yd-review-top">
           <view class="yd-review-brand">
             <image class="yd-review-mark" mode="aspectFit" src="/assets/reference/brand-house.png" />
@@ -21,7 +21,7 @@
             <view class="review-chip-row">
               <text>主动回忆</text>
               <text>错因回放</text>
-              <text>明天回访</text>
+              <text>明天回流</text>
             </view>
           </view>
           <image class="yd-review-art" mode="aspectFit" src="/assets/reference/review-world-map-transparent.png" />
@@ -29,8 +29,8 @@
 
         <view class="review-map-card">
           <view class="review-section-head">
-              <text>今日回访路径</text>
-              <text>奖励来自真实回忆，不奖励速度或分数比较</text>
+            <text>今日回访路径</text>
+            <text>只记录真实回忆、错因和下一步证据</text>
           </view>
           <view class="review-map-line">
             <view class="review-map-node done" data-scene="tutor" bindtap="openEntryDetail">
@@ -75,7 +75,7 @@
           <view class="review-action-card" data-scene="parent" bindtap="openEntryDetail">
             <image mode="aspectFit" src="/assets/reference/entry-parent.png" />
             <text>给家长看</text>
-            <text>只汇总证据和下一步</text>
+            <text>汇总证据和下一步</text>
           </view>
         </view>
 
@@ -84,7 +84,6 @@
           <button bindtap="reveal">先回忆，再选择</button>
           <button data-rating="good" bindtap="rate">记住了</button>
         </view>
-
       </view>
     </view>
   </scroll-view>
