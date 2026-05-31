@@ -525,3 +525,101 @@ page {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
+
+/* Final miniapp density pass: upload tab becomes a compact material cockpit. */
+.upload-content {
+  padding: calc(96rpx + env(safe-area-inset-top)) 30rpx calc(126rpx + env(safe-area-inset-bottom));
+}
+
+.yd-upload-screen {
+  padding: 16rpx;
+  border-radius: 32rpx;
+}
+
+.yd-upload-hero {
+  grid-template-columns: minmax(0, 1fr) 126rpx;
+  gap: 12rpx;
+  margin-top: 16rpx;
+}
+
+.yd-upload-title {
+  font-size: 32rpx;
+}
+
+.yd-upload-sub {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 20rpx;
+  line-height: 1.34;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.yd-upload-mascot {
+  width: 126rpx;
+  height: 118rpx;
+  border-radius: 26rpx;
+}
+
+.yd-upload-proof,
+.upload-type-strip {
+  margin-top: 10rpx;
+}
+
+.upload-material-grid {
+  gap: 10rpx;
+  margin-top: 14rpx;
+}
+
+.upload-material-card {
+  min-height: 128rpx;
+  padding: 11rpx 8rpx;
+  border-radius: 21rpx;
+}
+
+.upload-material-icon {
+  width: 52rpx;
+  height: 52rpx;
+}
+
+.yd-upload-pipeline {
+  gap: 8rpx;
+  margin-top: 14rpx;
+}
+
+.upload-pipeline-node {
+  min-height: 98rpx;
+  padding: 9rpx 3rpx;
+  border-radius: 19rpx;
+}
+
+.upload-pipeline-icon {
+  width: 38rpx;
+  height: 38rpx;
+}
+
+.upload-pipeline-node text:nth-child(2) {
+  font-size: 17rpx;
+}
+
+.upload-pipeline-node text:nth-child(3) {
+  font-size: 15rpx;
+}
+
+.yd-upload-primary {
+  height: 66rpx;
+  margin-top: 12rpx;
+  font-size: 23rpx;
+  line-height: 66rpx;
+}
+
+.upload-proof-board {
+  margin-top: 12rpx;
+  padding: 12rpx;
+  border-radius: 22rpx;
+}
+
+.upload-proof-list > view {
+  min-height: 88rpx;
+  padding: 10rpx;
+}

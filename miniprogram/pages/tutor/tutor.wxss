@@ -523,3 +523,89 @@ page {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
+
+/* Final miniapp density pass: AI tutor tab should read as an action surface. */
+.main-inner {
+  padding: calc(96rpx + env(safe-area-inset-top)) 30rpx calc(126rpx + env(safe-area-inset-bottom));
+}
+
+.yd-tutor-screen {
+  padding: 16rpx;
+  border-radius: 32rpx;
+}
+
+.yd-tutor-hero {
+  grid-template-columns: 148rpx minmax(0, 1fr);
+  gap: 12rpx;
+  margin-top: 18rpx;
+}
+
+.yd-tutor-mascot {
+  width: 150rpx;
+  height: 140rpx;
+  border-radius: 28rpx;
+}
+
+.yd-tutor-bubble {
+  padding: 16rpx;
+  border-radius: 24rpx;
+}
+
+.yd-tutor-bubble view:first-child {
+  font-size: 30rpx;
+}
+
+.yd-tutor-bubble > text {
+  display: -webkit-box;
+  margin-top: 8rpx;
+  overflow: hidden;
+  font-size: 21rpx;
+  line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.tutor-flow-card {
+  margin-top: 12rpx;
+  padding: 12rpx;
+}
+
+.tutor-ladder {
+  gap: 8rpx;
+  margin-top: 12rpx;
+}
+
+.tutor-ladder-node {
+  min-height: 100rpx;
+}
+
+.tutor-entry-grid {
+  gap: 10rpx;
+  margin-top: 12rpx;
+}
+
+.tutor-entry-card {
+  min-height: 124rpx;
+}
+
+.tutor-action-row {
+  margin-top: 12rpx;
+}
+
+.tutor-primary,
+.tutor-secondary {
+  height: 66rpx;
+  font-size: 23rpx;
+  line-height: 66rpx;
+}
+
+.tutor-support-grid {
+  gap: 10rpx;
+  margin-top: 12rpx;
+}
+
+.tutor-support-card {
+  min-height: 116rpx;
+  padding: 12rpx;
+  border-radius: 21rpx;
+}

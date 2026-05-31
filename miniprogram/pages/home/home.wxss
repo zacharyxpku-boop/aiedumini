@@ -659,3 +659,143 @@
   font-weight: 760;
   line-height: 1.45;
 }
+
+/* Final miniapp density pass: keep the home tab vivid without becoming a long feed. */
+.home-header {
+  padding: calc(42rpx + env(safe-area-inset-top)) 204rpx 12rpx 32rpx;
+}
+
+.home-scroll {
+  height: calc(100vh - 110rpx - env(safe-area-inset-top));
+}
+
+.yd-home-screen {
+  margin: 0 26rpx 22rpx;
+  border: 0;
+}
+
+.yd-home-hero-card {
+  min-height: 252rpx;
+  margin-top: 10rpx;
+  padding: 36rpx 28rpx 28rpx 32rpx;
+  grid-template-columns: minmax(0, 1fr) 250rpx;
+  border-radius: 34rpx;
+}
+
+.yd-home-hero-mascot {
+  width: 292rpx;
+  height: 286rpx;
+}
+
+.mini-title {
+  max-width: 410rpx;
+  font-size: 42rpx;
+  line-height: 1.06;
+}
+
+.mini-subtitle {
+  font-size: 23rpx;
+  line-height: 1.36;
+}
+
+.mini-streak-pill {
+  margin-top: 18rpx;
+  padding: 12rpx 18rpx;
+  font-size: 21rpx;
+}
+
+.mini-entry-grid {
+  gap: 12rpx;
+  margin-top: 18rpx;
+}
+
+.mini-entry-card {
+  min-height: 248rpx;
+  padding: 14rpx 8rpx 13rpx;
+  border-radius: 26rpx;
+}
+
+.mini-entry-visual {
+  width: 136rpx;
+  height: 112rpx;
+  margin-bottom: 10rpx;
+  border-radius: 22rpx;
+}
+
+.mini-entry-card text:first-child {
+  font-size: 27rpx;
+}
+
+.mini-entry-card text:nth-child(3) {
+  display: -webkit-box;
+  min-height: 44rpx;
+  font-size: 19rpx;
+  line-height: 1.18;
+  white-space: normal;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.mini-entry-arrow {
+  right: 12rpx;
+  bottom: 12rpx;
+  width: 32rpx;
+  height: 32rpx;
+  font-size: 20rpx;
+  line-height: 32rpx;
+}
+
+.mini-route-card {
+  margin-top: 16rpx;
+  padding: 17rpx;
+  border-radius: 28rpx;
+}
+
+.mini-route-input {
+  min-height: 80rpx;
+  margin-top: 12rpx;
+  padding: 16rpx;
+  border-radius: 22rpx;
+}
+
+.mini-route-line {
+  gap: 8rpx;
+  margin-top: 14rpx;
+}
+
+.mini-route-node {
+  min-height: 106rpx;
+  padding: 10rpx 4rpx;
+  border-radius: 20rpx;
+}
+
+.mini-route-icon {
+  width: 40rpx;
+  height: 40rpx;
+}
+
+.mini-route-node text:nth-child(2) {
+  font-size: 18rpx;
+}
+
+.mini-route-node text:nth-child(3) {
+  font-size: 16rpx;
+}
+
+.mini-main-cta {
+  height: 70rpx;
+  margin-top: 14rpx;
+  font-size: 24rpx;
+  line-height: 70rpx;
+}
+
+.mini-bottom-grid {
+  gap: 12rpx;
+  margin-top: 14rpx;
+}
+
+.mini-progress-card,
+.mini-sticker-card {
+  padding: 16rpx;
+  border-radius: 26rpx;
+}

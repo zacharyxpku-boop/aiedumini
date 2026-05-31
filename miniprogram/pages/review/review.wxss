@@ -443,3 +443,103 @@ page {
   -webkit-line-clamp: 2;
 }
 
+/* Final miniapp density pass: short revisit should feel like a compact route board. */
+.content-inner {
+  padding: calc(96rpx + env(safe-area-inset-top)) 30rpx calc(126rpx + env(safe-area-inset-bottom));
+}
+
+.yd-review-screen {
+  padding: 16rpx;
+  border-radius: 32rpx;
+}
+
+.yd-review-hero {
+  grid-template-columns: minmax(0, 1fr) 124rpx;
+  margin-top: 14rpx;
+}
+
+.yd-review-title {
+  font-size: 32rpx;
+}
+
+.yd-review-sub {
+  font-size: 20rpx;
+  line-height: 1.34;
+}
+
+.yd-review-art {
+  width: 124rpx;
+  height: 112rpx;
+  border-radius: 26rpx;
+}
+
+.review-chip-row {
+  margin-top: 10rpx;
+}
+
+.review-map-card {
+  margin-top: 12rpx;
+  padding: 12rpx;
+  border-radius: 22rpx;
+}
+
+.review-map-line {
+  gap: 8rpx;
+  margin-top: 12rpx;
+}
+
+.review-map-node {
+  min-height: 96rpx;
+  padding: 9rpx 3rpx;
+}
+
+.review-map-icon {
+  width: 38rpx;
+  height: 38rpx;
+}
+
+.review-action-grid {
+  gap: 10rpx;
+  margin-top: 12rpx;
+}
+
+.review-action-card {
+  min-height: 90rpx;
+  padding: 10rpx;
+  border-radius: 20rpx;
+}
+
+.review-action-card image {
+  width: 52rpx;
+  height: 52rpx;
+}
+
+.review-main-cta {
+  height: 64rpx;
+  margin-top: 12rpx;
+  font-size: 23rpx;
+  line-height: 64rpx;
+}
+
+.review-action-row {
+  gap: 10rpx;
+  margin-top: 10rpx;
+}
+
+.review-action-row button {
+  min-height: 58rpx;
+  font-size: 21rpx;
+  line-height: 58rpx;
+}
+
+.review-proof-panel {
+  margin-top: 12rpx;
+  padding: 12rpx;
+  border-radius: 22rpx;
+}
+
+.review-proof-card {
+  min-height: 88rpx;
+  padding: 10rpx;
+}
+

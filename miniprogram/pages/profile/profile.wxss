@@ -353,3 +353,130 @@ page {
   padding: 18rpx;
   border-radius: 34rpx;
 }
+
+/* Final miniapp density pass: parent tab shows evidence and next action at a glance. */
+.profile-shell {
+  padding: calc(96rpx + env(safe-area-inset-top)) 30rpx calc(126rpx + env(safe-area-inset-bottom));
+}
+
+.yd-parent-screen {
+  padding: 16rpx;
+  border-radius: 32rpx;
+}
+
+.yd-parent-hero {
+  grid-template-columns: minmax(0, 1fr) 126rpx;
+  gap: 12rpx;
+  margin-top: 16rpx;
+}
+
+.yd-parent-kicker {
+  padding: 7rpx 12rpx;
+  font-size: 19rpx;
+}
+
+.yd-parent-title {
+  margin-top: 10rpx;
+  font-size: 32rpx;
+}
+
+.yd-parent-sub {
+  display: -webkit-box;
+  margin-top: 8rpx;
+  overflow: hidden;
+  font-size: 20rpx;
+  line-height: 1.34;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.yd-parent-art {
+  width: 126rpx;
+  height: 116rpx;
+  border-radius: 26rpx;
+}
+
+.yd-parent-decision {
+  grid-template-columns: 92rpx minmax(0, 1fr) auto;
+  gap: 10rpx;
+  margin-top: 12rpx;
+  padding: 10rpx;
+  border-radius: 22rpx;
+}
+
+.yd-parent-decision-img {
+  width: 92rpx;
+  height: 72rpx;
+  border-radius: 18rpx;
+}
+
+.yd-parent-decision-copy text:nth-child(2) {
+  font-size: 18rpx;
+  line-height: 1.24;
+}
+
+.yd-parent-sources {
+  margin-top: 12rpx;
+  padding: 12rpx;
+  border-radius: 22rpx;
+}
+
+.yd-parent-source-row,
+.yd-parent-loop {
+  gap: 8rpx;
+  margin-top: 10rpx;
+}
+
+.yd-parent-source-row view {
+  padding: 9rpx 4rpx;
+  border-radius: 17rpx;
+}
+
+.yd-parent-source-row image {
+  width: 34rpx;
+  height: 34rpx;
+}
+
+.yd-parent-screen .ux-kit-jump-grid {
+  gap: 10rpx;
+  margin-top: 12rpx;
+}
+
+.parent-jump-card {
+  min-height: 126rpx;
+  padding: 11rpx 8rpx;
+}
+
+.parent-jump-card image {
+  width: 70rpx;
+  height: 58rpx;
+}
+
+.yd-parent-loop {
+  padding: 9rpx;
+}
+
+.yd-parent-loop text {
+  padding: 7rpx 3rpx;
+  font-size: 18rpx;
+}
+
+.yd-parent-evidence-grid {
+  gap: 10rpx;
+  margin-top: 10rpx;
+}
+
+.yd-parent-evidence-grid > view {
+  min-height: 86rpx;
+  padding: 10rpx;
+  border-radius: 19rpx;
+}
+
+.yd-parent-evidence-grid image {
+  width: 52rpx;
+  height: 52rpx;
+}
+
+.yd-parent-action-row {
+  margin-top: 12rpx;
+}

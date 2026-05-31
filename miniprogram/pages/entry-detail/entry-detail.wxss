@@ -473,6 +473,223 @@
   background: linear-gradient(180deg, #fff8df 0%, #ffffff 100%);
 }
 
+/* Final miniapp shell pass: make child scenes feel like compact app workbenches. */
+.entry-detail-page {
+  padding: calc(34rpx + env(safe-area-inset-top)) 24rpx calc(42rpx + env(safe-area-inset-bottom));
+  background:
+    radial-gradient(circle at 16% -2%, rgba(248, 198, 34, 0.18), transparent 26%),
+    radial-gradient(circle at 92% 4%, rgba(34, 185, 92, 0.13), transparent 25%),
+    linear-gradient(180deg, #fbfaf5 0%, #f4fbf1 100%);
+}
+
+.entry-detail-top {
+  margin-bottom: 10rpx;
+}
+
+.entry-back {
+  width: 64rpx;
+  height: 64rpx;
+  font-size: 38rpx;
+  line-height: 64rpx;
+}
+
+.entry-detail-page [class~="entry-jump-section"] {
+  position: sticky;
+  top: calc(8rpx + env(safe-area-inset-top));
+  z-index: 5;
+  margin: 0 -2rpx 12rpx;
+  padding: 8rpx;
+  border: 1rpx solid rgba(232, 238, 230, 0.92);
+  border-radius: 28rpx;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 12rpx 28rpx rgba(38, 58, 43, 0.055);
+}
+
+.entry-jump-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 7rpx;
+}
+
+.entry-jump-card {
+  min-width: 0;
+  min-height: 86rpx;
+  padding: 8rpx 2rpx 7rpx;
+  border-radius: 20rpx;
+  background: transparent;
+  color: #415148;
+  font-size: 19rpx;
+  font-weight: 900;
+  line-height: 1.08;
+}
+
+.entry-jump-card image {
+  width: 40rpx;
+  height: 40rpx;
+  display: block;
+  margin: 0 auto 6rpx;
+  border-radius: 14rpx;
+}
+
+.entry-jump-card text {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.entry-jump-card.active {
+  background: #ecf9ed;
+  color: #0f7b43;
+  box-shadow: inset 0 0 0 1rpx rgba(34, 185, 92, 0.16);
+}
+
+.entry-detail-hero {
+  min-height: 244rpx;
+  padding: 22rpx 20rpx;
+  grid-template-columns: minmax(0, 1fr) 168rpx;
+  border-radius: 30rpx;
+}
+
+.entry-title {
+  max-width: 440rpx;
+  font-size: 36rpx;
+  line-height: 1.08;
+}
+
+.entry-subtitle {
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  line-height: 1.38;
+  -webkit-line-clamp: 2;
+}
+
+.entry-image {
+  width: 168rpx;
+  height: 168rpx;
+  border-radius: 30rpx;
+}
+
+.entry-actions {
+  margin: 12rpx 0;
+}
+
+.entry-primary,
+.entry-secondary {
+  min-height: 70rpx;
+  font-size: 24rpx;
+}
+
+.entry-spotlight {
+  grid-template-columns: minmax(0, 1fr) 112rpx;
+  gap: 10rpx;
+  margin-bottom: 12rpx;
+  padding: 14rpx;
+  border-radius: 26rpx;
+}
+
+.entry-spotlight-title {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  line-height: 1.18;
+}
+
+.entry-spotlight-image {
+  width: 112rpx;
+  height: 112rpx;
+}
+
+.entry-spotlight-metrics {
+  gap: 6rpx;
+  margin-top: 10rpx;
+}
+
+.entry-spotlight-metrics view {
+  padding: 7rpx 5rpx;
+  border-radius: 15rpx;
+}
+
+.entry-spotlight-points {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8rpx;
+  margin-top: 10rpx;
+}
+
+.entry-spotlight-points view {
+  min-height: 62rpx;
+  padding: 9rpx;
+  border-radius: 18rpx;
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.entry-spotlight-points text:last-child {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #536258;
+  font-size: 18rpx;
+  line-height: 1.25;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.entry-card-grid {
+  gap: 9rpx;
+  margin-bottom: 12rpx;
+}
+
+.entry-card {
+  min-height: 112rpx;
+  padding: 11rpx 9rpx;
+  border-radius: 22rpx;
+}
+
+.entry-card-icon {
+  width: 54rpx;
+  height: 54rpx;
+}
+
+.entry-card-value {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 18rpx;
+  line-height: 1.25;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.entry-proof-strip {
+  position: sticky;
+  bottom: calc(8rpx + env(safe-area-inset-bottom));
+  z-index: 4;
+  gap: 7rpx;
+  padding: 8rpx;
+  border: 1rpx solid rgba(232, 238, 230, 0.9);
+  border-radius: 24rpx;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 -10rpx 28rpx rgba(38, 58, 43, 0.055);
+}
+
+.entry-proof-node {
+  min-height: 82rpx;
+  padding: 7rpx 2rpx;
+  border-radius: 17rpx;
+}
+
+.entry-proof-icon {
+  width: 34rpx;
+  height: 34rpx;
+}
+
+.entry-proof-node text {
+  font-size: 17rpx;
+}
+
+.entry-proof-hint {
+  display: none;
+}
+
 .entry-proof-node.active {
   border-color: rgba(34, 185, 92, 0.34);
   background: linear-gradient(180deg, #eaf9ef 0%, #ffffff 100%);
