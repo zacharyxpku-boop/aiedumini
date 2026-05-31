@@ -205,7 +205,7 @@ function buildUploadPersonalizedClosureView(bridge = {}) {
     title: '个性化闭环执行桥',
     statusLine: bridge.status === 'ready_for_guided_execution'
       ? '已具备真实任务证据：可以进入AI私教、修卡点、回访和家长报告。'
-      : '先补真实任务证据：资料/成绩只能生成方法候选，不能直接放行游戏或服务。',
+      : '先补真实任务证据：资料/成绩只能生成方法候选，不能直接放行回访或服务。',
     contentLine: `内容密度：${bridge.contentScalePlan ? bridge.contentScalePlan.density : 'pending'}；题型：${bridge.questionType || 'unknown'}；学科：${bridge.subject || 'unknown'}`,
     socraticLine: bridge.socraticStressFallback
       ? `苏格拉底兜底：${bridge.socraticStressFallback.fallbackOrder.join(' / ')}`
@@ -535,7 +535,7 @@ function buildUploadModeRecommendationView(modes = []) {
   return {
     id: 'upload_mode_recommendation_delivery_view',
     title: '今晚学习模式',
-    summaryLine: '默认仍是一对一苏格拉底点拨；小课堂、游戏和课程只在证据满足时补位。',
+    summaryLine: '默认仍是一对一苏格拉底点拨；小课堂、短回访和课程只在证据满足时补位。',
     cards
   };
 }
@@ -1330,7 +1330,7 @@ Page({
     return {
       title: '材料证据补全',
       summary: '不同材料补不同证据：测评补方法假设，学校材料补家校交接，家长观察补今晚动作，错题补第一步和错因。',
-      releaseGate: '本地规则决定报告、游戏和分享是否放行；AI 只改写追问和家长摘要。',
+      releaseGate: '本地规则决定报告、短回访和分享是否放行；AI 只改写追问和家长摘要。',
       fields,
       values,
       readyCount,
@@ -1362,7 +1362,7 @@ Page({
       title: '资料先补证据',
       line: missing.length
         ? `还差：${missing.slice(0, 2).join(' / ')}。补齐后才生成家长报告、回访验证或分享。`
-        : '这类资料必须先补齐结构化证据，不能直接放行报告、游戏或分享。',
+        : '这类资料必须先补齐结构化证据，不能直接放行报告、短回访或分享。',
       route: '/pages/upload/upload?from=material_evidence_gate',
       actionRoute: '/pages/upload/upload?from=material_evidence_gate',
       gameRoute: '',

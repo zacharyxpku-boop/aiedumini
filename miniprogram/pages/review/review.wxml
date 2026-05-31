@@ -29,8 +29,8 @@
 
         <view class="review-map-card">
           <view class="review-section-head">
-            <text>今日挑战地图</text>
-            <text>奖励来自真实回忆，不奖励速度或分数比较</text>
+              <text>今日回访路径</text>
+              <text>奖励来自真实回忆，不奖励速度或分数比较</text>
           </view>
           <view class="review-map-line">
             <view class="review-map-node done">
@@ -59,7 +59,7 @@
         <view class="review-action-grid">
           <view class="review-action-card primary" data-scene="review" bindtap="openEntryDetail">
             <image mode="aspectFit" src="/assets/reference/entry-review.png" />
-            <text>开始挑战</text>
+            <text>开始回访</text>
             <text>3 张回忆卡</text>
           </view>
           <view class="review-action-card" data-scene="tutor" bindtap="openEntryDetail">

@@ -241,7 +241,7 @@ function buildProfileDossierDeliveryView(dossier = {}, servicePathway = {}) {
       label: item.label || '学习模式',
       whenLine: item.when || item.trigger || '有真实学习证据时使用。',
       gateLine: profileReadableGate(item.localGate),
-      boundaryLine: '边界：默认仍是一对一苏格拉底点拨，小课堂和游戏只做补位。'
+      boundaryLine: '边界：默认仍是一对一苏格拉底点拨，小课堂和短回访只做补位。'
     })),
     solutionCards: solutionSequence.map((item, index) => ({
       id: item.id || `solution_mode_${index + 1}`,
@@ -2785,7 +2785,7 @@ function buildFamilyDecisionActionBridge(input = {}) {
       },
       {
         id: 'share',
-        label: '发家庭挑战卡',
+        label: '发家庭回访卡',
         route: sharePath,
         shareIntent: 'family_decision',
         reason: memo.shareLine || '把今晚动作发给家里，只看证据，不排行。',
