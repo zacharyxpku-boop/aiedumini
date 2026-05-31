@@ -2,7 +2,6 @@
   "pages": [
     "pages/home/home",
     "pages/review/review",
-    "pages/arcade/arcade",
     "pages/entry-detail/entry-detail",
     "pages/tutor/tutor",
     "pages/profile/profile",

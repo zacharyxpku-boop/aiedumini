@@ -1457,8 +1457,8 @@ function buildOpenMaicInspiredDecisionBridge(plan = {}, reportSummary = {}, revi
     120
   );
   const gameLine = safeText(
-    gameEvidence.shareLine || gameEvidence.summary || '回忆卡、轻练习和复访放行后再给奖励。',
-    '回忆卡、轻练习和复访放行后再给奖励。',
+    gameEvidence.shareLine || gameEvidence.summary || '回忆卡、回访验证和复访放行后再给奖励。',
+    '回忆卡、回访验证和复访放行后再给奖励。',
     120
   );
   const evidenceList = [

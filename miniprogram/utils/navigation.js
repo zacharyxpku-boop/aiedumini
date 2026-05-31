@@ -8,9 +8,7 @@ const TAB_ROUTES = [
   '/pages/upload/upload'
 ];
 
-const LEGACY_ROUTE_ALIASES = {
-  '/pages/arcade/arcade': '/pages/review/review'
-};
+const LEGACY_ROUTE_ALIASES = {};
 
 function normalizeRoute(route) {
   const value = typeof route === 'string' ? route.trim() : '';

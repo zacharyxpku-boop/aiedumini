@@ -321,7 +321,7 @@ function buildSocraticContract(taskType, signal) {
     nextQuestion: taskType === 'math_word_problem'
       ? `已知条件在哪里？${signal.parentCheck || '你先说第一步是什么？'}`
       : (signal.parentCheck || '你先说第一步是什么？'),
-    stopRule: '孩子能说出第一步和一个理由就停止加提示，转入回访或轻练习。',
+    stopRule: '孩子能说出第一步和一个理由就停止加提示，转入回访或回访验证。',
     evidenceToSave: signal.wrongCause || '保存错因、第一步和下次检查点。'
   };
 }
@@ -546,7 +546,7 @@ function buildSocraticPromptQualityJudge(taskType, suite, signalInput) {
       { id: 'misleading_mastery', label: '过早掌握', risk: '一题答对不能代表长期掌握' }
     ],
     stopConditions: [
-      { id: 'stop_first_step', label: '说出第一步', action: '停止讲解，转轻练习' },
+      { id: 'stop_first_step', label: '说出第一步', action: '停止讲解，转回访验证' },
       { id: 'stop_parent_handoff', label: '两轮沉默', action: '交给家长只问检查句' },
       { id: 'stop_privacy', label: '涉及隐私', action: '只保存安全字段' },
       { id: 'transfer_fail', label: '迁移失败', action: '回到入口，不加难度' }
@@ -975,7 +975,7 @@ function buildSocraticQualityReleaseAudit(input = {}) {
     }, item)),
     failedGateIds: failed.map((item) => item.id),
     parentSummary: failed.length === 0
-      ? '本轮只保留第一步和错因证据，可进入轻练习或明日回访。'
+      ? '本轮只保留第一步和错因证据，可进入回访验证或明日回访。'
       : `本轮先不继续加题，优先修复：${failed.map((item) => item.label).join('、')}。`,
     childNextAction: failed.length === 0
       ? (signal.parentCheck || '把第一步说出来，再做一题近迁移。')

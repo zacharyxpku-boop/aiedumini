@@ -1057,7 +1057,7 @@ function buildK12LocalAiImplementationRunway(options = {}) {
     nextBuildOrder: [
       '先补本地题型/错因/第一步样本',
       '再补苏格拉底和小讲堂触发评估',
-      '再补主动回忆游戏回流',
+      '再补主动回忆回访证据',
       '最后补家长报告和分享增长'
     ]
   };

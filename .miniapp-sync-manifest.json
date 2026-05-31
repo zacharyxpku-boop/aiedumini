@@ -1,8 +1,8 @@
 {
   "sourceRepo": "zacharyxpku-boop/ai-edu-platform",
   "sourcePath": "miniprogram",
-  "sourceCommit": "761b4ca",
-  "syncedAt": "2026-05-31T02:12:57.402Z",
+  "sourceCommit": "6987318",
+  "syncedAt": "2026-05-31T02:52:21.374Z",
   "files": [
     "miniprogram/app.js",
     "miniprogram/app.json",
@@ -33,10 +33,6 @@
     "miniprogram/custom-tab-bar/index.json",
     "miniprogram/custom-tab-bar/index.wxml",
     "miniprogram/custom-tab-bar/index.wxss",
-    "miniprogram/pages/arcade/arcade.js",
-    "miniprogram/pages/arcade/arcade.json",
-    "miniprogram/pages/arcade/arcade.wxml",
-    "miniprogram/pages/arcade/arcade.wxss",
     "miniprogram/pages/entry-detail/entry-detail.js",
     "miniprogram/pages/entry-detail/entry-detail.json",
     "miniprogram/pages/entry-detail/entry-detail.wxml",

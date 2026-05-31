@@ -54,7 +54,7 @@ Page({
       subtitle: '学校作业多，先排顺序；卡住时，先说第一步。',
       primaryLabel: '帮我安排今晚学习',
       primaryAction: 'planTonight',
-      secondaryLabel: '生成轻练习',
+      secondaryLabel: '生成回访验证',
       secondaryAction: 'goLearningMap',
       nextGate: '下一关：先生成学习卡'
     },
@@ -63,8 +63,8 @@ Page({
     parentSnapshot: null,
     weaknessVerdict: null,
     arcadeEntry: {
-      body: '没有材料时先生成第一关，有真实卡片后再进入游戏。',
-      cta: '去轻回访',
+      body: '没有材料时先生成第一步验证，有真实卡片后再进入回访验证。',
+      cta: '去短回访',
       action: 'goLearningMap'
     },
     wrongbookEntry: {
@@ -341,14 +341,14 @@ Page({
             ? '明天先清一张待回访卡'
             : query.action === 'first_step_revisit'
               ? '明天继续说出第一步'
-              : '先用自己的材料完成一组轻回访',
+              : '先用自己的材料完成一组短回访',
         action_detail: query.action === 'wrong_cause_revisit'
           ? '先让孩子说出这张错因卡的第一步，再做一道同类小题。'
           : query.action === 'due_card_revisit'
             ? '先回忆再核对，忘了就回到第一步提示卡。'
             : query.action === 'first_step_revisit'
               ? '家长只问一句，不接管答案：你第一步先看哪里？'
-              : '用自己的作业或错题生成一张卡，再完成一次 5 分钟轻回访。'
+              : '用自己的作业或错题生成一张卡，再完成一次 5 分钟短回访。'
       };
       if (storage.appendShareRun) {
         storage.appendShareRun({
@@ -640,7 +640,7 @@ Page({
       syncSummary: reviewSummary.sync,
       todayActions,
       cockpit: {
-        title: modulePath.current ? modulePath.current.title : '打开轻练习',
+        title: modulePath.current ? modulePath.current.title : '打开回访验证',
         reason: modulePath.reason || '选一个最聚焦的方法，把它变成点拨提示和复习卡。',
         score: modulePath.current ? modulePath.current.score : 0,
         maturity: reviewSummary.maturity ? reviewSummary.maturity.overall : 0,
@@ -727,13 +727,13 @@ Page({
   buildRouteStrip(active, tonightPlan) {
     const plan = tonightPlan || {};
     return {
-      text: plan.summaryLine || '今晚路线：排顺序 → 说第一步 → 修卡点 → 轻回访 → 家长看',
+      text: plan.summaryLine || '今晚路线：排顺序 → 说第一步 → 修卡点 → 短回访 → 家长看',
       shortText: '今晚路线 · 第 1 步：排顺序',
       steps: (plan.routeSteps || [
         { id: 'plan', label: '排顺序' },
         { id: 'first_step', label: '说第一步' },
         { id: 'repair', label: '修卡点' },
-        { id: 'review', label: '轻回访' },
+        { id: 'review', label: '短回访' },
         { id: 'parent', label: '家长看' }
       ]).map((step) => Object.assign({}, step, { active: step.id === active || step.active && step.id === active }))
     };
@@ -749,10 +749,10 @@ Page({
       subtitle: '作业点拨',
       status: topMust ? '已找到下一步' : '等待学习上下文',
       weak: weak.name || '先找到卡点',
-      pack: currentModule ? currentModule.title : '可生成轻练习',
+      pack: currentModule ? currentModule.title : '可生成回访验证',
       review: `${due} 张复习 · ${quiz} 道小测`,
       actions: [
-        { id: 'arcade', label: '轻回访', action: 'goLearningMap' },
+        { id: 'arcade', label: '短回访', action: 'goLearningMap' },
         { id: 'profile', label: '我的', action: 'goProfile' }
       ]
     };
@@ -819,7 +819,7 @@ Page({
         id: 'preview',
         label: '预习',
         title: '先猜主线，再看要点',
-        body: '把课本标题或课堂要点发来，先说你觉得会讲什么，再生成一组轻练习。',
+        body: '把课本标题或课堂要点发来，先说你觉得会讲什么，再生成一组回访验证。',
         action: 'goLearningMap',
         meta: '先想'
       },
@@ -853,7 +853,7 @@ Page({
   buildCategoryFilters() {
     return [
       { id: 'featured', label: '常用' },
-      { id: 'generate', label: '轻练习' },
+      { id: 'generate', label: '回访验证' },
       { id: 'review', label: '复习' },
       { id: 'profile', label: '我的' },
       { id: 'all', label: '全部' }
@@ -869,7 +869,7 @@ Page({
         id: 'pack',
         category: 'generate',
         tone: 'sky',
-        title: '生成轻练习',
+        title: '生成回访验证',
         desc: currentModule ? currentModule.title : '把作业、笔记或材料变成卡片、小测和回访提示。',
         status: currentModule ? `已推荐 ${currentModule.score}` : '材料入口',
         cta: '打开',
@@ -880,7 +880,7 @@ Page({
         id: 'review',
         category: 'review',
         tone: 'violet',
-        title: '5 分钟轻回访',
+        title: '5 分钟短回访',
         desc: `今天 ${due} 张到期，先回忆再核对思路。`,
         status: '5 分钟一关',
         cta: '开始',
@@ -949,7 +949,7 @@ Page({
       label: topMust ? '建议先做这个' : '等待你的作业清单',
       time: topMust ? `${topMust.minutes || 10} 分钟` : '约 3 分钟规划',
       lives: goal.completed >= goal.target ? '已完成' : '今晚',
-      pack: currentModule ? '可生成轻练习' : '先做作业点拨'
+      pack: currentModule ? '可生成回访验证' : '先做作业点拨'
     };
   },
 
@@ -1303,7 +1303,7 @@ Page({
           label: incoming.course_unit_label ? '练这个单元' : '轻挑战',
           route: questionBankRelayRoute,
           reason: naturalSpread.receiverPrompt || incoming.question_bank_relay_parent_check || incoming.course_unit_parent_decision || incoming.challenge_goal || actionLabel,
-          evidence: incoming.challenge_rule || '5分钟轻回访'
+          evidence: incoming.challenge_rule || '5分钟短回访'
         },
         {
           id: 'parent',
@@ -1367,7 +1367,7 @@ Page({
       subtitle: '学校作业很多时，先排顺序；遇到卡点时，我陪你先说出第一步。',
       primaryLabel: '帮我安排今晚学习',
       primaryAction: 'planTonight',
-      secondaryLabel: '生成轻练习',
+      secondaryLabel: '生成回访验证',
       secondaryAction: 'goLearningMap',
       taskStatus: hasTask ? '今晚任务' : '材料入口',
       packStatus: currentModule ? '可练' : (reviewSummary.total ? '已沉淀' : '待生成'),
@@ -1382,7 +1382,7 @@ Page({
       goalText: goal.completed >= goal.target
         ? '今日目标已完成'
         : `今日进度 ${goal.completed || 0}/${goal.target || 5}`,
-      challengeText: challenge.title || (currentModule ? currentModule.title : '完成一轮：想法 -> 提示 -> 轻练习 -> 修卡点'),
+      challengeText: challenge.title || (currentModule ? currentModule.title : '完成一轮：想法 -> 提示 -> 回访验证 -> 修卡点'),
       nextMeta: hasTask ? `${topMust.minutes || 10} 分钟` : '先说第一步',
       nextGate: reviewSummary.due
         ? '下一关：5 分钟回忆'
@@ -1416,8 +1416,8 @@ Page({
       {
         id: 'finish',
         label: '进入练习',
-        title: '做完再去轻练习',
-        body: topMust ? '做完这一小步，再把卡住点送进轻练习。' : '把提示后的内容变成可回访的小练习。',
+        title: '做完再去回访验证',
+        body: topMust ? '做完这一小步，再把卡住点送进回访验证。' : '把提示后的内容变成可回访的小练习。',
         value: '3',
         action: topMust ? 'startTopMust' : 'submitAiDraft',
         tone: 'calm'
@@ -1446,11 +1446,11 @@ Page({
   buildContentEntry(modulePath, reviewSummary) {
     const currentModule = modulePath && modulePath.current ? modulePath.current : null;
     return {
-      title: '轻练习工坊',
+      title: '回访验证工坊',
       label: '粘贴学习材料，先变成学习卡、小测和 7 天回访。',
       cards: [
         { id: 'input', value: '1', label: '粘贴材料', body: '作业、笔记、PPT 要点、错题说明' },
-        { id: 'pack', value: currentModule ? currentModule.score : '卡', label: '生成轻练习', body: currentModule ? currentModule.title : '知识卡 + 测验 + 点拨提示' },
+        { id: 'pack', value: currentModule ? currentModule.score : '卡', label: '生成回访验证', body: currentModule ? currentModule.title : '知识卡 + 测验 + 点拨提示' },
         { id: 'loop', value: reviewSummary.maturity ? reviewSummary.maturity.overall : 0, label: '进入复习', body: '每天自动回访最该复习的内容' }
       ]
     };
@@ -1490,7 +1490,7 @@ Page({
       },
       {
         id: 'pack',
-        role: '轻练习',
+        role: '回访验证',
         promise: '把真实材料变成可复习内容。',
         action: 'goLearningMap',
         label: '去生成'
@@ -1508,7 +1508,7 @@ Page({
       },
       {
         id: 'learningMap',
-        label: '轻回访',
+        label: '短回访',
         meta: modulePath.current ? '已推荐' : '材料',
         action: 'goLearningMap'
       },
@@ -1553,7 +1553,7 @@ Page({
           id: 'next',
           label: '下一步引擎',
           value: module ? module.score : 0,
-          body: module ? module.title : '打开轻练习生成器。'
+          body: module ? module.title : '打开回访验证生成器。'
         }
       ]
     };
@@ -1602,7 +1602,7 @@ Page({
             : '先听你想到哪一步，再问一个能帮你继续想的问题。',
           proof: currentModule ? `${currentModule.minutes} 分钟模块` : '3-5分钟',
           action: currentModule ? 'goLearningMap' : 'goTutor',
-          cta: currentModule ? '打开轻练习' : '打开作业点拨'
+          cta: currentModule ? '打开回访验证' : '打开作业点拨'
         },
         {
           id: 'memory',
@@ -1673,14 +1673,14 @@ Page({
     }
     actions.push({
       id: 'review',
-      title: '轻回访',
+      title: '短回访',
       desc: `${reviewSummary.due || 0} 张到期，${reviewSummary.quiz ? reviewSummary.quiz.count : 0} 张测验卡`,
       meta: '5 分钟',
       action: 'goReview'
     });
     actions.push({
       id: 'cockpit',
-      title: '打开轻练习',
+      title: '打开回访验证',
       desc: modulePath.current ? modulePath.current.title : '选一个练习方法',
       meta: '10-20 分钟',
       action: 'goLearningMap'

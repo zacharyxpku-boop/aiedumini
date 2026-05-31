@@ -119,7 +119,7 @@ function buildServiceGate(featureId, state = loadServiceAccessState()) {
     title: weekly.title,
     body: weekly.body,
     actionSuggestion: weekly.actionSuggestion,
-    trustLine: '当前只开放记录、复盘和轻练习；更深的连续服务开通后再显示。',
+    trustLine: '当前只开放记录、复盘和回访验证；更深的连续服务开通后再显示。',
     benefits: [
       '完整历史和本周模式',
       '第二步、第三步脚手架',

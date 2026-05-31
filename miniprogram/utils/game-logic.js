@@ -493,7 +493,7 @@ function buildGameRetentionLoop(profile = {}, result = {}, challenge = {}, quest
       ? `错的 ${wrong} 张会回到修卡点和间隔复习，不靠重刷蒙过。`
       : '本局没有明显断点，保留为可分享的掌握证据。',
     tomorrowLine: reviewedToday >= 6
-      ? '明天只回访最不稳的一张卡，避免把轻练习变成刷题。'
+      ? '明天只回访最不稳的一张卡，避免把回访验证变成刷题。'
       : '明天从同一张卡的第一步开始回访，家长只问一句。',
     xpLine: xp > 0 ? `本局写入 ${xp} 点学习记录。` : '本局先写入行为证据，不做虚拟奖励交易。',
     habitCue: streak > 0
@@ -2872,7 +2872,7 @@ function buildDailyReturnContract(highFrequency = {}, report = {}, options = {})
     {
       id: 'tonight_active_recall',
       label: '今晚',
-      trigger: '孩子完成点拨或轻练习后',
+      trigger: '孩子完成点拨或回访验证后',
       action: `90 秒主动回忆「${weakKey}」的第一步`,
       proof: 'student_first_step_voice_or_text',
       route: mission.comebackRoute || '/pages/review/review?from=daily_return_contract'

@@ -314,7 +314,7 @@ Page({
         ? context.miniLessonReport.blackboardFrames
         : [],
       flowTraceId: context.flowTraceId || '',
-      next: matchedCount ? '先修这张卡，再进入轻练习。' : '未找到对应卡，会先展示当前到期卡。'
+      next: matchedCount ? '先修这张卡，再进入回访验证。' : '未找到对应卡，会先展示当前到期卡。'
     };
   },
 
@@ -434,7 +434,7 @@ Page({
       { id: 'plan', label: '排顺序' },
       { id: 'first_step', label: '说第一步' },
       { id: 'repair', label: '修卡点' },
-      { id: 'review', label: '轻回访' },
+      { id: 'review', label: '短回访' },
       { id: 'parent', label: '家长看' }
     ];
     return {
@@ -502,7 +502,7 @@ Page({
     const completed = !!(focus && focus.repairStatus === 'completed') || !!context.done;
     const evidenceLine = completed
       ? '已留下第一步、回访卡和下一次复核入口。'
-      : `当前还有 ${Number(runway.due || (summary.dueCount || 0) || 0)} 张需要轻回访。`;
+      : `当前还有 ${Number(runway.due || (summary.dueCount || 0) || 0)} 张需要短回访。`;
     const actions = [
       {
         id: 'arcade',
@@ -713,7 +713,7 @@ Page({
       title: due ? '今天先赢这一关' : '今天保持手感',
       subtitle: due
         ? `咕点只推 ${due} 张最该复习的卡，卡住再回作业点拨拆一步。`
-        : '没有到期卡时，不硬塞任务。可以先做一轮轻练习。',
+        : '没有到期卡时，不硬塞任务。可以先做一轮回访验证。',
       season: season.tier || '青铜',
       level: progress.level || 1,
       xp: progress.xp || 0,
@@ -739,12 +739,12 @@ Page({
       rewards: (safe.rewards || []).slice(0, 2).map((reward) => Object.assign({}, reward, {
         stateLabel: reward.claimed ? '已记录' : reward.canClaim ? '可记录' : '未完成'
       })),
-      primaryLabel: due ? '开始轻回访' : '先轻练一下',
+      primaryLabel: due ? '开始短回访' : '先轻练一下',
       primaryAction: due ? 'review' : 'import',
       secondaryLabel: quiz.count ? '做 3 分钟测验' : '找卡点',
       secondaryAction: quiz.count ? 'quiz' : 'repair',
       lanes: [
-        { id: 'review', title: '轻回访', value: due, label: '到期卡', action: 'review' },
+        { id: 'review', title: '短回访', value: due, label: '到期卡', action: 'review' },
         { id: 'quiz', title: '主动回忆', value: quiz.count || 0, label: '测验卡', action: 'quiz' },
         { id: 'repair', title: '卡点修复', value: qualityQueue.length || 0, label: '待修复', action: 'repair' }
       ]

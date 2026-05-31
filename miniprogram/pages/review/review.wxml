@@ -72,6 +72,11 @@
             <text>换一题验证</text>
             <text>看是否真的迁移</text>
           </view>
+          <view class="review-challenge-card" data-scene="parent" bindtap="openEntryDetail">
+            <image mode="aspectFit" src="/assets/reference/entry-parent.png" />
+            <text>给家长看</text>
+            <text>只汇总证据和下一步</text>
+          </view>
         </view>
 
         <view class="review-main-cta" data-action="review" bindtap="runPlaybookAction">{{reviewViewModel.primaryCta.text}}</view>

@@ -828,7 +828,7 @@ function buildClassroomDecisionBoard(parts = {}, matrix = [], recommendationPlan
       { level: 1, label: '独立说第一步', action: '不讲答案，只让孩子说出下一笔' },
       { level: 2, label: '二选一启动', action: '给两个可能入口，让孩子选一个并说明理由' },
       { level: 3, label: '小黑板降阶', action: '只画关系或条件，不推完整解法' },
-      { level: 4, label: '减少题量', action: '同错因重复时停刷题，改成 3 分钟轻练习' }
+      { level: 4, label: '减少题量', action: '同错因重复时停刷题，改成 3 分钟回访验证' }
     ],
     classroomEvidencePacket: [
       `${subject} 第一脚记录`,
@@ -843,7 +843,7 @@ function buildClassroomDecisionBoard(parts = {}, matrix = [], recommendationPlan
       ? solution.nextEvidenceRequired.join(' / ')
       : 'child_first_step / wrong_cause_card / next_day_revisit',
     stopRule: '如果连续两次答不上来，不继续讲答案，改用小黑板画第一步。',
-    escalationRule: '如果 7 天内同一错因出现 3 次，先减少题量，改成 3 分钟轻练习和一次家长复盘。',
+    escalationRule: '如果 7 天内同一错因出现 3 次，先减少题量，改成 3 分钟回访验证和一次家长复盘。',
     successRule: '如果连续 2 天能独立说出第一步，再进入变式练习，不提前加难题。',
     classroomCadence: '当天观察启动，次日复核迁移，第 7 天决定加题量还是降阶。',
     nextConferenceQuestion: `下次复盘只问：${subject} 这类题，孩子能否自己说出第一步？`,
@@ -1994,7 +1994,7 @@ function buildSourceEvidenceLedger(input = {}, parts = {}, familyDecisionMemo = 
       label: '错题/试卷',
       pattern: /错题|试卷|周测|单元测|期中|期末|扣分|列式|阅读理解|计算|证明|实验|方程|应用题/,
       localFields: ['题型', '错因', '第一步', '明天回访', '第 7 天小变式'],
-      canProduce: '错因报告、第一步小黑板、轻练习和间隔回访',
+      canProduce: '错因报告、第一步小黑板、回访验证和间隔回访',
       missing: ['孩子原想法', '卡住的第一步'],
       nextAction: '抽一题做第一步，不做整张卷自动答案。',
       aiAllowed: '苏格拉底追问、小黑板话术、同错因变式表达',
@@ -2193,7 +2193,7 @@ function buildEvidenceBasedMethodologyGuide(methodCandidateCards = [], materialL
       label: '游戏化专注支持',
       principle: '只奖励第一步、错因命名和回访完成，不奖励速度、排名或刷题量。',
       useWhen: hasParentReport ? '家长观察到拖拉、分心或启动困难。' : '孩子已经有可回访卡，但需要更轻的坚持机制。',
-      reportLine: '报告会建议“小局轻练习”，但要先有真实卡片来源。',
+      reportLine: '报告会建议“短时回访验证”，但要先有真实卡片来源。',
       productRoute: '/pages/review/review?from=methodology_attention',
       evidenceGate: 'real_recall_source_and_no_answer_leak',
       sourceBasis: '自我调节、即时反馈和低压力动机设计。'
@@ -2277,7 +2277,7 @@ function buildPersonalizedLearningSolutionBlueprint(materialLanes = [], methodHy
     },
     {
       id: 'step_3_active_recall',
-      label: '过退出门后进轻练习/主动回忆',
+      label: '过退出门后进回访验证/主动回忆',
       trigger: '孩子能用自己的话说出第一步',
       localGate: '本地代码决定 XP、间隔回访和练习放行',
       aiRole: '只改写近迁移题的提示语气',
@@ -2303,7 +2303,7 @@ function buildPersonalizedLearningSolutionBlueprint(materialLanes = [], methodHy
     {
       id: 'wrong_paper_rule',
       label: '错题/试卷',
-      useFor: hasWrongPaper ? '错因卡、小黑板、轻练习和回访' : '待补充',
+      useFor: hasWrongPaper ? '错因卡、小黑板、回访验证和回访' : '待补充',
       mustVerifyWith: '孩子原想法、卡住第一步、同错因回访',
       cannotClaim: '不生成整卷答案、不自动判分、不做竞争比较'
     },
@@ -2376,7 +2376,7 @@ function buildPersonalizedLearningSolutionBlueprint(materialLanes = [], methodHy
         : '先记录今晚真实卡点：题目类型、孩子第一步、卡住位置和家长观察。',
     tomorrowRevisit: hasWrongPaper
       ? '明天只回访同一错因的一张卡，不加题量，不用分数评价。'
-      : '明天先确认孩子能否复述昨天的第一步，再决定是否进入轻练习。',
+      : '明天先确认孩子能否复述昨天的第一步，再决定是否进入回访验证。',
     day7Evidence: '第 7 天必须有小变式或同错因迁移证据；没有证据时不写长期画像、不贴学习类型标签。',
     parentAssistLine: hasParentObservation
       ? '家长只问：“你第一步想做什么？哪里卡住？明天我们只看这一点还记不记得。”'
@@ -2595,7 +2595,7 @@ function buildUploadedMaterialDecisionDossier(input = {}, parts = {}, sourceEvid
       collected: !!(laneById.wrong_question_paper && laneById.wrong_question_paper.collected),
       canSay: '可以说当前错因、第一步和今晚修复动作。',
       cannotSay: '不能自动给整卷答案、判分、排名或长期掌握结论。',
-      output: '错因卡、第一步小黑板、轻练习和间隔回访',
+      output: '错因卡、第一步小黑板、回访验证和间隔回访',
       nextEvidence: '让孩子留下原想法和卡住的第一步。'
     },
     {
@@ -2867,7 +2867,7 @@ function buildUploadedMaterialDecisionDossier(input = {}, parts = {}, sourceEvid
     summary: `已接入 ${collectedCount}/${materialLanes.length} 类资料；先输出方法候选和今晚动作，长期画像等回访证据齐了再放行。`,
     reportUseRule: '上传材料只进入证据卷宗；本地代码决定证据权重、放行门槛、分享字段和下一步动作。',
     talentRule: '天赋/学习偏好测评只能生成学习方法候选，必须用错题、第一步、隔天回访和第 7 天小变式验证。',
-    wrongPaperRule: '错题/试卷优先生成错因、第一步小黑板、轻练习和回访，不生成整卷答案或排名刺激。',
+    wrongPaperRule: '错题/试卷优先生成错因、第一步小黑板、回访验证和回访，不生成整卷答案或排名刺激。',
     schoolRule: '学校/老师材料只生成家校安全摘要、观察问题和家庭配合动作，不替代老师判断。',
     childStrengthLine: portraitConfidenceSystem.confidenceLevel === 'high'
       ? '可以描述阶段性学习优势，但仍按“证据支持的学习方法”表达，不贴固定天赋标签。'
@@ -3622,7 +3622,7 @@ function buildPersonalizedReportStandard(input = {}, parts = {}, parsed = {}, mo
       id: 'wrong_question_uploaded',
       label: '上传错题/试卷/订正',
       when: '有错题、订正痕迹、孩子原想法或卡住描述。',
-      output: '生成第一步、小黑板、错因卡、隔天回访和轻练习入口。',
+      output: '生成第一步、小黑板、错因卡、隔天回访和回访验证入口。',
       mustPairWith: ['孩子原想法', '卡住第一步', '错因猜测'],
       blocked: ['整题答案', '整卷解析', '替孩子完成作业']
     },
@@ -3698,7 +3698,7 @@ function buildPersonalizedReportStandard(input = {}, parts = {}, parsed = {}, mo
       {
         id: 'synthesis_game_loop',
         benchmark: 'Synthesis 的强项是把挑战做成游戏化任务，靠参与感和可见进展留住孩子。',
-        productAnswer: '原点不做泛娱乐游戏，只在真实错因通过门槛后开放轻练习/回忆挑战。',
+        productAnswer: '原点不做泛娱乐练习，只在真实错因通过门槛后开放回访验证/回忆挑战。',
         route: '/pages/review/review?from=parent_report_standard',
         evidenceReturn: 'retrieval_result + xp_gate + parent_receipt'
       },

@@ -159,7 +159,7 @@ const PUBLIC_K12_BORROW_PLAYBOOK = [
     localCodeOwns: ['license_gate', 'source_registry', 'reuse_scope', 'share_blocklist'],
     aiBetterFor: ['改写成小黑板说明', '生成一问一答的孩子版解释'],
     mustNotUse: ['未核查许可直接复用', '生成整套答案包', '把外部图文当自有内容发布'],
-    productEntry: '概念解释 / 轻练习'
+    productEntry: '概念解释 / 回访验证'
   },
   {
     id: 'family_uploaded_material',
@@ -232,7 +232,7 @@ const MODE_CHOICE_GUARDRAILS = [
   },
   {
     id: 'game_after_evidence',
-    rule: '轻练习必须在第一步或错因证据之后开启，不能只靠测评标签开启。'
+    rule: '回访验证必须在第一步或错因证据之后开启，不能只靠测评标签开启。'
   },
   {
     id: 'parent_confirms_service',

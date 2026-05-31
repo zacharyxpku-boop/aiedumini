@@ -1107,7 +1107,7 @@ function buildProductReadiness(storage, options = {}) {
     ),
     evidenceItem(
       'game_retention',
-      '轻练习留存证据',
+      '回访验证留存证据',
       !!(todaySession.gamePlayed || Number(gameProfile.review_count || gameProfile.xp || 0) > 0),
       [
         todaySession.gamePlayed ? 'todaySession.gamePlayed' : '',
@@ -1125,7 +1125,7 @@ function buildProductReadiness(storage, options = {}) {
         count(recent.latest3) ? `latest3 ${count(recent.latest3)}` : '',
         count(recent.latest7) ? `latest7 ${count(recent.latest7)}` : ''
       ],
-      '家长侧必须能看到孩子第一步、专注、回访或轻练习的证据。'
+      '家长侧必须能看到孩子第一步、专注、回访或回访验证的证据。'
     ),
     evidenceItem(
       'share_return',

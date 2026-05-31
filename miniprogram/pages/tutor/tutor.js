@@ -355,7 +355,7 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
   const handoffPlan = {
     title: proofSentence ? '点拨后继续走一小步' : blockedAnswer ? '先退回安全点拨' : '点拨还差一句证据',
     summary: proofSentence
-      ? '孩子已经能说回去，下一步不要加讲解，转成修卡点、轻回访或给家长看。'
+      ? '孩子已经能说回去，下一步不要加讲解，转成修卡点、短回访或给家长看。'
       : blockedAnswer
         ? '先拦住直接答案，把动作收窄到第一步和错因。'
         : '先补一句自己的第一步，再进入修卡点或轻练。',
@@ -372,8 +372,8 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
         id: 'recall',
         label: '5分钟轻练',
         route: '/pages/review/review?from=tutor_handoff&mode=recall',
-        reason: proofSentence ? '已经会说方法，马上用一局轻回访问是否转身还记得。' : '还没完全说清，先用低负担练习保留手感。',
-        evidence: '轻回访结果'
+        reason: proofSentence ? '已经会说方法，马上用一局短回访问是否转身还记得。' : '还没完全说清，先用低负担练习保留手感。',
+        evidence: '短回访结果'
       },
       {
         id: 'parent',

@@ -1009,7 +1009,7 @@ function contentEnginePlan(rawText, options = {}) {
     nextActions: [
       missingTypes.length ? `补齐 ${missingTypes.join(' / ')} 卡型` : '覆盖 concept / step / trap / cloze',
       counts.transfer ? '已生成举一反三卡，可用于错题回访' : '如是错题，补一句错因会生成举一反三卡',
-      avgQuality < 76 ? '导入后先做一次错因修补' : '直接进入每日轻回访',
+      avgQuality < 76 ? '导入后先做一次错因修补' : '直接进入每日短回访',
       adapter.remoteReady ? '可切换稳定服务增强' : '本地规则已可用，后续接入稳定服务后增强'
     ]
   });
@@ -2590,7 +2590,7 @@ function dailyMissionCenter(summary) {
   return {
     missions,
     primary,
-    label: primary ? `先从「${primary.title}」开始。` : '先完成今天的轻回访。'
+    label: primary ? `先从「${primary.title}」开始。` : '先完成今天的短回访。'
   };
 }
 
@@ -2666,7 +2666,7 @@ function studySeason(summary) {
     streakShield,
     lives: Number(loop.lives || 0),
     target: Math.max(60, Number(goal.target || 1) * 18),
-    checkpoint: challenge.title || '完成今天的轻回访',
+    checkpoint: challenge.title || '完成今天的短回访',
     status: weekXp >= 100 ? 'Season target cleared.' : `${Math.max(0, 100 - weekXp)}% to the weekly checkpoint.`
   };
 }
@@ -2902,12 +2902,12 @@ function gameEconomy(summary) {
     { id: 'season', title: '每周进展节点', reward: '进度提升', trigger: '积累本周学习记录', ready: !!season }
   ];
   return {
-    title: '本机轻练习激励',
+    title: '本机回访验证激励',
     lives: Number(loop.lives || 0),
     tier: season.tier || '起步',
     quests,
     ready: quests.filter((item) => item.ready).length,
-    label: '轻练习只围绕每日回忆、错因修补、小测检查和每周进展，不做交易或付费激励。'
+    label: '回访验证只围绕每日回忆、错因修补、小测检查和每周进展，不做交易或付费激励。'
   };
 }
 
@@ -2940,7 +2940,7 @@ function loopReadinessConsole(summary) {
     { id: 'loop', title: 'Learning loop', score: 100, evidence: 'diagnosis -> homework triage -> tutor -> review -> quiz -> repair -> factory packs' },
     { id: 'memory', title: '长期复习调度', score: safe.retentionLab ? 96 : 88, evidence: '间隔复习、保持率实验、负荷和考前计划' },
     { id: 'content', title: 'Content engine design', score: safe.contentPipeline ? 96 : 90, evidence: 'content engine plan, templates, factory packs, multi-format pipeline hooks' },
-    { id: 'game', title: '本机轻练习闭环', score: safe.gameEconomy ? 94 : 86, evidence: '每日任务、学习记录、状态恢复、小测节点' },
+    { id: 'game', title: '本机回访验证闭环', score: safe.gameEconomy ? 94 : 86, evidence: '每日任务、学习记录、状态恢复、小测节点' },
     { id: 'family', title: '家庭作业协同', score: 98, evidence: '家长视角、今晚只做一步、错因修复、复盘话术' }
   ];
   return {
@@ -2981,7 +2981,7 @@ function loopCapabilityBoard(summary) {
     title: '闭环能力看板',
     products,
     average: clampScore(products.reduce((sum, item) => sum + item.score, 0) / products.length),
-    label: '当前本机闭环已覆盖资料、复习、轻练习和家长复盘；生产证明依赖真实使用数据。'
+    label: '当前本机闭环已覆盖资料、复习、回访验证和家长复盘；生产证明依赖真实使用数据。'
   };
 }
 
@@ -3000,7 +3000,7 @@ function syntheticCohortLab(summary) {
     {
       id: 'steady',
       title: 'Steady user',
-      assumption: '每天 5 次回忆、一次轻回访、每周一次错因修补',
+      assumption: '每天 5 次回忆、一次短回访、每周一次错因修补',
       clarity: clampScore(base * 0.88),
       retention: clampScore(base * 0.82),
       fatigue: 'balanced'
@@ -3028,7 +3028,7 @@ function assetCompoundingMap(summary) {
     { id: 'weakness', title: '卡点信号', count: Number((safe.sources || []).length || 0), note: '家长观察和作业证据' },
     { id: 'content', title: '学习资产', count: Number(safe.notes || 0), note: '卡片、模板、学习包和模块' },
     { id: 'memory', title: '复习痕迹', count: Number(safe.total || 0), note: '间隔状态、到期记录和顽固错因标签' },
-    { id: 'repair', title: '修复线索', count: Number((safe.qualityQueue || []).length + Number(safe.leeches || 0)), note: '错因修复和针对性轻练习' },
+    { id: 'repair', title: '修复线索', count: Number((safe.qualityQueue || []).length + Number(safe.leeches || 0)), note: '错因修复和针对性回访验证' },
     { id: 'family', title: '家庭协同', count: Number((safe.missions || []).length || 0), note: '必做一步、家长复盘和不过量提醒' }
   ];
   return {
@@ -3180,7 +3180,7 @@ function maturityScore(summary) {
     },
     {
       id: 'gamification',
-      label: '轻练习留存',
+      label: '回访验证留存',
       score: clampScore(
         25
         + (safe.challenge ? 15 : 0)
@@ -3300,7 +3300,7 @@ function commercialReadiness(summary) {
     featureHit(hasModulePack, 10, '模块内容可沉淀成复习包', '把更多模块题型转成可直接回访的小卡组。'),
     featureHit(hasRepair, 12, '本机错因修复已能处理薄弱卡片', '接入稳定评分规则后再扩展复杂修复。'),
     featureHit(hasQuizLoop, 10, '小测结果已能回写记忆排程和修卡点', '补齐限时小测和更细的答题校验。'),
-    featureHit(hasGameLoop, 14, '挑战、任务、学习记录已形成游戏回流', '补齐连续任务和阶段检查点。'),
+    featureHit(hasGameLoop, 14, '挑战、任务、学习记录已形成回访证据', '补齐连续任务和阶段检查点。'),
     featureHit(hasLeaderboard, 8, '本机进展快照已存在', '多人排行等强社交功能先保持隐藏，等连续记录稳定后再开放。'),
     featureHit(
       safe.materialMemoryBridge && Array.isArray(safe.materialMemoryBridge.sourceRows) && safe.materialMemoryBridge.sourceRows.length > 0,
@@ -3327,7 +3327,7 @@ function commercialReadiness(summary) {
     {
       id: 'content_loop',
       name: '资料到练习闭环',
-      target: '资料导入 + 小测 + 轻练习反馈',
+      target: '资料导入 + 小测 + 回访验证反馈',
       score: scoreFeatures(contentLoopFeatures),
       features: contentLoopFeatures,
       biggestGap: contentLoopFeatures.find((item) => !item.value && item.gap)

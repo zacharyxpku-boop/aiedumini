@@ -135,7 +135,7 @@ function buildPrimaryHomeNextAction(input = {}) {
       type: 'review_return',
       priority: 30,
       dispatchCode: 3,
-      kicker: '轻回访',
+      kicker: '短回访',
       title: safeText(input.yesterdayReviewCard.noticeText, '接上昨天那一步'),
       body: safeText(input.yesterdayReviewCard.childArticulatedStep, '先复述昨天的第一步。'),
       cta: '继续回访'

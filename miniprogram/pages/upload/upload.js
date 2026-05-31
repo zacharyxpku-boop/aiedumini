@@ -422,7 +422,7 @@ function buildUploadDailyExecutionSeed(options = {}) {
     gameLine: gameUnlocked
       ? '游戏回访已解锁：只练主动回忆，不奖励速度、分数或同伴比较。'
       : '游戏回访暂不解锁：先补孩子第一步或错因证据。',
-    releaseLine: '放行规则：有第一步 + 错因 + 明天回访证据，才进入游戏或分享。',
+    releaseLine: '放行规则：有第一步 + 错因 + 明天回访证据，才进入回访验证或分享。',
     blockedLine: '不带原题、完整答案、分数、名次、天赋标签、孩子姓名或联系方式。',
     evidenceRequired: ['child_first_step', 'wrong_cause_named', 'next_day_revisit', 'parent_check'],
     syncPayload: {
@@ -755,7 +755,7 @@ function buildMaterialTypeGuide(type) {
   };
   return guides[type] || {
     examplePlaceholder: '粘贴课堂笔记、PPT 要点或手动整理：\n今天讲了什么概念；\n老师强调了哪一步；\n孩子具体卡在哪里。',
-    statusLine: '当前生成本地复习卡和轻练习，不承诺自动解析文件或直接出答案。',
+    statusLine: '当前生成本地复习卡和回访验证，不承诺自动解析文件或直接出答案。',
     modeLine: '验证方式：先拆成概念、步骤、陷阱、填空四类卡。',
     blockedClaimsLine: '不能做：自动抓取、自动批改、完整答案生成。'
   };
@@ -944,7 +944,7 @@ Page({
         {
           id: 'memory',
           title: '为什么不是白做',
-          body: '必须做和关键错因会进入今晚安排、作业点拨和轻回访，变成后面还能用的学习资产。',
+          body: '必须做和关键错因会进入今晚安排、作业点拨和短回访，变成后面还能用的学习资产。',
           tone: 'record'
         }
       ]
@@ -1361,7 +1361,7 @@ Page({
     return {
       title: '资料先补证据',
       line: missing.length
-        ? `还差：${missing.slice(0, 2).join(' / ')}。补齐后才生成家长报告、轻练习或分享。`
+        ? `还差：${missing.slice(0, 2).join(' / ')}。补齐后才生成家长报告、回访验证或分享。`
         : '这类资料必须先补齐结构化证据，不能直接放行报告、游戏或分享。',
       route: '/pages/upload/upload?from=material_evidence_gate',
       actionRoute: '/pages/upload/upload?from=material_evidence_gate',
@@ -1625,7 +1625,7 @@ Page({
     const openMaicDecisionBridge = openMaicInspiredPlan.buildOpenMaicInspiredDecisionBridge(openMaicTaskPlan, reportDraft, {
       nextStep: actionRoute
     }, {
-      summary: sourceSchemaId === 'wrong_question_paper' ? '错题先进入错因复现，再放行轻练习。' : '资料先进入第一步回访，再放行报告。'
+      summary: sourceSchemaId === 'wrong_question_paper' ? '错题先进入错因复现，再放行回访验证。' : '资料先进入第一步回访，再放行报告。'
     });
     const safeRelayPayload = Object.assign({}, openMaicDecisionBridge.shareRelayPayload || {}, {
       from: 'upload',

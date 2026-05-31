@@ -229,7 +229,7 @@ function gamePitch(gameId, dominantName) {
     story: '用故事讲概念',
     match: '对应关系泡泡消'
   };
-  return pitches[gameId] || dominantName || '轻练习';
+  return pitches[gameId] || dominantName || '回访验证';
 }
 
 function gameMascot(gameId) {
@@ -655,7 +655,7 @@ function buildRepairFocus(answer = {}, cards = []) {
     decision: selected
       ? `来自${gameName}，刚才选了「${selected}」，先说清为什么应为「${correctAnswer}」。`
       : `来自${gameName}，先把这张错卡的关键原因说清楚。`,
-    tags: ['轻回访', gameName, answer.knowledgeType || type.name].filter(Boolean),
+    tags: ['短回访', gameName, answer.knowledgeType || type.name].filter(Boolean),
     cardId: answer.cardId || '',
     calibrationKey: card.calibrationKey || `arcade:${gameType}:${answer.cardId || 'unknown'}`
   };
@@ -666,11 +666,11 @@ function buildHomeArcadeEntry(summary = {}, cards = []) {
   const primary = recommendations.find((item) => item.available) || recommendations[0] || GAME_TYPES[0];
   const due = Number(summary.due || cards.length || 0);
   return {
-    title: '轻练习',
+    title: '回访验证',
     label: primary && primary.available ? `${primary.shortName} · ${primary.minutes} 分钟` : '生成学习卡后可开始',
     body: due
-      ? `今天有 ${due} 张卡可以做轻回访。`
-      : '把作业、错题或知识点生成学习卡，再进入轻回访。',
+      ? `今天有 ${due} 张卡可以做短回访。`
+      : '把作业、错题或知识点生成学习卡，再进入短回访。',
     cta: primary && primary.available ? '进入今日轻练' : '先生成学习卡',
     action: primary && primary.available ? 'goArcade' : 'goLearningMap',
     gameId: primary ? primary.id : 'whack'

@@ -610,7 +610,7 @@ function classifyImportInput(text = '') {
       inputType: sourceMeta.type,
       shouldCreateFocus: false,
       sourceMeta,
-      feedback: `收到${sourceMeta.label}。只处理你粘贴的摘录，先导入轻回访；不自动抓取链接、不解析文件、不直接给答案。`
+      feedback: `收到${sourceMeta.label}。只处理你粘贴的摘录，先导入短回访；不自动抓取链接、不解析文件、不直接给答案。`
     };
   }
   if (/^https?:\/\/\S+$/i.test(value)) {

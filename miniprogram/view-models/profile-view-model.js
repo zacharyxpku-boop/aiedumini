@@ -107,7 +107,7 @@ function buildParentRecap(input = {}) {
     firstStepLine: `他先迈出的第一步是：${evidence.displayStep}`,
     recentFirstStepCount: proof.recentFirstStepCount,
     recentFocusEvidence: focusLine,
-    recentRevisitEvidence: proof.recentRevisitEvidence ? `已留下 ${proof.recentRevisitEvidence} 次轻回访痕迹。` : '明天轻轻回访后会留下记录。',
+    recentRevisitEvidence: proof.recentRevisitEvidence ? `已留下 ${proof.recentRevisitEvidence} 次短回访痕迹。` : '明天轻短回访后会留下记录。',
     trustBoundaryNote: evidence.hasChildStep
       ? '咕点没有给答案，也没有直接给结果，只记录孩子自己说出的第一步。'
       : '咕点没有给答案，也没有直接给结果，只先整理一个可开始的第一步。',
@@ -187,7 +187,7 @@ function buildProfileViewModel(input = {}) {
     quickSections: [
       { id: 'learning-records', title: '更多学习记录', collapsed: true },
       { id: 'review-share', title: '复盘卡与分享记录', collapsed: true },
-      { id: 'light-practice', title: '轻练习记录', collapsed: true }
+      { id: 'light-practice', title: '回访验证记录', collapsed: true }
     ],
     emptyState: hasFocus ? null : '今天还没有第一步记录。先让孩子说一句卡在哪里，咕点再整理给家长看。',
     nextStep: hasFocus ? parentRecap.oneNightProof : '',
