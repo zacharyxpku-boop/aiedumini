@@ -5,7 +5,7 @@
     data-path="/pages/home/home"
     bindtap="switchTab"
   >
-    <view class="yd-tab-icon-wrap"><view class="yd-tab-icon home"></view></view>
+    <view class="yd-tab-icon-wrap"><image class="yd-tab-icon" mode="aspectFit" src="/assets/reference/brand-house.png" /></view>
     <view class="yd-tab-text">今天</view>
   </view>
   <view
@@ -14,7 +14,7 @@
     data-path="/pages/tutor/tutor"
     bindtap="switchTab"
   >
-    <view class="yd-tab-icon-wrap"><view class="yd-tab-icon tutor"></view></view>
+    <view class="yd-tab-icon-wrap"><image class="yd-tab-icon" mode="aspectFit" src="/assets/reference/entry-tutor.png" /></view>
     <view class="yd-tab-text">AI私教</view>
   </view>
   <view
@@ -23,7 +23,7 @@
     data-path="/pages/review/review"
     bindtap="switchTab"
   >
-    <view class="yd-tab-icon-wrap"><view class="yd-tab-icon review"></view></view>
+    <view class="yd-tab-icon-wrap"><image class="yd-tab-icon" mode="aspectFit" src="/assets/reference/entry-review.png" /></view>
     <view class="yd-tab-text">短回访</view>
   </view>
   <view
@@ -32,7 +32,7 @@
     data-path="/pages/profile/profile"
     bindtap="switchTab"
   >
-    <view class="yd-tab-icon-wrap"><view class="yd-tab-icon parent"></view></view>
+    <view class="yd-tab-icon-wrap"><image class="yd-tab-icon" mode="aspectFit" src="/assets/reference/entry-parent.png" /></view>
     <view class="yd-tab-text">家长</view>
   </view>
   <view
@@ -41,7 +41,7 @@
     data-path="/pages/upload/upload"
     bindtap="switchTab"
   >
-    <view class="yd-tab-icon-wrap"><view class="yd-tab-icon upload"></view></view>
+    <view class="yd-tab-icon-wrap"><image class="yd-tab-icon" mode="aspectFit" src="/assets/reference/entry-upload.png" /></view>
     <view class="yd-tab-text">上传</view>
   </view>
 </view>

@@ -11,7 +11,7 @@
   height: 110rpx;
   padding: 8rpx 8rpx 12rpx;
   background: rgba(255, 255, 255, 0.98);
-  border: 1rpx solid #F0EDE5;
+  border: 1rpx solid #f0ede5;
   border-radius: 28rpx;
   box-shadow: 0 8rpx 24rpx rgba(55, 42, 24, 0.055);
   backdrop-filter: blur(24rpx);
@@ -21,16 +21,16 @@
 .yd-tab-item {
   position: relative;
   display: grid;
-  grid-template-rows: 44rpx 34rpx;
+  grid-template-rows: 46rpx 32rpx;
   row-gap: 4rpx;
-  min-width: 0;
   width: 100%;
+  min-width: 0;
   height: 88rpx;
   align-items: center;
   justify-content: center;
   margin: 0;
   padding: 5rpx 2rpx 6rpx;
-  color: #403D37;
+  color: #403d37;
   background: transparent;
   border: 0;
   border-radius: 20rpx;
@@ -42,9 +42,8 @@
 }
 
 .yd-tab-item.active {
-  color: #0C4A3B;
-  background: #F1FAEF;
-  border-color: transparent;
+  color: #0c4a3b;
+  background: #f1faef;
 }
 
 .yd-tab-item.active::after {
@@ -55,262 +54,39 @@
   width: 24rpx;
   height: 6rpx;
   border-radius: 999rpx;
-  background: #22B95C;
+  background: #22b95c;
   transform: translateX(-50%);
+}
+
+.yd-tab-icon-wrap {
+  display: flex;
+  width: 58rpx;
+  height: 46rpx;
+  align-items: center;
+  justify-content: center;
+  justify-self: center;
+  border-radius: 18rpx;
+  overflow: hidden;
+}
+
+.yd-tab-item.active .yd-tab-icon-wrap {
+  background: rgba(34, 185, 92, 0.12);
+}
+
+.yd-tab-icon {
+  display: block;
+  width: 42rpx;
+  height: 42rpx;
+  flex: 0 0 42rpx;
 }
 
 .yd-tab-text {
   display: block;
   width: 100%;
-  height: 34rpx;
+  height: 32rpx;
   overflow: hidden;
-  line-height: 34rpx;
+  line-height: 32rpx;
   text-align: center;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.yd-tab-icon-wrap {
-  display: flex;
-  width: 100%;
-  height: 44rpx;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.yd-tab-item.active .yd-tab-icon-wrap {
-  width: 52rpx;
-  height: 44rpx;
-  justify-self: center;
-  border-radius: 18rpx;
-  background: rgba(34, 185, 92, 0.12);
-}
-
-.yd-tab-icon {
-  position: relative;
-  width: 34rpx;
-  height: 34rpx;
-  flex: 0 0 34rpx;
-  color: #403D37;
-}
-
-.yd-tab-item.active .yd-tab-icon {
-  color: #0C4A3B;
-}
-
-.yd-tab-item.active .yd-tab-icon::after {
-  box-shadow: none;
-}
-
-.yd-tab-icon.home::before {
-  content: "";
-  position: absolute;
-  left: 5rpx;
-  top: 16rpx;
-  width: 26rpx;
-  height: 18rpx;
-  border: 3rpx solid currentColor;
-  border-top: 0;
-  border-radius: 2rpx 2rpx 7rpx 7rpx;
-}
-
-.yd-tab-icon.home::after {
-  content: "";
-  position: absolute;
-  left: 7rpx;
-  top: 6rpx;
-  width: 22rpx;
-  height: 22rpx;
-  border-left: 3rpx solid currentColor;
-  border-top: 3rpx solid currentColor;
-  transform: rotate(45deg);
-  border-radius: 4rpx 0 0 0;
-}
-
-.yd-tab-icon.pack::before {
-  content: "";
-  position: absolute;
-  left: 4rpx;
-  top: 13rpx;
-  width: 29rpx;
-  height: 22rpx;
-  border: 3rpx solid currentColor;
-  border-radius: 6rpx;
-}
-
-.yd-tab-icon.pack::after {
-  content: "";
-  position: absolute;
-  left: 7rpx;
-  top: 7rpx;
-  width: 15rpx;
-  height: 10rpx;
-  border: 3rpx solid currentColor;
-  border-bottom: 0;
-  border-radius: 6rpx 6rpx 0 0;
-}
-
-.yd-tab-icon.parent::before,
-.yd-tab-icon.parent::after {
-  content: "";
-  position: absolute;
-  border: 3rpx solid currentColor;
-  border-radius: 999rpx;
-}
-
-.yd-tab-icon.tutor::before {
-  content: "";
-  position: absolute;
-  left: 4rpx;
-  top: 5rpx;
-  width: 27rpx;
-  height: 22rpx;
-  border: 3rpx solid currentColor;
-  border-radius: 10rpx;
-}
-
-.yd-tab-icon.tutor::after {
-  content: "";
-  position: absolute;
-  left: 12rpx;
-  top: 15rpx;
-  width: 4rpx;
-  height: 4rpx;
-  border-radius: 50%;
-  background: currentColor;
-  box-shadow: 10rpx 0 0 currentColor, 5rpx 8rpx 0 -1rpx currentColor;
-}
-
-.yd-tab-icon.review::before {
-  content: "";
-  position: absolute;
-  left: 3rpx;
-  bottom: 4rpx;
-  width: 29rpx;
-  height: 13rpx;
-  border: 3rpx solid currentColor;
-  border-top: 0;
-  border-radius: 0 0 18rpx 18rpx;
-}
-
-.yd-tab-icon.review::after {
-  content: "";
-  position: absolute;
-  left: 10rpx;
-  top: 4rpx;
-  width: 13rpx;
-  height: 18rpx;
-  border-left: 3rpx solid currentColor;
-  border-bottom: 3rpx solid currentColor;
-  transform: rotate(-35deg);
-  border-radius: 0 0 0 8rpx;
-}
-
-.yd-tab-icon.upload::before {
-  content: "";
-  position: absolute;
-  left: 4rpx;
-  top: 8rpx;
-  width: 27rpx;
-  height: 23rpx;
-  border: 3rpx solid currentColor;
-  border-radius: 7rpx;
-}
-
-.yd-tab-icon.upload::after {
-  content: "";
-  position: absolute;
-  left: 13rpx;
-  top: 3rpx;
-  width: 9rpx;
-  height: 16rpx;
-  border-left: 3rpx solid currentColor;
-  border-top: 3rpx solid currentColor;
-  transform: rotate(45deg);
-}
-
-.yd-tab-icon.loop::before {
-  content: "";
-  position: absolute;
-  left: 6rpx;
-  top: 7rpx;
-  width: 25rpx;
-  height: 25rpx;
-  border: 3rpx solid currentColor;
-  border-left-color: transparent;
-  border-radius: 50%;
-}
-
-.yd-tab-icon.loop::after {
-  content: "";
-  position: absolute;
-  left: 6rpx;
-  top: 8rpx;
-  width: 10rpx;
-  height: 10rpx;
-  border-left: 3rpx solid currentColor;
-  border-bottom: 3rpx solid currentColor;
-  transform: rotate(45deg);
-  border-radius: 2rpx;
-}
-
-.yd-tab-icon.focus::before {
-  content: "";
-  position: absolute;
-  left: 5rpx;
-  top: 5rpx;
-  width: 24rpx;
-  height: 24rpx;
-  border: 3rpx solid currentColor;
-  border-radius: 50%;
-}
-
-.yd-tab-icon.focus::after {
-  content: "";
-  position: absolute;
-  left: 14rpx;
-  top: 14rpx;
-  width: 6rpx;
-  height: 6rpx;
-  border-radius: 50%;
-  background: currentColor;
-  box-shadow: 0 0 0 7rpx rgba(15, 79, 61, .12);
-}
-
-.yd-tab-icon.mine::before,
-.yd-tab-icon.mine::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  border: 3rpx solid currentColor;
-  transform: translateX(-50%);
-}
-
-.yd-tab-icon.mine::before {
-  top: 5rpx;
-  width: 13rpx;
-  height: 13rpx;
-  border-radius: 50%;
-}
-
-.yd-tab-icon.mine::after {
-  bottom: 4rpx;
-  width: 26rpx;
-  height: 14rpx;
-  border-radius: 18rpx 18rpx 5rpx 5rpx;
-}
-
-.yd-tab-icon.parent::before {
-  left: 3rpx;
-  top: 4rpx;
-  width: 14rpx;
-  height: 14rpx;
-}
-
-.yd-tab-icon.parent::after {
-  right: 2rpx;
-  top: 11rpx;
-  width: 12rpx;
-  height: 12rpx;
 }
