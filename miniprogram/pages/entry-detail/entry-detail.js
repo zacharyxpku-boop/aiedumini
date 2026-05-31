@@ -25,9 +25,9 @@ const SCENES = {
     secondaryLabel: '先补材料',
     secondaryRoute: '/pages/upload/upload?from=entry_today_material',
     cards: [
-      { label: '先定优先级', value: '把必须做、可放后、明天回访分开。', icon: '/assets/reference/entry-upload.png' },
-      { label: '再说第一步', value: '孩子先说准备从哪里开始，私教只追问下一句。', icon: '/assets/reference/entry-tutor.png' },
-      { label: '最后留证据', value: '完成后进入短回访或家长进展卡。', icon: '/assets/reference/entry-review.png' }
+      { label: '先定优先级', value: '把必须做、可放后、明天回访分开。', icon: '/assets/reference/entry-upload.png', scene: 'upload' },
+      { label: '再说第一步', value: '孩子先说准备从哪里开始，私教只追问下一句。', icon: '/assets/reference/entry-tutor.png', scene: 'tutor' },
+      { label: '最后留证据', value: '完成后进入短回访或家长进展卡。', icon: '/assets/reference/entry-review.png', scene: 'review' }
     ],
     spotlight: {
       kicker: '今晚路线板',
@@ -56,9 +56,9 @@ const SCENES = {
     secondaryLabel: '说完去复习卡',
     secondaryRoute: '/pages/review/review?from=entry_tutor_card',
     cards: [
-      { label: '孩子说', value: '我准备先看哪个条件/哪句话。', icon: '/assets/reference/entry-tutor.png' },
-      { label: 'AI 问', value: '下一步只问一个更小的问题。', icon: '/assets/reference/entry-map.png' },
-      { label: '家长看', value: '只看第一步证据和明天怎么回访。', icon: '/assets/reference/entry-parent.png' }
+      { label: '孩子说', value: '我准备先看哪个条件/哪句话。', icon: '/assets/reference/entry-tutor.png', scene: 'tutor' },
+      { label: 'AI 问', value: '下一步只问一个更小的问题。', icon: '/assets/reference/entry-map.png', scene: 'today' },
+      { label: '家长看', value: '只看第一步证据和明天怎么回访。', icon: '/assets/reference/entry-parent.png', scene: 'parent' }
     ],
     spotlight: {
       kicker: '私教追问板',
@@ -87,9 +87,9 @@ const SCENES = {
     secondaryLabel: '回到AI私教',
     secondaryRoute: '/pages/tutor/tutor?from=entry_review_repair',
     cards: [
-      { label: '记忆', value: '能不能说出关键概念。', icon: '/assets/reference/entry-review.png' },
-      { label: '迁移', value: '换一道同类题还会不会开始。', icon: '/assets/reference/entry-map.png' },
-      { label: '证据', value: '只记录第一步、错因和明天回访。', icon: '/assets/reference/entry-report.png' }
+      { label: '记忆', value: '能不能说出关键概念。', icon: '/assets/reference/entry-review.png', scene: 'review' },
+      { label: '迁移', value: '换一道同类题还会不会开始。', icon: '/assets/reference/entry-map.png', scene: 'today' },
+      { label: '证据', value: '只记录第一步、错因和明天回访。', icon: '/assets/reference/entry-report.png', scene: 'report' }
     ],
     spotlight: {
       kicker: '回访验证板',
@@ -118,9 +118,9 @@ const SCENES = {
     secondaryLabel: '补充测评/错题',
     secondaryRoute: '/pages/upload/upload?from=entry_report_material',
     cards: [
-      { label: '证据来源', value: '测评、成绩、错题、对话和复习记录分开标注，不混成一句结论。', icon: '/assets/reference/entry-upload.png' },
-      { label: '天赋匹配', value: '先解释孩子适合怎样输入、输出和反馈，再落到具体方法。', icon: '/assets/reference/entry-report.png' },
-      { label: '方法依据', value: '把费曼、苏格拉底追问、短周期回访变成可执行动作。', icon: '/assets/reference/entry-tutor.png' }
+      { label: '证据来源', value: '测评、成绩、错题、对话和复习记录分开标注，不混成一句结论。', icon: '/assets/reference/entry-upload.png', scene: 'upload' },
+      { label: '天赋匹配', value: '先解释孩子适合怎样输入、输出和反馈，再落到具体方法。', icon: '/assets/reference/entry-report.png', scene: 'report' },
+      { label: '方法依据', value: '把费曼、苏格拉底追问、短周期回访变成可执行动作。', icon: '/assets/reference/entry-tutor.png', scene: 'tutor' }
     ],
     spotlight: {
       kicker: '报告决策板',
@@ -149,9 +149,9 @@ const SCENES = {
     secondaryLabel: '补一条证据',
     secondaryRoute: '/pages/upload/upload?from=entry_parent_material',
     cards: [
-      { label: '证据来自哪里', value: '测评、成绩、错题、对话和复习记录。', icon: '/assets/reference/entry-report.png' },
-      { label: '为什么这样学', value: '从学习偏好和当前卡点匹配方法。', icon: '/assets/reference/entry-tutor.png' },
-      { label: '今晚怎么做', value: '只给一张家庭行动卡，不制造焦虑。', icon: '/assets/reference/entry-parent.png' }
+      { label: '证据来自哪里', value: '测评、成绩、错题、对话和复习记录。', icon: '/assets/reference/entry-report.png', scene: 'report' },
+      { label: '为什么这样学', value: '从学习偏好和当前卡点匹配方法。', icon: '/assets/reference/entry-tutor.png', scene: 'tutor' },
+      { label: '今晚怎么做', value: '只给一张家庭行动卡，不制造焦虑。', icon: '/assets/reference/entry-parent.png', scene: 'parent' }
     ],
     spotlight: {
       kicker: '家长行动卡',
@@ -180,9 +180,9 @@ const SCENES = {
     secondaryLabel: '没有报告，做快测',
     secondaryRoute: '/pages/profile/profile?from=entry_upload_quiz&panel=assessment&quick_assessment=1',
     cards: [
-      { label: '天赋/测评', value: '提取学习偏好、注意力和优势通道。', icon: '/assets/reference/entry-report.png' },
-      { label: '成绩/错题', value: '提取学科卡点、错因和回访优先级。', icon: '/assets/reference/entry-review.png' },
-      { label: '家长观察', value: '补足情绪、习惯和家庭配合线索。', icon: '/assets/reference/entry-parent.png' }
+      { label: '天赋/测评', value: '提取学习偏好、注意力和优势通道。', icon: '/assets/reference/entry-report.png', scene: 'report' },
+      { label: '成绩/错题', value: '提取学科卡点、错因和回访优先级。', icon: '/assets/reference/entry-review.png', scene: 'review' },
+      { label: '家长观察', value: '补足情绪、习惯和家庭配合线索。', icon: '/assets/reference/entry-parent.png', scene: 'parent' }
     ],
     spotlight: {
       kicker: '材料分类板',

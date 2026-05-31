@@ -414,7 +414,9 @@
 }
 
 .entry-card {
+  position: relative;
   display: grid;
+  grid-template-columns: 52rpx minmax(0, 1fr) 28rpx;
   min-width: 0;
   min-height: 136rpx;
   align-items: center;
@@ -425,6 +427,11 @@
   border-radius: 22rpx;
   background: #ffffff;
   box-shadow: 0 12rpx 26rpx rgba(32, 49, 39, 0.045);
+}
+
+.entry-card:active {
+  transform: translateY(1rpx);
+  box-shadow: 0 8rpx 18rpx rgba(32, 49, 39, 0.04);
 }
 
 .entry-card-icon {
@@ -460,6 +467,20 @@
   text-align: left;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+}
+
+.entry-card-arrow {
+  display: grid;
+  width: 28rpx;
+  height: 28rpx;
+  place-items: center;
+  justify-self: end;
+  border-radius: 999rpx;
+  color: #174c3d;
+  background: #eaf9ef;
+  font-size: 24rpx;
+  font-weight: 950;
+  line-height: 1;
 }
 
 .entry-proof-strip {
