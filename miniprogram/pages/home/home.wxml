@@ -60,7 +60,7 @@
         </view>
         <view class="mini-entry-card ux-kit-jump-card yellow" data-scene="review" bindtap="openEntryDetail">
           <image class="mini-entry-visual" mode="aspectFill" src="/assets/reference/entry-review.png" />
-          <text>复习岛</text>
+          <text>短回访</text>
           <text>回忆与变式验证</text>
           <view class="mini-entry-arrow orange">›</view>
         </view>

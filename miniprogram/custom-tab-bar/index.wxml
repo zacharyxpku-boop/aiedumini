@@ -24,7 +24,7 @@
     bindtap="switchTab"
   >
     <view class="yd-tab-icon-wrap"><view class="yd-tab-icon island"></view></view>
-    <view class="yd-tab-text">复习岛</view>
+    <view class="yd-tab-text">短回访</view>
   </view>
   <view
     class="yd-tab-item {{selected === 3 ? 'active' : ''}}"

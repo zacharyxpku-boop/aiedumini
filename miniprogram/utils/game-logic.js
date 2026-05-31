@@ -244,7 +244,7 @@ function buildKnowledgeGap(events, cards) {
     if (subject) gaps[key].subjects[subject] = (gaps[key].subjects[subject] || 0) + 1;
   });
   return Object.values(gaps).sort((a, b) => b.count - a.count).slice(0, 8).map((item) => Object.assign({}, item, {
-    next_action: list.some((card) => [card.weakPoint, card.wrongCauseLabel, card.knowledge_point, card.subject].includes(item.key)) ? '复习相关卡片' : '补充一张错因卡'
+    next_action: list.some((card) => [card.weakPoint, card.wrongCauseLabel, card.knowledge_point, card.subject].includes(item.key)) ? '复习关联卡片' : '补充一张错因卡'
   }));
 }
 
@@ -1108,7 +1108,7 @@ function buildSocraticQualityMemoryBridge(qualitySuite = {}, result = {}, retent
     activeScenario: memoryActions[0] || null,
     memoryActions,
     xpGate: '只有说出第一步、完成错因回放或次日回访，才发放 XP；盲刷题量不加分。',
-    reviewDeckRule: `本轮优先回收「${weakKey}」相关卡，再进入新题。`,
+    reviewDeckRule: `本轮优先回收「${weakKey}」关联卡，再进入新题。`,
     parentLine: '家长只看孩子是否说出第一步、是否完成回访，不看完整答案、分数或排名。',
     privacyBoundary: '不带原题照片、完整对话、分数、排名、私密评价或原始答案。',
     evidenceRequired: ['socratic_quality_scenario', 'first_step_recall', 'blocked_answer_boundary', 'wrong_axis_replay', 'next_day_transfer_check']

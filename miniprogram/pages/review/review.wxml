@@ -7,7 +7,7 @@
           <view class="yd-review-brand">
             <image class="yd-review-mark" mode="aspectFit" src="/assets/reference/brand-house.png" />
             <view>
-              <text>复习岛</text>
+              <text>短回访</text>
               <text>主动回忆和迁移验证</text>
             </view>
           </view>
