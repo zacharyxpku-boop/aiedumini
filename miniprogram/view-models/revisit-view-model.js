@@ -17,8 +17,8 @@ function companionStrip(input, hasEvidence) {
   const preference = companionPreference(input);
   const line = storage.getCompanionStageCopy
     ? storage.getCompanionStageCopy(hasEvidence ? 'revisit_recall' : 'revisit_empty', preference)
-    : '咕点陪你轻短回访昨天那一步。';
-  return safeText(line, '咕点陪你轻短回访昨天那一步。');
+    : '咕点陪你轻轻回访昨天那一步。';
+  return safeText(line, '咕点陪你轻轻回访昨天那一步。');
 }
 
 function firstReviewCard(input) {
@@ -102,7 +102,7 @@ function buildPrimaryCta(hasReviewCard) {
 function buildRevisitViewModel(input = {}) {
   const primaryCard = buildPrimaryCard(input);
   return {
-    routePill: '今晚路线 · 第 4 步：明天轻短回访',
+    routePill: '今晚路线 · 第 4 步：明天轻轻回访',
     companionStrip: companionStrip(input.companionPreference, primaryCard.hasReviewCard),
     title: '今天只回看这一小步',
     subtitle: '不是测验，不翻旧账，只把昨天开始过的第一步轻轻接回来。',
@@ -117,7 +117,7 @@ function buildRevisitViewModel(input = {}) {
         }
       : null,
     quickSections: [
-      { id: 'light', title: '明天轻短回访', collapsed: true },
+      { id: 'light', title: '明天轻轻回访', collapsed: true },
       { id: 'custom', title: '自选练习先收起', collapsed: true }
     ],
     debugWarnings: []

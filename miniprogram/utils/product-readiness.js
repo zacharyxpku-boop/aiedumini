@@ -1114,7 +1114,7 @@ function buildProductReadiness(storage, options = {}) {
         Number(gameProfile.review_count || 0) ? `review_count ${gameProfile.review_count}` : '',
         Number(gameProfile.xp || 0) ? `xp ${gameProfile.xp}` : ''
       ],
-      '小游戏必须写回学习记录，而不是只做装饰入口。'
+      '短回访必须写回学习记录，而不是只做装饰入口。'
     ),
     evidenceItem(
       'parent_evidence',
@@ -1162,7 +1162,7 @@ function buildProductReadiness(storage, options = {}) {
         depthMap ? `readyDimensions ${depthMap.readyCount}/${depthMap.totalCount}` : '',
         depthMap && depthMap.nextBestAction ? `next: ${depthMap.nextBestAction}` : ''
       ],
-      '需要追问、方案、回访、轻练、家长陪伴和回流至少 5 个维度有本地证据。'
+      '需要追问、方案、短回访、家长陪伴和回流至少 5 个维度有本地证据。'
     ),
     evidenceItem(
       'weekly_pattern',

@@ -207,7 +207,7 @@ const COMPANION_OPTIONS = [
     copy: {
       home: '咕点陪你先找今晚第一步。',
       review: '咕点陪你只修这一小步，不讲完整答案。',
-      revisit: '咕点陪你轻短回访昨天那一步。',
+      revisit: '咕点陪你轻轻回访昨天那一步。',
       profile: '咕点帮你整理成家长能看懂的一句话。'
     }
   }
@@ -240,7 +240,7 @@ const INTERNAL_LABELS = {
   thinking_receipt: '思路记录',
   homework_plan: '今晚路线',
   tutor: '作业点拨',
-  module: '学习关卡',
+  module: '学习模块',
   manual_import: '手动整理',
   remote_ai_content_engine_v1: '学习材料整理',
   rule_content_engine_v2: '本地材料整理'
@@ -290,8 +290,8 @@ const COMPANION_STAGE_COPY = {
     home_stuck: '咕点懂你卡住了，我们先说清入口。',
     review_focus: '咕点陪你只修这一小步，不讲完整答案。',
     review_repairing: '咕点陪你先看第一眼，再说出自己的第一步。',
-    review_completed: '咕点帮你记下这一小步，明天轻短回访。',
-    revisit_recall: '咕点陪你轻短回访昨天那一步。',
+    review_completed: '咕点帮你记下这一小步，明天轻轻回访。',
+    revisit_recall: '咕点陪你轻轻回访昨天那一步。',
     revisit_empty: '还没有回访卡。先修过一小步，明天咕点再来轻轻看。',
     profile_summary: '咕点帮你整理成家长能看懂的一句话。',
     profile_empty: '完成一次卡点修复后，咕点会整理给家长看。',
@@ -311,7 +311,7 @@ function stripPrefixLabel(value) {
   if (colonIndex > 0 && isInternalKey(text.slice(0, colonIndex))) {
     return text.slice(colonIndex + 1).trim();
   }
-  if (text.indexOf('module:') === 0) return '学习关卡';
+  if (text.indexOf('module:') === 0) return '学习模块';
   if (text.indexOf('review:') === 0) return '复习回访';
   if (text.indexOf('arcade:') === 0) return '短回访';
   if (text.indexOf('factory_') === 0 || text.indexOf('factory:') === 0) return '学习材料整理';
@@ -702,7 +702,7 @@ function growthMemoryCopyFor(stage, preference) {
     return `你不是整题不会，只是卡在${memory.issueType}。对应修法：先说第一步，再做一道小变式。`;
   }
   if (stage === 'revisit') {
-    return '咕点陪你轻短回访一下，不用一次做很多。';
+    return '咕点陪你轻轻回访一下，不用一次做很多。';
   }
   if (stage === 'profile') {
     return getGrowthMemoryLine(memory, preference).oneLine;
@@ -2763,11 +2763,11 @@ function buildCapabilityEvidenceLedger(options = {}) {
       label: '回访证据',
       ready: gameCount > 0 || questSignals.length > 0,
       evidenceLine: questSignals.length
-        ? `已有 ${questSignals.length} 条剧情闯关证据`
+        ? `已有 ${questSignals.length} 条主动回忆证据`
         : gameCount
-          ? `今日轻练 ${gameCount} 次`
-          : '还缺一局能写回学习记录的轻练',
-      nextAction: '打一小局，把错因或迁移结果写回复习队列',
+          ? `今日短回访 ${gameCount} 次`
+          : '还缺一次能写回学习记录的短回访',
+      nextAction: '做一次短回访，把错因或迁移结果写回复习队列',
       route: '/pages/review/review'
     },
     {
@@ -2883,7 +2883,7 @@ function buildCapabilityMaturityQueue(options = {}) {
       surface: 'arcade',
       route: '/pages/review/review',
       capabilities: ['game', 'socratic', 'parent_action', 'next_action'],
-      competitorLine: '对标 Gizmo：主动回忆和间隔复习要成为主循环，不只是小游戏外壳。',
+      competitorLine: '对标 Gizmo：主动回忆和间隔复习要成为主循环，不只是娱乐外壳。',
       nextAction: '打一局后必须写回错因、第一步和下一次回访。'
     },
     {
@@ -2902,7 +2902,7 @@ function buildCapabilityMaturityQueue(options = {}) {
       route: '/pages/review/review',
       capabilities: ['socratic', 'game', 'report', 'module_flow', 'next_action'],
       competitorLine: '对标成熟错题系统：错因不是静态标签，要回到同类变式和隔天回看。',
-      nextAction: '先修一张真实卡点，再进入轻练或家长复盘。'
+      nextAction: '先修一张真实卡点，再进入短回访或家长复盘。'
     },
     {
       id: 'light_entry_scale',
@@ -2943,7 +2943,7 @@ function buildCapabilityMaturityQueue(options = {}) {
   ];
   const maturityContracts = {
     socratic_depth: {
-      acceptanceCriteria: ['孩子先说出自己的第一步', '系统只追问误区和证据', '点拨回执能转成修卡点或轻练'],
+      acceptanceCriteria: ['孩子先说出自己的第一步', '系统只追问误区和证据', '点拨回执能转成修卡点或短回访'],
       fallbackPlan: ['沉默时给 A/B 微选择', '直接要答案时退回第一步小黑板', '连续卡住时交给家长只问一句'],
       evidenceRequired: ['child_first_step', 'diagnostic_probe', 'handoff_to_review']
     },
@@ -2958,7 +2958,7 @@ function buildCapabilityMaturityQueue(options = {}) {
       evidenceRequired: ['long_term_portrait', 'classroom_observation', 'seven_day_action']
     },
     repair_to_recall: {
-      acceptanceCriteria: ['卡点有明确错因', '修复后生成同类变式', '结果进入轻练或家长复盘'],
+      acceptanceCriteria: ['卡点有明确错因', '修复后生成同类变式', '结果进入短回访或家长复盘'],
       fallbackPlan: ['错因不清先回点拨', '同类题失败时降级到第一步', '次日未记住则重新排入回忆'],
       evidenceRequired: ['wrong_cause_label', 'near_transfer_attempt', 'next_day_recall']
     },
@@ -2973,7 +2973,7 @@ function buildCapabilityMaturityQueue(options = {}) {
       evidenceRequired: ['capability_gap_share', 'share_landing_next_action', 'no_ranking_boundary']
     },
     material_factory: {
-      acceptanceCriteria: ['材料变成复习卡', '卡片能进入轻练', '材料来源可追溯'],
+      acceptanceCriteria: ['材料变成复习卡', '卡片能进入短回访', '材料来源可追溯'],
       fallbackPlan: ['材料太薄时要求补一句卡点', '外部识别不可用时本地手动录入', '不把输入框伪装成自动导入'],
       evidenceRequired: ['material_to_card', 'source_trace', 'practice_asset']
     },
@@ -8457,7 +8457,7 @@ function buildRecentLearningSummary(nowInput = new Date()) {
       ? `最近 3 晚有 ${latest3.filter((item) => item.firstSteps > 0).length} 晚说出了第一步，${latest3.filter((item) => item.completedFocus > 0).length} 晚完成了专注。`
       : '再用两晚后，咕点会帮你看见模式。',
     sevenNightText: latest7.length >= 7
-      ? `最近 7 晚有 ${firstStepDays} 晚确认第一步、${focusDays} 晚留下专注记录、${gameDays} 晚做了轻练。`
+      ? `最近 7 晚有 ${firstStepDays} 晚确认第一步、${focusDays} 晚留下专注记录、${gameDays} 晚做了短回访。`
       : '用满 7 晚后，咕点再整理一条更稳的复盘线索。',
     firstStepDays,
     focusDays,
@@ -8932,7 +8932,7 @@ function buildLightEntrySeedBank(feature = 'daily_math', options = {}) {
       modelLine: `${taskTypeLabel(seed.taskType)} · ${seed.wrongCause}`,
       blackboardLine: `${bank.label}小黑板：${seed.label} -> ${seed.firstStep}`,
       evidenceLine: `留下 ${depth.evidenceRequired.slice(0, 2).join(' / ')} 证据`,
-      loopLine: `完成后回到${feature === 'dictation' ? '听写回访' : feature === 'daily_math' ? '口算轻练' : '修卡点'}，再给家长看一句第一步。`,
+      loopLine: `完成后回到${feature === 'dictation' ? '听写回访' : feature === 'daily_math' ? '口算回访' : '修卡点'}，再给家长看一句第一步。`,
       route: bank.route
     };
   });
@@ -10965,7 +10965,7 @@ function buildLearningDecisionPath(options = {}) {
   } else if (todaySession.childArticulatedStep && !todaySession.gamePlayed) {
     route = '/pages/review/review';
     action = '玩一小局短回访';
-    reason = '孩子已经说出第一步，下一步让轻练结果写回记录。';
+    reason = '孩子已经说出第一步，下一步让短回访结果写回记录。';
   } else if (!parentReflection.ready) {
     route = '/pages/profile/profile';
     action = '留下家长追问回执';
@@ -11384,7 +11384,7 @@ function buildParentActionGuide(input = {}) {
   return {
     tonightRecap: input.tonightRecap || '今晚先看孩子有没有说出自己的第一步。',
     weekPattern: repeatedLine,
-    monthSuggestion: '接下来 7 天，每晚只做一件事：让孩子先说出自己的第一步，再用一张卡轻短回访。',
+    monthSuggestion: '接下来 7 天，每晚只做一件事：让孩子先说出自己的第一步，再用一张卡轻轻回访。',
     parentPhraseTraining: {
       title: '7 天家长陪伴脚本',
       preview: '先练“少讲答案，多问对一句”。',
@@ -11505,7 +11505,7 @@ function buildLearningDepthMap(options = {}) {
     },
     {
       id: 'practice_feedback',
-      label: '轻练会反哺',
+      label: '短回访会反哺',
       ready: hasPracticeFeedback,
       evidence: hasPracticeFeedback
         ? `今日练习 ${Number(gameProfile.reviewed_today || gameProfile.reviewedToday || 0)} 次，正确 ${Number(gameProfile.correct_today || gameProfile.correctToday || 0)} 次`
@@ -11568,7 +11568,7 @@ function buildLearningDepthMap(options = {}) {
   return {
     title: '能力厚度地图',
     summary: depthScore >= 84
-      ? '追问、回访、轻练、家长陪伴和回流已经连成一条可复用路线。'
+      ? '追问、短回访、家长陪伴和回流已经连成一条可复用路线。'
       : '核心路线能跑，继续补齐追问、回访或家长陪伴证据。',
     depthScore,
     readyCount,
@@ -11700,7 +11700,7 @@ function buildQuestArcGameBridge(options = {}) {
       evidenceRequired: ['tonight_first_step', 'game_attempt']
     },
     first_step: {
-      title: '第一步闯关',
+      title: '第一步验证',
       missionLine: '这一局不抢答案，只练“先说第一步”。',
       playRule: '每张卡先说准备从哪里开始，再核对思路。',
       evidenceRequired: ['student_first_step', 'no_final_answer']
@@ -11839,12 +11839,12 @@ function buildModuleFlowCompass(options = {}) {
     },
     {
       id: 'arcade',
-      label: '游戏化轻练',
+      label: '短回访验证',
       route: '/pages/review/review',
       ready: Number(gameProfile.reviewed_today || gameProfile.reviewedToday || 0) > 0,
       evidence: Number(gameProfile.reviewed_today || gameProfile.reviewedToday || 0)
-        ? `今日轻练 ${Number(gameProfile.reviewed_today || gameProfile.reviewedToday || 0)} 题`
-        : '还没把轻练写回证据',
+        ? `今日短回访 ${Number(gameProfile.reviewed_today || gameProfile.reviewedToday || 0)} 题`
+        : '还没把短回访写回证据',
       nextAction: '打一小局，错卡回队列',
       action: 'goArcade'
     },
@@ -11936,9 +11936,9 @@ function buildSurfaceDepthPack(surface = 'home', options = {}) {
   const surfaces = {
     home: {
       title: '首页厚度包',
-      summary: '把今晚第一步、点拨、修卡点、轻练和家长证据串成一个入口。',
+      summary: '把今晚第一步、点拨、修卡点、短回访和家长证据串成一个入口。',
       focusIds: ['guided_tutor', 'light_entry_evidence', 'material_to_review', 'game_retention', 'parent_evidence', 'local_resilience'],
-      nextAction: '先把今晚第一步说清，再去点拨 / 修卡点 / 轻练。',
+      nextAction: '先把今晚第一步说清，再去点拨 / 修卡点 / 短回访。',
       benchmark: '首页不只是入口，要能把孩子推进到下一步证据。'
     },
     tutor: {
@@ -11957,7 +11957,7 @@ function buildSurfaceDepthPack(surface = 'home', options = {}) {
     },
     arcade: {
       title: '游戏厚度包',
-      summary: '轻练必须写回学习证据，而不是只给一个好玩外壳。',
+      summary: '短回访必须写回学习证据，而不是只给一个好玩外壳。',
       focusIds: ['game_retention', 'spaced_recall', 'parent_evidence', 'depth_compounding'],
       nextAction: '先打一局，再看它把哪张卡写回复习。',
       benchmark: '游戏不是装饰入口，是证据回流的动力层。'
@@ -12673,7 +12673,7 @@ function buildCompetitiveMoatWorkbench(options = {}) {
       id: 'safe_share_relay',
       label: '安全分享接力',
       target: '分享只带第一步、错因、回访窗口和接收者动作，不带原题、答案、照片、分数、排名。',
-      currentEvidence: '分享回流已接 home/profile/review/arcade 路由和 blockedFields。',
+      currentEvidence: '分享回流已接 home/profile/review 路由和 blockedFields。',
       localCodeOwns: ['allowlist_payload', 'denylist_payload', 'return_route', 'relay_completion'],
       aiBetterFor: ['邀请语改写'],
       nextAction: '把接收者自己的材料接入同题型第一步挑战。'

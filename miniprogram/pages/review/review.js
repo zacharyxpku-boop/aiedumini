@@ -332,7 +332,7 @@ Page({
       status: '先说第一步，再进练习',
       conceptGap: current.wrongCause || current.wrongCauseBucket || current.weakPoint || '这类题第一步还不稳定',
       firstStep: current.prompt || current.answer || current.blackboardLine || '先说出这类题的第一步',
-      checkQuestion: current.question || '不看答案，说出第一步',
+      checkQuestion: current.question || '先说出第一步，再核对思路',
       parentLine: current.backPrompt || (current.nextPracticePlan && current.nextPracticePlan.parentPrompt) || '家长只问第一步，不追完整答案。',
       nextDayReview: current.revisit || (current.nextPracticePlan && current.nextPracticePlan.nextPracticeText) || '换一题，只回访第一步和错因。',
       exitGate: current.exitGate || 'child_can_say_first_step',
@@ -506,7 +506,7 @@ Page({
     const actions = [
       {
         id: 'arcade',
-        label: '5分钟轻练',
+        label: '5分钟短回访',
         route: '/pages/review/review',
         reason: '把修过的卡点放进主动回忆，不靠照抄结果。',
         capabilityId: 'game'
@@ -623,7 +623,7 @@ Page({
     const mustDo = (daily.mustDo || []).slice(0, 3).map((item, index) => ({
       id: item.id || `must_${index}`,
       label: item.label || `动作 ${index + 1}`,
-      action: item.action || item.rule || '主动回忆，不看答案'
+      action: item.action || item.rule || '主动回忆，先说思路'
     }));
     const releaseQueue = (daily.releaseQueue || []).slice(0, 3).map((item, index) => ({
       id: item.id || `release_${index}`,
@@ -665,7 +665,7 @@ Page({
     return {
       id: 'rule_retest_panel',
       title: '规则复测卡',
-      badge: '不看答案 · 不比速度',
+      badge: '先说思路 · 不比速度',
       line: active.question || active.prompt || '换一道同类小题，只说第一步和错因。',
       parentLine: active.parentPrompt || '家长只问：这次第一步是什么？为什么先做这一步？',
       blackboardLine: active.blackboardHint || '小黑板只画第一步关系，不画完整解法。',
@@ -739,7 +739,7 @@ Page({
       rewards: (safe.rewards || []).slice(0, 2).map((reward) => Object.assign({}, reward, {
         stateLabel: reward.claimed ? '已记录' : reward.canClaim ? '可记录' : '未完成'
       })),
-      primaryLabel: due ? '开始短回访' : '先轻练一下',
+      primaryLabel: due ? '开始短回访' : '先短回访一下',
       primaryAction: due ? 'review' : 'import',
       secondaryLabel: quiz.count ? '做 3 分钟测验' : '找卡点',
       secondaryAction: quiz.count ? 'quiz' : 'repair',
@@ -1609,7 +1609,7 @@ Page({
       source: 'review_post_repair_bridge',
       sourceLabel: '修卡后行动桥',
       actionId: dataset.id || 'arcade',
-      actionLabel: dataset.label || '5分钟轻练',
+      actionLabel: dataset.label || '5分钟短回访',
       route,
       reasonLine: dataset.reason || bridge.headline || '',
       evidenceLine: bridge.evidenceLine || '',

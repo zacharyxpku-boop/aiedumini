@@ -1042,7 +1042,7 @@ Page({
   buildIncomingShareRelay(incoming = null) {
     if (!incoming || !incoming.share_code) return null;
     const actionLabel = incoming.action_label || '先接住这张学习复盘卡';
-    const actionDetail = incoming.action_detail || incoming.capability_next_action || '用自己的材料走一遍：第一步、轻练、回访。';
+    const actionDetail = incoming.action_detail || incoming.capability_next_action || '用自己的材料走一遍：第一步、短回访、家长回访。';
     const challengeRoute = navigation.normalizeRoute(incoming.challenge_route || incoming.capability_route || '/pages/review/review');
     const unitRoute = navigation.normalizeRoute(incoming.course_unit_game_route || incoming.course_unit_recall_route || challengeRoute);
     const firstStep = incoming.relay_first_step || incoming.challenge_goal || actionLabel;

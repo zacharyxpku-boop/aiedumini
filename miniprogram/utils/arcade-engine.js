@@ -39,7 +39,7 @@ const GAME_TYPES = [
   {
     id: 'quiz',
     name: '轻回忆',
-    shortName: '轻练',
+    shortName: '短回访',
     verb: '逐题推进',
     fit: ['concept', 'problem', 'fact', 'skill'],
     status: 'ready',
@@ -240,7 +240,7 @@ function gameMascot(gameId) {
     snake: '小藤',
     lab: '小实验'
   };
-  return mascots[gameId] || '关卡';
+  return mascots[gameId] || '回访';
 }
 
 function gamePrinciple(gameId) {
@@ -577,7 +577,7 @@ function buildRoundAdvice(result = {}, gameType = 'whack') {
           title: '短卡片已经热起来了',
           body: '趁手感还在，再来一小局可以把检索速度稳住。',
           primary: '再来一小局',
-          secondary: wrong ? '修错卡' : '去轻练'
+          secondary: wrong ? '修错卡' : '去短回访'
         }
       : {
           title: '先别硬冲速度',
@@ -589,7 +589,7 @@ function buildRoundAdvice(result = {}, gameType = 'whack') {
       ? {
           title: '概念能说出来了',
           body: '下一步可以继续轻回忆，或把模糊卡沉淀成更短的回忆卡。',
-          primary: '继续轻练',
+          primary: '继续短回访',
           secondary: wrong ? '修一个错因' : '回到复习'
         }
       : {
@@ -640,7 +640,7 @@ function buildRepairFocus(answer = {}, cards = []) {
     answer: correctAnswer,
     weakPoint: answer.knowledgeType || ''
   });
-  const gameName = (GAME_TYPES.find((item) => item.id === gameType) || {}).shortName || '轻练';
+  const gameName = (GAME_TYPES.find((item) => item.id === gameType) || {}).shortName || '短回访';
   return {
     id: `arcade_repair_${answer.cardId || Date.now()}`,
     title: question ? `修这一题：${question}` : '修本局第一张错卡',
@@ -671,7 +671,7 @@ function buildHomeArcadeEntry(summary = {}, cards = []) {
     body: due
       ? `今天有 ${due} 张卡可以做短回访。`
       : '把作业、错题或知识点生成学习卡，再进入短回访。',
-    cta: primary && primary.available ? '进入今日轻练' : '先生成学习卡',
+    cta: primary && primary.available ? '进入今日短回访' : '先生成学习卡',
     action: primary && primary.available ? 'goArcade' : 'goLearningMap',
     gameId: primary ? primary.id : 'whack'
   };

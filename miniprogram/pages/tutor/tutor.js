@@ -358,7 +358,7 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
       ? '孩子已经能说回去，下一步不要加讲解，转成修卡点、短回访或给家长看。'
       : blockedAnswer
         ? '先拦住直接答案，把动作收窄到第一步和错因。'
-        : '先补一句自己的第一步，再进入修卡点或轻练。',
+        : '先补一句自己的第一步，再进入修卡点或短回访。',
     evidenceLine: `当前 ${score}/100 · ${studentFirst ? '有第一步' : '缺第一步'} · ${namedWrongCause ? '有错因' : '缺错因'}`,
     actions: [
       {
@@ -370,7 +370,7 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
       },
       {
         id: 'recall',
-        label: '5分钟轻练',
+        label: '5分钟短回访',
         route: '/pages/review/review?from=tutor_handoff&mode=recall',
         reason: proofSentence ? '已经会说方法，马上用一局短回访问是否转身还记得。' : '还没完全说清，先用低负担练习保留手感。',
         evidence: '短回访结果'

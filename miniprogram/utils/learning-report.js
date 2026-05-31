@@ -631,7 +631,7 @@ function buildRecommendationPlan(parts, matrix) {
     { day: 1, minutes: 15, module: primaryModule, task: `只选 ${subject} 的一个题型，让孩子说出第一步。` },
     { day: 2, minutes: 15, module: 'focus', task: '围绕昨天那一句第一步坐一段，结束后留一句证据。' },
     { day: 3, minutes: 15, module: 'review', task: '回看一个错因，不要求多题，只留下下次检查点。' },
-    { day: 4, minutes: 10, module: 'arcade', task: '做 3 分钟轻练，把第一步练熟。' },
+    { day: 4, minutes: 10, module: 'review', task: '做 3 分钟短回访，把第一步练熟。' },
     { day: 5, minutes: 20, module: primaryModule, task: '换一个小变式，看能否迁移第一步。' },
     { day: 6, minutes: 10, module: 'profile', task: '家长只问一句，把孩子原话记下来。' },
     { day: 7, minutes: 15, module: 'review', task: '上传或录入最新小测，更新学习画像。' }

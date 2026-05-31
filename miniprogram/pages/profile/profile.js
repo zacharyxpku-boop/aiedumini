@@ -479,7 +479,7 @@ function buildTonightRouteSummary(tonightPlan, todayFocus, reviewSummary) {
     why: plan.summaryLine || '今晚不是多做题，而是先排顺序，再把最容易卡住的一步修掉。',
     firstAction: first.title ? `${first.priorityLabel || '先做'}：${first.title}` : '先排学校任务，再留一点时间修卡点。',
     focus: todayFocus && todayFocus.issueType ? `${storage.formatIssueType(todayFocus.issueType)} · ${focusTitle}` : focusTitle,
-    review: dueCount ? `明天回访 ${dueCount} 张卡点卡。` : '明天用 1 道同类题轻短回访。',
+    review: dueCount ? `明天回访 ${dueCount} 张卡点卡。` : '明天用 1 道同类题轻轻回访。',
     parentPrompt: plan.parentPrompt || '你觉得这题第一步应该找什么？',
     status: [
       plan.id ? '已排顺序' : '待排顺序',
@@ -2778,7 +2778,7 @@ function buildFamilyDecisionActionBridge(input = {}) {
       },
       {
         id: 'practice',
-        label: '5分钟轻练',
+        label: '5分钟短回访',
         route: courseUnitRoute,
         reason: courseUnit ? courseUnit.sevenDayReviewLine : (active.task || nextCapability.nextAction || '用一局短回访确认不是当场会、转身忘。'),
         evidence: courseUnit ? courseUnit.classroomObservationLine : (evidence[1] || '留下错因卡')
@@ -2841,8 +2841,8 @@ function buildCommercialUnlockCard(reviewSummary, tutorSummary, thinkingSummary,
   return {
     title: done >= 3 ? '本周复盘已可整理' : '先跑通一次完整闭环',
     body: done >= 3
-      ? '你已经完成一次带学、一次轻练和一次回访，可以整理成本周复盘。'
-      : '完成 1 次作业点拨 + 1 次轻练 + 1 次回访后，就能整理成本周复盘。',
+      ? '你已经完成一次带学、一次短回访和一次家长回访，可以整理成本周复盘。'
+      : '完成 1 次作业点拨 + 1 次短回访 + 1 次家长回访后，就能整理成本周复盘。',
     done,
     total: steps.length,
     steps,
@@ -3908,7 +3908,7 @@ Page({
       { id: 'tutor', label: '思路记录', value: safeNumber(thinking.total, 0), source: '作业点拨' },
       { id: 'memory', label: '记忆卡', value: safeNumber(review.total, 0), source: '复习引擎' },
       { id: 'method_fit', label: '方法适配', value: safeNumber(modules.useful, 0), source: '学习方法' },
-      { id: 'factory', label: '关卡生成', value: safeNumber(factory.generated, 0), source: '材料 -> 关卡' }
+      { id: 'factory', label: '回访生成', value: safeNumber(factory.generated, 0), source: '材料 -> 回访卡' }
     ];
     const loopScore = Math.min(100, 58
       + Math.min(12, safeNumber(review.total, 0))

@@ -78,9 +78,9 @@ const SCENES = {
     proofSteps: proofFlow('tutor')
   },
   review: {
-    badge: '复习小关',
+    badge: '短回访',
     title: '5 分钟验证记忆和迁移',
-    subtitle: '不在入口页铺满关卡。先选今天要验证的一张卡，再进入 90 秒回忆或错因复盘。',
+    subtitle: '不在入口页铺满玩法。先选今天要验证的一张卡，再进入 90 秒回忆或错因复盘。',
     heroImage: '/assets/reference/entry-review.png',
     primaryLabel: '开始 90 秒回忆',
     primaryRoute: '/pages/review/review?mode=recall_return&from=entry_review',
@@ -92,7 +92,7 @@ const SCENES = {
       { label: '证据', value: '只记录第一步、错因和明天回访。', icon: '/assets/reference/entry-report.png' }
     ],
     spotlight: {
-      kicker: '复习闯关板',
+      kicker: '回访验证板',
       title: '先回忆，再迁移，最后回流证据',
       image: '/assets/reference/entry-review.png',
       metrics: [

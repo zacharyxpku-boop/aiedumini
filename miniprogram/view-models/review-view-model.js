@@ -213,7 +213,7 @@ function buildReviewViewModel(input = {}) {
       action: 'home'
     },
     nextStep: todayFocus && todayFocus.repairStatus === 'completed'
-      ? '已生成明天回访卡。下一步：去轻短回访。'
+      ? '已生成明天回访卡。下一步：去轻轻回访。'
       : '',
     debugWarnings: []
   };

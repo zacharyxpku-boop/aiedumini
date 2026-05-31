@@ -78,7 +78,7 @@ function proofSummary(input = {}) {
     ? `最近 3 晚：${latest3.filter((item) => item.firstSteps > 0).length} 晚确认第一步，${latest3.filter((item) => item.completedFocus > 0 || item.interruptedFocus > 0).length} 晚留下专注痕迹。`
     : INSUFFICIENT_PROOF;
   const sevenNightText = latest7.length >= 7
-    ? `最近 7 晚：${recentSummary.firstStepDays || 0} 晚确认第一步，${recentSummary.focusDays || 0} 晚专注，${recentSummary.gameDays || 0} 晚轻练。`
+    ? `最近 7 晚：${recentSummary.firstStepDays || 0} 晚确认第一步，${recentSummary.focusDays || 0} 晚专注，${recentSummary.gameDays || 0} 晚短回访。`
     : INSUFFICIENT_PROOF;
   return {
     oneNightProof: history.length || focus
@@ -107,7 +107,7 @@ function buildParentRecap(input = {}) {
     firstStepLine: `他先迈出的第一步是：${evidence.displayStep}`,
     recentFirstStepCount: proof.recentFirstStepCount,
     recentFocusEvidence: focusLine,
-    recentRevisitEvidence: proof.recentRevisitEvidence ? `已留下 ${proof.recentRevisitEvidence} 次短回访痕迹。` : '明天轻短回访后会留下记录。',
+    recentRevisitEvidence: proof.recentRevisitEvidence ? `已留下 ${proof.recentRevisitEvidence} 次短回访痕迹。` : '明天轻轻回访后会留下记录。',
     trustBoundaryNote: evidence.hasChildStep
       ? '咕点没有给答案，也没有直接给结果，只记录孩子自己说出的第一步。'
       : '咕点没有给答案，也没有直接给结果，只先整理一个可开始的第一步。',
