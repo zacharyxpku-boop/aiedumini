@@ -1,7 +1,7 @@
 <view class="review-page">
   <scroll-view class="content-area" scroll-y enhanced show-scrollbar="{{false}}">
     <view class="content-inner">
-      <view class="yd-review-screen ux-entry ux-entry-review ux-kit-screen ux-kit-review">
+      <view class="yd-review-screen yd-app-screen yd-review-app">
         <view class="yd-review-pill">3分钟回访</view>
         <view class="yd-review-top">
           <view class="yd-review-brand">

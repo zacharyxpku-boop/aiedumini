@@ -1,13 +1,13 @@
 page {
-  background: #F9F8F4;
+  background: #f9f8f4;
 }
 
 .profile-page {
   position: relative;
   min-height: 100vh;
   overflow: hidden;
-  color: #1F2933;
-  background: #F9F8F4;
+  color: #1f2933;
+  background: #f9f8f4;
 }
 
 .profile-scroll {
@@ -19,16 +19,17 @@ page {
 .profile-shell {
   position: relative;
   z-index: 2;
-  padding: 0 44rpx calc(170rpx + env(safe-area-inset-bottom));
+  padding: calc(108rpx + env(safe-area-inset-top)) 30rpx calc(126rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
 }
 
 .yd-parent-screen {
   position: relative;
-  margin: 18rpx 0 26rpx;
-  padding: 24rpx;
+  margin: 0 0 22rpx;
+  padding: 16rpx;
   overflow: hidden;
   border: 1rpx solid rgba(232, 238, 230, 0.94);
-  border-radius: 36rpx;
+  border-radius: 34rpx;
   background:
     radial-gradient(circle at 9% 3%, rgba(248, 198, 34, 0.18), transparent 24%),
     radial-gradient(circle at 92% 12%, rgba(76, 159, 255, 0.12), transparent 22%),
@@ -38,7 +39,6 @@ page {
 
 .yd-parent-top,
 .yd-parent-brand,
-.yd-parent-hero,
 .yd-parent-section-head,
 .yd-parent-action-row {
   display: flex;
@@ -53,14 +53,14 @@ page {
 }
 
 .yd-parent-mark {
+  display: block;
+  flex: 0 0 auto;
   width: 52rpx;
   height: 52rpx;
-  flex: 0 0 auto;
-  display: block;
   padding: 7rpx;
+  border: 1rpx solid rgba(34, 185, 92, 0.16);
   border-radius: 18rpx;
   background: #ebf9ed;
-  border: 1rpx solid rgba(34, 185, 92, 0.16);
   box-shadow: 0 14rpx 26rpx rgba(34, 185, 92, 0.24);
 }
 
@@ -89,10 +89,10 @@ page {
 .yd-parent-pill {
   flex: 0 0 auto;
   padding: 13rpx 18rpx;
-  color: #14854a;
-  background: #ebf9ed;
   border: 1rpx solid rgba(34, 185, 92, 0.16);
   border-radius: 999rpx;
+  color: #14854a;
+  background: #ebf9ed;
   font-size: 22rpx;
   font-weight: 900;
   white-space: nowrap;
@@ -100,71 +100,76 @@ page {
 
 .yd-parent-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 172rpx;
+  grid-template-columns: minmax(0, 1fr) 126rpx;
+  gap: 12rpx;
   align-items: center;
-  margin-top: 28rpx;
+  margin-top: 16rpx;
 }
 
 .yd-parent-kicker {
   width: max-content;
   max-width: 100%;
-  padding: 9rpx 15rpx;
+  padding: 7rpx 12rpx;
   border-radius: 999rpx;
   color: #9a6b00;
   background: #fff4c9;
-  font-size: 21rpx;
+  font-size: 19rpx;
   font-weight: 900;
 }
 
 .yd-parent-title {
-  margin-top: 14rpx;
+  margin-top: 10rpx;
   color: #101a16;
-  font-size: 42rpx;
+  font-size: 32rpx;
   font-weight: 950;
   line-height: 1.09;
   letter-spacing: 0;
 }
 
 .yd-parent-sub {
-  margin-top: 12rpx;
+  display: -webkit-box;
+  margin-top: 8rpx;
+  overflow: hidden;
   color: #64706a;
-  font-size: 23rpx;
-  line-height: 1.5;
+  font-size: 20rpx;
+  line-height: 1.34;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .yd-parent-art {
-  width: 186rpx;
-  height: 164rpx;
-  border-radius: 34rpx;
+  width: 126rpx;
+  height: 116rpx;
+  border-radius: 26rpx;
   background: #fff1ea;
 }
 
 .yd-parent-decision,
 .yd-parent-sources {
   border: 1rpx solid rgba(232, 238, 230, 0.95);
-  border-radius: 26rpx;
+  border-radius: 22rpx;
   background: rgba(255, 255, 255, 0.94);
   box-shadow: 0 12rpx 28rpx rgba(38, 58, 43, 0.05);
 }
 
 .yd-parent-decision {
   display: grid;
-  grid-template-columns: 118rpx minmax(0, 1fr) auto;
+  grid-template-columns: 92rpx minmax(0, 1fr) auto;
+  gap: 10rpx;
   align-items: center;
-  gap: 14rpx;
-  margin-top: 18rpx;
-  padding: 14rpx;
+  margin-top: 12rpx;
+  padding: 10rpx;
   background:
     radial-gradient(circle at 88% 16%, rgba(248, 198, 34, 0.16), transparent 36%),
     linear-gradient(135deg, #f2fbef 0%, #ffffff 72%);
 }
 
 .yd-parent-decision-img {
-  width: 118rpx;
-  height: 90rpx;
+  width: 92rpx;
+  height: 72rpx;
   overflow: hidden;
   border: 4rpx solid rgba(255, 255, 255, 0.78);
-  border-radius: 22rpx;
+  border-radius: 18rpx;
   background: #edf8ff;
 }
 
@@ -190,9 +195,9 @@ page {
   display: -webkit-box;
   margin-top: 6rpx;
   color: #66756d;
-  font-size: 20rpx;
+  font-size: 18rpx;
   font-weight: 760;
-  line-height: 1.3;
+  line-height: 1.24;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
@@ -200,18 +205,18 @@ page {
 .yd-parent-decision-badge {
   flex: 0 0 auto;
   padding: 9rpx 13rpx;
+  border: 1rpx solid rgba(34, 185, 92, 0.18);
   border-radius: 999rpx;
   color: #0f7b43;
   background: #ffffff;
-  border: 1rpx solid rgba(34, 185, 92, 0.18);
   font-size: 19rpx;
   font-weight: 950;
   white-space: nowrap;
 }
 
 .yd-parent-sources {
-  margin-top: 14rpx;
-  padding: 16rpx;
+  margin-top: 12rpx;
+  padding: 12rpx;
 }
 
 .yd-parent-section-head text:first-child {
@@ -227,38 +232,27 @@ page {
   white-space: nowrap;
 }
 
-.yd-parent-screen .ux-kit-jump-grid {
-  gap: 12rpx;
-  margin-top: 18rpx;
-}
-
-.parent-jump-card {
-  background:
-    radial-gradient(circle at 82% 18%, rgba(248, 198, 34, 0.18), transparent 32%),
-    #ffffff;
-}
-
 .yd-parent-source-row,
 .yd-parent-loop {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10rpx;
-  margin-top: 14rpx;
+  gap: 8rpx;
+  margin-top: 10rpx;
 }
 
 .yd-parent-source-row view {
-  min-width: 0;
   display: grid;
+  min-width: 0;
   justify-items: center;
   gap: 6rpx;
-  padding: 12rpx 6rpx;
-  border-radius: 20rpx;
+  padding: 9rpx 4rpx;
+  border-radius: 17rpx;
   background: #f8fbf3;
 }
 
 .yd-parent-source-row image {
-  width: 40rpx;
-  height: 40rpx;
+  width: 34rpx;
+  height: 34rpx;
 }
 
 .yd-parent-source-row text,
@@ -273,43 +267,62 @@ page {
   white-space: nowrap;
 }
 
+.yd-parent-screen .yd-jump-grid {
+  gap: 10rpx;
+  margin-top: 12rpx;
+}
+
+.parent-jump-card {
+  min-height: 126rpx;
+  padding: 11rpx 8rpx;
+  background:
+    radial-gradient(circle at 82% 18%, rgba(248, 198, 34, 0.18), transparent 32%),
+    #ffffff;
+}
+
+.parent-jump-card image {
+  width: 70rpx;
+  height: 58rpx;
+}
+
 .yd-parent-loop {
-  padding: 12rpx;
+  padding: 9rpx;
   border-radius: 24rpx;
   background: #ecf9ed;
 }
 
 .yd-parent-loop text {
   position: relative;
-  padding: 8rpx 4rpx;
+  padding: 7rpx 3rpx;
   border-radius: 16rpx;
   background: rgba(255, 255, 255, 0.84);
+  font-size: 18rpx;
 }
 
 .yd-parent-evidence-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10rpx;
-  margin-top: 12rpx;
+  margin-top: 10rpx;
 }
 
 .yd-parent-evidence-grid > view {
   display: grid;
-  grid-template-columns: 62rpx minmax(0, 1fr);
+  grid-template-columns: 52rpx minmax(0, 1fr);
   gap: 10rpx;
   align-items: center;
-  min-height: 104rpx;
-  padding: 12rpx;
+  min-height: 86rpx;
+  padding: 10rpx;
   border: 1rpx solid rgba(232, 238, 230, 0.95);
-  border-radius: 20rpx;
+  border-radius: 19rpx;
   background:
     radial-gradient(circle at 92% 12%, rgba(248, 198, 34, 0.15), transparent 34%),
     #ffffff;
 }
 
 .yd-parent-evidence-grid image {
-  width: 62rpx;
-  height: 62rpx;
+  width: 52rpx;
+  height: 52rpx;
   border-radius: 18rpx;
 }
 
@@ -335,148 +348,11 @@ page {
 }
 
 .yd-parent-action-row {
-  margin-top: 18rpx;
+  margin-top: 12rpx;
 }
 
 .parent-primary,
 .parent-secondary {
   flex: 1 1 0;
   margin-top: 0;
-}
-
-.profile-shell {
-  padding: calc(108rpx + env(safe-area-inset-top)) 34rpx calc(138rpx + env(safe-area-inset-bottom));
-}
-
-.yd-parent-screen {
-  margin-top: 0;
-  padding: 18rpx;
-  border-radius: 34rpx;
-}
-
-/* Final miniapp density pass: parent tab shows evidence and next action at a glance. */
-.profile-shell {
-  padding: calc(96rpx + env(safe-area-inset-top)) 30rpx calc(126rpx + env(safe-area-inset-bottom));
-}
-
-.yd-parent-screen {
-  padding: 16rpx;
-  border-radius: 32rpx;
-}
-
-.yd-parent-hero {
-  grid-template-columns: minmax(0, 1fr) 126rpx;
-  gap: 12rpx;
-  margin-top: 16rpx;
-}
-
-.yd-parent-kicker {
-  padding: 7rpx 12rpx;
-  font-size: 19rpx;
-}
-
-.yd-parent-title {
-  margin-top: 10rpx;
-  font-size: 32rpx;
-}
-
-.yd-parent-sub {
-  display: -webkit-box;
-  margin-top: 8rpx;
-  overflow: hidden;
-  font-size: 20rpx;
-  line-height: 1.34;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-}
-
-.yd-parent-art {
-  width: 126rpx;
-  height: 116rpx;
-  border-radius: 26rpx;
-}
-
-.yd-parent-decision {
-  grid-template-columns: 92rpx minmax(0, 1fr) auto;
-  gap: 10rpx;
-  margin-top: 12rpx;
-  padding: 10rpx;
-  border-radius: 22rpx;
-}
-
-.yd-parent-decision-img {
-  width: 92rpx;
-  height: 72rpx;
-  border-radius: 18rpx;
-}
-
-.yd-parent-decision-copy text:nth-child(2) {
-  font-size: 18rpx;
-  line-height: 1.24;
-}
-
-.yd-parent-sources {
-  margin-top: 12rpx;
-  padding: 12rpx;
-  border-radius: 22rpx;
-}
-
-.yd-parent-source-row,
-.yd-parent-loop {
-  gap: 8rpx;
-  margin-top: 10rpx;
-}
-
-.yd-parent-source-row view {
-  padding: 9rpx 4rpx;
-  border-radius: 17rpx;
-}
-
-.yd-parent-source-row image {
-  width: 34rpx;
-  height: 34rpx;
-}
-
-.yd-parent-screen .ux-kit-jump-grid {
-  gap: 10rpx;
-  margin-top: 12rpx;
-}
-
-.parent-jump-card {
-  min-height: 126rpx;
-  padding: 11rpx 8rpx;
-}
-
-.parent-jump-card image {
-  width: 70rpx;
-  height: 58rpx;
-}
-
-.yd-parent-loop {
-  padding: 9rpx;
-}
-
-.yd-parent-loop text {
-  padding: 7rpx 3rpx;
-  font-size: 18rpx;
-}
-
-.yd-parent-evidence-grid {
-  gap: 10rpx;
-  margin-top: 10rpx;
-}
-
-.yd-parent-evidence-grid > view {
-  min-height: 86rpx;
-  padding: 10rpx;
-  border-radius: 19rpx;
-}
-
-.yd-parent-evidence-grid image {
-  width: 52rpx;
-  height: 52rpx;
-}
-
-.yd-parent-action-row {
-  margin-top: 12rpx;
 }

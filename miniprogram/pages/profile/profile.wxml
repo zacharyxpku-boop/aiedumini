@@ -1,7 +1,7 @@
 <view class="page safe-bottom profile-page">
   <scroll-view class="profile-scroll" scroll-y enhanced show-scrollbar="{{false}}">
     <view class="profile-shell">
-      <view class="ux-entry ux-entry-parent ux-kit-screen ux-kit-parent yd-parent-screen">
+      <view class="yd-parent-screen yd-app-screen yd-parent-app">
         <view class="yd-parent-top">
           <view class="yd-parent-brand">
             <image class="yd-parent-mark" mode="aspectFit" src="/assets/reference/brand-house.png" />
@@ -44,18 +44,18 @@
           </view>
         </view>
 
-        <view class="ux-kit-jump-grid">
-          <view class="ux-kit-jump-card primary parent-jump-card" data-scene="parent" bindtap="openEntryDetail">
+        <view class="yd-jump-grid">
+          <view class="yd-jump-card primary parent-jump-card" data-scene="parent" bindtap="openEntryDetail">
             <image mode="aspectFill" src="/assets/reference/entry-parent.png" />
             <text>今晚安排</text>
             <text>看行动卡</text>
           </view>
-          <view class="ux-kit-jump-card parent-jump-card" data-scene="upload" bindtap="openEntryDetail">
+          <view class="yd-jump-card parent-jump-card" data-scene="upload" bindtap="openEntryDetail">
             <image mode="aspectFill" src="/assets/reference/entry-upload.png" />
             <text>补充材料</text>
             <text>上传新证据</text>
           </view>
-          <view class="ux-kit-jump-card parent-jump-card" data-scene="review" bindtap="openEntryDetail">
+          <view class="yd-jump-card parent-jump-card" data-scene="review" bindtap="openEntryDetail">
             <image mode="aspectFill" src="/assets/reference/entry-review.png" />
             <text>复习回访</text>
             <text>验证是否迁移</text>
@@ -87,8 +87,8 @@
         </view>
 
         <view class="yd-parent-action-row">
-          <view class="ux-kit-primary parent-primary" data-scene="parent" bindtap="openEntryDetail">{{profileViewModel.primaryCta}}</view>
-          <view class="ux-kit-secondary parent-secondary" data-scene="upload" bindtap="openEntryDetail">补一份材料</view>
+          <view class="yd-action-primary parent-primary" data-scene="parent" bindtap="openEntryDetail">{{profileViewModel.primaryCta}}</view>
+          <view class="yd-action-secondary parent-secondary" data-scene="upload" bindtap="openEntryDetail">补一份材料</view>
         </view>
       </view>
     </view>

@@ -1,7 +1,7 @@
 <view class="upload-page">
   <scroll-view class="upload-scroll" scroll-y enhanced show-scrollbar="{{false}}">
     <view class="upload-content">
-      <view class="yd-upload-screen ux-entry ux-entry-upload ux-kit-screen ux-kit-upload">
+      <view class="yd-upload-screen yd-app-screen yd-upload-app">
         <view class="yd-upload-top">
           <view class="yd-upload-brand">
             <image class="yd-upload-mark" mode="aspectFit" src="/assets/reference/brand-house.png" />
@@ -30,18 +30,18 @@
           <image class="yd-upload-mascot" mode="aspectFill" src="/assets/reference/entry-upload.png" />
         </view>
 
-        <view class="upload-material-grid ux-kit-jump-grid">
-          <view class="upload-material-card ux-kit-jump-card primary" data-scene="upload" bindtap="openEntryDetail">
+        <view class="upload-material-grid yd-jump-grid">
+          <view class="upload-material-card yd-jump-card primary" data-scene="upload" bindtap="openEntryDetail">
             <image class="upload-material-icon" mode="aspectFit" src="/assets/reference/entry-upload.png" />
             <text>上传材料</text>
             <text>作业/错题/成绩</text>
           </view>
-          <view class="upload-material-card ux-kit-jump-card" data-scene="parent" bindtap="openEntryDetail">
+          <view class="upload-material-card yd-jump-card" data-scene="parent" bindtap="openEntryDetail">
             <image class="upload-material-icon blue" mode="aspectFit" src="/assets/reference/entry-report.png" />
             <text>家长报告</text>
             <text>证据与方法匹配</text>
           </view>
-          <view class="upload-material-card ux-kit-jump-card" data-scene="today" bindtap="openEntryDetail">
+          <view class="upload-material-card yd-jump-card" data-scene="today" bindtap="openEntryDetail">
             <image class="upload-material-icon yellow" mode="aspectFit" src="/assets/reference/entry-map.png" />
             <text>今晚路线</text>
             <text>直接生成任务</text>

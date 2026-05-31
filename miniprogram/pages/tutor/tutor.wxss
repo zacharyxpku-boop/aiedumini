@@ -1,14 +1,14 @@
 page {
-  background: #F4F2EC;
+  background: #f4f2ec;
 }
 
 .tutor-page {
   min-height: 100vh;
   overflow: hidden;
-  color: #2D2C2A;
+  color: #2d2c2a;
   background:
     radial-gradient(circle at 50% -80rpx, rgba(242, 212, 121, 0.18), rgba(242, 212, 121, 0) 360rpx),
-    #F4F2EC;
+    #f4f2ec;
 }
 
 .tutor-shell {
@@ -24,31 +24,21 @@ page {
   display: flex;
   flex-direction: column;
   gap: 16rpx;
-  padding: 0 16rpx calc(178rpx + env(safe-area-inset-bottom));
+  padding: calc(108rpx + env(safe-area-inset-top)) 30rpx calc(126rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
 }
 
 .yd-tutor-screen {
   position: relative;
-  padding: 24rpx;
+  padding: 16rpx;
+  overflow: hidden;
   border: 1rpx solid rgba(232, 238, 230, 0.94);
-  border-radius: 36rpx;
+  border-radius: 34rpx;
   background:
     radial-gradient(circle at 8% 4%, rgba(248, 198, 34, 0.17), transparent 24%),
     radial-gradient(circle at 92% 8%, rgba(34, 185, 92, 0.12), transparent 22%),
     linear-gradient(180deg, #fffef9 0%, #f7fbf3 100%);
   box-shadow: 0 22rpx 60rpx rgba(38, 58, 43, 0.08);
-  overflow: hidden;
-}
-
-.yd-tutor-top,
-.yd-tutor-brand,
-.yd-tutor-hero,
-.tutor-chip-row,
-.tutor-section-head,
-.tutor-ladder,
-.tutor-entry-grid,
-.tutor-action-row {
-  box-sizing: border-box;
 }
 
 .yd-tutor-top,
@@ -67,14 +57,14 @@ page {
 }
 
 .yd-tutor-mark {
+  display: block;
+  flex: 0 0 auto;
   width: 52rpx;
   height: 52rpx;
-  flex: 0 0 auto;
-  display: block;
   padding: 7rpx;
+  border: 1rpx solid rgba(76, 159, 255, 0.16);
   border-radius: 18rpx;
   background: #eef7ff;
-  border: 1rpx solid rgba(76, 159, 255, 0.16);
   box-shadow: 0 14rpx 26rpx rgba(76, 159, 255, 0.12);
 }
 
@@ -103,75 +93,80 @@ page {
 .yd-tutor-pill {
   flex: 0 0 auto;
   padding: 13rpx 18rpx;
-  color: #14854a;
-  background: #ebf9ed;
   border: 1rpx solid rgba(34, 185, 92, 0.16);
   border-radius: 999rpx;
+  color: #14854a;
+  background: #ebf9ed;
   font-size: 22rpx;
   font-weight: 900;
 }
 
 .yd-tutor-hero {
   display: grid;
-  grid-template-columns: 190rpx minmax(0, 1fr);
-  gap: 18rpx;
+  grid-template-columns: 148rpx minmax(0, 1fr);
+  gap: 12rpx;
   align-items: center;
-  margin-top: 26rpx;
+  margin-top: 18rpx;
 }
 
 .yd-tutor-mascot {
-  width: 194rpx;
-  height: 178rpx;
-  border-radius: 36rpx;
+  width: 150rpx;
+  height: 140rpx;
+  overflow: hidden;
+  border: 6rpx solid rgba(255, 255, 255, 0.78);
+  border-radius: 28rpx;
   background: #effaf0;
 }
 
 .yd-tutor-bubble {
   min-width: 0;
-  padding: 22rpx;
+  padding: 16rpx;
   border: 1rpx solid rgba(232, 238, 230, 0.95);
-  border-radius: 28rpx;
+  border-radius: 24rpx;
   background: rgba(255, 255, 255, 0.92);
 }
 
 .yd-tutor-bubble view:first-child {
   color: #101a16;
-  font-size: 34rpx;
+  font-size: 30rpx;
   font-weight: 950;
   line-height: 1.12;
 }
 
 .yd-tutor-bubble > text {
-  display: block;
-  margin-top: 10rpx;
+  display: -webkit-box;
+  margin-top: 8rpx;
+  overflow: hidden;
   color: #64706a;
-  font-size: 23rpx;
-  line-height: 1.55;
+  font-size: 21rpx;
+  line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .tutor-chip-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 10rpx;
-  margin-top: 16rpx;
+  gap: 8rpx;
+  margin-top: 12rpx;
 }
 
 .tutor-chip-row text {
-  padding: 8rpx 14rpx;
-  color: #26754c;
-  background: #f0fbf0;
+  padding: 7rpx 12rpx;
   border: 1rpx solid rgba(34, 185, 92, 0.14);
   border-radius: 999rpx;
-  font-size: 20rpx;
+  color: #26754c;
+  background: #f0fbf0;
+  font-size: 19rpx;
   font-weight: 820;
   white-space: nowrap;
 }
 
 .tutor-flow-card {
-  margin-top: 22rpx;
-  padding: 20rpx;
+  margin-top: 12rpx;
+  padding: 12rpx;
   border: 1rpx solid rgba(232, 238, 230, 0.95);
-  border-radius: 28rpx;
+  border-radius: 24rpx;
   background: rgba(255, 255, 255, 0.94);
 }
 
@@ -190,32 +185,32 @@ page {
 .tutor-ladder {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12rpx;
-  margin-top: 18rpx;
+  gap: 8rpx;
+  margin-top: 12rpx;
 }
 
 .tutor-ladder-node {
   position: relative;
-  min-width: 0;
-  min-height: 126rpx;
-  padding: 13rpx 7rpx 12rpx;
   display: grid;
-  justify-items: center;
+  min-width: 0;
+  min-height: 100rpx;
   align-content: center;
+  justify-items: center;
   gap: 5rpx;
+  padding: 10rpx 4rpx;
+  overflow: visible;
   border: 1rpx solid rgba(232, 238, 230, 0.95);
-  border-radius: 24rpx;
+  border-radius: 19rpx;
   background: linear-gradient(180deg, #ffffff 0%, #f8faf5 100%);
   box-shadow: 0 12rpx 24rpx rgba(41, 65, 52, 0.07);
-  overflow: visible;
 }
 
 .tutor-ladder-node::after {
   content: "";
   position: absolute;
   top: 50%;
-  right: -18rpx;
-  width: 24rpx;
+  right: -14rpx;
+  width: 18rpx;
   height: 4rpx;
   border-radius: 999rpx;
   background: #dce8dc;
@@ -227,31 +222,33 @@ page {
 }
 
 .tutor-ladder-icon {
-  width: 48rpx;
-  height: 48rpx;
-  padding: 7rpx;
-  border-radius: 17rpx;
+  width: 42rpx;
+  height: 42rpx;
+  padding: 6rpx;
+  border-radius: 15rpx;
   background: #f0f8ee;
 }
 
-.tutor-ladder-node text:nth-child(2) {
+.tutor-ladder-node text {
   max-width: 100%;
-  color: #17211d;
-  font-size: 20rpx;
-  font-weight: 950;
-  line-height: 1.18;
+  overflow: hidden;
   text-align: center;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
+.tutor-ladder-node text:nth-child(2) {
+  color: #17211d;
+  font-size: 18rpx;
+  font-weight: 950;
+  line-height: 1.18;
+}
+
 .tutor-ladder-node text:nth-child(3) {
-  max-width: 100%;
   color: #526158;
-  font-size: 17rpx;
+  font-size: 16rpx;
   font-weight: 780;
   line-height: 1.18;
-  text-align: center;
-  white-space: nowrap;
 }
 
 .tutor-ladder-node.active {
@@ -275,20 +272,20 @@ page {
 .tutor-entry-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14rpx;
-  margin-top: 22rpx;
+  gap: 10rpx;
+  margin-top: 12rpx;
 }
 
 .tutor-entry-card {
-  min-width: 0;
-  min-height: 166rpx;
-  padding: 16rpx 12rpx;
   display: grid;
-  justify-items: center;
+  min-width: 0;
+  min-height: 124rpx;
   align-content: start;
+  justify-items: center;
   gap: 8rpx;
+  padding: 11rpx 9rpx;
   border: 1rpx solid rgba(232, 238, 230, 0.95);
-  border-radius: 24rpx;
+  border-radius: 22rpx;
   background: rgba(255, 255, 255, 0.9);
   box-shadow: 0 14rpx 34rpx rgba(38, 58, 43, 0.055);
 }
@@ -298,8 +295,9 @@ page {
 }
 
 .tutor-entry-card image {
-  width: 86rpx;
-  height: 74rpx;
+  width: 72rpx;
+  height: 56rpx;
+  overflow: hidden;
   border-radius: 18rpx;
 }
 
@@ -326,17 +324,17 @@ page {
 }
 
 .tutor-action-row {
-  margin-top: 20rpx;
+  margin-top: 12rpx;
 }
 
 .tutor-primary,
 .tutor-secondary {
   flex: 1 1 0;
-  height: 76rpx;
+  height: 66rpx;
   border-radius: 999rpx;
-  font-size: 25rpx;
+  font-size: 23rpx;
   font-weight: 950;
-  line-height: 76rpx;
+  line-height: 66rpx;
   text-align: center;
 }
 
@@ -350,138 +348,18 @@ page {
   background: #ebf9ed;
 }
 
-.main-inner {
-  padding: calc(108rpx + env(safe-area-inset-top)) 34rpx calc(138rpx + env(safe-area-inset-bottom));
-}
-
-.yd-tutor-screen {
-  margin-top: 0;
-  padding: 18rpx 18rpx 20rpx;
-  border-radius: 34rpx;
-}
-
-.yd-tutor-hero {
-  grid-template-columns: 176rpx minmax(0, 1fr);
-  gap: 12rpx;
-  margin-top: 18rpx;
-}
-
-.yd-tutor-mascot {
-  width: 176rpx;
-  height: 168rpx;
-  overflow: hidden;
-  border: 6rpx solid rgba(255, 255, 255, 0.78);
-  border-radius: 36rpx;
-}
-
-.yd-tutor-bubble {
-  min-height: 168rpx;
-  padding: 16rpx;
-}
-
-.yd-tutor-bubble view:first-child {
-  font-size: 30rpx;
-  line-height: 1.12;
-}
-
-.yd-tutor-bubble > text {
-  display: -webkit-box;
-  margin-top: 8rpx;
-  overflow: hidden;
-  font-size: 22rpx;
-  line-height: 1.42;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-}
-
-.tutor-chip-row {
-  gap: 8rpx;
-  margin-top: 12rpx;
-}
-
-.tutor-chip-row text {
-  padding: 7rpx 12rpx;
-  font-size: 19rpx;
-}
-
-.tutor-flow-card {
-  margin-top: 14rpx;
-  padding: 14rpx;
-  border-radius: 24rpx;
-}
-
-.tutor-ladder {
-  gap: 9rpx;
-  margin-top: 14rpx;
-}
-
-.tutor-ladder-node {
-  min-height: 108rpx;
-  padding: 10rpx 4rpx;
-  border-radius: 19rpx;
-}
-
-.tutor-ladder-node::after {
-  right: -14rpx;
-  width: 18rpx;
-}
-
-.tutor-ladder-icon {
-  width: 42rpx;
-  height: 42rpx;
-  padding: 6rpx;
-  border-radius: 15rpx;
-}
-
-.tutor-ladder-node text:nth-child(2) {
-  font-size: 18rpx;
-}
-
-.tutor-ladder-node text:nth-child(3) {
-  font-size: 16rpx;
-}
-
-.tutor-entry-grid {
-  gap: 12rpx;
-  margin-top: 16rpx;
-}
-
-.tutor-entry-card {
-  min-height: 132rpx;
-  padding: 11rpx 9rpx;
-  border-radius: 22rpx;
-}
-
-.tutor-entry-card image {
-  width: 72rpx;
-  height: 56rpx;
-  overflow: hidden;
-  border-radius: 18rpx;
-}
-
-.tutor-action-row {
-  margin-top: 16rpx;
-}
-
-.tutor-primary,
-.tutor-secondary {
-  height: 70rpx;
-  font-size: 24rpx;
-  line-height: 70rpx;
-}
-
 .tutor-support-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12rpx;
-  margin-top: 14rpx;
+  gap: 10rpx;
+  margin-top: 12rpx;
 }
 
 .tutor-support-card {
-  min-height: 132rpx;
-  padding: 16rpx 16rpx 14rpx;
+  min-height: 116rpx;
+  padding: 12rpx;
   border: 1rpx solid rgba(232, 238, 230, 0.95);
-  border-radius: 24rpx;
+  border-radius: 21rpx;
   background:
     radial-gradient(circle at 90% 12%, rgba(248, 198, 34, 0.18), transparent 30%),
     #ffffff;
@@ -497,9 +375,9 @@ page {
 .tutor-support-kicker {
   display: inline-flex;
   padding: 6rpx 12rpx;
+  border-radius: 999rpx;
   color: #0f7b43;
   background: #edf9ee;
-  border-radius: 999rpx;
   font-size: 18rpx;
   font-weight: 900;
 }
@@ -522,90 +400,4 @@ page {
   line-height: 1.35;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
-}
-
-/* Final miniapp density pass: AI tutor tab should read as an action surface. */
-.main-inner {
-  padding: calc(96rpx + env(safe-area-inset-top)) 30rpx calc(126rpx + env(safe-area-inset-bottom));
-}
-
-.yd-tutor-screen {
-  padding: 16rpx;
-  border-radius: 32rpx;
-}
-
-.yd-tutor-hero {
-  grid-template-columns: 148rpx minmax(0, 1fr);
-  gap: 12rpx;
-  margin-top: 18rpx;
-}
-
-.yd-tutor-mascot {
-  width: 150rpx;
-  height: 140rpx;
-  border-radius: 28rpx;
-}
-
-.yd-tutor-bubble {
-  padding: 16rpx;
-  border-radius: 24rpx;
-}
-
-.yd-tutor-bubble view:first-child {
-  font-size: 30rpx;
-}
-
-.yd-tutor-bubble > text {
-  display: -webkit-box;
-  margin-top: 8rpx;
-  overflow: hidden;
-  font-size: 21rpx;
-  line-height: 1.35;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-}
-
-.tutor-flow-card {
-  margin-top: 12rpx;
-  padding: 12rpx;
-}
-
-.tutor-ladder {
-  gap: 8rpx;
-  margin-top: 12rpx;
-}
-
-.tutor-ladder-node {
-  min-height: 100rpx;
-}
-
-.tutor-entry-grid {
-  gap: 10rpx;
-  margin-top: 12rpx;
-}
-
-.tutor-entry-card {
-  min-height: 124rpx;
-}
-
-.tutor-action-row {
-  margin-top: 12rpx;
-}
-
-.tutor-primary,
-.tutor-secondary {
-  height: 66rpx;
-  font-size: 23rpx;
-  line-height: 66rpx;
-}
-
-.tutor-support-grid {
-  gap: 10rpx;
-  margin-top: 12rpx;
-}
-
-.tutor-support-card {
-  min-height: 116rpx;
-  padding: 12rpx;
-  border-radius: 21rpx;
 }

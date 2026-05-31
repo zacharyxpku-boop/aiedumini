@@ -3,7 +3,7 @@
 
     <scroll-view class="tutor-main" scroll-y enhanced show-scrollbar="{{false}}">
       <view class="main-inner">
-        <view class="yd-tutor-screen ux-entry ux-entry-tutor ux-kit-screen ux-kit-tutor">
+        <view class="yd-tutor-screen yd-app-screen yd-tutor-app">
           <view class="yd-tutor-top">
             <view class="yd-tutor-brand">
               <image class="yd-tutor-mark" mode="aspectFit" src="/assets/reference/brand-house.png" />
@@ -56,18 +56,18 @@
             </view>
           </view>
 
-          <view class="tutor-entry-grid ux-kit-jump-grid">
-            <view class="tutor-entry-card ux-kit-jump-card primary" data-scene="tutor" bindtap="openEntryDetail">
+          <view class="tutor-entry-grid yd-jump-grid">
+            <view class="tutor-entry-card yd-jump-card primary" data-scene="tutor" bindtap="openEntryDetail">
               <image mode="aspectFill" src="/assets/reference/entry-tutor.png" />
               <text>发题目</text>
               <text>先说卡在哪里</text>
             </view>
-            <view class="tutor-entry-card ux-kit-jump-card" data-scene="today" bindtap="openEntryDetail">
+            <view class="tutor-entry-card yd-jump-card" data-scene="today" bindtap="openEntryDetail">
               <image mode="aspectFill" src="/assets/reference/entry-map.png" />
               <text>排顺序</text>
               <text>今晚先做哪题</text>
             </view>
-            <view class="tutor-entry-card ux-kit-jump-card" data-scene="review" bindtap="openEntryDetail">
+            <view class="tutor-entry-card yd-jump-card" data-scene="review" bindtap="openEntryDetail">
               <image mode="aspectFill" src="/assets/reference/entry-review.png" />
               <text>沉淀卡</text>
               <text>说完加入复习</text>
