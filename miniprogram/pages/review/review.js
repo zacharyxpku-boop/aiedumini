@@ -905,7 +905,7 @@ Page({
     const name = (storage.loadProfile() && storage.loadProfile().name) || '同学';
     return {
       title: '今日复盘卡',
-      label: '可以分享自己的今日复盘卡，当前只展示个人复盘，不展示同学榜或好友挑战。',
+      label: '可以分享自己的今日复盘卡，当前只展示个人复盘，不展示同学榜或好友对比。',
       headline: `${name} 今天正在完成 ${season.tier || '青铜'} 复习冲刺。`,
       inviteCode: social.inviteCode || '本地复盘',
       shareCopy: `${name} 今天完成 ${goal.completed || 0}/${goal.target || 0} 个复习目标，回访了 ${quiz.count || 0} 张卡。`,
