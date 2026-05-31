@@ -672,7 +672,7 @@ function buildHomeArcadeEntry(summary = {}, cards = []) {
       ? `今天有 ${due} 张卡可以做短回访。`
       : '把作业、错题或知识点生成学习卡，再进入短回访。',
     cta: primary && primary.available ? '进入今日短回访' : '先生成学习卡',
-    action: primary && primary.available ? 'goArcade' : 'goLearningMap',
+    action: primary && primary.available ? 'goRevisit' : 'goLearningMap',
     gameId: primary ? primary.id : 'whack'
   };
 }

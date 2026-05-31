@@ -85,7 +85,7 @@ Page({
     quizShowAnswer: false,
     quizFeedback: null,
     reviewPlaybook: null,
-    challengeCard: null,
+    revisitProofCard: null,
     gameRunway: DEFAULT_GAME_RUNWAY,
     mistakeHub: DEFAULT_MISTAKE_HUB,
     reviewViewModel: reviewViewModels.buildReviewViewModel(),
@@ -425,7 +425,7 @@ Page({
         review: storage.growthMemoryCopyFor ? storage.growthMemoryCopyFor('review', companionPreference) : ''
       },
       reviewPlaybook: this.buildReviewPlaybook(summary, cards),
-      challengeCard: this.buildChallengeCard(summary)
+      revisitProofCard: this.buildRevisitProofCard(summary)
     });
   },
 
@@ -505,7 +505,7 @@ Page({
       : `当前还有 ${Number(runway.due || (summary.dueCount || 0) || 0)} 张需要短回访。`;
     const actions = [
       {
-        id: 'arcade',
+        id: 'revisit',
         label: '5分钟短回访',
         route: '/pages/review/review',
         reason: '把修过的卡点放进主动回忆，不靠照抄结果。',
@@ -671,7 +671,7 @@ Page({
       blackboardLine: active.blackboardHint || '小黑板只画第一步关系，不画完整解法。',
       xpRule: active.xpRule || '奖励说清第一步、错因和回访，不奖励速度或分数比较。',
       releaseGate: retest.releaseGate || '三段复测证据齐之前，不写长期掌握结论。',
-      arcadeRoute: active.nextPracticePlan && active.nextPracticePlan.arcadeRoute
+      revisitRoute: active.nextPracticePlan && active.nextPracticePlan.arcadeRoute
         ? active.nextPracticePlan.arcadeRoute
         : '/pages/review/review?from=rule_retest',
       count: ruleCards.length,
@@ -894,7 +894,7 @@ Page({
     };
   },
 
-  buildChallengeCard(summary) {
+  buildRevisitProofCard(summary) {
     const safe = summary || {};
     const social = safe.socialChallenge || {};
     const progress = safe.progress || {};
@@ -963,8 +963,8 @@ Page({
     this.refresh();
   },
 
-  copyChallengeCard() {
-    const card = this.data.challengeCard;
+  copyRevisitProofCard() {
+    const card = this.data.revisitProofCard;
     if (!card) return;
     const text = [card.headline, card.shareCopy].concat(card.prompts || []).join('\n');
     wx.setClipboardData({
@@ -1601,7 +1601,7 @@ Page({
     const action = {
       source: 'review_post_repair_bridge',
       sourceLabel: '修卡后行动桥',
-      actionId: dataset.id || 'arcade',
+      actionId: dataset.id || 'revisit',
       actionLabel: dataset.label || '5分钟短回访',
       route,
       reasonLine: dataset.reason || bridge.headline || '',
@@ -1646,14 +1646,14 @@ Page({
 
   runRuleRetestAction() {
     const panel = this.data.ruleRetestPanel || {};
-    const route = panel.arcadeRoute || '/pages/review/review?from=rule_retest';
+    const route = panel.revisitRoute || '/pages/review/review?from=rule_retest';
     if (storage.recordUnifiedNextAction) {
       storage.recordUnifiedNextAction({
         surface: 'review',
         source: 'rule_retest_panel',
         sourceLabel: '规则复测卡',
-        actionId: 'rule_retest_arcade',
-        actionLabel: '去做复测挑战',
+        actionId: 'rule_retest_revisit',
+        actionLabel: '去做复测回访',
         route,
         reasonLine: panel.line || '',
         evidenceLine: panel.releaseGate || '',

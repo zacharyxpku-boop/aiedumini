@@ -2834,7 +2834,7 @@ function socialChallengeShell(summary) {
     }
   ];
   return {
-    title: '本机轻挑战',
+    title: '本机短回访',
     mode: 'local_preview_cloud_ready',
     inviteCode: '',
     dailyPrompt: challenge.title || 'Finish today mission',

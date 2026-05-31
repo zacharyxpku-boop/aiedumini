@@ -409,7 +409,7 @@ function buildParentReport(profile, reviewSummary, moduleSummary, tutorSummary, 
     ],
     nextActions: [
       { id: 'upload', label: '更新今晚作业', action: 'upload', detail: '刷新三分类' },
-      { id: 'arcade', label: '去短回访', action: 'review', detail: '复习一个卡点' },
+      { id: 'revisit', label: '去短回访', action: 'review', detail: '复习一个卡点' },
       { id: 'review', label: '开始复习', action: 'review', detail: '把方法记住' },
       { id: 'tutor', label: '辅导必须做', action: 'tutor', detail: '只给最小提示' }
     ],
@@ -1810,7 +1810,7 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
         id: 'source',
         label: '公开资料',
         owner: '本地代码 + 人工校验',
-        action: '抽取课程结构、题型簇、常见错因和可玩挑战，不复制原题、答案或受限内容。',
+        action: '抽取课程结构、题型簇、常见错因和短回访验证，不复制原题、答案或受限内容。',
         route: '/pages/upload/upload?from=openmaic_k12_workbench&type=school_material'
       },
       {
@@ -2847,7 +2847,7 @@ function buildCommercialUnlockCard(reviewSummary, tutorSummary, thinkingSummary,
     total: steps.length,
     steps,
     cta: done >= 3 ? '整理本周复盘' : '继续补齐记录',
-    action: done >= 3 ? 'review' : 'arcade',
+    action: done >= 3 ? 'review' : 'revisit',
     secondaryCta: done >= 2 ? '整理本周复盘' : '',
     secondaryAction: 'lead'
   };
@@ -4102,7 +4102,7 @@ Page({
       review: '/pages/review/review',
       upload: '/pages/upload/upload',
       reportPreview: '/pages/entry-detail/entry-detail?scene=parent&from=parent_report',
-      arcade: '/pages/review/review',
+      revisit: '/pages/review/review',
       tutor: '/pages/tutor/tutor'
     };
     if (routeTargets[action]) {

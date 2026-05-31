@@ -3,7 +3,7 @@ const navigation = require('../../utils/navigation');
 const reviewCards = require('../../utils/review-cards');
 const gameLogic = require('../../utils/game-logic');
 const learningModules = require('../../utils/learning-modules');
-const arcadeEngine = require('../../utils/arcade-engine');
+const revisitEngine = require('../../utils/arcade-engine');
 const api = require('../../utils/api');
 const tutorLadder = require('../../utils/tutor-ladder');
 const importIntake = require('../../utils/import-intake');
@@ -62,7 +62,7 @@ Page({
     contentEntry: null,
     parentSnapshot: null,
     weaknessVerdict: null,
-    arcadeEntry: {
+    revisitEntry: {
       body: '没有材料时先生成第一步验证，有真实卡片后再进入回访验证。',
       cta: '去短回访',
       action: 'goLearningMap'
@@ -141,8 +141,8 @@ Page({
         id: 'practice',
         title: '想练一小会',
         body: '用 3 分钟，把第一步练熟。',
-        action: 'goArcade',
-        cta: '玩一小局'
+        action: 'goRevisit',
+        cta: '做短回访'
       }
     ],
     parentClassroom: [
@@ -549,7 +549,7 @@ Page({
       cardCount: taskCards.length,
       dueCount: Number((reviewSummary && reviewSummary.due) || 0),
       route: primary.route || '/pages/review/review?from=home_daily_memory_task',
-      arcadeRoute: '/pages/review/review?from=home_daily_memory_task',
+      revisitRoute: '/pages/review/review?from=home_daily_memory_task',
       reviewRoute: '/pages/review/review?from=home_daily_memory_task',
       taskCards,
       tomorrowLine: nextEvidence.dueAt
@@ -666,7 +666,7 @@ Page({
       contentEntry: this.buildContentEntry(modulePath, reviewSummary),
       parentSnapshot: this.buildParentSnapshot(state, topMust, reviewSummary, thinkingSummary),
       weaknessVerdict: this.buildWeaknessVerdict(state, topMust, reviewSummary, thinkingSummary, modulePath),
-      arcadeEntry: this.buildArcadeEntry(reviewSummary),
+      revisitEntry: this.buildRevisitEntry(reviewSummary),
       wrongbookEntry: this.buildWrongbookEntry(reviewSummary),
       firstRunGuide: this.buildFirstRunGuide(topMust, reviewSummary, state),
       dashboardHeader: this.buildDashboardHeader(topMust, reviewSummary, modulePath, state),
@@ -752,7 +752,7 @@ Page({
       pack: currentModule ? currentModule.title : '可生成回访验证',
       review: `${due} 张复习 · ${quiz} 道小测`,
       actions: [
-        { id: 'arcade', label: '短回访', action: 'goLearningMap' },
+        { id: 'revisit', label: '短回访', action: 'goLearningMap' },
         { id: 'profile', label: '我的', action: 'goProfile' }
       ]
     };
@@ -1033,10 +1033,10 @@ Page({
     };
   },
 
-  buildArcadeEntry(reviewSummary) {
+  buildRevisitEntry(reviewSummary) {
     const cards = reviewCards.sessionCards('smart', 8);
     const fallback = cards.length ? cards : reviewCards.cardBrowser({ status: 'all', limit: 8 });
-    return arcadeEngine.buildHomeArcadeEntry(reviewSummary || {}, fallback);
+    return revisitEngine.buildHomeArcadeEntry(reviewSummary || {}, fallback);
   },
 
   buildIncomingShareRelay(incoming = null) {
@@ -1207,7 +1207,7 @@ Page({
       defaultReceiverActionTomorrow: defaultReceiverAction.tomorrow,
       defaultReceiverActionSafetyLine: defaultReceiverAction.safetyLine,
       receiverOwnMaterialChallenge,
-      receiverOwnMaterialChallengeLine: receiverOwnMaterialChallenge ? `接收者自己的材料挑战：${receiverOwnMaterialChallenge.label}｜${receiverOwnMaterialChallenge.receiverAction}` : '',
+      receiverOwnMaterialChallengeLine: receiverOwnMaterialChallenge ? `接收者自己的材料回访：${receiverOwnMaterialChallenge.label}｜${receiverOwnMaterialChallenge.receiverAction}` : '',
       receiverOwnMaterialChallengeRoute: receiverOwnMaterialChallenge ? receiverOwnMaterialChallenge.route : '',
       receiverOwnMaterialChallengeParentCheckLine: receiverOwnMaterialChallenge ? receiverOwnMaterialChallenge.parentCheck : '',
       receiverOwnMaterialChallengeNextRevisitLine: receiverOwnMaterialChallenge ? receiverOwnMaterialChallenge.nextRevisit : '',
@@ -1230,14 +1230,14 @@ Page({
       spreadEvidenceLine: spreadReadinessGate ? `需要证据：${spreadReadinessGate.requiredEvidence}` : '',
       peerRelayLadder,
       peerRelayLadderLine: peerRelayLadder ? `同伴接力阶梯：${peerRelayLadder.stageLine}` : '',
-      peerRelayAttractionLine: peerRelayLadder && peerRelayLadder.attractionHook ? `可复制挑战：${peerRelayLadder.attractionHook}` : '',
+      peerRelayAttractionLine: peerRelayLadder && peerRelayLadder.attractionHook ? `可复制回访：${peerRelayLadder.attractionHook}` : '',
       peerRelayLocalGateLine: peerRelayLadder && peerRelayLadder.localGate ? `本地放行门禁：${peerRelayLadder.localGate}` : '',
       peerRelaySeasonArc,
       peerRelaySeasonLine: peerRelaySeasonArc ? `7天接力赛季：${peerRelaySeasonArc.seasonLine || peerRelaySeasonArc.status}` : '',
       peerRelaySeasonDayLine: peerRelaySeasonArc ? `赛季节点：${peerRelaySeasonArc.days}` : '',
       peerRelaySeasonGateLine: peerRelaySeasonArc ? `赛季门禁：${peerRelaySeasonArc.localGate}` : '',
       sourceChallengeDeck,
-      sourceChallengeLine: sourceChallengeDeck ? `来源挑战：${sourceChallengeDeck.sourceLabel} · ${sourceChallengeDeck.count || 1} 组可借鉴结构。` : '',
+      sourceChallengeLine: sourceChallengeDeck ? `来源回访：${sourceChallengeDeck.sourceLabel} · ${sourceChallengeDeck.count || 1} 组可借鉴结构。` : '',
       sourceChallengePromptLine: sourceChallengeDeck ? sourceChallengeDeck.prompt : '',
       sourceChallengeDecisionLine: sourceChallengeDeck && sourceChallengeDeck.commercialDecision ? `使用判断：${sourceChallengeDeck.commercialDecision}` : '',
       sourceChallengeLocalRuleLine: sourceChallengeDeck && sourceChallengeDeck.localRule ? sourceChallengeDeck.localRule : '',
@@ -1300,7 +1300,7 @@ Page({
         },
         {
           id: 'challenge',
-          label: incoming.course_unit_label ? '练这个单元' : '轻挑战',
+          label: incoming.course_unit_label ? '练这个单元' : '短回访',
           route: questionBankRelayRoute,
           reason: naturalSpread.receiverPrompt || incoming.question_bank_relay_parent_check || incoming.course_unit_parent_decision || incoming.challenge_goal || actionLabel,
           evidence: incoming.challenge_rule || '5分钟短回访'
@@ -1321,9 +1321,9 @@ Page({
         },
         {
           id: 'source_challenge',
-          label: '来源挑战',
+          label: '来源回访',
           route: sourceChallengeRoute,
-          reason: sourceChallengeDeck ? sourceChallengeDeck.prompt : '用公开资料结构，换成自己的作业材料做一次第一步挑战。',
+          reason: sourceChallengeDeck ? sourceChallengeDeck.prompt : '用公开资料结构，换成自己的作业材料做一次第一步回访。',
           evidence: '公开结构本地化'
         },
         {
@@ -2091,9 +2091,9 @@ Page({
     navigation.navigateLearningRoute('/pages/review/review?from=yesterday_review');
   },
 
-  goArcade() {
+  goRevisit() {
     this.trackShareActivation('challenge_started', {
-      next: 'arcade'
+      next: 'revisit'
     });
     const incoming = this.data.incomingShare || (storage.loadIncomingShare && storage.loadIncomingShare()) || {};
     const socraticReportQuery = incoming.share_code
@@ -2200,7 +2200,7 @@ Page({
       source: 'incoming_share_relay',
       sourceLabel: '分享回流接力',
       actionId: dataset.id || 'challenge',
-      actionLabel: dataset.label || '轻挑战',
+      actionLabel: dataset.label || '短回访',
       route: target,
       reasonLine: dataset.reason || '',
       evidenceLine: dataset.evidence || ''

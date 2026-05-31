@@ -19,7 +19,7 @@ const MODE_CATALOG = [
     id: 'game_recall',
     label: '短回访验证',
     fit: ['会了容易忘', '需要重复巩固', '需要提高坚持度'],
-    action: '用一局轻挑战复查同一错因，不奖励最终答案。',
+    action: '用一次短回访复查同一错因，不奖励最终答案。',
     route: '/pages/review/review?from=service_pathway'
   },
   {

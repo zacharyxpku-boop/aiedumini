@@ -1651,8 +1651,8 @@ function buildRealTrialGameChallengeBridge(options = {}) {
     ready: challengeCards.length > 0,
     count: challengeCards.length,
     reportLine: challengeCards.length
-      ? `已把 ${challengeCards.length} 张真实试用回访卡接到轻挑战：只练第一步、错因和明天回访。`
-      : '真实试用回访卡生成后，会自动接到轻挑战和安全分享接力。',
+      ? `已把 ${challengeCards.length} 张真实试用回访卡接到短回访验证：只练第一步、错因和明天回访。`
+      : '真实试用回访卡生成后，会自动接到短回访验证和安全分享接力。',
     gameMode: 'first_step_revisit',
     localRuleLine: '本地代码决定哪些真实试用卡能进入回访验证、分享和回访；AI 只负责把追问改得更自然。',
     shareBoundary: '分享只带第一步、错因、家长检查和回访路线；不带原题、答案、照片、分数、排名和完整对话。',
@@ -7026,7 +7026,7 @@ function buildShareChallengePlan(input = {}) {
     ? subjectDepth.firstStep
     : (focus.childArticulatedStep || focus.systemSuggestedStep || '先说清第一步');
   const route = capability.route || input.route || '/pages/review/review';
-  const goal = `用自己的材料完成一次「${subjectLabel}」轻挑战`;
+  const goal = `用自己的材料完成一次「${subjectLabel}」短回访验证`;
   const steps = [
     { id: 'recall', label: '主动回忆', text: `先不看答案，说出：${firstStep}` },
     { id: 'repair', label: '错因修复', text: actionLabel || '错了也只退回第一步提示卡。' },
@@ -7037,11 +7037,11 @@ function buildShareChallengePlan(input = {}) {
     { id: 'tomorrow', label: '明天', text: '只回访最不稳的 1 张卡，不扩题量。' },
     { id: 'day_7', label: '第 7 天', text: '用 1 道小变式确认能不能迁移。' }
   ];
-  const privacyBoundary = '分享只带轻挑战、第一步、能力缺口和回访动作，不带孩子完整对话、分数、原题照片。';
+  const privacyBoundary = '分享只带短回访验证、第一步、能力缺口和回访动作，不带孩子完整对话、分数、原题照片。';
   const peerSafeLine = '同伴只接同类动作，不比较速度、不比较正确率。';
   const returnPathContract = [
     { id: 'land', label: '落地页', text: '先解释这不是排行榜，而是一张可复用的学习动作卡。' },
-    { id: 'choose', label: '选动作', text: '从修卡点、轻挑战、给家长看三条路里选一条。' },
+    { id: 'choose', label: '选动作', text: '从修卡点、短回访、给家长看三条路里选一条。' },
     { id: 'persist', label: '留证据', text: '完成后写入分享接力、统一下一步和页面能力账本。' }
   ];
   const relayChain = [
@@ -7196,7 +7196,7 @@ function buildShareChallengePlan(input = {}) {
   });
   const shareRelayActions = [
     { id: 'repair', label: '修卡点', route: wrongCauseReplayPayload.entry, evidence: 'wrong_cause_relay' },
-    { id: 'challenge', label: '做轻挑战', route, evidence: 'active_recall_relay' },
+    { id: 'revisit', label: '做短回访', route, evidence: 'active_recall_relay' },
     { id: 'parent', label: '给家长看', route: '/pages/profile/profile?from=share_relay', evidence: 'parent_decision_relay' }
   ];
   const safeRelayChallengePacket = buildSafeRelayChallengePacket({
@@ -7251,7 +7251,7 @@ function buildShareChallengePlan(input = {}) {
   };
   return {
     id: 'share_challenge_plan',
-    title: '同伴轻挑战',
+    title: '同伴短回访',
     goal,
     route,
     noRankingLine: '不排行、不晒分，只看有没有说清第一步。',
@@ -10497,7 +10497,7 @@ function buildWeeklyEvidenceFlywheel(options = {}) {
       childAction: activeCards[2] ? activeCards[2].prompt : '做一张小变式',
       evidence: 'near_transfer_attempted',
       parentDecision: '看方法能不能搬家，不用刷题量证明',
-      gameReturn: '小变式轻挑战'
+      gameReturn: '小变式短回访'
     },
     {
       day: 4,
@@ -10964,7 +10964,7 @@ function buildLearningDecisionPath(options = {}) {
     reason = '已有错因卡，但迁移练习还没有完成。';
   } else if (todaySession.childArticulatedStep && !todaySession.gamePlayed) {
     route = '/pages/review/review';
-    action = '玩一小局短回访';
+    action = '做一次短回访';
     reason = '孩子已经说出第一步，下一步让短回访结果写回记录。';
   } else if (!parentReflection.ready) {
     route = '/pages/profile/profile';
@@ -11378,7 +11378,7 @@ function buildParentActionGuide(input = {}) {
     { day: 3, action: '做 1 道同类题', script: '这道同类题，第一步和昨天一样吗？', evidence: 'same_type_try_once' },
     { day: 4, action: '检查错因', script: '这次卡住，是读题、列式、步骤还是检查？', evidence: 'wrong_cause_named' },
     { day: 5, action: '让孩子教家长', script: '你用一句话教我：这类题第一步看什么？', evidence: 'child_explains_back' },
-    { day: 6, action: '主动回忆挑战', script: '玩一小局后，说一张错卡为什么回来。', evidence: 'arcade_wrong_card_returned' },
+    { day: 6, action: '主动回忆回访', script: '做一次短回访后，说一张错卡为什么回来。', evidence: 'revisit_wrong_card_returned' },
     { day: 7, action: '形成周小结', script: '这一周最常卡的是哪一步？下周先修哪一类？', evidence: 'weekly_pattern_named' }
   ];
   return {
@@ -11509,7 +11509,7 @@ function buildLearningDepthMap(options = {}) {
       ready: hasPracticeFeedback,
       evidence: hasPracticeFeedback
         ? `今日练习 ${Number(gameProfile.reviewed_today || gameProfile.reviewedToday || 0)} 次，正确 ${Number(gameProfile.correct_today || gameProfile.correctToday || 0)} 次`
-        : '先玩一小局，让结果写回学习记录'
+        : '先做一次短回访，让结果写回学习记录'
     },
     {
       id: 'parent_coaching',
@@ -11845,8 +11845,8 @@ function buildModuleFlowCompass(options = {}) {
       evidence: Number(gameProfile.reviewed_today || gameProfile.reviewedToday || 0)
         ? `今日短回访 ${Number(gameProfile.reviewed_today || gameProfile.reviewedToday || 0)} 题`
         : '还没把短回访写回证据',
-      nextAction: '打一小局，错卡回队列',
-      action: 'goArcade'
+      nextAction: '做一次短回访，错卡回队列',
+      action: 'goRevisit'
     },
     {
       id: 'transfer',

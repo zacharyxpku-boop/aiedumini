@@ -531,7 +531,7 @@ function buildPublicK12SelectedHomework(challenge = {}) {
   const wrongCause = challenge.localTransform || challenge.gameUse || taskType;
   return {
     id: `public_k12_tutor_${challenge.id || taskType}`,
-    text: challenge.prompt || challenge.title || `公开 K12 挑战：${challenge.subject || '当前学科'} · ${taskType}`,
+    text: challenge.prompt || challenge.title || `公开 K12 第一问：${challenge.subject || '当前学科'} · ${taskType}`,
     subject: challenge.subject || '',
     taskType,
     source: 'public_k12_intake',
@@ -568,7 +568,7 @@ function publicK12TutorIntro(challenge = {}, selected = {}) {
   const subject = challenge.subject || selected.subject || '当前学科';
   const taskType = challenge.taskType || selected.taskType || 'unknown';
   const firstMove = challenge.observableFirstMove || selected.evidence && selected.evidence.first_step_prompt || '先说第一步。';
-  return `已进入公开 K12 第一挑战：${subject} · ${taskType}。请贴你自己的作业材料或用一句话复述题目，我只追问第一步：${firstMove} 不给完整答案，不外传原题/照片/分数。`;
+  return `已进入公开 K12 第一问：${subject} · ${taskType}。请贴你自己的作业材料或用一句话复述题目，我只追问第一步：${firstMove} 不给完整答案，不外传原题/照片/分数。`;
 }
 
 function buildSocraticFeedbackAdjustment(item, turnState = {}) {

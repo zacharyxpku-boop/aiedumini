@@ -218,7 +218,7 @@ function buildLearningAssessment(text) {
     tutor: '用咕点追问，让孩子把第一步说出来。',
     focus: '先进入专注舱，围绕这一小步坐一段。',
     review: '先修错题卡点，留下下次检查点。',
-    revisit: '先做短回访，再进主动回忆挑战。'
+    revisit: '先做短回访，再做主动回忆验证。'
   }[capability.id] || '先从最小动作开始。';
 
   return {

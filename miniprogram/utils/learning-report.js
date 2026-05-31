@@ -470,10 +470,10 @@ function buildScoreReleasePolicy(input = {}, sources = [], parsed = {}, behavior
     || (!negativeScoreSheetSignal && /score_sheet|成绩单|分数单|考试成绩|试卷|错题|老师反馈|学校反馈/.test(sourceText))
     || (!!input.scoreText && parsedSubjectCount > 0);
   const talentOrThirdParty = typedAsThirdParty
-    || /天赋|测评|学习类型|学习风格|视觉型|听觉型|动觉型|多元智能|MBTI|澶╄祴|娴嬭瘎|瀛︿範绫诲瀷|瀛︿範椋庢牸|瑙嗚/.test(sourceText);
+    || /天赋|测评|学习类型|学习风格|视觉型|听觉型|动觉型|多元智能|MBTI/.test(sourceText);
   const homeworkEvidence = explicitScoreSourceType
     || !!(behaviorSignals.firstStep || behaviorSignals.childFirstStep || behaviorSignals.wrongCause || behaviorSignals.weakPoint || behaviorSignals.homeworkDelay)
-    || /错题|作业|试卷|第一步|卡住|列式|回访|小变式|閿欓|浣滀笟|璇曞嵎|绗/.test(sourceText);
+    || /错题|作业|试卷|第一步|卡住|列式|回访|小变式/.test(sourceText);
   const scoreRankingReleased = explicitScoreSheet && (!talentOrThirdParty || homeworkEvidence);
   const methodCandidateOnly = !scoreRankingReleased && (talentOrThirdParty || parsedSubjectCount > 0);
   const incomingScores = Object.assign({}, parsed.parsedScores || {}, input.parsedScores || {});
