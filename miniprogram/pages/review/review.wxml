@@ -56,23 +56,23 @@
           </view>
         </view>
 
-        <view class="review-challenge-grid">
-          <view class="review-challenge-card primary" data-scene="review" bindtap="openEntryDetail">
+        <view class="review-action-grid">
+          <view class="review-action-card primary" data-scene="review" bindtap="openEntryDetail">
             <image mode="aspectFit" src="/assets/reference/entry-review.png" />
             <text>开始挑战</text>
             <text>3 张回忆卡</text>
           </view>
-          <view class="review-challenge-card" data-scene="tutor" bindtap="openEntryDetail">
+          <view class="review-action-card" data-scene="tutor" bindtap="openEntryDetail">
             <image mode="aspectFit" src="/assets/reference/entry-tutor.png" />
             <text>回到AI私教</text>
             <text>卡住先问第一步</text>
           </view>
-          <view class="review-challenge-card" data-scene="today" bindtap="openEntryDetail">
+          <view class="review-action-card" data-scene="today" bindtap="openEntryDetail">
             <image mode="aspectFit" src="/assets/reference/entry-map.png" />
             <text>换一题验证</text>
             <text>看是否真的迁移</text>
           </view>
-          <view class="review-challenge-card" data-scene="parent" bindtap="openEntryDetail">
+          <view class="review-action-card" data-scene="parent" bindtap="openEntryDetail">
             <image mode="aspectFit" src="/assets/reference/entry-parent.png" />
             <text>给家长看</text>
             <text>只汇总证据和下一步</text>

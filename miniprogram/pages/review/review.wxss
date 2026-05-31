@@ -41,7 +41,7 @@ page {
 .review-chip-row,
 .review-section-head,
 .review-map-line,
-.review-challenge-grid {
+.review-action-grid {
   box-sizing: border-box;
 }
 
@@ -265,14 +265,14 @@ page {
   line-height: 1.18;
 }
 
-.review-challenge-grid {
+.review-action-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12rpx;
   margin-top: 16rpx;
 }
 
-.review-challenge-card {
+.review-action-card {
   display: grid;
   align-content: start;
   justify-items: center;
@@ -285,18 +285,18 @@ page {
   box-shadow: 0 14rpx 34rpx rgba(38, 58, 43, 0.055);
 }
 
-.review-challenge-card.primary {
+.review-action-card.primary {
   background: linear-gradient(180deg, #ffffff 0%, #f0fbf0 100%);
 }
 
-.review-challenge-card image {
+.review-action-card image {
   width: 72rpx;
   height: 56rpx;
   overflow: hidden;
   border-radius: 18rpx;
 }
 
-.review-challenge-card text {
+.review-action-card text {
   display: block;
   max-width: 100%;
   overflow: hidden;
@@ -304,7 +304,7 @@ page {
   text-overflow: ellipsis;
 }
 
-.review-challenge-card text:nth-child(2) {
+.review-action-card text:nth-child(2) {
   color: #17211d;
   font-size: 22rpx;
   font-weight: 950;
@@ -312,7 +312,7 @@ page {
   white-space: nowrap;
 }
 
-.review-challenge-card text:nth-child(3) {
+.review-action-card text:nth-child(3) {
   color: #66746d;
   font-size: 18rpx;
   line-height: 1.35;

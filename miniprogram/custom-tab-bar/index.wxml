@@ -23,7 +23,7 @@
     data-path="/pages/review/review"
     bindtap="switchTab"
   >
-    <view class="yd-tab-icon-wrap"><view class="yd-tab-icon island"></view></view>
+    <view class="yd-tab-icon-wrap"><view class="yd-tab-icon review"></view></view>
     <view class="yd-tab-text">短回访</view>
   </view>
   <view

@@ -409,7 +409,7 @@ button::after {
 .ux-primary-button,
 .ux-jump-row,
 .ux-board,
-.ux-island-map,
+.ux-journey-map,
 .ux-evidence-strip,
 .ux-material-grid {
   position: relative;
@@ -523,7 +523,7 @@ button::after {
   font-weight: 950;
 }
 
-.ux-island-map {
+.ux-journey-map {
   display: grid;
   grid-template-columns: 1fr 38rpx 1fr 38rpx 1fr;
   align-items: center;
@@ -949,7 +949,7 @@ button::after {
   text-align: center;
 }
 
-.ux-island-scene {
+.ux-journey-scene {
   position: relative;
   min-height: 390rpx;
   margin-top: 20rpx;
@@ -958,7 +958,7 @@ button::after {
   background: linear-gradient(180deg, #dff5ff 0%, #f5ffe9 100%);
 }
 
-.ux-island-shape {
+.ux-journey-shape {
   position: absolute;
   left: 92rpx;
   top: 92rpx;
@@ -987,7 +987,7 @@ button::after {
   top: 74rpx;
 }
 
-.ux-entry-island .ux-map-node {
+.ux-entry-journey .ux-map-node {
   position: absolute;
   min-height: 66rpx;
   width: 66rpx;
@@ -997,17 +997,17 @@ button::after {
   font-size: 27rpx;
 }
 
-.ux-entry-island .ux-map-node.done {
+.ux-entry-journey .ux-map-node.done {
   left: 58rpx;
   top: 74rpx;
 }
 
-.ux-entry-island .ux-map-node.active {
+.ux-entry-journey .ux-map-node.active {
   left: 182rpx;
   top: 34rpx;
 }
 
-.ux-entry-island .ux-map-node:not(.done):not(.active) {
+.ux-entry-journey .ux-map-node:not(.done):not(.active) {
   right: 58rpx;
   top: 104rpx;
 }

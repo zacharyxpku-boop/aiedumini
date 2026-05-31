@@ -182,7 +182,7 @@
   box-shadow: 10rpx 0 0 currentColor, 5rpx 8rpx 0 -1rpx currentColor;
 }
 
-.yd-tab-icon.island::before {
+.yd-tab-icon.review::before {
   content: "";
   position: absolute;
   left: 3rpx;
@@ -194,7 +194,7 @@
   border-radius: 0 0 18rpx 18rpx;
 }
 
-.yd-tab-icon.island::after {
+.yd-tab-icon.review::after {
   content: "";
   position: absolute;
   left: 10rpx;
