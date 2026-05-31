@@ -357,7 +357,7 @@ function buildUploadAiMaterialSolutionView(contract = {}, sourceSchemaId = '', o
   const confidenceLevel = confidence.level || 'low';
   return {
     id: 'upload_ai_material_solution_view',
-    title: 'AI analysis to action',
+    title: 'AI分析后的下一步',
     statusLine: contract && contract.endpointPath
       ? `server endpoint: ${contract.endpointPath}; fallback: ${fallback.status || 'local_guarded_draft'}`
       : 'local guarded draft until server analysis is configured',
@@ -376,10 +376,10 @@ function buildUploadAiMaterialSolutionView(contract = {}, sourceSchemaId = '', o
     coverageLine: contentCoverageReceipt.coverageLine || 'coverage: local first-step strategy until verified content match is available',
     coverageFallbackLine: contentCoverageReceipt.fallbackLine || 'fallback: Socratic first step and next-day revisit',
     routes: [
-      { id: 'socratic', label: 'Socratic', route: executionPath.socraticRoute || '/pages/tutor/tutor?from=ai_material_analysis' },
-      { id: 'mini_lesson', label: 'Mini lesson', route: executionPath.miniLessonRoute || '/pages/tutor/tutor?from=ai_material_analysis_mini_lesson' },
-      { id: 'review_recall', label: 'Review recall', route: executionPath.gameRecallRoute || '/pages/review/review?from=ai_material_analysis' },
-      { id: 'parent_review', label: 'Parent review', route: executionPath.parentReviewRoute || '/pages/profile/profile?from=ai_material_analysis' }
+      { id: 'socratic', label: 'AI私教追问', route: executionPath.socraticRoute || '/pages/tutor/tutor?from=ai_material_analysis' },
+      { id: 'mini_lesson', label: '3分钟小课堂', route: executionPath.miniLessonRoute || '/pages/tutor/tutor?from=ai_material_analysis_mini_lesson' },
+      { id: 'review_recall', label: '短回访验证', route: executionPath.gameRecallRoute || '/pages/review/review?from=ai_material_analysis' },
+      { id: 'parent_review', label: '家长报告', route: executionPath.parentReviewRoute || '/pages/profile/profile?from=ai_material_analysis' }
     ],
     releaseLine: releaseGates.length
       ? `release gates: ${releaseGates.slice(0, 4).join(' / ')}`
@@ -420,8 +420,8 @@ function buildUploadDailyExecutionSeed(options = {}) {
     tutorRoute,
     gameRoute,
     gameLine: gameUnlocked
-      ? '游戏回访已解锁：只练主动回忆，不奖励速度、分数或同伴比较。'
-      : '游戏回访暂不解锁：先补孩子第一步或错因证据。',
+      ? '短回访已解锁：只练主动回忆，不奖励速度、分数或同伴比较。'
+      : '短回访暂不解锁：先补孩子第一步或错因证据。',
     releaseLine: '放行规则：有第一步 + 错因 + 明天回访证据，才进入回访验证或分享。',
     blockedLine: '不带原题、完整答案、分数、名次、天赋标签、孩子姓名或联系方式。',
     evidenceRequired: ['child_first_step', 'wrong_cause_named', 'next_day_revisit', 'parent_check'],

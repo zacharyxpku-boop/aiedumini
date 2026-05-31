@@ -10357,7 +10357,7 @@ function buildCourseUnitDepthExpansionAtlas(options = {}) {
     id: 'course_unit_depth_expansion_atlas',
     title: '题型深度扩展图谱',
     subjectLabel: active ? active.label : '',
-    summary: `已把 ${unitAtlases.length} 个单元扩展为原型题、误区变体、第一步小黑板、家长检查、游戏回访和安全分享。`,
+    summary: `已把 ${unitAtlases.length} 个单元扩展为原型题、误区变体、第一步小黑板、家长检查、短回访和安全分享。`,
     boundary: '这是题型级内容厚度，不是全科拍题讲完整答案。',
     unitCount: unitAtlases.length,
     archetypeCount: unitAtlases.reduce((sum, item) => sum + item.archetypeCount, 0),
