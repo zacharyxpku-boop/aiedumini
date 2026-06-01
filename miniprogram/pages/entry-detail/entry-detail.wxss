@@ -17,15 +17,15 @@
 
 .entry-back {
   display: grid;
-  width: 72rpx;
-  height: 72rpx;
+  width: 60rpx;
+  height: 60rpx;
   place-items: center;
   padding: 0;
-  border-radius: 36rpx;
+  border-radius: 30rpx;
   color: #203127;
   background: #ffffff;
   box-shadow: 0 12rpx 24rpx rgba(32, 49, 39, 0.07);
-  font-size: 44rpx;
+  font-size: 38rpx;
   line-height: 1;
 }
 
@@ -51,8 +51,8 @@
 .entry-jump-section {
   position: relative;
   z-index: 5;
-  margin: 0 0 12rpx;
-  padding: 10rpx;
+  margin: 0 0 10rpx;
+  padding: 8rpx;
   border: 1rpx solid rgba(232, 238, 230, 0.92);
   border-radius: 26rpx;
   background: rgba(255, 255, 255, 0.94);
@@ -68,18 +68,18 @@
 .entry-jump-card {
   display: grid;
   min-width: 0;
-  min-height: 78rpx;
+  min-height: 58rpx;
   box-sizing: border-box;
   align-content: center;
   justify-items: center;
-  gap: 3rpx;
-  padding: 8rpx 4rpx 7rpx;
+  gap: 2rpx;
+  padding: 6rpx 4rpx;
   border: 1rpx solid transparent;
-  border-radius: 22rpx;
+  border-radius: 18rpx;
   color: #526158;
   background: #f7faf3;
   box-shadow: none;
-  font-size: 18rpx;
+  font-size: 16rpx;
 }
 
 .entry-jump-card.active {
@@ -90,8 +90,8 @@
 }
 
 .entry-jump-card image {
-  width: 36rpx;
-  height: 36rpx;
+  width: 28rpx;
+  height: 28rpx;
 }
 
 .entry-jump-card text {
@@ -104,11 +104,11 @@
 .entry-detail-hero {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 184rpx;
+  grid-template-columns: minmax(0, 1fr) 164rpx;
   gap: 10rpx;
   align-items: center;
-  min-height: 244rpx;
-  padding: 24rpx 24rpx 22rpx;
+  min-height: 214rpx;
+  padding: 20rpx 22rpx 18rpx;
   overflow: hidden;
   border: 1rpx solid #e8eee6;
   border-radius: 32rpx;
@@ -227,8 +227,8 @@
 }
 
 .entry-image {
-  width: 182rpx;
-  height: 182rpx;
+  width: 160rpx;
+  height: 160rpx;
   justify-self: end;
   overflow: hidden;
   border-radius: 30rpx;
@@ -245,12 +245,12 @@
 .entry-primary,
 .entry-secondary {
   display: flex;
-  min-height: 72rpx;
+  min-height: 64rpx;
   align-items: center;
   justify-content: center;
   padding: 0 12rpx;
   border-radius: 999rpx;
-  font-size: 24rpx;
+  font-size: 23rpx;
   font-weight: 950;
   line-height: 1.2;
 }
@@ -270,10 +270,10 @@
 .entry-spotlight {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 122rpx;
+  grid-template-columns: minmax(0, 1fr) 108rpx;
   gap: 10rpx;
   margin-bottom: 12rpx;
-  padding: 16rpx;
+  padding: 14rpx;
   overflow: hidden;
   border: 1rpx solid #e8eee6;
   border-radius: 28rpx;
@@ -341,8 +341,8 @@
 .entry-spotlight-image {
   position: relative;
   z-index: 1;
-  width: 118rpx;
-  height: 118rpx;
+  width: 100rpx;
+  height: 100rpx;
   justify-self: end;
   align-self: center;
   filter: drop-shadow(0 14rpx 18rpx rgba(47, 88, 58, 0.12));
@@ -421,13 +421,13 @@
 .entry-card {
   position: relative;
   display: grid;
-  grid-template-columns: 52rpx minmax(0, 1fr) 28rpx;
+  grid-template-columns: 44rpx minmax(0, 1fr) 24rpx;
   min-width: 0;
-  min-height: 136rpx;
+  min-height: 112rpx;
   align-items: center;
   justify-items: start;
-  gap: 8rpx;
-  padding: 12rpx 10rpx;
+  gap: 7rpx;
+  padding: 10rpx 9rpx;
   border: 1rpx solid #e8eee6;
   border-radius: 22rpx;
   background: #ffffff;
@@ -441,9 +441,9 @@
 
 .entry-card-icon {
   display: block;
-  width: 52rpx;
-  height: 52rpx;
-  border-radius: 16rpx;
+  width: 44rpx;
+  height: 44rpx;
+  border-radius: 14rpx;
   background: #f8fbf5;
   box-shadow: 0 10rpx 18rpx rgba(34, 57, 43, 0.08);
 }
@@ -451,7 +451,7 @@
 .entry-card-label {
   overflow: hidden;
   color: #16a34a;
-  font-size: 21rpx;
+  font-size: 19rpx;
   font-weight: 950;
   line-height: 1.2;
   text-align: left;
@@ -467,7 +467,7 @@
   display: -webkit-box;
   overflow: hidden;
   color: #455149;
-  font-size: 18rpx;
+  font-size: 17rpx;
   line-height: 1.25;
   text-align: left;
   -webkit-box-orient: vertical;
@@ -476,14 +476,14 @@
 
 .entry-card-arrow {
   display: grid;
-  width: 28rpx;
-  height: 28rpx;
+  width: 24rpx;
+  height: 24rpx;
   place-items: center;
   justify-self: end;
   border-radius: 999rpx;
   color: #174c3d;
   background: #eaf9ef;
-  font-size: 24rpx;
+  font-size: 22rpx;
   font-weight: 950;
   line-height: 1;
 }
@@ -493,9 +493,9 @@
   z-index: 4;
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 6rpx;
-  margin-top: 12rpx;
-  padding: 8rpx;
+  gap: 5rpx;
+  margin-top: 10rpx;
+  padding: 6rpx;
   border: 1rpx solid rgba(232, 238, 230, 0.9);
   border-radius: 24rpx;
   background: rgba(255, 255, 255, 0.86);
@@ -506,12 +506,12 @@
   position: relative;
   display: grid;
   min-width: 0;
-  min-height: 74rpx;
+  min-height: 56rpx;
   box-sizing: border-box;
   align-content: center;
   justify-items: center;
-  gap: 4rpx;
-  padding: 8rpx 4rpx;
+  gap: 2rpx;
+  padding: 6rpx 3rpx;
   overflow: visible;
   border: 1rpx solid #e8eee6;
   border-radius: 20rpx;
@@ -548,10 +548,10 @@
 }
 
 .entry-proof-icon {
-  width: 30rpx;
-  height: 30rpx;
-  padding: 5rpx;
-  border-radius: 14rpx;
+  width: 24rpx;
+  height: 24rpx;
+  padding: 4rpx;
+  border-radius: 12rpx;
   background: #eef7ff;
 }
 
@@ -563,7 +563,7 @@
   max-width: 100%;
   overflow: hidden;
   color: #17211d;
-  font-size: 16rpx;
+  font-size: 14rpx;
   font-weight: 950;
   line-height: 1.18;
   text-align: center;
