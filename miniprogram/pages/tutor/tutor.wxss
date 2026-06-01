@@ -32,9 +32,9 @@ page {
 .yd-tutor-screen {
   position: relative;
   display: flex;
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   flex-direction: column;
-  min-height: calc(100vh - 234rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  min-height: auto;
   padding: 16rpx;
   overflow: hidden;
   border: 1rpx solid rgba(232, 238, 230, 0.94);
@@ -281,6 +281,7 @@ page {
 
 .tutor-chat-card {
   display: grid;
+  align-content: start;
   gap: 12rpx;
   flex: 0 0 auto;
   min-height: 214rpx;
