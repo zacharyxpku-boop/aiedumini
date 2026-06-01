@@ -871,7 +871,14 @@ Page({
     const homeworkText = draft && draft.text ? draft.text : this.data.homeworkText;
     const routeMaterialType = normalizeMaterialType(query, this.data.materialType);
     const routeMaterialText = safeQueryText(query.materialText || query.text || '');
-    const shouldOpenMaterialPanel = !!(query.type || query.materialType || query.sourceSchemaId || routeMaterialText);
+    const shouldOpenMaterialPanel = !!(
+      query.type
+      || query.materialType
+      || query.sourceSchemaId
+      || routeMaterialText
+      || query.open === 'flow'
+      || String(query.from || '').indexOf('entry_') === 0
+    );
     this.setData({
       minutes: (state.homework_plan && state.homework_plan.minutes_available) || profile.minutes || 35,
       homeworkText,
@@ -901,7 +908,14 @@ Page({
     const options = pendingRoute.options || {};
     const routeMaterialType = normalizeMaterialType(options, this.data.materialType);
     const routeMaterialText = safeQueryText(options.materialText || options.text || '');
-    const shouldOpenMaterialPanel = !!(options.type || options.materialType || options.sourceSchemaId || routeMaterialText);
+    const shouldOpenMaterialPanel = !!(
+      options.type
+      || options.materialType
+      || options.sourceSchemaId
+      || routeMaterialText
+      || options.open === 'flow'
+      || String(options.from || '').indexOf('entry_') === 0
+    );
     this.setData({
       uploadEntryMode: shouldOpenMaterialPanel ? 'material' : this.data.uploadEntryMode,
       uploadEntryDeck: buildUploadEntryDeck(shouldOpenMaterialPanel ? 'material' : this.data.uploadEntryMode),
