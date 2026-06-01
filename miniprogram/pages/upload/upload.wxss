@@ -57,6 +57,7 @@ page {
   flex: 0 0 auto;
   width: 52rpx;
   height: 52rpx;
+  object-fit: contain;
   padding: 7rpx;
   border: 1rpx solid rgba(34, 185, 92, 0.16);
   border-radius: 18rpx;
@@ -292,6 +293,7 @@ page {
 .upload-pipeline-icon {
   width: 38rpx;
   height: 38rpx;
+  object-fit: contain;
   padding: 6rpx;
   border-radius: 15rpx;
   background: #f0f8ee;

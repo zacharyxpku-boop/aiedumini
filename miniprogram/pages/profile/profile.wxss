@@ -65,6 +65,7 @@ page {
   flex: 0 0 auto;
   width: 52rpx;
   height: 52rpx;
+  object-fit: contain;
   padding: 7rpx;
   border: 1rpx solid rgba(34, 185, 92, 0.16);
   border-radius: 18rpx;
@@ -272,6 +273,7 @@ page {
 .yd-parent-source-row image {
   width: 30rpx;
   height: 30rpx;
+  object-fit: contain;
 }
 
 .yd-parent-source-row text {
@@ -301,6 +303,7 @@ page {
 .parent-jump-card image {
   width: 56rpx;
   height: 48rpx;
+  object-fit: contain;
 }
 
 .yd-parent-methods {

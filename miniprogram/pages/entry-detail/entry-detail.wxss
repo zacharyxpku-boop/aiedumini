@@ -451,6 +451,7 @@
   display: block;
   width: 38rpx;
   height: 38rpx;
+  object-fit: contain;
   border-radius: 12rpx;
   background: #f8fbf5;
   box-shadow: 0 10rpx 18rpx rgba(34, 57, 43, 0.08);
@@ -558,6 +559,7 @@
 .entry-proof-icon {
   width: 18rpx;
   height: 18rpx;
+  object-fit: contain;
   padding: 2rpx;
   border-radius: 10rpx;
   background: #eef7ff;

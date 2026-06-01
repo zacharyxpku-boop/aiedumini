@@ -57,6 +57,7 @@
 .home-brand-icon {
   width: 56rpx;
   height: 56rpx;
+  object-fit: contain;
   border-radius: 20rpx;
 }
 
@@ -244,7 +245,7 @@
 .mini-route-node.done { background: #eefbed; }
 .mini-route-node.active { border-color: rgba(34,185,92,.34); background: #e9f8ef; }
 .mini-route-node.final { background: #fff8df; }
-.mini-route-icon { width: 28rpx; height: 28rpx; border-radius: 10rpx; }
+.mini-route-icon { width: 28rpx; height: 28rpx; object-fit: contain; border-radius: 10rpx; }
 .mini-route-node text:nth-child(2) { max-width: 100%; overflow: hidden; color: #17211d; font-size: 16rpx; font-weight: 950; text-overflow: ellipsis; white-space: nowrap; }
 .mini-route-node text:nth-child(3) { display: none; }
 

@@ -67,6 +67,7 @@ page {
   flex: 0 0 auto;
   width: 52rpx;
   height: 52rpx;
+  object-fit: contain;
   padding: 7rpx;
   border: 1rpx solid rgba(76, 159, 255, 0.16);
   border-radius: 18rpx;
@@ -237,6 +238,7 @@ page {
 .tutor-ladder-icon {
   width: 42rpx;
   height: 42rpx;
+  object-fit: contain;
   padding: 6rpx;
   border-radius: 15rpx;
   background: #f0f8ee;
