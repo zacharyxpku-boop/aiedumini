@@ -343,8 +343,8 @@ page {
 }
 
 .yd-parent-action-row {
-  margin-top: auto;
-  padding-top: 14rpx;
+  margin-top: 14rpx;
+  padding-top: 0;
 }
 
 .parent-primary,

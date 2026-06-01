@@ -282,7 +282,7 @@ page {
 .tutor-chat-card {
   display: grid;
   gap: 12rpx;
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   min-height: 214rpx;
   margin-top: 14rpx;
   padding: 16rpx;
@@ -348,8 +348,8 @@ page {
 }
 
 .tutor-action-row {
-  margin-top: auto;
-  padding-top: 14rpx;
+  margin-top: 14rpx;
+  padding-top: 0;
 }
 
 .tutor-primary,

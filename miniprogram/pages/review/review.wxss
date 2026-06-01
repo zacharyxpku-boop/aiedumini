@@ -328,7 +328,7 @@ page {
 
 .review-main-cta {
   height: 64rpx;
-  margin-top: auto;
+  margin-top: 16rpx;
   border-radius: 999rpx;
   color: #1d261f;
   background: linear-gradient(180deg, #ffd84f 0%, #f5b300 100%);

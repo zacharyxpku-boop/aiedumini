@@ -243,8 +243,8 @@ page {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8rpx;
-  margin-top: auto;
-  padding-top: 16rpx;
+  margin-top: 16rpx;
+  padding-top: 0;
 }
 
 .upload-pipeline-node {
