@@ -29,9 +29,9 @@ page {
 .yd-parent-screen {
   position: relative;
   display: flex;
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   flex-direction: column;
-  min-height: calc(100vh - 234rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  min-height: auto;
   margin: 0 0 22rpx;
   padding: 16rpx;
   overflow: hidden;
