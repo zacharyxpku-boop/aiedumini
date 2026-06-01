@@ -420,7 +420,7 @@ function buildUploadDailyExecutionSeed(options = {}) {
     tutorRoute,
     gameRoute,
     gameLine: gameUnlocked
-      ? '短回访已解锁：只练主动回忆，不奖励速度、分数或同伴比较。'
+      ? '短回访已解锁：只练主动回忆，不做速度、分数或同伴比较。'
       : '短回访暂不解锁：先补孩子第一步或错因证据。',
     releaseLine: '放行规则：有第一步 + 错因 + 明天回访证据，才进入回访验证或分享。',
     blockedLine: '不带原题、完整答案、分数、名次、天赋标签、孩子姓名或联系方式。',
@@ -652,9 +652,9 @@ function buildUploadAiLocalDeliveryView(split = []) {
     familyLine: item.id === 'ai_expression_layer'
       ? '家长可期待：表达更自然、追问更贴近孩子，但不替孩子完成题目。'
       : item.id === 'local_release_gate'
-        ? '家长可期待：隐私、放行、奖励和分享都先过规则闸门。'
+        ? '家长可期待：隐私、放行、外部激励和分享都先过规则闸门。'
         : '家长可期待：AI 给方法候选，本地证据决定是否继续。',
-    boundaryLine: '边界：AI 不负责贴标签、放答案、发奖励或决定商业转化。'
+    boundaryLine: '边界：AI 不负责贴标签、放答案、发外部激励或决定商业转化。'
   }));
   return {
     id: 'upload_ai_local_delivery_readable_view',
@@ -706,7 +706,7 @@ function buildMaterialTypeGuide(type) {
     },
     score_sheet: {
       examplePlaceholder: '粘贴成绩单/周测文字即可：\n六年级数学 82，应用题扣 10 分，计算扣 3 分；\n英语阅读慢，完形错 4 个；\n家长想知道先补哪一类题、今晚先做什么。',
-      statusLine: '当前只把成绩作为家长私有优先级信号；不做公开排名、不发行为奖励、不承诺提分。',
+      statusLine: '当前只把成绩作为家长私有优先级信号；不做公开排名、不发行为激励、不承诺提分。',
       modeLine: '验证方式：用分数定位弱学科，再用一张真实错题确认错因和第一步。',
       blockedClaimsLine: '不能做：排名营销、分数刺激、不承诺分数结果、把成绩写进分享卡。'
     },

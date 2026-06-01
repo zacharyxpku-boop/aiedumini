@@ -260,7 +260,7 @@ function buildProfileDossierDeliveryView(dossier = {}, servicePathway = {}) {
       id: item.id || `ai_local_${index + 1}`,
       label: item.label || 'AI/规则分工',
       ownsLine: profileListLine('负责内容', item.owns),
-      boundaryLine: '边界：AI 不决定答案、奖励、标签、隐私和商业放行。'
+    boundaryLine: '边界：AI 不决定答案、外部激励、标签、隐私和商业放行。'
     })),
     serviceModeCards: serviceModes.map((item, index) => ({
       id: item.id || `service_mode_${index + 1}`,
@@ -1799,12 +1799,12 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
   const openMaicBorrowWorkbench = {
     id: 'openmaic_k12_borrow_workbench',
     title: '小讲堂借力工作台',
-    summary: `只借公开资料的结构、场景流和质量门；本地代码负责门禁、回流、奖励、隐私和报告放行，AI 只负责追问与表达。`,
+    summary: `只借公开资料的结构、场景流和质量门；本地代码负责门禁、回流、外部激励、隐私和报告放行，AI 只负责追问与表达。`,
     statusLine: `已接 ${publicK12Resources.length} 类公开资料线索、${publicK12Workbench.length} 条使用工作台、${publicK12ChallengeDeck.length} 张可玩采集卡。`,
     sourcePolicyLine: openMaicDecisionBridge && openMaicDecisionBridge.sourcePolicy
       ? '只借公开结构和课堂编排思路，不复制代码、不照搬题文、不承诺完整 AI 课堂。'
       : '只参考两阶段生成、事件流和质量门，不复制代码、不照搬提示词、不做完整课堂平台。',
-    releaseLine: '放行规则：没有孩子第一步、错因回放、次日回访和家长确认，不写长期画像，不发奖励，不生成可分享结论。',
+    releaseLine: '放行规则：没有孩子第一步、错因回放、次日回访和家长确认，不写长期画像，不发外部激励，不生成可分享结论。',
     lanes: [
       {
         id: 'source',
