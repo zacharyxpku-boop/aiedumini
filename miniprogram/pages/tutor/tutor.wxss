@@ -118,6 +118,8 @@ page {
 .yd-tutor-mascot {
   width: 142rpx;
   height: 138rpx;
+  align-self: center;
+  object-fit: contain;
   overflow: hidden;
   border: 6rpx solid rgba(255, 255, 255, 0.78);
   border-radius: 28rpx;

@@ -19,6 +19,13 @@ image {
   box-sizing: border-box;
 }
 
+image {
+  display: block;
+  max-width: 100%;
+  flex-shrink: 0;
+  vertical-align: top;
+}
+
 button {
   margin: 0;
   padding: 0;
@@ -422,6 +429,7 @@ button::after {
   width: 104rpx;
   height: 104rpx;
   justify-self: center;
+  object-fit: contain;
   filter: drop-shadow(0 12rpx 16rpx rgba(34, 68, 48, .12));
 }
 

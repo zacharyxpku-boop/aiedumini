@@ -95,6 +95,7 @@
 .entry-jump-card image {
   width: 28rpx;
   height: 28rpx;
+  object-fit: contain;
 }
 
 .entry-jump-card text {
@@ -234,6 +235,8 @@
   width: 116rpx;
   height: 116rpx;
   justify-self: end;
+  align-self: center;
+  object-fit: contain;
   overflow: hidden;
   border-radius: 26rpx;
   filter: drop-shadow(0 18rpx 24rpx rgba(47, 88, 58, 0.14));
@@ -349,6 +352,7 @@
   height: 88rpx;
   justify-self: end;
   align-self: center;
+  object-fit: contain;
   filter: drop-shadow(0 14rpx 18rpx rgba(47, 88, 58, 0.12));
 }
 

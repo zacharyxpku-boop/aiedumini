@@ -29,6 +29,7 @@ Component({
     switchTab(event) {
       const index = Number(event.currentTarget.dataset.index || 0);
       const path = event.currentTarget.dataset.path;
+      if (!path || tabs.indexOf(path) < 0) return;
       this.setData({ selected: index });
       navigation.switchTab(path);
     }

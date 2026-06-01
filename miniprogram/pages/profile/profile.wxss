@@ -149,6 +149,9 @@ page {
 .yd-parent-art {
   width: 124rpx;
   height: 116rpx;
+  align-self: center;
+  object-fit: contain;
+  overflow: hidden;
   border-radius: 26rpx;
   background: #fff1ea;
 }
@@ -176,6 +179,8 @@ page {
 .yd-parent-decision-img {
   width: 78rpx;
   height: 62rpx;
+  align-self: center;
+  object-fit: contain;
   overflow: hidden;
   border: 4rpx solid rgba(255, 255, 255, 0.78);
   border-radius: 18rpx;

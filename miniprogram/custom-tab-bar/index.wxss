@@ -78,6 +78,7 @@
   width: 42rpx;
   height: 42rpx;
   flex: 0 0 42rpx;
+  object-fit: contain;
 }
 
 .yd-tab-text {

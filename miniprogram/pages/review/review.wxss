@@ -159,6 +159,8 @@ page {
 .yd-review-art {
   width: 128rpx;
   height: 118rpx;
+  align-self: center;
+  object-fit: contain;
   overflow: hidden;
   border: 6rpx solid rgba(255, 255, 255, 0.76);
   border-radius: 26rpx;
