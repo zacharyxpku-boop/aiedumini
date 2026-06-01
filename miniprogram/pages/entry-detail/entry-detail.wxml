@@ -1,6 +1,6 @@
 <view class="entry-detail-page">
   <view class="entry-detail-top">
-    <button class="entry-back" bindtap="goBack">‹</button>
+    <view class="entry-back" bindtap="goBack">‹</view>
     <view class="entry-brand">
       <image mode="aspectFit" src="/assets/reference/brand-house.png" />
       <text>原点智学</text>
@@ -9,10 +9,10 @@
 
   <view class="entry-jump-section">
     <view class="entry-jump-grid">
-      <button class="entry-jump-card {{item.key === sceneKey ? 'active' : ''}}" wx:for="{{loopNodes}}" wx:key="key" data-scene="{{item.key}}" bindtap="openScene">
+      <view class="entry-jump-card {{item.key === sceneKey ? 'active' : ''}}" wx:for="{{loopNodes}}" wx:key="key" data-scene="{{item.key}}" bindtap="openScene">
         <image mode="aspectFit" src="{{item.image}}" />
         <text>{{item.label}}</text>
-      </button>
+      </view>
     </view>
   </view>
 
@@ -31,8 +31,8 @@
   </view>
 
   <view class="entry-actions">
-    <button class="entry-primary" bindtap="goPrimary">{{scene.primaryLabel}}</button>
-    <button class="entry-secondary" bindtap="goSecondary">{{scene.secondaryLabel}}</button>
+    <view class="entry-primary" bindtap="goPrimary">{{scene.primaryLabel}}</view>
+    <view class="entry-secondary" bindtap="goSecondary">{{scene.secondaryLabel}}</view>
   </view>
 
   <view class="entry-spotlight scene-{{sceneKey}}" wx:if="{{scene.spotlight}}">
@@ -67,7 +67,7 @@
   </view>
 
   <view class="entry-proof-strip">
-    <button
+    <view
       class="entry-proof-node {{item.active ? 'active' : ''}} {{index === scene.proofSteps.length - 1 ? 'final' : ''}}"
       wx:for="{{scene.proofSteps}}"
       wx:key="label"
@@ -77,6 +77,6 @@
       <image class="entry-proof-icon" mode="aspectFit" src="{{item.icon}}" />
       <text>{{item.label}}</text>
       <text class="entry-proof-hint">{{item.hint}}</text>
-    </button>
+    </view>
   </view>
 </view>

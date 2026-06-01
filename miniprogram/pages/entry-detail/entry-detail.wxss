@@ -1,6 +1,6 @@
 .entry-detail-page {
   min-height: 100vh;
-  padding: calc(34rpx + env(safe-area-inset-top)) 24rpx calc(38rpx + env(safe-area-inset-bottom));
+  padding: calc(34rpx + env(safe-area-inset-top)) 24rpx calc(34rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
   color: #203127;
   background:
@@ -16,15 +16,17 @@
 }
 
 .entry-back {
+  display: grid;
   width: 72rpx;
   height: 72rpx;
+  place-items: center;
   padding: 0;
   border-radius: 36rpx;
   color: #203127;
   background: #ffffff;
   box-shadow: 0 12rpx 24rpx rgba(32, 49, 39, 0.07);
   font-size: 44rpx;
-  line-height: 72rpx;
+  line-height: 1;
 }
 
 .entry-brand {
@@ -47,8 +49,7 @@
 }
 
 .entry-jump-section {
-  position: sticky;
-  top: calc(8rpx + env(safe-area-inset-top));
+  position: relative;
   z-index: 5;
   margin: 0 0 12rpx;
   padding: 10rpx;
@@ -60,18 +61,19 @@
 
 .entry-jump-grid {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8rpx;
 }
 
 .entry-jump-card {
   display: grid;
   min-width: 0;
-  min-height: 104rpx;
+  min-height: 78rpx;
+  box-sizing: border-box;
   align-content: center;
   justify-items: center;
-  gap: 4rpx;
-  padding: 8rpx 4rpx;
+  gap: 3rpx;
+  padding: 8rpx 4rpx 7rpx;
   border: 1rpx solid transparent;
   border-radius: 22rpx;
   color: #526158;
@@ -88,8 +90,8 @@
 }
 
 .entry-jump-card image {
-  width: 48rpx;
-  height: 48rpx;
+  width: 36rpx;
+  height: 36rpx;
 }
 
 .entry-jump-card text {
@@ -242,7 +244,10 @@
 
 .entry-primary,
 .entry-secondary {
+  display: flex;
   min-height: 72rpx;
+  align-items: center;
+  justify-content: center;
   padding: 0 12rpx;
   border-radius: 999rpx;
   font-size: 24rpx;
@@ -484,24 +489,25 @@
 }
 
 .entry-proof-strip {
-  position: sticky;
-  bottom: calc(8rpx + env(safe-area-inset-bottom));
+  position: relative;
   z-index: 4;
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 6rpx;
-  margin-top: 10rpx;
-  padding: 0;
+  margin-top: 12rpx;
+  padding: 8rpx;
   border: 1rpx solid rgba(232, 238, 230, 0.9);
-  background: transparent;
-  box-shadow: 0 -10rpx 28rpx rgba(38, 58, 43, 0.055);
+  border-radius: 24rpx;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 12rpx 28rpx rgba(38, 58, 43, 0.055);
 }
 
 .entry-proof-node {
   position: relative;
   display: grid;
   min-width: 0;
-  min-height: 96rpx;
+  min-height: 74rpx;
+  box-sizing: border-box;
   align-content: center;
   justify-items: center;
   gap: 4rpx;
@@ -518,8 +524,8 @@
   content: "";
   position: absolute;
   top: 50%;
-  right: -18rpx;
-  width: 24rpx;
+  right: -11rpx;
+  width: 16rpx;
   height: 4rpx;
   border-radius: 999rpx;
   background: #dce8dc;
@@ -542,8 +548,8 @@
 }
 
 .entry-proof-icon {
-  width: 34rpx;
-  height: 34rpx;
+  width: 30rpx;
+  height: 30rpx;
   padding: 5rpx;
   border-radius: 14rpx;
   background: #eef7ff;
@@ -557,7 +563,7 @@
   max-width: 100%;
   overflow: hidden;
   color: #17211d;
-  font-size: 17rpx;
+  font-size: 16rpx;
   font-weight: 950;
   line-height: 1.18;
   text-align: center;
