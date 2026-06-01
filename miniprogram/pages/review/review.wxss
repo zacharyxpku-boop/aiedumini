@@ -13,16 +13,17 @@ page {
 .content-area {
   position: relative;
   z-index: 2;
-  height: 100vh;
+  min-height: 100vh;
+  height: auto;
   box-sizing: border-box;
 }
 
 .content-inner {
-  padding: calc(108rpx + env(safe-area-inset-top)) 30rpx calc(126rpx + env(safe-area-inset-bottom));
+  padding: calc(96rpx + env(safe-area-inset-top)) 28rpx calc(112rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  min-height: auto;
 }
 
 .yd-review-screen {
@@ -31,11 +32,11 @@ page {
   flex: 0 0 auto;
   flex-direction: column;
   min-height: auto;
-  margin-bottom: 18rpx;
-  padding: 16rpx;
+  margin-bottom: 0;
+  padding: 14rpx;
   overflow: hidden;
   border: 1rpx solid rgba(232, 238, 230, 0.94);
-  border-radius: 34rpx;
+  border-radius: 30rpx;
   background:
     radial-gradient(circle at 8% 4%, rgba(248, 198, 34, 0.18), transparent 24%),
     radial-gradient(circle at 92% 8%, rgba(34, 185, 92, 0.12), transparent 22%),
@@ -111,11 +112,11 @@ page {
 
 .yd-review-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 146rpx;
-  gap: 14rpx;
+  grid-template-columns: minmax(0, 1fr) 128rpx;
+  gap: 12rpx;
   align-items: center;
-  min-height: 178rpx;
-  margin-top: 16rpx;
+  min-height: 148rpx;
+  margin-top: 12rpx;
 }
 
 .yd-review-title {
@@ -156,8 +157,8 @@ page {
 }
 
 .yd-review-art {
-  width: 146rpx;
-  height: 138rpx;
+  width: 128rpx;
+  height: 118rpx;
   overflow: hidden;
   border: 6rpx solid rgba(255, 255, 255, 0.76);
   border-radius: 26rpx;
@@ -165,8 +166,8 @@ page {
 }
 
 .review-map-card {
-  margin-top: 14rpx;
-  padding: 14rpx 12rpx;
+  margin-top: 10rpx;
+  padding: 12rpx 10rpx;
   border: 1rpx solid rgba(232, 238, 230, 0.95);
   border-radius: 22rpx;
   background: rgba(255, 255, 255, 0.94);
@@ -198,7 +199,7 @@ page {
   position: relative;
   display: grid;
   min-width: 0;
-  min-height: 112rpx;
+  min-height: 88rpx;
   align-content: center;
   justify-items: center;
   gap: 5rpx;
@@ -275,13 +276,13 @@ page {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10rpx;
-  margin-top: 14rpx;
+  margin-top: 10rpx;
 }
 
 .review-action-card {
   display: grid;
   grid-template-columns: 52rpx minmax(0, 1fr);
-  min-height: 108rpx;
+  min-height: 88rpx;
   align-items: center;
   justify-items: stretch;
   column-gap: 10rpx;
@@ -327,15 +328,15 @@ page {
 }
 
 .review-main-cta {
-  height: 64rpx;
-  margin-top: 16rpx;
+  height: 60rpx;
+  margin-top: 12rpx;
   border-radius: 999rpx;
   color: #1d261f;
   background: linear-gradient(180deg, #ffd84f 0%, #f5b300 100%);
   box-shadow: 0 16rpx 28rpx rgba(248, 198, 34, 0.22);
   font-size: 23rpx;
   font-weight: 950;
-  line-height: 64rpx;
+  line-height: 60rpx;
   text-align: center;
 }
 
