@@ -51,35 +51,37 @@
 .entry-jump-section {
   position: relative;
   z-index: 5;
-  margin: 8rpx 0 6rpx;
-  padding: 5rpx;
+  margin: 8rpx 0;
+  padding: 8rpx;
   border: 1rpx solid rgba(232, 238, 230, 0.8);
-  border-radius: 26rpx;
-  background: rgba(255, 255, 255, 0.72);
+  border-radius: 22rpx;
+  background: rgba(255, 255, 255, 0.82);
   box-shadow: 0 8rpx 20rpx rgba(38, 58, 43, 0.045);
 }
 
 .entry-jump-grid {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 4rpx;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7rpx;
 }
 
 .entry-jump-card {
   display: grid;
+  grid-template-columns: 32rpx minmax(0, 1fr);
   min-width: 0;
-  min-height: 62rpx;
+  min-height: 56rpx;
   box-sizing: border-box;
-  align-content: center;
-  justify-items: center;
-  gap: 2rpx;
-  padding: 6rpx 2rpx;
-  border: 1rpx solid transparent;
-  border-radius: 999rpx;
+  align-items: center;
+  justify-items: start;
+  gap: 7rpx;
+  padding: 7rpx 9rpx;
+  overflow: hidden;
+  border: 1rpx solid rgba(232, 238, 230, 0.92);
+  border-radius: 17rpx;
   color: #526158;
-  background: transparent;
-  box-shadow: none;
-  font-size: 18rpx;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 8rpx 16rpx rgba(38, 58, 43, 0.035);
+  font-size: 19rpx;
   line-height: 1.1;
 }
 
@@ -91,8 +93,8 @@
 }
 
 .entry-jump-card image {
-  width: 32rpx;
-  height: 32rpx;
+  width: 30rpx;
+  height: 30rpx;
 }
 
 .entry-jump-card text {
@@ -495,8 +497,8 @@
   z-index: 4;
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 5rpx;
-  margin-top: 7rpx;
+  gap: 4rpx;
+  margin-top: 6rpx;
   padding: 4rpx;
   border: 1rpx solid rgba(232, 238, 230, 0.9);
   border-radius: 20rpx;
@@ -508,15 +510,15 @@
   position: relative;
   display: grid;
   min-width: 0;
-  min-height: 50rpx;
+  min-height: 44rpx;
   box-sizing: border-box;
   align-content: center;
   justify-items: center;
   gap: 2rpx;
-  padding: 5rpx 3rpx;
+  padding: 4rpx 2rpx;
   overflow: visible;
   border: 1rpx solid #e8eee6;
-  border-radius: 20rpx;
+  border-radius: 16rpx;
   background: linear-gradient(180deg, #ffffff 0%, #f8faf5 100%);
   box-shadow: 0 12rpx 24rpx rgba(32, 49, 39, 0.05);
   line-height: 1.15;
@@ -550,9 +552,9 @@
 }
 
 .entry-proof-icon {
-  width: 22rpx;
-  height: 22rpx;
-  padding: 4rpx;
+  width: 20rpx;
+  height: 20rpx;
+  padding: 3rpx;
   border-radius: 12rpx;
   background: #eef7ff;
 }
