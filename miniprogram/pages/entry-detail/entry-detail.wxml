@@ -7,15 +7,6 @@
     </view>
   </view>
 
-  <view class="entry-jump-section">
-    <view class="entry-jump-grid">
-      <view class="entry-jump-card {{item.key === sceneKey ? 'active' : ''}}" wx:for="{{loopNodes}}" wx:key="key" data-scene="{{item.key}}" bindtap="openScene">
-        <image mode="aspectFit" src="{{item.image}}" />
-        <text>{{item.label}}</text>
-      </view>
-    </view>
-  </view>
-
   <view class="entry-detail-hero scene-{{sceneKey}}">
     <view>
       <view class="entry-badge">{{scene.badge}}</view>
@@ -28,6 +19,15 @@
       </view>
     </view>
     <image class="entry-image" mode="aspectFit" src="{{scene.heroImage}}" />
+  </view>
+
+  <view class="entry-jump-section">
+    <view class="entry-jump-grid">
+      <view class="entry-jump-card {{item.key === sceneKey ? 'active' : ''}}" wx:for="{{loopNodes}}" wx:key="key" data-scene="{{item.key}}" bindtap="openScene">
+        <image mode="aspectFit" src="{{item.image}}" />
+        <text>{{item.label}}</text>
+      </view>
+    </view>
   </view>
 
   <view class="entry-actions">

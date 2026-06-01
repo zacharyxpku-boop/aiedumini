@@ -51,35 +51,36 @@
 .entry-jump-section {
   position: relative;
   z-index: 5;
-  margin: 0 0 10rpx;
-  padding: 7rpx;
-  border: 1rpx solid rgba(232, 238, 230, 0.92);
-  border-radius: 24rpx;
-  background: rgba(255, 255, 255, 0.94);
-  box-shadow: 0 12rpx 28rpx rgba(38, 58, 43, 0.055);
+  margin: 12rpx 0 10rpx;
+  padding: 6rpx;
+  border: 1rpx solid rgba(232, 238, 230, 0.8);
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 8rpx 20rpx rgba(38, 58, 43, 0.045);
 }
 
 .entry-jump-grid {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 6rpx;
+  gap: 4rpx;
 }
 
 .entry-jump-card {
   display: grid;
   min-width: 0;
-  min-height: 72rpx;
+  min-height: 70rpx;
   box-sizing: border-box;
   align-content: center;
   justify-items: center;
   gap: 2rpx;
-  padding: 6rpx 4rpx;
+  padding: 6rpx 2rpx;
   border: 1rpx solid transparent;
-  border-radius: 18rpx;
+  border-radius: 999rpx;
   color: #526158;
-  background: #f7faf3;
+  background: transparent;
   box-shadow: none;
-  font-size: 16rpx;
+  font-size: 18rpx;
+  line-height: 1.1;
 }
 
 .entry-jump-card.active {
@@ -90,8 +91,8 @@
 }
 
 .entry-jump-card image {
-  width: 30rpx;
-  height: 30rpx;
+  width: 36rpx;
+  height: 36rpx;
 }
 
 .entry-jump-card text {
