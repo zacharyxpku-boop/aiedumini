@@ -695,8 +695,8 @@ Page({
       blackboardLine: active.blackboardHint || '小黑板只画第一步关系，不画完整解法。',
       xpRule: active.xpRule || '只记录说清第一步、错因和回访，不做速度或分数比较。',
       releaseGate: retest.releaseGate || '三段复测证据齐之前，不写长期掌握结论。',
-      revisitRoute: active.nextPracticePlan && active.nextPracticePlan.arcadeRoute
-        ? active.nextPracticePlan.arcadeRoute
+      revisitRoute: active.nextPracticePlan && (active.nextPracticePlan.appRoute || active.nextPracticePlan.reviewRoute)
+        ? (active.nextPracticePlan.appRoute || active.nextPracticePlan.reviewRoute)
         : '/pages/review/review?from=rule_retest',
       count: ruleCards.length,
       cadence

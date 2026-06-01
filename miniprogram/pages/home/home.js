@@ -3,7 +3,6 @@ const navigation = require('../../utils/navigation');
 const reviewCards = require('../../utils/review-cards');
 const gameLogic = require('../../utils/game-logic');
 const learningModules = require('../../utils/learning-modules');
-const revisitEngine = require('../../utils/arcade-engine');
 const api = require('../../utils/api');
 const tutorLadder = require('../../utils/tutor-ladder');
 const importIntake = require('../../utils/import-intake');
@@ -1036,7 +1035,16 @@ Page({
   buildRevisitEntry(reviewSummary) {
     const cards = reviewCards.sessionCards('smart', 8);
     const fallback = cards.length ? cards : reviewCards.cardBrowser({ status: 'all', limit: 8 });
-    return revisitEngine.buildHomeArcadeEntry(reviewSummary || {}, fallback);
+    const due = Number((reviewSummary && reviewSummary.due) || fallback.length || 0);
+    return {
+      title: '回访验证',
+      label: due ? `今日 ${due} 张 · 5 分钟` : '生成学习卡后可开始',
+      body: due
+        ? `今天有 ${due} 张卡可以做短回访。`
+        : '把作业、错题或知识点生成学习卡，再进入短回访。',
+      cta: due ? '进入今日短回访' : '先生成学习卡',
+      action: due ? 'goRevisit' : 'goLearningMap'
+    };
   },
 
   buildIncomingShareRelay(incoming = null) {

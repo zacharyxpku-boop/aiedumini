@@ -559,7 +559,7 @@ function buildPublicK12SelectedHomework(challenge = {}) {
       receiverMustUseOwnMaterial: challenge.receiverMustUseOwnMaterial !== false,
       route: challenge.route || '',
       reviewRoute: challenge.reviewRoute || '',
-      arcadeRoute: challenge.arcadeRoute || ''
+      returnRoute: challenge.reviewRoute || challenge.route || ''
     }
   };
 }
