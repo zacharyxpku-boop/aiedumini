@@ -41,37 +41,37 @@
 
       <view class="mini-entry-grid yd-jump-grid">
         <view class="mini-entry-card yd-jump-card green" data-scene="upload" bindtap="openEntryDetail">
-          <image class="mini-entry-visual" mode="aspectFill" src="/assets/reference/entry-upload.png" />
+          <image class="mini-entry-visual" mode="aspectFit" src="/assets/reference/entry-upload.png" />
           <text>上传资料</text>
           <text>文档、试卷、错题</text>
           <view class="mini-entry-arrow">›</view>
         </view>
         <view class="mini-entry-card yd-jump-card blue" data-scene="report" bindtap="openEntryDetail">
-          <image class="mini-entry-visual" mode="aspectFill" src="/assets/reference/entry-report.png" />
+          <image class="mini-entry-visual" mode="aspectFit" src="/assets/reference/entry-report.png" />
           <text>个性化报告</text>
           <text>待提升点与建议</text>
           <view class="mini-entry-arrow blue">›</view>
         </view>
         <view class="mini-entry-card yd-jump-card green" data-scene="tutor" bindtap="openEntryDetail">
-          <image class="mini-entry-visual" mode="aspectFill" src="/assets/reference/entry-tutor.png" />
+          <image class="mini-entry-visual" mode="aspectFit" src="/assets/reference/entry-tutor.png" />
           <text>AI私教</text>
           <text>只追问第一步</text>
           <view class="mini-entry-arrow">›</view>
         </view>
         <view class="mini-entry-card yd-jump-card yellow" data-scene="review" bindtap="openEntryDetail">
-          <image class="mini-entry-visual" mode="aspectFill" src="/assets/reference/entry-review.png" />
+          <image class="mini-entry-visual" mode="aspectFit" src="/assets/reference/entry-review.png" />
           <text>短回访</text>
           <text>回忆与变式验证</text>
           <view class="mini-entry-arrow orange">›</view>
         </view>
         <view class="mini-entry-card yd-jump-card orange" data-scene="parent" bindtap="openEntryDetail">
-          <image class="mini-entry-visual" mode="aspectFill" src="/assets/reference/entry-parent.png" />
+          <image class="mini-entry-visual" mode="aspectFit" src="/assets/reference/entry-parent.png" />
           <text>家长报告</text>
           <text>证据与下一步</text>
           <view class="mini-entry-arrow orange">›</view>
         </view>
         <view class="mini-entry-card yd-jump-card map" data-scene="today" bindtap="openEntryDetail">
-          <image class="mini-entry-visual" mode="aspectFill" src="/assets/reference/entry-map.png" />
+          <image class="mini-entry-visual" mode="aspectFit" src="/assets/reference/entry-map.png" />
           <text>今晚路径</text>
           <text>五步闭环</text>
           <view class="mini-entry-arrow">›</view>
@@ -84,27 +84,27 @@
         <textarea class="mini-route-input" value="{{thoughtInput}}" placeholder="{{homeViewModel.inputCard.placeholder}}" maxlength="500" auto-height bindinput="onThoughtInput" />
         <view class="mini-route-line">
           <view class="mini-route-node done">
-            <image class="mini-route-icon" mode="aspectFill" src="/assets/reference/entry-upload.png" />
+            <image class="mini-route-icon" mode="aspectFit" src="/assets/reference/entry-upload.png" />
             <text>上传资料</text>
             <text>材料进来</text>
           </view>
           <view class="mini-route-node done">
-            <image class="mini-route-icon" mode="aspectFill" src="/assets/reference/entry-report.png" />
+            <image class="mini-route-icon" mode="aspectFit" src="/assets/reference/entry-report.png" />
             <text>生成报告</text>
             <text>依据清楚</text>
           </view>
           <view class="mini-route-node active">
-            <image class="mini-route-icon" mode="aspectFill" src="/assets/reference/entry-tutor.png" />
+            <image class="mini-route-icon" mode="aspectFit" src="/assets/reference/entry-tutor.png" />
             <text>说第一步</text>
             <text>AI私教追问</text>
           </view>
           <view class="mini-route-node">
-            <image class="mini-route-icon" mode="aspectFill" src="/assets/reference/entry-review.png" />
+            <image class="mini-route-icon" mode="aspectFit" src="/assets/reference/entry-review.png" />
             <text>回访</text>
             <text>验证迁移</text>
           </view>
           <view class="mini-route-node final">
-            <image class="mini-route-icon" mode="aspectFill" src="/assets/reference/entry-parent.png" />
+            <image class="mini-route-icon" mode="aspectFit" src="/assets/reference/entry-parent.png" />
             <text>家长看</text>
             <text>只看下一步</text>
           </view>
