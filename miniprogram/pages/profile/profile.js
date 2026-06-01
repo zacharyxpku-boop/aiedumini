@@ -3090,8 +3090,11 @@ Page({
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().setData({ selected: 3 });
     }
-    if (navigation.consumePendingTabRouteContext) {
-      navigation.consumePendingTabRouteContext('/pages/profile/profile');
+    const pendingRoute = navigation.consumePendingTabRouteContext
+      ? navigation.consumePendingTabRouteContext('/pages/profile/profile')
+      : null;
+    if (pendingRoute && pendingRoute.options) {
+      this.applyRouteOptions(pendingRoute.options);
     }
     this.refresh();
   },
@@ -3326,9 +3329,16 @@ Page({
         menus: ['shareAppMessage', 'shareTimeline']
       });
     }
-    const query = options || {};
+    this.applyRouteOptions(options || {});
+  },
+
+  applyRouteOptions(query = {}) {
     const panel = query.panel === 'report' ? 'assessment' : (query.panel || '');
-    if (query.quick_assessment === '1' || panel === 'assessment') {
+    const from = String(query.from || '');
+    const shouldOpenAssessment = query.quick_assessment === '1'
+      || panel === 'assessment'
+      || from === 'entry_report_evidence';
+    if (shouldOpenAssessment) {
       this.setData({
         profilePanel: 'assessment',
         profilePanelTitle: '测评与方法建议',

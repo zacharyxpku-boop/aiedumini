@@ -946,11 +946,11 @@ Page({
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().setData({ selected: 1 });
     }
-    if (navigation.consumePendingTabRouteContext) {
-      navigation.consumePendingTabRouteContext('/pages/tutor/tutor');
-    }
+    const pendingRoute = navigation.consumePendingTabRouteContext
+      ? navigation.consumePendingTabRouteContext('/pages/tutor/tutor')
+      : null;
     const state = storage.loadState();
-    const routeOptions = currentRouteOptions();
+    const routeOptions = Object.assign({}, currentRouteOptions(), pendingRoute && pendingRoute.options ? pendingRoute.options : {});
     const publicK12Challenge = findPublicK12Challenge(routeOptions);
     const publicK12Selected = publicK12Challenge ? buildPublicK12SelectedHomework(publicK12Challenge) : null;
     const uploadReportHandoff = routeOptions.from === 'upload_report_ready' && storage.get
