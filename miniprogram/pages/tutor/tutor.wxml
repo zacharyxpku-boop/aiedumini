@@ -32,7 +32,7 @@
             <view class="tutor-bubble me">我想先找题目里给了哪些数量。</view>
             <view class="tutor-input-bar">
               <text>说出你的第一步...</text>
-              <view data-scene="review" bindtap="openEntryDetail">发送</view>
+              <view data-step="{{activeStep}}" bindtap="launchFirstStep">发送</view>
             </view>
           </view>
 
@@ -66,8 +66,8 @@
           </view>
 
           <view class="tutor-action-row">
-            <view class="tutor-primary" data-scene="tutor" bindtap="openEntryDetail">发送第一步</view>
-            <view class="tutor-secondary" data-scene="parent" bindtap="openEntryDetail">家长看证据</view>
+            <view class="tutor-primary" data-step="{{activeStep}}" bindtap="launchFirstStep">发送第一步</view>
+            <view class="tutor-secondary" bindtap="goReportPreview">家长看证据</view>
           </view>
         </view>
       </view>

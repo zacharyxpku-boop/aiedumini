@@ -1126,6 +1126,33 @@ Page({
     });
   },
 
+  launchFirstStep(event) {
+    const dataset = event && event.currentTarget && event.currentTarget.dataset
+      ? event.currentTarget.dataset
+      : {};
+    const step = dataset.step || this.data.activeStep || 'read_problem';
+    const selected = this.data.selected;
+    const stepTextMap = {
+      read_problem: selected ? `先帮我读题：${selected.text}` : '先帮我读题',
+      write_first_step: '我不知道下一步怎么写',
+      find_direction: '给我一个方向，但不要直接讲最终结果',
+      similar_example: '给我一个相似例子',
+      method_summary: '帮我总结方法，做成复习卡',
+      fast_mode: selected ? `我想加快一点，只提示方向和第一步。\n${selected.text}` : '我想加快一点，只提示方向和第一步。',
+      find_conditions: '带我找条件',
+      explain_misconception: '帮我判断错因',
+      transfer: '带我做一道变式',
+      review: '带我做一句话复盘'
+    };
+    const input = stepTextMap[step] || '带我做下一步';
+    this.setData({
+      activeStep: step,
+      input
+    }, () => {
+      this.send();
+    });
+  },
+
   startGuidedTutorMode(event) {
     const id = event.currentTarget.dataset.id;
     const mode = GUIDED_TUTOR_MODES.find((item) => item.id === id) || GUIDED_TUTOR_MODES[0];

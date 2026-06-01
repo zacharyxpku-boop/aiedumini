@@ -82,8 +82,8 @@
         </view>
 
         <view class="yd-parent-action-row">
-          <view class="yd-action-primary parent-primary" data-scene="parent" bindtap="openEntryDetail">{{profileViewModel.primaryCta}}</view>
-          <view class="yd-action-secondary parent-secondary" data-scene="upload" bindtap="openEntryDetail">补一份材料</view>
+          <view class="yd-action-primary parent-primary" bindtap="goLearningReportCta">{{profileViewModel.primaryCta}}</view>
+          <view class="yd-action-secondary parent-secondary" data-action="upload" bindtap="runParentReportAction">补一份材料</view>
         </view>
       </view>
     </view>
