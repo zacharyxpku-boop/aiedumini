@@ -2435,7 +2435,7 @@ Page({
   },
 
   goHome() {
-    wx.switchTab({ url: '/pages/home/home' });
+    navigation.switchTab('/pages/home/home');
   },
 
   openEntryDetail(event) {

@@ -1752,7 +1752,7 @@ Page({
   },
 
   openScenarioProfile() {
-    wx.switchTab({ url: '/pages/profile/profile' });
+    navigation.switchTab('/pages/profile/profile');
   },
 
   runQuestArcAction() {
@@ -2006,7 +2006,7 @@ Page({
   },
 
   goHome() {
-    wx.switchTab({ url: '/pages/home/home' });
+    navigation.switchTab('/pages/home/home');
   },
 
   goReview() {
@@ -2277,7 +2277,7 @@ Page({
   },
 
   goProfile() {
-    wx.switchTab({ url: '/pages/profile/profile' });
+    navigation.switchTab('/pages/profile/profile');
   },
 
   trackShareActivation(event, payload = {}) {

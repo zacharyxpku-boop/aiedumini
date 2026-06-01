@@ -97,6 +97,14 @@ function clearPendingTabRouteContext() {
   }
 }
 
+function switchTab(route) {
+  const url = baseRoute(route);
+  if (!url || typeof wx === 'undefined' || !wx.switchTab) return false;
+  clearPendingTabRouteContext();
+  wx.switchTab({ url });
+  return true;
+}
+
 function shouldOpenFunctionalTab(options = {}) {
   const from = String(options.from || '');
   return from.indexOf('entry_') === 0 || options.open === 'flow' || options.panel || options.type || options.mode;
@@ -124,6 +132,7 @@ module.exports = {
   rememberTabRouteContext,
   consumePendingTabRouteContext,
   clearPendingTabRouteContext,
+  switchTab,
   shouldOpenFunctionalTab,
   activeRoute
 };

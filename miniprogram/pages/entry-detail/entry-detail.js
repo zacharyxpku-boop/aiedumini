@@ -269,6 +269,6 @@ Page({
       wx.navigateBack();
       return;
     }
-    wx.switchTab({ url: '/pages/home/home' });
+    navigation.switchTab('/pages/home/home');
   }
 });

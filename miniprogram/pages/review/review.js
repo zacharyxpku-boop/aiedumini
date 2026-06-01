@@ -1745,7 +1745,7 @@ Page({
   },
 
   goHome() {
-    wx.switchTab({ url: '/pages/home/home' });
+    navigation.switchTab('/pages/home/home');
   },
 
   goLearningMap() {
@@ -1765,7 +1765,7 @@ Page({
   },
 
   goProfile() {
-    wx.switchTab({ url: '/pages/profile/profile' });
+    navigation.switchTab('/pages/profile/profile');
   },
   runSurfaceDepthAction(event) {
     const dataset = event.currentTarget.dataset || {};
