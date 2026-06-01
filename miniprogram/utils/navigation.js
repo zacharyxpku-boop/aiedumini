@@ -87,6 +87,16 @@ function consumePendingTabRouteContext(route) {
   });
 }
 
+function clearPendingTabRouteContext() {
+  if (typeof wx === 'undefined' || !wx.removeStorageSync) return false;
+  try {
+    wx.removeStorageSync('navigation.pendingTabRoute.v1');
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
 function shouldOpenFunctionalTab(options = {}) {
   const from = String(options.from || '');
   return from.indexOf('entry_') === 0 || options.open === 'flow' || options.panel || options.type || options.mode;
@@ -113,6 +123,7 @@ module.exports = {
   parseQuery,
   rememberTabRouteContext,
   consumePendingTabRouteContext,
+  clearPendingTabRouteContext,
   shouldOpenFunctionalTab,
   activeRoute
 };

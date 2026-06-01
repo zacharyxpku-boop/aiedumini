@@ -1,3 +1,5 @@
+const navigation = require('../utils/navigation');
+
 const tabs = ['/pages/home/home', '/pages/tutor/tutor', '/pages/review/review', '/pages/profile/profile', '/pages/upload/upload'];
 
 Component({
@@ -27,6 +29,7 @@ Component({
     switchTab(event) {
       const index = Number(event.currentTarget.dataset.index || 0);
       const path = event.currentTarget.dataset.path;
+      if (navigation.clearPendingTabRouteContext) navigation.clearPendingTabRouteContext();
       this.setData({ selected: index });
       wx.switchTab({ url: path });
     }
