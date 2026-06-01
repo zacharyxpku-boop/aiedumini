@@ -262,12 +262,13 @@ Page({
     const from = String(query.from || '');
     const mode = String(query.mode || '');
     if (from.indexOf('entry_') !== 0 && !mode) return null;
+    const isEntryReviewReturn = from === 'entry_review' || mode === 'recall_return';
     return {
       from,
       mode,
-      title: mode === 'recall_return' ? '来自回访入口' : '来自学习入口',
+      title: isEntryReviewReturn ? '来自回访入口' : '来自学习入口',
       line: '已从入口页进入短回访，先选一张卡完成 90 秒回忆或迁移验证。',
-      actionLabel: mode === 'recall_return' ? '开始 90 秒回忆' : '进入短回访',
+      actionLabel: isEntryReviewReturn ? '开始 90 秒回忆' : '进入短回访',
       returnRoute: '/pages/entry-detail/entry-detail?scene=review',
       flowTraceId: from || mode || 'entry_review'
     };

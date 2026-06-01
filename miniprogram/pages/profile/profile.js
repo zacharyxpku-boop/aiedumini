@@ -3335,15 +3335,18 @@ Page({
   applyRouteOptions(query = {}) {
     const panel = query.panel === 'report' ? 'assessment' : (query.panel || '');
     const from = String(query.from || '');
+    const quickAssessment = String(query.quick_assessment || '') === '1';
+    const isEntryUploadQuiz = from === 'entry_upload_quiz' && quickAssessment;
     const shouldOpenAssessment = query.quick_assessment === '1'
       || panel === 'assessment'
-      || from === 'entry_report_evidence';
+      || from === 'entry_report_evidence'
+      || isEntryUploadQuiz;
     if (shouldOpenAssessment) {
       this.setData({
         profilePanel: 'assessment',
         profilePanelTitle: '测评与方法建议',
         showAdvancedProfile: true,
-        showLearningQuestionnaire: query.quick_assessment === '1' ? true : this.data.showLearningQuestionnaire
+        showLearningQuestionnaire: quickAssessment ? true : this.data.showLearningQuestionnaire
       });
     }
   },

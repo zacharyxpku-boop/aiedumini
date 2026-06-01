@@ -511,6 +511,36 @@ function currentRouteOptions() {
   }
 }
 
+function buildEntryTutorIntent(options = {}) {
+  const from = String(options.from || '');
+  const open = String(options.open || '');
+  if (from === 'entry_today_first_step') {
+    return {
+      from,
+      open,
+      intro: '我已从今晚路线进入。先说你准备从哪一步开始，我只追问下一小步。',
+      resetMessages: open === 'flow'
+    };
+  }
+  if (from === 'entry_tutor_first_step') {
+    return {
+      from,
+      open,
+      intro: '我已进入 AI 私教追问板。把题目、卡点或第一步发来，我只给最小提示。',
+      resetMessages: open === 'flow'
+    };
+  }
+  if (from === 'entry_review_repair') {
+    return {
+      from,
+      open,
+      intro: '我已从短回访回到 AI 私教。先修复刚才卡住的错因，不重讲整题。',
+      resetMessages: true
+    };
+  }
+  return null;
+}
+
 function findPublicK12Challenge(options = {}) {
   const from = String(options.from || '');
   const challengeId = String(options.challenge_id || options.challengeId || '');
@@ -951,6 +981,7 @@ Page({
       : null;
     const state = storage.loadState();
     const routeOptions = Object.assign({}, currentRouteOptions(), pendingRoute && pendingRoute.options ? pendingRoute.options : {});
+    const entryTutorIntent = buildEntryTutorIntent(routeOptions);
     const publicK12Challenge = findPublicK12Challenge(routeOptions);
     const publicK12Selected = publicK12Challenge ? buildPublicK12SelectedHomework(publicK12Challenge) : null;
     const uploadReportHandoff = routeOptions.from === 'upload_report_ready' && storage.get
@@ -995,12 +1026,17 @@ Page({
     const weakPoints = state.weak_points || [];
     const intro = publicK12Challenge
       ? publicK12TutorIntro(publicK12Challenge, selected)
+      : entryTutorIntent
+      ? entryTutorIntent.intro
       : selected
       ? `我已锁定今晚第一项必须做：「${selected.text}」。先说你的第一步，我只处理关键错因。`
       : '我只处理必须做任务和关键错因，不替你写作业。先从首页锁定一项今晚必须做。';
-    const messages = storage.get(storage.KEYS.tutorMessages, null) || [
+    const savedMessages = storage.get(storage.KEYS.tutorMessages, null);
+    const messages = entryTutorIntent && entryTutorIntent.resetMessages ? [
       { role: 'assistant', text: intro }
-    ];
+    ] : (savedMessages || [
+      { role: 'assistant', text: intro }
+    ]);
 
     const pasteRisk = pasteRiskSignal(messages);
     const tutorTurnState = tutorLadder.nextTutorTurnState
