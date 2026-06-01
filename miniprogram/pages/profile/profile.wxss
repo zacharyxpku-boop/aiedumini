@@ -21,10 +21,17 @@ page {
   z-index: 2;
   padding: calc(108rpx + env(safe-area-inset-top)) 30rpx calc(126rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 .yd-parent-screen {
   position: relative;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: calc(100vh - 234rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   margin: 0 0 22rpx;
   padding: 16rpx;
   overflow: hidden;
@@ -100,9 +107,10 @@ page {
 
 .yd-parent-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 126rpx;
-  gap: 12rpx;
+  grid-template-columns: minmax(0, 1fr) 148rpx;
+  gap: 14rpx;
   align-items: center;
+  min-height: 190rpx;
   margin-top: 16rpx;
 }
 
@@ -138,8 +146,8 @@ page {
 }
 
 .yd-parent-art {
-  width: 126rpx;
-  height: 116rpx;
+  width: 148rpx;
+  height: 142rpx;
   border-radius: 26rpx;
   background: #fff1ea;
 }
@@ -157,8 +165,8 @@ page {
   grid-template-columns: 92rpx minmax(0, 1fr) auto;
   gap: 10rpx;
   align-items: center;
-  margin-top: 12rpx;
-  padding: 10rpx;
+  margin-top: 14rpx;
+  padding: 12rpx;
   background:
     radial-gradient(circle at 88% 16%, rgba(248, 198, 34, 0.16), transparent 36%),
     linear-gradient(135deg, #f2fbef 0%, #ffffff 72%);
@@ -215,7 +223,7 @@ page {
 }
 
 .yd-parent-sources {
-  margin-top: 12rpx;
+  margin-top: 14rpx;
   padding: 12rpx;
 }
 
@@ -273,7 +281,7 @@ page {
 
 .yd-parent-screen .yd-jump-grid {
   gap: 10rpx;
-  margin-top: 12rpx;
+  margin-top: 14rpx;
 }
 
 .parent-jump-card {
@@ -291,6 +299,7 @@ page {
 
 .yd-parent-methods {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 12rpx;
   padding: 10rpx;
   border-radius: 24rpx;
   background: #ecf9ed;
@@ -334,7 +343,8 @@ page {
 }
 
 .yd-parent-action-row {
-  margin-top: 12rpx;
+  margin-top: auto;
+  padding-top: 14rpx;
 }
 
 .parent-primary,

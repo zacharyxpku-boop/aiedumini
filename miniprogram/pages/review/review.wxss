@@ -20,10 +20,17 @@ page {
 .content-inner {
   padding: calc(108rpx + env(safe-area-inset-top)) 30rpx calc(126rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 .yd-review-screen {
   position: relative;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: calc(100vh - 234rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   margin-bottom: 18rpx;
   padding: 16rpx;
   overflow: hidden;
@@ -104,10 +111,11 @@ page {
 
 .yd-review-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 124rpx;
-  gap: 12rpx;
+  grid-template-columns: minmax(0, 1fr) 146rpx;
+  gap: 14rpx;
   align-items: center;
-  margin-top: 14rpx;
+  min-height: 178rpx;
+  margin-top: 16rpx;
 }
 
 .yd-review-title {
@@ -148,8 +156,8 @@ page {
 }
 
 .yd-review-art {
-  width: 124rpx;
-  height: 112rpx;
+  width: 146rpx;
+  height: 138rpx;
   overflow: hidden;
   border: 6rpx solid rgba(255, 255, 255, 0.76);
   border-radius: 26rpx;
@@ -157,8 +165,8 @@ page {
 }
 
 .review-map-card {
-  margin-top: 12rpx;
-  padding: 12rpx;
+  margin-top: 14rpx;
+  padding: 14rpx 12rpx;
   border: 1rpx solid rgba(232, 238, 230, 0.95);
   border-radius: 22rpx;
   background: rgba(255, 255, 255, 0.94);
@@ -190,7 +198,7 @@ page {
   position: relative;
   display: grid;
   min-width: 0;
-  min-height: 96rpx;
+  min-height: 112rpx;
   align-content: center;
   justify-items: center;
   gap: 5rpx;
@@ -267,13 +275,13 @@ page {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10rpx;
-  margin-top: 12rpx;
+  margin-top: 14rpx;
 }
 
 .review-action-card {
   display: grid;
   grid-template-columns: 52rpx minmax(0, 1fr);
-  min-height: 90rpx;
+  min-height: 108rpx;
   align-items: center;
   justify-items: stretch;
   column-gap: 10rpx;
@@ -320,7 +328,7 @@ page {
 
 .review-main-cta {
   height: 64rpx;
-  margin-top: 12rpx;
+  margin-top: auto;
   border-radius: 999rpx;
   color: #1d261f;
   background: linear-gradient(180deg, #ffd84f 0%, #f5b300 100%);
