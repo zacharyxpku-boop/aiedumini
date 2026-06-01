@@ -947,7 +947,7 @@ Page({
     };
   },
 
-  runPlaybookAction(event) {
+  runLegacyReviewPlaybookAction(event) {
     const action = event.currentTarget.dataset.action;
     if (action === 'review') {
       const currentFocus = this.data.todayFocus || (storage.loadTodayFocus ? storage.loadTodayFocus() : null);
@@ -1417,6 +1417,24 @@ Page({
     }
     if (action === 'revisit') {
       this.goLearningMap();
+      return;
+    }
+    if (action === 'review') {
+      const currentFocus = this.data.todayFocus || (storage.loadTodayFocus ? storage.loadTodayFocus() : null);
+      const blackboardHint = storage.buildBlackboardHint ? storage.buildBlackboardHint(currentFocus || {}) : null;
+      const blackboardUsedAt = blackboardHint ? new Date().toISOString() : '';
+      const focus = storage.updateTodayFocusRepair ? storage.updateTodayFocusRepair({
+        repairStatus: 'in_progress',
+        progress: Math.max(56, Number((this.data.todayFocus && this.data.todayFocus.progress) || 0)),
+        blackboardHint: blackboardHint ? Object.assign({}, blackboardHint, { usedAt: blackboardUsedAt }) : undefined,
+        blackboardUsedAt
+      }) : null;
+      this.setData({
+        sessionMode: 'smart',
+        todayFocus: focus || this.data.todayFocus,
+        feedbackText: '\u5df2\u8fdb\u5165\u77ed\u56de\u8bbf\uff1a\u5148\u56de\u5fc6\u7b2c\u4e00\u6b65\uff0c\u518d\u505a\u4e00\u5f20\u53d8\u5f0f\u3002'
+      });
+      this.refresh();
       return;
     }
     this.goFocus();
