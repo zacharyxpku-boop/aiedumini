@@ -82,8 +82,11 @@
 }
 
 .yd-home-screen {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 110rpx - env(safe-area-inset-top));
   margin: 0 24rpx 18rpx;
-  padding: 0 0 calc(112rpx + env(safe-area-inset-bottom));
+  padding: 0 0 calc(132rpx + env(safe-area-inset-bottom));
   border: 0;
   background: transparent;
   box-shadow: none;
@@ -237,7 +240,13 @@
 .mini-entry-arrow.blue { background: rgba(47,129,247,.12); color: #2f74d0; }
 .mini-entry-arrow.orange { background: rgba(255,122,69,.12); color: #c6512f; }
 
-.mini-route-card { margin-top: 9rpx; padding: 12rpx; }
+.mini-route-card {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  margin-top: 12rpx;
+  padding: 12rpx;
+}
 .mini-route-input { width: 100%; min-height: 54rpx; margin-top: 7rpx; padding: 11rpx 13rpx; border: 1rpx solid #e8eee6; border-radius: 18rpx; background: #f8fbf5; color: #203127; font-size: 21rpx; line-height: 1.25; }
 
 .mini-route-line { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 5rpx; margin-top: 8rpx; }
@@ -250,4 +259,4 @@
 .mini-route-node text:nth-child(3) { display: none; }
 
 .route-next-lite { color: #0d7a3d; font-weight: 900; }
-.mini-main-cta { height: 60rpx; margin-top: 9rpx; border-radius: 18rpx; background: linear-gradient(180deg, #22b95c 0%, #16a34a 100%); color: #fff; font-size: 23rpx; font-weight: 950; line-height: 60rpx; text-align: center; box-shadow: 0 16rpx 28rpx rgba(34,185,92,.2); }
+.mini-main-cta { height: 60rpx; margin-top: auto; border-radius: 18rpx; background: linear-gradient(180deg, #22b95c 0%, #16a34a 100%); color: #fff; font-size: 23rpx; font-weight: 950; line-height: 60rpx; text-align: center; box-shadow: 0 16rpx 28rpx rgba(34,185,92,.2); }

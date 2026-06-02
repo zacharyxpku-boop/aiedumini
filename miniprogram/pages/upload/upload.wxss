@@ -18,15 +18,15 @@ page {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  min-height: auto;
+  min-height: 100vh;
 }
 
 .yd-upload-screen {
   position: relative;
   display: flex;
-  flex: 0 0 auto;
+  flex: 1 1 auto;
   flex-direction: column;
-  min-height: auto;
+  min-height: calc(100vh - 208rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   margin-bottom: 0;
   padding: 14rpx;
   overflow: hidden;
@@ -350,7 +350,7 @@ page {
 
 .yd-upload-primary {
   height: 60rpx;
-  margin-top: 10rpx;
+  margin-top: auto;
   border-radius: 999rpx;
   color: #1d261f;
   background: linear-gradient(180deg, #ffd84f 0%, #f5b300 100%);

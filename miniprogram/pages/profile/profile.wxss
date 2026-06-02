@@ -24,15 +24,15 @@ page {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  min-height: auto;
+  min-height: 100vh;
 }
 
 .yd-parent-screen {
   position: relative;
   display: flex;
-  flex: 0 0 auto;
+  flex: 1 1 auto;
   flex-direction: column;
-  min-height: auto;
+  min-height: calc(100vh - 208rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   margin: 0;
   padding: 14rpx;
   overflow: hidden;
@@ -352,7 +352,7 @@ page {
 }
 
 .yd-parent-action-row {
-  margin-top: 10rpx;
+  margin-top: auto;
   padding-top: 0;
 }
 
