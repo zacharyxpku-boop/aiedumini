@@ -514,10 +514,10 @@
   position: relative;
   z-index: 4;
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 3rpx;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7rpx;
   margin-top: 10rpx;
-  padding: 3rpx;
+  padding: 6rpx;
   border: 1rpx solid rgba(232, 238, 230, 0.9);
   border-radius: 18rpx;
   background: rgba(255, 255, 255, 0.74);
@@ -543,15 +543,7 @@
 }
 
 .entry-proof-node::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  right: -11rpx;
-  width: 16rpx;
-  height: 4rpx;
-  border-radius: 999rpx;
-  background: #dce8dc;
-  transform: translateY(-50%);
+  display: none;
 }
 
 .entry-proof-node:last-child::after {

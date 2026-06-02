@@ -188,26 +188,26 @@ page {
 
 .tutor-section-head text:last-child {
   color: #738077;
-  font-size: 17rpx;
+  font-size: 20rpx;
   font-weight: 780;
 }
 
 .tutor-ladder {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 6rpx;
-  margin-top: 8rpx;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8rpx;
+  margin-top: 10rpx;
 }
 
 .tutor-ladder-node {
   position: relative;
   display: grid;
   min-width: 0;
-  min-height: 70rpx;
+  min-height: 86rpx;
   align-content: center;
   justify-items: center;
-  gap: 3rpx;
-  padding: 7rpx 3rpx;
+  gap: 5rpx;
+  padding: 9rpx 6rpx;
   overflow: visible;
   border: 1rpx solid rgba(232, 238, 230, 0.95);
   border-radius: 19rpx;
@@ -221,15 +221,7 @@ page {
 }
 
 .tutor-ladder-node::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  right: -14rpx;
-  width: 18rpx;
-  height: 4rpx;
-  border-radius: 999rpx;
-  background: #dce8dc;
-  transform: translateY(-50%);
+  display: none;
 }
 
 .tutor-ladder-node:last-child::after {
@@ -237,8 +229,8 @@ page {
 }
 
 .tutor-ladder-icon {
-  width: 32rpx;
-  height: 32rpx;
+  width: 38rpx;
+  height: 38rpx;
   object-fit: contain;
   padding: 6rpx;
   border-radius: 15rpx;
@@ -255,7 +247,7 @@ page {
 
 .tutor-ladder-node text:nth-child(2) {
   color: #17211d;
-  font-size: 16rpx;
+  font-size: 20rpx;
   font-weight: 950;
   line-height: 1.18;
 }
