@@ -13,16 +13,17 @@
           <view class="yd-upload-pill">学习包</view>
         </view>
 
-        <view class="yd-upload-hero">
+        <view class="yd-upload-hero" bindtap="submit">
           <view class="yd-upload-copy">
             <view class="yd-upload-title">先把材料分清楚</view>
-            <view class="yd-upload-sub">测评、成绩、错题和家长观察会进入不同证据位，再生成报告和今晚路线。</view>
+            <view class="yd-upload-sub">把作业、错题、成绩或测评先发过来。系统先分类，再生成家长报告和今晚路线。</view>
             <view class="yd-upload-proof">
+              <text>点击上传材料</text>
               <text>不公开分享</text>
               <text>先分类再分析</text>
             </view>
             <view class="upload-type-strip">
-              <text>学习偏好/测评资料</text>
+              <text>作业/错题</text>
               <text>成绩单/周测</text>
               <text>错题试卷</text>
             </view>
@@ -31,45 +32,18 @@
         </view>
 
         <view class="upload-material-grid yd-jump-grid">
-          <view class="upload-material-card yd-jump-card primary" data-scene="upload" bindtap="openEntryDetail">
-            <image class="upload-material-icon" mode="aspectFit" src="/assets/reference/entry-upload.png" />
-            <text>上传材料</text>
-            <text>作业/错题/成绩</text>
-          </view>
-          <view class="upload-material-card yd-jump-card" data-scene="parent" bindtap="openEntryDetail">
+          <view class="upload-material-card yd-jump-card primary" data-scene="parent" bindtap="openEntryDetail">
             <image class="upload-material-icon blue" mode="aspectFit" src="/assets/reference/entry-report.png" />
             <text>家长报告</text>
-            <text>证据与方法匹配</text>
+            <text>证据、卡点和方法建议</text>
           </view>
-          <view class="upload-material-card yd-jump-card" data-scene="today" bindtap="openEntryDetail">
+          <view class="upload-material-card yd-jump-card primary map-card" data-scene="today" bindtap="openEntryDetail">
             <image class="upload-material-icon yellow" mode="aspectFit" src="/assets/reference/entry-map.png" />
             <text>今晚路线</text>
-            <text>直接生成任务</text>
+            <text>从哪一步开始做</text>
           </view>
         </view>
 
-        <view class="yd-upload-pipeline">
-          <view class="upload-pipeline-node done" data-scene="upload" bindtap="openEntryDetail">
-            <image class="upload-pipeline-icon" mode="aspectFit" src="/assets/reference/entry-upload.png" />
-            <text>已分类</text>
-            <text>材料入库</text>
-          </view>
-          <view class="upload-pipeline-node active" data-scene="report" bindtap="openEntryDetail">
-            <image class="upload-pipeline-icon" mode="aspectFit" src="/assets/reference/entry-report.png" />
-            <text>提证据</text>
-            <text>置信度</text>
-          </view>
-          <view class="upload-pipeline-node" data-scene="parent" bindtap="openEntryDetail">
-            <image class="upload-pipeline-icon" mode="aspectFit" src="/assets/reference/entry-parent.png" />
-            <text>出报告</text>
-            <text>给家长</text>
-          </view>
-          <view class="upload-pipeline-node next" data-scene="tutor" bindtap="openEntryDetail">
-            <image class="upload-pipeline-icon" mode="aspectFit" src="/assets/reference/entry-tutor.png" />
-            <text>进入点拨</text>
-            <text>说第一步</text>
-          </view>
-        </view>
         <view class="yd-upload-primary" bindtap="submit">生成学习包</view>
 
       </view>

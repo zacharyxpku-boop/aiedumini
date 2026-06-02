@@ -63,7 +63,7 @@ Page({
     weaknessVerdict: null,
     revisitEntry: {
       body: '没有材料时先生成第一步验证，有真实卡片后再进入回访验证。',
-      cta: '去短回访',
+      cta: '明天验证',
       action: 'goLearningMap'
     },
     wrongbookEntry: {

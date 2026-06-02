@@ -102,28 +102,35 @@ page {
 
 .yd-upload-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 190rpx;
+  grid-template-columns: minmax(0, 1fr) 214rpx;
   gap: 18rpx;
   align-items: center;
   flex: 0 0 auto;
-  min-height: 286rpx;
-  max-height: 326rpx;
+  min-height: 356rpx;
+  max-height: none;
   margin-top: 0;
-  padding: 24rpx 22rpx;
+  padding: 30rpx 26rpx;
   overflow: hidden;
   border: 2rpx dashed rgba(34, 185, 92, 0.5);
-  border-radius: 30rpx;
+  border-radius: 34rpx;
   background:
     radial-gradient(circle at 92% 8%, rgba(248, 198, 34, 0.18), transparent 22%),
     linear-gradient(135deg, #ffffff 0%, #f3fbef 100%);
-  box-shadow: inset 0 0 0 1rpx rgba(255, 255, 255, 0.72);
+  box-shadow:
+    0 18rpx 46rpx rgba(34, 185, 92, 0.10),
+    inset 0 0 0 1rpx rgba(255, 255, 255, 0.72);
+}
+
+.yd-upload-hero:active {
+  transform: translateY(1rpx);
+  box-shadow: inset 0 0 0 2rpx rgba(34, 185, 92, 0.18);
 }
 
 .yd-upload-title {
   color: #101a16;
-  font-size: 47rpx;
+  font-size: 52rpx;
   font-weight: 950;
-  line-height: 1.1;
+  line-height: 1.08;
   letter-spacing: 0;
   overflow-wrap: break-word;
   word-break: break-word;
@@ -131,13 +138,13 @@ page {
 
 .yd-upload-sub {
   display: -webkit-box;
-  margin-top: 9rpx;
+  margin-top: 12rpx;
   overflow: hidden;
   color: #64706a;
-  font-size: 26rpx;
+  font-size: 27rpx;
   line-height: 1.42;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 3;
 }
 
 .yd-upload-proof,
@@ -172,8 +179,8 @@ page {
 }
 
 .yd-upload-mascot {
-  width: 190rpx;
-  height: 190rpx;
+  width: 214rpx;
+  height: 214rpx;
   align-self: center;
   justify-self: end;
   overflow: hidden;
@@ -186,19 +193,19 @@ page {
 
 .upload-material-grid {
   display: grid;
-  grid-template-columns: 1.25fr .875fr .875fr;
-  gap: 10rpx;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12rpx;
   margin-top: 0;
 }
 
 .upload-material-card {
   display: grid;
   min-width: 0;
-  min-height: 174rpx;
+  min-height: 168rpx;
   align-content: center;
   justify-items: center;
-  gap: 8rpx;
-  padding: 9rpx 7rpx;
+  gap: 9rpx;
+  padding: 16rpx 12rpx;
   border: 1rpx solid rgba(232, 238, 230, 0.95);
   border-radius: 21rpx;
   background: rgba(255, 255, 255, 0.9);
@@ -207,6 +214,15 @@ page {
 
 .upload-material-card.primary {
   background: linear-gradient(180deg, #ffffff 0%, #f0fbf0 100%);
+}
+
+.upload-material-card.map-card {
+  background: linear-gradient(180deg, #ffffff 0%, #fff8df 100%);
+}
+
+.upload-material-card:active {
+  transform: scale(0.985);
+  box-shadow: 0 8rpx 20rpx rgba(38, 58, 43, 0.08);
 }
 
 .upload-material-icon {
@@ -254,100 +270,9 @@ page {
   -webkit-line-clamp: 2;
 }
 
-.yd-upload-pipeline {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8rpx;
-  margin-top: 0;
-  padding-top: 0;
-}
-
-.upload-pipeline-node {
-  position: relative;
-  display: grid;
-  min-width: 0;
-  min-height: 132rpx;
-  align-content: center;
-  justify-items: center;
-  gap: 6rpx;
-  padding: 9rpx 6rpx;
-  overflow: visible;
-  border: 0;
-  border-radius: 18rpx;
-  background: rgba(255, 255, 255, 0.62);
-  box-shadow: none;
-}
-
-.upload-pipeline-node:active {
-  transform: translateY(1rpx);
-  box-shadow: 0 8rpx 18rpx rgba(41, 65, 52, 0.05);
-}
-
-.upload-pipeline-node::after {
-  display: none;
-}
-
-.upload-pipeline-node:last-child::after {
-  display: none;
-}
-
-.upload-pipeline-icon {
-  width: 50rpx;
-  height: 50rpx;
-  object-fit: contain;
-  padding: 6rpx;
-  border-radius: 15rpx;
-  background: #f0f8ee;
-}
-
-.upload-pipeline-node text {
-  max-width: 100%;
-  overflow: hidden;
-  text-align: center;
-  text-overflow: ellipsis;
-  white-space: normal;
-}
-
-.upload-pipeline-node text:nth-child(2) {
-  color: #17211d;
-  font-size: 24rpx;
-  font-weight: 950;
-  line-height: 1.18;
-  white-space: normal;
-}
-
-.upload-pipeline-node text:nth-child(3) {
-  display: none;
-}
-
-.upload-pipeline-node.done {
-  background: rgba(34, 185, 92, 0.10);
-}
-
-.upload-pipeline-node.active {
-  background: #ffffff;
-  box-shadow: inset 0 0 0 2rpx rgba(76, 159, 255, 0.18);
-}
-
-.upload-pipeline-node.next {
-  background: rgba(248, 198, 34, 0.18);
-}
-
-.upload-pipeline-node.done .upload-pipeline-icon {
-  background: #dff7e6;
-}
-
-.upload-pipeline-node.active .upload-pipeline-icon {
-  background: #e5f2ff;
-}
-
-.upload-pipeline-node.next .upload-pipeline-icon {
-  background: #fff1bd;
-}
-
 .yd-upload-primary {
   height: 92rpx;
-  margin-top: 8rpx;
+  margin-top: 2rpx;
   border-radius: 999rpx;
   color: #1d261f;
   background: linear-gradient(180deg, #ffd84f 0%, #f5b300 100%);

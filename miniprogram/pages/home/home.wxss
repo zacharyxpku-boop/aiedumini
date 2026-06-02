@@ -249,8 +249,8 @@
 }
 .mini-route-input { width: 100%; min-height: 82rpx; margin-top: 10rpx; padding: 15rpx 16rpx; border: 1rpx solid #e8eee6; border-radius: 20rpx; background: #f8fbf5; color: #203127; font-size: 23rpx; line-height: 1.32; }
 
-.mini-route-line { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6rpx; margin-top: 11rpx; padding: 6rpx; border-radius: 20rpx; background: #f3faf1; }
-.mini-route-node { display: grid; min-height: 74rpx; justify-items: center; align-content: center; gap: 3rpx; padding: 7rpx 5rpx; border: 0; border-radius: 15rpx; background: transparent; }
+.mini-route-line { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 5rpx; margin-top: 11rpx; padding: 6rpx; border-radius: 20rpx; background: #f3faf1; }
+.mini-route-node { display: grid; min-height: 78rpx; justify-items: center; align-content: center; gap: 3rpx; padding: 7rpx 3rpx; border: 0; border-radius: 15rpx; background: transparent; }
 .mini-route-node.done { background: rgba(34,185,92,.08); }
 .mini-route-node.active { background: #ffffff; box-shadow: inset 0 0 0 2rpx rgba(34,185,92,.18); }
 .mini-route-node.final { background: rgba(248,198,34,.16); }
