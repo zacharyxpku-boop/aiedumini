@@ -36,7 +36,7 @@ page {
   flex: 1 1 auto;
   flex-direction: column;
   min-height: calc(100vh - 208rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-  padding: 14rpx;
+  padding: 20rpx;
   overflow: hidden;
   border: 1rpx solid rgba(232, 238, 230, 0.94);
   border-radius: 30rpx;
@@ -110,15 +110,16 @@ page {
 
 .yd-tutor-hero {
   display: grid;
-  grid-template-columns: 142rpx minmax(0, 1fr);
-  gap: 12rpx;
+  grid-template-columns: 190rpx minmax(0, 1fr);
+  gap: 18rpx;
   align-items: center;
-  margin-top: 14rpx;
+  min-height: 228rpx;
+  margin-top: 16rpx;
 }
 
 .yd-tutor-mascot {
-  width: 142rpx;
-  height: 138rpx;
+  width: 188rpx;
+  height: 184rpx;
   align-self: center;
   object-fit: contain;
   overflow: hidden;
@@ -129,7 +130,7 @@ page {
 
 .yd-tutor-bubble {
   min-width: 0;
-  padding: 16rpx;
+  padding: 20rpx;
   border: 1rpx solid rgba(232, 238, 230, 0.95);
   border-radius: 24rpx;
   background: rgba(255, 255, 255, 0.92);
@@ -137,7 +138,7 @@ page {
 
 .yd-tutor-bubble view:first-child {
   color: #101a16;
-  font-size: 30rpx;
+  font-size: 40rpx;
   font-weight: 950;
   line-height: 1.12;
 }
@@ -147,8 +148,8 @@ page {
   margin-top: 8rpx;
   overflow: hidden;
   color: #64706a;
-  font-size: 21rpx;
-  line-height: 1.35;
+  font-size: 23rpx;
+  line-height: 1.42;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
@@ -289,9 +290,9 @@ page {
   align-content: start;
   gap: 10rpx;
   flex: 1 1 auto;
-  min-height: 168rpx;
-  margin-top: 10rpx;
-  padding: 13rpx;
+  min-height: 228rpx;
+  margin-top: 14rpx;
+  padding: 18rpx;
   border: 1rpx solid rgba(232, 238, 230, 0.95);
   border-radius: 24rpx;
   background: rgba(255, 255, 255, 0.94);
@@ -300,7 +301,7 @@ page {
 
 .tutor-chat-title {
   color: #18211d;
-  font-size: 25rpx;
+  font-size: 28rpx;
   font-weight: 950;
 }
 
@@ -310,7 +311,7 @@ page {
   border-radius: 20rpx;
   color: #31423a;
   background: #f1f7ef;
-  font-size: 21rpx;
+  font-size: 23rpx;
   font-weight: 760;
   line-height: 1.42;
 }
@@ -355,21 +356,22 @@ page {
 
 .tutor-action-row {
   margin-top: auto;
-  padding-top: 0;
+  padding-top: 12rpx;
 }
 
 .tutor-primary,
 .tutor-secondary {
   flex: 1 1 0;
-  height: 60rpx;
+  height: 72rpx;
   border-radius: 999rpx;
-  font-size: 23rpx;
+  font-size: 26rpx;
   font-weight: 950;
-  line-height: 60rpx;
+  line-height: 72rpx;
   text-align: center;
 }
 
 .tutor-primary {
+  height: 72rpx;
   color: #1d261f;
   background: linear-gradient(180deg, #ffd84f 0%, #f5b300 100%);
 }

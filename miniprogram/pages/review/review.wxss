@@ -33,7 +33,7 @@ page {
   flex-direction: column;
   min-height: calc(100vh - 208rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   margin-bottom: 0;
-  padding: 14rpx;
+  padding: 20rpx;
   overflow: hidden;
   border: 1rpx solid rgba(232, 238, 230, 0.94);
   border-radius: 30rpx;
@@ -113,16 +113,16 @@ page {
 
 .yd-review-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 128rpx;
-  gap: 12rpx;
+  grid-template-columns: minmax(0, 1fr) 184rpx;
+  gap: 18rpx;
   align-items: center;
-  min-height: 148rpx;
-  margin-top: 12rpx;
+  min-height: 232rpx;
+  margin-top: 16rpx;
 }
 
 .yd-review-title {
   color: #101a16;
-  font-size: 32rpx;
+  font-size: 42rpx;
   font-weight: 950;
   line-height: 1.1;
   letter-spacing: 0;
@@ -133,8 +133,8 @@ page {
   margin-top: 9rpx;
   overflow: hidden;
   color: #64706a;
-  font-size: 20rpx;
-  line-height: 1.34;
+  font-size: 23rpx;
+  line-height: 1.42;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
@@ -158,8 +158,8 @@ page {
 }
 
 .yd-review-art {
-  width: 128rpx;
-  height: 118rpx;
+  width: 178rpx;
+  height: 164rpx;
   align-self: center;
   object-fit: contain;
   overflow: hidden;
@@ -169,8 +169,9 @@ page {
 }
 
 .review-map-card {
-  margin-top: 10rpx;
-  padding: 12rpx 10rpx;
+  flex: 1 1 auto;
+  margin-top: 14rpx;
+  padding: 16rpx 12rpx;
   border: 1rpx solid rgba(232, 238, 230, 0.95);
   border-radius: 22rpx;
   background: rgba(255, 255, 255, 0.94);
@@ -202,7 +203,7 @@ page {
   position: relative;
   display: grid;
   min-width: 0;
-  min-height: 88rpx;
+  min-height: 104rpx;
   align-content: center;
   justify-items: center;
   gap: 5rpx;
@@ -286,7 +287,7 @@ page {
 .review-action-card {
   display: grid;
   grid-template-columns: 52rpx minmax(0, 1fr);
-  min-height: 88rpx;
+  min-height: 102rpx;
   align-items: center;
   justify-items: stretch;
   column-gap: 10rpx;
@@ -332,15 +333,15 @@ page {
 }
 
 .review-main-cta {
-  height: 60rpx;
+  height: 72rpx;
   margin-top: auto;
   border-radius: 999rpx;
   color: #1d261f;
   background: linear-gradient(180deg, #ffd84f 0%, #f5b300 100%);
   box-shadow: 0 16rpx 28rpx rgba(248, 198, 34, 0.22);
-  font-size: 23rpx;
+  font-size: 26rpx;
   font-weight: 950;
-  line-height: 60rpx;
+  line-height: 72rpx;
   text-align: center;
 }
 
