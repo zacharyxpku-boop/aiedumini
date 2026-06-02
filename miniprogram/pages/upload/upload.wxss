@@ -104,9 +104,9 @@ page {
   grid-template-columns: minmax(0, 1fr) 190rpx;
   gap: 18rpx;
   align-items: center;
-  flex: 1 1 330rpx;
-  min-height: 320rpx;
-  max-height: none;
+  flex: 0 0 auto;
+  min-height: 258rpx;
+  max-height: 306rpx;
   margin-top: 0;
   padding: 24rpx 22rpx;
   overflow: hidden;
@@ -183,7 +183,7 @@ page {
 
 .upload-material-grid {
   display: grid;
-  grid-template-columns: 1.4fr .8fr .8fr;
+  grid-template-columns: 1.25fr .875fr .875fr;
   gap: 10rpx;
   margin-top: 0;
 }
@@ -191,8 +191,8 @@ page {
 .upload-material-card {
   display: grid;
   min-width: 0;
-  min-height: 124rpx;
-  align-content: start;
+  min-height: 116rpx;
+  align-content: center;
   justify-items: center;
   gap: 8rpx;
   padding: 9rpx 7rpx;
@@ -260,7 +260,7 @@ page {
   position: relative;
   display: grid;
   min-width: 0;
-  min-height: 104rpx;
+  min-height: 94rpx;
   align-content: center;
   justify-items: center;
   gap: 6rpx;
@@ -342,7 +342,7 @@ page {
 
 .yd-upload-primary {
   height: 72rpx;
-  margin-top: auto;
+  margin-top: 14rpx;
   border-radius: 999rpx;
   color: #1d261f;
   background: linear-gradient(180deg, #ffd84f 0%, #f5b300 100%);

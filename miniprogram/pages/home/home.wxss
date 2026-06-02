@@ -84,7 +84,7 @@
 .yd-home-screen {
   display: flex;
   flex-direction: column;
-  min-height: calc(100vh - 86rpx - env(safe-area-inset-top));
+  min-height: auto;
   margin: 0 22rpx 18rpx;
   padding: 0 0 calc(104rpx + env(safe-area-inset-bottom));
   border: 0;
@@ -98,8 +98,8 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) 220rpx;
   gap: 12rpx;
-  min-height: 238rpx;
-  padding: 26rpx 20rpx 24rpx 26rpx;
+  min-height: 252rpx;
+  padding: 28rpx 22rpx 26rpx 28rpx;
   overflow: hidden;
   border: 1rpx solid #e8eee6;
   border-radius: 34rpx;
@@ -176,20 +176,21 @@
 
 .mini-entry-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8rpx;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10rpx;
   margin-top: 12rpx;
 }
 
 .mini-entry-card {
   position: relative;
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: 58rpx minmax(0, 1fr);
   align-content: center;
-  justify-items: center;
-  gap: 5rpx;
-  min-height: 88rpx;
-  padding: 8rpx 6rpx;
+  align-items: center;
+  justify-items: start;
+  gap: 10rpx;
+  min-height: 98rpx;
+  padding: 10rpx 12rpx;
   overflow: hidden;
   border: 1rpx solid #e8eee6;
   border-radius: 24rpx;
@@ -203,8 +204,8 @@
 .mini-entry-card.map { background: linear-gradient(180deg, #ffffff 0%, #eefbed 100%); }
 
 .mini-entry-visual {
-  width: 42rpx;
-  height: 42rpx;
+  width: 58rpx;
+  height: 58rpx;
   align-self: center;
   object-fit: contain;
   border-radius: 18rpx;
@@ -216,11 +217,11 @@
   grid-column: auto;
   max-width: 100%;
   overflow: hidden;
-  text-align: center;
+  text-align: left;
   text-overflow: ellipsis;
 }
 .mini-entry-card text:first-of-type { color: #123f31; font-size: 21rpx; font-weight: 950; white-space: nowrap; }
-.mini-entry-card text:nth-of-type(2) { display: none; }
+.mini-entry-card text:nth-of-type(2) { display: block; margin-top: 4rpx; color: #66746d; font-size: 18rpx; line-height: 1.22; white-space: nowrap; }
 
 .mini-entry-arrow {
   position: absolute;
@@ -242,7 +243,7 @@
 
 .mini-route-card {
   display: flex;
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   flex-direction: column;
   margin-top: 0;
   padding: 16rpx;
@@ -259,4 +260,4 @@
 .mini-route-node text:nth-child(3) { display: none; }
 
 .route-next-lite { color: #0d7a3d; font-weight: 900; }
-.mini-main-cta { height: 72rpx; margin-top: auto; border-radius: 22rpx; background: linear-gradient(180deg, #22b95c 0%, #16a34a 100%); color: #fff; font-size: 26rpx; font-weight: 950; line-height: 72rpx; text-align: center; box-shadow: 0 18rpx 32rpx rgba(34,185,92,.22); }
+.mini-main-cta { height: 72rpx; margin-top: 14rpx; border-radius: 22rpx; background: linear-gradient(180deg, #22b95c 0%, #16a34a 100%); color: #fff; font-size: 26rpx; font-weight: 950; line-height: 72rpx; text-align: center; box-shadow: 0 18rpx 32rpx rgba(34,185,92,.22); }

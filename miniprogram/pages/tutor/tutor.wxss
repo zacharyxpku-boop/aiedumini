@@ -115,7 +115,7 @@ page {
   gap: 18rpx;
   align-items: center;
   flex: 0 0 auto;
-  min-height: 236rpx;
+  min-height: 224rpx;
   margin-top: 0;
 }
 
@@ -283,9 +283,9 @@ page {
   display: grid;
   align-content: start;
   gap: 10rpx;
-  flex: 1 1 auto;
-  min-height: 286rpx;
-  max-height: none;
+  flex: 0 0 auto;
+  min-height: 238rpx;
+  max-height: 286rpx;
   margin-top: 0;
   padding: 18rpx;
   border: 1rpx solid rgba(232, 238, 230, 0.95);
@@ -350,7 +350,7 @@ page {
 }
 
 .tutor-action-row {
-  margin-top: auto;
+  margin-top: 14rpx;
   padding-top: 0;
 }
 

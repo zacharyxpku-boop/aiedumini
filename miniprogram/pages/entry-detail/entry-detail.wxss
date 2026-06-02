@@ -116,7 +116,7 @@
   gap: 16rpx;
   align-items: center;
   flex: 0 0 auto;
-  min-height: 292rpx;
+  min-height: 264rpx;
   padding: 26rpx 22rpx 24rpx;
   overflow: hidden;
   border: 1rpx solid #e8eee6;
@@ -283,8 +283,8 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) 92rpx;
   gap: 8rpx;
-  flex: 1 1 auto;
-  min-height: 286rpx;
+  flex: 0 0 auto;
+  min-height: 254rpx;
   margin-top: 0;
   margin-bottom: 0;
   padding: 16rpx;
