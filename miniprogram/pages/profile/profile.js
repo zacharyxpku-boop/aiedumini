@@ -3129,6 +3129,53 @@ Page({
       || safeNumber(tutorSummary && tutorSummary.completed, 0)
       || safeNumber(thinkingSummary && thinkingSummary.total, 0)
     );
+    const lightRecentLearningSummary = storage.buildRecentLearningSummary ? storage.buildRecentLearningSummary() : null;
+    const lightTodayFocusReviewCards = storage.loadReviewCards
+      ? storage.loadReviewCards().filter((card) => card && (card.source === 'today_focus' || card.sourceFocusId === (todayFocus && todayFocus.id)))
+      : [];
+    const lightWeeklyGrowthMemory = storage.buildWeeklyGrowthMemory ? storage.buildWeeklyGrowthMemory(companionPreference) : null;
+    const lightProfileViewModel = profileViewModels.buildProfileViewModel({
+      companionPreference,
+      todayFocus,
+      reviewCard: lightTodayFocusReviewCards[0] || null,
+      reviewCards: lightTodayFocusReviewCards,
+      growthMemory: lightWeeklyGrowthMemory,
+      reviewEvents: storage.loadReviewEvents ? storage.loadReviewEvents() : [],
+      latestFocusSession: focusHistory[0] || null,
+      focusHistory,
+      focusCabinSummary,
+      recentLearningSummary: lightRecentLearningSummary
+    });
+    const lightProfileEmptyGuide = hasParentEvidence
+      ? ''
+      : '再用两晚，咕点会帮你看见孩子常卡在哪一步。今晚先记录一句自己的第一步就够了。';
+    this.setData({
+      profile,
+      consent: !!storage.get(storage.KEYS.consent, false),
+      identity: storage.loadClientIdentity(),
+      moduleSummary,
+      tutorSummary,
+      thinkingSummary,
+      reviewSummary,
+      profileViewModel: lightProfileViewModel,
+      focusCabinSummary,
+      latestFocusSession: focusHistory[0] || null,
+      todayFocus,
+      tonightPlan,
+      routeStrip: buildRouteStrip('parent', tonightPlan),
+      companionPreference,
+      weeklyGrowthMemory: lightWeeklyGrowthMemory,
+      calibrationProfile,
+      parentGoal,
+      hasParentEvidence,
+      profileEmptyGuide: lightProfileEmptyGuide,
+      parentTonightItems: this.buildParentTonightItems(state),
+      learningReportSummary: {
+        ctaLabel: lightProfileViewModel.primaryCta,
+        nextActionRoute: '/pages/entry-detail/entry-detail?scene=parent&from=profile_recap_done'
+      }
+    });
+    return;
     const gameProfileCard = buildGameProfileCard(reviewSummary);
     const wrongCauseSummary = buildWrongCauseSummary(reviewSummary, thinkingSummary);
     const globalEvidenceBrief = storage.buildGlobalEvidenceBrief ? storage.buildGlobalEvidenceBrief() : null;

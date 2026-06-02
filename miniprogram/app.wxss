@@ -445,7 +445,8 @@ button::after {
   overflow: hidden;
   text-align: center;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
+  line-height: 1.2;
 }
 
 .yd-jump-card text:first-of-type {
@@ -476,6 +477,8 @@ button::after {
   box-shadow: 0 16rpx 28rpx rgba(11, 70, 52, .18);
   font-size: 29rpx;
   font-weight: 950;
+  line-height: 1.2;
+  text-align: center;
 }
 
 .yd-action-secondary {
@@ -491,6 +494,8 @@ button::after {
   background: #fffef9;
   font-size: 24rpx;
   font-weight: 900;
+  line-height: 1.2;
+  text-align: center;
 }
 
 /* Active tab first screens stay focused; deeper workflows open through routed child pages. */

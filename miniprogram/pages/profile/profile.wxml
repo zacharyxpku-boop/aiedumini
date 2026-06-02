@@ -26,7 +26,7 @@
           <image class="yd-parent-decision-img" mode="aspectFit" src="/assets/reference/report-radar-card-illustration.png" />
           <view class="yd-parent-decision-copy">
             <text>今晚结论</text>
-            <text>先稳住一个真实卡点，让孩子说出第一步，明天用 90 秒复述验证。</text>
+            <text>{{profileViewModel.parentRecap.firstStepLine}}</text>
           </view>
           <view class="yd-parent-decision-badge">查看</view>
         </view>
@@ -37,53 +37,40 @@
             <text>不靠感觉下结论</text>
           </view>
           <view class="yd-parent-source-row">
-            <view data-scene="upload" bindtap="openEntryDetail"><image mode="aspectFit" src="/assets/reference/entry-upload.png" /><text>资料</text></view>
-            <view data-scene="report" bindtap="openEntryDetail"><image mode="aspectFit" src="/assets/reference/entry-report.png" /><text>报告</text></view>
-            <view data-scene="review" bindtap="openEntryDetail"><image mode="aspectFit" src="/assets/reference/entry-review.png" /><text>回访</text></view>
-            <view data-scene="parent" bindtap="openEntryDetail"><image mode="aspectFit" src="/assets/reference/entry-parent.png" /><text>行动</text></view>
+            <view data-scene="parent" bindtap="openEntryDetail"><image mode="aspectFit" src="/assets/reference/entry-parent.png" /><text>第一步</text></view>
+            <view data-scene="report" bindtap="openEntryDetail"><image mode="aspectFit" src="/assets/reference/entry-report.png" /><text>证据</text></view>
+            <view data-scene="parent" bindtap="openEntryDetail"><image mode="aspectFit" src="/assets/reference/family-avatar-group-transparent.png" /><text>一句话</text></view>
+            <view data-scene="parent" bindtap="openEntryDetail"><image mode="aspectFit" src="/assets/reference/learning-route-map-transparent.png" /><text>明天验</text></view>
           </view>
         </view>
 
-        <view class="yd-jump-grid">
-          <view class="yd-jump-card primary parent-jump-card" data-scene="parent" bindtap="openEntryDetail">
+        <view class="yd-parent-loop">
+          <view class="yd-parent-loop-card primary" data-scene="parent" bindtap="openEntryDetail">
             <image mode="aspectFit" src="/assets/reference/entry-parent.png" />
-            <text>今晚安排</text>
-            <text>看行动卡</text>
+            <view>
+              <text>1 看证据</text>
+              <text>{{profileViewModel.parentRecap.tonightRecap}}</text>
+            </view>
           </view>
-          <view class="yd-jump-card parent-jump-card" data-scene="upload" bindtap="openEntryDetail">
-            <image mode="aspectFit" src="/assets/reference/entry-upload.png" />
-            <text>补充材料</text>
-            <text>上传新证据</text>
+          <view class="yd-parent-loop-card" data-scene="parent" bindtap="openEntryDetail">
+            <image mode="aspectFit" src="/assets/reference/family-avatar-group-transparent.png" />
+            <view>
+              <text>2 只问一句</text>
+              <text>{{profileViewModel.parentRecap.parentOneQuestion}}</text>
+            </view>
           </view>
-          <view class="yd-jump-card parent-jump-card" data-scene="review" bindtap="openEntryDetail">
-            <image mode="aspectFit" src="/assets/reference/entry-review.png" />
-            <text>短回访</text>
-            <text>验证是否迁移</text>
-          </view>
-        </view>
-
-        <view class="yd-parent-methods">
-          <view data-scene="tutor" bindtap="openEntryDetail">
-            <text>费曼复述</text>
-            <text>孩子用自己的话讲题意</text>
-          </view>
-          <view data-scene="tutor" bindtap="openEntryDetail">
-            <text>苏格拉底追问</text>
-            <text>只追问第一步和依据</text>
-          </view>
-          <view data-scene="review" bindtap="openEntryDetail">
-            <text>间隔回访</text>
-            <text>明天用 90 秒再验证</text>
-          </view>
-          <view data-scene="today" bindtap="openEntryDetail">
-            <text>变式迁移</text>
-            <text>换一个情境确认真会了</text>
+          <view class="yd-parent-loop-card final" data-scene="parent" bindtap="openEntryDetail">
+            <image mode="aspectFit" src="/assets/reference/learning-route-map-transparent.png" />
+            <view>
+              <text>3 明天再看</text>
+              <text>{{profileViewModel.parentRecap.trustBoundaryNote}}</text>
+            </view>
           </view>
         </view>
 
         <view class="yd-parent-action-row">
           <view class="yd-action-primary parent-primary" bindtap="goLearningReportCta">{{profileViewModel.primaryCta}}</view>
-          <view class="yd-action-secondary parent-secondary" data-action="upload" bindtap="runParentReportAction">补一份材料</view>
+          <view class="yd-action-secondary parent-secondary" data-action="reportPreview" bindtap="runParentReportAction">看证据详情</view>
         </view>
       </view>
     </view>

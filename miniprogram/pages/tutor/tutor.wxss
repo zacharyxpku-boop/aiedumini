@@ -144,6 +144,8 @@ page {
   font-size: 47rpx;
   font-weight: 950;
   line-height: 1.12;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .yd-tutor-bubble > text {
