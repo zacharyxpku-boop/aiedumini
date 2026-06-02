@@ -84,7 +84,7 @@
 .yd-home-screen {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
   min-height: calc(100vh - 98rpx - env(safe-area-inset-top));
   margin: 0 22rpx 18rpx;
   padding: 0 0 calc(104rpx + env(safe-area-inset-bottom));

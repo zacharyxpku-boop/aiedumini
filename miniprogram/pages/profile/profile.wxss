@@ -33,7 +33,7 @@ page {
   flex: 0 0 auto;
   flex-direction: column;
   gap: 14rpx;
-  justify-content: space-between;
+  justify-content: flex-start;
   min-height: calc(100vh - 198rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   margin: 0;
   padding: 20rpx;
@@ -115,7 +115,7 @@ page {
   gap: 18rpx;
   align-items: center;
   flex: 0 0 auto;
-  min-height: 226rpx;
+  min-height: 214rpx;
   margin-top: 0;
 }
 
@@ -234,7 +234,7 @@ page {
 
 .yd-parent-sources {
   flex: 0 0 auto;
-  min-height: 130rpx;
+  min-height: 118rpx;
   margin-top: 0;
   padding: 14rpx;
 }
@@ -269,7 +269,7 @@ page {
   min-width: 0;
   justify-items: center;
   gap: 6rpx;
-  min-height: 70rpx;
+  min-height: 76rpx;
   padding: 9rpx 6rpx;
   border-radius: 16rpx;
   background: rgba(34, 185, 92, 0.08);
@@ -304,7 +304,7 @@ page {
 }
 
 .parent-jump-card {
-  min-height: 78rpx;
+  min-height: 92rpx;
   padding: 7rpx 5rpx;
   background:
     radial-gradient(circle at 82% 18%, rgba(248, 198, 34, 0.18), transparent 32%),
@@ -364,8 +364,8 @@ page {
 }
 
 .yd-parent-action-row {
-  margin-top: 14rpx;
-  padding-top: 10rpx;
+  margin-top: 10rpx;
+  padding-top: 0;
 }
 
 .parent-primary,

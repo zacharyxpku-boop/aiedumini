@@ -27,7 +27,7 @@ page {
   flex: 0 0 auto;
   flex-direction: column;
   gap: 14rpx;
-  justify-content: space-between;
+  justify-content: flex-start;
   min-height: calc(100vh - 190rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   margin-bottom: 0;
   padding: 20rpx;
@@ -106,8 +106,8 @@ page {
   gap: 18rpx;
   align-items: center;
   flex: 0 0 auto;
-  min-height: 258rpx;
-  max-height: 306rpx;
+  min-height: 226rpx;
+  max-height: 258rpx;
   margin-top: 0;
   padding: 24rpx 22rpx;
   overflow: hidden;
@@ -121,7 +121,7 @@ page {
 
 .yd-upload-title {
   color: #101a16;
-  font-size: 42rpx;
+  font-size: 40rpx;
   font-weight: 950;
   line-height: 1.1;
   letter-spacing: 0;
@@ -170,8 +170,8 @@ page {
 }
 
 .yd-upload-mascot {
-  width: 184rpx;
-  height: 184rpx;
+  width: 174rpx;
+  height: 174rpx;
   align-self: center;
   justify-self: end;
   overflow: hidden;
@@ -192,7 +192,7 @@ page {
 .upload-material-card {
   display: grid;
   min-width: 0;
-  min-height: 116rpx;
+  min-height: 126rpx;
   align-content: center;
   justify-items: center;
   gap: 8rpx;
@@ -264,7 +264,7 @@ page {
   position: relative;
   display: grid;
   min-width: 0;
-  min-height: 82rpx;
+  min-height: 90rpx;
   align-content: center;
   justify-items: center;
   gap: 6rpx;
@@ -345,7 +345,7 @@ page {
 
 .yd-upload-primary {
   height: 72rpx;
-  margin-top: 14rpx;
+  margin-top: 10rpx;
   border-radius: 999rpx;
   color: #1d261f;
   background: linear-gradient(180deg, #ffd84f 0%, #f5b300 100%);
