@@ -170,9 +170,9 @@ page {
   border-radius: 999rpx;
   color: #26754c;
   background: #f0fbf0;
-  font-size: 19rpx;
+  font-size: 20rpx;
   font-weight: 820;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .tutor-flow-card {
@@ -248,7 +248,7 @@ page {
   overflow: hidden;
   text-align: center;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .tutor-ladder-node text:nth-child(2) {
@@ -338,7 +338,7 @@ page {
   color: #8a958f;
   font-size: 21rpx;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .tutor-input-bar view {

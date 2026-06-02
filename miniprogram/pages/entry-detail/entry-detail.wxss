@@ -81,7 +81,7 @@
 
 .entry-jump-current text:first-child {
   color: #77847d;
-  font-size: 18rpx;
+  font-size: 20rpx;
   font-weight: 800;
 }
 
@@ -226,7 +226,7 @@
   border-radius: 999rpx;
   color: #16a34a;
   background: #e9f8ef;
-  font-size: 19rpx;
+  font-size: 20rpx;
   font-weight: 850;
 }
 
@@ -358,7 +358,7 @@
   border-radius: 999rpx;
   color: #0d7a3d;
   background: rgba(34, 185, 92, 0.10);
-  font-size: 18rpx;
+  font-size: 20rpx;
   font-weight: 900;
 }
 
@@ -417,12 +417,12 @@
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .entry-spotlight-metrics text:first-child {
   color: #6c7970;
-  font-size: 19rpx;
+  font-size: 20rpx;
   font-weight: 760;
 }
 
@@ -551,12 +551,12 @@
   line-height: 1.18;
   text-align: center;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .entry-proof-hint {
   display: none;
   color: #6c7970 !important;
-  font-size: 17rpx !important;
+  font-size: 20rpx !important;
   font-weight: 760 !important;
 }

@@ -150,9 +150,9 @@ page {
 .upload-type-strip text {
   padding: 7rpx 12rpx;
   border-radius: 999rpx;
-  font-size: 19rpx;
+  font-size: 20rpx;
   font-weight: 820;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .yd-upload-proof text {
@@ -166,7 +166,7 @@ page {
   border: 1rpx solid rgba(248, 198, 34, 0.24);
   color: #6d5b25;
   background: #fff7df;
-  font-size: 19rpx;
+  font-size: 20rpx;
 }
 
 .yd-upload-mascot {
@@ -246,7 +246,7 @@ page {
 .upload-material-card text:nth-child(3) {
   display: -webkit-box;
   color: #66746d;
-  font-size: 19rpx;
+  font-size: 20rpx;
   line-height: 1.35;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
@@ -303,7 +303,7 @@ page {
   overflow: hidden;
   text-align: center;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .upload-pipeline-node text:nth-child(2) {

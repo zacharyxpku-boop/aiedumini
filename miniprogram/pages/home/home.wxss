@@ -226,7 +226,7 @@
   display: -webkit-box;
   margin-top: 4rpx;
   color: #66746d;
-  font-size: 19rpx;
+  font-size: 20rpx;
   line-height: 1.22;
   white-space: normal;
   -webkit-box-orient: vertical;

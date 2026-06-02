@@ -155,7 +155,7 @@ page {
   border-radius: 999rpx;
   color: #26754c;
   background: #f0fbf0;
-  font-size: 19rpx;
+  font-size: 20rpx;
   font-weight: 820;
   white-space: nowrap;
 }
@@ -190,7 +190,7 @@ page {
 
 .review-section-head text:last-child {
   color: #738077;
-  font-size: 19rpx;
+  font-size: 20rpx;
   font-weight: 780;
   line-height: 1.2;
   text-align: right;
@@ -258,7 +258,7 @@ page {
   overflow: hidden;
   text-align: center;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .review-map-node text:nth-child(2) {
@@ -353,7 +353,7 @@ page {
   font-size: 21rpx;
   font-weight: 900;
   line-height: 58rpx;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .review-action-row button:last-child {
