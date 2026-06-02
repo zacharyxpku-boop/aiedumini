@@ -35,10 +35,10 @@ page {
   display: flex;
   flex: 0 0 auto;
   flex-direction: column;
-  gap: 14rpx;
+  gap: 16rpx;
   justify-content: flex-start;
   min-height: calc(100vh - 190rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-  padding: 20rpx;
+  padding: 22rpx;
   overflow: visible;
   border: 1rpx solid rgba(232, 238, 230, 0.94);
   border-radius: 30rpx;
@@ -116,7 +116,7 @@ page {
   gap: 18rpx;
   align-items: center;
   flex: 0 0 auto;
-  min-height: 214rpx;
+  min-height: 242rpx;
   margin-top: 0;
 }
 
@@ -133,7 +133,7 @@ page {
 
 .yd-tutor-bubble {
   min-width: 0;
-  padding: 20rpx;
+  padding: 24rpx;
   border: 1rpx solid rgba(232, 238, 230, 0.95);
   border-radius: 24rpx;
   background: rgba(255, 255, 255, 0.92);
@@ -141,7 +141,7 @@ page {
 
 .yd-tutor-bubble view:first-child {
   color: #101a16;
-  font-size: 40rpx;
+  font-size: 44rpx;
   font-weight: 950;
   line-height: 1.12;
 }
@@ -151,7 +151,7 @@ page {
   margin-top: 8rpx;
   overflow: hidden;
   color: #64706a;
-  font-size: 23rpx;
+  font-size: 25rpx;
   line-height: 1.42;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
@@ -177,7 +177,7 @@ page {
 
 .tutor-flow-card {
   margin-top: 0;
-  padding: 10rpx;
+  padding: 14rpx;
   border: 1rpx solid rgba(232, 238, 230, 0.95);
   border-radius: 24rpx;
   background: rgba(255, 255, 255, 0.94);
@@ -198,9 +198,9 @@ page {
 .tutor-ladder {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 6rpx;
-  margin-top: 10rpx;
-  padding: 6rpx;
+  gap: 8rpx;
+  margin-top: 12rpx;
+  padding: 8rpx;
   border-radius: 20rpx;
   background: #f3faf1;
 }
@@ -209,7 +209,7 @@ page {
   position: relative;
   display: grid;
   min-width: 0;
-  min-height: 76rpx;
+  min-height: 98rpx;
   align-content: center;
   justify-items: center;
   gap: 5rpx;
@@ -235,8 +235,8 @@ page {
 }
 
 .tutor-ladder-icon {
-  width: 38rpx;
-  height: 38rpx;
+  width: 44rpx;
+  height: 44rpx;
   object-fit: contain;
   padding: 6rpx;
   border-radius: 15rpx;
@@ -253,7 +253,7 @@ page {
 
 .tutor-ladder-node text:nth-child(2) {
   color: #17211d;
-  font-size: 21rpx;
+  font-size: 23rpx;
   font-weight: 950;
   line-height: 1.18;
   white-space: normal;
@@ -286,12 +286,12 @@ page {
 .tutor-chat-card {
   display: grid;
   align-content: start;
-  gap: 10rpx;
+  gap: 12rpx;
   flex: 0 0 auto;
-  min-height: 196rpx;
+  min-height: 248rpx;
   max-height: none;
   margin-top: 0;
-  padding: 18rpx;
+  padding: 20rpx;
   border: 1rpx solid rgba(232, 238, 230, 0.95);
   border-radius: 24rpx;
   background: rgba(255, 255, 255, 0.94);
@@ -300,7 +300,7 @@ page {
 
 .tutor-chat-title {
   color: #18211d;
-  font-size: 28rpx;
+  font-size: 30rpx;
   font-weight: 950;
 }
 
@@ -310,7 +310,7 @@ page {
   border-radius: 20rpx;
   color: #31423a;
   background: #f1f7ef;
-  font-size: 22rpx;
+  font-size: 23rpx;
   font-weight: 760;
   line-height: 1.42;
 }
@@ -322,7 +322,7 @@ page {
 
 .tutor-input-bar {
   display: flex;
-  min-height: 58rpx;
+  min-height: 68rpx;
   align-items: center;
   justify-content: space-between;
   gap: 12rpx;
@@ -343,14 +343,14 @@ page {
 
 .tutor-input-bar view {
   flex: 0 0 auto;
-  height: 46rpx;
+  height: 52rpx;
   padding: 0 18rpx;
   border-radius: 999rpx;
   color: #1d261f;
   background: linear-gradient(180deg, #ffd84f 0%, #f5b300 100%);
   font-size: 20rpx;
   font-weight: 950;
-  line-height: 46rpx;
+  line-height: 52rpx;
 }
 
 .tutor-action-row {
@@ -361,16 +361,16 @@ page {
 .tutor-primary,
 .tutor-secondary {
   flex: 1 1 0;
-  height: 72rpx;
+  height: 80rpx;
   border-radius: 999rpx;
   font-size: 26rpx;
   font-weight: 950;
-  line-height: 72rpx;
+  line-height: 80rpx;
   text-align: center;
 }
 
 .tutor-primary {
-  height: 72rpx;
+  height: 80rpx;
   color: #1d261f;
   background: linear-gradient(180deg, #ffd84f 0%, #f5b300 100%);
 }
