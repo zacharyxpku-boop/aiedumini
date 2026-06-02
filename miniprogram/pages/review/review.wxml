@@ -64,7 +64,7 @@
           </view>
           <view class="review-action-card" data-scene="tutor" bindtap="openEntryDetail">
             <image mode="aspectFit" src="/assets/reference/entry-tutor.png" />
-            <text>回到AI私教</text>
+            <text>回到点拨</text>
             <text>卡住先问第一步</text>
           </view>
           <view class="review-action-card" data-scene="today" bindtap="openEntryDetail">

@@ -19,7 +19,7 @@ page {
 }
 
 .content-inner {
-  padding: calc(96rpx + env(safe-area-inset-top)) 28rpx calc(112rpx + env(safe-area-inset-bottom));
+  padding: calc(86rpx + env(safe-area-inset-top)) 28rpx calc(104rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -31,7 +31,7 @@ page {
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
-  min-height: calc(100vh - 208rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  min-height: calc(100vh - 190rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   margin-bottom: 0;
   padding: 20rpx;
   overflow: hidden;
@@ -169,8 +169,9 @@ page {
 }
 
 .review-map-card {
-  flex: 1 1 auto;
-  margin-top: 14rpx;
+  flex: 0 0 auto;
+  min-height: 188rpx;
+  margin-top: 12rpx;
   padding: 14rpx 12rpx;
   border: 1rpx solid rgba(232, 238, 230, 0.95);
   border-radius: 22rpx;
@@ -278,7 +279,7 @@ page {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 6rpx;
-  margin-top: 10rpx;
+  margin-top: 12rpx;
 }
 
 .review-action-card {
@@ -327,7 +328,7 @@ page {
 
 .review-main-cta {
   height: 72rpx;
-  margin-top: auto;
+  margin-top: 14rpx;
   border-radius: 999rpx;
   color: #1d261f;
   background: linear-gradient(180deg, #ffd84f 0%, #f5b300 100%);

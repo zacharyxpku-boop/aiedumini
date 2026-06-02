@@ -7,7 +7,7 @@
             <view class="yd-tutor-brand">
               <image class="yd-tutor-mark" mode="aspectFit" src="/assets/reference/brand-house.png" />
               <view>
-                <text>AI私教</text>
+                <text>原点点拨</text>
                 <text>只追问第一步</text>
               </view>
             </view>
@@ -18,7 +18,7 @@
             <image class="yd-tutor-mascot" mode="aspectFit" src="/assets/reference/tutor-socratic-board-transparent.png" />
             <view class="yd-tutor-bubble">
               <view>先说第一步</view>
-              <text>咕点不替你写答案。你说题目或卡点，它只问下一句最小提示。</text>
+              <text>原点不替你写答案。你说题目或卡点，它只问下一句最小提示。</text>
               <view class="tutor-chip-row">
                 <text>不给完整答案</text>
                 <text>只问依据</text>
@@ -27,7 +27,7 @@
           </view>
 
           <view class="tutor-chat-card">
-            <view class="tutor-chat-title">咕点正在陪你想第一步</view>
+            <view class="tutor-chat-title">原点正在陪你想第一步</view>
             <view class="tutor-bubble">先不急着算答案。读完题后，第一步想找什么条件？</view>
             <view class="tutor-bubble me">我想先找题目里给了哪些数量。</view>
             <view class="tutor-input-bar">
@@ -38,7 +38,7 @@
 
           <view class="tutor-flow-card">
             <view class="tutor-section-head">
-              <text>AI私教点拨边界</text>
+              <text>原点点拨边界</text>
               <text>先启动，再迁移</text>
             </view>
             <view class="tutor-ladder">

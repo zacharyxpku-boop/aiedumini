@@ -14,7 +14,7 @@ page {
 }
 
 .upload-content {
-  padding: calc(96rpx + env(safe-area-inset-top)) 28rpx calc(112rpx + env(safe-area-inset-bottom));
+  padding: calc(86rpx + env(safe-area-inset-top)) 28rpx calc(104rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -26,7 +26,7 @@ page {
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
-  min-height: calc(100vh - 208rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  min-height: calc(100vh - 190rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   margin-bottom: 0;
   padding: 20rpx;
   overflow: hidden;
@@ -103,8 +103,9 @@ page {
   grid-template-columns: minmax(0, 1fr) 190rpx;
   gap: 18rpx;
   align-items: center;
-  flex: 1 1 auto;
-  min-height: 266rpx;
+  flex: 0 0 auto;
+  min-height: 286rpx;
+  max-height: 326rpx;
   margin-top: 16rpx;
   padding: 24rpx 22rpx;
   overflow: hidden;
@@ -181,7 +182,7 @@ page {
 
 .upload-material-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: 1.4fr .8fr .8fr;
   gap: 10rpx;
   margin-top: 14rpx;
 }
@@ -189,7 +190,7 @@ page {
 .upload-material-card {
   display: grid;
   min-width: 0;
-  min-height: 126rpx;
+  min-height: 112rpx;
   align-content: start;
   justify-items: center;
   gap: 8rpx;
@@ -250,7 +251,7 @@ page {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8rpx;
-  margin-top: 14rpx;
+  margin-top: 12rpx;
   padding-top: 0;
 }
 
@@ -258,7 +259,7 @@ page {
   position: relative;
   display: grid;
   min-width: 0;
-  min-height: 98rpx;
+  min-height: 76rpx;
   align-content: center;
   justify-items: center;
   gap: 5rpx;
@@ -292,8 +293,8 @@ page {
 }
 
 .upload-pipeline-icon {
-  width: 38rpx;
-  height: 38rpx;
+  width: 30rpx;
+  height: 30rpx;
   object-fit: contain;
   padding: 6rpx;
   border-radius: 15rpx;
@@ -316,10 +317,7 @@ page {
 }
 
 .upload-pipeline-node text:nth-child(3) {
-  color: #526158;
-  font-size: 15rpx;
-  font-weight: 780;
-  line-height: 1.18;
+  display: none;
 }
 
 .upload-pipeline-node.done {
@@ -351,7 +349,7 @@ page {
 
 .yd-upload-primary {
   height: 72rpx;
-  margin-top: auto;
+  margin-top: 14rpx;
   border-radius: 999rpx;
   color: #1d261f;
   background: linear-gradient(180deg, #ffd84f 0%, #f5b300 100%);

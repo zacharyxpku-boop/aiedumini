@@ -57,7 +57,7 @@
           </view>
           <view class="yd-jump-card parent-jump-card" data-scene="review" bindtap="openEntryDetail">
             <image mode="aspectFit" src="/assets/reference/entry-review.png" />
-            <text>复习回访</text>
+            <text>短回访</text>
             <text>验证是否迁移</text>
           </view>
         </view>

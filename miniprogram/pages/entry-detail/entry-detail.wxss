@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  padding: calc(82rpx + env(safe-area-inset-top)) 22rpx calc(28rpx + env(safe-area-inset-bottom));
+  padding: calc(76rpx + env(safe-area-inset-top)) 22rpx calc(30rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
   color: #203127;
   background:
@@ -53,8 +53,8 @@
 .entry-jump-section {
   position: relative;
   z-index: 5;
-  margin: 8rpx 0 0;
-  padding: 6rpx;
+  margin: 10rpx 0 0;
+  padding: 5rpx;
   border: 1rpx solid rgba(232, 238, 230, 0.8);
   border-radius: 22rpx;
   background: rgba(255, 255, 255, 0.82);
@@ -111,11 +111,11 @@
 .entry-detail-hero {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 184rpx;
-  gap: 14rpx;
+  grid-template-columns: minmax(0, 1fr) 198rpx;
+  gap: 16rpx;
   align-items: center;
-  min-height: 232rpx;
-  padding: 22rpx 20rpx 20rpx;
+  min-height: 262rpx;
+  padding: 26rpx 22rpx 24rpx;
   overflow: hidden;
   border: 1rpx solid #e8eee6;
   border-radius: 28rpx;
@@ -195,7 +195,7 @@
 }
 
 .entry-title {
-  font-size: 42rpx;
+  font-size: 44rpx;
   font-weight: 950;
   line-height: 1.12;
   letter-spacing: 0;
@@ -234,8 +234,8 @@
 }
 
 .entry-image {
-  width: 172rpx;
-  height: 172rpx;
+  width: 190rpx;
+  height: 190rpx;
   justify-self: end;
   align-self: center;
   object-fit: contain;
@@ -248,13 +248,13 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8rpx;
-  margin: 8rpx 0 0;
+  margin: 12rpx 0 0;
 }
 
 .entry-primary,
 .entry-secondary {
   display: flex;
-  min-height: 66rpx;
+  min-height: 72rpx;
   align-items: center;
   justify-content: center;
   padding: 0 12rpx;
@@ -281,9 +281,9 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) 92rpx;
   gap: 8rpx;
-  flex: 1 1 auto;
-  min-height: 274rpx;
-  margin-top: 8rpx;
+  flex: 0 0 auto;
+  min-height: 244rpx;
+  margin-top: 12rpx;
   margin-bottom: 0;
   padding: 16rpx;
   overflow: hidden;
@@ -428,9 +428,9 @@
 
 .entry-card-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 6rpx;
-  margin-top: 8rpx;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8rpx;
+  margin-top: 10rpx;
 }
 
 .entry-card {
@@ -438,7 +438,7 @@
   display: grid;
   grid-template-columns: 38rpx minmax(0, 1fr) 20rpx;
   min-width: 0;
-  min-height: 90rpx;
+  min-height: 82rpx;
   align-items: center;
   justify-items: start;
   gap: 6rpx;
@@ -510,7 +510,7 @@
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 3rpx;
-  margin-top: 8rpx;
+  margin-top: 10rpx;
   padding: 3rpx;
   border: 1rpx solid rgba(232, 238, 230, 0.9);
   border-radius: 18rpx;

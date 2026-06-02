@@ -1,7 +1,7 @@
 <view class="home-page">
   <view class="first-run-overlay" wx:if="{{showFirstRunOverlay}}" catchtap="closeFirstRunOverlay">
     <view class="first-run-card">
-      <view>咕点不直接给结果</view>
+      <view>原点不直接给答案</view>
       <text>陪你先看清今晚第一步。</text>
       <text>点一下继续，或等 3 秒自动收起。</text>
     </view>
@@ -12,7 +12,7 @@
       <image class="home-brand-icon" mode="aspectFit" src="/assets/reference/brand-house.png" />
       <view>
         <view class="home-title">原点智学</view>
-        <view class="home-subtitle">今晚先迈出第一步</view>
+        <view class="home-subtitle">今晚先推出第一步</view>
       </view>
     </view>
   </view>
@@ -54,7 +54,7 @@
         </view>
         <view class="mini-entry-card yd-jump-card green" data-scene="tutor" bindtap="openEntryDetail">
           <image class="mini-entry-visual" mode="aspectFit" src="/assets/reference/entry-tutor.png" />
-          <text>AI私教</text>
+          <text>原点点拨</text>
           <text>只追问第一步</text>
           <view class="mini-entry-arrow">›</view>
         </view>
@@ -96,7 +96,7 @@
           <view class="mini-route-node active">
             <image class="mini-route-icon" mode="aspectFit" src="/assets/reference/entry-tutor.png" />
             <text>说第一步</text>
-            <text>AI私教追问</text>
+            <text>点拨追问</text>
           </view>
           <view class="mini-route-node">
             <image class="mini-route-icon" mode="aspectFit" src="/assets/reference/entry-review.png" />

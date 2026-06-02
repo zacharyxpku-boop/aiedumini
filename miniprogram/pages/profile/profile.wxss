@@ -20,7 +20,7 @@ page {
 .profile-shell {
   position: relative;
   z-index: 2;
-  padding: calc(96rpx + env(safe-area-inset-top)) 28rpx calc(112rpx + env(safe-area-inset-bottom));
+  padding: calc(86rpx + env(safe-area-inset-top)) 28rpx calc(112rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -32,7 +32,7 @@ page {
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
-  min-height: calc(100vh - 208rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  min-height: calc(100vh - 198rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   margin: 0;
   padding: 20rpx;
   overflow: hidden;
@@ -112,7 +112,7 @@ page {
   grid-template-columns: minmax(0, 1fr) 184rpx;
   gap: 18rpx;
   align-items: center;
-  min-height: 226rpx;
+  min-height: 216rpx;
   margin-top: 16rpx;
 }
 
@@ -170,7 +170,7 @@ page {
   grid-template-columns: 108rpx minmax(0, 1fr) auto;
   gap: 12rpx;
   align-items: center;
-  margin-top: 14rpx;
+  margin-top: 12rpx;
   padding: 14rpx;
   background:
     radial-gradient(circle at 88% 16%, rgba(248, 198, 34, 0.16), transparent 36%),
@@ -230,8 +230,9 @@ page {
 }
 
 .yd-parent-sources {
-  flex: 1 1 auto;
-  margin-top: 14rpx;
+  flex: 0 0 auto;
+  min-height: 130rpx;
+  margin-top: 12rpx;
   padding: 14rpx;
 }
 
@@ -354,7 +355,7 @@ page {
 }
 
 .yd-parent-action-row {
-  margin-top: auto;
+  margin-top: 14rpx;
   padding-top: 10rpx;
 }
 

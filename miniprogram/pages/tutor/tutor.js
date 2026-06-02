@@ -526,7 +526,7 @@ function buildEntryTutorIntent(options = {}) {
     return {
       from,
       open,
-      intro: '我已进入 AI 私教追问板。把题目、卡点或第一步发来，我只给最小提示。',
+      intro: '我已进入原点点拨追问板。把题目、卡点或第一步发来，我只给最小提示。',
       resetMessages: open === 'flow'
     };
   }
@@ -534,7 +534,7 @@ function buildEntryTutorIntent(options = {}) {
     return {
       from,
       open,
-      intro: '我已从短回访回到 AI 私教。先修复刚才卡住的错因，不重讲整题。',
+      intro: '我已从短回访回到原点点拨。先修复刚才卡住的错因，不重讲整题。',
       resetMessages: true
     };
   }
