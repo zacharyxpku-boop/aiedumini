@@ -24,13 +24,14 @@ page {
 .yd-upload-screen {
   position: relative;
   display: flex;
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   flex-direction: column;
   gap: 14rpx;
+  justify-content: space-between;
   min-height: calc(100vh - 190rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   margin-bottom: 0;
   padding: 20rpx;
-  overflow: hidden;
+  overflow: visible;
   border: 1rpx solid rgba(232, 238, 230, 0.94);
   border-radius: 30rpx;
   background:
@@ -263,16 +264,16 @@ page {
   position: relative;
   display: grid;
   min-width: 0;
-  min-height: 94rpx;
+  min-height: 82rpx;
   align-content: center;
   justify-items: center;
   gap: 6rpx;
   padding: 9rpx 6rpx;
   overflow: visible;
-  border: 1rpx solid rgba(220, 232, 220, 0.95);
-  border-radius: 19rpx;
-  background: linear-gradient(180deg, #ffffff 0%, #f6fbf3 100%);
-  box-shadow: 0 12rpx 24rpx rgba(41, 65, 52, 0.07);
+  border: 0;
+  border-radius: 18rpx;
+  background: rgba(255, 255, 255, 0.62);
+  box-shadow: none;
 }
 
 .upload-pipeline-node:active {
@@ -318,18 +319,16 @@ page {
 }
 
 .upload-pipeline-node.done {
-  border-color: rgba(34, 185, 92, 0.28);
-  background: linear-gradient(180deg, #effbf2 0%, #ffffff 100%);
+  background: rgba(34, 185, 92, 0.10);
 }
 
 .upload-pipeline-node.active {
-  border-color: rgba(76, 159, 255, 0.32);
-  background: linear-gradient(180deg, #eef7ff 0%, #ffffff 100%);
+  background: #ffffff;
+  box-shadow: inset 0 0 0 2rpx rgba(76, 159, 255, 0.18);
 }
 
 .upload-pipeline-node.next {
-  border-color: rgba(248, 198, 34, 0.34);
-  background: linear-gradient(180deg, #fff8df 0%, #ffffff 100%);
+  background: rgba(248, 198, 34, 0.18);
 }
 
 .upload-pipeline-node.done .upload-pipeline-icon {

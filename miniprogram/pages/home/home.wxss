@@ -84,7 +84,8 @@
 .yd-home-screen {
   display: flex;
   flex-direction: column;
-  min-height: auto;
+  justify-content: space-between;
+  min-height: calc(100vh - 98rpx - env(safe-area-inset-top));
   margin: 0 22rpx 18rpx;
   padding: 0 0 calc(104rpx + env(safe-area-inset-bottom));
   border: 0;
@@ -244,17 +245,17 @@
   flex: 0 0 auto;
   flex-direction: column;
   margin-top: 0;
-  padding: 16rpx;
+  padding: 16rpx 16rpx 14rpx;
 }
 .mini-route-input { width: 100%; min-height: 82rpx; margin-top: 10rpx; padding: 15rpx 16rpx; border: 1rpx solid #e8eee6; border-radius: 20rpx; background: #f8fbf5; color: #203127; font-size: 23rpx; line-height: 1.32; }
 
-.mini-route-line { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8rpx; margin-top: 11rpx; }
-.mini-route-node { display: grid; min-height: 88rpx; justify-items: center; align-content: center; gap: 4rpx; padding: 8rpx 5rpx; border: 1rpx solid #e8eee6; border-radius: 17rpx; background: #ffffff; }
-.mini-route-node.done { background: #eefbed; }
-.mini-route-node.active { border-color: rgba(34,185,92,.34); background: #e9f8ef; }
-.mini-route-node.final { background: #fff8df; }
-.mini-route-icon { width: 34rpx; height: 34rpx; object-fit: contain; border-radius: 12rpx; }
-.mini-route-node text:nth-child(2) { max-width: 100%; overflow: hidden; color: #17211d; font-size: 19rpx; font-weight: 950; text-overflow: ellipsis; white-space: nowrap; }
+.mini-route-line { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6rpx; margin-top: 11rpx; padding: 6rpx; border-radius: 20rpx; background: #f3faf1; }
+.mini-route-node { display: grid; min-height: 74rpx; justify-items: center; align-content: center; gap: 3rpx; padding: 7rpx 5rpx; border: 0; border-radius: 15rpx; background: transparent; }
+.mini-route-node.done { background: rgba(34,185,92,.08); }
+.mini-route-node.active { background: #ffffff; box-shadow: inset 0 0 0 2rpx rgba(34,185,92,.18); }
+.mini-route-node.final { background: rgba(248,198,34,.16); }
+.mini-route-icon { width: 34rpx; height: 34rpx; object-fit: contain; border-radius: 10rpx; }
+.mini-route-node text:nth-child(2) { max-width: 100%; overflow: hidden; color: #17211d; font-size: 20rpx; font-weight: 950; line-height: 1.15; text-align: center; text-overflow: ellipsis; white-space: normal; }
 .mini-route-node text:nth-child(3) { display: none; }
 
 .route-next-lite { color: #0d7a3d; font-weight: 900; }
