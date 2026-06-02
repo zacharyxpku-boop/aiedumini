@@ -1,5 +1,5 @@
 {
-  "description": "原点智学家庭学习决策小程序",
+  "description": "Yuandian Zhixue miniapp",
   "setting": {
     "urlCheck": true,
     "es6": true,
@@ -15,7 +15,7 @@
     "uglifyFileName": false,
     "checkInvalidKey": true,
     "checkSiteMap": true,
-    "uploadWithSourceMap": true,
+    "uploadWithSourceMap": false,
     "compileHotReLoad": false,
     "lazyloadPlaceholderEnable": false,
     "useMultiFrameRuntime": false,
@@ -49,7 +49,56 @@
   },
   "simulatorPluginLibVersion": {},
   "packOptions": {
-    "ignore": [],
+    "ignore": [
+      {
+        "type": "file",
+        "value": "assets/ui-kit.png"
+      },
+      {
+        "type": "folder",
+        "value": "assets/focus"
+      },
+      {
+        "type": "file",
+        "value": "assets/brand/family-report.png"
+      },
+      {
+        "type": "file",
+        "value": "assets/brand/gudian-mascot-study.png"
+      },
+      {
+        "type": "file",
+        "value": "assets/brand/gudian-mascot.png"
+      },
+      {
+        "type": "file",
+        "value": "assets/brand/gudian-reader.png"
+      },
+      {
+        "type": "file",
+        "value": "assets/brand/review-sprout.png"
+      },
+      {
+        "type": "file",
+        "value": "assets/reference/gudian-sticker.png"
+      },
+      {
+        "type": "file",
+        "value": "assets/reference/hero-mascot.png"
+      },
+      {
+        "type": "file",
+        "value": "utils/personalized-report-template.js"
+      },
+      {
+        "type": "file",
+        "value": "utils/product-readiness.js"
+      },
+      {
+        "type": "file",
+        "value": "utils/share-relay-schema.cjs"
+      }
+    ],
     "include": []
   }
 }
