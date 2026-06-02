@@ -220,22 +220,20 @@
   text-align: left;
   text-overflow: ellipsis;
 }
-.mini-entry-card text:first-of-type { color: #123f31; font-size: 21rpx; font-weight: 950; white-space: nowrap; }
-.mini-entry-card text:nth-of-type(2) { display: block; margin-top: 4rpx; color: #66746d; font-size: 18rpx; line-height: 1.22; white-space: nowrap; }
+.mini-entry-card text:first-of-type { color: #123f31; font-size: 22rpx; font-weight: 950; line-height: 1.18; white-space: normal; }
+.mini-entry-card text:nth-of-type(2) {
+  display: -webkit-box;
+  margin-top: 4rpx;
+  color: #66746d;
+  font-size: 19rpx;
+  line-height: 1.22;
+  white-space: normal;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
 
 .mini-entry-arrow {
-  position: absolute;
-  right: 8rpx;
-  bottom: 8rpx;
-  width: 26rpx;
-  height: 26rpx;
-  border-radius: 50%;
-  background: rgba(34,185,92,.12);
-  color: #16a34a;
-  font-size: 18rpx;
-  font-weight: 950;
-  line-height: 26rpx;
-  text-align: center;
+  display: none;
 }
 
 .mini-entry-arrow.blue { background: rgba(47,129,247,.12); color: #2f74d0; }

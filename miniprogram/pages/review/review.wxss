@@ -310,10 +310,10 @@ page {
 
 .review-action-card text:nth-child(2) {
   color: #17211d;
-  font-size: 20rpx;
+  font-size: 21rpx;
   font-weight: 950;
   line-height: 1.2;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .review-action-card text:nth-child(3) {

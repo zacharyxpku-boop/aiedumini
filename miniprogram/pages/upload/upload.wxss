@@ -239,13 +239,16 @@ page {
   font-size: 22rpx;
   font-weight: 950;
   line-height: 1.2;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .upload-material-card text:nth-child(3) {
+  display: -webkit-box;
   color: #66746d;
-  font-size: 18rpx;
+  font-size: 19rpx;
   line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .yd-upload-pipeline {
@@ -304,9 +307,10 @@ page {
 
 .upload-pipeline-node text:nth-child(2) {
   color: #17211d;
-  font-size: 20rpx;
+  font-size: 21rpx;
   font-weight: 950;
   line-height: 1.18;
+  white-space: normal;
 }
 
 .upload-pipeline-node text:nth-child(3) {
