@@ -22,12 +22,18 @@
   </view>
 
   <view class="entry-jump-section">
-    <view class="entry-jump-grid">
-      <view class="entry-jump-card {{item.key === sceneKey ? 'active' : ''}}" wx:for="{{loopNodes}}" wx:key="key" data-scene="{{item.key}}" bindtap="openScene">
-        <image mode="aspectFit" src="{{item.image}}" />
-        <text>{{item.label}}</text>
-      </view>
+    <view class="entry-jump-current">
+      <text>当前入口</text>
+      <text>{{scene.badge}}</text>
     </view>
+    <scroll-view class="entry-jump-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+      <view class="entry-jump-row">
+        <view class="entry-jump-card" wx:for="{{sceneLinks}}" wx:key="key" data-scene="{{item.key}}" bindtap="openScene">
+          <image mode="aspectFit" src="{{item.image}}" />
+          <text>{{item.label}}</text>
+        </view>
+      </view>
+    </scroll-view>
   </view>
 
   <view class="entry-actions">
@@ -56,6 +62,7 @@
   </view>
 
   <view class="entry-proof-strip">
+    <view class="entry-proof-label">闭环</view>
     <view
       class="entry-proof-node {{item.active ? 'active' : ''}} {{index === scene.proofSteps.length - 1 ? 'final' : ''}}"
       wx:for="{{scene.proofSteps}}"
