@@ -32,11 +32,11 @@ page {
   display: flex;
   flex: 0 0 auto;
   flex-direction: column;
-  gap: 14rpx;
+  gap: 16rpx;
   justify-content: flex-start;
   min-height: calc(100vh - 198rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   margin: 0;
-  padding: 20rpx;
+  padding: 22rpx;
   overflow: visible;
   border: 1rpx solid rgba(232, 238, 230, 0.94);
   border-radius: 30rpx;
@@ -115,7 +115,7 @@ page {
   gap: 18rpx;
   align-items: center;
   flex: 0 0 auto;
-  min-height: 214rpx;
+  min-height: 242rpx;
   margin-top: 0;
 }
 
@@ -133,7 +133,7 @@ page {
 .yd-parent-title {
   margin-top: 7rpx;
   color: #101a16;
-  font-size: 40rpx;
+  font-size: 43rpx;
   font-weight: 950;
   line-height: 1.09;
   letter-spacing: 0;
@@ -144,7 +144,7 @@ page {
   margin-top: 6rpx;
   overflow: hidden;
   color: #64706a;
-  font-size: 23rpx;
+  font-size: 24rpx;
   line-height: 1.42;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
@@ -174,7 +174,7 @@ page {
   gap: 12rpx;
   align-items: center;
   margin-top: 0;
-  padding: 14rpx;
+  padding: 16rpx;
   background:
     radial-gradient(circle at 88% 16%, rgba(248, 198, 34, 0.16), transparent 36%),
     linear-gradient(135deg, #f2fbef 0%, #ffffff 72%);
@@ -203,7 +203,7 @@ page {
 
 .yd-parent-decision-copy text:first-child {
   color: #173f31;
-  font-size: 24rpx;
+  font-size: 25rpx;
   font-weight: 950;
   line-height: 1.18;
   white-space: nowrap;
@@ -234,7 +234,7 @@ page {
 
 .yd-parent-sources {
   flex: 0 0 auto;
-  min-height: 118rpx;
+  min-height: 138rpx;
   margin-top: 0;
   padding: 14rpx;
 }
@@ -270,7 +270,7 @@ page {
   min-width: 0;
   justify-items: center;
   gap: 6rpx;
-  min-height: 76rpx;
+  min-height: 88rpx;
   padding: 9rpx 6rpx;
   border-radius: 16rpx;
   background: rgba(34, 185, 92, 0.08);
@@ -305,7 +305,7 @@ page {
 }
 
 .parent-jump-card {
-  min-height: 92rpx;
+  min-height: 104rpx;
   padding: 7rpx 5rpx;
   background:
     radial-gradient(circle at 82% 18%, rgba(248, 198, 34, 0.18), transparent 32%),
@@ -330,7 +330,7 @@ page {
   display: grid;
   min-width: 0;
   gap: 4rpx;
-  padding: 8rpx;
+  padding: 10rpx;
   border: 0;
   border-radius: 16rpx;
   background: rgba(255, 255, 255, 0.62);

@@ -35,10 +35,10 @@ page {
   display: flex;
   flex: 0 0 auto;
   flex-direction: column;
-  gap: 16rpx;
+  gap: 18rpx;
   justify-content: flex-start;
   min-height: calc(100vh - 190rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-  padding: 22rpx;
+  padding: 24rpx;
   overflow: visible;
   border: 1rpx solid rgba(232, 238, 230, 0.94);
   border-radius: 30rpx;
@@ -116,7 +116,7 @@ page {
   gap: 18rpx;
   align-items: center;
   flex: 0 0 auto;
-  min-height: 242rpx;
+  min-height: 266rpx;
   margin-top: 0;
 }
 
@@ -141,7 +141,7 @@ page {
 
 .yd-tutor-bubble view:first-child {
   color: #101a16;
-  font-size: 44rpx;
+  font-size: 47rpx;
   font-weight: 950;
   line-height: 1.12;
 }
@@ -151,7 +151,7 @@ page {
   margin-top: 8rpx;
   overflow: hidden;
   color: #64706a;
-  font-size: 25rpx;
+  font-size: 26rpx;
   line-height: 1.42;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
@@ -165,19 +165,19 @@ page {
 }
 
 .tutor-chip-row text {
-  padding: 7rpx 12rpx;
+  padding: 8rpx 13rpx;
   border: 1rpx solid rgba(34, 185, 92, 0.14);
   border-radius: 999rpx;
   color: #26754c;
   background: #f0fbf0;
-  font-size: 20rpx;
+  font-size: 21rpx;
   font-weight: 820;
   white-space: normal;
 }
 
 .tutor-flow-card {
   margin-top: 0;
-  padding: 14rpx;
+  padding: 16rpx;
   border: 1rpx solid rgba(232, 238, 230, 0.95);
   border-radius: 24rpx;
   background: rgba(255, 255, 255, 0.94);
@@ -209,7 +209,7 @@ page {
   position: relative;
   display: grid;
   min-width: 0;
-  min-height: 98rpx;
+  min-height: 118rpx;
   align-content: center;
   justify-items: center;
   gap: 5rpx;
@@ -235,8 +235,8 @@ page {
 }
 
 .tutor-ladder-icon {
-  width: 44rpx;
-  height: 44rpx;
+  width: 50rpx;
+  height: 50rpx;
   object-fit: contain;
   padding: 6rpx;
   border-radius: 15rpx;
@@ -288,7 +288,7 @@ page {
   align-content: start;
   gap: 12rpx;
   flex: 0 0 auto;
-  min-height: 248rpx;
+  min-height: 338rpx;
   max-height: none;
   margin-top: 0;
   padding: 20rpx;
@@ -310,7 +310,7 @@ page {
   border-radius: 20rpx;
   color: #31423a;
   background: #f1f7ef;
-  font-size: 23rpx;
+  font-size: 24rpx;
   font-weight: 760;
   line-height: 1.42;
 }
@@ -322,7 +322,7 @@ page {
 
 .tutor-input-bar {
   display: flex;
-  min-height: 68rpx;
+  min-height: 76rpx;
   align-items: center;
   justify-content: space-between;
   gap: 12rpx;
@@ -336,21 +336,21 @@ page {
   min-width: 0;
   overflow: hidden;
   color: #8a958f;
-  font-size: 21rpx;
+  font-size: 22rpx;
   text-overflow: ellipsis;
   white-space: normal;
 }
 
 .tutor-input-bar view {
   flex: 0 0 auto;
-  height: 52rpx;
+  height: 58rpx;
   padding: 0 18rpx;
   border-radius: 999rpx;
   color: #1d261f;
   background: linear-gradient(180deg, #ffd84f 0%, #f5b300 100%);
-  font-size: 20rpx;
+  font-size: 22rpx;
   font-weight: 950;
-  line-height: 52rpx;
+  line-height: 58rpx;
 }
 
 .tutor-action-row {
@@ -361,16 +361,16 @@ page {
 .tutor-primary,
 .tutor-secondary {
   flex: 1 1 0;
-  height: 80rpx;
+  height: 90rpx;
   border-radius: 999rpx;
-  font-size: 26rpx;
+  font-size: 29rpx;
   font-weight: 950;
-  line-height: 80rpx;
+  line-height: 90rpx;
   text-align: center;
 }
 
 .tutor-primary {
-  height: 80rpx;
+  height: 90rpx;
   color: #1d261f;
   background: linear-gradient(180deg, #ffd84f 0%, #f5b300 100%);
 }
