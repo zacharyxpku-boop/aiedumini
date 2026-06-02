@@ -32,6 +32,7 @@ page {
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
+  gap: 14rpx;
   min-height: calc(100vh - 198rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   margin: 0;
   padding: 20rpx;
@@ -112,8 +113,9 @@ page {
   grid-template-columns: minmax(0, 1fr) 184rpx;
   gap: 18rpx;
   align-items: center;
-  min-height: 216rpx;
-  margin-top: 16rpx;
+  flex: 0 0 auto;
+  min-height: 244rpx;
+  margin-top: 0;
 }
 
 .yd-parent-kicker {
@@ -170,7 +172,7 @@ page {
   grid-template-columns: 108rpx minmax(0, 1fr) auto;
   gap: 12rpx;
   align-items: center;
-  margin-top: 12rpx;
+  margin-top: 0;
   padding: 14rpx;
   background:
     radial-gradient(circle at 88% 16%, rgba(248, 198, 34, 0.16), transparent 36%),
@@ -230,9 +232,9 @@ page {
 }
 
 .yd-parent-sources {
-  flex: 0 0 auto;
-  min-height: 130rpx;
-  margin-top: 12rpx;
+  flex: 1 1 auto;
+  min-height: 154rpx;
+  margin-top: 0;
   padding: 14rpx;
 }
 
@@ -297,7 +299,7 @@ page {
 .yd-parent-screen .yd-jump-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 6rpx;
-  margin-top: 8rpx;
+  margin-top: 0;
 }
 
 .parent-jump-card {
@@ -316,7 +318,7 @@ page {
 
 .yd-parent-methods {
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  margin-top: 8rpx;
+  margin-top: 0;
   padding: 7rpx;
   border-radius: 20rpx;
   background: #ecf9ed;
@@ -360,7 +362,7 @@ page {
 }
 
 .yd-parent-action-row {
-  margin-top: 14rpx;
+  margin-top: auto;
   padding-top: 10rpx;
 }
 

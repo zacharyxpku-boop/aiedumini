@@ -26,6 +26,7 @@ page {
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
+  gap: 14rpx;
   min-height: calc(100vh - 190rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   margin-bottom: 0;
   padding: 20rpx;
@@ -103,10 +104,10 @@ page {
   grid-template-columns: minmax(0, 1fr) 190rpx;
   gap: 18rpx;
   align-items: center;
-  flex: 0 0 auto;
-  min-height: 286rpx;
-  max-height: 326rpx;
-  margin-top: 16rpx;
+  flex: 1 1 330rpx;
+  min-height: 320rpx;
+  max-height: none;
+  margin-top: 0;
   padding: 24rpx 22rpx;
   overflow: hidden;
   border: 2rpx dashed rgba(34, 185, 92, 0.5);
@@ -184,13 +185,13 @@ page {
   display: grid;
   grid-template-columns: 1.4fr .8fr .8fr;
   gap: 10rpx;
-  margin-top: 14rpx;
+  margin-top: 0;
 }
 
 .upload-material-card {
   display: grid;
   min-width: 0;
-  min-height: 112rpx;
+  min-height: 124rpx;
   align-content: start;
   justify-items: center;
   gap: 8rpx;
@@ -251,7 +252,7 @@ page {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8rpx;
-  margin-top: 12rpx;
+  margin-top: 0;
   padding-top: 0;
 }
 
@@ -259,7 +260,7 @@ page {
   position: relative;
   display: grid;
   min-width: 0;
-  min-height: 88rpx;
+  min-height: 104rpx;
   align-content: center;
   justify-items: center;
   gap: 6rpx;
@@ -341,7 +342,7 @@ page {
 
 .yd-upload-primary {
   height: 72rpx;
-  margin-top: 14rpx;
+  margin-top: auto;
   border-radius: 999rpx;
   color: #1d261f;
   background: linear-gradient(180deg, #ffd84f 0%, #f5b300 100%);

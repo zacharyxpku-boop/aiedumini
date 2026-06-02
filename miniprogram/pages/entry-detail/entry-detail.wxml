@@ -55,17 +55,6 @@
     </view>
   </view>
 
-  <view class="entry-card-grid">
-    <view class="entry-card" wx:for="{{scene.cards}}" wx:key="label" data-scene="{{item.scene}}" bindtap="openScene">
-      <image class="entry-card-icon" mode="aspectFit" src="{{item.icon}}" />
-      <view>
-        <view class="entry-card-label">{{item.label}}</view>
-        <view class="entry-card-value">{{item.value}}</view>
-      </view>
-      <text class="entry-card-arrow">›</text>
-    </view>
-  </view>
-
   <view class="entry-proof-strip">
     <view
       class="entry-proof-node {{item.active ? 'active' : ''}} {{index === scene.proofSteps.length - 1 ? 'final' : ''}}"

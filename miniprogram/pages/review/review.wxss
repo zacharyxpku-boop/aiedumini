@@ -31,6 +31,7 @@ page {
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
+  gap: 14rpx;
   min-height: calc(100vh - 190rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   margin-bottom: 0;
   padding: 20rpx;
@@ -116,8 +117,9 @@ page {
   grid-template-columns: minmax(0, 1fr) 184rpx;
   gap: 18rpx;
   align-items: center;
-  min-height: 232rpx;
-  margin-top: 16rpx;
+  flex: 0 0 auto;
+  min-height: 252rpx;
+  margin-top: 0;
 }
 
 .yd-review-title {
@@ -169,9 +171,9 @@ page {
 }
 
 .review-map-card {
-  flex: 0 0 auto;
-  min-height: 188rpx;
-  margin-top: 12rpx;
+  flex: 1 1 auto;
+  min-height: 232rpx;
+  margin-top: 0;
   padding: 14rpx 12rpx;
   border: 1rpx solid rgba(232, 238, 230, 0.95);
   border-radius: 22rpx;
@@ -204,7 +206,7 @@ page {
   position: relative;
   display: grid;
   min-width: 0;
-  min-height: 94rpx;
+  min-height: 108rpx;
   align-content: center;
   justify-items: center;
   gap: 5rpx;
@@ -271,12 +273,12 @@ page {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8rpx;
-  margin-top: 12rpx;
+  margin-top: 0;
 }
 
 .review-action-card {
   display: grid;
-  min-height: 90rpx;
+  min-height: 104rpx;
   align-items: center;
   justify-items: center;
   gap: 5rpx;
@@ -320,7 +322,7 @@ page {
 
 .review-main-cta {
   height: 72rpx;
-  margin-top: 14rpx;
+  margin-top: auto;
   border-radius: 999rpx;
   color: #1d261f;
   background: linear-gradient(180deg, #ffd84f 0%, #f5b300 100%);
@@ -335,7 +337,7 @@ page {
   display: grid;
   grid-template-columns: 1.08fr .92fr;
   gap: 10rpx;
-  margin-top: 10rpx;
+  margin-top: 0;
 }
 
 .review-action-row button {
