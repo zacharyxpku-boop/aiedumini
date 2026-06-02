@@ -3099,13 +3099,27 @@ Page({
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().setData({ selected: 3 });
     }
+    if (this._profileRefreshTimer) {
+      clearTimeout(this._profileRefreshTimer);
+      this._profileRefreshTimer = null;
+    }
     const pendingRoute = navigation.consumePendingTabRouteContext
       ? navigation.consumePendingTabRouteContext('/pages/profile/profile')
       : null;
     if (pendingRoute && pendingRoute.options) {
       this.applyRouteOptions(pendingRoute.options);
     }
-    this.refresh();
+    this._profileRefreshTimer = setTimeout(() => {
+      this._profileRefreshTimer = null;
+      this.refresh();
+    }, 32);
+  },
+
+  onHide() {
+    if (this._profileRefreshTimer) {
+      clearTimeout(this._profileRefreshTimer);
+      this._profileRefreshTimer = null;
+    }
   },
 
   refresh() {
