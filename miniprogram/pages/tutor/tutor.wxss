@@ -173,8 +173,8 @@ page {
 }
 
 .tutor-flow-card {
-  margin-top: 10rpx;
-  padding: 10rpx;
+  margin-top: 12rpx;
+  padding: 8rpx 10rpx;
   border: 1rpx solid rgba(232, 238, 230, 0.95);
   border-radius: 24rpx;
   background: rgba(255, 255, 255, 0.94);
@@ -182,32 +182,32 @@ page {
 
 .tutor-section-head text:first-child {
   color: #18211d;
-  font-size: 27rpx;
+  font-size: 23rpx;
   font-weight: 950;
 }
 
 .tutor-section-head text:last-child {
   color: #738077;
-  font-size: 20rpx;
+  font-size: 17rpx;
   font-weight: 780;
 }
 
 .tutor-ladder {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 8rpx;
-  margin-top: 12rpx;
+  gap: 6rpx;
+  margin-top: 8rpx;
 }
 
 .tutor-ladder-node {
   position: relative;
   display: grid;
   min-width: 0;
-  min-height: 84rpx;
+  min-height: 70rpx;
   align-content: center;
   justify-items: center;
-  gap: 5rpx;
-  padding: 10rpx 4rpx;
+  gap: 3rpx;
+  padding: 7rpx 3rpx;
   overflow: visible;
   border: 1rpx solid rgba(232, 238, 230, 0.95);
   border-radius: 19rpx;
@@ -237,8 +237,8 @@ page {
 }
 
 .tutor-ladder-icon {
-  width: 42rpx;
-  height: 42rpx;
+  width: 32rpx;
+  height: 32rpx;
   object-fit: contain;
   padding: 6rpx;
   border-radius: 15rpx;
@@ -255,14 +255,14 @@ page {
 
 .tutor-ladder-node text:nth-child(2) {
   color: #17211d;
-  font-size: 18rpx;
+  font-size: 16rpx;
   font-weight: 950;
   line-height: 1.18;
 }
 
 .tutor-ladder-node text:nth-child(3) {
   color: #526158;
-  font-size: 16rpx;
+  display: none;
   font-weight: 780;
   line-height: 1.18;
 }
@@ -290,7 +290,7 @@ page {
   align-content: start;
   gap: 10rpx;
   flex: 1 1 auto;
-  min-height: 228rpx;
+  min-height: 238rpx;
   margin-top: 14rpx;
   padding: 18rpx;
   border: 1rpx solid rgba(232, 238, 230, 0.95);
@@ -307,11 +307,11 @@ page {
 
 .tutor-chat-card .tutor-bubble {
   max-width: 82%;
-  padding: 13rpx 16rpx;
+  padding: 12rpx 15rpx;
   border-radius: 20rpx;
   color: #31423a;
   background: #f1f7ef;
-  font-size: 23rpx;
+  font-size: 22rpx;
   font-weight: 760;
   line-height: 1.42;
 }
