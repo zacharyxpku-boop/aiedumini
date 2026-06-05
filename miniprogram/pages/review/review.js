@@ -3,6 +3,7 @@ const storage = require('../../utils/storage');
 const navigation = require('../../utils/navigation');
 const api = require('../../utils/api');
 const gameLogic = require('../../utils/game-logic');
+const revisitEngine = require('../../utils/revisit-engine');
 const reviewViewModels = require('../../view-models/review-view-model');
 
 const DEFAULT_REVISIT_RUNWAY = {
@@ -87,6 +88,7 @@ Page({
     reviewPlaybook: null,
     revisitProofCard: null,
     revisitRunway: DEFAULT_REVISIT_RUNWAY,
+    playableReviewTools: [],
     practiceTemplateWorkshop: null,
     practiceTemplatePack: null,
     practiceTemplateWorkbench: null,
@@ -412,6 +414,30 @@ Page({
     };
   },
 
+  buildPlayableReviewTools(cards = []) {
+    const sourceCards = Array.isArray(cards) ? cards : [];
+    const recommended = revisitEngine.recommendGames
+      ? revisitEngine.recommendGames(sourceCards)
+      : [];
+    const toolIds = ['quiz', 'match', 'snake'];
+    const fallback = {
+      quiz: { title: '90秒回忆', pitch: '先在心里回忆，再翻开核对。', readyCount: sourceCards.length, available: !!sourceCards.length },
+      match: { title: '配对消消', pitch: '把短概念和含义配起来。', readyCount: 0, available: false },
+      snake: { title: '顺序拼图', pitch: '把解题步骤排成正确顺序。', readyCount: 0, available: false }
+    };
+    return toolIds.map((id) => {
+      const item = recommended.find((tool) => tool.id === id) || fallback[id];
+      return {
+        id,
+        title: item.title || fallback[id].title,
+        line: item.pitch || fallback[id].pitch,
+        count: Number(item.readyCount || 0),
+        available: !!item.available,
+        status: item.available ? '可开始' : '先补卡'
+      };
+    });
+  },
+
   refresh() {
     const summary = reviewCards.reviewSummary();
     const todayFocus = storage.loadTodayFocus ? storage.loadTodayFocus() : null;
@@ -427,6 +453,7 @@ Page({
     const reviewEvents = storage.loadReviewEvents ? storage.loadReviewEvents() : [];
     const profile = storage.loadGameProfile ? storage.loadGameProfile() : {};
     const revisitRunway = this.buildRevisitRunway(summary, cards);
+    const playableReviewTools = this.buildPlayableReviewTools(cards);
     const practiceTemplateWorkshop = summary.practiceTemplateWorkshop
       || (reviewCards.practiceTemplateWorkshop ? reviewCards.practiceTemplateWorkshop(summary, cards) : null);
     const focusProgress = todayFocus ? Number(todayFocus.progress || 0) : revisitRunway.percent;
@@ -464,6 +491,7 @@ Page({
       revisitRunway: Object.assign({}, revisitRunway, {
         percent: Math.max(Number(revisitRunway.percent || 0), Math.max(0, Math.min(100, focusProgress || 0)))
       }),
+      playableReviewTools,
       practiceTemplateWorkshop,
       practiceTemplatePack: this.data.practiceTemplatePack,
       mistakeHub: this.buildMistakeHub(summary, todayFocus),
@@ -1701,6 +1729,55 @@ Page({
       return;
     }
     this.goFocus();
+  },
+
+  runPlayableReviewTool(event) {
+    const dataset = event && event.currentTarget ? event.currentTarget.dataset || {} : {};
+    const toolId = dataset.id || 'quiz';
+    const tool = (this.data.playableReviewTools || []).find((item) => item.id === toolId) || {};
+    if (!tool.available) {
+      wx.showToast({ title: '先生成一张真实回访卡', icon: 'none' });
+      return;
+    }
+    const cards = this.data.cards || [];
+    const round = toolId === 'match' && revisitEngine.buildMatchRound
+      ? revisitEngine.buildMatchRound(cards, { limit: 4 })
+      : toolId === 'snake' && revisitEngine.buildSnakeRound
+        ? revisitEngine.buildSnakeRound(cards, { limit: 3 })
+        : revisitEngine.buildQuestRound
+          ? revisitEngine.buildQuestRound(cards, { limit: 3, timeLimit: 90 })
+          : null;
+    if (storage.appendReviewEvent) {
+      storage.appendReviewEvent({
+        kind: 'playable_review_tool_started',
+        tool_id: toolId,
+        total: round && round.total ? round.total : 0,
+        source: 'review_tab_toolbench'
+      });
+    }
+    if (toolId === 'quiz') {
+      this.setData({
+        feedbackText: `已打开${tool.title || '90秒回忆'}：先回忆，再核对。`
+      });
+      this.reveal();
+      return;
+    }
+    this.setData({
+      practiceTemplateWorkbench: Object.assign({}, this.data.practiceTemplateWorkbench || {}, {
+        id: `review_tool_${toolId}`,
+        title: tool.title || '短回访工具',
+        status: tool.status || '可开始',
+        line: tool.line || '只使用真实回访卡，不展示原题答案和排名。',
+        primaryAction: '开始',
+        samples: ((round && (round.pairs || round.tracks || round.questions)) || []).slice(0, 3).map((item, index) => ({
+          id: item.id || `${toolId}_${index}`,
+          label: item.question || item.text || item.knowledgeType || tool.title,
+          source: item.answer || item.knowledgeType || '回访卡'
+        })),
+        safetyLine: '只记录第一步、错因和明天回访，不做排名、勋章或商店。'
+      }),
+      feedbackText: `已打开${tool.title || '短回访工具'}，本轮使用 ${round && round.total ? round.total : tool.count || 0} 张真实卡。`
+    });
   },
 
   runTemplateDeliverable(event) {

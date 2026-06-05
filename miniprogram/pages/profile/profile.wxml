@@ -37,19 +37,6 @@
           <view><text>报告图稿</text><text>{{learningReportSummary.parentReportWorkflowImageLine}}</text></view>
         </view>
 
-        <view class="yd-parent-sources">
-          <view class="yd-parent-section-head">
-            <text>这页用来做什么</text>
-            <text>看证据，不替孩子做题</text>
-          </view>
-          <view class="yd-parent-source-row">
-            <view data-scene="parent" bindtap="openEntryDetail"><image mode="aspectFit" src="/assets/reference/entry-parent.png" /><text>第一步</text></view>
-            <view data-scene="report" bindtap="openEntryDetail"><image mode="aspectFit" src="/assets/reference/entry-report.png" /><text>判断依据</text></view>
-            <view data-scene="parent" bindtap="openEntryDetail"><image mode="aspectFit" src="/assets/reference/family-avatar-group-transparent.png" /><text>一句话</text></view>
-            <view data-scene="parent" bindtap="openEntryDetail"><image mode="aspectFit" src="/assets/reference/learning-route-map-transparent.png" /><text>明天验</text></view>
-          </view>
-        </view>
-
         <view class="yd-parent-loop">
           <view class="yd-parent-loop-card primary" data-scene="parent" bindtap="openEntryDetail">
             <image mode="aspectFit" src="/assets/reference/entry-parent.png" />

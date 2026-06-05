@@ -17,7 +17,7 @@
         <view class="yd-review-hero">
           <view class="yd-review-copy">
             <view class="yd-review-title">{{reviewViewModel.title}}</view>
-            <view class="yd-review-sub route-note short">先说错因，再做一张变式，明天只回看真正卡住的点。</view>
+            <view class="yd-review-sub route-note short">先说错因，再做一张变式，换题看是否真的迁移，明天只回看真正卡住的点。</view>
             <view class="review-chip-row">
               <text>主动回忆</text>
               <text>错因回放</text>
@@ -27,45 +27,17 @@
           <image class="yd-review-art" mode="aspectFit" src="/assets/reference/review-world-map-transparent.png" />
         </view>
 
-        <view class="review-map-card">
-          <view class="review-section-head">
-            <text>今日回访路径</text>
-            <text>只记录真实回忆、错因和下一步证据</text>
-          </view>
-          <view class="review-map-line">
-            <view class="review-map-node done" data-scene="tutor" bindtap="openEntryDetail">
-              <image class="review-map-icon" mode="aspectFit" src="/assets/reference/entry-tutor.png" />
-              <text>错因</text>
-              <text>已定位</text>
-            </view>
-            <view class="review-map-node active" data-scene="review" bindtap="openEntryDetail">
-              <image class="review-map-icon" mode="aspectFit" src="/assets/reference/entry-review.png" />
-              <text>回忆</text>
-              <text>进行中</text>
-            </view>
-            <view class="review-map-node" data-scene="today" bindtap="openEntryDetail">
-              <image class="review-map-icon" mode="aspectFit" src="/assets/reference/entry-map.png" />
-              <text>变式</text>
-              <text>换题验</text>
-            </view>
-            <view class="review-map-node final" data-scene="parent" bindtap="openEntryDetail">
-              <image class="review-map-icon" mode="aspectFit" src="/assets/reference/entry-parent.png" />
-              <text>确认</text>
-              <text>家长看</text>
-            </view>
-          </view>
-        </view>
-
         <view class="review-mechanism-strip">
+          <text class="review-mechanism-cell">3张卡｜少量回忆</text>
           <text class="review-mechanism-cell">选卡｜只选一个卡点</text>
           <text class="review-mechanism-cell">90秒｜先回忆再核对</text>
           <text class="review-mechanism-cell">明天｜回流同一错因</text>
         </view>
 
         <view class="review-record-panel">
-          <view class="review-section-head"><text>{{practiceTemplateWorkshop.title}}</text><text>{{practiceTemplateWorkshop.catalogLine}}</text></view>
-          <text class="review-workshop-lead">先生成一套本机练习包：参考闪卡、配对、拼图、多米诺和 UNO 的工具化思路，只使用错因卡和第一步证据。</text>
-          <view class="review-record-steps"><text wx:for="{{practiceTemplateWorkshop.lanes}}" wx:key="id" class="review-lane-card" data-action="template" bindtap="runPlaybookAction">{{item.label}}｜{{item.line}}｜{{item.catalogCount || 0}} 款</text></view>
+          <view class="review-section-head"><text>短回访工具台</text><text>先回忆，再迁移</text></view>
+          <text class="review-workshop-lead">这里不是旧游戏页。每个工具只使用真实回访卡：先说第一步和错因，再做一张小变式。</text>
+          <view class="review-tool-grid"><view wx:for="{{playableReviewTools}}" wx:key="id" class="review-tool-card {{item.available ? 'ready' : 'locked'}}" data-id="{{item.id}}" bindtap="runPlayableReviewTool"><text>{{item.title}}</text><text>{{item.line}}</text><text>{{item.status}}｜{{item.count}} 张</text></view></view>
         </view>
 
         <view class="review-template-pack" wx:if="{{practiceTemplatePack && practiceTemplatePack.id}}">
@@ -79,13 +51,6 @@
           <text class="review-workbench-line">{{practiceTemplateWorkbench.line}}</text>
           <text class="review-preview-card">{{practiceTemplateWorkbench.samples[0].label}} · {{practiceTemplateWorkbench.samples[0].source}}</text><text class="review-preview-card">{{practiceTemplateWorkbench.samples[1].label}} · {{practiceTemplateWorkbench.samples[1].source}}</text><text class="review-preview-card">{{practiceTemplateWorkbench.samples[2].label}} · {{practiceTemplateWorkbench.samples[2].source}}</text>
           <text class="review-workbench-safe">{{practiceTemplateWorkbench.safetyLine}}</text>
-        </view>
-
-        <view class="review-action-grid">
-          <view class="review-action-card primary" data-action="review" bindtap="runPlaybookAction"><image mode="aspectFit" src="/assets/reference/entry-review.png" /><text>开始回访</text><text>3 张回忆卡</text></view>
-          <view class="review-action-card" data-scene="tutor" bindtap="openEntryDetail"><image mode="aspectFit" src="/assets/reference/entry-tutor.png" /><text>回到点拨</text><text>卡住先问第一步</text></view>
-          <view class="review-action-card" data-scene="today" bindtap="openEntryDetail"><image mode="aspectFit" src="/assets/reference/entry-map.png" /><text>换一题验证</text><text>看是否真的迁移</text></view>
-          <view class="review-action-card" data-scene="parent" bindtap="openEntryDetail"><image mode="aspectFit" src="/assets/reference/entry-parent.png" /><text>给家长看</text><text>汇总证据和下一步</text></view>
         </view>
 
         <view class="review-main-cta" data-action="review" bindtap="runPlaybookAction">{{reviewViewModel.primaryCta.text}}</view>

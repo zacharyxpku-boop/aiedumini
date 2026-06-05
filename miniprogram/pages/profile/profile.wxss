@@ -162,8 +162,7 @@ page {
   background: #fff1ea;
 }
 
-.yd-parent-decision,
-.yd-parent-sources {
+.yd-parent-decision {
   border: 1rpx solid rgba(232, 238, 230, 0.95);
   border-radius: 22rpx;
   background: rgba(255, 255, 255, 0.94);
@@ -291,13 +290,6 @@ page {
   -webkit-line-clamp: 2;
 }
 
-.yd-parent-sources {
-  flex: 0 0 auto;
-  min-height: 138rpx;
-  margin-top: 0;
-  padding: 14rpx;
-}
-
 .yd-parent-section-head text:first-child {
   color: #18211d;
   font-size: 24rpx;
@@ -312,49 +304,11 @@ page {
   text-align: right;
 }
 
-.yd-parent-source-row,
 .yd-parent-loop {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8rpx;
   margin-top: 10rpx;
-}
-
-.yd-parent-source-row {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.yd-parent-source-row view {
-  display: grid;
-  min-width: 0;
-  justify-items: center;
-  gap: 6rpx;
-  min-height: 88rpx;
-  padding: 9rpx 6rpx;
-  border-radius: 16rpx;
-  background: rgba(34, 185, 92, 0.08);
-}
-
-.yd-parent-source-row view:active {
-  transform: translateY(1rpx);
-  background: #effaf0;
-}
-
-.yd-parent-source-row image {
-  width: 38rpx;
-  height: 38rpx;
-  object-fit: contain;
-}
-
-.yd-parent-source-row text {
-  display: block;
-  overflow: hidden;
-  color: #174533;
-  font-size: 20rpx;
-  font-weight: 900;
-  text-align: center;
-  text-overflow: ellipsis;
-  white-space: normal;
 }
 
 .yd-parent-loop {
