@@ -89,6 +89,7 @@ Page({
     revisitProofCard: null,
     revisitRunway: DEFAULT_REVISIT_RUNWAY,
     playableReviewTools: [],
+    activeReviewTool: null,
     practiceTemplateWorkshop: null,
     practiceTemplatePack: null,
     practiceTemplateWorkbench: null,
@@ -436,6 +437,45 @@ Page({
         status: item.available ? '可开始' : '先补卡'
       };
     });
+  },
+
+  buildActiveReviewTool(tool = {}, round = null) {
+    const toolId = tool.id || (round && round.gameType) || 'quiz';
+    const questions = round && Array.isArray(round.questions) ? round.questions : [];
+    const pairs = round && Array.isArray(round.pairs) ? round.pairs : [];
+    const tracks = round && Array.isArray(round.tracks) ? round.tracks : [];
+    const items = toolId === 'match'
+      ? pairs.slice(0, 3).map((item, index) => ({
+        id: item.id || `match_${index}`,
+        label: `配对 ${index + 1}`,
+        prompt: item.question || '先看题面',
+        check: item.answer ? `对应：${item.answer}` : '点对应含义'
+      }))
+      : toolId === 'snake'
+        ? tracks.slice(0, 2).map((item, index) => ({
+          id: item.id || `snake_${index}`,
+          label: `顺序 ${index + 1}`,
+          prompt: item.question || '把步骤排好',
+          check: Array.isArray(item.correctOrder) && item.correctOrder.length ? item.correctOrder.join(' → ') : '按第一步到最后一步排序'
+        }))
+        : questions.slice(0, 3).map((item, index) => ({
+          id: item.id || `quiz_${index}`,
+          label: `回忆 ${index + 1}`,
+          prompt: item.question || '先闭眼回忆这张卡',
+          check: item.answer ? `核对：${item.answer}` : '再翻开核对'
+        }));
+    return {
+      id: toolId,
+      title: tool.title || (round && round.title) || '短回访工具',
+      status: items.length ? `本轮 ${items.length} 张` : '缺少回访卡',
+      line: tool.line || (round && round.subtitle) || '先主动回忆，再核对第一步和错因。',
+      empty: !items.length,
+      itemCount: items.length,
+      primary: items[0] || null,
+      secondary: items[1] || null,
+      third: items[2] || null,
+      items
+    };
   },
 
   refresh() {
@@ -1736,7 +1776,15 @@ Page({
     const toolId = dataset.id || 'quiz';
     const tool = (this.data.playableReviewTools || []).find((item) => item.id === toolId) || {};
     if (!tool.available) {
-      wx.showToast({ title: '先生成一张真实回访卡', icon: 'none' });
+      this.setData({
+        activeReviewTool: this.buildActiveReviewTool(Object.assign({}, tool, {
+          id: toolId,
+          title: tool.title || '短回访工具',
+          line: '这个工具需要真实回访卡，不能用空题假跑。',
+          status: '先补卡'
+        }), null),
+        feedbackText: '先生成一张真实回访卡，再运行短回访工具。'
+      });
       return;
     }
     const cards = this.data.cards || [];
@@ -1755,14 +1803,8 @@ Page({
         source: 'review_tab_toolbench'
       });
     }
-    if (toolId === 'quiz') {
-      this.setData({
-        feedbackText: `已打开${tool.title || '90秒回忆'}：先回忆，再核对。`
-      });
-      this.reveal();
-      return;
-    }
     this.setData({
+      activeReviewTool: this.buildActiveReviewTool(tool, round),
       practiceTemplateWorkbench: Object.assign({}, this.data.practiceTemplateWorkbench || {}, {
         id: `review_tool_${toolId}`,
         title: tool.title || '短回访工具',
@@ -1778,6 +1820,35 @@ Page({
       }),
       feedbackText: `已打开${tool.title || '短回访工具'}，本轮使用 ${round && round.total ? round.total : tool.count || 0} 张真实卡。`
     });
+    if (toolId === 'quiz') {
+      this.reveal();
+    }
+  },
+
+  finishPlayableReviewTool(event) {
+    const result = event && event.currentTarget && event.currentTarget.dataset
+      ? event.currentTarget.dataset.result
+      : 'remembered';
+    const active = this.data.activeReviewTool || {};
+    if (!active.id || active.empty) return;
+    if (storage.appendReviewEvent) {
+      storage.appendReviewEvent({
+        kind: 'playable_review_tool_finished',
+        tool_id: active.id,
+        result,
+        count: Number(active.itemCount || (Array.isArray(active.items) ? active.items.length : 0)),
+        source: 'review_tab_live_tool',
+        created_at: new Date().toISOString()
+      });
+    }
+    this.setData({
+      feedbackText: result === 'remembered'
+        ? `${active.title}已记录：明天只回看同一错因。`
+        : `${active.title}已记录：保留到下一轮回看。`
+    });
+    if (result === 'remembered') {
+      this.rate({ currentTarget: { dataset: { rating: 'good' } } });
+    }
   },
 
   runTemplateDeliverable(event) {

@@ -38,6 +38,38 @@
           <view class="review-section-head"><text>短回访工具台</text><text>先回忆，再迁移</text></view>
           <text class="review-workshop-lead">这里不是旧游戏页。每个工具只使用真实回访卡：先说第一步和错因，再做一张小变式。</text>
           <view class="review-tool-grid"><view wx:for="{{playableReviewTools}}" wx:key="id" class="review-tool-card {{item.available ? 'ready' : 'locked'}}" data-id="{{item.id}}" bindtap="runPlayableReviewTool"><text>{{item.title}}</text><text>{{item.line}}</text><text>{{item.status}}｜{{item.count}} 张</text></view></view>
+          <view class="review-live-tool" wx:if="{{activeReviewTool && activeReviewTool.id}}">
+            <view class="review-live-head">
+              <text>{{activeReviewTool.title}}</text>
+              <text>{{activeReviewTool.status}}</text>
+            </view>
+            <text class="review-live-line">{{activeReviewTool.line}}</text>
+            <view class="review-live-empty" wx:if="{{activeReviewTool.empty}}">
+              <text>还没有可运行的真实回访卡。</text>
+              <text>先从上传材料或苏格拉底点拨生成一张“第一步 + 错因”卡，再回到这里打开工具。</text>
+            </view>
+            <block wx:else>
+              <view class="review-live-card">
+                <text>{{activeReviewTool.primary.label}}</text>
+                <text>{{activeReviewTool.primary.prompt}}</text>
+                <text>{{activeReviewTool.primary.check}}</text>
+              </view>
+              <view class="review-live-card compact" wx:if="{{activeReviewTool.secondary && activeReviewTool.secondary.id}}">
+                <text>{{activeReviewTool.secondary.label}}</text>
+                <text>{{activeReviewTool.secondary.prompt}}</text>
+                <text>{{activeReviewTool.secondary.check}}</text>
+              </view>
+              <view class="review-live-card compact" wx:if="{{activeReviewTool.third && activeReviewTool.third.id}}">
+                <text>{{activeReviewTool.third.label}}</text>
+                <text>{{activeReviewTool.third.prompt}}</text>
+                <text>{{activeReviewTool.third.check}}</text>
+              </view>
+              <view class="review-live-actions">
+                <button data-result="remembered" bindtap="finishPlayableReviewTool">记住了</button>
+                <button data-result="needs_repair" bindtap="finishPlayableReviewTool">还要回看</button>
+              </view>
+            </block>
+          </view>
         </view>
 
         <view class="review-template-pack" wx:if="{{practiceTemplatePack && practiceTemplatePack.id}}">
