@@ -1,19 +1,5 @@
 const navigation = require('../../utils/navigation');
 
-const PROOF_FLOW = [
-  { scene: 'upload', label: '资料', hint: '先分类', icon: '/assets/reference/entry-upload.png' },
-  { scene: 'report', label: '报告', hint: '看依据', icon: '/assets/reference/entry-report.png' },
-  { scene: 'tutor', label: '点拨', hint: '说一步', icon: '/assets/reference/entry-tutor.png' },
-  { scene: 'review', label: '回访', hint: '验迁移', icon: '/assets/reference/entry-review.png' },
-  { scene: 'parent', label: '家长', hint: '下一步', icon: '/assets/reference/entry-parent.png' }
-];
-
-function proofFlow(activeScene) {
-  return PROOF_FLOW.map((item) => Object.assign({}, item, {
-    active: item.scene === activeScene || (activeScene === 'today' && item.scene === 'tutor')
-  }));
-}
-
 const SCENES = {
   today: {
     badge: '今晚主线',
@@ -43,8 +29,7 @@ const SCENES = {
         '孩子先说第一步，系统再决定去点拨、回访还是家长页。',
         '每次完成都留下证据，明天能接着回访。'
       ]
-    },
-    proofSteps: proofFlow('today')
+    }
   },
   upload: {
     badge: '材料入口',
@@ -74,8 +59,7 @@ const SCENES = {
         '材料不足时先生成待补清单，不硬下结论。',
         '所有材料最后都进入同一个报告和学习闭环。'
       ]
-    },
-    proofSteps: proofFlow('upload')
+    }
   },
   report: {
     badge: '个性化报告',
@@ -105,8 +89,7 @@ const SCENES = {
         '只把互相支持的信号写进结论，弱证据进入待补充。',
         '每个建议都必须落到今晚能做的一步。'
       ]
-    },
-    proofSteps: proofFlow('report')
+    }
   },
   tutor: {
     badge: 'AI点拨提示',
@@ -136,8 +119,7 @@ const SCENES = {
         '只给最小提示：条件、依据、反例三选一。',
         '对话结束后生成回访卡，避免一次讲完就忘。'
       ]
-    },
-    proofSteps: proofFlow('tutor')
+    }
   },
   review: {
     badge: '短回访',
@@ -167,8 +149,7 @@ const SCENES = {
         '换一道同类题，看孩子能不能自己启动。',
         '只把错因和可迁移动作回流给报告和家长。'
       ]
-    },
-    proofSteps: proofFlow('review')
+    }
   },
   parent: {
     badge: '家长视图',
@@ -198,41 +179,15 @@ const SCENES = {
         '只记录孩子说出的第一步和卡住原因。',
         '明天用同类小题回忆，不翻旧账。'
       ]
-    },
-    proofSteps: proofFlow('parent')
+    }
   }
 };
 
-const SCENE_NAV = {
-  today: { label: '今晚主线', image: '/assets/reference/entry-map.png' },
-  upload: { label: '上传材料', image: '/assets/reference/entry-upload.png' },
-  report: { label: '个性化报告', image: '/assets/reference/entry-report.png' },
-  tutor: { label: 'AI点拨', image: '/assets/reference/entry-tutor.png' },
-  review: { label: '回访验证', image: '/assets/reference/entry-review.png' },
-  parent: { label: '家长中心', image: '/assets/reference/entry-parent.png' }
-};
-
-const LOOP_NODES = [
-  { key: 'today', label: '主线', image: '/assets/reference/entry-map.png' },
-  { key: 'upload', label: '上传', image: '/assets/reference/entry-upload.png' },
-  { key: 'report', label: '报告', image: '/assets/reference/entry-report.png' },
-  { key: 'tutor', label: '点拨', image: '/assets/reference/entry-tutor.png' },
-  { key: 'review', label: '回访', image: '/assets/reference/entry-review.png' },
-  { key: 'parent', label: '家长', image: '/assets/reference/entry-parent.png' }
-];
-
-function buildSceneLinks(activeKey) {
-  return Object.keys(SCENE_NAV)
-    .filter((key) => key !== activeKey)
-    .map((key) => Object.assign({ key }, SCENE_NAV[key]));
-}
 
 Page({
   data: {
     sceneKey: 'today',
-    scene: SCENES.today,
-    sceneLinks: buildSceneLinks('today'),
-    loopNodes: LOOP_NODES
+    scene: SCENES.today
   },
 
   onLoad(query = {}) {
@@ -244,16 +199,8 @@ Page({
     const sceneKey = SCENES[key] ? key : 'today';
     this.setData({
       sceneKey,
-      scene: SCENES[sceneKey],
-      sceneLinks: buildSceneLinks(sceneKey)
+      scene: SCENES[sceneKey]
     });
-  },
-
-  openScene(event) {
-    const key = event && event.currentTarget && event.currentTarget.dataset
-      ? event.currentTarget.dataset.scene
-      : 'today';
-    this.setScene(key);
   },
 
   goPrimary() {

@@ -21,19 +21,12 @@
     <image class="entry-image" mode="aspectFit" src="{{scene.heroImage}}" />
   </view>
 
-  <view class="entry-jump-section">
-    <view class="entry-jump-current">
-      <text>当前入口</text>
-      <text>{{scene.badge}}</text>
+  <view class="entry-focus-card">
+    <view>
+      <text class="entry-focus-label">当前只做</text>
+      <text class="entry-focus-title">{{scene.badge}}</text>
     </view>
-    <scroll-view class="entry-jump-scroll" scroll-x enhanced show-scrollbar="{{false}}">
-      <view class="entry-jump-row">
-        <view class="entry-jump-card" wx:for="{{sceneLinks}}" wx:key="key" data-scene="{{item.key}}" bindtap="openScene">
-          <image mode="aspectFit" src="{{item.image}}" />
-          <text>{{item.label}}</text>
-        </view>
-      </view>
-    </scroll-view>
+    <text class="entry-focus-copy">先完成这个入口的主动作，再按下方下一步进入闭环。</text>
   </view>
 
   <view class="entry-actions">
@@ -58,21 +51,6 @@
         <text></text>
         <text>{{item}}</text>
       </view>
-    </view>
-  </view>
-
-  <view class="entry-proof-strip">
-    <view class="entry-proof-label">闭环</view>
-    <view
-      class="entry-proof-node {{item.active ? 'active' : ''}} {{index === scene.proofSteps.length - 1 ? 'final' : ''}}"
-      wx:for="{{scene.proofSteps}}"
-      wx:key="label"
-      data-scene="{{item.scene}}"
-      bindtap="openScene"
-    >
-      <image class="entry-proof-icon" mode="aspectFit" src="{{item.icon}}" />
-      <text>{{item.label}}</text>
-      <text class="entry-proof-hint">{{item.hint}}</text>
     </view>
   </view>
 </view>
