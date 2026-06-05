@@ -27,16 +27,9 @@
           <image class="yd-review-art" mode="aspectFit" src="/assets/reference/review-world-map-transparent.png" />
         </view>
 
-        <view class="review-mechanism-strip">
-          <text class="review-mechanism-cell">3张卡｜少量回忆</text>
-          <text class="review-mechanism-cell">选卡｜只选一个卡点</text>
-          <text class="review-mechanism-cell">90秒｜先回忆再核对</text>
-          <text class="review-mechanism-cell">明天｜回流同一错因</text>
-        </view>
-
         <view class="review-record-panel">
-          <view class="review-section-head"><text>短回访工具台</text><text>先回忆，再迁移</text></view>
-          <text class="review-workshop-lead">这里不是旧游戏页。每个工具只使用真实回访卡：先说第一步和错因，再做一张小变式。</text>
+          <view class="review-section-head"><text>选一个小工具</text><text>3 分钟练一轮</text></view>
+          <text class="review-workshop-lead">像课堂互动工具一样练一张真实卡：先回忆，再核对，不排行、不比速度，不按速度或分数给反馈。</text>
           <view class="review-tool-grid"><view wx:for="{{playableReviewTools}}" wx:key="id" class="review-tool-card {{item.available ? 'ready' : 'locked'}}" data-id="{{item.id}}" bindtap="runPlayableReviewTool"><text>{{item.title}}</text><text>{{item.line}}</text><text>{{item.status}}｜{{item.count}} 张</text></view></view>
           <view class="review-live-tool" wx:if="{{activeReviewTool && activeReviewTool.id}}">
             <view class="review-live-head">
@@ -73,15 +66,16 @@
         </view>
 
         <view class="review-template-pack" wx:if="{{practiceTemplatePack && practiceTemplatePack.id}}">
-          <text class="review-template-title">{{practiceTemplatePack.title}} · {{practiceTemplatePack.catalogCount}} 款教具已生成</text>
-          <text class="review-template-meta">来源卡 {{practiceTemplatePack.sourceCount}} · A4 彩色 · 注音字段 · 家长确认</text>
-          <text class="review-template-action" data-id="{{practiceTemplatePack.deliverables[0].id}}" data-label="{{practiceTemplatePack.deliverables[0].label}}" data-route="{{practiceTemplatePack.deliverables[0].route}}" bindtap="runTemplateDeliverable">{{practiceTemplatePack.deliverables[0].label}} · {{practiceTemplatePack.deliverables[0].count}} 个模板 · 打开</text><text class="review-template-action" data-id="{{practiceTemplatePack.deliverables[1].id}}" data-label="{{practiceTemplatePack.deliverables[1].label}}" data-route="{{practiceTemplatePack.deliverables[1].route}}" bindtap="runTemplateDeliverable">{{practiceTemplatePack.deliverables[1].label}} · {{practiceTemplatePack.deliverables[1].count}} 个模板 · 打开</text><text class="review-template-action" data-id="{{practiceTemplatePack.deliverables[2].id}}" data-label="{{practiceTemplatePack.deliverables[2].label}}" data-route="{{practiceTemplatePack.deliverables[2].route}}" bindtap="runTemplateDeliverable">{{practiceTemplatePack.deliverables[2].label}} · {{practiceTemplatePack.deliverables[2].count}} 个模板 · 打开</text><text class="review-template-action" data-id="{{practiceTemplatePack.deliverables[3].id}}" data-label="{{practiceTemplatePack.deliverables[3].label}}" data-route="{{practiceTemplatePack.deliverables[3].route}}" bindtap="runTemplateDeliverable">{{practiceTemplatePack.deliverables[3].label}} · {{practiceTemplatePack.deliverables[3].count}} 个模板 · 打开</text>
+          <text class="review-template-title">可生成练习单：多米诺、拼图、闪卡、UNO 卡</text>
+          <text class="review-template-meta">先跑完这一轮，再按错因生成打印或课后练习模板。</text>
+          <text class="review-template-action" data-id="{{practiceTemplatePack.deliverables[0].id}}" data-label="{{practiceTemplatePack.deliverables[0].label}}" data-route="{{practiceTemplatePack.deliverables[0].route}}" bindtap="runTemplateDeliverable">生成练习单</text>
         </view>
 
         <view class="review-template-workbench" wx:if="{{practiceTemplateWorkbench && practiceTemplateWorkbench.id}}">
-          <text class="review-workbench-title">{{practiceTemplateWorkbench.title}}</text><text class="review-workbench-status">{{practiceTemplateWorkbench.status}} · {{practiceTemplateWorkbench.count}} 个模板 · {{practiceTemplateWorkbench.primaryAction}}</text>
+          <text class="review-workbench-title">{{practiceTemplateWorkbench.title}}</text>
+          <text class="review-workbench-status">{{practiceTemplateWorkbench.status}} · {{practiceTemplateWorkbench.count}} 个模板</text>
           <text class="review-workbench-line">{{practiceTemplateWorkbench.line}}</text>
-          <text class="review-preview-card">{{practiceTemplateWorkbench.samples[0].label}} · {{practiceTemplateWorkbench.samples[0].source}}</text><text class="review-preview-card">{{practiceTemplateWorkbench.samples[1].label}} · {{practiceTemplateWorkbench.samples[1].source}}</text><text class="review-preview-card">{{practiceTemplateWorkbench.samples[2].label}} · {{practiceTemplateWorkbench.samples[2].source}}</text>
+          <text class="review-preview-card">{{practiceTemplateWorkbench.samples[0].label}} · {{practiceTemplateWorkbench.samples[0].source}}</text>
           <text class="review-workbench-safe">{{practiceTemplateWorkbench.safetyLine}}</text>
         </view>
 

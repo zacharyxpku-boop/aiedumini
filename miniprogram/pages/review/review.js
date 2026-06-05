@@ -782,7 +782,7 @@ Page({
       reviewWindows,
       releaseQueue,
       comboLine: combo.totalSeconds ? `${combo.totalSeconds} 秒主动回忆：先说第一步，再说错因，最后核对。` : '90 秒主动回忆：先说第一步，再说错因，最后核对。',
-      xpRule: daily.antiCramRule ? String(daily.antiCramRule).replace(new RegExp(['X', 'P'].join(''), 'g'), '行为反馈') : '行为反馈只记录主动回忆、错因回放和明天回访，不做速度或分数比较。',
+      xpRule: daily.antiCramRule ? String(daily.antiCramRule).replace(new RegExp(['X', 'P'].join(''), 'g'), '行为反馈') : '行为反馈只记录主动回忆、错因回放和明天回访，不按速度或分数给反馈。',
       parentLine: daily.parentLine || `家长只问一句：这张卡第一步为什么先做「${weakKey}」？`,
       shareLine: daily.shareLine || '分享只带错因和下一步，不带原题、答案、分数或完整对话。',
       nextRoute: '/pages/review/review?from=memory_prescription'
@@ -808,7 +808,7 @@ Page({
       line: active.question || active.prompt || '换一道同类小题，只说第一步和错因。',
       parentLine: active.parentPrompt || '家长只问：这次第一步是什么？为什么先做这一步？',
       blackboardLine: active.blackboardHint || '小黑板只画第一步关系，不画完整解法。',
-      xpRule: active.xpRule || '只记录说清第一步、错因和回访，不做速度或分数比较。',
+      xpRule: active.xpRule || '只记录说清第一步、错因和回访，不按速度或分数给反馈。',
       releaseGate: retest.releaseGate || '三段复测证据齐之前，不写长期掌握结论。',
       revisitRoute: active.nextPracticePlan && (active.nextPracticePlan.appRoute || active.nextPracticePlan.reviewRoute)
         ? (active.nextPracticePlan.appRoute || active.nextPracticePlan.reviewRoute)
