@@ -1774,7 +1774,7 @@ Page({
           label: item.question || item.text || item.knowledgeType || tool.title,
           source: item.answer || item.knowledgeType || '回访卡'
         })),
-        safetyLine: '只记录第一步、错因和明天回访，不做排名、勋章或商店。'
+        safetyLine: '只记录第一步、错因和明天回访，不展示分数比较或消费入口。'
       }),
       feedbackText: `已打开${tool.title || '短回访工具'}，本轮使用 ${round && round.total ? round.total : tool.count || 0} 张真实卡。`
     });
