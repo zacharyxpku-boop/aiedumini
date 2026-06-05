@@ -1,8 +1,8 @@
-<view class="home-page">
+﻿<view class="home-page">
   <view class="first-run-overlay" wx:if="{{showFirstRunOverlay}}" catchtap="closeFirstRunOverlay">
     <view class="first-run-card">
       <view>原点不直接给答案</view>
-      <text>陪你先看清今晚第一步。</text>
+      <text>先陪你看清今晚第一步。</text>
       <text>点一下继续，或等 3 秒自动收起。</text>
     </view>
   </view>
@@ -31,50 +31,34 @@
 
       <view class="mini-relay-card" wx:if="{{incomingShareRelay}}">
         <view class="mini-relay-head">
-          <text>同伴接力</text>
-          <text bindtap="continueShareRelay">继续</text>
+          <text>鍚屼即鎺ュ姏</text>
+          <text bindtap="continueShareRelay">缁х画</text>
         </view>
         <view wx:for="{{incomingShareRelay.relayPackCards}}" wx:key="id">{{item.title}} {{item.line}}</view>
         <view>{{incomingShareRelay.receiverOwnMaterialActionLine}}</view>
         <view>{{incomingShareRelay.firstStepLine}}</view>
       </view>
 
-      <view class="mini-entry-grid yd-jump-grid">
-        <view class="mini-entry-card yd-jump-card green" data-scene="upload" bindtap="openEntryDetail">
-          <image class="mini-entry-visual" mode="aspectFit" src="/assets/reference/entry-upload.png" />
-          <text>上传资料</text>
-          <text>文档、试卷、错题</text>
-          <view class="mini-entry-arrow">›</view>
+      <view class="home-upload-feature yd-jump-card" data-scene="upload" bindtap="openEntryDetail">
+        <view class="home-upload-copy">
+          <view class="home-card-kicker">第一步</view>
+          <view class="home-upload-title">先把作业或错题发过来</view>
+          <view class="home-upload-sub">拍照、粘贴文字、发试卷都可以。原点会先帮你看清今晚从哪里开始。</view>
+          <view class="home-upload-cta">上传材料</view>
         </view>
-        <view class="mini-entry-card yd-jump-card blue" data-scene="report" bindtap="openEntryDetail">
-          <image class="mini-entry-visual" mode="aspectFit" src="/assets/reference/entry-report.png" />
-          <text>个性化报告</text>
-          <text>待提升点与建议</text>
-          <view class="mini-entry-arrow blue">›</view>
-        </view>
-        <view class="mini-entry-card yd-jump-card green" data-scene="tutor" bindtap="openEntryDetail">
-          <image class="mini-entry-visual" mode="aspectFit" src="/assets/reference/entry-tutor.png" />
-          <text>原点点拨</text>
-          <text>只追问第一步</text>
-          <view class="mini-entry-arrow">›</view>
-        </view>
-        <view class="mini-entry-card yd-jump-card yellow" data-scene="review" bindtap="openEntryDetail">
-          <image class="mini-entry-visual" mode="aspectFit" src="/assets/reference/entry-review.png" />
-          <text>短回访</text>
-          <text>回忆与变式验证</text>
-          <view class="mini-entry-arrow orange">›</view>
-        </view>
-        <view class="mini-entry-card yd-jump-card orange" data-scene="parent" bindtap="openEntryDetail">
-          <image class="mini-entry-visual" mode="aspectFit" src="/assets/reference/entry-parent.png" />
+        <image class="home-upload-visual" mode="aspectFit" src="/assets/reference/upload-folder-stack-transparent.png" />
+      </view>
+
+      <view class="home-result-grid">
+        <view class="home-result-card blue" data-scene="parent" bindtap="openEntryDetail">
+          <image class="home-result-icon" mode="aspectFit" src="/assets/reference/family-avatar-group-transparent.png" />
           <text>家长报告</text>
-          <text>证据与下一步</text>
-          <view class="mini-entry-arrow orange">›</view>
+          <text>看证据、看下一步</text>
         </view>
-        <view class="mini-entry-card yd-jump-card map" data-scene="today" bindtap="openEntryDetail">
-          <image class="mini-entry-visual" mode="aspectFit" src="/assets/reference/entry-map.png" />
+        <view class="home-result-card green" data-scene="today" bindtap="openEntryDetail">
+          <image class="home-result-icon" mode="aspectFit" src="/assets/reference/learning-route-map-transparent.png" />
           <text>今晚路径</text>
-          <text>五步闭环</text>
-          <view class="mini-entry-arrow">›</view>
+          <text>把任务排成顺序</text>
         </view>
       </view>
       <view class="mini-route-card">
@@ -82,35 +66,8 @@
         <view class="mini-subtitle" wx:if="{{homeViewModel.miniLessonResume}}">{{homeViewModel.miniLessonResume.title}}</view>
         <view class="mini-subtitle" wx:if="{{homeViewModel.reportServiceResume}}">{{homeViewModel.reportServiceResume.title}}</view>
         <textarea class="mini-route-input" value="{{thoughtInput}}" placeholder="{{homeViewModel.inputCard.placeholder}}" maxlength="500" auto-height bindinput="onThoughtInput" />
-        <view class="mini-route-line">
-          <view class="mini-route-node done">
-            <image class="mini-route-icon" mode="aspectFit" src="/assets/reference/entry-upload.png" />
-            <text>上传资料</text>
-            <text>材料进来</text>
-          </view>
-          <view class="mini-route-node done">
-            <image class="mini-route-icon" mode="aspectFit" src="/assets/reference/entry-report.png" />
-            <text>生成报告</text>
-            <text>依据清楚</text>
-          </view>
-          <view class="mini-route-node active">
-            <image class="mini-route-icon" mode="aspectFit" src="/assets/reference/entry-tutor.png" />
-            <text>说第一步</text>
-            <text>点拨追问</text>
-          </view>
-          <view class="mini-route-node">
-            <image class="mini-route-icon" mode="aspectFit" src="/assets/reference/entry-review.png" />
-            <text>回访</text>
-            <text>验证迁移</text>
-          </view>
-          <view class="mini-route-node final">
-            <image class="mini-route-icon" mode="aspectFit" src="/assets/reference/entry-parent.png" />
-            <text>家长看</text>
-            <text>只看下一步</text>
-          </view>
-        </view>
         <view class="mini-subtitle" wx:if="{{homeViewModel.emptyState}}">{{homeViewModel.emptyState}}</view>
-        <view class="mini-subtitle route-next-lite" wx:if="{{homeViewModel.nextStep}}" catchtap="runHomeNextStep">{{homeViewModel.nextStep.text}} · {{homeViewModel.nextStep.cta}}</view>
+        <view class="mini-subtitle route-next-lite" wx:if="{{homeViewModel.nextStep}}" catchtap="runHomeNextStep">{{homeViewModel.nextStep.text}} 路 {{homeViewModel.nextStep.cta}}</view>
         <view class="mini-main-cta" catchtap="planTonight">{{homeViewModel.primaryCta}}</view>
         <view class="mini-subtitle" bindtap="submitAiDraft">{{homeViewModel.secondaryAction}}</view>
       </view>
