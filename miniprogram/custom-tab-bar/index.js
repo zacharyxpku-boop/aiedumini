@@ -1,1 +1,37 @@
-const navigation=require("../utils/navigation"),tabs=["/pages/home/home","/pages/tutor/tutor","/pages/review/review","/pages/profile/profile","/pages/upload/upload"];Component({lifetimes:{attached(){const e=getCurrentPages(),t=e.length?`/${e[e.length-1].route}`:"/pages/home/home",a=Math.max(0,tabs.indexOf(t));this.setData({selected:a})}},pageLifetimes:{show(){const e=getCurrentPages(),t=e.length?`/${e[e.length-1].route}`:"/pages/home/home",a=Math.max(0,tabs.indexOf(t));this.setData({selected:a})}},data:{selected:0},methods:{switchTab(e){const t=Number(e.currentTarget.dataset.index||0),a=e.currentTarget.dataset.path;!a||tabs.indexOf(a)<0||(this.setData({selected:t}),navigation.switchTab(a))}}});
+const navigation = require('../utils/navigation');
+
+const tabs = ['/pages/home/home', '/pages/tutor/tutor', '/pages/review/review', '/pages/profile/profile', '/pages/upload/upload'];
+
+Component({
+  lifetimes: {
+    attached() {
+      const pages = getCurrentPages();
+      const route = pages.length ? `/${pages[pages.length - 1].route}` : '/pages/home/home';
+      const selected = Math.max(0, tabs.indexOf(route));
+      this.setData({ selected });
+    }
+  },
+
+  pageLifetimes: {
+    show() {
+      const pages = getCurrentPages();
+      const route = pages.length ? `/${pages[pages.length - 1].route}` : '/pages/home/home';
+      const selected = Math.max(0, tabs.indexOf(route));
+      this.setData({ selected });
+    }
+  },
+
+  data: {
+    selected: 0
+  },
+
+  methods: {
+    switchTab(event) {
+      const index = Number(event.currentTarget.dataset.index || 0);
+      const path = event.currentTarget.dataset.path;
+      if (!path || tabs.indexOf(path) < 0) return;
+      this.setData({ selected: index });
+      navigation.switchTab(path);
+    }
+  }
+});

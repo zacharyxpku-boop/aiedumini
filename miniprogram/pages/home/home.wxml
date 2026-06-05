@@ -35,7 +35,7 @@
           <text bindtap="continueShareRelay">继续</text>
         </view>
         <view wx:for="{{incomingShareRelay.relayPackCards}}" wx:key="id">{{item.title}} {{item.line}}</view>
-        <view>{{incomingShareRelay.receiverOwnMaterialChallengeLine}}</view>
+        <view>{{incomingShareRelay.receiverOwnMaterialActionLine}}</view>
         <view>{{incomingShareRelay.firstStepLine}}</view>
       </view>
 

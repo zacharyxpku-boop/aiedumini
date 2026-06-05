@@ -1,1 +1,28 @@
-const api=require("./utils/api"),storage=require("./utils/storage");App({globalData:{apiBase:"https://yuandianzhixue.com",productName:"原点智学",tutorName:"咕点"},onLaunch(){storage.ensureLocalUserId&&storage.ensureLocalUserId(),storage.archiveYesterdaySession&&storage.archiveYesterdaySession(),setTimeout(()=>{const e=storage.loadProfile();api.initSession(e).catch(()=>{})},800)},onShareAppMessage:()=>({title:`${(storage.loadProfile?storage.loadProfile():{}).name||"我家孩子"} 今晚确认了第一步`,path:`/pages/home/home?ref=${storage.getLocalUserId?storage.getLocalUserId():""}`})});
+const api = require('./utils/api');
+const storage = require('./utils/storage');
+
+App({
+  globalData: {
+    apiBase: 'https://yuandianzhixue.com',
+    productName: '原点智学',
+    tutorName: '咕点'
+  },
+
+  onLaunch() {
+    storage.ensureLocalUserId && storage.ensureLocalUserId();
+    storage.archiveYesterdaySession && storage.archiveYesterdaySession();
+    setTimeout(() => {
+      const profile = storage.loadProfile();
+      api.initSession(profile).catch(() => {});
+    }, 800);
+  },
+
+  onShareAppMessage() {
+    const profile = storage.loadProfile ? storage.loadProfile() : {};
+    const name = profile.name || '我家孩子';
+    return {
+      title: `${name} 今晚确认了第一步`,
+      path: `/pages/home/home?ref=${storage.getLocalUserId ? storage.getLocalUserId() : ''}`
+    };
+  }
+});

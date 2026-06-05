@@ -1,1 +1,274 @@
-const navigation=require("../../utils/navigation"),PROOF_FLOW=[{scene:"upload",label:"资料",hint:"先分类",icon:"/assets/reference/entry-upload.png"},{scene:"report",label:"报告",hint:"看依据",icon:"/assets/reference/entry-report.png"},{scene:"tutor",label:"点拨",hint:"说一步",icon:"/assets/reference/entry-tutor.png"},{scene:"review",label:"回访",hint:"验迁移",icon:"/assets/reference/entry-review.png"},{scene:"parent",label:"家长",hint:"下一步",icon:"/assets/reference/entry-parent.png"}];function proofFlow(e){return PROOF_FLOW.map(r=>Object.assign({},r,{active:r.scene===e||"today"===e&&"tutor"===r.scene}))}const SCENES={today:{badge:"今晚主线",title:"先把今晚任务变成 3 个可执行动作",subtitle:"入口页只负责决定从哪开始。这里承接任务拆解、证据记录和下一步跳转。",heroImage:"/assets/reference/learning-route-map-transparent.png",primaryLabel:"去AI私教说第一步",primaryRoute:"/pages/tutor/tutor?from=entry_today_first_step&open=flow",secondaryLabel:"先补材料",secondaryRoute:"/pages/upload/upload?from=entry_today_material",cards:[{label:"先定优先级",value:"把必须做、可放后、明天回访分开。",icon:"/assets/reference/entry-upload.png",scene:"upload"},{label:"再说第一步",value:"孩子先说从哪里开始，AI私教只追问下一句。",icon:"/assets/reference/entry-tutor.png",scene:"tutor"},{label:"最后留证据",value:"完成后进入短回访或家长进展卡。",icon:"/assets/reference/entry-review.png",scene:"review"}],spotlight:{kicker:"今晚路线板",title:"入口只做一件事：决定从哪一步开始",image:"/assets/reference/learning-route-map-transparent.png",metrics:[{label:"任务拆解",value:"3步"},{label:"预计用时",value:"15分"},{label:"回流证据",value:"1条"}],points:["先把今晚任务变成可执行动作，不在首页堆满说明。","孩子先说第一步，系统再决定去私教、回访还是家长页。","每次完成都留下证据，明天能接着回访。"]},proofSteps:proofFlow("today")},upload:{badge:"材料入口",title:"先分类，再生成学习包",subtitle:"材料不一致也要输出稳定 SOP：识别材料类型、提取证据、生成下一步。",heroImage:"/assets/reference/upload-folder-stack-transparent.png",primaryLabel:"选择文件/图片",primaryRoute:"/pages/upload/upload?from=entry_upload_file&open=flow",secondaryLabel:"没有报告，做快测",secondaryRoute:"/pages/profile/profile?from=entry_upload_quiz&panel=assessment&quick_assessment=1",cards:[{label:"天测/测评",value:"提取学习偏好、注意力和优势通道。",icon:"/assets/reference/entry-report.png",scene:"report"},{label:"成绩/错题",value:"提取学科卡点、错因和回访优先级。",icon:"/assets/reference/entry-review.png",scene:"review"},{label:"家长观察",value:"补足情绪、习惯和家庭配合线索。",icon:"/assets/reference/entry-parent.png",scene:"parent"}],spotlight:{kicker:"材料分类板",title:"先识别材料类型，再进入报告 SOP",image:"/assets/reference/upload-folder-stack-transparent.png",metrics:[{label:"可上传",value:"6类"},{label:"弱证据",value:"待确认"},{label:"输出格式",value:"稳定"}],points:["测评、成绩、错题、老师反馈、家长观察分开处理。","材料不足时先生成待补清单，不硬下结论。","所有材料最后都进入同一个报告和学习闭环。"]},proofSteps:proofFlow("upload")},report:{badge:"个性化报告",title:"先讲清证据，再匹配学习方法",subtitle:"报告要说明材料从哪里来、天赋信号和成绩表现是否互相支持，以及为什么推荐这组学习方法。",heroImage:"/assets/reference/report-radar-card-illustration.png",primaryLabel:"查看证据报告",primaryRoute:"/pages/profile/profile?from=entry_report_evidence&open=flow",secondaryLabel:"补充测评/错题",secondaryRoute:"/pages/upload/upload?from=entry_report_material",cards:[{label:"证据来源",value:"测评、成绩、错题、对话和回访记录分开标注。",icon:"/assets/reference/entry-upload.png",scene:"upload"},{label:"天测匹配",value:"解释孩子适合怎样输入、输出和反馈。",icon:"/assets/reference/entry-report.png",scene:"report"},{label:"方法依据",value:"把费曼复述、苏格拉底追问、短周期回访变成动作。",icon:"/assets/reference/entry-tutor.png",scene:"tutor"}],spotlight:{kicker:"报告决策板",title:"证据先分层，结论才可信",image:"/assets/reference/report-radar-card-illustration.png",metrics:[{label:"材料完整度",value:"4类"},{label:"交叉验证",value:"3步"},{label:"方法匹配",value:"可执行"}],points:["先把测评、成绩、错题和家长观察分开看。","只把互相支持的信号写进结论，弱证据进入待补充。","每个建议都必须落到今晚能做的一步。"]},proofSteps:proofFlow("report")},tutor:{badge:"AI私教提示",title:"先问一句，不替孩子做完",subtitle:"把题目、卡点或第一步发进来，系统只给最小提示，并把可复习的点沉淀下来。",heroImage:"/assets/reference/tutor-socratic-board-transparent.png",primaryLabel:"进入追问对话",primaryRoute:"/pages/tutor/tutor?from=entry_tutor_first_step&open=flow",secondaryLabel:"说完去回访卡",secondaryRoute:"/pages/review/review?from=entry_tutor_card",cards:[{label:"孩子说",value:"我准备先看哪一个条件、哪一句话。",icon:"/assets/reference/entry-tutor.png",scene:"tutor"},{label:"AI问",value:"下一步只问一个更小的问题。",icon:"/assets/reference/entry-map.png",scene:"today"},{label:"家长看",value:"只看第一步证据和明天怎么回访。",icon:"/assets/reference/entry-parent.png",scene:"parent"}],spotlight:{kicker:"私教追问板",title:"不直接给答案，只追问下一小步",image:"/assets/reference/tutor-socratic-board-transparent.png",metrics:[{label:"提示层级",value:"3层"},{label:"答案边界",value:"守住"},{label:"沉淀卡点",value:"可回访"}],points:["先确认孩子已经说出的第一步，而不是替他开讲。","只给最小提示：条件、依据、反例三选一。","对话结束后生成回访卡，避免一次讲完就忘。"]},proofSteps:proofFlow("tutor")},review:{badge:"短回访",title:"5 分钟验证记忆和迁移",subtitle:"不在入口页铺满玩法。先选今天要验证的一张卡，再进入 90 秒回忆或错因复盘。",heroImage:"/assets/reference/review-world-map-transparent.png",primaryLabel:"开始 90 秒回忆",primaryRoute:"/pages/review/review?mode=recall_return&from=entry_review",secondaryLabel:"回到AI私教",secondaryRoute:"/pages/tutor/tutor?from=entry_review_repair",cards:[{label:"记忆",value:"能不能说出关键概念。",icon:"/assets/reference/entry-review.png",scene:"review"},{label:"迁移",value:"换一道同类题还会不会开始。",icon:"/assets/reference/entry-map.png",scene:"today"},{label:"证据",value:"只记录第一步、错因和明天回访。",icon:"/assets/reference/entry-report.png",scene:"report"}],spotlight:{kicker:"回访验证板",title:"先回忆，再迁移，最后回流证据",image:"/assets/reference/review-world-map-transparent.png",metrics:[{label:"单轮长度",value:"90秒"},{label:"验证目标",value:"迁移"},{label:"记录来源",value:"真回忆"}],points:["回访不是刷题，而是验证昨天那一步还记不记得。","换一道同类题，看孩子能不能自己启动。","只把错因和可迁移动作回流给报告和家长。"]},proofSteps:proofFlow("review")},parent:{badge:"家长视图",title:"家长只看该问什么和下一步",subtitle:"家长不需要替孩子学习，也不需要被制造焦虑。这里把报告结论、第一步证据和明天回访动作收成一张家庭行动卡。",heroImage:"/assets/reference/family-avatar-group-transparent.png",primaryLabel:"打开家长中心",primaryRoute:"/pages/profile/profile?from=entry_parent_report&open=flow",secondaryLabel:"补一条证据",secondaryRoute:"/pages/upload/upload?from=entry_parent_material",cards:[{label:"证据来自哪里",value:"测评、成绩、错题、对话和回访记录。",icon:"/assets/reference/entry-report.png",scene:"report"},{label:"为什么这样学",value:"从学习偏好和当前卡点匹配方法。",icon:"/assets/reference/entry-tutor.png",scene:"tutor"},{label:"今晚怎么做",value:"只给一张家庭行动卡，不制造焦虑。",icon:"/assets/reference/entry-parent.png",scene:"parent"}],spotlight:{kicker:"家长行动卡",title:"今晚只问一个低压问题",image:"/assets/reference/family-avatar-group-transparent.png",metrics:[{label:"今晚目标",value:"一句话"},{label:"家长角色",value:"观察者"},{label:"回访时间",value:"明天"}],points:["不要催完整答案，只问“你准备从哪一步开始”。","只记录孩子说出的第一步和卡住原因。","明天用同类小题回忆，不翻旧账。"]},proofSteps:proofFlow("parent")}},SCENE_NAV={today:{label:"今晚主线",image:"/assets/reference/entry-map.png"},upload:{label:"上传材料",image:"/assets/reference/entry-upload.png"},report:{label:"个性化报告",image:"/assets/reference/entry-report.png"},tutor:{label:"AI私教",image:"/assets/reference/entry-tutor.png"},review:{label:"回访验证",image:"/assets/reference/entry-review.png"},parent:{label:"家长中心",image:"/assets/reference/entry-parent.png"}},LOOP_NODES=[{key:"today",label:"主线",image:"/assets/reference/entry-map.png"},{key:"upload",label:"上传",image:"/assets/reference/entry-upload.png"},{key:"report",label:"报告",image:"/assets/reference/entry-report.png"},{key:"tutor",label:"点拨",image:"/assets/reference/entry-tutor.png"},{key:"review",label:"回访",image:"/assets/reference/entry-review.png"},{key:"parent",label:"家长",image:"/assets/reference/entry-parent.png"}];function buildSceneLinks(e){return Object.keys(SCENE_NAV).filter(r=>r!==e).map(e=>Object.assign({key:e},SCENE_NAV[e]))}Page({data:{sceneKey:"today",scene:SCENES.today,sceneLinks:buildSceneLinks("today"),loopNodes:LOOP_NODES},onLoad(e={}){const r=e.scene||"today";this.setScene(r)},setScene(e="today"){const r=SCENES[e]?e:"today";this.setData({sceneKey:r,scene:SCENES[r],sceneLinks:buildSceneLinks(r)})},openScene(e){const r=e&&e.currentTarget&&e.currentTarget.dataset?e.currentTarget.dataset.scene:"today";this.setScene(r)},goPrimary(){navigation.navigateLearningRoute(this.data.scene.primaryRoute)},goSecondary(){navigation.navigateLearningRoute(this.data.scene.secondaryRoute)},goBack(){getCurrentPages().length>1?wx.navigateBack():navigation.switchTab("/pages/home/home")}});
+const navigation = require('../../utils/navigation');
+
+const PROOF_FLOW = [
+  { scene: 'upload', label: '资料', hint: '先分类', icon: '/assets/reference/entry-upload.png' },
+  { scene: 'report', label: '报告', hint: '看依据', icon: '/assets/reference/entry-report.png' },
+  { scene: 'tutor', label: '点拨', hint: '说一步', icon: '/assets/reference/entry-tutor.png' },
+  { scene: 'review', label: '回访', hint: '验迁移', icon: '/assets/reference/entry-review.png' },
+  { scene: 'parent', label: '家长', hint: '下一步', icon: '/assets/reference/entry-parent.png' }
+];
+
+function proofFlow(activeScene) {
+  return PROOF_FLOW.map((item) => Object.assign({}, item, {
+    active: item.scene === activeScene || (activeScene === 'today' && item.scene === 'tutor')
+  }));
+}
+
+const SCENES = {
+  today: {
+    badge: '今晚主线',
+    title: '先把今晚任务变成 3 个可执行动作',
+    subtitle: '入口页只负责决定从哪开始。这里承接任务拆解、证据记录和下一步跳转。',
+    heroImage: '/assets/reference/learning-route-map-transparent.png',
+    primaryLabel: '去AI点拨说第一步',
+    primaryRoute: '/pages/tutor/tutor?from=entry_today_first_step&open=flow',
+    secondaryLabel: '先补材料',
+    secondaryRoute: '/pages/upload/upload?from=entry_today_material',
+    cards: [
+      { label: '先定优先级', value: '把必须做、可放后、明天回访分开。', icon: '/assets/reference/entry-upload.png', scene: 'upload' },
+      { label: '再说第一步', value: '孩子先说从哪里开始，AI点拨只追问下一句。', icon: '/assets/reference/entry-tutor.png', scene: 'tutor' },
+      { label: '最后留证据', value: '完成后进入短回访或家长进展卡。', icon: '/assets/reference/entry-review.png', scene: 'review' }
+    ],
+    spotlight: {
+      kicker: '今晚路线板',
+      title: '入口只做一件事：决定从哪一步开始',
+      image: '/assets/reference/learning-route-map-transparent.png',
+      metrics: [
+        { label: '任务拆解', value: '3步' },
+        { label: '预计用时', value: '15分' },
+        { label: '回流证据', value: '1条' }
+      ],
+      points: [
+        '先把今晚任务变成可执行动作，不在首页堆满说明。',
+        '孩子先说第一步，系统再决定去点拨、回访还是家长页。',
+        '每次完成都留下证据，明天能接着回访。'
+      ]
+    },
+    proofSteps: proofFlow('today')
+  },
+  upload: {
+    badge: '材料入口',
+    title: '先分类，再生成学习包',
+    subtitle: '材料不一致也要输出稳定 SOP：识别材料类型、提取证据、生成下一步。',
+    heroImage: '/assets/reference/upload-folder-stack-transparent.png',
+    primaryLabel: '选择文件/图片',
+    primaryRoute: '/pages/upload/upload?from=entry_upload_file&open=flow',
+    secondaryLabel: '没有报告，做快测',
+    secondaryRoute: '/pages/profile/profile?from=entry_upload_quiz&panel=assessment&quick_assessment=1',
+    cards: [
+      { label: '天测/测评', value: '提取学习偏好、注意力和优势通道。', icon: '/assets/reference/entry-report.png', scene: 'report' },
+      { label: '成绩/错题', value: '提取学科卡点、错因和回访优先级。', icon: '/assets/reference/entry-review.png', scene: 'review' },
+      { label: '家长观察', value: '补足情绪、习惯和家庭配合线索。', icon: '/assets/reference/entry-parent.png', scene: 'parent' }
+    ],
+    spotlight: {
+      kicker: '材料分类板',
+      title: '先识别材料类型，再进入报告 SOP',
+      image: '/assets/reference/upload-folder-stack-transparent.png',
+      metrics: [
+        { label: '可上传', value: '6类' },
+        { label: '弱证据', value: '待确认' },
+        { label: '输出格式', value: '稳定' }
+      ],
+      points: [
+        '测评、成绩、错题、老师反馈、家长观察分开处理。',
+        '材料不足时先生成待补清单，不硬下结论。',
+        '所有材料最后都进入同一个报告和学习闭环。'
+      ]
+    },
+    proofSteps: proofFlow('upload')
+  },
+  report: {
+    badge: '个性化报告',
+    title: '先讲清证据，再匹配学习方法',
+    subtitle: '报告要说明材料从哪里来、天赋信号和成绩表现是否互相支持，以及为什么推荐这组学习方法。',
+    heroImage: '/assets/reference/report-radar-card-illustration.png',
+    primaryLabel: '查看证据报告',
+    primaryRoute: '/pages/profile/profile?from=entry_report_evidence&open=flow',
+    secondaryLabel: '补充测评/错题',
+    secondaryRoute: '/pages/upload/upload?from=entry_report_material',
+    cards: [
+      { label: '证据来源', value: '测评、成绩、错题、对话和回访记录分开标注。', icon: '/assets/reference/entry-upload.png', scene: 'upload' },
+      { label: '天测匹配', value: '解释孩子适合怎样输入、输出和反馈。', icon: '/assets/reference/entry-report.png', scene: 'report' },
+      { label: '方法依据', value: '把费曼复述、苏格拉底追问、短周期回访变成动作。', icon: '/assets/reference/entry-tutor.png', scene: 'tutor' }
+    ],
+    spotlight: {
+      kicker: '报告决策板',
+      title: '证据先分层，结论才可信',
+      image: '/assets/reference/report-radar-card-illustration.png',
+      metrics: [
+        { label: '材料完整度', value: '4类' },
+        { label: '交叉验证', value: '3步' },
+        { label: '方法匹配', value: '可执行' }
+      ],
+      points: [
+        '先把测评、成绩、错题和家长观察分开看。',
+        '只把互相支持的信号写进结论，弱证据进入待补充。',
+        '每个建议都必须落到今晚能做的一步。'
+      ]
+    },
+    proofSteps: proofFlow('report')
+  },
+  tutor: {
+    badge: 'AI点拨提示',
+    title: '先问一句，不替孩子做完',
+    subtitle: '把题目、卡点或第一步发进来，系统只给最小提示，并把可复习的点沉淀下来。',
+    heroImage: '/assets/reference/tutor-socratic-board-transparent.png',
+    primaryLabel: '进入追问对话',
+    primaryRoute: '/pages/tutor/tutor?from=entry_tutor_first_step&open=flow',
+    secondaryLabel: '说完去回访卡',
+    secondaryRoute: '/pages/review/review?from=entry_tutor_card',
+    cards: [
+      { label: '孩子说', value: '我准备先看哪一个条件、哪一句话。', icon: '/assets/reference/entry-tutor.png', scene: 'tutor' },
+      { label: 'AI问', value: '下一步只问一个更小的问题。', icon: '/assets/reference/entry-map.png', scene: 'today' },
+      { label: '家长看', value: '只看第一步证据和明天怎么回访。', icon: '/assets/reference/entry-parent.png', scene: 'parent' }
+    ],
+    spotlight: {
+      kicker: '点拨追问板',
+      title: '不直接给答案，只追问下一小步',
+      image: '/assets/reference/tutor-socratic-board-transparent.png',
+      metrics: [
+        { label: '提示层级', value: '3层' },
+        { label: '答案边界', value: '守住' },
+        { label: '沉淀卡点', value: '可回访' }
+      ],
+      points: [
+        '先确认孩子已经说出的第一步，而不是替他开讲。',
+        '只给最小提示：条件、依据、反例三选一。',
+        '对话结束后生成回访卡，避免一次讲完就忘。'
+      ]
+    },
+    proofSteps: proofFlow('tutor')
+  },
+  review: {
+    badge: '短回访',
+    title: '5 分钟验证记忆和迁移',
+    subtitle: '不在入口页铺满玩法。先选今天要验证的一张卡，再进入 90 秒回忆或错因复盘。',
+    heroImage: '/assets/reference/review-world-map-transparent.png',
+    primaryLabel: '开始 90 秒回忆',
+    primaryRoute: '/pages/review/review?mode=recall_return&from=entry_review',
+    secondaryLabel: '回到AI点拨',
+    secondaryRoute: '/pages/tutor/tutor?from=entry_review_repair',
+    cards: [
+      { label: '记忆', value: '能不能说出关键概念。', icon: '/assets/reference/entry-review.png', scene: 'review' },
+      { label: '迁移', value: '换一道同类题还会不会开始。', icon: '/assets/reference/entry-map.png', scene: 'today' },
+      { label: '证据', value: '只记录第一步、错因和明天回访。', icon: '/assets/reference/entry-report.png', scene: 'report' }
+    ],
+    spotlight: {
+      kicker: '回访验证板',
+      title: '先回忆，再迁移，最后回流证据',
+      image: '/assets/reference/review-world-map-transparent.png',
+      metrics: [
+        { label: '单轮长度', value: '90秒' },
+        { label: '验证目标', value: '迁移' },
+        { label: '记录来源', value: '真回忆' }
+      ],
+      points: [
+        '回访不是刷题，而是验证昨天那一步还记不记得。',
+        '换一道同类题，看孩子能不能自己启动。',
+        '只把错因和可迁移动作回流给报告和家长。'
+      ]
+    },
+    proofSteps: proofFlow('review')
+  },
+  parent: {
+    badge: '家长视图',
+    title: '家长只看该问什么和下一步',
+    subtitle: '家长不需要替孩子学习，也不需要被制造焦虑。这里把报告结论、第一步证据和明天回访动作收成一张家庭行动卡。',
+    heroImage: '/assets/reference/family-avatar-group-transparent.png',
+    primaryLabel: '打开家长中心',
+    primaryRoute: '/pages/profile/profile?from=entry_parent_report&open=flow',
+    secondaryLabel: '补一条证据',
+    secondaryRoute: '/pages/upload/upload?from=entry_parent_material',
+    cards: [
+      { label: '证据来自哪里', value: '测评、成绩、错题、对话和回访记录。', icon: '/assets/reference/entry-report.png', scene: 'report' },
+      { label: '为什么这样学', value: '从学习偏好和当前卡点匹配方法。', icon: '/assets/reference/entry-tutor.png', scene: 'tutor' },
+      { label: '今晚怎么做', value: '只给一张家庭行动卡，不制造焦虑。', icon: '/assets/reference/entry-parent.png', scene: 'parent' }
+    ],
+    spotlight: {
+      kicker: '家长行动卡',
+      title: '今晚只问一个低压问题',
+      image: '/assets/reference/family-avatar-group-transparent.png',
+      metrics: [
+        { label: '今晚目标', value: '一句话' },
+        { label: '家长角色', value: '观察者' },
+        { label: '回访时间', value: '明天' }
+      ],
+      points: [
+        '不要催完整答案，只问“你准备从哪一步开始”。',
+        '只记录孩子说出的第一步和卡住原因。',
+        '明天用同类小题回忆，不翻旧账。'
+      ]
+    },
+    proofSteps: proofFlow('parent')
+  }
+};
+
+const SCENE_NAV = {
+  today: { label: '今晚主线', image: '/assets/reference/entry-map.png' },
+  upload: { label: '上传材料', image: '/assets/reference/entry-upload.png' },
+  report: { label: '个性化报告', image: '/assets/reference/entry-report.png' },
+  tutor: { label: 'AI点拨', image: '/assets/reference/entry-tutor.png' },
+  review: { label: '回访验证', image: '/assets/reference/entry-review.png' },
+  parent: { label: '家长中心', image: '/assets/reference/entry-parent.png' }
+};
+
+const LOOP_NODES = [
+  { key: 'today', label: '主线', image: '/assets/reference/entry-map.png' },
+  { key: 'upload', label: '上传', image: '/assets/reference/entry-upload.png' },
+  { key: 'report', label: '报告', image: '/assets/reference/entry-report.png' },
+  { key: 'tutor', label: '点拨', image: '/assets/reference/entry-tutor.png' },
+  { key: 'review', label: '回访', image: '/assets/reference/entry-review.png' },
+  { key: 'parent', label: '家长', image: '/assets/reference/entry-parent.png' }
+];
+
+function buildSceneLinks(activeKey) {
+  return Object.keys(SCENE_NAV)
+    .filter((key) => key !== activeKey)
+    .map((key) => Object.assign({ key }, SCENE_NAV[key]));
+}
+
+Page({
+  data: {
+    sceneKey: 'today',
+    scene: SCENES.today,
+    sceneLinks: buildSceneLinks('today'),
+    loopNodes: LOOP_NODES
+  },
+
+  onLoad(query = {}) {
+    const key = query.scene || 'today';
+    this.setScene(key);
+  },
+
+  setScene(key = 'today') {
+    const sceneKey = SCENES[key] ? key : 'today';
+    this.setData({
+      sceneKey,
+      scene: SCENES[sceneKey],
+      sceneLinks: buildSceneLinks(sceneKey)
+    });
+  },
+
+  openScene(event) {
+    const key = event && event.currentTarget && event.currentTarget.dataset
+      ? event.currentTarget.dataset.scene
+      : 'today';
+    this.setScene(key);
+  },
+
+  goPrimary() {
+    navigation.navigateLearningRoute(this.data.scene.primaryRoute);
+  },
+
+  goSecondary() {
+    navigation.navigateLearningRoute(this.data.scene.secondaryRoute);
+  },
+
+  goBack() {
+    if (getCurrentPages().length > 1) {
+      wx.navigateBack();
+      return;
+    }
+    navigation.switchTab('/pages/home/home');
+  }
+});

@@ -1,8 +1,8 @@
 {
   "sourceRepo": "zacharyxpku-boop/ai-edu-platform",
   "sourcePath": "miniprogram",
-  "sourceCommit": "6987318",
-  "syncedAt": "2026-06-02T17:22:43.735Z",
+  "sourceCommit": "fe3f331",
+  "syncedAt": "2026-06-05T04:08:44.989Z",
   "files": [
     "miniprogram/app.js",
     "miniprogram/app.json",
@@ -72,7 +72,6 @@
     "miniprogram/README.md",
     "miniprogram/sitemap.json",
     "miniprogram/utils/api.js",
-    "miniprogram/utils/arcade-engine.js",
     "miniprogram/utils/family-report-engine.js",
     "miniprogram/utils/focus-cabin.js",
     "miniprogram/utils/game-logic.js",
@@ -92,6 +91,7 @@
     "miniprogram/utils/product-readiness.js",
     "miniprogram/utils/real-homework-coverage.js",
     "miniprogram/utils/review-cards.js",
+    "miniprogram/utils/revisit-engine.js",
     "miniprogram/utils/service-access.js",
     "miniprogram/utils/share-relay-schema.cjs",
     "miniprogram/utils/share-relay-schema.js",

@@ -1,1 +1,138 @@
-"use strict";const TAB_ROUTES=["/pages/home/home","/pages/tutor/tutor","/pages/review/review","/pages/profile/profile","/pages/upload/upload"],LEGACY_ROUTE_ALIASES={};function normalizeRoute(e){const t="string"==typeof e?e.trim():"";return t?t.startsWith("/")?t:`/${t}`:""}function baseRoute(e){return normalizeRoute(e).split("?")[0]}function routeQuery(e){const t=normalizeRoute(e),n=t.indexOf("?");return n>=0?t.slice(n+1):""}function activeRoute(e){const t=normalizeRoute(e),n=baseRoute(t),o=LEGACY_ROUTE_ALIASES[n];if(!o)return t;const r=routeQuery(t);return r?`${o}?${r}`:o}function rememberTabRouteContext(e){const t=normalizeRoute(e),n=baseRoute(t),o=routeQuery(t);if(o&&"undefined"!=typeof wx&&wx.setStorageSync)try{wx.setStorageSync("navigation.pendingTabRoute.v1",{route:t,base:n,query:o,createdAt:Date.now()})}catch(e){}}function parseQuery(e=""){return String(e||"").split("&").filter(Boolean).reduce((e,t)=>{const n=t.indexOf("="),o=n>=0?t.slice(0,n):t,r=n>=0?t.slice(n+1):"";if(!o)return e;try{e[decodeURIComponent(o)]=decodeURIComponent(r||"")}catch(t){e[o]=r||""}return e},{})}function consumePendingTabRouteContext(e){const t=baseRoute(e);if(!t||"undefined"==typeof wx||!wx.getStorageSync)return null;let n=null;try{n=wx.getStorageSync("navigation.pendingTabRoute.v1")}catch(e){return null}return n&&n.base===t?Date.now()-Number(n.createdAt||0)>3e5?(wx.removeStorageSync&&wx.removeStorageSync("navigation.pendingTabRoute.v1"),null):(wx.removeStorageSync&&wx.removeStorageSync("navigation.pendingTabRoute.v1"),Object.assign({},n,{options:parseQuery(n.query||"")})):null}function clearPendingTabRouteContext(){if("undefined"==typeof wx||!wx.removeStorageSync)return!1;try{return wx.removeStorageSync("navigation.pendingTabRoute.v1"),!0}catch(e){return!1}}function switchTab(e){const t=baseRoute(e);return!(!t||"undefined"==typeof wx||!wx.switchTab)&&(clearPendingTabRouteContext(),wx.switchTab({url:t}),!0)}function shouldOpenFunctionalTab(e={}){return 0===String(e.from||"").indexOf("entry_")||"flow"===e.open||e.panel||e.type||e.mode}function navigateLearningRoute(e){const t=activeRoute(e);if(!t||"undefined"==typeof wx)return!1;const n=baseRoute(t);return TAB_ROUTES.includes(n)?(rememberTabRouteContext(t),wx.switchTab({url:n}),!0):(wx.navigateTo({url:t}),!0)}module.exports={navigateLearningRoute:navigateLearningRoute,normalizeRoute:normalizeRoute,baseRoute:baseRoute,routeQuery:routeQuery,parseQuery:parseQuery,rememberTabRouteContext:rememberTabRouteContext,consumePendingTabRouteContext:consumePendingTabRouteContext,clearPendingTabRouteContext:clearPendingTabRouteContext,switchTab:switchTab,shouldOpenFunctionalTab:shouldOpenFunctionalTab,activeRoute:activeRoute};
+'use strict';
+
+const TAB_ROUTES = [
+  '/pages/home/home',
+  '/pages/tutor/tutor',
+  '/pages/review/review',
+  '/pages/profile/profile',
+  '/pages/upload/upload'
+];
+
+const LEGACY_ROUTE_ALIASES = {};
+
+function normalizeRoute(route) {
+  const value = typeof route === 'string' ? route.trim() : '';
+  if (!value) return '';
+  return value.startsWith('/') ? value : `/${value}`;
+}
+
+function baseRoute(route) {
+  return normalizeRoute(route).split('?')[0];
+}
+
+function routeQuery(route) {
+  const url = normalizeRoute(route);
+  const index = url.indexOf('?');
+  return index >= 0 ? url.slice(index + 1) : '';
+}
+
+function activeRoute(route) {
+  const url = normalizeRoute(route);
+  const base = baseRoute(url);
+  const alias = LEGACY_ROUTE_ALIASES[base];
+  if (!alias) return url;
+  const query = routeQuery(url);
+  return query ? `${alias}?${query}` : alias;
+}
+
+function rememberTabRouteContext(route) {
+  const url = normalizeRoute(route);
+  const base = baseRoute(url);
+  const query = routeQuery(url);
+  if (!query || typeof wx === 'undefined' || !wx.setStorageSync) return;
+  try {
+    wx.setStorageSync('navigation.pendingTabRoute.v1', {
+      route: url,
+      base,
+      query,
+      createdAt: Date.now()
+    });
+  } catch (error) {
+    // Navigation must still work when storage is unavailable.
+  }
+}
+
+function parseQuery(query = '') {
+  return String(query || '').split('&').filter(Boolean).reduce((acc, pair) => {
+    const index = pair.indexOf('=');
+    const rawKey = index >= 0 ? pair.slice(0, index) : pair;
+    const rawValue = index >= 0 ? pair.slice(index + 1) : '';
+    if (!rawKey) return acc;
+    try {
+      acc[decodeURIComponent(rawKey)] = decodeURIComponent(rawValue || '');
+    } catch (error) {
+      acc[rawKey] = rawValue || '';
+    }
+    return acc;
+  }, {});
+}
+
+function consumePendingTabRouteContext(route) {
+  const base = baseRoute(route);
+  if (!base || typeof wx === 'undefined' || !wx.getStorageSync) return null;
+  let pending = null;
+  try {
+    pending = wx.getStorageSync('navigation.pendingTabRoute.v1');
+  } catch (error) {
+    return null;
+  }
+  if (!pending || pending.base !== base) return null;
+  if (Date.now() - Number(pending.createdAt || 0) > 5 * 60 * 1000) {
+    if (wx.removeStorageSync) wx.removeStorageSync('navigation.pendingTabRoute.v1');
+    return null;
+  }
+  if (wx.removeStorageSync) wx.removeStorageSync('navigation.pendingTabRoute.v1');
+  return Object.assign({}, pending, {
+    options: parseQuery(pending.query || '')
+  });
+}
+
+function clearPendingTabRouteContext() {
+  if (typeof wx === 'undefined' || !wx.removeStorageSync) return false;
+  try {
+    wx.removeStorageSync('navigation.pendingTabRoute.v1');
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+function switchTab(route) {
+  const url = baseRoute(route);
+  if (!url || typeof wx === 'undefined' || !wx.switchTab) return false;
+  clearPendingTabRouteContext();
+  wx.switchTab({ url });
+  return true;
+}
+
+function shouldOpenFunctionalTab(options = {}) {
+  const from = String(options.from || '');
+  return from.indexOf('entry_') === 0 || options.open === 'flow' || options.panel || options.type || options.mode;
+}
+
+function navigateLearningRoute(route) {
+  const url = activeRoute(route);
+  if (!url || typeof wx === 'undefined') return false;
+  const base = baseRoute(url);
+  if (TAB_ROUTES.includes(base)) {
+    rememberTabRouteContext(url);
+    wx.switchTab({ url: base });
+    return true;
+  }
+  wx.navigateTo({ url });
+  return true;
+}
+
+module.exports = {
+  navigateLearningRoute,
+  normalizeRoute,
+  baseRoute,
+  routeQuery,
+  parseQuery,
+  rememberTabRouteContext,
+  consumePendingTabRouteContext,
+  clearPendingTabRouteContext,
+  switchTab,
+  shouldOpenFunctionalTab,
+  activeRoute
+};

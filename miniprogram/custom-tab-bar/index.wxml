@@ -15,7 +15,7 @@
     bindtap="switchTab"
   >
     <view class="yd-tab-icon-wrap"><image class="yd-tab-icon" mode="aspectFit" src="/assets/reference/entry-tutor.png" /></view>
-    <view class="yd-tab-text">AI私教</view>
+    <view class="yd-tab-text">AI点拨</view>
   </view>
   <view
     class="yd-tab-item {{selected === 2 ? 'active' : ''}}"

@@ -1,1 +1,24 @@
-function requirePrivacy(e){return new Promise((r,i)=>{wx.requirePrivacyAuthorize?wx.requirePrivacyAuthorize({success(){r({ok:!0})},fail(r){wx.showToast({title:e?`需要同意隐私指引后使用${e}`:"需要同意隐私指引",icon:"none"}),i(r)}}):r({ok:!0,mode:"privacy_api_unavailable"})})}module.exports={requirePrivacy:requirePrivacy};
+function requirePrivacy(scopeName) {
+  return new Promise((resolve, reject) => {
+    if (!wx.requirePrivacyAuthorize) {
+      resolve({ ok: true, mode: 'privacy_api_unavailable' });
+      return;
+    }
+    wx.requirePrivacyAuthorize({
+      success() {
+        resolve({ ok: true });
+      },
+      fail(error) {
+        wx.showToast({
+          title: scopeName ? `需要同意隐私指引后使用${scopeName}` : '需要同意隐私指引',
+          icon: 'none'
+        });
+        reject(error);
+      }
+    });
+  });
+}
+
+module.exports = {
+  requirePrivacy
+};

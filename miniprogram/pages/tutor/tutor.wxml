@@ -19,20 +19,32 @@
             <view class="yd-tutor-bubble">
               <view>先说第一步</view>
               <text>原点不替你写答案。你说题目或卡点，它只问下一句最小提示。</text>
-              <view class="tutor-chip-row">
-                <text>不给完整答案</text>
-                <text>只问依据</text>
-              </view>
             </view>
+          </view>
+
+          <view class="tutor-socratic-panel">
+            <view class="tutor-section-head"><text>三轮苏格拉底</text><text>不替写，只把孩子带到下一步</text></view>
+            <view class="tutor-socratic-steps"><view class="active"><text>一</text><text>复述题意</text><text>先说题目真正问什么</text></view><view><text>二</text><text>找证据</text><text>只追问条件、关系、错因</text></view><view><text>三</text><text>留回访</text><text>能说第一步才进报告</text></view></view>
+            <view class="tutor-mode-grid"><text class="tutor-mode-card" data-step="read_problem" bindtap="sendQuick">读题｜题目问什么</text><text class="tutor-mode-card" data-step="write_first_step" bindtap="sendQuick">第一步｜先写哪一句</text><text class="tutor-mode-card" data-step="find_direction" bindtap="sendQuick">找方向｜只看入口</text></view>
+            <text class="tutor-prompt-board">孩子只需要先回：“我先圈题目问什么 / 我先找已知条件 / 我先写第一步式子”。</text>
+            <text class="tutor-socratic-trace">{{socraticTrace.localLine}}｜{{socraticTrace.promptLine}}｜{{socraticTrace.boundaryLine}}</text>
+            <text class="tutor-socratic-boundary">提示层级 {{currentHintLevel}}。{{socraticReasoningLine}}</text>
           </view>
 
           <view class="tutor-chat-card">
             <view class="tutor-chat-title">原点正在陪你想第一步</view>
-            <view class="tutor-bubble">先不急着算答案。读完题后，第一步想找什么条件？</view>
-            <view class="tutor-bubble me">我想先找题目里给了哪些数量。</view>
+            <block wx:if="{{messages && messages.length}}">
+              <block wx:for="{{messages}}" wx:key="index">
+                <view class="tutor-bubble {{item.role === 'user' ? 'me' : ''}}">{{item.text}}</view>
+              </block>
+            </block>
+            <block wx:else>
+              <view class="tutor-bubble">先不急着算答案。读完题后，第一步想找什么条件？</view>
+              <view class="tutor-bubble me">我想先找题目里给了哪些数量。</view>
+            </block>
             <view class="tutor-input-bar">
-              <text>说出你的第一步...</text>
-              <view data-step="{{activeStep}}" bindtap="launchFirstStep">发送</view>
+              <input value="{{input}}" bindinput="onInput" bindconfirm="send" confirm-type="send" placeholder="写下题目、卡点或你的第一步" />
+              <view bindtap="send">发送</view>
             </view>
           </view>
 
@@ -66,7 +78,7 @@
           </view>
 
           <view class="tutor-action-row">
-            <view class="tutor-primary" data-step="{{activeStep}}" bindtap="launchFirstStep">发送第一步</view>
+            <view class="tutor-primary" data-step="{{activeStep}}" bindtap="launchFirstStep">开始追问第一步</view>
             <view class="tutor-secondary" bindtap="goReportPreview">家长看证据</view>
           </view>
         </view>
