@@ -25,7 +25,7 @@ page {
   display: flex;
   flex-direction: column;
   gap: 12rpx;
-  padding: calc(86rpx + env(safe-area-inset-top)) 28rpx calc(104rpx + env(safe-area-inset-bottom));
+  padding: calc(86rpx + env(safe-area-inset-top)) 28rpx calc(148rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
   min-height: 100vh;
 }
@@ -288,32 +288,6 @@ page {
   line-height: 1.32;
 }
 
-.tutor-socratic-trace {
-  display: none;
-  margin-top: 10rpx;
-  padding: 9rpx 10rpx;
-  border-radius: 14rpx;
-  color: #2d3b33;
-  background: #f8fbf4;
-  font-size: 21rpx;
-  font-weight: 760;
-  line-height: 1.28;
-  overflow-wrap: break-word;
-  word-break: break-word;
-}
-
-.tutor-socratic-boundary {
-  display: block;
-  margin-top: 8rpx;
-  padding: 0;
-  border-radius: 0;
-  color: #7a6a2c;
-  background: transparent;
-  font-size: 20rpx;
-  font-weight: 780;
-  line-height: 1.3;
-}
-
 .tutor-section-head text:first-child {
   color: #18211d;
   font-size: 23rpx;
@@ -331,7 +305,7 @@ page {
   align-content: start;
   gap: 12rpx;
   flex: 0 0 auto;
-  min-height: 340rpx;
+  min-height: 386rpx;
   max-height: none;
   margin-top: 0;
   padding: 20rpx;
@@ -343,7 +317,7 @@ page {
 
 .tutor-chat-title {
   color: #18211d;
-  font-size: 33rpx;
+  font-size: 31rpx;
   font-weight: 950;
 }
 
@@ -365,7 +339,7 @@ page {
 
 .tutor-input-bar {
   display: flex;
-  min-height: 92rpx;
+  min-height: 86rpx;
   align-items: center;
   justify-content: space-between;
   gap: 12rpx;
@@ -378,11 +352,11 @@ page {
 .tutor-input-bar input {
   flex: 1 1 auto;
   min-width: 0;
-  height: 84rpx;
+  height: 78rpx;
   color: #8a958f;
   font-size: 24rpx;
   font-weight: 760;
-  line-height: 84rpx;
+  line-height: 78rpx;
 }
 
 .tutor-feedback-row {
@@ -395,7 +369,7 @@ page {
 .tutor-feedback-stuck {
   display: flex;
   min-width: 0;
-  min-height: 78rpx;
+  min-height: 72rpx;
   align-items: center;
   justify-content: center;
   padding: 0 14rpx;
@@ -451,18 +425,18 @@ page {
 }
 
 .tutor-action-row {
-  margin-top: 10rpx;
+  margin-top: 2rpx;
   padding-top: 0;
 }
 
 .tutor-primary {
   flex: 1 1 0;
   min-width: 0;
-  height: 96rpx;
+  height: 88rpx;
   border-radius: 999rpx;
   font-size: 27rpx;
   font-weight: 950;
-  line-height: 96rpx;
+  line-height: 88rpx;
   text-align: center;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -470,7 +444,7 @@ page {
 }
 
 .tutor-primary {
-  height: 96rpx;
+  height: 88rpx;
   color: #1d261f;
   background: linear-gradient(180deg, #ffd84f 0%, #f5b300 100%);
 }

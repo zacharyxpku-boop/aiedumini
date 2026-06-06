@@ -38,13 +38,35 @@ function buildNextStep(input) {
     };
   }
   if (input && input.tonightPlan) {
+    const firstItem = input.tonightPlan.planItems && input.tonightPlan.planItems[0]
+      ? safeText(input.tonightPlan.planItems[0].title, '今晚第一项')
+      : '今晚第一项';
     return {
-      text: '下一步：先说一句你卡在哪里。',
-      cta: '我来说第一步',
-      action: 'first'
+      text: `下一步：先做 ${firstItem}。`,
+      cta: '开始第一项',
+      action: 'route'
     };
   }
   return null;
+}
+
+function buildPersonalPlanCard(input = {}) {
+  const plan = input.tonightPlan || {};
+  const source = plan.personalPlan || null;
+  if (!source) return null;
+  return {
+    title: safeText(source.title, '今晚个性化学习方案'),
+    profileLine: safeText(source.profileLine, '先看孩子当前最卡的一步。'),
+    methodLine: safeText(source.methodLine, '先圈关键词，再说第一步，再动笔。'),
+    motivationLine: safeText(source.motivationLine, '今晚先完成一个能开口说清的小动作。'),
+    aiCoachLine: safeText(source.aiCoachLine, '卡住时进入 AI 点拨，只追问下一小步。'),
+    gameLine: safeText(source.gameLine, '做完后进入短回访，把会的东西留到明天。'),
+    routeLabel: safeText(source.routeLabel, 'AI点拨 → 短回访 → 家长看'),
+    coachCta: '去 AI 点拨',
+    revisitCta: '做短回访',
+    coachRoute: source.coachRoute || '/pages/tutor/tutor?from=home_personal_plan',
+    revisitRoute: source.revisitRoute || '/pages/review/review?from=home_personal_plan'
+  };
 }
 
 function buildMiniLessonResume(input = {}) {
@@ -188,30 +210,32 @@ function buildHomeViewModel(input = {}) {
   const hasPlanOrFocus = !!(input.tonightPlan || input.todayFocus);
   const miniLessonResume = buildMiniLessonResume(input);
   const reportServiceResume = buildReportServiceResume(input);
+  const personalPlan = buildPersonalPlanCard(input);
   const primaryNextAction = buildPrimaryHomeNextAction(Object.assign({}, input, {
     miniLessonResume,
     reportServiceResume
   }));
   return {
-    routePill: '今晚路线 · 第 1 步：排顺序',
+    routePill: hasPlanOrFocus ? '已分析 · 继续下一步' : '今天 · 先分析材料或情况',
     companionStrip: companionStrip(input.companionPreference),
-    title: '今晚作业先从哪一步开始？',
-    subtitle: '发作业清单，或者说一句你卡在哪里。',
+    title: hasPlanOrFocus ? '已看清今晚最该先做的一步' : '把作业、错题或卡住点发过来',
+    subtitle: hasPlanOrFocus ? '接下来进 AI 点拨或短回访，不在首页堆完整方案。' : '孩子可以上传材料，也可以直接写一句现在卡在哪里。',
     inputCard: {
-      title: '把今晚作业或卡住点发过来',
-      placeholder: '比如：数学 8 道明天交；或者：我写到第二步就乱了。',
+      title: hasPlanOrFocus ? '修改情况后重新分析' : '用文字补充今晚情况',
+      placeholder: '比如：数学方程 8 道，应用题不会写第一步；也可以先上传材料。',
       helper: hasPlanOrFocus
-        ? '先说作业、第一步或卡住点。'
-        : '咕点不会直接给答案，只陪你先找到第一步。'
+        ? '改动任务后重新分析；卡住进 AI 点拨，做完进短回访。'
+        : '不用写长，先说任务、卡点或发材料；这里不直接给答案。'
     },
-    primaryCta: '帮我安排今晚学习',
-    secondaryAction: '我已经卡住了',
+    primaryCta: hasPlanOrFocus ? '重新分析今晚情况' : '分析今晚情况',
+    secondaryAction: '卡住了，去 AI 点拨',
     teacherPickerLabel: '咕点在旁边',
     teacherPickerHint: '我懂你卡住了，我陪你先迈出第一步。',
     selectedCompanionLabel: safeText((companionPreference(input.companionPreference) || {}).selectedLabel, '咕点'),
     emptyState: hasPlanOrFocus ? null : '还没有今晚路线。咕点在旁边，先说一句卡在哪里。',
     primaryNextAction,
     nextStep: buildNextStep(Object.assign({}, input, { miniLessonResume })),
+    personalPlan,
     miniLessonResume,
     reportServiceResume,
     debugWarnings: []

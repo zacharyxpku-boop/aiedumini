@@ -39,11 +39,11 @@
         <view>{{incomingShareRelay.firstStepLine}}</view>
       </view>
 
-      <view class="home-upload-feature yd-jump-card" data-scene="upload" bindtap="openEntryDetail">
+      <view class="home-upload-feature yd-jump-card" bindtap="goUpload">
         <view class="home-upload-copy">
-          <view class="home-card-kicker">第一步</view>
-          <view class="home-upload-title">先把作业或错题发过来</view>
-          <view class="home-upload-sub">拍照、粘贴文字、发试卷都可以。原点会先帮你看清今晚从哪里开始。</view>
+          <view class="home-card-kicker">材料分析</view>
+          <view class="home-upload-title">拍作业或发错题</view>
+          <view class="home-upload-sub">图片、文字、试卷都可以。先看清任务，再决定今晚从哪一步开始。</view>
           <view class="home-upload-cta">上传材料</view>
         </view>
         <image class="home-upload-visual" mode="aspectFit" src="/assets/reference/upload-folder-stack-transparent.png" />
@@ -62,14 +62,33 @@
         </view>
       </view>
       <view class="mini-route-card">
-        <view class="mini-section-head"><text>{{homeViewModel.inputCard.title}}</text><text>预计 15-20 分钟</text></view>
+        <view class="mini-section-head"><text>{{homeViewModel.inputCard.title}}</text><text>文字分析</text></view>
         <view class="mini-subtitle" wx:if="{{homeViewModel.miniLessonResume}}">{{homeViewModel.miniLessonResume.title}}</view>
         <view class="mini-subtitle" wx:if="{{homeViewModel.reportServiceResume}}">{{homeViewModel.reportServiceResume.title}}</view>
-        <textarea class="mini-route-input" value="{{thoughtInput}}" placeholder="{{homeViewModel.inputCard.placeholder}}" maxlength="500" auto-height bindinput="onThoughtInput" />
+        <textarea class="mini-route-input" value="{{aiDraft}}" placeholder="{{homeViewModel.inputCard.placeholder}}" maxlength="500" auto-height bindinput="onAiDraftInput" />
+        <view class="mini-route-helper">{{homeViewModel.inputCard.helper}}</view>
         <view class="mini-subtitle" wx:if="{{homeViewModel.emptyState}}">{{homeViewModel.emptyState}}</view>
-        <view class="mini-subtitle route-next-lite" wx:if="{{homeViewModel.nextStep}}" catchtap="runHomeNextStep">{{homeViewModel.nextStep.text}} 路 {{homeViewModel.nextStep.cta}}</view>
+        <view class="home-analysis-result" wx:if="{{homeViewModel.personalPlan}}">
+          <view class="home-analysis-mark">已分析</view>
+          <view class="home-analysis-copy">
+            <text>{{homeViewModel.personalPlan.title}}</text>
+            <text>{{homeViewModel.personalPlan.profileLine}}</text>
+          </view>
+          <view class="home-analysis-actions">
+            <view data-action="coach" bindtap="runPersonalPlanAction">{{homeViewModel.personalPlan.coachCta}}</view>
+            <view data-action="revisit" bindtap="runPersonalPlanAction">{{homeViewModel.personalPlan.revisitCta}}</view>
+          </view>
+        </view>
+        <view class="route-next-lite" wx:if="{{homeViewModel.nextStep}}" catchtap="runHomeNextStep"><text>{{homeViewModel.nextStep.text}}</text><text>{{homeViewModel.nextStep.cta}}</text></view>
         <view class="mini-main-cta" catchtap="planTonight">{{homeViewModel.primaryCta}}</view>
-        <view class="mini-subtitle" bindtap="submitAiDraft">{{homeViewModel.secondaryAction}}</view>
+        <view class="home-secondary-action" bindtap="startStuck">{{homeViewModel.secondaryAction}}</view>
+      </view>
+
+      <view class="home-close-strip">
+        <text>今晚产出</text>
+        <text>第一步</text>
+        <text>家长看</text>
+        <text>短回访</text>
       </view>
 
     </view>

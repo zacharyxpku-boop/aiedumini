@@ -25,6 +25,22 @@ function parseIncomingShareQuery(query = {}) {
   return Object.assign({}, query || {}, parsed || {});
 }
 
+function hasHomeworkListSignal(text = '') {
+  const value = String(text || '').trim();
+  if (!value) return false;
+  const compact = value.replace(/\s+/g, '');
+  return /[0-9０-９一二三四五六七八九十百]+(道|题|页|遍|个|分钟|分|套|篇|章|节|次)/.test(compact)
+    || /(数学|语文|英语|物理|化学|生物|地理|历史|政治|方程|应用题|计算|阅读|作文|听写|单词|错题|作业|试卷|练习|预习|复习)/.test(value)
+    || /[；;、，,\n]/.test(value);
+}
+
+function isPureStuckInput(text = '') {
+  const value = String(text || '').trim();
+  if (!value) return false;
+  return /不会|卡住|不知道|不会列式|读不懂|算错|说不清|不会写/.test(value)
+    && !hasHomeworkListSignal(value);
+}
+
 Page({
   data: {
     state: null,
@@ -1853,20 +1869,20 @@ Page({
   startStuck() {
     const text = String(this.data.aiDraft || '').trim();
     if (text) {
-      this.submitAiDraft();
+      this.submitAiDraft({ forceTutor: true });
       return;
     }
     this.setData({
       aiDraft: '我卡住了。\n题目是：\n我先想到的是：\n我不知道下一步怎么写。'
     }, () => {
-      this.submitAiDraft();
+      this.submitAiDraft({ forceTutor: true });
     });
   },
 
   planTonight() {
     const text = String(this.data.aiDraft || '').trim();
     const draft = text || '数学应用题 3 道，明天必交\n英语单词 10 分钟\n整理今天卡住的一步\n数学拓展题 2 道';
-    if (/不会|卡住|不知道|不会列式|读不懂|算错|说不清/.test(draft)) {
+    if (text && isPureStuckInput(draft)) {
       this.submitAiDraft();
       return;
     }
@@ -1882,13 +1898,13 @@ Page({
         todayFocus: this.data.todayFocus
       }),
       routeStrip: this.buildRouteStrip('plan', plan),
-      focusFeedback: plan ? '已排好今晚路线，按今晚路线开始就行。' : '先写今晚作业清单，我来帮你排顺序。'
+      focusFeedback: plan ? '已排好今晚路线，先做第一项；卡住时再说第一步。' : '先写今晚作业清单，我来帮你排顺序。'
     });
   },
 
   noop() {},
 
-  submitAiDraft() {
+  submitAiDraft(options = {}) {
     const text = String(this.data.aiDraft || '').trim();
     if (!text) {
       wx.showToast({ title: '先说一句卡在哪', icon: 'none' });
@@ -1968,6 +1984,10 @@ Page({
         ? `${importRoute.feedback} 去修这个卡点。`
         : importRoute.feedback
     });
+    if (options.forceTutor) {
+      this.openTutorFromHome('/pages/tutor/tutor?from=home_stuck&open=flow');
+      return;
+    }
     this.routeImportDraft(importRoute.route);
   },
 
@@ -2024,7 +2044,25 @@ Page({
       this.goTutor();
       return;
     }
+    if (action === 'route') {
+      this.goLearningMap();
+      return;
+    }
     this.goReview();
+  },
+
+  runPersonalPlanAction(event) {
+    const action = event && event.currentTarget && event.currentTarget.dataset
+      ? event.currentTarget.dataset.action
+      : '';
+    const card = this.data.homeViewModel && this.data.homeViewModel.personalPlan
+      ? this.data.homeViewModel.personalPlan
+      : {};
+    if (action === 'coach') {
+      navigation.navigateLearningRoute(card.coachRoute || '/pages/tutor/tutor?from=home_personal_plan');
+      return;
+    }
+    navigation.navigateLearningRoute(card.revisitRoute || '/pages/review/review?from=home_personal_plan');
   },
 
   runPrimaryNextAction() {

@@ -934,7 +934,7 @@ Page({
     const weak = ((state && state.weak_points) || [])[0] || null;
     const summary = (plan && plan.summary) || {};
     return {
-      title: '今晚作业先分流',
+      title: '今晚作业先排顺序',
       label: '把作业清单粘进来，先看哪些必须做、哪些有余力再做、哪些今晚可以放过。',
       stats: [
         { label: '必须做', value: plan ? plan.must_do.length : 0 },
@@ -971,7 +971,7 @@ Page({
     const guide = buildMaterialTypeGuide(type);
     const labels = {
       parent_report: '家长观察',
-      talent_assessment: '天赋/学习偏好测评',
+      talent_assessment: '学习偏好测评',
       score_sheet: '成绩单/周测',
       school_material: '学校/老师材料',
       wrong_question_paper: '错题/试卷',
@@ -992,7 +992,7 @@ Page({
       return {
         title: '学习材料变复习卡',
         label: methodMode
-          ? '可以粘贴天赋/学习偏好测评、老师反馈、错题试卷或家长观察；系统先做证据分流，不贴标签、不出完整答案。'
+          ? '可以粘贴学习偏好测评、老师反馈、错题试卷或家长观察；系统先做证据分类，不贴标签、不出完整答案。'
           : '先粘贴公众号/网页摘录、PDF 摘录、课堂笔记或 PPT 要点，预览能不能变成可复习的知识卡。',
         type: labels[type] || '课堂笔记',
         sourceLine,

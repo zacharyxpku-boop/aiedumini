@@ -14,7 +14,7 @@ page {
 }
 
 .upload-content {
-  padding: calc(86rpx + env(safe-area-inset-top)) 28rpx calc(104rpx + env(safe-area-inset-bottom));
+  padding: calc(86rpx + env(safe-area-inset-top)) 26rpx calc(188rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -26,11 +26,11 @@ page {
   display: flex;
   flex: 0 0 auto;
   flex-direction: column;
-  gap: 18rpx;
+  gap: 12rpx;
   justify-content: flex-start;
   min-height: calc(100vh - 190rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-  margin-bottom: 0;
-  padding: 24rpx;
+  margin-bottom: 34rpx;
+  padding: 20rpx;
   overflow: visible;
   border: 1rpx solid rgba(232, 238, 230, 0.94);
   border-radius: 30rpx;
@@ -60,7 +60,7 @@ page {
   width: 52rpx;
   height: 52rpx;
   object-fit: contain;
-  padding: 7rpx;
+  padding: 6rpx;
   border: 1rpx solid rgba(34, 185, 92, 0.16);
   border-radius: 18rpx;
   background: #ebf9ed;
@@ -77,7 +77,7 @@ page {
 
 .yd-upload-brand text:first-child {
   color: #18211d;
-  font-size: 30rpx;
+  font-size: 28rpx;
   font-weight: 950;
   line-height: 1.15;
 }
@@ -85,34 +85,34 @@ page {
 .yd-upload-brand text:last-child {
   margin-top: 3rpx;
   color: #6a766f;
-  font-size: 21rpx;
+  font-size: 20rpx;
   font-weight: 760;
 }
 
 .yd-upload-pill {
   flex: 0 0 auto;
-  padding: 13rpx 18rpx;
+  padding: 10rpx 16rpx;
   border: 1rpx solid rgba(34, 185, 92, 0.16);
   border-radius: 999rpx;
   color: #14854a;
   background: #ebf9ed;
-  font-size: 22rpx;
+  font-size: 21rpx;
   font-weight: 900;
 }
 
 .yd-upload-hero {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 214rpx;
-  gap: 18rpx;
+  gap: 14rpx;
   align-items: center;
   flex: 0 0 auto;
   min-height: 356rpx;
   max-height: none;
   margin-top: 0;
-  padding: 30rpx 26rpx;
+  padding: 24rpx 22rpx;
   overflow: hidden;
   border: 2rpx dashed rgba(34, 185, 92, 0.5);
-  border-radius: 34rpx;
+  border-radius: 30rpx;
   background:
     radial-gradient(circle at 92% 8%, rgba(248, 198, 34, 0.18), transparent 22%),
     linear-gradient(135deg, #ffffff 0%, #f3fbef 100%);
@@ -128,9 +128,9 @@ page {
 
 .yd-upload-title {
   color: #101a16;
-  font-size: 52rpx;
+  font-size: 46rpx;
   font-weight: 950;
-  line-height: 1.08;
+  line-height: 1.06;
   letter-spacing: 0;
   overflow-wrap: break-word;
   word-break: break-word;
@@ -138,28 +138,28 @@ page {
 
 .yd-upload-sub {
   display: -webkit-box;
-  margin-top: 12rpx;
+  margin-top: 9rpx;
   overflow: hidden;
   color: #64706a;
-  font-size: 27rpx;
-  line-height: 1.42;
+  font-size: 25rpx;
+  line-height: 1.34;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
 }
 
 .yd-upload-proof,
 .upload-type-strip {
   display: flex;
   flex-wrap: wrap;
-  gap: 8rpx;
-  margin-top: 10rpx;
+  gap: 7rpx;
+  margin-top: 8rpx;
 }
 
 .yd-upload-proof text,
 .upload-type-strip text {
-  padding: 8rpx 13rpx;
+  padding: 7rpx 11rpx;
   border-radius: 999rpx;
-  font-size: 21rpx;
+  font-size: 20rpx;
   font-weight: 820;
   white-space: normal;
 }
@@ -171,7 +171,7 @@ page {
 }
 
 .upload-type-strip text {
-  padding: 6rpx 10rpx;
+  padding: 5rpx 9rpx;
   border: 1rpx solid rgba(248, 198, 34, 0.24);
   color: #6d5b25;
   background: #fff7df;
@@ -186,7 +186,7 @@ page {
   overflow: hidden;
   object-fit: contain;
   border: 6rpx solid rgba(255, 255, 255, 0.76);
-  border-radius: 28rpx;
+  border-radius: 24rpx;
   background: #f6fbf0;
   filter: drop-shadow(0 16rpx 22rpx rgba(34, 68, 48, 0.12));
 }
@@ -194,19 +194,19 @@ page {
 .upload-output-trail {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10rpx;
-  padding: 10rpx;
+  gap: 8rpx;
+  padding: 8rpx;
   border: 1rpx solid rgba(232, 238, 230, 0.95);
-  border-radius: 22rpx;
+  border-radius: 20rpx;
   background: rgba(255, 255, 255, 0.92);
 }
 
 .upload-intake-workbench,
 .upload-material-panel,
 .upload-report-ready {
-  padding: 16rpx;
+  padding: 14rpx;
   border: 1rpx solid rgba(232, 238, 230, 0.95);
-  border-radius: 24rpx;
+  border-radius: 22rpx;
   background: rgba(255, 255, 255, 0.94);
   box-shadow: 0 12rpx 28rpx rgba(38, 58, 43, 0.045);
 }
@@ -220,13 +220,13 @@ page {
 
 .upload-workbench-head text:first-child {
   color: #18211d;
-  font-size: 25rpx;
+  font-size: 24rpx;
   font-weight: 950;
   line-height: 1.2;
 }
 
 .upload-workbench-head text:last-child {
-  max-width: 390rpx;
+  max-width: 360rpx;
   color: #738077;
   font-size: 20rpx;
   font-weight: 780;
@@ -236,17 +236,17 @@ page {
 
 .upload-textarea {
   width: 100%;
-  min-height: 148rpx;
-  margin-top: 12rpx;
-  padding: 18rpx;
+  min-height: 118rpx;
+  margin-top: 9rpx;
+  padding: 15rpx;
   box-sizing: border-box;
   border: 1rpx solid rgba(232, 238, 230, 0.95);
-  border-radius: 20rpx;
+  border-radius: 18rpx;
   color: #27352f;
   background: #f9fcf7;
-  font-size: 24rpx;
+  font-size: 23rpx;
   font-weight: 760;
-  line-height: 1.42;
+  line-height: 1.35;
 }
 
 .upload-textarea.material {
@@ -259,8 +259,8 @@ page {
 .upload-report-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 8rpx;
-  margin-top: 12rpx;
+  gap: 7rpx;
+  margin-top: 9rpx;
 }
 
 .upload-chip-row text,
@@ -269,11 +269,11 @@ page {
 .upload-report-actions text,
 .upload-material-submit {
   display: inline-flex;
-  padding: 10rpx 14rpx;
+  padding: 8rpx 12rpx;
   border-radius: 999rpx;
   color: #174533;
   background: #f0fbf0;
-  font-size: 21rpx;
+  font-size: 20rpx;
   font-weight: 900;
   line-height: 1.2;
 }
@@ -303,11 +303,28 @@ page {
 }
 
 .upload-report-ready {
+  position: fixed;
+  right: 28rpx;
+  bottom: calc(132rpx + env(safe-area-inset-bottom));
+  left: 28rpx;
+  z-index: 20;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 12rpx;
   align-items: center;
   background: linear-gradient(135deg, #f2fbef 0%, #ffffff 72%);
+  box-shadow: 0 22rpx 56rpx rgba(38, 58, 43, 0.18);
+}
+
+.upload-material-panel {
+  position: fixed;
+  right: 28rpx;
+  bottom: calc(132rpx + env(safe-area-inset-bottom));
+  left: 28rpx;
+  z-index: 22;
+  max-height: 54vh;
+  overflow: hidden;
+  box-shadow: 0 22rpx 56rpx rgba(38, 58, 43, 0.18);
 }
 
 .upload-report-ready text {
@@ -352,7 +369,7 @@ page {
 .upload-output-trail view {
   display: grid;
   min-width: 0;
-  min-height: 92rpx;
+  min-height: 70rpx;
   align-content: center;
   justify-items: center;
   gap: 6rpx;
@@ -361,14 +378,14 @@ page {
 }
 
 .upload-output-trail text:first-child {
-  width: 34rpx;
-  height: 34rpx;
+  width: 30rpx;
+  height: 30rpx;
   border-radius: 999rpx;
   color: #1d261f;
   background: #ffd84f;
   font-size: 20rpx;
   font-weight: 950;
-  line-height: 34rpx;
+  line-height: 30rpx;
   text-align: center;
 }
 
@@ -376,7 +393,7 @@ page {
   max-width: 100%;
   overflow: hidden;
   color: #2e3b35;
-  font-size: 23rpx;
+  font-size: 21rpx;
   font-weight: 900;
   line-height: 1.18;
   text-align: center;
@@ -394,11 +411,11 @@ page {
 .upload-material-card {
   display: grid;
   min-width: 0;
-  min-height: 168rpx;
+  min-height: 138rpx;
   align-content: center;
   justify-items: center;
-  gap: 9rpx;
-  padding: 16rpx 12rpx;
+  gap: 7rpx;
+  padding: 13rpx 10rpx;
   border: 1rpx solid rgba(232, 238, 230, 0.95);
   border-radius: 21rpx;
   background: rgba(255, 255, 255, 0.9);
@@ -424,7 +441,7 @@ page {
   height: 70rpx;
   box-sizing: border-box;
   object-fit: contain;
-  padding: 8rpx;
+  padding: 7rpx;
   border: 1rpx solid rgba(232, 238, 230, 0.95);
   border-radius: 16rpx;
   background: #effaf0;
@@ -448,7 +465,7 @@ page {
 
 .upload-material-card text:nth-child(2) {
   color: #17211d;
-  font-size: 25rpx;
+  font-size: 24rpx;
   font-weight: 950;
   line-height: 1.2;
   white-space: normal;
@@ -457,20 +474,20 @@ page {
 .upload-material-card text:nth-child(3) {
   display: -webkit-box;
   color: #66746d;
-  font-size: 23rpx;
-  line-height: 1.35;
+  font-size: 21rpx;
+  line-height: 1.24;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
 
 .yd-upload-primary {
   height: 92rpx;
-  margin-top: 2rpx;
+  margin-top: 0;
   border-radius: 999rpx;
   color: #1d261f;
   background: linear-gradient(180deg, #ffd84f 0%, #f5b300 100%);
   box-shadow: 0 16rpx 28rpx rgba(248, 198, 34, 0.22);
-  font-size: 30rpx;
+  font-size: 28rpx;
   font-weight: 950;
   line-height: 92rpx;
   text-align: center;

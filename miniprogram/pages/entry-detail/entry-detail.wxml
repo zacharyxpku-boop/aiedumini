@@ -13,9 +13,9 @@
       <view class="entry-title">{{scene.title}}</view>
       <view class="entry-subtitle">{{scene.subtitle}}</view>
       <view class="entry-mini-path">
-        <text>依据</text>
-        <text>行动</text>
-        <text>回流</text>
+        <text>看证据</text>
+        <text>去执行</text>
+        <text>留记录</text>
       </view>
     </view>
     <image class="entry-image" mode="aspectFit" src="{{scene.heroImage}}" />
@@ -23,10 +23,10 @@
 
   <view class="entry-focus-card">
     <view>
-      <text class="entry-focus-label">当前只做</text>
+      <text class="entry-focus-label">现在去做</text>
       <text class="entry-focus-title">{{scene.badge}}</text>
     </view>
-    <text class="entry-focus-copy">先完成这个入口的主动作，再按下方下一步进入闭环。</text>
+    <text class="entry-focus-copy">{{scene.focusCopy}}</text>
   </view>
 
   <view class="entry-actions">

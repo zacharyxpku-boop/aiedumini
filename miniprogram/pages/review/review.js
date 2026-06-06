@@ -275,7 +275,7 @@ Page({
       from,
       mode,
       title: isEntryReviewReturn ? '来自回访入口' : '来自学习入口',
-      line: '已从入口页进入短回访，先选一张卡完成 90 秒回忆或迁移验证。',
+      line: '先选一张真实卡，马上完成 90 秒回忆或迁移验证。',
       actionLabel: isEntryReviewReturn ? '开始 90 秒回忆' : '进入短回访',
       returnRoute: '/pages/entry-detail/entry-detail?scene=review',
       flowTraceId: from || mode || 'entry_review'

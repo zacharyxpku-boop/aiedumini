@@ -3579,6 +3579,38 @@ function buildRouteSteps(activeId) {
   return steps.map((step) => Object.assign({}, step, { active: step.id === activeId }));
 }
 
+function buildPersonalizedStudyPlan(planItems = [], context = {}) {
+  const first = planItems[0] || {};
+  const todayFocus = context.todayFocus || null;
+  const dueCards = context.dueCards || [];
+  const reportDailyAction = context.reportDailyAction || null;
+  const companionPreference = context.companionPreference || {};
+  const companionName = companionPreference.selectedLabel || '咕点';
+  const focusName = todayFocus && (todayFocus.issueType || todayFocus.title)
+    ? (todayFocus.issueType || todayFocus.title)
+    : (first.relatedIssueType || '启动第一步');
+  const subjectLine = first.subject && first.subject !== '未知' ? first.subject : '今晚作业';
+  const firstTitle = first.title || '今晚第一项';
+  const hasReview = dueCards.length > 0;
+  const hasProfileAction = !!(reportDailyAction && reportDailyAction.task);
+  return {
+    title: '今晚个性化学习方案',
+    profileLine: hasProfileAction
+      ? `结合学习画像，今晚先做：${reportDailyAction.task}`
+      : `先抓「${focusName}」，不把所有作业平均用力。`,
+    methodLine: `${subjectLine}先做「${firstTitle}」：圈关键词，说第一步，再动笔。`,
+    motivationLine: '今晚只追一个小胜利：孩子能自己开口说第一步。',
+    aiCoachLine: `${companionName}只追问下一小步；卡住就进 AI 点拨。`,
+    gameLine: hasReview
+      ? `最后用 ${dueCards.length} 张短回访卡主动回忆。`
+      : '做完第一项后生成短回访卡，明天再检查。',
+    routeLabel: hasReview ? '点拨 → 回访 → 家长' : '点拨 → 回访卡 → 家长',
+    coachRoute: '/pages/tutor/tutor?from=home_personal_plan',
+    revisitRoute: '/pages/review/review?from=home_personal_plan',
+    parentRoute: '/pages/profile/profile?from=home_personal_plan'
+  };
+}
+
 function buildTonightPlan(inputText = '', options = {}) {
   const todayFocus = loadTodayFocus();
   const reportDailyActionQueue = buildReportDailyActionQueue();
@@ -3665,6 +3697,12 @@ function buildTonightPlan(inputText = '', options = {}) {
     });
   }
   const first = planItems[0] || null;
+  const personalPlan = buildPersonalizedStudyPlan(planItems, {
+    todayFocus,
+    dueCards,
+    reportDailyAction: reportDailyActionQueue && reportDailyActionQueue.ready ? reportDailyActionQueue.active : null,
+    companionPreference
+  });
   return {
     id: options.id || `route_${Date.now()}_${randomPart()}`,
     date: new Date().toISOString().slice(0, 10),
@@ -3674,6 +3712,7 @@ function buildTonightPlan(inputText = '', options = {}) {
     focusId: todayFocus && todayFocus.id,
     reviewCardIds: dueCards.map((card) => card.id),
     reportDailyAction: reportDailyActionQueue && reportDailyActionQueue.ready ? reportDailyActionQueue.active : null,
+    personalPlan,
     parentAdvice: '家长只问一句：你觉得这题第一步应该找什么？不要直接讲最终结果。',
     parentPrompt: '你觉得这题第一步应该找什么？',
     routeStatus: todayFocus && todayFocus.repairStatus === 'completed'

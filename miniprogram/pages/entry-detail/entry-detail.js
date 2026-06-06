@@ -3,12 +3,13 @@ const navigation = require('../../utils/navigation');
 const SCENES = {
   today: {
     badge: '今晚主线',
-    title: '先把今晚任务变成 3 个可执行动作',
-    subtitle: '入口页只负责决定从哪开始。这里承接任务拆解、证据记录和下一步跳转。',
+    title: '今晚先从哪一步开始',
+    subtitle: '把今晚作业排成一个可执行起点。先说第一步；材料不够，再补一份证据。',
     heroImage: '/assets/reference/learning-route-map-transparent.png',
-    primaryLabel: '去AI点拨说第一步',
+    focusCopy: '先让孩子说出起点，再进入点拨；做完留一条明天能回看的证据。',
+    primaryLabel: '说第一步',
     primaryRoute: '/pages/tutor/tutor?from=entry_today_first_step&open=flow',
-    secondaryLabel: '先补材料',
+    secondaryLabel: '先传材料',
     secondaryRoute: '/pages/upload/upload?from=entry_today_material',
     cards: [
       { label: '先定优先级', value: '把必须做、可放后、明天回访分开。', icon: '/assets/reference/entry-upload.png', scene: 'upload' },
@@ -17,28 +18,29 @@ const SCENES = {
     ],
     spotlight: {
       kicker: '今晚路线板',
-      title: '入口只做一件事：决定从哪一步开始',
+      title: '只决定今晚的第一个动作',
       image: '/assets/reference/learning-route-map-transparent.png',
       metrics: [
         { label: '任务拆解', value: '3步' },
         { label: '预计用时', value: '15分' },
-        { label: '回流证据', value: '1条' }
+        { label: '留证据', value: '1条' }
       ],
       points: [
-        '先把今晚任务变成可执行动作，不在首页堆满说明。',
-        '孩子先说第一步，系统再决定去点拨、回访还是家长页。',
-        '每次完成都留下证据，明天能接着回访。'
+        '先选一个最容易开始的动作，不把所有任务摊开讲。',
+        '孩子说出第一步后，再进入 AI 点拨。',
+        '做完留一条证据，明天才能接着回访。'
       ]
     }
   },
   upload: {
     badge: '材料入口',
-    title: '先分类，再生成学习包',
-    subtitle: '材料不一致也要输出稳定 SOP：识别材料类型、提取证据、生成下一步。',
+    title: '上传材料，生成报告和路线',
+    subtitle: '把作业、错题、成绩或家长观察发进来。系统先分类，再给家长报告和今晚路线。',
     heroImage: '/assets/reference/upload-folder-stack-transparent.png',
-    primaryLabel: '选择文件/图片',
+    focusCopy: '先补真实材料；上传后直接生成家长报告和今晚路线两个结果。',
+    primaryLabel: '上传材料',
     primaryRoute: '/pages/upload/upload?from=entry_upload_file&open=flow',
-    secondaryLabel: '没有报告，做快测',
+    secondaryLabel: '做快测',
     secondaryRoute: '/pages/profile/profile?from=entry_upload_quiz&panel=assessment&quick_assessment=1',
     cards: [
       { label: '天测/测评', value: '提取学习偏好、注意力和优势通道。', icon: '/assets/reference/entry-report.png', scene: 'report' },
@@ -47,32 +49,33 @@ const SCENES = {
     ],
     spotlight: {
       kicker: '材料分类板',
-      title: '先识别材料类型，再进入报告 SOP',
+      title: '材料先分类，报告才可靠',
       image: '/assets/reference/upload-folder-stack-transparent.png',
       metrics: [
         { label: '可上传', value: '6类' },
-        { label: '弱证据', value: '待确认' },
-        { label: '输出格式', value: '稳定' }
+        { label: '报告', value: '可生成' },
+        { label: '路线', value: '今晚用' }
       ],
       points: [
-        '测评、成绩、错题、老师反馈、家长观察分开处理。',
-        '材料不足时先生成待补清单，不硬下结论。',
-        '所有材料最后都进入同一个报告和学习闭环。'
+        '作业、错题、成绩、老师反馈和家长观察分开处理。',
+        '材料不足时只提示补什么，不硬下结论。',
+        '上传后直接进入报告和今晚路线。'
       ]
     }
   },
   report: {
     badge: '个性化报告',
     title: '先讲清证据，再匹配学习方法',
-    subtitle: '报告要说明材料从哪里来、天赋信号和成绩表现是否互相支持，以及为什么推荐这组学习方法。',
+    subtitle: '报告先看材料来源、学习画像和当前表现是否互相支持，再给出今晚能执行的方法。',
     heroImage: '/assets/reference/report-radar-card-illustration.png',
+    focusCopy: '先看证据是否足够，再决定今晚用哪一种学习方法。',
     primaryLabel: '查看证据报告',
     primaryRoute: '/pages/profile/profile?from=entry_report_evidence&open=flow',
     secondaryLabel: '补充测评/错题',
     secondaryRoute: '/pages/upload/upload?from=entry_report_material',
     cards: [
       { label: '证据来源', value: '测评、成绩、错题、对话和回访记录分开标注。', icon: '/assets/reference/entry-upload.png', scene: 'upload' },
-      { label: '天测匹配', value: '解释孩子适合怎样输入、输出和反馈。', icon: '/assets/reference/entry-report.png', scene: 'report' },
+      { label: '画像匹配', value: '看孩子更适合怎样输入、输出和反馈。', icon: '/assets/reference/entry-report.png', scene: 'report' },
       { label: '方法依据', value: '把费曼复述、苏格拉底追问、短周期回访变成动作。', icon: '/assets/reference/entry-tutor.png', scene: 'tutor' }
     ],
     spotlight: {
@@ -96,6 +99,7 @@ const SCENES = {
     title: '先问一句，不替孩子做完',
     subtitle: '把题目、卡点或第一步发进来，系统只给最小提示，并把可复习的点沉淀下来。',
     heroImage: '/assets/reference/tutor-socratic-board-transparent.png',
+    focusCopy: '先问一个更小的问题，不替孩子写完整答案。',
     primaryLabel: '进入追问对话',
     primaryRoute: '/pages/tutor/tutor?from=entry_tutor_first_step&open=flow',
     secondaryLabel: '说完去回访卡',
@@ -124,8 +128,9 @@ const SCENES = {
   review: {
     badge: '短回访',
     title: '5 分钟验证记忆和迁移',
-    subtitle: '不在入口页铺满玩法。先选今天要验证的一张卡，再进入 90 秒回忆或错因复盘。',
+    subtitle: '先选今天要验证的一张真实卡，再进入 90 秒回忆或错因复盘。',
     heroImage: '/assets/reference/review-world-map-transparent.png',
+    focusCopy: '先跑一张真实卡：回忆、迁移、记录明天要回看的点。',
     primaryLabel: '开始 90 秒回忆',
     primaryRoute: '/pages/review/review?mode=recall_return&from=entry_review',
     secondaryLabel: '回到AI点拨',
@@ -153,9 +158,10 @@ const SCENES = {
   },
   parent: {
     badge: '家长视图',
-    title: '家长只看该问什么和下一步',
-    subtitle: '家长不需要替孩子学习，也不需要被制造焦虑。这里把报告结论、第一步证据和明天回访动作收成一张家庭行动卡。',
+    title: '家长今晚只问一句',
+    subtitle: '家长不用替孩子学题，只看证据、问一句低压问题、明天再回访。',
     heroImage: '/assets/reference/family-avatar-group-transparent.png',
+    focusCopy: '先看孩子今天留下了什么证据，再问一句能启动行动的问题。',
     primaryLabel: '打开家长中心',
     primaryRoute: '/pages/profile/profile?from=entry_parent_report&open=flow',
     secondaryLabel: '补一条证据',
@@ -167,7 +173,7 @@ const SCENES = {
     ],
     spotlight: {
       kicker: '家长行动卡',
-      title: '今晚只问一个低压问题',
+      title: '今晚别追问答案，只问起点',
       image: '/assets/reference/family-avatar-group-transparent.png',
       metrics: [
         { label: '今晚目标', value: '一句话' },
@@ -175,8 +181,8 @@ const SCENES = {
         { label: '回访时间', value: '明天' }
       ],
       points: [
-        '不要催完整答案，只问“你准备从哪一步开始”。',
-        '只记录孩子说出的第一步和卡住原因。',
+        '只问“你准备从哪一步开始”。',
+        '记录孩子说出的第一步和卡住原因。',
         '明天用同类小题回忆，不翻旧账。'
       ]
     }

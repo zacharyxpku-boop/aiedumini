@@ -146,7 +146,7 @@ function profileReadableGate(raw = '') {
 function profileReadableOwner(raw = '') {
   const value = String(raw || '');
   if (!value) return '负责方：家庭和本地规则共同确认。';
-  if (/ai/i.test(value)) return '负责方：AI 只负责表达、追问和总结。';
+  if (/ai/i.test(value)) return '负责方：AI 用于表达、追问和总结。';
   if (/local|rule|code|本地|规则/.test(value)) return '负责方：本地规则负责安全、证据和放行。';
   if (/parent|family|家长|家庭/.test(value)) return '负责方：家长只确认范围和观察证据。';
   return `负责方：${value}`;
@@ -1799,7 +1799,7 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
   const openMaicBorrowWorkbench = {
     id: 'openmaic_k12_borrow_workbench',
     title: '小讲堂借力工作台',
-    summary: `只借公开资料的结构、场景流和质量门；本地代码负责门禁、回流、过程反馈、隐私和报告放行，AI 只负责追问与表达。`,
+    summary: `只借公开资料的结构、场景流和质量门；本地代码处理门禁、回流、过程反馈、隐私和报告放行，AI 用于追问与表达。`,
     statusLine: `已接 ${publicK12Resources.length} 类公开资料线索、${publicK12Workbench.length} 条使用工作台、${publicK12RevisitDeck.length} 张可玩采集卡。`,
     sourcePolicyLine: openMaicDecisionBridge && openMaicDecisionBridge.sourcePolicy
       ? '只借公开结构和课堂编排思路，不复制代码、不照搬题文、不承诺完整 AI 课堂。'
@@ -1838,7 +1838,7 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     blockedClaims: ['完整答案', '拍照自动解题', '天赋定性', '分数排名外传', '复制开源题库原文'],
     nextRoutes: [
       { id: 'upload_wrong_paper', label: '上传错题/试卷', route: '/pages/upload/upload?from=openmaic_k12_workbench&type=wrong_question_paper' },
-      { id: 'upload_talent', label: '录入天赋/学习偏好测评', route: '/pages/upload/upload?from=openmaic_k12_workbench&type=talent_assessment' },
+      { id: 'upload_talent', label: '录入学习偏好测评', route: '/pages/upload/upload?from=openmaic_k12_workbench&type=talent_assessment' },
       { id: 'socratic', label: '去问第一步', route: '/pages/tutor/tutor?from=openmaic_k12_workbench' },
       { id: 'review', label: '做一次回访', route: '/pages/review/review?from=openmaic_k12_workbench' }
     ]

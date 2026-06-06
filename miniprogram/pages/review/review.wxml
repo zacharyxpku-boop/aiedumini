@@ -4,82 +4,50 @@
       <view class="yd-review-screen yd-app-screen yd-review-app">
         <view class="yd-review-pill">3 分钟回访</view>
         <view class="yd-review-top">
-          <view class="yd-review-brand">
-            <image class="yd-review-mark" mode="aspectFit" src="/assets/reference/brand-house.png" />
-            <view>
-              <text>短回访</text>
-              <text>主动回忆和迁移验证</text>
-            </view>
-          </view>
+          <view class="yd-review-brand"><image class="yd-review-mark" mode="aspectFit" src="/assets/reference/brand-house.png" /><view><text>短回访</text><text>主动回忆和迁移验证</text></view></view>
           <view class="yd-review-pill">{{revisitRunway.due || 0}} 张到期</view>
         </view>
 
         <view class="yd-review-hero">
           <view class="yd-review-copy">
             <view class="yd-review-title">{{reviewViewModel.title}}</view>
-            <view class="yd-review-sub route-note short">先说错因，再做一张变式，换题看是否真的迁移，明天只回看真正卡住的点。</view>
-            <view class="review-chip-row">
-              <text>主动回忆</text>
-              <text>错因回放</text>
-              <text>明天回流</text>
-            </view>
+            <view class="yd-review-sub route-note short">先回忆一张真卡，再换题验证迁移。</view>
+            <view class="review-chip-row"><text>主动回忆</text><text>错因回放</text><text>明天回流</text></view>
           </view>
           <image class="yd-review-art" mode="aspectFit" src="/assets/reference/review-world-map-transparent.png" />
         </view>
 
         <view class="review-record-panel">
           <view class="review-section-head"><text>选一个小工具</text><text>3 分钟练一轮</text></view>
-          <text class="review-workshop-lead">像课堂互动工具一样练一张真实卡：先回忆，再核对，不排行、不比速度，不按速度或分数给反馈。</text>
-          <view class="review-tool-grid"><view wx:for="{{playableReviewTools}}" wx:key="id" class="review-tool-card {{item.available ? 'ready' : 'locked'}}" data-id="{{item.id}}" bindtap="runPlayableReviewTool"><text>{{item.title}}</text><text>{{item.line}}</text><text>{{item.status}}｜{{item.count}} 张</text></view></view>
-          <view class="review-live-tool" wx:if="{{activeReviewTool && activeReviewTool.id}}">
-            <view class="review-live-head">
-              <text>{{activeReviewTool.title}}</text>
-              <text>{{activeReviewTool.status}}</text>
-            </view>
+          <text class="review-workshop-lead">选一张卡，跑一轮 3 分钟回访。</text>
+          <view class="review-tool-grid">
+            <view wx:for="{{playableReviewTools}}" wx:key="id" class="review-tool-card {{item.available ? 'ready' : 'locked'}}" data-id="{{item.id}}" bindtap="runPlayableReviewTool"><text>{{item.title}}</text><text>{{item.line}}</text><text>{{item.status}}｜{{item.count}} 张</text></view>
+          </view>
+          <view class="review-empty-note" wx:if="{{activeReviewTool && activeReviewTool.empty}}"><text>还没有真实卡。先上传材料或完成一次 AI 点拨。</text></view>
+          <view class="review-live-tool" wx:elif="{{activeReviewTool && activeReviewTool.id}}">
+            <view class="review-live-head"><text>{{activeReviewTool.title}}</text><text>{{activeReviewTool.status}}</text></view>
             <text class="review-live-line">{{activeReviewTool.line}}</text>
-            <view class="review-live-empty" wx:if="{{activeReviewTool.empty}}">
-              <text>还没有可运行的真实回访卡。</text>
-              <text>先从上传材料或苏格拉底点拨生成一张“第一步 + 错因”卡，再回到这里打开工具。</text>
-            </view>
-            <block wx:else>
-              <view class="review-live-card">
-                <text>{{activeReviewTool.primary.label}}</text>
-                <text>{{activeReviewTool.primary.prompt}}</text>
-                <text>{{activeReviewTool.primary.check}}</text>
-              </view>
-              <view class="review-live-card compact" wx:if="{{activeReviewTool.secondary && activeReviewTool.secondary.id}}">
-                <text>{{activeReviewTool.secondary.label}}</text>
-                <text>{{activeReviewTool.secondary.prompt}}</text>
-                <text>{{activeReviewTool.secondary.check}}</text>
-              </view>
-              <view class="review-live-card compact" wx:if="{{activeReviewTool.third && activeReviewTool.third.id}}">
-                <text>{{activeReviewTool.third.label}}</text>
-                <text>{{activeReviewTool.third.prompt}}</text>
-                <text>{{activeReviewTool.third.check}}</text>
-              </view>
-              <view class="review-live-actions">
-                <button data-result="remembered" bindtap="finishPlayableReviewTool">记住了</button>
-                <button data-result="needs_repair" bindtap="finishPlayableReviewTool">还要回看</button>
-              </view>
-            </block>
+            <view class="review-live-card"><text>{{activeReviewTool.primary.label}}</text><text>{{activeReviewTool.primary.prompt}}</text><text>{{activeReviewTool.primary.check}}</text></view>
+            <view class="review-live-card compact" wx:if="{{activeReviewTool.secondary && activeReviewTool.secondary.id}}"><text>{{activeReviewTool.secondary.label}}</text><text>{{activeReviewTool.secondary.prompt}}</text><text>{{activeReviewTool.secondary.check}}</text></view>
+            <view class="review-live-card compact" wx:if="{{activeReviewTool.third && activeReviewTool.third.id}}"><text>{{activeReviewTool.third.label}}</text><text>{{activeReviewTool.third.prompt}}</text><text>{{activeReviewTool.third.check}}</text></view>
+            <view class="review-live-actions"><button data-result="remembered" bindtap="finishPlayableReviewTool">记住了</button><button data-result="needs_repair" bindtap="finishPlayableReviewTool">还要回看</button></view>
           </view>
         </view>
 
-        <view class="review-template-pack" wx:if="{{practiceTemplatePack && practiceTemplatePack.id}}">
-          <text class="review-template-title">可生成练习单：多米诺、拼图、闪卡、UNO 卡</text>
-          <text class="review-template-meta">先跑完这一轮，再按错因生成打印或课后练习模板。</text>
-          <text class="review-template-action" data-id="{{practiceTemplatePack.deliverables[0].id}}" data-label="{{practiceTemplatePack.deliverables[0].label}}" data-route="{{practiceTemplatePack.deliverables[0].route}}" bindtap="runTemplateDeliverable">生成练习单</text>
+        <view class="review-platform-panel">
+          <view class="review-platform-head"><text>玩法工坊</text><text>从一张真卡生成可操作练习</text></view>
+          <view class="review-platform-grid">
+            <view class="review-platform-card worksheet" data-action="template" bindtap="runPlaybookAction"><text>练习单生成器</text><text>拼图配对、闪卡、UNO 卡</text></view>
+            <view class="review-platform-card live" data-id="quiz" bindtap="runPlayableReviewTool"><text>课堂互动工具</text><text>把卡点变成一轮互动</text></view>
+            <view class="review-platform-card solo" data-action="review" bindtap="runPlaybookAction"><text>学生自主练习</text><text>自己回忆，再核对错因</text></view>
+            <view class="review-platform-card reuse" data-action="template" bindtap="runPlaybookAction"><text>模板复用</text><text>保存今晚这套练法</text></view>
+          </view>
         </view>
 
-        <view class="review-template-workbench" wx:if="{{practiceTemplateWorkbench && practiceTemplateWorkbench.id}}">
-          <text class="review-workbench-title">{{practiceTemplateWorkbench.title}}</text>
-          <text class="review-workbench-status">{{practiceTemplateWorkbench.status}} · {{practiceTemplateWorkbench.count}} 个模板</text>
-          <text class="review-workbench-line">{{practiceTemplateWorkbench.line}}</text>
-          <text class="review-preview-card">{{practiceTemplateWorkbench.samples[0].label}} · {{practiceTemplateWorkbench.samples[0].source}}</text>
-          <text class="review-workbench-safe">{{practiceTemplateWorkbench.safetyLine}}</text>
-        </view>
-
+        <view class="review-template-pack" wx:if="{{practiceTemplatePack && practiceTemplatePack.id}}"><text class="review-template-title">可生成练习单：多类型题、拼图、闪卡、UNO 卡</text><text class="review-template-meta">先跑完这一轮，再按错因生成打印或课后练习模板。</text><text class="review-template-action" data-id="{{practiceTemplatePack.deliverables[0].id}}" data-label="{{practiceTemplatePack.deliverables[0].label}}" data-route="{{practiceTemplatePack.deliverables[0].route}}" bindtap="runTemplateDeliverable">生成练习卡</text></view>
+        <view class="review-template-workbench" wx:if="{{practiceTemplateWorkbench && practiceTemplateWorkbench.id}}"><text class="review-workbench-title">{{practiceTemplateWorkbench.title}}</text><text class="review-workbench-status">{{practiceTemplateWorkbench.status}} ｜ {{practiceTemplateWorkbench.count}} 个模板</text><text class="review-workbench-line">{{practiceTemplateWorkbench.line}}</text><text class="review-preview-card">{{practiceTemplateWorkbench.samples[0].label}} ｜ {{practiceTemplateWorkbench.samples[0].source}}</text><text class="review-workbench-safe">{{practiceTemplateWorkbench.safetyLine}}</text></view>
         <view class="review-main-cta" data-action="review" bindtap="runPlaybookAction">{{reviewViewModel.primaryCta.text}}</view>
+        <view class="review-close-strip"><text>今日闭环</text><text>第一步</text><text>错因</text><text>明天回看</text></view>
       </view>
     </view>
   </scroll-view>
