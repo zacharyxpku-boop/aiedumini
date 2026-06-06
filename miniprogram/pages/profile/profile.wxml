@@ -31,10 +31,9 @@
           <view class="yd-parent-decision-badge">查看</view>
         </view>
 
-        <view class="yd-parent-report-lane">
-          <view><text>资料来源</text><text>{{learningReportSummary.parentReportWorkflowSourceLine}}</text></view>
-          <view><text>本地推理</text><text>{{learningReportSummary.parentReportWorkflowReasoningLine}}</text></view>
-          <view><text>报告图稿</text><text>{{learningReportSummary.parentReportWorkflowImageLine}}</text></view>
+        <view class="yd-parent-task-head">
+          <text>家长今晚只做这三步</text>
+          <text>不重学题，只看证据、问一句、明天回看。</text>
         </view>
 
         <view class="yd-parent-loop">
