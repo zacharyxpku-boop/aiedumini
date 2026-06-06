@@ -1,12 +1,12 @@
 const navigation = require('../utils/navigation');
 
-const tabs = ['/pages/home/home', '/pages/tutor/tutor', '/pages/review/review', '/pages/profile/profile', '/pages/upload/upload'];
+const tabs = ['/pages/tutor/tutor', '/pages/review/review', '/pages/profile/profile', '/pages/upload/upload'];
 
 Component({
   lifetimes: {
     attached() {
       const pages = getCurrentPages();
-      const route = pages.length ? `/${pages[pages.length - 1].route}` : '/pages/home/home';
+      const route = pages.length ? `/${pages[pages.length - 1].route}` : '/pages/tutor/tutor';
       const selected = Math.max(0, tabs.indexOf(route));
       this.setData({ selected });
     }
@@ -15,7 +15,7 @@ Component({
   pageLifetimes: {
     show() {
       const pages = getCurrentPages();
-      const route = pages.length ? `/${pages[pages.length - 1].route}` : '/pages/home/home';
+      const route = pages.length ? `/${pages[pages.length - 1].route}` : '/pages/tutor/tutor';
       const selected = Math.max(0, tabs.indexOf(route));
       this.setData({ selected });
     }

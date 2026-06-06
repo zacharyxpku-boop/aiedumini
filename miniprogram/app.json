@@ -1,11 +1,11 @@
 {
   "pages": [
-    "pages/home/home",
+    "pages/tutor/tutor",
     "pages/review/review",
     "pages/entry-detail/entry-detail",
-    "pages/tutor/tutor",
     "pages/profile/profile",
     "pages/upload/upload",
+    "pages/home/home",
     "pages/legal/legal"
   ],
   "__usePrivacyCheck__": true,
@@ -23,10 +23,6 @@
     "backgroundColor": "#FFFDF8",
     "borderStyle": "white",
     "list": [
-      {
-        "pagePath": "pages/home/home",
-        "text": "今天"
-      },
       {
         "pagePath": "pages/tutor/tutor",
         "text": "AI点拨"

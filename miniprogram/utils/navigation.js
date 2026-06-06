@@ -1,7 +1,6 @@
 'use strict';
 
 const TAB_ROUTES = [
-  '/pages/home/home',
   '/pages/tutor/tutor',
   '/pages/review/review',
   '/pages/profile/profile',

@@ -1,8 +1,8 @@
-﻿<view class="home-page">
+<view class="home-page">
   <view class="first-run-overlay" wx:if="{{showFirstRunOverlay}}" catchtap="closeFirstRunOverlay">
     <view class="first-run-card">
       <view>原点不直接给答案</view>
-      <text>先陪你看清今晚第一步。</text>
+      <text>先去 AI 点拨说清第一步。</text>
       <text>点一下继续，或等 3 秒自动收起。</text>
     </view>
   </view>
@@ -12,7 +12,7 @@
       <image class="home-brand-icon" mode="aspectFit" src="/assets/reference/brand-house.png" />
       <view>
         <view class="home-title">原点智学</view>
-        <view class="home-subtitle">作业和卡点先分析</view>
+        <view class="home-subtitle">旧入口已迁移到 AI 点拨</view>
       </view>
     </view>
   </view>
@@ -21,32 +21,35 @@
     <view class="yd-home-screen yd-app-screen yd-home-app">
       <view class="yd-home-hero-card">
         <view class="yd-home-hero-copy">
-          <view class="mini-streak-pill"><text class="mini-streak-dot"></text><text>{{homeViewModel.routePill}}</text></view>
-          <view class="mini-title">{{homeViewModel.title}}</view>
-          <view class="mini-subtitle">{{homeViewModel.subtitle}}</view>
-          <view class="mini-streak-pill"><text class="mini-streak-dot"></text><text>连续学习</text><text>7</text><text>天</text></view>
+          <view class="mini-streak-pill"><text class="mini-streak-dot"></text><text>旧链接兼容页</text></view>
+          <view class="mini-title">从 AI 点拨开始</view>
+          <view class="mini-subtitle">这里不再安排整晚任务。孩子先说题目、材料或卡点，咕点只追问第一步。</view>
+          <view class="home-hero-actions">
+            <view class="mini-main-cta" bindtap="goTutor">进入 AI 点拨</view>
+            <view class="home-secondary-action" bindtap="goUpload">上传材料</view>
+          </view>
         </view>
         <image class="yd-home-hero-mascot" mode="aspectFit" src="/assets/reference/gudian-fullbody-transparent.png" />
       </view>
 
       <view class="mini-relay-card" wx:if="{{incomingShareRelay}}">
         <view class="mini-relay-head">
-          <text>鍚屼即鎺ュ姏</text>
-          <text bindtap="continueShareRelay">缁х画</text>
+          <text>同伴接力</text>
+          <text bindtap="continueShareRelay">继续</text>
         </view>
         <view wx:for="{{incomingShareRelay.relayPackCards}}" wx:key="id">{{item.title}} {{item.line}}</view>
         <view>{{incomingShareRelay.receiverOwnMaterialActionLine}}</view>
         <view>{{incomingShareRelay.firstStepLine}}</view>
       </view>
 
-      <view class="home-upload-feature yd-jump-card" bindtap="goUpload">
+      <view class="home-upload-feature yd-jump-card" bindtap="goTutor">
         <view class="home-upload-copy">
-          <view class="home-card-kicker">材料分析</view>
-          <view class="home-upload-title">拍作业或发错题</view>
-          <view class="home-upload-sub">图片、文字、试卷都可以。先看清材料和卡点，再给出学习建议。</view>
-          <view class="home-upload-cta">上传材料</view>
+          <view class="home-card-kicker">AI 点拨</view>
+          <view class="home-upload-title">先说第一步</view>
+          <view class="home-upload-sub">文字描述、题目卡点或材料线索都可以。咕点不代写，只帮孩子把下一步说出来。</view>
+          <view class="home-upload-cta">开始点拨</view>
         </view>
-        <image class="home-upload-visual" mode="aspectFit" src="/assets/reference/upload-folder-stack-transparent.png" />
+        <image class="home-upload-visual" mode="aspectFit" src="/assets/reference/tutor-socratic-board-transparent.png" />
       </view>
 
       <view class="home-result-grid">
@@ -55,37 +58,24 @@
           <text>家长报告</text>
           <text>看证据、看下一步</text>
         </view>
-      </view>
-      <view class="mini-route-card">
-        <view class="mini-section-head"><text>{{homeViewModel.inputCard.title}}</text><text>文字分析</text></view>
-        <view class="mini-subtitle" wx:if="{{homeViewModel.miniLessonResume}}">{{homeViewModel.miniLessonResume.title}}</view>
-        <view class="mini-subtitle" wx:if="{{homeViewModel.reportServiceResume}}">{{homeViewModel.reportServiceResume.title}}</view>
-        <textarea class="mini-route-input" value="{{aiDraft}}" placeholder="{{homeViewModel.inputCard.placeholder}}" maxlength="500" auto-height bindinput="onAiDraftInput" />
-        <view class="mini-route-helper">{{homeViewModel.inputCard.helper}}</view>
-        <view class="mini-subtitle" wx:if="{{homeViewModel.emptyState}}">{{homeViewModel.emptyState}}</view>
-        <view class="home-analysis-result" wx:if="{{homeViewModel.personalPlan}}">
-          <view class="home-analysis-mark">已分析</view>
-          <view class="home-analysis-copy">
-            <text>{{homeViewModel.personalPlan.title}}</text>
-            <text>{{homeViewModel.personalPlan.profileLine}}</text>
-          </view>
-          <view class="home-analysis-actions">
-            <view data-action="coach" bindtap="runPersonalPlanAction">{{homeViewModel.personalPlan.coachCta}}</view>
-            <view data-action="revisit" bindtap="runPersonalPlanAction">{{homeViewModel.personalPlan.revisitCta}}</view>
-          </view>
+        <view class="home-result-card green" bindtap="goUpload">
+          <image class="home-result-icon" mode="aspectFit" src="/assets/reference/upload-folder-stack-transparent.png" />
+          <text>上传材料</text>
+          <text>作业、错题、测评</text>
         </view>
-        <view class="route-next-lite" wx:if="{{homeViewModel.nextStep}}" catchtap="runHomeNextStep"><text>{{homeViewModel.nextStep.text}}</text><text>{{homeViewModel.nextStep.cta}}</text></view>
-        <view class="mini-main-cta" catchtap="planTonight">{{homeViewModel.primaryCta}}</view>
-        <view class="home-secondary-action" bindtap="startStuck">{{homeViewModel.secondaryAction}}</view>
+        <view class="home-result-card yellow" bindtap="goReview">
+          <image class="home-result-icon" mode="aspectFit" src="/assets/reference/review-world-map-transparent.png" />
+          <text>短回访</text>
+          <text>3 分钟检验迁移</text>
+        </view>
       </view>
 
       <view class="home-close-strip">
-        <text>今晚产出</text>
-        <text>第一步</text>
+        <text>当前路径</text>
+        <text>AI 点拨</text>
         <text>家长看</text>
         <text>短回访</text>
       </view>
-
     </view>
   </scroll-view>
 </view>

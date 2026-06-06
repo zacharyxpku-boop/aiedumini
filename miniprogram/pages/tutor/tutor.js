@@ -656,6 +656,44 @@ function publicK12TutorIntro(intakeCard = {}, selected = {}) {
   return `已进入公开 K12 第一问：${subject} · ${taskType}。请贴你自己的作业材料或用一句话复述题目，我只追问第一步：${firstMove} 不给完整答案，不外传原题/照片/分数。`;
 }
 
+function buildTutorHomeContext(selected = {}, state = {}, routeOptions = {}) {
+  const subject = selected.subject || (state.profile && state.profile.subject) || routeOptions.subject || '当前材料';
+  const task = selected.text || selected.title || ((state.homework_plan || {}).must_do || [])[0] && ((state.homework_plan || {}).must_do || [])[0].text || '把题目、卡点或材料发来';
+  const issue = selected.issueType || selected.taskType || routeOptions.mode || routeOptions.from || 'first_step';
+  const source = routeOptions.from === 'upload_report_ready'
+    ? '已接住上传材料'
+    : selected && selected.text
+      ? '已接住上次卡点'
+      : routeOptions.from
+        ? '已接住入口上下文'
+        : '首页从这里开始';
+  const emotionLine = /anxiety|parent|profile|report|upload_report|still_blocked/.test(`${routeOptions.from || ''} ${issue}`)
+    ? '先稳住情绪，再问第一步。'
+    : '先听孩子说，不急着讲完整过程。';
+  const knowledgeLine = selected && selected.evidence && selected.evidence.wrong_cause
+    ? `当前错因：${selected.evidence.wrong_cause}`
+    : `当前线索：${subject}`;
+  return {
+    title: selected && (selected.text || selected.title) ? '咕点正在看这一步' : '咕点先听你说',
+    line: selected && selected.text
+      ? `围绕「${task}」追问第一步、依据和错因。`
+      : '不用先选功能。把题目、卡点、家长担心或上传材料发来，原点只问下一句。',
+    subject,
+    chips: [
+      source,
+      subject,
+      '苏格拉底追问',
+      '不代写答案'
+    ].filter(Boolean).slice(0, 4),
+    careCards: [
+      { id: 'parent_anxiety', title: '接住家长焦虑', line: '只给可验证的一句话，不贴长期标签。' },
+      { id: 'child_emotion', title: '接住孩子情绪', line: emotionLine },
+      { id: 'knowledge_guidance', title: '引导知识入口', line: knowledgeLine },
+      { id: 'ability_growth', title: '培养能力', line: '让孩子说出第一步、依据和下次检查点。' }
+    ]
+  };
+}
+
 function buildSocraticFeedbackAdjustment(item, turnState = {}) {
   const currentLevel = Math.max(1, Math.min(5, Number((item && item.hintLevel) || turnState.hintLevel || 1)));
   if (item && item.status === 'first_step_spoken') {
@@ -1024,14 +1062,15 @@ Page({
     childExitTicketText: '',
     surfaceDepthPack: null,
     unifiedNextAction: null,
-    showTutorDetails: false
+    showTutorDetails: false,
+    tutorHomeContext: buildTutorHomeContext()
   },
 
   trackedMasteryStatus: '',
 
   onShow() {
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
-      this.getTabBar().setData({ selected: 1 });
+      this.getTabBar().setData({ selected: 0 });
     }
     const pendingRoute = navigation.consumePendingTabRouteContext
       ? navigation.consumePendingTabRouteContext('/pages/tutor/tutor')
@@ -1086,8 +1125,8 @@ Page({
       : entryTutorIntent
       ? entryTutorIntent.intro
       : selected
-      ? `我已锁定今晚第一项必须做：「${selected.text}」。先说你的第一步，我只处理关键错因。`
-      : '我只处理必须做任务和关键错因，不替你写作业。先从首页锁定一项今晚必须做。';
+      ? `我已接住这个卡点：「${selected.text}」。先说你的第一步，我只处理关键错因。`
+      : '把题目、材料、家长担心或孩子卡住的地方发来。我不代写答案，只追问下一小步。';
     const savedMessages = storage.get(storage.KEYS.tutorMessages, null);
     const messages = entryTutorIntent && entryTutorIntent.resetMessages ? [
       { role: 'assistant', text: intro }
@@ -1102,6 +1141,7 @@ Page({
     const receipt = Object.assign({}, buildThinkingReceipt(messages, null, pasteRisk, this.data.activeStep, selected), {
       fallbackId: `initial_${messages.length}`
     });
+    const tutorHomeContext = buildTutorHomeContext(selected, state, routeOptions);
     this.setData({
       selected,
       selectedEvidence,
@@ -1124,6 +1164,7 @@ Page({
       miniLessonParentAssistCard: null,
       miniLessonActiveFrameIndex: 0,
       childExitTicketText: '',
+      tutorHomeContext,
       tutorTurnState,
       surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('tutor') : null,
       unifiedNextAction: storage.buildUnifiedNextActionController ? storage.buildUnifiedNextActionController({ surface: 'tutor' }) : null
@@ -1894,7 +1935,7 @@ Page({
   },
 
   goHome() {
-    navigation.switchTab('/pages/home/home');
+    navigation.switchTab('/pages/tutor/tutor');
   },
 
   openEntryDetail(event) {

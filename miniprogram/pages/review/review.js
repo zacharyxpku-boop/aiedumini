@@ -123,7 +123,7 @@ Page({
 
   onShow() {
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
-      this.getTabBar().setData({ selected: 2 });
+      this.getTabBar().setData({ selected: 1 });
     }
     const pendingRoute = navigation.consumePendingTabRouteContext
       ? navigation.consumePendingTabRouteContext('/pages/review/review')
@@ -2190,7 +2190,7 @@ Page({
   },
 
   goHome() {
-    navigation.switchTab('/pages/home/home');
+    navigation.switchTab('/pages/tutor/tutor');
   },
 
   goLearningMap() {

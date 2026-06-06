@@ -191,6 +191,6 @@ Page({
       wx.navigateBack();
       return;
     }
-    navigation.switchTab('/pages/home/home');
+    navigation.switchTab('/pages/tutor/tutor');
   }
 });

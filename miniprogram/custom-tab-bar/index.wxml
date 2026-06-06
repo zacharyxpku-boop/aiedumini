@@ -2,15 +2,6 @@
   <view
     class="yd-tab-item {{selected === 0 ? 'active' : ''}}"
     data-index="0"
-    data-path="/pages/home/home"
-    bindtap="switchTab"
-  >
-    <view class="yd-tab-icon-wrap"><image class="yd-tab-icon" mode="aspectFit" src="/assets/reference/brand-house.png" /></view>
-    <view class="yd-tab-text">今天</view>
-  </view>
-  <view
-    class="yd-tab-item {{selected === 1 ? 'active' : ''}}"
-    data-index="1"
     data-path="/pages/tutor/tutor"
     bindtap="switchTab"
   >
@@ -18,8 +9,8 @@
     <view class="yd-tab-text">AI点拨</view>
   </view>
   <view
-    class="yd-tab-item {{selected === 2 ? 'active' : ''}}"
-    data-index="2"
+    class="yd-tab-item {{selected === 1 ? 'active' : ''}}"
+    data-index="1"
     data-path="/pages/review/review"
     bindtap="switchTab"
   >
@@ -27,8 +18,8 @@
     <view class="yd-tab-text">短回访</view>
   </view>
   <view
-    class="yd-tab-item {{selected === 3 ? 'active' : ''}}"
-    data-index="3"
+    class="yd-tab-item {{selected === 2 ? 'active' : ''}}"
+    data-index="2"
     data-path="/pages/profile/profile"
     bindtap="switchTab"
   >
@@ -36,8 +27,8 @@
     <view class="yd-tab-text">家长</view>
   </view>
   <view
-    class="yd-tab-item {{selected === 4 ? 'active' : ''}}"
-    data-index="4"
+    class="yd-tab-item {{selected === 3 ? 'active' : ''}}"
+    data-index="3"
     data-path="/pages/upload/upload"
     bindtap="switchTab"
   >

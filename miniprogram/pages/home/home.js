@@ -2026,7 +2026,7 @@ Page({
   },
 
   goHome() {
-    navigation.switchTab('/pages/home/home');
+    navigation.switchTab('/pages/tutor/tutor');
   },
 
   goReview() {

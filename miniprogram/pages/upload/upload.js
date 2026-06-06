@@ -898,7 +898,7 @@ Page({
 
   onShow() {
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
-      this.getTabBar().setData({ selected: 4 });
+      this.getTabBar().setData({ selected: 3 });
     }
     const pendingRoute = navigation.consumePendingTabRouteContext
       ? navigation.consumePendingTabRouteContext('/pages/upload/upload')
@@ -2480,7 +2480,7 @@ Page({
   },
 
   goHome() {
-    navigation.switchTab('/pages/home/home');
+    navigation.switchTab('/pages/tutor/tutor');
   },
 
   openEntryDetail(event) {

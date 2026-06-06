@@ -3138,7 +3138,7 @@ Page({
 
   onShow() {
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
-      this.getTabBar().setData({ selected: 3 });
+      this.getTabBar().setData({ selected: 2 });
     }
     if (this._profileRefreshTimer) {
       clearTimeout(this._profileRefreshTimer);
@@ -4339,7 +4339,7 @@ Page({
   },
 
   goHome() {
-    navigation.switchTab('/pages/home/home');
+    navigation.switchTab('/pages/tutor/tutor');
   },
 
   openEntryDetail(event) {

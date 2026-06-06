@@ -159,6 +159,27 @@ page {
   -webkit-line-clamp: 2;
 }
 
+.tutor-context-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+  margin-top: 14rpx;
+}
+
+.tutor-context-chips text {
+  max-width: 100%;
+  padding: 7rpx 12rpx;
+  border: 1rpx solid rgba(34, 185, 92, 0.14);
+  border-radius: 999rpx;
+  color: #216a46;
+  background: #f0fbef;
+  font-size: 20rpx;
+  font-weight: 860;
+  line-height: 1.18;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
 .tutor-chip-row {
   display: flex;
   flex-wrap: wrap;
@@ -175,6 +196,49 @@ page {
   font-size: 21rpx;
   font-weight: 820;
   white-space: normal;
+}
+
+.tutor-care-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10rpx;
+}
+
+.tutor-care-card {
+  display: grid;
+  min-height: 98rpx;
+  align-content: center;
+  gap: 5rpx;
+  padding: 14rpx 16rpx;
+  border: 1rpx solid rgba(232, 238, 230, 0.95);
+  border-radius: 20rpx;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 10rpx 22rpx rgba(38, 58, 43, 0.04);
+}
+
+.tutor-care-card text {
+  display: block;
+  min-width: 0;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.tutor-care-card text:first-child {
+  color: #17211d;
+  font-size: 23rpx;
+  font-weight: 950;
+  line-height: 1.18;
+}
+
+.tutor-care-card text:last-child {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #64706a;
+  font-size: 20rpx;
+  font-weight: 760;
+  line-height: 1.28;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .tutor-socratic-panel {
