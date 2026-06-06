@@ -2495,7 +2495,7 @@ Page({
   },
 
   goLearningMap() {
-    wx.navigateTo({ url: '/pages/entry-detail/entry-detail?scene=today&from=upload' });
+    navigation.navigateLearningRoute('/pages/profile/profile?from=upload_report_ready');
   },
 
   viewLatestReport() {

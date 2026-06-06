@@ -184,7 +184,7 @@ function buildReviewViewModel(input = {}) {
   const evidence = todayFocus ? focusEvidence(todayFocus) : null;
   const blackboard = buildVisualBlackboard(todayFocus);
   return {
-    routePill: '今晚路线 · 第 3 步：修卡点',
+    routePill: '卡点修复 · 说清最卡一步',
     companionStrip: companionStrip(input.companionPreference),
     title: '今晚只修一个卡点',
     subtitle: '不是整题不会，只先把最卡的这一步说清楚。',

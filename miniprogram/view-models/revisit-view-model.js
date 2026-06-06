@@ -102,7 +102,7 @@ function buildPrimaryCta(hasReviewCard) {
 function buildRevisitViewModel(input = {}) {
   const primaryCard = buildPrimaryCard(input);
   return {
-    routePill: '今晚路线 · 第 4 步：明天轻轻回访',
+    routePill: '短回访 · 明天轻轻复盘',
     companionStrip: companionStrip(input.companionPreference, primaryCard.hasReviewCard),
     title: '今天只回看这一小步',
     subtitle: '不是测验，不翻旧账，只把昨天开始过的第一步轻轻接回来。',

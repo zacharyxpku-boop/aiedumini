@@ -176,7 +176,7 @@ function buildProfileViewModel(input = {}) {
   const hasFocus = !!(input.todayFocus && input.todayFocus.id !== null);
   const parentRecap = buildParentRecap(input);
   return {
-    routePill: '今晚路线 · 第 5 步：家长 5 秒复盘',
+    routePill: '家长复盘 · 5 秒看证据',
     companionStrip: companionStrip(input.companionPreference),
     title: '今晚家长只问这一句',
     subtitle: '不是看分数，是看孩子今晚有没有说出第一步、围绕它坐过一段。',

@@ -3,10 +3,10 @@ const storage = require('../utils/storage');
 const UNSAFE_KEY_RE = /^[a-z]+(?:_[a-z0-9]+)+$|[a-z]+[A-Z][a-zA-Z]+/;
 
 const COMPANION_HOME_COPY = {
-  gudian: '咕点：我懂你卡住了，我陪你先迈出第一步。'
+  gudian: '咕点：把材料和卡点发来，我陪你先看清问题。'
 };
 
-function safeText(value, fallback = '今晚路线') {
+function safeText(value, fallback = '学习建议') {
   const text = String(value || '').replace(/\s+/g, ' ').trim();
   if (!text || UNSAFE_KEY_RE.test(text)) return fallback;
   return text.slice(0, 90);
@@ -180,7 +180,7 @@ function buildPrimaryHomeNextAction(input = {}) {
       type: 'first_step',
       priority: 50,
       dispatchCode: 5,
-      kicker: '今晚路线',
+      kicker: '学习建议',
       title: '接上已经确认的第一步',
       body: safeText(input.todayFocus.systemSuggestedStep || input.todayFocus.childArticulatedStep, '先把这一小步做完。'),
       cta: '去专注舱'
@@ -191,10 +191,10 @@ function buildPrimaryHomeNextAction(input = {}) {
     type: 'first_step',
     priority: 90,
     dispatchCode: 6,
-    kicker: '今晚路线',
-    title: '今晚作业先从哪一步开始？',
-    body: '发作业清单，或者说一句你卡在哪里。',
-    cta: '帮我安排今晚学习'
+    kicker: '学习建议',
+    title: '把材料或卡住点先发过来',
+    body: '可以上传作业、错题，也可以直接说一句哪里卡住。',
+    cta: '分析今晚情况'
   };
   return {
     priority: fallback.priority,
@@ -230,9 +230,9 @@ function buildHomeViewModel(input = {}) {
     primaryCta: hasPlanOrFocus ? '重新分析今晚情况' : '分析今晚情况',
     secondaryAction: '卡住了，去 AI 点拨',
     teacherPickerLabel: '咕点在旁边',
-    teacherPickerHint: '我懂你卡住了，我陪你先迈出第一步。',
+    teacherPickerHint: '把材料和卡点发来，我陪你先看清问题。',
     selectedCompanionLabel: safeText((companionPreference(input.companionPreference) || {}).selectedLabel, '咕点'),
-    emptyState: hasPlanOrFocus ? null : '还没有今晚路线。咕点在旁边，先说一句卡在哪里。',
+    emptyState: hasPlanOrFocus ? null : '还没有分析结果。咕点在旁边，先说一句卡在哪里。',
     primaryNextAction,
     nextStep: buildNextStep(Object.assign({}, input, { miniLessonResume })),
     personalPlan,

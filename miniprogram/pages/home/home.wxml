@@ -12,7 +12,7 @@
       <image class="home-brand-icon" mode="aspectFit" src="/assets/reference/brand-house.png" />
       <view>
         <view class="home-title">原点智学</view>
-        <view class="home-subtitle">今晚先推出第一步</view>
+        <view class="home-subtitle">作业和卡点先分析</view>
       </view>
     </view>
   </view>
@@ -43,7 +43,7 @@
         <view class="home-upload-copy">
           <view class="home-card-kicker">材料分析</view>
           <view class="home-upload-title">拍作业或发错题</view>
-          <view class="home-upload-sub">图片、文字、试卷都可以。先看清任务，再决定今晚从哪一步开始。</view>
+          <view class="home-upload-sub">图片、文字、试卷都可以。先看清材料和卡点，再给出学习建议。</view>
           <view class="home-upload-cta">上传材料</view>
         </view>
         <image class="home-upload-visual" mode="aspectFit" src="/assets/reference/upload-folder-stack-transparent.png" />
@@ -54,11 +54,6 @@
           <image class="home-result-icon" mode="aspectFit" src="/assets/reference/family-avatar-group-transparent.png" />
           <text>家长报告</text>
           <text>看证据、看下一步</text>
-        </view>
-        <view class="home-result-card green" data-scene="today" bindtap="openEntryDetail">
-          <image class="home-result-icon" mode="aspectFit" src="/assets/reference/learning-route-map-transparent.png" />
-          <text>今晚路径</text>
-          <text>把任务排成顺序</text>
         </view>
       </view>
       <view class="mini-route-card">

@@ -465,7 +465,7 @@ function buildRouteStrip(active, tonightPlan) {
     { id: 'parent', label: '家长看' }
   ];
   return {
-    text: '今晚路线：排顺序 → 说第一步 → 修卡点 → 明天验证 → 家长看',
+    text: '学习记录：材料分析 → AI 点拨 → 短回访 → 家长看',
     steps: steps.map((step) => Object.assign({}, step, { active: step.id === active }))
   };
 }
@@ -4277,7 +4277,7 @@ Page({
       return;
     }
     const routeTargets = {
-      learningMap: '/pages/entry-detail/entry-detail?scene=today&from=parent_learning_map',
+      learningMap: '/pages/profile/profile?from=parent_learning_map',
       review: '/pages/review/review',
       upload: '/pages/upload/upload',
       reportPreview: '/pages/entry-detail/entry-detail?scene=parent&from=parent_report',
@@ -4350,11 +4350,11 @@ Page({
   },
 
   goLearningMap() {
-    wx.navigateTo({ url: '/pages/entry-detail/entry-detail?scene=today&from=parent' });
+    navigation.navigateLearningRoute('/pages/profile/profile?from=parent_learning_map');
   },
 
   goFocus() {
-    wx.navigateTo({ url: '/pages/entry-detail/entry-detail?scene=today&from=parent_focus' });
+    navigation.navigateLearningRoute('/pages/tutor/tutor?from=parent_focus&open=flow');
   },
 
   goProfile() {

@@ -1,43 +1,12 @@
 const navigation = require('../../utils/navigation');
 
 const SCENES = {
-  today: {
-    badge: '今晚主线',
-    title: '今晚先从哪一步开始',
-    subtitle: '把今晚作业排成一个可执行起点。先说第一步；材料不够，再补一份证据。',
-    heroImage: '/assets/reference/learning-route-map-transparent.png',
-    focusCopy: '先让孩子说出起点，再进入点拨；做完留一条明天能回看的证据。',
-    primaryLabel: '说第一步',
-    primaryRoute: '/pages/tutor/tutor?from=entry_today_first_step&open=flow',
-    secondaryLabel: '先传材料',
-    secondaryRoute: '/pages/upload/upload?from=entry_today_material',
-    cards: [
-      { label: '先定优先级', value: '把必须做、可放后、明天回访分开。', icon: '/assets/reference/entry-upload.png', scene: 'upload' },
-      { label: '再说第一步', value: '孩子先说从哪里开始，AI点拨只追问下一句。', icon: '/assets/reference/entry-tutor.png', scene: 'tutor' },
-      { label: '最后留证据', value: '完成后进入短回访或家长进展卡。', icon: '/assets/reference/entry-review.png', scene: 'review' }
-    ],
-    spotlight: {
-      kicker: '今晚路线板',
-      title: '只决定今晚的第一个动作',
-      image: '/assets/reference/learning-route-map-transparent.png',
-      metrics: [
-        { label: '任务拆解', value: '3步' },
-        { label: '预计用时', value: '15分' },
-        { label: '留证据', value: '1条' }
-      ],
-      points: [
-        '先选一个最容易开始的动作，不把所有任务摊开讲。',
-        '孩子说出第一步后，再进入 AI 点拨。',
-        '做完留一条证据，明天才能接着回访。'
-      ]
-    }
-  },
   upload: {
     badge: '材料入口',
-    title: '上传材料，生成报告和路线',
-    subtitle: '把作业、错题、成绩或家长观察发进来。系统先分类，再给家长报告和今晚路线。',
+    title: '上传材料，生成家长报告',
+    subtitle: '把作业、错题、成绩或家长观察发进来。系统先分类，再给家长报告。',
     heroImage: '/assets/reference/upload-folder-stack-transparent.png',
-    focusCopy: '先补真实材料；上传后直接生成家长报告和今晚路线两个结果。',
+    focusCopy: '先补真实材料；上传后直接生成家长报告。',
     primaryLabel: '上传材料',
     primaryRoute: '/pages/upload/upload?from=entry_upload_file&open=flow',
     secondaryLabel: '做快测',
@@ -59,7 +28,7 @@ const SCENES = {
       points: [
         '作业、错题、成绩、老师反馈和家长观察分开处理。',
         '材料不足时只提示补什么，不硬下结论。',
-        '上传后直接进入报告和今晚路线。'
+        '上传后直接进入家长报告。'
       ]
     }
   },
@@ -106,7 +75,7 @@ const SCENES = {
     secondaryRoute: '/pages/review/review?from=entry_tutor_card',
     cards: [
       { label: '孩子说', value: '我准备先看哪一个条件、哪一句话。', icon: '/assets/reference/entry-tutor.png', scene: 'tutor' },
-      { label: 'AI问', value: '下一步只问一个更小的问题。', icon: '/assets/reference/entry-map.png', scene: 'today' },
+      { label: 'AI问', value: '下一步只问一个更小的问题。', icon: '/assets/reference/entry-tutor.png', scene: 'tutor' },
       { label: '家长看', value: '只看第一步证据和明天怎么回访。', icon: '/assets/reference/entry-parent.png', scene: 'parent' }
     ],
     spotlight: {
@@ -137,7 +106,7 @@ const SCENES = {
     secondaryRoute: '/pages/tutor/tutor?from=entry_review_repair',
     cards: [
       { label: '记忆', value: '能不能说出关键概念。', icon: '/assets/reference/entry-review.png', scene: 'review' },
-      { label: '迁移', value: '换一道同类题还会不会开始。', icon: '/assets/reference/entry-map.png', scene: 'today' },
+      { label: '迁移', value: '换一道同类题还会不会开始。', icon: '/assets/reference/entry-review.png', scene: 'review' },
       { label: '证据', value: '只记录第一步、错因和明天回访。', icon: '/assets/reference/entry-report.png', scene: 'report' }
     ],
     spotlight: {
@@ -192,17 +161,17 @@ const SCENES = {
 
 Page({
   data: {
-    sceneKey: 'today',
-    scene: SCENES.today
+    sceneKey: 'upload',
+    scene: SCENES.upload
   },
 
   onLoad(query = {}) {
-    const key = query.scene || 'today';
+    const key = query.scene || 'upload';
     this.setScene(key);
   },
 
-  setScene(key = 'today') {
-    const sceneKey = SCENES[key] ? key : 'today';
+  setScene(key = 'upload') {
+    const sceneKey = SCENES[key] ? key : 'upload';
     this.setData({
       sceneKey,
       scene: SCENES[sceneKey]

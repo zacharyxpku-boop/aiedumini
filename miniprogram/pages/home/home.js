@@ -104,7 +104,7 @@ Page({
     todayFocus: null,
     tonightPlan: null,
     routeStrip: null,
-    routeDisplayText: '今晚路线 · 第 1 步：排顺序',
+    routeDisplayText: '材料分析 · 先看清卡点',
     companionPreference: { selectedCompanion: 'gudian', selectedLabel: '咕点' },
     companionCopy: { home: '咕点陪你先找今晚第一步。' },
     companionLine: '咕点：我懂你卡住了，我陪你先迈出第一步。',
@@ -706,7 +706,7 @@ Page({
       todayFocus,
       tonightPlan,
       routeStrip: this.buildRouteStrip('plan', tonightPlan),
-      routeDisplayText: '今晚路线 · 第 1 步：排顺序',
+      routeDisplayText: '材料分析 · 先看清卡点',
       companionPreference,
       companionCopy: {
         home: storage.getCompanionStageCopy ? storage.getCompanionStageCopy('home_plan', companionPreference) : '咕点陪你先找今晚第一步。'
@@ -742,8 +742,8 @@ Page({
   buildRouteStrip(active, tonightPlan) {
     const plan = tonightPlan || {};
     return {
-      text: plan.summaryLine || '今晚路线：排顺序 → 说第一步 → 修卡点 → 短回访 → 家长看',
-      shortText: '今晚路线 · 第 1 步：排顺序',
+      text: plan.summaryLine || '学习记录：材料分析 → AI 点拨 → 短回访 → 家长看',
+      shortText: '材料分析 · 先看清卡点',
       steps: (plan.routeSteps || [
         { id: 'plan', label: '排顺序' },
         { id: 'first_step', label: '说第一步' },
@@ -1898,7 +1898,7 @@ Page({
         todayFocus: this.data.todayFocus
       }),
       routeStrip: this.buildRouteStrip('plan', plan),
-      focusFeedback: plan ? '已排好今晚路线，先做第一项；卡住时再说第一步。' : '先写今晚作业清单，我来帮你排顺序。'
+      focusFeedback: plan ? '已根据材料生成学习建议；卡住时进 AI 点拨。' : '先写作业清单或卡住点，我来帮你分析。'
     });
   },
 
@@ -1998,8 +1998,8 @@ Page({
   openEntryDetail(event) {
     const scene = event && event.currentTarget && event.currentTarget.dataset
       ? event.currentTarget.dataset.scene
-      : 'today';
-    wx.navigateTo({ url: `/pages/entry-detail/entry-detail?scene=${scene || 'today'}` });
+      : 'upload';
+    wx.navigateTo({ url: `/pages/entry-detail/entry-detail?scene=${scene || 'upload'}` });
   },
 
   goUpload() {
@@ -2020,9 +2020,9 @@ Page({
 
   goLearningMap() {
     this.trackShareActivation('revisit_started', {
-      next: 'entry-detail'
+      next: 'review'
     });
-    wx.navigateTo({ url: '/pages/entry-detail/entry-detail?scene=today' });
+    navigation.navigateLearningRoute('/pages/review/review?from=home_revisit');
   },
 
   goHome() {
@@ -2128,7 +2128,7 @@ Page({
       wx.showToast({ title: '先回咕点确认今晚第一步，才能进入专注。', icon: 'none' });
       return;
     }
-    wx.navigateTo({ url: '/pages/entry-detail/entry-detail?scene=today&from=first_step_focus' });
+    this.openTutorFromHome('/pages/tutor/tutor?from=home_first_step_focus&open=flow');
   },
 
   continueYesterdayReview() {

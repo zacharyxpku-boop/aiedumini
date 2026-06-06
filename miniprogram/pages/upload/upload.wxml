@@ -16,7 +16,7 @@
         <view class="yd-upload-hero" bindtap="submit">
           <view class="yd-upload-copy">
             <view class="yd-upload-title">先把材料分清楚</view>
-            <view class="yd-upload-sub">把作业、错题、成绩或测评先发过来。系统先分类，再生成家长报告和今晚路线。</view>
+            <view class="yd-upload-sub">把作业、错题、成绩或测评先发过来。系统先分类，再生成家长能看懂的报告。</view>
             <view class="yd-upload-proof">
               <text>点击上传材料</text>
               <text>不公开分享</text>
@@ -32,7 +32,7 @@
         </view>
 
         <view class="upload-intake-workbench">
-          <view class="upload-workbench-head"><text>把材料变成报告</text><text>先粘贴清单或家长观察，再生成今晚路线</text></view>
+          <view class="upload-workbench-head"><text>把材料变成报告</text><text>先粘贴清单或家长观察，再生成报告</text></view>
           <textarea class="upload-textarea" value="{{homeworkText}}" bindinput="onInput" maxlength="1200" placeholder="例：数学应用题 4 道，孩子卡在等量关系；英语听写 20 个，容易错前 8 个。" />
           <view class="upload-chip-row">
             <text wx:for="{{quickChips}}" wx:key="label" data-index="{{index}}" bindtap="useQuickChip">{{item.label}}</text>
@@ -56,10 +56,6 @@
             <text>2</text>
             <text>家长报告</text>
           </view>
-          <view>
-            <text>3</text>
-            <text>今晚路线</text>
-          </view>
         </view>
 
         <view class="upload-material-grid yd-jump-grid">
@@ -68,14 +64,9 @@
             <text>家长报告</text>
             <text>证据与方法匹配</text>
           </view>
-          <view class="upload-material-card yd-jump-card primary map-card" data-scene="today" bindtap="openEntryDetail">
-            <image class="upload-material-icon yellow" mode="aspectFit" src="/assets/reference/entry-map.png" />
-            <text>今晚路线</text>
-            <text>从哪一步开始做</text>
-          </view>
         </view>
 
-        <view class="yd-upload-primary" bindtap="submit">生成报告和今晚路线</view>
+        <view class="yd-upload-primary" bindtap="submit">生成家长报告</view>
         <view class="upload-report-ready" wx:if="{{lastReportCta}}">
           <text class="upload-report-title">报告已生成 · {{lastReportCta.title}}</text><block wx:if="{{parentReportWorkflowView}}">
             <text class="upload-report-flow">{{parentReportWorkflowView.statusLine}}</text>

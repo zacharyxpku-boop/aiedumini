@@ -576,14 +576,6 @@ function currentRouteOptions() {
 function buildEntryTutorIntent(options = {}) {
   const from = String(options.from || '');
   const open = String(options.open || '');
-  if (from === 'entry_today_first_step') {
-    return {
-      from,
-      open,
-      intro: '我已从今晚路线进入。先说你准备从哪一步开始，我只追问下一小步。',
-      resetMessages: open === 'flow'
-    };
-  }
   if (from === 'entry_tutor_first_step') {
     return {
       from,
@@ -1921,7 +1913,7 @@ Page({
       wx.showToast({ title: '先回咕点确认今晚第一步，才能进专注舱。', icon: 'none' });
       return;
     }
-    wx.navigateTo({ url: '/pages/entry-detail/entry-detail?scene=today&from=tutor_focus' });
+    navigation.navigateLearningRoute('/pages/review/review?from=tutor_focus');
   },
 
   goReview() {

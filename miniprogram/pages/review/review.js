@@ -574,7 +574,7 @@ Page({
       { id: 'parent', label: '家长看' }
     ];
     return {
-      text: '今晚路线：这里承接最值得修的一个卡点。',
+      text: '学习记录：这里承接最值得修的一个卡点。',
       steps: steps.map((step) => Object.assign({}, step, { active: step.id === active }))
     };
   },
@@ -2194,7 +2194,7 @@ Page({
   },
 
   goLearningMap() {
-    wx.navigateTo({ url: '/pages/entry-detail/entry-detail?scene=today&from=review' });
+    navigation.navigateLearningRoute('/pages/review/review?from=review_continue');
   },
 
   openEntryDetail(event) {
@@ -2206,7 +2206,7 @@ Page({
   },
 
   goFocus() {
-    wx.navigateTo({ url: '/pages/entry-detail/entry-detail?scene=today&from=review_focus' });
+    navigation.navigateLearningRoute('/pages/tutor/tutor?from=review_focus&open=flow');
   },
 
   goProfile() {
