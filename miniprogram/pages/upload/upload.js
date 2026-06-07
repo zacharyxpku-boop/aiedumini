@@ -205,7 +205,7 @@ function buildUploadPersonalizedClosureView(bridge = {}) {
     title: '个性化闭环执行桥',
     statusLine: bridge.status === 'ready_for_guided_execution'
       ? '已具备真实任务证据：可以进入AI私教、修卡点、回访和家长报告。'
-      : '先补真实任务证据：资料/成绩只能生成方法候选，不能直接放行游戏或服务。',
+      : '先补真实任务证据：资料/成绩只能生成方法候选，不能直接放行分享或服务。',
     contentLine: `内容密度：${bridge.contentScalePlan ? bridge.contentScalePlan.density : 'pending'}；题型：${bridge.questionType || 'unknown'}；学科：${bridge.subject || 'unknown'}`,
     socraticLine: bridge.socraticStressFallback
       ? `苏格拉底兜底：${bridge.socraticStressFallback.fallbackOrder.join(' / ')}`
@@ -422,7 +422,7 @@ function buildUploadDailyExecutionSeed(options = {}) {
     gameLine: gameUnlocked
       ? '短回访已解锁：只练主动回忆，不看速度、分数或同伴比较。'
       : '短回访暂不解锁：先补孩子第一步或错因证据。',
-    releaseLine: '放行规则：有第一步 + 错因 + 明天回访证据，才进入游戏或分享。',
+    releaseLine: '放行规则：有第一步 + 错因 + 明天回访证据，才进入短回访或分享。',
     blockedLine: '不带原题、完整答案、分数、名次、天赋标签、孩子姓名或联系方式。',
     evidenceRequired: ['child_first_step', 'wrong_cause_named', 'next_day_revisit', 'parent_check'],
     syncPayload: {
@@ -535,7 +535,7 @@ function buildUploadModeRecommendationView(modes = []) {
   return {
     id: 'upload_mode_recommendation_delivery_view',
     title: '今晚学习模式',
-    summaryLine: '默认仍是一对一苏格拉底点拨；小课堂、游戏和课程只在证据满足时补位。',
+    summaryLine: '默认仍是一对一苏格拉底点拨；小课堂、短回访和课程只在证据满足时补位。',
     cards
   };
 }
@@ -731,7 +731,7 @@ function buildMaterialTypeGuide(type) {
     parent_report: {
       examplePlaceholder: '粘贴家长观察即可：\n晚上 8 点后容易拖拉；\n遇到应用题会急，说“我不会”；\n如果先复述题意，情绪会稳定一点。',
       statusLine: '当前生成家庭决策书和低压陪伴话术，不给孩子贴能力标签。',
-      modeLine: '验证方式：今晚只验证一个动作，明天看孩子是否能少卡一步。',
+      modeLine: '验证方式：本次只验证一个动作，明天看孩子是否能少卡一步。',
       blockedClaimsLine: '不能做：能力定性、情绪诊断、家庭教育评判。'
     },
     wechat_article: {
@@ -755,7 +755,7 @@ function buildMaterialTypeGuide(type) {
   };
   return guides[type] || {
     examplePlaceholder: '粘贴课堂笔记、PPT 要点或手动整理：\n今天讲了什么概念；\n老师强调了哪一步；\n孩子具体哪一步没接上。',
-    statusLine: '当前生成本地复习卡和轻练习，不承诺自动解析文件或直接出答案。',
+    statusLine: '当前生成本地复习卡和短回访练习，不承诺自动解析文件或直接出答案。',
     modeLine: '验证方式：先拆成概念、步骤、陷阱、填空四类卡。',
     blockedClaimsLine: '不能做：自动抓取、自动批改、完整答案生成。'
   };
@@ -1345,7 +1345,7 @@ Page({
     return {
       title: '材料证据补全',
       summary: '不同材料补不同证据：测评补方法假设，学校材料补家校交接，家长观察补今晚动作，错题补第一步和错因。',
-      releaseGate: '本地规则决定报告、游戏和分享是否放行；AI 只改写追问和家长摘要。',
+      releaseGate: '本地规则决定报告、短回访和分享是否放行；AI 只改写追问和家长摘要。',
       fields,
       values,
       readyCount,
@@ -1376,8 +1376,8 @@ Page({
     return {
       title: '资料先补证据',
       line: missing.length
-        ? `还差：${missing.slice(0, 2).join(' / ')}。补齐后才生成家长报告、轻练习或分享。`
-        : '这类资料必须先补齐结构化证据，不能直接放行报告、游戏或分享。',
+        ? `还差：${missing.slice(0, 2).join(' / ')}。补齐后才生成家长报告、短回访或分享。`
+        : '这类资料必须先补齐结构化证据，不能直接放行报告、短回访或分享。',
       route: '/pages/upload/upload?from=material_evidence_gate',
       actionRoute: '/pages/upload/upload?from=material_evidence_gate',
       gameRoute: '',
@@ -1643,7 +1643,7 @@ Page({
     const openMaicDecisionBridge = openMaicInspiredPlan.buildOpenMaicInspiredDecisionBridge(openMaicTaskPlan, reportDraft, {
       nextStep: actionRoute
     }, {
-      summary: sourceSchemaId === 'wrong_question_paper' ? '错题先进入错因复现，再放行轻练习。' : '资料先进入第一步回访，再放行报告。'
+      summary: sourceSchemaId === 'wrong_question_paper' ? '错题先进入错因复现，再放行短回访练习。' : '资料先进入第一步回访，再放行报告。'
     });
     const safeRelayPayload = Object.assign({}, openMaicDecisionBridge.shareRelayPayload || {}, {
       from: 'upload',
@@ -1756,21 +1756,21 @@ Page({
       : {};
     const workflowModuleLine = [
       workflowModuleDecision.tutorRoute ? '苏格拉底点拨' : '',
-      workflowModuleDecision.reviewRoute ? '练习工坊/短回访' : '',
+      workflowModuleDecision.reviewRoute ? '短回访' : '',
       workflowModuleDecision.parentRoute || workflowModuleDecision.reportRoute ? '家长报告' : ''
-    ].filter(Boolean).join(' / ') || '苏格拉底点拨 / 练习工坊/短回访 / 家长报告';
+    ].filter(Boolean).join(' / ') || '苏格拉底点拨 / 短回访 / 家长报告';
     const parentReportWorkflowView = {
-      title: '资料到报告图稿',
+      title: '材料报告已生成',
       statusLine: parentReportGenerationWorkflow && parentReportGenerationWorkflow.parentReadableLine
         ? parentReportGenerationWorkflow.parentReadableLine
-        : '资料已进入报告推理链路。',
+        : '材料已完成分类，可以查看家长报告。',
       sourceLine: parentReportGenerationWorkflow && parentReportGenerationWorkflow.sourceMap
         ? `上传页资料包：${parentReportGenerationWorkflow.sourceMap.sourceCount || 0} 份资料 / ${parentReportGenerationWorkflow.sourceMap.imageCount || 0} 张图片，家长页可看报告预览`
         : '上传页资料包 / 家长观察，家长页可看报告预览',
-      reasoningLine: `本地 reasoning 已接点拨、回访和家长报告：${workflowModuleLine}`,
+      reasoningLine: `下一步可进入：${workflowModuleLine}`,
       imageLine: parentReportGenerationWorkflow && parentReportGenerationWorkflow.apiKey && parentReportGenerationWorkflow.apiKey.requiredForImageRender === false
-        ? 'Image 2 报告图稿生成已可用。'
-        : 'Image 2 报告图稿等待服务端 OPENAI_API_KEY；本地报告预览先可看',
+        ? '报告预览已准备好。'
+        : '报告预览可先查看，完整图稿稍后自动补齐。',
       routes: {
         source: `/pages/upload/upload?from=report_workflow_source&${query}`,
         modules: '/pages/tutor/tutor?from=report_workflow_modules',

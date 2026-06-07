@@ -52,7 +52,7 @@ function firstStepEvidence(input = {}) {
     || '';
   const displayStep = childStep || systemStep || target.title || '';
   return {
-    stuckPointText: safeText(stuck, '今晚第一步还没记录清楚'),
+    stuckPointText: safeText(stuck, '本次第一步还没记录清楚'),
     systemSuggestedStep: safeText(systemStep, '咕点建议先看题目问什么'),
     childArticulatedStep: safeText(childStep, ''),
     displayStep: safeText(displayStep, '先把题目问什么说出来'),
@@ -78,11 +78,11 @@ function proofSummary(input = {}) {
     ? `最近 3 晚：${latest3.filter((item) => item.firstSteps > 0).length} 晚确认第一步，${latest3.filter((item) => item.completedFocus > 0 || item.interruptedFocus > 0).length} 晚留下专注痕迹。`
     : INSUFFICIENT_PROOF;
   const sevenNightText = latest7.length >= 7
-    ? `最近 7 晚：${recentSummary.firstStepDays || 0} 晚确认第一步，${recentSummary.focusDays || 0} 晚专注，${recentSummary.gameDays || 0} 晚短回访。`
+      ? `最近 7 次：${recentSummary.firstStepDays || 0} 次确认第一步，${recentSummary.focusDays || 0} 次专注，${recentSummary.gameDays || 0} 次短回访。`
     : INSUFFICIENT_PROOF;
   return {
     oneNightProof: history.length || focus
-      ? `今晚看见了：孩子说出第一步 ${childSteps} 次，围绕第一步坐下 ${taskBound} 次。`
+      ? `本次看见了：孩子说出第一步 ${childSteps} 次，围绕第一步坐下 ${taskBound} 次。`
       : INSUFFICIENT_PROOF,
     threeNightPattern: threeNightText,
     sevenNightReadiness: sevenNightText,
@@ -102,7 +102,7 @@ function buildParentRecap(input = {}) {
     ? (interrupted ? '中途停下也算开始过。' : '已经围绕这一小步坐过一段。')
     : '还没有进入专注舱留下痕迹。';
   return {
-    tonightRecap: `今晚孩子卡在：${evidence.stuckPointText}`,
+    tonightRecap: `本次孩子卡在：${evidence.stuckPointText}`,
     parentOneQuestion: '你可以只问一句：刚才你第一步先看了哪里？',
     firstStepLine: `他先迈出的第一步是：${evidence.displayStep}`,
     recentFirstStepCount: proof.recentFirstStepCount,
@@ -141,7 +141,7 @@ function buildPrimaryCard(input) {
       {
         id: 'tonightRecap',
         className: '',
-        label: '今晚孩子卡在',
+        label: '本次孩子卡在',
         text: recap.tonightRecap
       },
       {
@@ -178,8 +178,8 @@ function buildProfileViewModel(input = {}) {
   return {
     routePill: '家长复盘 · 5 秒看证据',
     companionStrip: companionStrip(input.companionPreference),
-    title: '今晚家长只问这一句',
-    subtitle: '不是看分数，是看孩子今晚有没有说出第一步、围绕它坐过一段。',
+    title: '家长只问这一句',
+    subtitle: '不是看分数，是看孩子有没有说出第一步、围绕它坐过一段。',
     parentRecap,
     primaryCard: buildPrimaryCard(input),
     primaryCta: '完成今日复盘',

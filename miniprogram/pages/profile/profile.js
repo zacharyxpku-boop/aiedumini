@@ -1860,11 +1860,11 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     ? `上传页 ${workflowSourceMap.sourceCount} 份资料 / ${workflowSourceMap.imageCount || 0} 张图`
     : '上传页资料包 / 家长观察';
   const workflowReasoningLine = workflowModuleDecision.tutorRoute && workflowModuleDecision.reviewRoute
-    ? 'reasoning 已接点拨、回访和家长报告'
-    : 'reasoning 先判证据和模块';
+    ? '已接入点拨、短回访和家长报告'
+    : '先看证据，再决定下一步模块';
   const workflowImageLine = workflowImagePlan.requiresServerSideKey || workflowApiKey.requiredForImageRender
-    ? 'Image 2 等服务端 OPENAI_API_KEY'
-    : 'Image 2 图稿生成可用';
+    ? '报告预览可先查看，完整图稿稍后补齐'
+    : '完整报告图稿已可查看';
   return {
     title: draft.title || '学习画像',
     modeLabel: reportState.reportProgress && reportState.reportProgress.label ? reportState.reportProgress.label : '0% · 快速版',
@@ -1873,7 +1873,7 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     overviewLine: overview.line || '先补一张成绩单或测评描述，咕点会先给出快速版画像。',
     evidenceLine: (overview.evidence || []).slice(0, 2).join(' · '),
     parentReportGenerationWorkflow,
-    parentReportWorkflowTitle: parentReportWorkflowView && parentReportWorkflowView.title ? parentReportWorkflowView.title : '资料到报告图稿',
+    parentReportWorkflowTitle: parentReportWorkflowView && parentReportWorkflowView.title ? parentReportWorkflowView.title : '材料报告已生成',
     parentReportWorkflowSourceLine: workflowSourceLine,
     parentReportWorkflowReasoningLine: workflowPromptEngineering.reasoningPrompt ? workflowReasoningLine : '先看证据，不替孩子做题',
     parentReportWorkflowImageLine: workflowImageLine,
@@ -2984,10 +2984,10 @@ Page({
     thinkingSummary: null,
     reviewSummary: null,
     profileViewModel: {
-      title: '今晚家长先看这一步',
+      title: '家长先看这一步',
       primaryCta: '完成今日复盘',
       parentRecap: {
-        tonightRecap: '今晚先看证据',
+        tonightRecap: '本次先看证据',
         parentOneQuestion: '你刚才先看了哪里？',
         firstStepLine: '先看孩子的第一步',
         trustBoundaryNote: '明天再看一次，确认有没有迁移。'
@@ -3197,10 +3197,10 @@ Page({
       learningReportSummary: {
         ctaLabel: lightProfileViewModel.primaryCta,
         nextActionRoute: '/pages/entry-detail/entry-detail?scene=parent&from=profile_recap_done',
-        parentReportWorkflowTitle: '资料到报告图稿',
+        parentReportWorkflowTitle: '材料报告已生成',
         parentReportWorkflowSourceLine: '上传页资料包 / 家长观察',
-        parentReportWorkflowReasoningLine: 'reasoning 先判证据和模块',
-        parentReportWorkflowImageLine: 'Image 2 等服务端 OPENAI_API_KEY',
+        parentReportWorkflowReasoningLine: '先看证据，再决定下一步模块',
+        parentReportWorkflowImageLine: '报告预览可先查看，完整图稿稍后补齐',
         reportJobCaseId
       }
     });
@@ -3869,9 +3869,9 @@ Page({
   formatReportJobImageLine(status = {}) {
     const images = status.pipeline && status.pipeline.images ? status.pipeline.images : {};
     const imageCount = Number(images.count || 0);
-    if (imageCount > 0) return `Image 2 图稿已生成 ${imageCount} 张，家长预览可继续看`;
+    if (imageCount > 0) return `完整报告图稿已生成 ${imageCount} 张，家长预览可继续看`;
     if (status.status === 'report_job_status_missing' || status.error === 'report_job_status_missing') return '本地报告预览可看，图稿任务还没生成';
-    if (status.externalProviderRequired) return 'Image 2 图稿等服务端 OPENAI_API_KEY，本地报告预览先可看';
+    if (status.externalProviderRequired) return '报告预览可先查看，完整图稿稍后补齐';
     if (status.localWorkCompleteUntilProvider) return '本地报告已准备好，图稿服务端状态正在确认';
     return status.nextBestAction || '本地报告预览可看，远程图稿状态正在查询';
   },

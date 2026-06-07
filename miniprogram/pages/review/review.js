@@ -421,14 +421,18 @@ Page({
     const toolIds = ['quiz', 'match', 'snake'];
     const fallback = {
       quiz: { title: '90秒回忆', pitch: '先在心里回忆，再翻开核对。', readyCount: sourceCards.length, available: !!sourceCards.length },
-      match: { title: '配对消消', pitch: '把短概念和含义配起来。', readyCount: 0, available: false },
-      snake: { title: '顺序拼图', pitch: '把解题步骤排成正确顺序。', readyCount: 0, available: false }
+      match: { title: '概念配对', pitch: '把短概念和含义配起来。', readyCount: 0, available: false },
+      snake: { title: '步骤排序', pitch: '把解题步骤排成正确顺序。', readyCount: 0, available: false }
     };
     return toolIds.map((id) => {
       const item = recommended.find((tool) => tool.id === id) || fallback[id];
       return {
         id,
-        title: item.title || fallback[id].title,
+        title: id === 'match'
+          ? '概念配对'
+          : id === 'snake'
+            ? '步骤排序'
+            : (item.title || fallback[id].title),
         line: item.pitch || fallback[id].pitch,
         count: Number(item.readyCount || 0),
         available: !!item.available,

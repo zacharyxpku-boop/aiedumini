@@ -18,7 +18,7 @@ function companionStrip(input) {
   const line = storage.getCompanionStageCopy
     ? storage.getCompanionStageCopy('review_focus', preference)
     : '咕点陪你只修这一小步，不讲完整结果。';
-  return safeText(line, '咕点陪你只修今晚最卡的这一小步。');
+  return safeText(line, '咕点陪你只修本次最卡的这一小步。');
 }
 
 function issueLabel(todayFocus) {
@@ -186,7 +186,7 @@ function buildReviewViewModel(input = {}) {
   return {
     routePill: '卡点修复 · 说清最卡一步',
     companionStrip: companionStrip(input.companionPreference),
-    title: '今晚只修一个卡点',
+    title: '本次只修一个卡点',
     subtitle: '不是整题不会，只先把最卡的这一步说清楚。',
     primaryCard: buildPrimaryCard(input),
     repairContract: buildRepairContract(todayFocus),

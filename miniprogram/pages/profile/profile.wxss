@@ -257,7 +257,7 @@ page {
 
 .yd-parent-loop {
   grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: repeat(3, minmax(190rpx, 1fr));
+  grid-template-rows: repeat(3, minmax(148rpx, auto));
   flex: 1 1 auto;
   margin-top: 0;
   gap: 12rpx;

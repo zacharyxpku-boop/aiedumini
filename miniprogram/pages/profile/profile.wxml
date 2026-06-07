@@ -15,8 +15,8 @@
 
         <view class="yd-parent-hero">
           <view class="yd-parent-copy">
-            <view class="yd-parent-kicker">家长只看结论</view>
-            <view class="yd-parent-title">今晚结论和一句话</view>
+            <view class="yd-parent-kicker">家长只看证据</view>
+            <view class="yd-parent-title">证据报告和下一问</view>
             <view class="yd-parent-sub">看证据，问一句，明天验证。</view>
           </view>
           <image class="yd-parent-art" mode="aspectFit" src="/assets/reference/family-avatar-group-transparent.png" />
@@ -25,7 +25,7 @@
         <view class="yd-parent-decision" data-scene="parent" bindtap="openEntryDetail">
           <image class="yd-parent-decision-img" mode="aspectFit" src="/assets/reference/report-radar-card-illustration.png" />
           <view class="yd-parent-decision-copy">
-            <text>今晚结论</text>
+            <text>本次证据</text>
             <text>{{profileViewModel.parentRecap.firstStepLine}}</text>
           </view>
           <view class="yd-parent-decision-badge">查看</view>
