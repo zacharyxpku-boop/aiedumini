@@ -178,6 +178,74 @@ page {
   background: #f3fbef;
 }
 
+.review-play-lanes {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8rpx;
+}
+
+.review-play-lane {
+  display: grid;
+  min-width: 0;
+  min-height: 132rpx;
+  align-content: center;
+  justify-items: center;
+  gap: 5rpx;
+  padding: 54rpx 7rpx 12rpx;
+  border: 1rpx solid rgba(232, 238, 230, 0.95);
+  border-radius: 20rpx;
+  background: rgba(255, 255, 255, 0.92);
+  background-position: center 12rpx;
+  background-repeat: no-repeat;
+  background-size: 42rpx 42rpx;
+  box-shadow: 0 8rpx 18rpx rgba(38, 58, 43, 0.045);
+}
+
+.review-play-lane:nth-child(2) {
+  background: #eef7ff;
+}
+
+.review-play-lane:nth-child(3) {
+  background: #f2fbef;
+}
+
+.review-lane-sheet {
+  background-image: url("/assets/reference/entry-review.png");
+}
+
+.review-lane-live {
+  background-image: url("/assets/reference/review-world-map-transparent.png");
+}
+
+.review-lane-solo {
+  background-image: url("/assets/reference/gudian-sticker.png");
+}
+
+.review-play-lane text {
+  display: -webkit-box;
+  max-width: 100%;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  -webkit-box-orient: vertical;
+}
+
+.review-play-lane text:nth-child(2) {
+  color: #17211d;
+  font-size: 21rpx;
+  font-weight: 950;
+  line-height: 1.12;
+  -webkit-line-clamp: 1;
+}
+
+.review-play-lane text:nth-child(3) {
+  color: #66746d;
+  font-size: 20rpx;
+  font-weight: 800;
+  line-height: 1.18;
+  -webkit-line-clamp: 2;
+}
+
 .review-section-head text:first-child {
   color: #18211d;
   font-size: 25rpx;

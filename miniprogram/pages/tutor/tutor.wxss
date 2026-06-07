@@ -192,32 +192,56 @@ page {
   gap: 8rpx;
 }
 
-.tutor-capability-strip > text {
+.tutor-capability-card {
   display: grid;
   min-width: 0;
-  min-height: 92rpx;
+  min-height: 118rpx;
   align-content: center;
   justify-items: center;
-  gap: 6rpx;
-  padding: 10rpx 6rpx;
+  gap: 5rpx;
+  padding: 48rpx 6rpx 10rpx;
   border: 1rpx solid rgba(232, 238, 230, 0.9);
   border-radius: 18rpx;
-  background: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 255, 255, 0.9);
+  background-position: center 10rpx;
+  background-repeat: no-repeat;
+  background-size: 38rpx 38rpx;
+  box-shadow: 0 8rpx 16rpx rgba(38, 58, 43, 0.04);
 }
 
-.tutor-capability-strip > text text:first-child {
+.tutor-capability-tutor {
+  background-image: url("/assets/reference/entry-tutor.png");
+}
+
+.tutor-capability-upload {
+  background-image: url("/assets/reference/entry-upload.png");
+}
+
+.tutor-capability-review {
+  background-image: url("/assets/reference/entry-review.png");
+}
+
+.tutor-capability-parent {
+  background-image: url("/assets/reference/entry-parent.png");
+}
+
+.tutor-capability-card text:first-child {
   color: #13241c;
   font-size: 23rpx;
   font-weight: 950;
   line-height: 1.08;
 }
 
-.tutor-capability-strip > text text:last-child {
+.tutor-capability-card text:nth-child(2) {
+  display: -webkit-box;
   color: #65746c;
   font-size: 20rpx;
   font-weight: 820;
   line-height: 1.16;
   text-align: center;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .tutor-chip-row {

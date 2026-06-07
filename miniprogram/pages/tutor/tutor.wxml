@@ -25,12 +25,12 @@
             </view>
           </view>
 
-          <text class="tutor-capability-strip"><text><text>追问</text><text>不代写答案</text></text><text><text>材料</text><text>作业/错题/测评</text></text><text><text>练习</text><text>8种知识乐园</text></text><text><text>证据</text><text>家长只看重点</text></text></text>
+          <view class="tutor-capability-strip"><text class="tutor-capability-card tutor-capability-tutor"><text>追问</text><text>不代写答案</text></text><text class="tutor-capability-card tutor-capability-upload"><text>材料</text><text>作业/错题/测评</text></text><text class="tutor-capability-card tutor-capability-review"><text>练习</text><text>8种知识乐园</text></text><text class="tutor-capability-card tutor-capability-parent"><text>证据</text><text>家长只看重点</text></text></view>
 
-          <view class="tutor-care-line">
+          <text class="tutor-care-line">
             <text>先稳住，再说第一步</text>
             <text>不直接给答案</text>
-          </view>
+          </text>
 
           <view class="tutor-socratic-panel">
             <view class="tutor-section-head">

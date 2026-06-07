@@ -27,6 +27,8 @@
           <image class="yd-upload-mascot" mode="aspectFit" src="/assets/reference/upload-folder-stack-transparent.png" />
         </view>
 
+        <view class="upload-next-row"><view class="upload-next-card report" bindtap="viewLatestReport"><image mode="aspectFit" src="/assets/reference/entry-report.png" /><text>家长报告</text><text>先出证据卡，再给今晚一句话</text></view><view class="upload-next-card route" bindtap="goReview"><image mode="aspectFit" src="/assets/reference/learning-route-map-transparent.png" /><text>知识乐园路线</text><text>把错因变成互动练习和练习单</text></view></view>
+
         <view class="upload-intake-workbench">
           <view class="upload-workbench-head"><text>粘贴材料</text><text>生成前先看证据</text></view>
           <textarea class="upload-textarea" value="{{homeworkText}}" bindinput="onInput" maxlength="1200" placeholder="例：数学应用题 4 道，孩子卡在等量关系；英语听写 20 个，容易错前 8 个。" />

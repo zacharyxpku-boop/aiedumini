@@ -17,6 +17,8 @@
           <image class="yd-review-art" mode="aspectFit" src="/assets/reference/review-world-map-transparent.png" />
         </view>
 
+        <view class="review-play-lanes"><text class="review-play-lane review-lane-sheet"><text>练习单生成器</text><text>闪卡、配对、UNO、打印练习单</text></text><text class="review-play-lane review-lane-live"><text>课堂互动工具</text><text>错因地鼠、路线接龙、快闪问答</text></text><text class="review-play-lane review-lane-solo"><text>自主练习</text><text>做完自评，回到家长证据</text></text></view>
+
         <view class="review-record-panel">
           <view class="review-section-head"><text>乐园地图</text><text>每局只用真实学习卡</text></view>
           <text class="review-workshop-lead">先选一个岛，完成后用四档自评收口。</text>

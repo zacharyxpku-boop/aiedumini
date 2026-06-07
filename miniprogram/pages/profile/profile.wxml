@@ -15,11 +15,26 @@
 
         <view class="yd-parent-hero">
           <view class="yd-parent-copy">
-            <view class="yd-parent-kicker">家长只看证据</view>
-            <view class="yd-parent-title">只看证据，少问一句</view>
-            <view class="yd-parent-sub">把今天的材料、AI私教点拨和知识乐园结果，收成家长今晚能执行的一张卡。</view>
+            <view class="yd-parent-kicker">家长证据看板</view>
+            <view class="yd-parent-title">今晚只做复盘</view>
+            <view class="yd-parent-sub">不再堆任务，只把材料、AI私教和知识乐园收成一张能执行的家庭卡。</view>
           </view>
           <image class="yd-parent-art" mode="aspectFit" src="/assets/reference/family-avatar-group-transparent.png" />
+        </view>
+
+        <view class="yd-parent-purpose">
+          <view>
+            <text>看证据</text>
+            <text>材料和错因是否真实</text>
+          </view>
+          <view>
+            <text>问一句</text>
+            <text>孩子下一步说得出来吗</text>
+          </view>
+          <view>
+            <text>明天回访</text>
+            <text>只追踪一个小变化</text>
+          </view>
         </view>
 
         <view class="yd-parent-decision" data-scene="parent" data-source="parent_decision_card" bindtap="openEntryDetail">
