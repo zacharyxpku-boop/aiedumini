@@ -25,11 +25,11 @@
     "list": [
       {
         "pagePath": "pages/tutor/tutor",
-        "text": "AI点拨"
+        "text": "AI私教"
       },
       {
         "pagePath": "pages/review/review",
-        "text": "短回访"
+        "text": "知识乐园"
       },
       {
         "pagePath": "pages/profile/profile",
