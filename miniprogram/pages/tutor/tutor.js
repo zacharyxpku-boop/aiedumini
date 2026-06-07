@@ -856,15 +856,15 @@ function buildMiniLessonFeedbackBridge(item = {}, receipt = {}, adjustment = {})
   if (item.status !== 'still_blocked' || !trigger.shouldTrigger || miniLessonAudit.ok !== true) return null;
   if (!canRenderMiniLesson && modeRouter.nextMode === 'parent_handoff') {
     return {
-      id: 'socratic_feedback_parent_handoff_bridge',
-      type: 'parent_handoff_required',
-      title: '家长接手',
+      id: 'socratic_feedback_evidence_review_bridge',
+      type: 'evidence_review_required',
+      title: '补一张小黑板证据',
       reason: modeRouter.reason || trigger.reason || adjustment.nextAction,
-      route: modeRouter.route || '/pages/profile/profile?from=mini_lesson_parent_handoff',
-      nextAction: '停止继续加提示，家长只问一句第一步，明天再回访同一个卡点。',
+      route: '/pages/review/review?from=tutor_still_blocked_evidence',
+      nextAction: '先不再加提示，只留 A/B 小黑板证据，回短回访复测同一个卡点。',
       evidence: {
         triggerEvidence: trigger.triggerEvidence || {},
-        releaseGate: modeRouter.releaseGate || 'parent_confirms_one_question_and_next_day_revisit',
+        releaseGate: modeRouter.releaseGate || 'child_records_micro_choice_and_next_day_revisit',
         blockedFields: ['original_question', 'full_answer', 'full_dialogue', 'score', 'ranking', 'talent_label']
       }
     };
@@ -884,7 +884,7 @@ function buildMiniLessonFeedbackBridge(item = {}, receipt = {}, adjustment = {})
     firstStep: blackboard.firstStep || blackboard.boardMove || '先说出第一步',
     blackboardLine: blackboard.boardMove || blackboard.firstStep || '',
     blackboardFrames: Array.isArray(blackboard.frames) ? blackboard.frames : [],
-    parentCheck: miniLesson.parentCheck || miniLesson.parentLine || '家长只问第一步，不追完整答案。',
+    parentCheck: miniLesson.parentCheck || miniLesson.parentLine || '家庭只回看第一步，不追完整答案。',
     nextDayReview: miniLesson.nextDayReview || (miniLesson.nearTransfer && miniLesson.nearTransfer.prompt) || '明天换一题，只回访第一步。',
     exitGate: miniLesson.exitGate ? miniLesson.exitGate.passEvidence : 'child_can_say_first_step',
     route: '/pages/tutor/tutor?from=socratic_feedback_mini_lesson',
@@ -897,7 +897,7 @@ function buildMiniLessonFeedbackBridge(item = {}, receipt = {}, adjustment = {})
     title: '已切入 3 分钟小讲堂',
     reason: trigger.reason || adjustment.nextAction,
     route: seed.route,
-    nextAction: '看三帧小黑板，写一句退出票，再决定回访或家长协助。',
+    nextAction: '看三帧小黑板，写一句退出票，再回短回访复测。',
     reviewSeed: seed,
     evidence: {
       triggerEvidence: trigger.triggerEvidence || {},
@@ -1953,7 +1953,7 @@ Page({
       storage.appendReviewEvent(reviewSeed);
     }
     let miniLessonReturnCard = null;
-    if (miniLessonFeedbackBridge && miniLessonFeedbackBridge.type !== 'parent_handoff_required' && storage.ensureMiniLessonReturnReviewCard) {
+    if (miniLessonFeedbackBridge && miniLessonFeedbackBridge.type !== 'evidence_review_required' && storage.ensureMiniLessonReturnReviewCard) {
       miniLessonReturnCard = storage.ensureMiniLessonReturnReviewCard(miniLessonFeedbackBridge.reviewSeed, {
         source: 'socratic_feedback_still_blocked',
         taskType: miniLessonFeedbackBridge.reviewSeed.taskType || '',
@@ -1972,10 +1972,10 @@ Page({
           created_at: item.createdAt
         });
       }
-    } else if (miniLessonFeedbackBridge && miniLessonFeedbackBridge.type === 'parent_handoff_required' && storage.appendReviewEvent) {
+    } else if (miniLessonFeedbackBridge && miniLessonFeedbackBridge.type === 'evidence_review_required' && storage.appendReviewEvent) {
       storage.appendReviewEvent({
-        type: 'socratic_feedback_parent_handoff_required',
-        event: 'socratic_feedback_parent_handoff_required',
+        type: 'socratic_feedback_evidence_review_required',
+        event: 'socratic_feedback_evidence_review_required',
         route: miniLessonFeedbackBridge.route,
         evidence: miniLessonFeedbackBridge.evidence,
         nextAction: miniLessonFeedbackBridge.nextAction,
@@ -2100,7 +2100,7 @@ Page({
       storage.recordUnifiedNextAction({
         source: 'tutor_mini_lesson_exit_gate',
         sourceLabel: '3 分钟小讲堂退出门',
-        actionLabel: exitGatePassed ? '明天回访第一步' : '继续降级到家长协助',
+        actionLabel: exitGatePassed ? '明天回访第一步' : '补一张小黑板证据',
         route: nextRoute,
         readiness: exitGatePassed ? 'exit_gate_passed' : 'exit_gate_needs_support',
         capabilityId: 'mini_lesson_exit_gate',
@@ -2113,8 +2113,8 @@ Page({
       storage.recordSurfaceDepthAction({
         surface: 'tutor',
         dimensionId: 'mini_lesson_exit_gate',
-        evidence: exitGatePassed ? 'child_exit_ticket_text' : 'parent_support_needed',
-        nextAction: exitGatePassed ? 'next_day_revisit' : 'parent_handoff',
+        evidence: exitGatePassed ? 'child_exit_ticket_text' : 'blackboard_evidence_needed',
+        nextAction: exitGatePassed ? 'next_day_revisit' : 'blackboard_evidence_review',
         route: nextRoute,
         subject: selected.subject || receipt.subject || '',
         taskType: selected.taskType || receipt.taskType || ''
@@ -2123,20 +2123,20 @@ Page({
     this.setData({
       miniLessonExitGateStatus: exitGatePassed
         ? '已过退出门'
-        : (passed ? '缺孩子自己的退出票，转家长协助' : '还不能过，转家长协助'),
+        : (passed ? '缺孩子自己的退出票，先补小黑板证据' : '还不能过，先补小黑板证据'),
       miniLessonExitGateNextRoute: nextRoute,
       miniLessonExitGateAction: {
-        label: exitGatePassed ? '去明天回访卡' : '打开家长协助卡',
+        label: exitGatePassed ? '去明天回访卡' : '补小黑板证据',
         route: exitGatePassed ? nextRoute : ((exitGateRecord && exitGateRecord.parentAssistCard && exitGateRecord.parentAssistCard.route) || nextRoute),
-        status: exitGatePassed ? 'exit_gate_passed' : 'parent_assist_required'
+        status: exitGatePassed ? 'exit_gate_passed' : 'blackboard_evidence_required'
       },
       miniLessonParentAssistCard: exitGatePassed ? null : ((exitGateRecord && exitGateRecord.parentAssistCard) || null),
       socraticFeedbackStatus: exitGatePassed ? 'first_step_spoken' : 'still_blocked',
-      socraticFeedbackNextAction: exitGateNeedsSupport ? '停止加提示，交给家长只问一句' : '明天只回访同一个第一步'
+      socraticFeedbackNextAction: exitGateNeedsSupport ? '先补一张小黑板证据，不继续追完整题' : '明天只回访同一个第一步'
     });
     if (typeof wx !== 'undefined' && wx.showToast) {
       wx.showToast({
-        title: exitGatePassed ? '已记录退出门' : '已转家长协助',
+        title: exitGatePassed ? '已记录退出门' : '已记录卡点',
         icon: 'none'
       });
     }

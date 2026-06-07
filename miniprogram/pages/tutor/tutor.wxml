@@ -79,7 +79,7 @@
             </view>
             <view class="tutor-feedback-row" wx:if="{{hasUserTutorTurn}}"><view class="tutor-feedback-good" data-status="first_step_spoken" bindtap="recordSocraticEffectivenessFeedback">我说出第一步了</view><view class="tutor-feedback-stuck" data-status="still_blocked" bindtap="recordSocraticEffectivenessFeedback">还是卡住</view></view>
             <text class="tutor-feedback-note" wx:if="{{socraticFeedbackNextAction}}">{{socraticFeedbackNextAction}}</text>
-            <view class="tutor-bridge-card" wx:if="{{miniLessonFeedbackBridge && miniLessonFeedbackBridge.nextAction}}"><view><text>卡住后的下一步</text><text>{{miniLessonFeedbackBridge.nextAction}}</text></view><text>{{miniLessonFeedbackBridge.type === 'parent_handoff_required' ? '停止加提示，家长只看证据。' : '转成 3 分钟小讲堂，做完回短回访。'}}</text><view class="tutor-bridge-action" data-id="mini_lesson_bridge" data-label="{{miniLessonFeedbackBridge.nextAction}}" data-route="{{miniLessonFeedbackBridge.route}}" data-evidence="still_blocked_feedback" bindtap="runTutorHandoffAction">继续</view></view>
+            <view class="tutor-bridge-card" wx:if="{{miniLessonFeedbackBridge && miniLessonFeedbackBridge.nextAction}}"><view><text>补一张证据</text><text>{{miniLessonFeedbackBridge.nextAction}}</text></view><text>{{miniLessonFeedbackBridge.type === 'evidence_review_required' ? '只留 A/B 小黑板证据，回短回访复测。' : '转成 3 分钟小讲堂，做完回短回访。'}}</text><view class="tutor-bridge-action" data-id="mini_lesson_bridge" data-label="{{miniLessonFeedbackBridge.nextAction}}" data-route="{{miniLessonFeedbackBridge.route}}" data-evidence="still_blocked_feedback" bindtap="runTutorHandoffAction">继续</view></view>
           </view>
         </view>
       </view>

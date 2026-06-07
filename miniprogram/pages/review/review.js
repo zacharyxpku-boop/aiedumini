@@ -272,11 +272,14 @@ Page({
     return {
       from,
       mode,
+      reportId: String(query.reportId || query.report_id || ''),
+      cardId: String(query.cardId || query.card_id || ''),
+      sourceSchemaId: String(query.sourceSchemaId || query.source_schema_id || ''),
       title: isEntryReviewReturn ? '来自回访入口' : '来自学习入口',
       line: '先选一张真实卡，马上完成 90 秒回忆或迁移验证。',
       actionLabel: isEntryReviewReturn ? '开始 90 秒回忆' : '进入短回访',
       returnRoute: '/pages/entry-detail/entry-detail?scene=review',
-      flowTraceId: from || mode || 'entry_review'
+      flowTraceId: String(query.flowTraceId || query.flow_trace_id || from || mode || 'entry_review')
     };
   },
 

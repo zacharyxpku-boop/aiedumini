@@ -302,10 +302,10 @@ function nextTutorTurnState(text, messages = [], currentHintLevel = 1, selected 
     nextQuestion: pressureSignal.parentCheck || '你先说第一步是什么？',
     blackboardMove: pressureSignal.boardMove || '小黑板只画入口关系。',
     parentHandoffLine: shouldHandoff
-      ? '如果还卡住，就交给家长只问一句检查点，明天再回访。'
+      ? '如果还卡住，就收成小黑板：只选 A/B，留下明天回访证据。'
       : '先问、再提示、再看能不能自己说回去。',
     stopRule: shouldHandoff
-      ? '三轮后仍卡住，停止继续追问，转家长检查句和明日回访。'
+      ? '三轮后仍卡住，停止追完整题，只保留小黑板和明日回访。'
       : '这一轮只问一步，不展开整题结论。',
     shouldUseTwoChoice: hintLevel >= 4 || stuckCount >= 2,
     evidenceLine: `轮次 ${roundIndex} · ${answerRequest ? '要答案' : shouldHandoff ? '准备交接' : '继续追问'} · ${pressureSignal.firstStep || '先说第一步'}`
@@ -332,7 +332,7 @@ function buildSocraticFallbackPlan(taskType, signal = {}, diagnosticProbe = {}, 
   return {
     id: 'socratic_fallback_plan',
     mode: answerBlocked ? 'answer_boundary' : lowThreshold ? 'low_threshold' : 'first_step_micro_choice',
-    title: '卡住后的降级计划',
+    title: '第一步小黑板',
     trigger: '沉默、反复说不会、或要求直接给答案',
     firstMove: signal.boardMove || '只画一个入口位置。',
     microChoices: [
@@ -341,7 +341,7 @@ function buildSocraticFallbackPlan(taskType, signal = {}, diagnosticProbe = {}, 
     ],
     parentScript: `A 先圈条件，B 先说问题；${signal.parentCheck || '你先说第一步，不用算完。'}`,
     blackboardMove: signal.boardMove || '小黑板只保留第一笔。',
-    stopRule: answerBlocked ? '不继续讲完整答案，只回到第一步。' : '两轮仍沉默就交给家长只问一句检查点。',
+    stopRule: answerBlocked ? '不继续讲完整答案，只回到第一步。' : '两轮仍沉默就保留小黑板证据，明天回访同一个入口。',
     evidenceRequired: ['child_micro_choice', 'first_step', 'wrong_cause']
   };
 }
@@ -368,7 +368,7 @@ function buildVisualSocraticRecoveryProtocol(taskType, signal = {}, diagnosticPr
       { id: 'b', label: 'B', text: '说问题' }
     ],
     parentHandoff: {
-      line: signal.parentCheck || '家长只问一个入口问题。',
+      line: signal.parentCheck || '家庭回看时只看一个入口问题。',
       shareBoundary: `${SAFE_BOUNDARY_TEXT} 不带原题照片。`
     },
     exitCriteria: ['说出第一步', '说出一个理由', '能做近迁移入口']
@@ -380,8 +380,8 @@ function buildVisualSocraticRecoveryProtocol(taskType, signal = {}, diagnosticPr
 function buildFallbackRecoveryBridge(taskType, signal = {}, diagnosticProbe = {}, fallbackPlan = {}, recovery = {}, flags = {}) {
   return {
     id: 'fallback_recovery_bridge',
-    title: '失败兜底到报告的桥',
-    trigger: '三轮后仍卡住',
+    title: '小黑板证据桥',
+    trigger: '多轮仍卡住',
     nextSmallAction: signal.parentCheck || '只交付一个第一步检查点。',
     blackboardLine: signal.boardMove || '只画入口关系。',
     microChoiceLine: '二选一后仍卡住就停止加题。',
@@ -394,7 +394,7 @@ function buildFallbackRecoveryBridge(taskType, signal = {}, diagnosticProbe = {}
     boardLayerCount: 3,
     failureBranchCount: 3,
     exitCriteriaCount: 3,
-    parentDecisionLine: signal.parentCheck || '家长只问第一步。',
+    parentDecisionLine: signal.parentCheck || '家庭只回看第一步。',
     reportLine: `小黑板：${signal.wrongCause || '报告只写证据，不下诊断结论。'}`,
     shareBoundary: `${SAFE_BOUNDARY_TEXT} 不展示完整对话。`,
     evidenceRequired: ['child_micro_choice', 'first_step', 'wrong_cause', 'exit_criteria']
@@ -423,8 +423,8 @@ function buildQuestionTypeSocraticPath(taskType, signal) {
       { id: 'board_3', boardMove: signal.wrongCause || '标易混点', parentPrompt: '让孩子说哪里容易混。' }
     ],
     fallbackLadder: [
-      { id: 'fallback_1', label: '失败兜底', move: '改成二选一，不给整题结论' },
-      { id: 'fallback_2', label: '家长接手', move: signal.parentCheck || '只问检查句' },
+      { id: 'fallback_1', label: '证据收窄', move: '改成二选一，不给整题结论' },
+      { id: 'fallback_2', label: '小黑板证据', move: signal.parentCheck || '只看第一步入口' },
       { id: 'fallback_3', label: '明天回访', move: signal.reviewMove || '换数复查入口' }
     ],
     evidenceContractLine: `证据合同：${signal.wrongCause || '保存错因证据。'}`,
@@ -475,7 +475,7 @@ function buildQuestionBankVisualBoardBridge(taskType, signal) {
     ],
     failureBranches: [
       { id: 'silent_child', trigger: '不说话', boardMove: '擦掉多余信息，只留一格让孩子补' },
-      { id: 'answer_request', trigger: '要答案', boardMove: '回到第一步和家长检查句' },
+      { id: 'answer_request', trigger: '要答案', boardMove: '回到第一步和错因' },
       { id: 'transfer_fail', trigger: '迁移失败', boardMove: signal.reviewMove || '换数复查入口' }
     ],
     exitCriteria: ['孩子说出第一步', '能解释错因', '能做近迁移入口'],
@@ -508,7 +508,7 @@ function buildSocraticQualityEvaluationSuite(taskType, signalInput) {
     title: '苏格拉底质量评测套件',
     summary: '用沉默、要答案、迁移失败三类压力场景检查点拨质量。',
     reportLine: '质量门槛：报告只增加可观察证据，不因为多问几句就提高画像置信度。',
-    gates: ['不输出完整答案', '必须要孩子说第一步', '失败后降级而不是加题', '保护隐私字段', '不因一句答对就提高画像'],
+    gates: ['不输出完整答案', '必须要孩子说第一步', '卡住后收窄而不是加题', '保护隐私字段', '不因一句答对就提高画像'],
     cases,
     totalScenarioCount: cases.reduce((sum, item) => sum + item.scenarios.length, 0),
     activeCase: {
@@ -575,7 +575,7 @@ function buildThreeRoundSocraticProtocol(taskType, signal) {
     status: 'ready',
     roundCount: 3,
     title: '三轮苏格拉底协议',
-    parentLine: '最多三轮，仍卡住就降级给家长检查句。',
+    parentLine: '最多三轮，仍卡住就收成小黑板证据。',
     rounds: [
       { id: 'round_1_axis_probe', label: '第 1 轮', coachMove: firstStep, blackboardMove: boardMove, passEvidence: '孩子说出第一步' },
       { id: 'round_2_wrong_cause_micro_choice', label: '第 2 轮', coachMove: `二选一：先修「${wrongCause}」，还是先把「${firstStep}」说完整？`, blackboardMove: `只留一个错因空位：${wrongCause}`, passEvidence: 'child_micro_choice_with_wrong_cause' },
@@ -693,7 +693,7 @@ function buildSocraticAiLocalBoundaryContract(taskType, signal = {}, options = {
       {
         id: 'stop_rule',
         inputSignal: parentCheck,
-        localDecision: '三轮仍卡住就停止加提示，转家长检查句和明日回访',
+        localDecision: '三轮仍卡住就停止加提示，只保留小黑板和明日回访',
         aiAllowedRewrite: '可以把停止说明改得更温和',
         blockedBehavior: '不能继续加难题、加奖励或给整题结论'
       },
@@ -845,7 +845,7 @@ function buildRuntimeSocraticReply(turnState = {}, item = {}, signal = {}, flags
         status: 'handoff_or_micro_choice',
         branch: turnState.fallbackBranch,
         childFriendlyLine: childLine,
-        releaseRule: '三轮后仍卡住，只允许家长检查句和明日回访，不继续加解释。'
+        releaseRule: '三轮后仍卡住，只保留小黑板和明日回访，不继续加解释。'
       }
     };
   }
@@ -940,18 +940,18 @@ function buildSocraticQualityReleaseAudit(input = {}) {
       label: '孩子能继续动手',
       passed: !!checks.childCanContinue,
       evidence: '保留 A/B 微动作或复述入口',
-      nextFix: '降级为二选一微动作'
+      nextFix: '收窄为二选一微动作'
     },
     {
       id: 'fallback_ready',
-      label: '失败有兜底',
+      label: '卡住后有证据出口',
       passed: !!checks.fallbackReady && protocol.roundCount === 3,
-      evidence: '三轮后转小讲堂、家长复盘或明日回访',
-      nextFix: '补齐三轮兜底协议'
+      evidence: '三轮后转小讲堂、小黑板证据或明日回访',
+      nextFix: '补齐三轮证据出口协议'
     },
     {
       id: 'share_parent_safe',
-      label: '家长可安全接手',
+      label: '家庭可安全回看',
       passed: !!checks.parentSafe && Array.isArray(promptJudge.evidenceRequired) && promptJudge.evidenceRequired.includes('safe_share_boundary'),
       evidence: '分享只带行动和证据，不带原题全文与完整对话',
       nextFix: '移除原题、完整答案、完整对话字段'
@@ -969,7 +969,7 @@ function buildSocraticQualityReleaseAudit(input = {}) {
     taskType: input.taskType || scorecard.taskType || 'unknown',
     score: Number(scorecard.score || 0),
     status,
-    statusText: status === 'release_ready' ? '可继续本轮点拨' : status === 'needs_coach_review' ? '需要教练复核' : '转小讲堂或家长接手',
+    statusText: status === 'release_ready' ? '可继续本轮点拨' : status === 'needs_coach_review' ? '需要教练复核' : '转小讲堂或小黑板证据',
     releaseGates: releaseGates.map((item) => Object.assign({
       statusText: item.passed ? '通过' : '未过'
     }, item)),
@@ -980,7 +980,7 @@ function buildSocraticQualityReleaseAudit(input = {}) {
     childNextAction: failed.length === 0
       ? (signal.parentCheck || '把第一步说出来，再做一题近迁移。')
       : failed[0].nextFix,
-    reportLine: '报告只记录第一步、错因、兜底去向和家长接手动作，不把一次答对写成长期掌握。',
+    reportLine: '报告只记录第一步、错因、证据出口和回访动作，不把一次答对写成长期掌握。',
     evidenceRequired: ['first_step_only', 'no_final_answer', 'wrong_cause_fit', 'child_can_continue', 'fallback_ready', 'safe_share_boundary']
   };
 }
