@@ -2217,6 +2217,7 @@ Page({
           imagePaths: files.map((item) => item.tempFilePath).filter(Boolean).slice(0, 4)
         });
         this.updatePreview(this.data.homeworkText, this.data.minutes);
+        wx.showToast({ title: '照片已留存，请补文字', icon: 'none' });
       };
       if (wx.chooseMedia) {
         wx.chooseMedia({

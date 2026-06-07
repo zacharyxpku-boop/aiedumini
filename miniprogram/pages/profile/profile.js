@@ -240,7 +240,7 @@ function buildProfileDossierDeliveryView(dossier = {}, servicePathway = {}) {
       label: item.label || '学习模式',
       whenLine: item.when || item.trigger || '有真实学习证据时使用。',
       gateLine: profileReadableGate(item.localGate),
-      boundaryLine: '边界：家长页只呈现证据、今晚一句话和明天验证，不堆其他功能入口。'
+      boundaryLine: '边界：家长页只呈现证据、本次行动和下次验证，不堆其他功能入口。'
     })),
     solutionCards: solutionSequence.map((item, index) => ({
       id: item.id || `solution_mode_${index + 1}`,
@@ -350,12 +350,12 @@ function buildParentReport(profile, reviewSummary, moduleSummary, tutorSummary, 
     + Math.min(4, safeNumber(thinking.transferPrompts, 0) * 2)
     + Math.min(8, Math.round(safeNumber(thinking.avgScore, 0) / 13)));
   const label = todayFocus && todayFocus.title
-    ? `当前重点：${issueName}。今晚建议：${todayFocus.recommendation || '先做 1 道同类题 + 1 道小变式'}。`
+    ? `当前重点：${issueName}。建议：${todayFocus.recommendation || '先做 1 道同类题 + 1 道小变式'}。`
     : recordScore >= 86
     ? '这周已经能看见孩子卡在哪、怎么改、下次先查什么。'
     : recordScore >= 68
       ? '这套闭环已经开始起作用，但还需要更多复习和卡点记录。'
-      : '今晚先做一项必须做、一轮卡点修复、一次短复习。';
+      : '先做一项关键点拨、一轮卡点修复、一次短回访。';
   const recordStatus = recordScore >= 86 ? '记录稳定' : recordScore >= 68 ? '正在形成' : '继续积累';
   const goal = parentGoal || {};
   const goalLine = goal.strategy ? `家庭目标：${goal.label}。${goal.strategy}` : '';
@@ -370,7 +370,7 @@ function buildParentReport(profile, reviewSummary, moduleSummary, tutorSummary, 
       thinkingProbeLine: `追问 ${safeNumber(thinking.diagnosticProbes, 0)} 次 · 迁移提示 ${safeNumber(thinking.transferPrompts, 0)} 次`,
       parentHelp: '先让孩子说第一步，不要直接讲最终结果。',
     inspectionLine: todayFocus && todayFocus.repairStatus === 'completed'
-      ? `今晚已经修过「${weakPoint}」，收尾问一句：下次第一步先查什么？`
+      ? `本次已经修过「${weakPoint}」，收尾问一句：下次第一步先查什么？`
       : `我能不能说清「${weakPoint}」为什么卡住、下次第一步先做什么？`,
     shareLine: `这周：完成 ${safeNumber(tutor.completed, 0)} 次关键点拨，沉淀 ${safeNumber(review.total, 0)} 张复习卡，留下 ${safeNumber(thinking.total, 0)} 条思路记录。`,
     recordLine: `我的学习记录 ${totalAssets} 项。作业、点拨、复习和卡点正在慢慢连起来。`,
@@ -379,13 +379,13 @@ function buildParentReport(profile, reviewSummary, moduleSummary, tutorSummary, 
         id: 'must_do',
         value: safeNumber(tutor.completed, 0),
         label: '关键点拨',
-        note: '作业点拨只用在最值得今晚先做的任务上。'
+        note: '作业点拨只用在最值得先做的任务上。'
       },
       {
         id: 'memory',
         value: safeNumber(review.total, 0),
         label: '复习资产',
-        note: '重要方法会进入长期复习，而不是只学今晚。'
+        note: '重要方法会进入长期复习，而不是只学一次。'
       },
       {
         id: 'accuracy',
@@ -407,7 +407,7 @@ function buildParentReport(profile, reviewSummary, moduleSummary, tutorSummary, 
       }
     ],
     nextActions: [
-      { id: 'upload', label: '更新今晚作业', action: 'upload', detail: '刷新三分类' },
+      { id: 'upload', label: '更新材料', action: 'upload', detail: '刷新证据' },
       { id: 'tomorrow_check', label: '明天再看', action: 'parent', detail: '确认一个卡点' },
       { id: 'review', label: '开始复习', action: 'review', detail: '把方法记住' },
       { id: 'tutor', label: '辅导必须做', action: 'tutor', detail: '只给最小提示' }
@@ -443,7 +443,7 @@ function buildTutorProcessSummary(todayFocus, thinkingReceipts, tutorMessages) {
     items: [
       { id: 'child', label: '孩子原话', text: childText },
       { id: 'prompt', label: '咕点追问', text: tutorText },
-      fallbackBridge ? { id: 'fallback', label: '失败兜底', text: fallbackBridge.reportLine || fallbackBridge.nextSmallAction || '' } : null,
+      fallbackBridge ? { id: 'recovery', label: '证据补齐', text: fallbackBridge.reportLine || fallbackBridge.nextSmallAction || '' } : null,
       fallbackBridge ? { id: 'blackboard', label: '小黑板', text: fallbackBridge.blackboardLine || '' } : null
     ].filter(Boolean).slice(0, 4),
     fallbackRecoveryBridge: fallbackBridge,
@@ -672,7 +672,7 @@ function buildDailyShareCard(profile, reviewSummary, revisitEvidenceCard, wrongC
     : '';
   const tonightDecisionRelay = learningReportSummary && learningReportSummary.tonightDecisionBrief
     ? {
-      title: learningReportSummary.tonightDecisionTitle || '今晚决策书',
+      title: learningReportSummary.tonightDecisionTitle || '行动建议卡',
       headline: learningReportSummary.tonightDecisionHeadline || '',
       parentQuestion: learningReportSummary.tonightDecisionParentScript || '',
       tomorrow: learningReportSummary.tonightDecisionTomorrowRevisit || '',
@@ -1441,7 +1441,7 @@ function buildPartnerServiceReviewCard(partnerWorkbench = null, servicePathway =
         ? '第 7 天小变式和家长确认已满足，可以整理一次顾问复盘建议。'
         : '真实作业证据和家长确认已具备，可以进入受保护的 7 天执行闭环。',
     decisionLine: stage === 'ready_for_review'
-      ? '复盘只判断保留、降级或更换学习方法，不承诺提分。'
+      ? '复盘只判断保留、调整或更换学习方法，不承诺提分。'
       : stage === 'run_7_day_loop'
         ? '先跑 7 天：证据动作、隔天回访、第 7 天小变式，再决定是否升级。'
         : '先补真实错题、孩子第一步、隔天回访或家长确认，再讨论服务。',
@@ -2875,7 +2875,7 @@ function buildProfileReadinessSnapshot(input = {}) {
   const externalBlocked = !!acceptance.launchBlockedByExternalConfig;
   const conclusion = localPassed
     ? (externalBlocked ? '本机闭环可试用，公开发布前还要接好正式身份与访问名单。' : '核心学习闭环已接通，可以进入真实家庭试用。')
-    : '还有本地闭环待补齐，今晚先按下一步把证据补上。';
+    : '还有本地闭环待补齐，先按下一步把证据补上。';
   const flowLine = compass && compass.readyCount !== undefined
     ? `${compass.readyCount} / ${compass.totalCount || 0} 个环节已接上：${compass.summary || '先跑通一次完整学习回路'}`
     : '先从作业点拨、错题修复、明天验证和家长复盘跑通一次。';
@@ -2900,7 +2900,7 @@ function buildProfileReadinessSnapshot(input = {}) {
       body: `复习调度、行为反馈、分享隐私、家长结论和安全边界共 ${localRuleRows.length || 6} 类必须规则可跑，不能交给模型临场决定。`
     }
   ];
-  const aiBoundaryReleaseRule = '即使暂时不用大模型，入口、点拨兜底、错因卡、复习、家长复盘和安全分享也必须能跑。';
+  const aiBoundaryReleaseRule = '即使暂时不用大模型，入口、点拨护栏、错因卡、复习、家长复盘和安全分享也必须能跑。';
   const finalTargetRows = Array.isArray(finalTargetGapMeter.rows)
     ? finalTargetGapMeter.rows.map((item) => ({
       id: item.id,
@@ -2922,7 +2922,7 @@ function buildProfileReadinessSnapshot(input = {}) {
     }))
     : [];
   return {
-    title: '今晚闭环状态',
+    title: '学习闭环状态',
     conclusion,
     flowLine,
     evidenceLine,

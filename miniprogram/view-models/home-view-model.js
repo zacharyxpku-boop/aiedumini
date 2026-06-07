@@ -3,7 +3,7 @@ const storage = require('../utils/storage');
 const UNSAFE_KEY_RE = /^[a-z]+(?:_[a-z0-9]+)+$|[a-z]+[A-Z][a-zA-Z]+/;
 
 const COMPANION_HOME_COPY = {
-  gudian: '咕点：把材料和卡点发来，我陪你先看清问题。'
+  gudian: '咕点：把材料发来，我先帮你拆出可验证的一步。'
 };
 
 function safeText(value, fallback = '学习建议') {
@@ -79,7 +79,7 @@ function buildReportServiceResume(input = {}) {
       : '建议模式：先用苏格拉底1对1，必要时补小讲堂。',
     actionLine: safeText(
       firstValidation.action || (servicePathway && servicePathway.nextAction) || handoff.line,
-      '今晚只做一个最小动作，并留下孩子自己的第一步证据。'
+      '本次先做一个最小动作，并留下孩子自己的第一步证据。'
     ),
     parentGateLine: parentConfirmed
       ? '放行：只交付行动、家长问题和下一条证据。'
@@ -101,7 +101,7 @@ function buildPrimaryHomeNextAction(input = {}) {
       dispatchCode: 1,
       kicker: '报告建议',
       title: safeText(input.reportServiceResume.title, '继续家庭方案验证'),
-      body: safeText(input.reportServiceResume.actionLine || input.reportServiceResume.statusLine, '今晚只做一个最小动作。'),
+      body: safeText(input.reportServiceResume.actionLine || input.reportServiceResume.statusLine, '本次只做一个最小动作。'),
       cta: safeText(input.reportServiceResume.cta, '继续行动')
     });
   }
@@ -145,9 +145,9 @@ function buildPrimaryHomeNextAction(input = {}) {
     priority: 90,
     dispatchCode: 6,
     kicker: '学习建议',
-    title: '把材料或卡住点先发过来',
-    body: '可以上传作业、错题，也可以直接说一句哪里卡住。',
-    cta: '去 AI 点拨'
+    title: '先上传材料或题目',
+    body: '作业、错题、测评或一句题目描述都可以，先生成能执行的下一步。',
+    cta: '开始处理'
   };
   return {
     priority: fallback.priority,
@@ -168,21 +168,21 @@ function buildHomeViewModel(input = {}) {
     reportServiceResume
   }));
   return {
-    routePill: hasPlanOrFocus ? '已分析 · 继续下一步' : '先分析材料或情况',
+    routePill: hasPlanOrFocus ? '已分析 · 继续下一步' : '先处理材料',
     companionStrip: companionStrip(input.companionPreference),
-    title: hasPlanOrFocus ? '已看清下一步' : '把作业、错题或材料发过来',
+    title: hasPlanOrFocus ? '已看清下一步' : '把材料发过来',
     subtitle: hasPlanOrFocus ? '接下来进 AI 点拨或短回访，不在首页堆完整方案。' : '孩子可以上传材料，也可以直接说题目。',
     inputCard: {
       title: hasPlanOrFocus ? '修改情况后重新分析' : '用文字补充情况',
-      placeholder: '比如：数学方程 8 道，应用题不会写第一步；也可以先上传材料。',
+      placeholder: '比如：数学方程 8 道，应用题第一步不清楚；也可以先上传材料。',
       helper: hasPlanOrFocus
         ? '材料变了就重新分析；卡住进 AI 点拨，做完进短回访。'
-        : '不用写长，先说题目、材料或哪一步没接上；这里不直接给答案。'
+        : '不用写长，先说题目、材料或第一步线索；这里不直接给答案。'
     },
     primaryCta: hasPlanOrFocus ? '重新分析材料' : '分析材料',
-    secondaryAction: '卡住了，去 AI 点拨',
+    secondaryAction: '直接去 AI 点拨',
     teacherPickerLabel: '咕点在旁边',
-    teacherPickerHint: '把材料和卡点发来，我陪你先看清问题。',
+    teacherPickerHint: '把材料发来，我先帮你拆出可验证的一步。',
     selectedCompanionLabel: safeText((companionPreference(input.companionPreference) || {}).selectedLabel, '咕点'),
     emptyState: hasPlanOrFocus ? null : '还没有分析结果。先上传材料或进入 AI 点拨。',
     primaryNextAction,

@@ -694,10 +694,10 @@ Page({
       dailyMemoryTask: this.buildDailyMemoryTaskCard(reviewSummary, todayFocus),
       sevenSubjectMasterySprint: storage.buildSevenSubjectMasterySprint ? storage.buildSevenSubjectMasterySprint() : null,
       todayFocus,
-      routeDisplayText: '材料分析 · 先看清卡点',
+      routeDisplayText: '材料分析 · 生成下一步',
       companionPreference,
       companionCopy: {
-        home: storage.getCompanionStageCopy ? storage.getCompanionStageCopy('home_plan', companionPreference) : '咕点陪你先找今晚第一步。'
+        home: storage.getCompanionStageCopy ? storage.getCompanionStageCopy('home_plan', companionPreference) : '咕点陪你先把材料拆成一步。'
       },
       companionLine: storage.formatCompanionLine ? storage.formatCompanionLine(companionPreference) : '咕点：我懂你卡住了，我陪你先迈出第一步。',
       homeViewModel: buildHomeViewModel({
@@ -783,7 +783,7 @@ Page({
       + Math.min(12, Number(thinking.total || 0) * 3)
       + (topMust ? 12 : 0));
     return {
-      title: '今晚先修这一处',
+      title: '先修这一处',
       name,
       why,
       tonight,
@@ -985,10 +985,10 @@ Page({
     const hasRealHomework = !!(state && state.homework_text);
     const totalCards = Number((reviewSummary && reviewSummary.total) || 0);
     return {
-      title: hasRealHomework ? '今晚按这个顺序走' : '第一次打开，先做这 3 步',
+      title: hasRealHomework ? '按这个顺序处理' : '第一次打开，先做这 3 步',
       label: hasRealHomework
         ? '先做最高价值任务，再把卡点沉淀成复习卡。'
-        : '直接填今晚作业，我会分出必交先做、灵活安排、可以后置。',
+        : '直接填作业材料，我会先分出关键项和可后置项。',
       steps: [
         {
           id: 'upload',
@@ -1141,7 +1141,7 @@ Page({
       incoming.tonight_share_boundary
     );
     const tonightDecisionSummary = hasTonightDecision
-      ? `这张卡带回一份今晚决策书：${incoming.tonight_decision || '先做一个最小动作'}`
+      ? `这张卡带回一份行动卡：${incoming.tonight_decision || '先做一个最小动作'}`
       : '';
     const socraticReportEvidence = incoming.tonight_decision || incoming.socratic_report_decision || incoming.socratic_report_action || '';
     const primaryReceiverAction = (safeRelayPacket && safeRelayPacket.receiverAction) || (wrongCauseViralPack && wrongCauseViralPack.receiverAction) || actionDetail;
@@ -1275,7 +1275,7 @@ Page({
       socraticReportNoIncreaseLine: incoming.socratic_report_no_increase ? `不加题规则：${incoming.socratic_report_no_increase}` : '',
       socraticReportParentProofLine: incoming.socratic_report_parent_proof ? `家长证据：${incoming.socratic_report_parent_proof}` : '',
       socraticReportBoundaryLine: incoming.socratic_report_boundary ? `分享边界：${incoming.socratic_report_boundary}` : '',
-      tonightDecisionLine: hasTonightDecision && incoming.tonight_decision ? `今晚决策：${incoming.tonight_decision}` : '',
+      tonightDecisionLine: hasTonightDecision && incoming.tonight_decision ? `行动建议：${incoming.tonight_decision}` : '',
       tonightParentQuestionLine: hasTonightDecision && incoming.tonight_parent_question ? `家长只问：${incoming.tonight_parent_question}` : '',
       tonightTomorrowLine: hasTonightDecision && incoming.tonight_tomorrow ? `明天回访：${incoming.tonight_tomorrow}` : '',
       tonightReleaseGateLine: hasTonightDecision && incoming.tonight_release_gate ? `放行门槛：${incoming.tonight_release_gate}` : '',
@@ -1357,7 +1357,7 @@ Page({
     const currentModule = modulePath && modulePath.current ? modulePath.current : null;
     const hasTask = !!topMust;
     return {
-      title: '旧入口已迁移',
+      title: '入口已收口',
       subtitle: '从 AI 点拨开始，说题目、材料或第一步。',
       primaryLabel: '进入 AI 点拨',
       primaryAction: 'goTutor',
@@ -1496,8 +1496,8 @@ Page({
     return [
       {
         id: 'must',
-        label: '今晚',
-        meta: topMust ? `${topMust.minutes || 10} 分钟` : '规划',
+        label: '点拨',
+        meta: topMust ? `${topMust.minutes || 10} 分钟` : '材料',
         action: topMust ? 'startTopMust' : 'submitAiDraft'
       },
       {
@@ -1526,16 +1526,16 @@ Page({
       northStar: Math.min(100, 74 + Math.min(10, proofRecords) + Math.min(8, reviewSummary.due || 0) + Math.min(8, thinking.proofSentence || 0)),
       cards: [
         {
-          id: 'tonight',
-          label: '今晚决策',
+          id: 'next_action',
+          label: '下一步',
           value: topMust ? '已锁定' : '待输入',
-          body: topMust ? topMust.text : '先填作业，再拆成必交先做、灵活安排、可以后置。'
+          body: topMust ? topMust.text : '先上传材料，再拆出一个可验证动作。'
         },
         {
           id: 'weak',
           label: '卡点信号',
           value: weak.score || '--',
-          body: weak.name || '先说今晚卡在哪。'
+          body: weak.name || '先说题目或第一步。'
         },
         {
           id: 'records',
@@ -1573,8 +1573,8 @@ Page({
   buildTonightSprint(topMust, reviewSummary, modulePath) {
     const currentModule = modulePath.current || null;
     return {
-      title: '今晚15分钟冲刺',
-      label: '一个家庭今晚就能跑完一次有用闭环：选对任务、陪孩子说第一步、把卡点沉淀到复习。',
+      title: '15分钟学习闭环',
+      label: '一次就能跑完有用闭环：选对任务、陪孩子说第一步、把卡点沉淀到复习。',
       steps: [
         {
           id: 'task',
@@ -1658,7 +1658,7 @@ Page({
     } else {
       actions.push({
         id: 'upload',
-        title: '填今晚作业',
+        title: '填作业材料',
         desc: '粘贴清单，分出必交先做、灵活安排、可以后置。',
         meta: '3 分钟',
         action: 'goUpload',
@@ -1853,7 +1853,7 @@ Page({
   submitAiDraft(options = {}) {
     const text = String(this.data.aiDraft || '').trim();
     if (!text) {
-      wx.showToast({ title: '先说一句卡在哪', icon: 'none' });
+      wx.showToast({ title: '先说题目或第一步', icon: 'none' });
       return;
     }
     const importRoute = importIntake.classifyImportInput(text);

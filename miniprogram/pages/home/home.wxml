@@ -8,25 +8,25 @@
   </view>
 
   <view class="home-header">
-    <view class="home-brand">
-      <image class="home-brand-icon" mode="aspectFit" src="/assets/reference/brand-house.png" />
-      <view>
-        <view class="home-title">原点智学</view>
-        <view class="home-subtitle">旧入口已迁移到 AI 点拨</view>
-      </view>
-    </view>
+        <view class="home-brand">
+          <image class="home-brand-icon" mode="aspectFit" src="/assets/reference/brand-house.png" />
+          <view>
+            <view class="home-title">原点智学</view>
+            <view class="home-subtitle">材料、点拨、回访、报告</view>
+          </view>
+        </view>
   </view>
 
   <scroll-view scroll-y enhanced show-scrollbar="{{false}}" class="home-scroll">
     <view class="yd-home-screen yd-app-screen yd-home-app">
       <view class="yd-home-hero-card">
-        <view class="yd-home-hero-copy">
-          <view class="mini-streak-pill"><text class="mini-streak-dot"></text><text>旧链接兼容页</text></view>
-          <view class="mini-title">从 AI 点拨开始</view>
-          <view class="mini-subtitle">这里不再安排整晚任务。孩子先说题目、材料或卡点，咕点只追问第一步。</view>
+          <view class="yd-home-hero-copy">
+          <view class="mini-streak-pill"><text class="mini-streak-dot"></text><text>今日学习台</text></view>
+          <view class="mini-title">先把材料发来</view>
+          <view class="mini-subtitle">上传作业、错题或测评，咕点先拆出一个能验证的第一步，再接 AI 点拨和短回访。</view>
           <view class="home-hero-actions">
-            <view class="mini-main-cta" bindtap="goTutor">进入 AI 点拨</view>
-            <view class="home-secondary-action" bindtap="goUpload">上传材料</view>
+            <view class="mini-main-cta" bindtap="goUpload">上传材料</view>
+            <view class="home-secondary-action" bindtap="goTutor">直接点拨</view>
           </view>
         </view>
         <image class="yd-home-hero-mascot" mode="aspectFit" src="/assets/reference/gudian-fullbody-transparent.png" />
@@ -42,14 +42,14 @@
         <view>{{incomingShareRelay.firstStepLine}}</view>
       </view>
 
-      <view class="home-upload-feature yd-jump-card" bindtap="goTutor">
+      <view class="home-upload-feature yd-jump-card" bindtap="goUpload">
         <view class="home-upload-copy">
-          <view class="home-card-kicker">AI 点拨</view>
-          <view class="home-upload-title">先说第一步</view>
-          <view class="home-upload-sub">文字描述、题目卡点或材料线索都可以。咕点不代写，只帮孩子把下一步说出来。</view>
-          <view class="home-upload-cta">开始点拨</view>
+          <view class="home-card-kicker">材料分析</view>
+          <view class="home-upload-title">上传后生成报告</view>
+          <view class="home-upload-sub">作业、错题、测评都可以。先看证据，再给孩子一个小动作和家长一句追问。</view>
+          <view class="home-upload-cta">去上传</view>
         </view>
-        <image class="home-upload-visual" mode="aspectFit" src="/assets/reference/tutor-socratic-board-transparent.png" />
+        <image class="home-upload-visual" mode="aspectFit" src="/assets/reference/upload-folder-stack-transparent.png" />
       </view>
 
       <view class="home-result-grid">

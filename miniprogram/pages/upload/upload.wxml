@@ -26,9 +26,9 @@
         </view>
 
         <view class="upload-intake-workbench">
-          <view class="upload-workbench-head"><text>粘贴或拍照</text><text>生成前先看证据</text></view>
+          <view class="upload-workbench-head"><text>粘贴材料</text><text>生成前先看证据</text></view>
           <textarea class="upload-textarea" value="{{homeworkText}}" bindinput="onInput" maxlength="1200" placeholder="例：数学应用题 4 道，孩子卡在等量关系；英语听写 20 个，容易错前 8 个。" />
-          <view class="upload-workbench-actions"><text bindtap="chooseImage">加照片</text><text data-type="parent_report" bindtap="openMaterialReportPanel">补充观察</text></view>
+          <view class="upload-workbench-actions"><text bindtap="chooseImage">照片留存</text><text data-type="parent_report" bindtap="openMaterialReportPanel">补充观察</text></view>
         </view>
 
         <view class="upload-material-panel" wx:if="{{showMaterialPanel}}">
@@ -59,7 +59,7 @@
 
         <view class="yd-upload-primary" bindtap="submit">生成家长报告</view>
         <view class="upload-report-ready" wx:if="{{lastReportCta}}">
-          <text class="upload-report-title">{{lastReportCta.reportReadiness && lastReportCta.reportReadiness.banner ? lastReportCta.reportReadiness.banner : '报告已生成'}} · {{lastReportCta.title}}</text><block wx:if="{{parentReportWorkflowView}}">
+          <text class="upload-report-title">{{lastReportCta.reportReadiness && lastReportCta.reportReadiness.banner ? lastReportCta.reportReadiness.banner : '材料结果'}} · {{lastReportCta.title}}</text><block wx:if="{{parentReportWorkflowView}}">
             <text class="upload-report-flow">{{parentReportWorkflowView.loopLine}}</text>
             <text class="upload-report-flow">{{parentReportWorkflowView.statusLine}}</text>
             <text class="upload-report-flow">{{parentReportWorkflowView.reasoningLine}}</text>

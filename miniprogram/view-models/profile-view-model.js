@@ -155,7 +155,7 @@ function buildFamilyDecisionCard(input = {}) {
     ? round.round_advice.primary
     : '明天只回访同一张卡';
   return {
-    title: sourceLabels.length ? `今晚先做：${safeText(nextAction, '只做一个第一步')}` : '先补一条真实学习证据',
+    title: sourceLabels.length ? `下一步：${safeText(nextAction, '只做一个第一步')}` : '先补一条真实学习证据',
     subtitle: sourceLabels.length
       ? `已接住${sourceLabels.join(' + ')}，不升级长期标签。`
       : '上传材料或完成一次 AI 点拨后，这里会变成家庭决策。',
