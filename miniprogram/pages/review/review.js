@@ -97,8 +97,6 @@ Page({
     reviewViewModel: reviewViewModels.buildReviewViewModel(),
     todayFocus: null,
     miniActionText: '',
-    tonightPlan: null,
-    routeStrip: null,
     surfaceDepthPack: null,
     unifiedNextAction: null,
     memoryPrescriptionPanel: null,
@@ -481,7 +479,6 @@ Page({
   refresh() {
     const summary = reviewCards.reviewSummary();
     const todayFocus = storage.loadTodayFocus ? storage.loadTodayFocus() : null;
-    const tonightPlan = storage.loadTonightPlan ? storage.loadTonightPlan() : null;
     const companionPreference = storage.loadCompanionPreference ? storage.loadCompanionPreference() : null;
     const limit = (summary.deck && summary.deck.dailyLimit) || 5;
     const activeMiniLessonContext = storage.loadActiveMiniLessonResumeContext
@@ -499,8 +496,7 @@ Page({
     const focusProgress = todayFocus ? Number(todayFocus.progress || 0) : revisitRunway.percent;
     const reviewViewModel = reviewViewModels.buildReviewViewModel({
       companionPreference,
-      todayFocus,
-      tonightPlan
+      todayFocus
     });
     this.setData({
       summary,
@@ -538,8 +534,6 @@ Page({
       reviewViewModel,
       todayFocus,
       miniActionText: todayFocus && todayFocus.miniActionText ? todayFocus.miniActionText : this.data.miniActionText,
-      tonightPlan,
-      routeStrip: this.buildRouteStrip('repair', tonightPlan),
       surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('review') : null,
       unifiedNextAction: storage.buildUnifiedNextActionController ? storage.buildUnifiedNextActionController({ surface: 'review' }) : null,
       memoryPrescriptionPanel: this.buildMemoryPrescriptionPanel(summary, cards, reviewEvents, profile, todayFocus),
@@ -563,20 +557,6 @@ Page({
       reviewPlaybook: this.buildReviewPlaybook(summary, cards),
       revisitProofCard: this.buildRevisitProofCard(summary)
     });
-  },
-
-  buildRouteStrip(active, tonightPlan) {
-    const steps = (tonightPlan && tonightPlan.routeSteps) || [
-      { id: 'plan', label: '排顺序' },
-      { id: 'first_step', label: '说第一步' },
-      { id: 'repair', label: '修卡点' },
-      { id: 'review', label: '短回访' },
-      { id: 'parent', label: '家长看' }
-    ];
-    return {
-      text: '学习记录：这里承接最值得修的一个卡点。',
-      steps: steps.map((step) => Object.assign({}, step, { active: step.id === active }))
-    };
   },
 
   buildTransferPracticePanel(card) {
@@ -1027,7 +1007,7 @@ Page({
       ],
       longTermRecord: {
         title: '长期记忆资产',
-        label: `${sources.length} 类来源汇入同一套卡组：今晚安排、作业、作业点拨、学习模块和导入材料都会沉淀。`,
+        label: `${sources.length} 类来源汇入同一套卡组：作业、错题、AI 点拨、学习模块和导入材料都会沉淀。`,
         score: safe.assetCompounding ? safe.assetCompounding.score : (safe.maturity ? safe.maturity.overall : 0)
       }
     };

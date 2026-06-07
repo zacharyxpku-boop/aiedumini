@@ -705,7 +705,7 @@ function buildMaterialTypeGuide(type) {
       blockedClaimsLine: '不能做：天赋定性、性格判断、排名解释、长期能力结论。'
     },
     score_sheet: {
-      examplePlaceholder: '粘贴成绩单/周测文字即可：\n六年级数学 82，应用题扣 10 分，计算扣 3 分；\n英语阅读慢，完形错 4 个；\n家长想知道先补哪一类题、今晚先做什么。',
+      examplePlaceholder: '粘贴成绩单/周测文字即可：\n六年级数学 82，应用题扣 10 分，计算扣 3 分；\n英语阅读慢，完形错 4 个；\n家长想知道先补哪一类题、下一步如何验证。',
       statusLine: '当前只把成绩作为家长私有优先级信号；不做公开排名、不发过程反馈、不承诺提分。',
       modeLine: '验证方式：用分数定位弱学科，再用一张真实错题确认错因和第一步。',
       blockedClaimsLine: '不能做：排名营销、分数刺激、不承诺分数结果、把成绩写进分享卡。'
@@ -754,7 +754,7 @@ function buildMaterialTypeGuide(type) {
     }
   };
   return guides[type] || {
-    examplePlaceholder: '粘贴课堂笔记、PPT 要点或手动整理：\n今天讲了什么概念；\n老师强调了哪一步；\n孩子具体卡在哪里。',
+    examplePlaceholder: '粘贴课堂笔记、PPT 要点或手动整理：\n今天讲了什么概念；\n老师强调了哪一步；\n孩子具体哪一步没接上。',
     statusLine: '当前生成本地复习卡和轻练习，不承诺自动解析文件或直接出答案。',
     modeLine: '验证方式：先拆成概念、步骤、陷阱、填空四类卡。',
     blockedClaimsLine: '不能做：自动抓取、自动批改、完整答案生成。'
@@ -765,9 +765,9 @@ function buildUploadEntryDeck(activeMode = 'homework') {
   const entries = [
     {
       id: 'homework',
-      label: '填今晚作业',
-      title: '今晚先排顺序',
-      line: '写题型、数量和时间，马上生成必做/灵活/后置。',
+      label: '贴作业材料',
+      title: '材料先变证据',
+      line: '写题型、数量和卡点，生成家长报告和点拨证据。',
       placeholder: '例如：\n数学方程基础题 8 道；\n应用题 4 道，写完整过程；\n英语听写 20 个词。',
       cta: '写作业清单'
     },
@@ -790,8 +790,8 @@ function buildUploadEntryDeck(activeMode = 'homework') {
   ].map((item) => Object.assign({}, item, { active: item.id === activeMode }));
   const active = entries.find((item) => item.active) || entries[0];
   return {
-    title: '今晚三步录入',
-    summary: '先选一种入口：作业清单、卡点一句、材料摘录。选完直接进入今晚第一步。',
+    title: '材料三步录入',
+    summary: '先选一种入口：作业清单、卡点一句、材料摘录。选完生成报告证据。',
     entries,
     active,
     activeMode: active.id,
@@ -800,7 +800,7 @@ function buildUploadEntryDeck(activeMode = 'homework') {
       ? '下面会打开材料区；先贴摘录，再生成家长报告/复习卡/回访卡。'
       : active.id === 'stuck'
         ? '下面只要补一句卡点；系统会优先生成第一步点拨和小讲堂触发证据。'
-        : '下面写作业清单；系统会先排今晚必做和第一步。'
+        : '下面写作业清单；系统会先生成材料分类和家长可看的证据。'
   };
 }
 
@@ -826,7 +826,7 @@ Page({
     structuredEvidenceCapture: null,
     lastReportCta: null,
     parentReportWorkflowView: null,
-    submitLabel: '生成今晚作业三分类',
+    submitLabel: '生成家长报告',
     quickChips: [
       { label: '语文背诵', text: '语文背诵 1 篇，孩子容易卡在开头。' },
       { label: '整理错题', text: '错题订正：题目写这里；我错在审题/等量关系/单位换算；想要举一反三。' },
@@ -934,8 +934,8 @@ Page({
     const weak = ((state && state.weak_points) || [])[0] || null;
     const summary = (plan && plan.summary) || {};
     return {
-      title: '今晚作业先排顺序',
-      label: '把作业清单粘进来，先看哪些必须做、哪些有余力再做、哪些今晚可以放过。',
+      title: '材料证据预览',
+      label: '把作业、错题或测评粘进来，先看来源、卡点和报告证据是否够用。',
       stats: [
         { label: '必须做', value: plan ? plan.must_do.length : 0 },
         { label: '可省时间', value: `${summary.saved_minutes || 0} 分钟` },
@@ -959,7 +959,7 @@ Page({
         {
           id: 'memory',
           title: '为什么不是白做',
-          body: '必须做和关键错因会进入今晚安排、作业点拨和轻回访，变成后面还能用的学习资产。',
+          body: '关键错因会进入家长报告、AI 点拨和短回访，变成后面还能用的学习资产。',
           tone: 'record'
         }
       ]
@@ -1054,8 +1054,8 @@ Page({
 
   buildSubmitLabel(text) {
     return this.extractWrongQuestionLines(text).length
-      ? '整理错题本并规划今晚'
-      : '生成今晚作业三分类';
+      ? '整理错题并生成报告'
+      : '生成家长报告';
   },
 
   buildInputCoach(text, plan) {
@@ -1071,10 +1071,10 @@ Page({
     const next = !lines.length
       ? '先写 3 行：题型、数量、卡住点。'
       : !hasStuckPoint
-        ? '再补一句孩子卡在哪里，分类会更可信。'
+        ? '再补一句孩子哪一步没接上，分类会更可信。'
         : !hasCount
           ? '再补题目数量或预计时间，咕点才能算减负。'
-          : '可以生成三分类了。';
+          : '可以生成家长报告了。';
     return {
       score,
       next,
@@ -1483,7 +1483,7 @@ Page({
     const needsEvidence = sourceSchemaId === 'talent_assessment';
     return {
       id: 'tonight_task_card',
-      title: needsEvidence ? '今晚只验证一种学习方法' : '今晚先跑通一张任务卡',
+      title: needsEvidence ? '先验证一种学习方法' : '生成一张学习证据卡',
       status: needsEvidence ? 'method_candidate_only' : 'ready_for_first_step',
       sourceSchemaId,
       sourceSchemaLabel: decisionSource.sourceSchemaLabel || sourceSchemaId,

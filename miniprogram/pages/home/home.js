@@ -66,7 +66,7 @@ Page({
     quickDock: [],
     gameHero: {
       title: '今晚从哪一步开始？',
-      subtitle: '学校作业多，先排顺序；卡住时，先说第一步。',
+      subtitle: '材料、题目或卡点先发来；卡住时，先说第一步。',
       primaryLabel: '进入 AI 点拨',
       primaryAction: 'goTutor',
       secondaryLabel: '生成回访验证',
@@ -102,8 +102,6 @@ Page({
     learningStages: [],
     focusFeedback: '',
     todayFocus: null,
-    tonightPlan: null,
-    routeStrip: null,
     routeDisplayText: '材料分析 · 先看清卡点',
     companionPreference: { selectedCompanion: 'gudian', selectedLabel: '咕点' },
     companionCopy: { home: '咕点陪你先找今晚第一步。' },
@@ -608,7 +606,6 @@ Page({
     const tags = (evidence.tags || []).slice(0, 3);
     const reviewSummary = reviewCards.reviewSummary();
     const thinkingSummary = storage.thinkingReceiptSummary ? storage.thinkingReceiptSummary() : null;
-    const tonightPlan = storage.loadTonightPlan ? storage.loadTonightPlan() : null;
     const todayFocus = storage.loadTodayFocus ? storage.loadTodayFocus() : null;
     const miniLessonResume = this.buildMiniLessonResumeCard(storage.loadReviewCards ? storage.loadReviewCards() : []);
     const learningReportState = storage.loadLearningReportState ? storage.loadLearningReportState() : null;
@@ -704,8 +701,6 @@ Page({
       dailyMemoryTask: this.buildDailyMemoryTaskCard(reviewSummary, todayFocus),
       sevenSubjectMasterySprint: storage.buildSevenSubjectMasterySprint ? storage.buildSevenSubjectMasterySprint() : null,
       todayFocus,
-      tonightPlan,
-      routeStrip: this.buildRouteStrip('plan', tonightPlan),
       routeDisplayText: '材料分析 · 先看清卡点',
       companionPreference,
       companionCopy: {
@@ -714,7 +709,6 @@ Page({
       companionLine: storage.formatCompanionLine ? storage.formatCompanionLine(companionPreference) : '咕点：我懂你卡住了，我陪你先迈出第一步。',
       homeViewModel: buildHomeViewModel({
         companionPreference,
-        tonightPlan,
         todayFocus,
         miniLessonResume,
         learningReportState,
@@ -729,29 +723,12 @@ Page({
           : (storage.growthMemoryCopyFor ? storage.growthMemoryCopyFor('home', companionPreference) : '')
       },
       companionOptions: storage.COMPANION_OPTIONS || [],
-      showWeakVerdict: !!(tonightPlan || todayFocus || this.data.focusFeedback),
-      planSummaryText: tonightPlan && tonightPlan.summaryLine
-        ? tonightPlan.summaryLine
-        : (growthMemoryLine && !growthMemoryLine.empty
-          ? growthMemoryLine.oneLine
-          : (storage.growthMemoryCopyFor ? storage.growthMemoryCopyFor('home', companionPreference) : '')),
+      showWeakVerdict: !!(todayFocus || this.data.focusFeedback),
+      planSummaryText: growthMemoryLine && !growthMemoryLine.empty
+        ? growthMemoryLine.oneLine
+        : (storage.growthMemoryCopyFor ? storage.growthMemoryCopyFor('home', companionPreference) : ''),
       updatedText: state.updated_at ? state.updated_at.slice(5, 16).replace('T', ' ') : '刚刚'
     });
-  },
-
-  buildRouteStrip(active, tonightPlan) {
-    const plan = tonightPlan || {};
-    return {
-      text: plan.summaryLine || '学习记录：材料分析 → AI 点拨 → 短回访 → 家长看',
-      shortText: '材料分析 · 先看清卡点',
-      steps: (plan.routeSteps || [
-        { id: 'plan', label: '排顺序' },
-        { id: 'first_step', label: '说第一步' },
-        { id: 'repair', label: '修卡点' },
-        { id: 'review', label: '短回访' },
-        { id: 'parent', label: '家长看' }
-      ]).map((step) => Object.assign({}, step, { active: step.id === active || step.active && step.id === active }))
-    };
   },
 
   buildDashboardHeader(topMust, reviewSummary, modulePath, state) {
@@ -1840,7 +1817,6 @@ Page({
       companionPreference,
       homeViewModel: buildHomeViewModel({
         companionPreference,
-        tonightPlan: this.data.tonightPlan,
         todayFocus: this.data.todayFocus,
         reportServiceResume: this.data.homeViewModel && this.data.homeViewModel.reportServiceResume,
         growthMemory: growthMemoryLine
@@ -1953,7 +1929,6 @@ Page({
       todayFocus,
       homeViewModel: buildHomeViewModel({
         companionPreference: this.data.companionPreference,
-        tonightPlan: this.data.tonightPlan,
         todayFocus
       }),
       showWeakVerdict: !!(todayFocus && todayFocus.isStuck),
@@ -2021,25 +1996,7 @@ Page({
       this.goTutor();
       return;
     }
-    if (action === 'route') {
-      this.goLearningMap();
-      return;
-    }
     this.goReview();
-  },
-
-  runPersonalPlanAction(event) {
-    const action = event && event.currentTarget && event.currentTarget.dataset
-      ? event.currentTarget.dataset.action
-      : '';
-    const card = this.data.homeViewModel && this.data.homeViewModel.personalPlan
-      ? this.data.homeViewModel.personalPlan
-      : {};
-    if (action === 'coach') {
-      navigation.navigateLearningRoute(card.coachRoute || '/pages/tutor/tutor?from=home_personal_plan');
-      return;
-    }
-    navigation.navigateLearningRoute(card.revisitRoute || '/pages/review/review?from=home_personal_plan');
   },
 
   runPrimaryNextAction() {

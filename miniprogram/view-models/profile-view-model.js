@@ -189,7 +189,7 @@ function buildProfileViewModel(input = {}) {
       { id: 'review-share', title: '复盘卡与分享记录', collapsed: true },
       { id: 'light-practice', title: '回访验证记录', collapsed: true }
     ],
-    emptyState: hasFocus ? null : '今天还没有第一步记录。先让孩子说一句卡在哪里，咕点再整理给家长看。',
+    emptyState: hasFocus ? null : '今天还没有第一步记录。先让孩子说一句哪一步没接上，咕点再整理给家长看。',
     nextStep: hasFocus ? parentRecap.oneNightProof : '',
     debugWarnings: []
   };

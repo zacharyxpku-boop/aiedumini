@@ -37,36 +37,11 @@ function buildNextStep(input) {
       action: 'review'
     };
   }
-  if (input && input.tonightPlan) {
-    const firstItem = input.tonightPlan.planItems && input.tonightPlan.planItems[0]
-      ? safeText(input.tonightPlan.planItems[0].title, '今晚第一项')
-      : '今晚第一项';
-    return {
-      text: `下一步：先做 ${firstItem}。`,
-      cta: '开始第一项',
-      action: 'route'
-    };
-  }
   return null;
 }
 
 function buildPersonalPlanCard(input = {}) {
-  const plan = input.tonightPlan || {};
-  const source = plan.personalPlan || null;
-  if (!source) return null;
-  return {
-    title: safeText(source.title, '材料分析结果'),
-    profileLine: safeText(source.profileLine, '先看孩子当前最卡的一步。'),
-    methodLine: safeText(source.methodLine, '先圈关键词，再说第一步，再动笔。'),
-    motivationLine: safeText(source.motivationLine, '先完成一个能开口说清的小动作。'),
-    aiCoachLine: safeText(source.aiCoachLine, '卡住时进入 AI 点拨，只追问下一小步。'),
-    gameLine: safeText(source.gameLine, '做完后进入短回访，把会的东西留到明天。'),
-    routeLabel: safeText(source.routeLabel, 'AI点拨 → 短回访 → 家长看'),
-    coachCta: '去 AI 点拨',
-    revisitCta: '做短回访',
-    coachRoute: source.coachRoute || '/pages/tutor/tutor?from=home_personal_plan',
-    revisitRoute: source.revisitRoute || '/pages/review/review?from=home_personal_plan'
-  };
+  return null;
 }
 
 function buildMiniLessonResume(input = {}) {
@@ -207,7 +182,7 @@ function buildPrimaryHomeNextAction(input = {}) {
 }
 
 function buildHomeViewModel(input = {}) {
-  const hasPlanOrFocus = !!(input.tonightPlan || input.todayFocus);
+  const hasPlanOrFocus = !!input.todayFocus;
   const miniLessonResume = buildMiniLessonResume(input);
   const reportServiceResume = buildReportServiceResume(input);
   const personalPlan = buildPersonalPlanCard(input);
@@ -224,8 +199,8 @@ function buildHomeViewModel(input = {}) {
       title: hasPlanOrFocus ? '修改情况后重新分析' : '用文字补充情况',
       placeholder: '比如：数学方程 8 道，应用题不会写第一步；也可以先上传材料。',
       helper: hasPlanOrFocus
-        ? '改动任务后重新分析；卡住进 AI 点拨，做完进短回访。'
-        : '不用写长，先说任务、卡点或发材料；这里不直接给答案。'
+        ? '材料变了就重新分析；卡住进 AI 点拨，做完进短回访。'
+        : '不用写长，先说题目、材料或哪一步没接上；这里不直接给答案。'
     },
     primaryCta: hasPlanOrFocus ? '重新分析材料' : '分析材料',
     secondaryAction: '卡住了，去 AI 点拨',

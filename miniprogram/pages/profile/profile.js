@@ -456,41 +456,6 @@ function buildTutorProcessSummary(todayFocus, thinkingReceipts, tutorMessages) {
   };
 }
 
-function buildRouteStrip(active, tonightPlan) {
-  const steps = (tonightPlan && tonightPlan.routeSteps) || [
-    { id: 'plan', label: '排顺序' },
-    { id: 'first_step', label: '说第一步' },
-    { id: 'repair', label: '修卡点' },
-    { id: 'review', label: '明天验证' },
-    { id: 'parent', label: '家长看' }
-  ];
-  return {
-    text: '学习记录：材料分析 → AI 点拨 → 短回访 → 家长看',
-    steps: steps.map((step) => Object.assign({}, step, { active: step.id === active }))
-  };
-}
-
-function buildTonightRouteSummary(tonightPlan, todayFocus, reviewSummary) {
-  const plan = tonightPlan || {};
-  const first = (plan.planItems || [])[0] || {};
-  const focusTitle = todayFocus && todayFocus.title ? todayFocus.title : '今晚先修这一处';
-  const dueCount = Array.isArray(plan.reviewCardIds) ? plan.reviewCardIds.length : safeNumber(reviewSummary && reviewSummary.due, 0);
-  return {
-    why: plan.summaryLine || '今晚不是多做题，而是先排顺序，再把最容易卡住的一步修掉。',
-    firstAction: first.title ? `${first.priorityLabel || '先做'}：${first.title}` : '先排学校任务，再留一点时间修卡点。',
-    focus: todayFocus && todayFocus.issueType ? `${storage.formatIssueType(todayFocus.issueType)} · ${focusTitle}` : focusTitle,
-    review: dueCount ? `明天验证 ${dueCount} 张卡点卡。` : '明天用 1 道同类题再看一次。',
-    parentPrompt: plan.parentPrompt || '你觉得这题第一步应该找什么？',
-    status: [
-      plan.id ? '已排顺序' : '待排顺序',
-      todayFocus && todayFocus.id ? '已找到卡点' : '待说第一步',
-      todayFocus && todayFocus.repairStatus === 'completed' ? '已修卡点' : '待修卡点',
-      dueCount ? '已生成明日回访' : '待生成回访',
-      '家长可查看'
-    ].join(' / ')
-  };
-}
-
 function buildParentLoopProof(reviewSummary, moduleSummary, tutorSummary, thinkingSummary, factorySummary) {
   const review = reviewSummary || {};
   const modules = moduleSummary || {};
@@ -1147,7 +1112,7 @@ function buildProfileSafeSummary(todayFocus, focusHistory = [], profileEmptyGuid
     reviewEvidenceCount ? '回访记录' : ''
   ].filter(Boolean).join(' / ') || '本机暂未积累足够证据';
   const parentActionChecklist = [
-    { id: 'listen', label: '先听', text: stuckPoint || childStep || '孩子今晚卡在哪里' },
+    { id: 'listen', label: '先听', text: stuckPoint || childStep || '孩子哪一步没接上' },
     { id: 'ask', label: '只问', text: storage.parentQuestionFromFirstStep ? storage.parentQuestionFromFirstStep(childStep || systemStep) : '你第一步先做了什么？' },
     { id: 'revisit', label: '明天', text: tomorrowRevisit }
   ];
@@ -3031,13 +2996,10 @@ Page({
     focusCabinSummary: null,
     latestFocusSession: null,
     todayFocus: null,
-    tonightPlan: null,
-    routeStrip: null,
     companionPreference: null,
     companionCopy: { profile: '咕点帮你整理成家长能看懂的一句话。' },
     companionLine: '咕点：我懂你卡住了，我陪你先迈出第一步。',
     weeklyGrowthMemory: null,
-    tonightRouteSummary: null,
     tutorProcessSummary: null,
     calibrationProfile: null,
     parentReport: null,
@@ -3176,7 +3138,6 @@ Page({
     const tutorMessages = storage.get ? storage.get(storage.KEYS.tutorMessages, []) : [];
     const todayFocus = storage.loadTodayFocus ? storage.loadTodayFocus() : null;
     if (storage.saveTodaySession) storage.saveTodaySession({ parentRecapViewed: true });
-    const tonightPlan = storage.loadTonightPlan ? storage.loadTonightPlan() : null;
     const companionPreference = storage.loadCompanionPreference ? storage.loadCompanionPreference() : null;
     const focusHistory = focusCabin.loadHistory ? focusCabin.loadHistory() : [];
     const focusCabinSummary = focusCabin.progressSummary ? focusCabin.progressSummary(focusHistory) : null;
@@ -3226,8 +3187,6 @@ Page({
       focusCabinSummary,
       latestFocusSession: focusHistory[0] || null,
       todayFocus,
-      tonightPlan,
-      routeStrip: buildRouteStrip('parent', tonightPlan),
       companionPreference,
       weeklyGrowthMemory: lightWeeklyGrowthMemory,
       calibrationProfile,
@@ -3316,7 +3275,6 @@ Page({
     }
     const parentReport = buildParentReport(profile, reviewSummary, moduleSummary, tutorSummary, calibrationProfile, reviewSummary.sync, thinkingSummary, parentGoal, todayFocus);
     const tutorProcessSummary = buildTutorProcessSummary(todayFocus, thinkingReceipts, tutorMessages);
-    const tonightRouteSummary = buildTonightRouteSummary(tonightPlan, todayFocus, reviewSummary);
     const todayFocusReviewCards = storage.loadReviewCards
       ? storage.loadReviewCards().filter((card) => card && (card.source === 'today_focus' || card.sourceFocusId === (todayFocus && todayFocus.id)))
       : [];
@@ -3365,15 +3323,12 @@ Page({
       focusCabinSummary,
       latestFocusSession: focusHistory[0] || null,
       todayFocus,
-      tonightPlan,
-      routeStrip: buildRouteStrip('parent', tonightPlan),
       companionPreference,
       companionCopy: {
         profile: storage.getCompanionStageCopy ? storage.getCompanionStageCopy('profile_summary', companionPreference) : '咕点帮你整理成家长能看懂的一句话。'
       },
       companionLine: storage.formatCompanionLine ? storage.formatCompanionLine(companionPreference) : '咕点：我懂你卡住了，我陪你先迈出第一步。',
       weeklyGrowthMemory,
-      tonightRouteSummary,
       tutorProcessSummary,
       syncDiagnostics: reviewSummary.sync && reviewSummary.sync.diagnostics,
       syncReadiness: buildSyncReadiness(storage.loadClientIdentity(), reviewSummary.sync, reviewSummary.sync && reviewSummary.sync.diagnostics),
@@ -4160,7 +4115,7 @@ Page({
         { id: 'content_loop', name: '内容回访', score: review.contentPipeline ? 98 : 94, strength: '材料 -> 卡片 -> 小测 -> 连续记录', gap: '真实材料处理和稳定复盘规模' },
         { id: 'memory_loop', name: '长期记忆', score: review.retentionLab ? 96 : 92, strength: '间隔复习、负载控制和卡点修复', gap: '真实调度参数校准' },
         { id: 'tutor_loop', name: 'AI点拨学伴', score: thinking.total ? 99 : 96, strength: '追问引导和思路记录', gap: '模型级误区复盘' },
-        { id: 'china_student', name: '中国学生场景', score: 100, strength: '今晚安排 -> 作业三分类 -> 我的进展', gap: '需要真实体验记录' }
+        { id: 'china_student', name: '中国学生场景', score: 100, strength: '材料证据 -> AI 点拨 -> 家长报告', gap: '需要真实体验记录' }
       ]
     };
   },
@@ -4413,7 +4368,7 @@ Page({
   clearLocalData() {
     wx.showModal({
       title: '清除本地学习数据',
-      content: '将清除本机的今晚安排、作业分类、会话、复习卡和临时选择；不影响你已经主动提交的咨询信息。',
+      content: '将清除本机的材料分类、会话、复习卡和临时选择；不影响你已经主动提交的咨询信息。',
       confirmText: '清除',
       confirmColor: '#B85C2E',
       success: (res) => {
