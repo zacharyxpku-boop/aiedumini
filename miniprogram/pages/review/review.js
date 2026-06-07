@@ -300,7 +300,7 @@ Page({
         line: '已进入学生作业包：先说第一步和错因，明天回访，第 7 天做小变式。',
         actionLabel: '布置自主练习'
       },
-      template_reuse: {
+      template_structure: {
         title: '本机结构卡',
         line: '只保存练习结构，不分享原题、答案、分数、身份或完整对话。',
         actionLabel: '保存结构卡'
@@ -1585,8 +1585,8 @@ Page({
       readyToAssign: selfPractice.length >= 8 && sourceCards.length > 0
     };
     const communityReusePlan = {
-      id: 'community_reuse',
-      route: '/pages/review/review?from=template_reuse',
+      id: 'local_structure_card',
+      route: '/pages/review/review?from=template_structure',
       templates: communityReuse,
       localSaveKey: 'review.practice.template.pack.v1',
       saveReady: true,
@@ -1599,11 +1599,11 @@ Page({
       { id: 'worksheet_generator', label: '练习卡', count: worksheet.length, route: worksheetBundle.route, ready: worksheetBundle.readyToPreview },
       { id: 'classroom_interactive', label: '课堂互动工具', count: live.length, route: classroomInteractiveRun.route, ready: classroomInteractiveRun.readyToRun },
       { id: 'student_assignment', label: '学生自主练习', count: selfPractice.length, route: studentAssignment.route, ready: studentAssignment.readyToAssign },
-      { id: 'community_reuse', label: '本机结构卡', count: communityReuse.length, route: communityReusePlan.route, ready: communityReusePlan.readyToReuse }
+      { id: 'local_structure_card', label: '本机结构卡', count: communityReuse.length, route: communityReusePlan.route, ready: communityReusePlan.readyToReuse }
     ];
     return {
       id: packId,
-      title: safeWorkshop.title || '练习模板工坊',
+      title: safeWorkshop.title || '练习卡生成',
       createdAt: now,
       sourceCount: sourceCards.length,
       catalogCount: Number(safeWorkshop.catalogCount || catalog.length || 0),
@@ -1667,10 +1667,10 @@ Page({
         sampleTitle: '自主练习包',
         samples: (pack.selfPractice || []).slice(0, 3)
       },
-      community_reuse: {
+      local_structure_card: {
         title: '本机结构卡',
         status: '可保存',
-        line: '只保存模板结构，家长确认后才能复用，不带原题、答案或身份信息。',
+        line: '只保存练习结构，家长确认后才能再次使用，不带原题、答案或身份信息。',
         primaryAction: '保存结构卡',
         sampleTitle: '可保存结构',
         samples: (pack.communityReuse || []).slice(0, 3)
@@ -1723,7 +1723,7 @@ Page({
           worksheet_count: pack.worksheet.length,
           live_count: pack.live.length,
           self_practice_count: pack.selfPractice.length,
-          community_reuse_count: pack.communityReuse.length,
+          local_structure_card_count: pack.communityReuse.length,
           created_at: pack.createdAt
         });
       }

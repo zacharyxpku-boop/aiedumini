@@ -18,8 +18,8 @@
         </view>
 
         <view class="review-record-panel">
-          <view class="review-section-head"><text>选一个小工具</text><text>3 分钟练一轮</text></view>
-          <text class="review-workshop-lead">选一张卡，跑一轮 3 分钟回访。</text>
+          <view class="review-section-head"><text>选一张卡</text><text>回忆、核对、明天再看</text></view>
+          <text class="review-workshop-lead">先完成一轮 3 分钟回访。</text>
           <view class="review-tool-grid">
             <view wx:for="{{playableReviewTools}}" wx:key="id" class="review-tool-card {{item.available ? 'ready' : 'locked'}}" data-id="{{item.id}}" bindtap="runPlayableReviewTool"><text>{{item.title}}</text><text>{{item.line}}</text><text>{{item.status}}｜{{item.count}} 张</text></view>
           </view>
@@ -34,9 +34,9 @@
           </view>
         </view>
 
-        <view class="review-template-pack compact" wx:if="{{practiceTemplatePack && practiceTemplatePack.id}}"><text class="review-template-title">回访后可生成练习卡</text><text class="review-template-action" data-id="{{practiceTemplatePack.deliverables[0].id}}" data-label="{{practiceTemplatePack.deliverables[0].label}}" data-route="{{practiceTemplatePack.deliverables[0].route}}" bindtap="runTemplateDeliverable">生成</text></view>
-        <view class="review-template-workbench" wx:if="{{practiceTemplateWorkbench && practiceTemplateWorkbench.id}}"><text class="review-workbench-title">{{practiceTemplateWorkbench.title}}</text><text class="review-workbench-status">{{practiceTemplateWorkbench.status}} ｜ {{practiceTemplateWorkbench.count}} 个模板</text><text class="review-workbench-line">{{practiceTemplateWorkbench.line}}</text><text class="review-preview-card">{{practiceTemplateWorkbench.samples[0].label}} ｜ {{practiceTemplateWorkbench.samples[0].source}}</text><text class="review-workbench-safe">{{practiceTemplateWorkbench.safetyLine}}</text></view>
         <view class="review-main-cta" data-action="review" bindtap="runPlaybookAction">{{reviewViewModel.primaryCta.text}}</view>
+        <view class="review-template-pack compact" wx:if="{{practiceTemplatePack && practiceTemplatePack.id && activeReviewTool && activeReviewTool.id}}"><text class="review-template-title">回访后可生成练习卡</text><text class="review-template-action" data-id="{{practiceTemplatePack.deliverables[0].id}}" data-label="{{practiceTemplatePack.deliverables[0].label}}" data-route="{{practiceTemplatePack.deliverables[0].route}}" bindtap="runTemplateDeliverable">生成</text></view>
+        <view class="review-template-workbench" wx:if="{{practiceTemplateWorkbench && practiceTemplateWorkbench.id && activeReviewTool && activeReviewTool.id}}"><text class="review-workbench-title">{{practiceTemplateWorkbench.title}}</text><text class="review-workbench-status">{{practiceTemplateWorkbench.status}} ｜ {{practiceTemplateWorkbench.count}} 张卡</text><text class="review-workbench-line">{{practiceTemplateWorkbench.line}}</text><text class="review-preview-card">{{practiceTemplateWorkbench.samples[0].label}} ｜ {{practiceTemplateWorkbench.samples[0].source}}</text><text class="review-workbench-safe">{{practiceTemplateWorkbench.safetyLine}}</text></view>
       </view>
     </view>
   </scroll-view>

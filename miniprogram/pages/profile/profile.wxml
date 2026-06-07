@@ -15,9 +15,9 @@
 
         <view class="yd-parent-hero">
           <view class="yd-parent-copy">
-            <view class="yd-parent-kicker">给家长看的证据和下一步</view>
-            <view class="yd-parent-title">今晚孩子卡在哪，家长该问哪一句？</view>
-            <view class="yd-parent-sub">只看证据、问一句话、明天再验证。</view>
+            <view class="yd-parent-kicker">家长只看结论</view>
+            <view class="yd-parent-title">今晚结论和一句话</view>
+            <view class="yd-parent-sub">看证据，问一句，明天验证。</view>
           </view>
           <image class="yd-parent-art" mode="aspectFit" src="/assets/reference/family-avatar-group-transparent.png" />
         </view>

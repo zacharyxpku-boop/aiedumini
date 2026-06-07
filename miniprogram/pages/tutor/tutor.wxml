@@ -58,15 +58,11 @@
               <input value="{{input}}" bindinput="onInput" bindconfirm="send" confirm-type="send" placeholder="写题目、卡点或第一步" />
               <view bindtap="send">发送</view>
             </view>
-            <view class="tutor-feedback-row">
+            <view class="tutor-feedback-row" wx:if="{{messages && messages.length}}">
               <view class="tutor-feedback-good" data-status="first_step_spoken" bindtap="recordSocraticEffectivenessFeedback">我说出第一步了</view>
               <view class="tutor-feedback-stuck" data-status="still_blocked" bindtap="recordSocraticEffectivenessFeedback">还是卡住</view>
             </view>
             <text class="tutor-feedback-note" wx:if="{{socraticFeedbackNextAction}}">{{socraticFeedbackNextAction}}</text>
-          </view>
-
-          <view class="tutor-action-row">
-            <view class="tutor-primary" data-step="{{activeStep}}" bindtap="launchFirstStep">开始追问第一步</view>
           </view>
         </view>
       </view>

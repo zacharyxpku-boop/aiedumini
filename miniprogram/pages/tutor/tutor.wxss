@@ -51,8 +51,7 @@ page {
 
 .yd-tutor-top,
 .yd-tutor-brand,
-.tutor-section-head,
-.tutor-action-row {
+.tutor-section-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -475,29 +474,4 @@ page {
   font-size: 22rpx;
   font-weight: 950;
   line-height: 58rpx;
-}
-
-.tutor-action-row {
-  margin-top: 2rpx;
-  padding-top: 0;
-}
-
-.tutor-primary {
-  flex: 1 1 0;
-  min-width: 0;
-  height: 88rpx;
-  border-radius: 999rpx;
-  font-size: 27rpx;
-  font-weight: 950;
-  line-height: 88rpx;
-  text-align: center;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.tutor-primary {
-  height: 88rpx;
-  color: #1d261f;
-  background: linear-gradient(180deg, #ffd84f 0%, #f5b300 100%);
 }

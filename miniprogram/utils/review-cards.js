@@ -2807,7 +2807,7 @@ function practiceTeachingAidCatalog() {
     { id: 'matching_pairs', label: '配对卡', lane: 'worksheet', format: 'cutout', renderMode: 'cut_and_match' },
     { id: 'domino_chain', label: '多米诺骨牌', lane: 'worksheet', format: 'cutout', renderMode: 'domino_chain' },
     { id: 'puzzle_match', label: '拼图配对', lane: 'worksheet', format: 'cutout', renderMode: 'puzzle_match' },
-    { id: 'uno_cards', label: 'UNO 练习牌', lane: 'worksheet', format: 'card', renderMode: 'rule_card' },
+    { id: 'rule_cards', label: '规则练习牌', lane: 'worksheet', format: 'card', renderMode: 'rule_card' },
     { id: 'bingo_grid', label: 'Bingo 九宫格', lane: 'worksheet', format: 'grid', renderMode: 'bingo_grid' },
     { id: 'word_wall', label: '词墙卡', lane: 'worksheet', format: 'wall', renderMode: 'word_wall' },
     { id: 'sort_cards', label: '分类卡', lane: 'worksheet', format: 'card', renderMode: 'sort_stack' },
@@ -2840,7 +2840,7 @@ function practiceTeachingAidCatalog() {
     { id: 'parent_receipt', label: '家长回执', lane: 'self', format: 'assignment', renderMode: 'parent_receipt' },
     { id: 'template_save', label: '保存模板', lane: 'community', format: 'template', renderMode: 'local_save' },
     { id: 'template_remix', label: '改编模板', lane: 'community', format: 'template', renderMode: 'remix_local' },
-    { id: 'template_reuse', label: '一键复用', lane: 'community', format: 'template', renderMode: 'reuse_local' },
+    { id: 'structure_card', label: '结构卡', lane: 'community', format: 'template', renderMode: 'reuse_local' },
     { id: 'subject_pack', label: '学科模板包', lane: 'community', format: 'template', renderMode: 'subject_pack' },
     { id: 'teacher_note', label: '老师备注', lane: 'community', format: 'template', renderMode: 'teacher_note' },
     { id: 'family_template', label: '家庭模板', lane: 'community', format: 'template', renderMode: 'family_template' },
@@ -2880,7 +2880,7 @@ function practiceTemplateWorkshop(summary = {}, cards = []) {
     {
       id: 'worksheet',
       label: '练习单',
-      line: '闪卡、配对、拼图、多米诺、UNO、Bingo',
+      line: '闪卡、配对、拼图、多米诺、规则卡',
       mode: 'worksheet_generator',
       source: topic,
       ready: readyCount > 0,
@@ -2912,9 +2912,9 @@ function practiceTemplateWorkshop(summary = {}, cards = []) {
     },
     {
       id: 'community',
-      label: '模板复用',
-      line: '本地保存、下次复用、家长确认、安全分享',
-      mode: 'local_template_reuse',
+      label: '结构卡',
+      line: '本地保存、下次使用、家长确认、安全分享',
+      mode: 'local_structure_card',
       ready: true,
       action: '先本地保存，云端共创后续接入',
       catalogCount: (catalogByLane.community || []).length,
@@ -2923,9 +2923,9 @@ function practiceTemplateWorkshop(summary = {}, cards = []) {
   ];
   return {
     id: 'practice_template_workshop',
-    title: '练习模板工坊',
+    title: '练习卡生成',
     subtitle: '从卡点生成 ' + catalog.length + ' 款教具、课堂互动和自主练习，不做排名刺激',
-    catalogLine: catalog.length + ' 款模板：多米诺、拼图配对、UNO、闪卡、课堂互动和课后自主练习',
+    catalogLine: catalog.length + ' 款练习卡：多米诺、拼图配对、规则卡、闪卡、课堂互动和课后自主练习',
     readyCount,
     sourceCount: safeCards.length,
     catalogCount: catalog.length,
@@ -2942,7 +2942,7 @@ function practiceTemplateWorkshop(summary = {}, cards = []) {
       releaseGate: 'first_step_and_wrong_cause_before_assignment'
     },
     communityPlan: {
-      mode: 'local_template_reuse_first',
+      mode: 'local_structure_card_first',
       saveReady: true,
       shareReady: false,
       rule: '先本地保存和复用；云端共创必须经过家长确认和隐私字段过滤。'

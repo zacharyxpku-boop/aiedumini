@@ -13,12 +13,11 @@
           <view class="yd-upload-pill">学习包</view>
         </view>
 
-        <view class="yd-upload-hero" bindtap="submit">
+        <view class="yd-upload-hero">
           <view class="yd-upload-copy">
-            <view class="yd-upload-title">先把材料分清楚</view>
-            <view class="yd-upload-sub">把作业、错题、成绩或测评先发过来。系统先分类，再生成家长能看懂的报告。</view>
+            <view class="yd-upload-title">上传材料，生成家长报告</view>
+            <view class="yd-upload-sub">作业、错题、成绩或测评都可以。</view>
             <view class="yd-upload-proof">
-              <text>点击上传材料</text>
               <text>不公开分享</text>
               <text>先分类再分析</text>
             </view>
@@ -27,7 +26,7 @@
         </view>
 
         <view class="upload-intake-workbench">
-          <view class="upload-workbench-head"><text>把材料变成报告</text><text>粘贴材料，或先拍照留档</text></view>
+          <view class="upload-workbench-head"><text>粘贴或拍照</text><text>生成前先看证据</text></view>
           <textarea class="upload-textarea" value="{{homeworkText}}" bindinput="onInput" maxlength="1200" placeholder="例：数学应用题 4 道，孩子卡在等量关系；英语听写 20 个，容易错前 8 个。" />
           <view class="upload-workbench-actions"><text bindtap="chooseImage">加照片</text><text data-type="parent_report" bindtap="openMaterialReportPanel">补充观察</text></view>
         </view>

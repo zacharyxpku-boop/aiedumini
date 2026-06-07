@@ -3779,7 +3779,7 @@ function buildParentReportGenerationWorkflow(input = {}, context = {}) {
   ].concat(Array.isArray(dossier.blockedFields) ? dossier.blockedFields : [])));
   const reasoningPrompt = [
     '你是原点智学的报告推理器，只能基于已上传资料和本地证据台账做判断。',
-    '先判断资料类型、证据强弱、缺失证据，再选择苏格拉底私教、练习模板工坊、家长回访或补资料模块。',
+    '先判断资料类型、证据强弱、缺失证据，再选择苏格拉底点拨、练习卡、家长回访或补资料模块。',
     '每个判断必须写清：证据来自哪里、为什么这样推理、今晚让孩子做哪一步、明天如何回访。',
     '材料不足时只能输出方法候选，不输出固定画像、天赋标签、提分承诺或完整答案。'
   ].join('\n');
