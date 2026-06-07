@@ -208,8 +208,8 @@ function buildReviewViewModel(input = {}) {
         }
       : null,
     emptyState: todayFocus ? null : {
-      text: '还没有要修的卡点。先回到作业点拨，说一句你卡在哪里。',
-      cta: '去说第一步',
+      text: '还没有回访材料。先去 AI 点拨上传材料，或直接写下题目。',
+      cta: '去 AI 点拨',
       action: 'home'
     },
     nextStep: todayFocus && todayFocus.repairStatus === 'completed'
