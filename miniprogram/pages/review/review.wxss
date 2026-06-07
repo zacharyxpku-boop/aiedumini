@@ -438,6 +438,23 @@ page {
   background: #ffffff;
 }
 
+.review-live-actions.grade {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.review-live-actions.grade button {
+  min-height: 68rpx;
+  line-height: 68rpx;
+  color: #17211d;
+  background: #ffffff;
+  box-shadow: inset 0 0 0 1rpx rgba(76, 159, 255, 0.14);
+}
+
+.review-live-actions.grade button:nth-child(3) {
+  color: #ffffff;
+  background: #16221d;
+}
+
 .review-template-pack {
   display: grid;
   gap: 6rpx;

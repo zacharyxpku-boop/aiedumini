@@ -1480,12 +1480,12 @@ Page({
     }
     if (storage.recordUnifiedNextAction && diagnosticReceipt.openMaicInspiredTaskPlan && diagnosticReceipt.openMaicInspiredTaskPlan.outline) {
       storage.recordUnifiedNextAction({
-        source: 'openmaic_inspired_task_plan',
-        sourceLabel: '今晚任务单',
+        source: 'reference_workflow_hint',
+        sourceLabel: '参考工作流',
         actionLabel: diagnosticReceipt.openMaicInspiredTaskPlan.outline.firstStep,
-        route: '/pages/review/review?from=openmaic_task_plan',
-        readiness: 'task_plan_ready',
-        capabilityId: 'openmaic_inspired_homework_loop',
+        route: '/pages/review/review?from=reference_workflow_hint',
+        readiness: 'reference_hint_ready',
+        capabilityId: 'socratic_to_revisit_reference_hint',
         evidence: diagnosticReceipt.openMaicInspiredTaskPlan.outline.evidenceRequired
       });
     }

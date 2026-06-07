@@ -23,7 +23,7 @@ const SCENES = {
       metrics: [
         { label: '可上传', value: '6类' },
         { label: '报告', value: '可生成' },
-        { label: '路线', value: '今晚用' }
+        { label: '下一步', value: '去点拨' }
       ],
       points: [
         '作业、错题、成绩、老师反馈和家长观察分开处理。',
@@ -35,9 +35,9 @@ const SCENES = {
   report: {
     badge: '个性化报告',
     title: '先讲清证据，再匹配学习方法',
-    subtitle: '报告先看材料来源、学习画像和当前表现是否互相支持，再给出今晚能执行的方法。',
+    subtitle: '报告先看材料来源、学习画像和当前表现是否互相支持，再给出能执行的方法。',
     heroImage: '/assets/reference/report-radar-card-illustration.png',
-    focusCopy: '先看证据是否足够，再决定今晚用哪一种学习方法。',
+    focusCopy: '先看证据是否足够，再决定用哪一种学习方法。',
     primaryLabel: '查看证据报告',
     primaryRoute: '/pages/profile/profile?from=entry_report_evidence&open=flow',
     secondaryLabel: '补充测评/错题',
@@ -59,7 +59,7 @@ const SCENES = {
       points: [
         '先把测评、成绩、错题和家长观察分开看。',
         '只把互相支持的信号写进结论，弱证据进入待补充。',
-        '每个建议都必须落到今晚能做的一步。'
+        '每个建议都必须落到可观察、可复查的一步。'
       ]
     }
   },
@@ -127,7 +127,7 @@ const SCENES = {
   },
   parent: {
     badge: '家长视图',
-    title: '家长今晚只问一句',
+    title: '家长只看证据，再问一句',
     subtitle: '家长不用替孩子学题，只看证据、问一句低压问题、明天再回访。',
     heroImage: '/assets/reference/family-avatar-group-transparent.png',
     focusCopy: '先看孩子今天留下了什么证据，再问一句能启动行动的问题。',
@@ -138,19 +138,19 @@ const SCENES = {
     cards: [
       { label: '证据来自哪里', value: '测评、成绩、错题、对话和回访记录。', icon: '/assets/reference/entry-report.png', scene: 'report' },
       { label: '为什么这样学', value: '从学习偏好和当前卡点匹配方法。', icon: '/assets/reference/entry-tutor.png', scene: 'tutor' },
-      { label: '今晚怎么做', value: '只给一张家庭行动卡，不制造焦虑。', icon: '/assets/reference/entry-parent.png', scene: 'parent' }
+      { label: '怎么陪伴', value: '只给一张家庭行动卡，不制造焦虑。', icon: '/assets/reference/entry-parent.png', scene: 'parent' }
     ],
     spotlight: {
       kicker: '家长行动卡',
-      title: '今晚别追问答案，只问起点',
+      title: '别追问答案，只问证据',
       image: '/assets/reference/family-avatar-group-transparent.png',
       metrics: [
-        { label: '今晚目标', value: '一句话' },
+        { label: '家长目标', value: '一句话' },
         { label: '家长角色', value: '观察者' },
         { label: '回访时间', value: '明天' }
       ],
       points: [
-        '只问“你准备从哪一步开始”。',
+        '只问“你刚才是怎么想的”。',
         '记录孩子说出的第一步和卡住原因。',
         '明天用同类小题回忆，不翻旧账。'
       ]

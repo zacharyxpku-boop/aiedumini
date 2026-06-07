@@ -210,7 +210,7 @@ function buildUploadPersonalizedClosureView(bridge = {}) {
     socraticLine: bridge.socraticStressFallback
       ? `苏格拉底兜底：${bridge.socraticStressFallback.fallbackOrder.join(' / ')}`
       : '',
-    gameLine: bridge.gameRetentionPlan
+    revisitLine: bridge.gameRetentionPlan
       ? `回访练习：${bridge.gameRetentionPlan.openedPracticeRecall ? '可进入回访练习' : '先锁定，等第一步/错因/隔天回访'}；证据门槛 ${String(bridge.gameRetentionPlan.xpGate || '').replace(new RegExp(['X', 'P'].join(''), 'g'), '行为反馈')}`
       : '',
     scoreLine: bridge.scoreReportBridge
@@ -400,14 +400,14 @@ function buildUploadDailyExecutionSeed(options = {}) {
   const reportId = options.reportId || '';
   const sourceSchemaId = options.sourceSchemaId || 'upload_material';
   const query = `from=upload_daily_seed&reportId=${encodeURIComponent(reportId)}&sourceSchemaId=${encodeURIComponent(sourceSchemaId)}`;
-  const gameRoute = options.gameRoute || '';
+  const revisitRoute = options.revisitRoute || '';
   const reviewRoute = `/pages/review/review?${query}`;
   const tutorRoute = options.actionRoute || aiView.nextActionRoute || `/pages/tutor/tutor?${query}`;
   const subjectLine = scoreSignalView.subjectLine || aiView.subjectLine || 'subject: pending evidence';
   const coverageLine = contentCoverageReceipt.coverageLine || aiView.coverageLine || 'coverage: local first-step strategy';
   const firstStep = tonightTaskCard.firstStep || aiView.firstStepLine || 'ask the child to say the first step';
   const wrongCause = tonightTaskCard.wrongCause || aiView.wrongCauseLine || 'name one wrong-cause candidate';
-  const gameUnlocked = !!gameRoute;
+  const revisitUnlocked = !!revisitRoute;
   return {
     id: 'upload_daily_execution_seed',
     title: '上传资料后的每日执行种子',
@@ -418,8 +418,8 @@ function buildUploadDailyExecutionSeed(options = {}) {
     wrongCauseLine: `错因线索：${wrongCause}`,
     reviewRoute,
     tutorRoute,
-    gameRoute,
-    gameLine: gameUnlocked
+    revisitRoute,
+    revisitLine: revisitUnlocked
       ? '短回访已解锁：只练主动回忆，不看速度、分数或同伴比较。'
       : '短回访暂不解锁：先补孩子第一步或错因证据。',
     releaseLine: '放行规则：有第一步 + 错因 + 明天回访证据，才进入短回访或分享。',
@@ -430,8 +430,8 @@ function buildUploadDailyExecutionSeed(options = {}) {
       source_schema_id: sourceSchemaId,
       review_route: reviewRoute,
       tutor_route: tutorRoute,
-      game_route: gameRoute,
-      game_unlocked: gameUnlocked,
+      revisit_route: revisitRoute,
+      revisit_unlocked: revisitUnlocked,
       evidence_required: 'child_first_step,wrong_cause_named,next_day_revisit,parent_check'
     }
   };
@@ -1380,9 +1380,9 @@ Page({
         : '这类资料必须先补齐结构化证据，不能直接放行报告、短回访或分享。',
       route: '/pages/upload/upload?from=material_evidence_gate',
       actionRoute: '/pages/upload/upload?from=material_evidence_gate',
-      gameRoute: '',
+      revisitRoute: '',
       sourceSchemaId: decisionSource.sourceSchemaId || '',
-      blockedFields: ['report_cta', 'game_route', 'share_payload', 'talent_label', 'full_answer'],
+      blockedFields: ['report_cta', 'revisit_route', 'share_payload', 'talent_label', 'full_answer'],
       status: 'blocked_until_structured_evidence',
       structuredEvidenceMissing: missing
     };
@@ -1498,7 +1498,7 @@ Page({
       parentCheck,
       tomorrowReview,
       actionRoute: options.actionRoute || servicePathway.nextRoute || '',
-      gameRoute: needsEvidence ? '' : (options.gameRoute || ''),
+      revisitRoute: needsEvidence ? '' : (options.revisitRoute || ''),
       releaseGate: needsEvidence
         ? 'talent_method_candidate_requires_wrong_question_evidence'
         : (topicCard.localGate || miniLessonReport.topicLocalGate || 'child_can_say_first_step'),
@@ -1689,7 +1689,7 @@ Page({
       && Array.isArray(servicePathway.modeRecommendations)
       && servicePathway.modeRecommendations.some((item) => item && item.id === 'practice_recall')
     );
-    const gameRoute = sourceSchemaId !== 'talent_assessment' && hasPracticeRecallReleaseEvidence && servicePathwayAllowsPracticeRecall
+    const revisitRoute = sourceSchemaId !== 'talent_assessment' && hasPracticeRecallReleaseEvidence && servicePathwayAllowsPracticeRecall
       ? `/pages/review/review?from=upload_report_ready&${query}`
       : '';
     const tonightTaskCard = this.buildTonightTaskCard(decisionSource, reportState, {
@@ -1697,14 +1697,14 @@ Page({
       openMaicTaskPlan,
       servicePathway,
       actionRoute,
-      gameRoute,
+      revisitRoute,
       blockedFields: safeRelayPayload.blockedFields
     });
     const dailyExecutionSeed = buildUploadDailyExecutionSeed({
       sourceSchemaId,
       reportId,
       actionRoute,
-      gameRoute,
+      revisitRoute,
       aiMaterialSolutionView,
       scoreSignalView,
       contentCoverageReceipt,
@@ -1790,7 +1790,7 @@ Page({
           : '已生成资料证据卷宗；先看本次材料怎么用，再决定是否进入点拨或回访。',
       route: `/pages/profile/profile?from=upload_report_ready&${query}`,
       actionRoute,
-      gameRoute,
+      revisitRoute,
       actionLabel: sourceSchemaId === 'talent_assessment'
         ? '补真实错题验证'
         : sourceSchemaId === 'wrong_question_paper' ? '去修这批错题' : '去问第一步',
@@ -2540,9 +2540,9 @@ Page({
     navigation.navigateLearningRoute(cta.actionRoute || '/pages/tutor/tutor?from=upload_report_ready');
   },
 
-  runReportGameAction() {
+  runReportRevisitAction() {
     const cta = this.data.lastReportCta || {};
-    if (!cta.gameRoute) {
+    if (!cta.revisitRoute) {
       wx.showToast({
         title: '先补真实证据',
         icon: 'none'
@@ -2551,7 +2551,7 @@ Page({
       return;
     }
     this.saveReportHandoff(cta);
-    navigation.navigateLearningRoute(cta.gameRoute);
+    navigation.navigateLearningRoute(cta.revisitRoute);
   },
 
   runSurfaceDepthAction(event) {

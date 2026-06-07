@@ -2,7 +2,6 @@ const api = require('../../utils/api');
 const storage = require('../../utils/storage');
 const navigation = require('../../utils/navigation');
 const reviewCards = require('../../utils/review-cards');
-const gameLogic = require('../../utils/game-logic');
 const profileViewModels = require('../../view-models/profile-view-model');
 const focusCabin = require('../../utils/focus-cabin');
 const learningAssessment = require('../../utils/learning-assessment');
@@ -55,7 +54,7 @@ function createShareRelaySchemaFallback() {
     'course_unit_parent_decision',
     'course_unit_share_contract',
     'course_unit_recall_route',
-    'course_unit_game_route',
+    'course_unit_revisit_route',
     'relay_review',
     'relay_spread_status',
     'relay_season_status',
@@ -547,22 +546,17 @@ function buildWrongCauseSummary(reviewSummary, thinkingSummary) {
 function buildGameProfileCard(reviewSummary) {
   const gameProfile = storage.loadGameProfile ? storage.loadGameProfile() : {};
   const progress = (reviewSummary && reviewSummary.progress) || {};
-  const level = gameLogic.getLevel(gameProfile.xp || progress.xp || 0);
-  const achievements = gameLogic.listAchievements(gameProfile.achievements || []);
-  const unlocked = achievements.filter((item) => item.unlocked);
-  const shopItems = gameLogic.listShopItems(gameProfile.inventory || []).slice(0, 3);
+  const evidencePoints = Number(gameProfile.xp || progress.xp || 0);
+  const reviewedToday = Number((reviewSummary && reviewSummary.reviewedToday) || 0);
   return {
-    title: '明天验证记录',
-    xp: Number(gameProfile.xp || progress.xp || 0),
-    coins: Number(gameProfile.coins || 0),
+    title: '短回访证据',
+    xp: evidencePoints,
+    evidencePoints,
     streak: Number(gameProfile.streak || progress.streak || 0),
     lives: Number(gameProfile.lives || 5),
-    level,
-    achievements,
-    unlockedCount: unlocked.length,
-    achievementText: unlocked.length ? `已留下 ${unlocked.length}/${achievements.length} 条阶段记录` : '完成第一次回访后留下记录',
-    shopItems,
-    leaderboardNotice: '这里只看孩子自己的回访记录，不做同伴对比。'
+    reviewedToday,
+    achievementText: reviewedToday ? `今天已完成 ${reviewedToday} 次短回访` : '完成第一次回访后留下记录',
+    comparisonNotice: '这里只看孩子自己的回访记录，不做同伴对比。'
   };
 }
 
@@ -693,7 +687,7 @@ function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCause
     : '';
   const courseUnitDecision = buildCourseUnitDecisionBoard(courseUnitMap);
   const courseUnitQuery = courseUnitDecision
-    ? `&course_unit_label=${encodeURIComponent(courseUnitDecision.unitLabel || '')}&course_unit_subject=${encodeURIComponent(courseUnitDecision.subjectLabel || '')}&course_unit_tier=${encodeURIComponent(courseUnitDecision.tier || '')}&course_unit_parent_decision=${encodeURIComponent(courseUnitDecision.parentTonightDecision || '')}&course_unit_report_contract=${encodeURIComponent(courseUnitDecision.reportContract || '')}&course_unit_share_contract=${encodeURIComponent(courseUnitDecision.shareContract || '')}&course_unit_blackboard=${encodeURIComponent(courseUnitDecision.blackboardLine || '')}&course_unit_recall_route=${encodeURIComponent(courseUnitDecision.recallRoute || '')}&course_unit_game_route=${encodeURIComponent(courseUnitDecision.gameRoute || '')}`
+    ? `&course_unit_label=${encodeURIComponent(courseUnitDecision.unitLabel || '')}&course_unit_subject=${encodeURIComponent(courseUnitDecision.subjectLabel || '')}&course_unit_tier=${encodeURIComponent(courseUnitDecision.tier || '')}&course_unit_parent_decision=${encodeURIComponent(courseUnitDecision.parentTonightDecision || '')}&course_unit_report_contract=${encodeURIComponent(courseUnitDecision.reportContract || '')}&course_unit_share_contract=${encodeURIComponent(courseUnitDecision.shareContract || '')}&course_unit_blackboard=${encodeURIComponent(courseUnitDecision.blackboardLine || '')}&course_unit_recall_route=${encodeURIComponent(courseUnitDecision.recallRoute || '')}&course_unit_revisit_route=${encodeURIComponent(courseUnitDecision.revisitRoute || '')}`
     : '';
   const path = `/pages/home/home?share=${code}&from=daily_card&challenge=review&mode=same_identity&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}${sourceChallengeQuery}${openMaicQuery}${courseUnitQuery}${socraticReportQuery}${tonightDecisionQuery}${questionBankRelayQuery}${visualRelayQuery}`;
   const parentPath = `/pages/home/home?share=${code}&from=parent_card&mode=parent_recap&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}${sourceChallengeQuery}${openMaicQuery}${courseUnitQuery}${socraticReportQuery}${tonightDecisionQuery}${questionBankRelayQuery}${visualRelayQuery}`;
@@ -928,7 +922,7 @@ function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCause
       course_unit_share_contract: courseUnitDecision && courseUnitDecision.shareContract,
       course_unit_blackboard: courseUnitDecision && courseUnitDecision.blackboardLine,
       course_unit_recall_route: courseUnitDecision && courseUnitDecision.recallRoute,
-      course_unit_game_route: courseUnitDecision && courseUnitDecision.gameRoute,
+      course_unit_revisit_route: courseUnitDecision && courseUnitDecision.revisitRoute,
       mode: 'same_identity',
       challenge: 'review'
     }
@@ -1014,7 +1008,7 @@ function buildSafeSharePayload(card = {}, intent = 'peer_challenge', extra = {})
     'course_unit_parent_decision',
     'course_unit_share_contract',
     'course_unit_recall_route',
-    'course_unit_game_route',
+    'course_unit_revisit_route',
     'relay_review',
     'relay_spread_status',
     'relay_season_status',
@@ -1096,8 +1090,8 @@ function buildProfileSafeSummary(todayFocus, focusHistory = [], profileEmptyGuid
   const firstStepLine = childStep
     ? `孩子已经说出第一步：${childStep}`
     : systemStep
-      ? `今晚先从这里开始：${systemStep}`
-      : '今晚先让孩子说出“我第一步准备看哪里”。';
+      ? `先看这条证据：${systemStep}`
+      : '先让孩子说出“我刚才是怎么想的”。';
   const nextReviewCard = reviewCardsForFocus[0] || null;
   const reviewEvidenceCount = reviewEventsForFocus.length;
   const tomorrowRevisit = nextReviewCard && (nextReviewCard.front || nextReviewCard.title)
@@ -1165,7 +1159,7 @@ function buildCourseUnitDecisionBoard(courseUnitMap = null) {
     shareContract: unit.shareContract,
     actionRoute: unit.route || '/pages/tutor/tutor',
     recallRoute: unit.recallRoute || '/pages/review/review',
-    gameRoute: unit.gameRoute || '/pages/review/review',
+    revisitRoute: unit.revisitRoute || unit.recallRoute || '/pages/review/review',
     evidenceRequired: unit.evidenceRequired || []
   };
 }
@@ -2463,11 +2457,11 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
           reason: uploadedMaterialReportHandoff.line || '来自刚上传资料的下一步'
         }]
         : [])
-      .concat(uploadedMaterialReportHandoff && uploadedMaterialReportHandoff.gameRoute
+      .concat(uploadedMaterialReportHandoff && uploadedMaterialReportHandoff.revisitRoute
         ? [{
-          id: 'handoff_game',
+          id: 'handoff_revisit',
           label: '去回访验证',
-          route: uploadedMaterialReportHandoff.gameRoute,
+          route: uploadedMaterialReportHandoff.revisitRoute,
           reason: '把刚上传资料转成一次主动回忆'
         }]
         : [])
@@ -2761,7 +2755,7 @@ function buildFamilyDecisionActionBridge(input = {}) {
     : ['孩子说出第一步', '留下错因卡', '明天能回访同一小步'];
   const tutorRoute = memo.route || (plan.cta && plan.cta.path) || '/pages/tutor/tutor?from=family_decision_bridge';
   const practiceRoute = nextCapability.route || active.route || '/pages/review/review?from=family_decision_bridge';
-  const courseUnitRoute = courseUnit && courseUnit.gameRoute ? courseUnit.gameRoute : practiceRoute;
+  const courseUnitRoute = courseUnit && courseUnit.revisitRoute ? courseUnit.revisitRoute : practiceRoute;
   const subjectLine = subjectDepth && subjectDepth.label
     ? `${subjectDepth.label}：${subjectDepth.firstStep}`
     : (visual && visual.parentLine) || '第一步小黑板只看一笔，不讲完整答案。';
@@ -3035,7 +3029,7 @@ Page({
       scoreInput: '',
       talentLine: '先看孩子愿意怎么想，再决定用苏格拉底、专注舱、错题修复还是回访验证。',
       methodLine: '如果总是没思路，先用咕点追问；如果坐不住，先用专注舱；如果反复错，先进错题卡点修复。',
-      nextQuestion: '先说你准备从哪一步开始？',
+      nextQuestion: '先说你刚才是怎么想的？',
       primaryCta: '录入成绩/测评'
     },
     learningReportState: storage.loadLearningReportState ? storage.loadLearningReportState() : null,
@@ -3581,7 +3575,7 @@ Page({
     this.drawWrappedText(ctx, body, 48, 210, 540, 38, 4);
     ctx.setFillStyle('#1f2a24');
     ctx.setFontSize(28);
-    ctx.fillText('今晚只问一句', 48, 440);
+    ctx.fillText('家长只问一句', 48, 440);
     ctx.setFillStyle('#3f5148');
     ctx.setFontSize(26);
     this.drawWrappedText(ctx, action, 48, 492, 540, 38, 4);

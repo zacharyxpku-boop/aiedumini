@@ -65,7 +65,7 @@ Page({
     parentHandoff: null,
     quickDock: [],
     gameHero: {
-      title: '今晚从哪一步开始？',
+      title: '把卡点先说清',
       subtitle: '材料、题目或卡点先发来；卡住时，先说第一步。',
       primaryLabel: '进入 AI 点拨',
       primaryAction: 'goTutor',
