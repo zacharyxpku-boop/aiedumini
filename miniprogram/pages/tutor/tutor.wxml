@@ -6,18 +6,18 @@
           <view class="yd-tutor-top">
             <view class="yd-tutor-brand">
               <image class="yd-tutor-mark" mode="aspectFit" src="/assets/reference/brand-house.png" />
-              <view>
+              <text class="yd-tutor-brand-lines">
                 <text>原点 · 咕点 AI私教</text>
                 <text>先追问第一步，再生成练习证据</text>
-              </view>
+              </text>
             </view>
-            <view class="yd-tutor-pill">不代写</view>
+            <text class="yd-tutor-pill">不代写</text>
           </view>
 
           <view class="yd-tutor-hero">
             <image class="yd-tutor-mascot" mode="aspectFit" src="/assets/reference/tutor-socratic-board-transparent.png" />
             <view class="yd-tutor-bubble">
-              <view>{{tutorHomeContext.title}}</view>
+              <text class="yd-tutor-bubble-title">{{tutorHomeContext.title}}</text>
               <text>{{tutorHomeContext.line}}</text>
               <view class="tutor-context-chips">
                 <text wx:for="{{tutorHomeContext.chips}}" wx:key="index">{{item}}</text>
@@ -25,7 +25,7 @@
             </view>
           </view>
 
-          <view class="tutor-capability-strip"><text class="tutor-capability-card tutor-capability-tutor"><text>追问</text><text>不代写答案</text></text><text class="tutor-capability-card tutor-capability-upload"><text>材料</text><text>作业/错题/测评</text></text><text class="tutor-capability-card tutor-capability-review"><text>练习</text><text>8种知识乐园</text></text><text class="tutor-capability-card tutor-capability-parent"><text>证据</text><text>家长只看重点</text></text></view>
+          <view class="tutor-capability-strip"><view class="tutor-capability-card"><image mode="aspectFit" src="/assets/reference/entry-tutor.png" /><text>追问</text><text>不代写答案</text></view><view class="tutor-capability-card"><image mode="aspectFit" src="/assets/reference/entry-upload.png" /><text>材料</text><text>作业/错题/测评</text></view><view class="tutor-capability-card"><image mode="aspectFit" src="/assets/reference/entry-review.png" /><text>练习</text><text>8种知识乐园</text></view><view class="tutor-capability-card"><image mode="aspectFit" src="/assets/reference/entry-parent.png" /><text>证据</text><text>家长只看重点</text></view></view>
 
           <text class="tutor-care-line">
             <text>先稳住，再说第一步</text>
@@ -33,10 +33,10 @@
           </text>
 
           <view class="tutor-socratic-panel">
-            <view class="tutor-section-head">
+            <text class="tutor-section-head">
               <text>先选一句真实情况</text>
               <text>咕点只追下一小步</text>
-            </view>
+            </text>
             <view class="tutor-mode-grid">
               <text class="tutor-mode-card" data-step="read_problem" bindtap="launchFirstStep">我有点慌</text>
               <text class="tutor-mode-card primary" data-step="write_first_step" bindtap="launchFirstStep">先写第一步</text>
@@ -46,7 +46,7 @@
           </view>
 
           <view class="tutor-chat-card">
-            <view class="tutor-chat-title">把题目、卡点或材料发给 AI私教</view>
+            <text class="tutor-chat-title">把题目、卡点或材料发给 AI私教</text>
             <view class="tutor-service-status" wx:if="{{tutorServiceStatus && tutorServiceStatus.visible}}">
               <text>{{tutorServiceStatus.label}}</text>
               <text>{{tutorServiceStatus.line}}</text>
@@ -77,7 +77,7 @@
             <view class="tutor-micro-choice-row" wx:if="{{socraticMicroChoices && socraticMicroChoices.length}}"><text data-id="{{socraticMicroChoices[0].id}}" data-index="0" bindtap="selectSocraticMicroChoice">{{socraticMicroChoices[0].label}} {{socraticMicroChoices[0].text}}</text><text data-id="{{socraticMicroChoices[1].id}}" data-index="1" bindtap="selectSocraticMicroChoice">{{socraticMicroChoices[1].label}} {{socraticMicroChoices[1].text}}</text></view>
             <view class="tutor-input-bar">
               <input value="{{input}}" bindinput="onInput" bindconfirm="send" confirm-type="send" placeholder="写题目、卡点或第一步" />
-              <view bindtap="send">发送</view>
+              <text bindtap="send">发送</text>
             </view>
             <view class="tutor-feedback-row" wx:if="{{hasUserTutorTurn}}"><view class="tutor-feedback-good" data-status="first_step_spoken" bindtap="recordSocraticEffectivenessFeedback">我说出第一步了</view><view class="tutor-feedback-stuck" data-status="still_blocked" bindtap="recordSocraticEffectivenessFeedback">还是卡住</view></view>
             <text class="tutor-feedback-note" wx:if="{{socraticFeedbackNextAction}}">{{socraticFeedbackNextAction}}</text>
