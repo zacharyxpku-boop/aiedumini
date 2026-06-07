@@ -55,10 +55,10 @@ function buildPersonalPlanCard(input = {}) {
   const source = plan.personalPlan || null;
   if (!source) return null;
   return {
-    title: safeText(source.title, '今晚个性化学习方案'),
+    title: safeText(source.title, '材料分析结果'),
     profileLine: safeText(source.profileLine, '先看孩子当前最卡的一步。'),
     methodLine: safeText(source.methodLine, '先圈关键词，再说第一步，再动笔。'),
-    motivationLine: safeText(source.motivationLine, '今晚先完成一个能开口说清的小动作。'),
+    motivationLine: safeText(source.motivationLine, '先完成一个能开口说清的小动作。'),
     aiCoachLine: safeText(source.aiCoachLine, '卡住时进入 AI 点拨，只追问下一小步。'),
     gameLine: safeText(source.gameLine, '做完后进入短回访，把会的东西留到明天。'),
     routeLabel: safeText(source.routeLabel, 'AI点拨 → 短回访 → 家长看'),
@@ -216,23 +216,23 @@ function buildHomeViewModel(input = {}) {
     reportServiceResume
   }));
   return {
-    routePill: hasPlanOrFocus ? '已分析 · 继续下一步' : '今天 · 先分析材料或情况',
+    routePill: hasPlanOrFocus ? '已分析 · 继续下一步' : '先分析材料或情况',
     companionStrip: companionStrip(input.companionPreference),
-    title: hasPlanOrFocus ? '已看清今晚最该先做的一步' : '把作业、错题或卡住点发过来',
-    subtitle: hasPlanOrFocus ? '接下来进 AI 点拨或短回访，不在首页堆完整方案。' : '孩子可以上传材料，也可以直接写一句现在卡在哪里。',
+    title: hasPlanOrFocus ? '已看清下一步' : '把作业、错题或材料发过来',
+    subtitle: hasPlanOrFocus ? '接下来进 AI 点拨或短回访，不在首页堆完整方案。' : '孩子可以上传材料，也可以直接说题目。',
     inputCard: {
-      title: hasPlanOrFocus ? '修改情况后重新分析' : '用文字补充今晚情况',
+      title: hasPlanOrFocus ? '修改情况后重新分析' : '用文字补充情况',
       placeholder: '比如：数学方程 8 道，应用题不会写第一步；也可以先上传材料。',
       helper: hasPlanOrFocus
         ? '改动任务后重新分析；卡住进 AI 点拨，做完进短回访。'
         : '不用写长，先说任务、卡点或发材料；这里不直接给答案。'
     },
-    primaryCta: hasPlanOrFocus ? '重新分析今晚情况' : '分析今晚情况',
+    primaryCta: hasPlanOrFocus ? '重新分析材料' : '分析材料',
     secondaryAction: '卡住了，去 AI 点拨',
     teacherPickerLabel: '咕点在旁边',
     teacherPickerHint: '把材料和卡点发来，我陪你先看清问题。',
     selectedCompanionLabel: safeText((companionPreference(input.companionPreference) || {}).selectedLabel, '咕点'),
-    emptyState: hasPlanOrFocus ? null : '还没有分析结果。咕点在旁边，先说一句卡在哪里。',
+    emptyState: hasPlanOrFocus ? null : '还没有分析结果。先上传材料或进入 AI 点拨。',
     primaryNextAction,
     nextStep: buildNextStep(Object.assign({}, input, { miniLessonResume })),
     personalPlan,

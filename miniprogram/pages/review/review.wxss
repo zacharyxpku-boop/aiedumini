@@ -438,95 +438,6 @@ page {
   background: #ffffff;
 }
 
-.review-platform-panel {
-  padding: 16rpx;
-  border: 1rpx solid rgba(232, 238, 230, 0.95);
-  border-radius: 22rpx;
-  background: rgba(255, 255, 255, 0.94);
-  box-shadow: 0 12rpx 28rpx rgba(38, 58, 43, 0.045);
-}
-
-.review-platform-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12rpx;
-}
-
-.review-platform-head text:first-child {
-  color: #18211d;
-  font-size: 25rpx;
-  font-weight: 950;
-  line-height: 1.18;
-}
-
-.review-platform-head text:last-child {
-  color: #738077;
-  font-size: 20rpx;
-  font-weight: 780;
-  line-height: 1.22;
-  text-align: right;
-}
-
-.review-platform-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10rpx;
-  margin-top: 12rpx;
-}
-
-.review-platform-card {
-  display: grid;
-  min-height: 150rpx;
-  align-content: center;
-  gap: 8rpx;
-  padding: 18rpx 15rpx;
-  border: 1rpx solid rgba(232, 238, 230, 0.95);
-  border-radius: 18rpx;
-  background: #f6fbf0;
-}
-
-.review-platform-card:active {
-  transform: scale(0.985);
-}
-
-.review-platform-card.worksheet {
-  background: #fff8df;
-}
-
-.review-platform-card.live {
-  background: #eef7ff;
-}
-
-.review-platform-card.solo {
-  background: #f0fbf0;
-}
-
-.review-platform-card.reuse {
-  background: #fff3ed;
-}
-
-.review-platform-card text {
-  display: block;
-  max-width: 100%;
-  overflow-wrap: break-word;
-  word-break: break-word;
-}
-
-.review-platform-card text:first-child {
-  color: #17211d;
-  font-size: 24rpx;
-  font-weight: 950;
-  line-height: 1.16;
-}
-
-.review-platform-card text:nth-child(2) {
-  color: #66746d;
-  font-size: 21rpx;
-  font-weight: 780;
-  line-height: 1.28;
-}
-
 .review-template-pack {
   display: grid;
   gap: 6rpx;
@@ -535,6 +446,12 @@ page {
   border-radius: 22rpx;
   background: #fbfff6;
   box-shadow: 0 12rpx 28rpx rgba(38, 58, 43, 0.045);
+}
+
+.review-template-pack.compact {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  padding: 12rpx 14rpx;
 }
 
 .review-template-title,
@@ -699,40 +616,4 @@ page {
   font-weight: 950;
   line-height: 94rpx;
   text-align: center;
-}
-
-.review-close-strip {
-  display: grid;
-  grid-template-columns: 1.15fr repeat(3, minmax(0, 1fr));
-  gap: 8rpx;
-  align-items: center;
-  min-height: 72rpx;
-  padding: 10rpx;
-  border: 1rpx solid rgba(232, 238, 230, 0.95);
-  border-radius: 22rpx;
-  background: rgba(255, 255, 255, 0.78);
-}
-
-.review-close-strip text {
-  display: flex;
-  min-width: 0;
-  min-height: 48rpx;
-  align-items: center;
-  justify-content: center;
-  border-radius: 999rpx;
-  color: #26754c;
-  background: #f0fbf0;
-  font-size: 20rpx;
-  font-weight: 900;
-  line-height: 1.16;
-  overflow-wrap: break-word;
-  word-break: break-word;
-  text-align: center;
-}
-
-.review-close-strip text:first-child {
-  color: #17211d;
-  background: #fff8df;
-  font-size: 21rpx;
-  font-weight: 950;
 }

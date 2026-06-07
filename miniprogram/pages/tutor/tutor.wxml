@@ -25,23 +25,9 @@
             </view>
           </view>
 
-          <view class="tutor-care-grid">
-            <view class="tutor-care-card">
-              <text>{{tutorHomeContext.careCards[0].title}}</text>
-              <text>{{tutorHomeContext.careCards[0].line}}</text>
-            </view>
-            <view class="tutor-care-card">
-              <text>{{tutorHomeContext.careCards[1].title}}</text>
-              <text>{{tutorHomeContext.careCards[1].line}}</text>
-            </view>
-            <view class="tutor-care-card">
-              <text>{{tutorHomeContext.careCards[2].title}}</text>
-              <text>{{tutorHomeContext.careCards[2].line}}</text>
-            </view>
-            <view class="tutor-care-card">
-              <text>{{tutorHomeContext.careCards[3].title}}</text>
-              <text>{{tutorHomeContext.careCards[3].line}}</text>
-            </view>
+          <view class="tutor-care-line">
+            <text>先稳住，再说第一步</text>
+            <text>不直接给答案</text>
           </view>
 
           <view class="tutor-socratic-panel">
@@ -54,7 +40,7 @@
               <text class="tutor-mode-card primary" data-step="write_first_step" bindtap="launchFirstStep">先写第一步</text>
               <text class="tutor-mode-card" data-step="find_direction" bindtap="launchFirstStep">我看不懂题</text>
             </view>
-            <text class="tutor-prompt-board">例：我现在卡在题目问什么，不知道先圈哪一个条件。</text>
+            <text class="tutor-prompt-board">例：题目问什么我没看明白。</text>
           </view>
 
           <view class="tutor-chat-card">

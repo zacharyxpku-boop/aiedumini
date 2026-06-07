@@ -286,9 +286,9 @@ Page({
     const from = String(query.from || '');
     const templateModes = {
       template_worksheet: {
-        title: '练习单生成器',
-        line: '已进入可打印练习单预览：闪卡、配对、拼图、多米诺和 UNO 都只使用本机错因卡。',
-        actionLabel: '查看练习单'
+        title: '练习卡',
+        line: '已进入练习卡预览：只使用本机错因卡和第一步证据。',
+        actionLabel: '查看练习卡'
       },
       template_live: {
         title: '课堂互动工具',
@@ -301,9 +301,9 @@ Page({
         actionLabel: '布置自主练习'
       },
       template_reuse: {
-        title: '共创模板复用',
-        line: '已进入本机模板复用：只保存结构，不分享原题、答案、分数、身份或完整对话。',
-        actionLabel: '保存复用模板'
+        title: '本机结构卡',
+        line: '只保存练习结构，不分享原题、答案、分数、身份或完整对话。',
+        actionLabel: '保存结构卡'
       }
     };
     const mode = templateModes[from];
@@ -1596,10 +1596,10 @@ Page({
       readyToReuse: communityReuse.length >= 8
     };
     const deliverables = [
-      { id: 'worksheet_generator', label: '练习单生成器', count: worksheet.length, route: worksheetBundle.route, ready: worksheetBundle.readyToPreview },
+      { id: 'worksheet_generator', label: '练习卡', count: worksheet.length, route: worksheetBundle.route, ready: worksheetBundle.readyToPreview },
       { id: 'classroom_interactive', label: '课堂互动工具', count: live.length, route: classroomInteractiveRun.route, ready: classroomInteractiveRun.readyToRun },
       { id: 'student_assignment', label: '学生自主练习', count: selfPractice.length, route: studentAssignment.route, ready: studentAssignment.readyToAssign },
-      { id: 'community_reuse', label: '共创模板复用', count: communityReuse.length, route: communityReusePlan.route, ready: communityReusePlan.readyToReuse }
+      { id: 'community_reuse', label: '本机结构卡', count: communityReuse.length, route: communityReusePlan.route, ready: communityReusePlan.readyToReuse }
     ];
     return {
       id: packId,
@@ -1668,11 +1668,11 @@ Page({
         samples: (pack.selfPractice || []).slice(0, 3)
       },
       community_reuse: {
-        title: '共创模板复用',
+        title: '本机结构卡',
         status: '可保存',
         line: '只保存模板结构，家长确认后才能复用，不带原题、答案或身份信息。',
-        primaryAction: '保存复用模板',
-        sampleTitle: '可复用模板',
+        primaryAction: '保存结构卡',
+        sampleTitle: '可保存结构',
         samples: (pack.communityReuse || []).slice(0, 3)
       }
     };
@@ -1730,7 +1730,7 @@ Page({
       this.setData({
         practiceTemplatePack: pack,
         practiceTemplateWorkbench: this.buildPracticeTemplateWorkbench(pack.deliverables[0], pack),
-        feedbackText: `已生成 ${pack.catalogCount} 款教具：练习单、课堂互动、自主练习和模板复用都已进本机包。`
+        feedbackText: `已生成 ${pack.catalogCount} 张本机练习卡。`
       });
       return;
     }

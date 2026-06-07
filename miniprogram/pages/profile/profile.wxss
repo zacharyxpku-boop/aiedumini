@@ -234,37 +234,6 @@ page {
   white-space: nowrap;
 }
 
-.yd-parent-task-head {
-  display: grid;
-  gap: 6rpx;
-  padding: 16rpx 18rpx;
-  border: 1rpx solid rgba(34, 185, 92, 0.14);
-  border-radius: 22rpx;
-  background: #f2fbef;
-  box-shadow: 0 12rpx 28rpx rgba(38, 58, 43, 0.045);
-}
-
-.yd-parent-task-head text {
-  display: block;
-  max-width: 100%;
-  overflow-wrap: break-word;
-  word-break: break-word;
-}
-
-.yd-parent-task-head text:first-child {
-  color: #173f31;
-  font-size: 27rpx;
-  font-weight: 950;
-  line-height: 1.18;
-}
-
-.yd-parent-task-head text:nth-child(2) {
-  color: #596b61;
-  font-size: 22rpx;
-  font-weight: 800;
-  line-height: 1.32;
-}
-
 .yd-parent-section-head text:first-child {
   color: #18211d;
   font-size: 24rpx;

@@ -31,11 +31,6 @@
           <view class="yd-parent-decision-badge">查看</view>
         </view>
 
-        <view class="yd-parent-task-head">
-          <text>家长今晚只做这三步</text>
-          <text>不重学题，只看证据、问一句、明天回看。</text>
-        </view>
-
         <view class="yd-parent-loop">
           <view class="yd-parent-loop-card primary" data-scene="parent" bindtap="openEntryDetail">
             <image mode="aspectFit" src="/assets/reference/entry-parent.png" />

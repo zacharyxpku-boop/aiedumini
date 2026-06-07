@@ -22,22 +22,14 @@
               <text>不公开分享</text>
               <text>先分类再分析</text>
             </view>
-            <view class="upload-type-strip">
-              <text>作业/错题</text>
-              <text>成绩单/周测</text>
-              <text>错题试卷</text>
-            </view>
           </view>
           <image class="yd-upload-mascot" mode="aspectFit" src="/assets/reference/upload-folder-stack-transparent.png" />
         </view>
 
         <view class="upload-intake-workbench">
-          <view class="upload-workbench-head"><text>把材料变成报告</text><text>先粘贴清单或家长观察，再生成报告</text></view>
+          <view class="upload-workbench-head"><text>把材料变成报告</text><text>粘贴材料，或先拍照留档</text></view>
           <textarea class="upload-textarea" value="{{homeworkText}}" bindinput="onInput" maxlength="1200" placeholder="例：数学应用题 4 道，孩子卡在等量关系；英语听写 20 个，容易错前 8 个。" />
-          <view class="upload-chip-row">
-            <text wx:for="{{quickChips}}" wx:key="label" data-index="{{index}}" bindtap="useQuickChip">{{item.label}}</text>
-          </view>
-          <view class="upload-workbench-actions"><text bindtap="chooseImage">加照片留档</text><text data-type="parent_report" bindtap="openMaterialReportPanel">家长观察</text><text data-type="wrong_question_paper" bindtap="openMaterialReportPanel">错题/试卷</text></view>
+          <view class="upload-workbench-actions"><text bindtap="chooseImage">加照片</text><text data-type="parent_report" bindtap="openMaterialReportPanel">补充观察</text></view>
         </view>
 
         <view class="upload-material-panel" wx:if="{{showMaterialPanel}}">
@@ -55,14 +47,6 @@
           <view>
             <text>2</text>
             <text>家长报告</text>
-          </view>
-        </view>
-
-        <view class="upload-material-grid yd-jump-grid">
-          <view class="upload-material-card yd-jump-card primary" data-scene="parent" bindtap="openEntryDetail">
-            <image class="upload-material-icon blue" mode="aspectFit" src="/assets/reference/entry-report.png" />
-            <text>家长报告</text>
-            <text>证据与方法匹配</text>
           </view>
         </view>
 

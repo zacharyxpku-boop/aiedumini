@@ -34,20 +34,9 @@
           </view>
         </view>
 
-        <view class="review-platform-panel">
-          <view class="review-platform-head"><text>玩法工坊</text><text>从一张真卡生成可操作练习</text></view>
-          <view class="review-platform-grid">
-            <view class="review-platform-card worksheet" data-action="template" bindtap="runPlaybookAction"><text>练习单生成器</text><text>拼图配对、闪卡、UNO 卡</text></view>
-            <view class="review-platform-card live" data-id="quiz" bindtap="runPlayableReviewTool"><text>课堂互动工具</text><text>把卡点变成一轮互动</text></view>
-            <view class="review-platform-card solo" data-action="review" bindtap="runPlaybookAction"><text>学生自主练习</text><text>自己回忆，再核对错因</text></view>
-            <view class="review-platform-card reuse" data-action="template" bindtap="runPlaybookAction"><text>模板复用</text><text>保存今晚这套练法</text></view>
-          </view>
-        </view>
-
-        <view class="review-template-pack" wx:if="{{practiceTemplatePack && practiceTemplatePack.id}}"><text class="review-template-title">可生成练习单：多类型题、拼图、闪卡、UNO 卡</text><text class="review-template-meta">先跑完这一轮，再按错因生成打印或课后练习模板。</text><text class="review-template-action" data-id="{{practiceTemplatePack.deliverables[0].id}}" data-label="{{practiceTemplatePack.deliverables[0].label}}" data-route="{{practiceTemplatePack.deliverables[0].route}}" bindtap="runTemplateDeliverable">生成练习卡</text></view>
+        <view class="review-template-pack compact" wx:if="{{practiceTemplatePack && practiceTemplatePack.id}}"><text class="review-template-title">回访后可生成练习卡</text><text class="review-template-action" data-id="{{practiceTemplatePack.deliverables[0].id}}" data-label="{{practiceTemplatePack.deliverables[0].label}}" data-route="{{practiceTemplatePack.deliverables[0].route}}" bindtap="runTemplateDeliverable">生成</text></view>
         <view class="review-template-workbench" wx:if="{{practiceTemplateWorkbench && practiceTemplateWorkbench.id}}"><text class="review-workbench-title">{{practiceTemplateWorkbench.title}}</text><text class="review-workbench-status">{{practiceTemplateWorkbench.status}} ｜ {{practiceTemplateWorkbench.count}} 个模板</text><text class="review-workbench-line">{{practiceTemplateWorkbench.line}}</text><text class="review-preview-card">{{practiceTemplateWorkbench.samples[0].label}} ｜ {{practiceTemplateWorkbench.samples[0].source}}</text><text class="review-workbench-safe">{{practiceTemplateWorkbench.safetyLine}}</text></view>
         <view class="review-main-cta" data-action="review" bindtap="runPlaybookAction">{{reviewViewModel.primaryCta.text}}</view>
-        <view class="review-close-strip"><text>今日闭环</text><text>第一步</text><text>错因</text><text>明天回看</text></view>
       </view>
     </view>
   </scroll-view>

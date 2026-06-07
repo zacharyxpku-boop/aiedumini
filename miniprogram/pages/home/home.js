@@ -67,8 +67,8 @@ Page({
     gameHero: {
       title: '今晚从哪一步开始？',
       subtitle: '学校作业多，先排顺序；卡住时，先说第一步。',
-      primaryLabel: '帮我安排今晚学习',
-      primaryAction: 'planTonight',
+      primaryLabel: '进入 AI 点拨',
+      primaryAction: 'goTutor',
       secondaryLabel: '生成回访验证',
       secondaryAction: 'goLearningMap',
       nextGate: '下一关：先生成学习卡'
@@ -1387,10 +1387,10 @@ Page({
     const currentModule = modulePath && modulePath.current ? modulePath.current : null;
     const hasTask = !!topMust;
     return {
-      title: '今晚从哪一步开始？',
-      subtitle: '学校作业很多时，先排顺序；遇到卡点时，我陪你先说出第一步。',
-      primaryLabel: '帮我安排今晚学习',
-      primaryAction: 'planTonight',
+      title: '旧入口已迁移',
+      subtitle: '从 AI 点拨开始，说题目、材料或第一步。',
+      primaryLabel: '进入 AI 点拨',
+      primaryAction: 'goTutor',
       secondaryLabel: '生成回访验证',
       secondaryAction: 'goLearningMap',
       taskStatus: hasTask ? '今晚任务' : '材料入口',
@@ -1876,29 +1876,6 @@ Page({
       aiDraft: '我卡住了。\n题目是：\n我先想到的是：\n我不知道下一步怎么写。'
     }, () => {
       this.submitAiDraft({ forceTutor: true });
-    });
-  },
-
-  planTonight() {
-    const text = String(this.data.aiDraft || '').trim();
-    const draft = text || '数学应用题 3 道，明天必交\n英语单词 10 分钟\n整理今天卡住的一步\n数学拓展题 2 道';
-    if (text && isPureStuckInput(draft)) {
-      this.submitAiDraft();
-      return;
-    }
-    const plan = storage.createTonightPlanFromInput ? storage.createTonightPlanFromInput(draft, {
-      source: 'home_route_cta'
-    }) : null;
-    this.setData({
-      aiDraft: draft,
-      tonightPlan: plan,
-      homeViewModel: buildHomeViewModel({
-        companionPreference: this.data.companionPreference,
-        tonightPlan: plan,
-        todayFocus: this.data.todayFocus
-      }),
-      routeStrip: this.buildRouteStrip('plan', plan),
-      focusFeedback: plan ? '已根据材料生成学习建议；卡住时进 AI 点拨。' : '先写作业清单或卡住点，我来帮你分析。'
     });
   },
 
