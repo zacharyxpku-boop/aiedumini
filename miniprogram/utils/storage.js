@@ -8633,19 +8633,16 @@ function updateReviewLoopForRating(rating, streak = 0) {
   }));
 }
 
-function localLeaderboardSnapshot(profile = {}, progress = {}) {
-  const loop = loadReviewLoop();
+function localSelfEvidenceSnapshot(profile = {}, progress = {}) {
   const name = profile.name || 'Local learner';
-  const self = {
-    rank: 1,
+  return [{
+    order: 1,
     name,
-    xp: Number(progress.xp || 0),
-    streak: Number(progress.streak || 0),
-    isSelf: true
-  };
-  const peers = Array.isArray(loop.leaderboard) ? loop.leaderboard : [];
-  return [self].concat(peers).sort((a, b) => Number(b.xp || 0) - Number(a.xp || 0)).slice(0, 8)
-    .map((item, index) => Object.assign({}, item, { rank: index + 1 }));
+    learningRecordTotal: Number(progress.xp || progress.learningRecordTotal || 0),
+    currentStreak: Number(progress.streak || progress.currentStreak || 0),
+    isSelf: true,
+    source: 'local_self_evidence_snapshot'
+  }];
 }
 
 function rcNowIso() {
@@ -13104,7 +13101,7 @@ module.exports = {
   saveReviewLoop,
   updateReviewLoopForRating,
   claimReviewReward,
-  localLeaderboardSnapshot,
+  localSelfEvidenceSnapshot,
   loadUserFirstStepProfile,
   saveUserFirstStepProfile,
   loadTaskTypePattern,

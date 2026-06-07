@@ -2160,7 +2160,8 @@ function loopStatus(progress) {
     currentStreak: Number(gameProfile.streak || loop.current_streak || (progress && progress.streak) || 0),
     longestStreak: Number(gameProfile.best_streak || loop.longest_streak || 0),
     coins: Number(gameProfile.coins || 0),
-    leaderboard: storage.localLeaderboardSnapshot ? storage.localLeaderboardSnapshot(profile, progress || {}) : [],
+    selfEvidenceSnapshot: storage.localSelfEvidenceSnapshot ? storage.localSelfEvidenceSnapshot(profile, progress || {}) : [],
+    leaderboard: [],
     label: lives <= 1 ? 'Life low: focus on must-do and leech cards.' : 'Life loop healthy.'
   };
 }
@@ -3438,7 +3439,7 @@ function commercialReadiness(summary) {
   const hasQuizLoop = safe.quizLoop && safe.quizLoop.attempts >= 1;
   const hasShareLibrary = safe.deckLibrary && safe.deckLibrary.some((item) => item.shareReady);
   const hasRevisitLoop = !!safe.dailyRevisit && (safe.missions || []).length >= 3 && (safe.rewards || []).length > 0;
-  const hasLeaderboard = loop.leaderboard && loop.leaderboard.length > 0;
+  const hasSelfEvidenceSnapshot = loop.selfEvidenceSnapshot && loop.selfEvidenceSnapshot.length > 0;
   const hasSyncProtocol = sync.diagnostics && sync.diagnostics.schemaVersion;
   const hasStructuredImportExport = !!(
     safe.materialMemoryBridge &&
@@ -3453,7 +3454,7 @@ function commercialReadiness(summary) {
     featureHit(hasRepair, 12, '本机错因修复已能处理薄弱卡片', '接入稳定评分规则后再扩展复杂修复。'),
     featureHit(hasQuizLoop, 10, '小测结果已能回写记忆排程和修卡点', '补齐限时小测和更细的答题校验。'),
     featureHit(hasRevisitLoop, 14, '短回访、任务、学习记录已形成回访证据', '补齐连续任务和阶段检查点。'),
-    featureHit(hasLeaderboard, 8, '本机进展快照已存在', '多人排行等强社交功能先保持隐藏，等连续记录稳定后再开放。'),
+    featureHit(hasSelfEvidenceSnapshot, 8, '本机进展快照已存在', '多人排行等强社交功能先保持隐藏，等连续记录稳定后再开放。'),
     featureHit(
       safe.materialMemoryBridge && Array.isArray(safe.materialMemoryBridge.sourceRows) && safe.materialMemoryBridge.sourceRows.length > 0,
       12,
