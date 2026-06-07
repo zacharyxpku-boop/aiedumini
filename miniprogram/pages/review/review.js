@@ -429,6 +429,12 @@ Page({
       match: { title: '拼图配对', pitch: '把卡点和第一步配起来。', readyCount: sourceCards.length, available: sourceCards.length >= 2 },
       snake: { title: '路线接龙', pitch: '按题意、条件、第一步排顺。', readyCount: sourceCards.length, available: sourceCards.length >= 2 }
     };
+    const display = {
+      whack: { icon: '地', themeClass: 'theme-whack' },
+      quiz: { icon: '快', themeClass: 'theme-quiz' },
+      match: { icon: '拼', themeClass: 'theme-match' },
+      snake: { icon: '路', themeClass: 'theme-snake' }
+    };
     const missionFor = (id, item) => {
       const count = Number(item.readyCount || 0);
       if (!item.available) return id === 'quiz' || id === 'whack' ? '先补 1 张真卡' : '先补 2 张真卡';
@@ -446,7 +452,9 @@ Page({
         count: Number(item.readyCount || 0),
         available: !!item.available,
         status: item.available ? '可开始' : '先补卡',
-        mission: missionFor(id, item)
+        mission: missionFor(id, item),
+        icon: display[id] ? display[id].icon : '练',
+        themeClass: display[id] ? display[id].themeClass : 'theme-quiz'
       };
     });
   },

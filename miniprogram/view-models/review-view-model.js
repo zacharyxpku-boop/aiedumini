@@ -83,17 +83,17 @@ function buildPrimaryCard(input) {
 }
 
 function buildPrimaryCta(todayFocus) {
-  if (!todayFocus) return { text: '去说第一步', action: 'home', completed: false };
+  if (!todayFocus) return { text: '生成练习工具包', action: 'template', completed: false };
   if (todayFocus.repairStatus === 'completed') {
-    return { text: '今天这个卡点先修到这里', action: 'revisit', completed: true };
+    return { text: '生成练习工具包', action: 'template', completed: true };
   }
   if (todayFocus.childArticulatedStep || todayFocus.hasMiniActionDone) {
-    return { text: '完成今日修复', action: 'complete', completed: false };
+    return { text: '生成练习工具包', action: 'template', completed: false };
   }
   if (todayFocus.repairStatus === 'in_progress') {
-    return { text: '先补一句自己的第一步', action: 'review', completed: false };
+    return { text: '生成练习工具包', action: 'template', completed: false };
   }
-  return { text: '开始 5 分钟修复', action: 'review', completed: false };
+  return { text: '生成练习工具包', action: 'template', completed: false };
 }
 
 function buildRepairContract(todayFocus) {

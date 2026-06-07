@@ -12,20 +12,20 @@
           <view class="yd-review-copy">
             <view class="yd-review-title">{{reviewViewModel.title}}</view>
             <view class="yd-review-sub route-note short">用真实错因卡开一局：先玩，再自评，再生成明天回访证据。</view>
-            <view class="review-chip-row"><text>快闪问答</text><text>错因地鼠</text><text>拼图配对</text><text>路线接龙</text></view>
+            <view class="review-chip-row"><text>错因地鼠</text><text>快闪问答</text><text>拼图配对</text><text>路线接龙</text></view>
           </view>
           <image class="yd-review-art" mode="aspectFit" src="/assets/reference/review-world-map-transparent.png" />
         </view>
 
         <view class="review-record-panel">
-          <view class="review-section-head"><text>选一个玩法</text><text>每局只用真实学习卡</text></view>
-          <text class="review-workshop-lead">先选一局知识玩法，完成后再用四档自评收口。</text>
+          <view class="review-section-head"><text>乐园地图</text><text>每局只用真实学习卡</text></view>
+          <text class="review-workshop-lead">先选一个岛，完成后用四档自评收口。</text>
           <view class="review-feedback-strip" wx:if="{{feedbackText}}">
             <text>{{feedbackText}}</text>
             <text wx:if="{{activeReviewTool && activeReviewTool.repairFocus}}" bindtap="openReviewRepairFocus">修这一张</text>
           </view>
           <view class="review-tool-grid">
-            <view wx:for="{{playableReviewTools}}" wx:key="id" class="review-tool-card {{item.available ? 'ready' : 'locked'}}" data-id="{{item.id}}" bindtap="runPlayableReviewTool"><text>{{item.title}}</text><text>{{item.line}}</text><text>{{item.status}}｜{{item.count}} 张</text><text>{{item.mission}}</text></view>
+            <view wx:for="{{playableReviewTools}}" wx:key="id" class="review-tool-card {{item.available ? 'ready' : 'locked'}} {{item.themeClass}}" data-id="{{item.id}}" bindtap="runPlayableReviewTool"><text class="review-tool-icon">{{item.icon}}</text><text>{{item.title}}</text><text>{{item.line}}</text><text>{{item.status}}｜{{item.count}} 张</text><text>{{item.mission}}</text></view>
           </view>
           <view class="review-empty-note" wx:if="{{activeReviewTool && activeReviewTool.empty}}"><text>还没有真实卡。先上传材料或完成一次 AI 点拨。</text></view>
           <view class="review-live-tool" wx:elif="{{activeReviewTool && activeReviewTool.id}}">
@@ -47,9 +47,9 @@
           </view>
         </view>
 
-        <view class="review-main-cta" data-action="review" bindtap="runPlaybookAction">{{reviewViewModel.primaryCta.text}}</view>
-        <view class="review-template-pack compact" wx:if="{{practiceTemplatePack && practiceTemplatePack.id && activeReviewTool && activeReviewTool.id}}"><text class="review-template-title">回访后生成练习工具</text><view class="review-template-actions"><text class="review-template-action {{practiceTemplatePack.deliverables[0].ready ? 'ready' : 'pending'}}" data-id="{{practiceTemplatePack.deliverables[0].id}}" data-label="{{practiceTemplatePack.deliverables[0].label}}" data-route="{{practiceTemplatePack.deliverables[0].route}}" bindtap="runTemplateDeliverable">{{practiceTemplatePack.deliverables[0].label}}</text><text class="review-template-action {{practiceTemplatePack.deliverables[1].ready ? 'ready' : 'pending'}}" data-id="{{practiceTemplatePack.deliverables[1].id}}" data-label="{{practiceTemplatePack.deliverables[1].label}}" data-route="{{practiceTemplatePack.deliverables[1].route}}" bindtap="runTemplateDeliverable">{{practiceTemplatePack.deliverables[1].label}}</text><text class="review-template-action {{practiceTemplatePack.deliverables[2].ready ? 'ready' : 'pending'}}" data-id="{{practiceTemplatePack.deliverables[2].id}}" data-label="{{practiceTemplatePack.deliverables[2].label}}" data-route="{{practiceTemplatePack.deliverables[2].route}}" bindtap="runTemplateDeliverable">{{practiceTemplatePack.deliverables[2].label}}</text><text class="review-template-action {{practiceTemplatePack.deliverables[3].ready ? 'ready' : 'pending'}}" data-id="{{practiceTemplatePack.deliverables[3].id}}" data-label="{{practiceTemplatePack.deliverables[3].label}}" data-route="{{practiceTemplatePack.deliverables[3].route}}" bindtap="runTemplateDeliverable">{{practiceTemplatePack.deliverables[3].label}}</text></view></view>
-        <view class="review-template-workbench" wx:if="{{practiceTemplateWorkbench && practiceTemplateWorkbench.id && activeReviewTool && activeReviewTool.id}}"><text class="review-workbench-title">{{practiceTemplateWorkbench.title}}</text><text class="review-workbench-status">{{practiceTemplateWorkbench.status}} ｜ {{practiceTemplateWorkbench.count}} 张卡</text><text class="review-workbench-line">{{practiceTemplateWorkbench.line}}</text><text class="review-preview-card">{{practiceTemplateWorkbench.samples[0].label}} ｜ {{practiceTemplateWorkbench.samples[0].source}}</text><text class="review-workbench-safe">{{practiceTemplateWorkbench.safetyLine}}</text></view>
+        <view class="review-main-cta" data-action="template" bindtap="runPlaybookAction">生成练习工具包</view>
+        <view class="review-template-pack compact" wx:if="{{practiceTemplatePack && practiceTemplatePack.id}}"><text class="review-template-title">练习工具包</text><view class="review-template-actions"><text class="review-template-action {{practiceTemplatePack.deliverables[0].ready ? 'ready' : 'pending'}}" data-id="{{practiceTemplatePack.deliverables[0].id}}" data-label="{{practiceTemplatePack.deliverables[0].label}}" data-route="{{practiceTemplatePack.deliverables[0].route}}" bindtap="runTemplateDeliverable">{{practiceTemplatePack.deliverables[0].label}}</text><text class="review-template-action {{practiceTemplatePack.deliverables[1].ready ? 'ready' : 'pending'}}" data-id="{{practiceTemplatePack.deliverables[1].id}}" data-label="{{practiceTemplatePack.deliverables[1].label}}" data-route="{{practiceTemplatePack.deliverables[1].route}}" bindtap="runTemplateDeliverable">{{practiceTemplatePack.deliverables[1].label}}</text><text class="review-template-action {{practiceTemplatePack.deliverables[2].ready ? 'ready' : 'pending'}}" data-id="{{practiceTemplatePack.deliverables[2].id}}" data-label="{{practiceTemplatePack.deliverables[2].label}}" data-route="{{practiceTemplatePack.deliverables[2].route}}" bindtap="runTemplateDeliverable">{{practiceTemplatePack.deliverables[2].label}}</text><text class="review-template-action {{practiceTemplatePack.deliverables[3].ready ? 'ready' : 'pending'}}" data-id="{{practiceTemplatePack.deliverables[3].id}}" data-label="{{practiceTemplatePack.deliverables[3].label}}" data-route="{{practiceTemplatePack.deliverables[3].route}}" bindtap="runTemplateDeliverable">{{practiceTemplatePack.deliverables[3].label}}</text></view></view>
+        <view class="review-template-workbench" wx:if="{{practiceTemplateWorkbench && practiceTemplateWorkbench.id}}"><text class="review-workbench-title">{{practiceTemplateWorkbench.title}}</text><text class="review-workbench-status">{{practiceTemplateWorkbench.status}} ｜ {{practiceTemplateWorkbench.count}} 张卡</text><text class="review-workbench-line">{{practiceTemplateWorkbench.line}}</text><text class="review-preview-card">{{practiceTemplateWorkbench.samples[0].label}} ｜ {{practiceTemplateWorkbench.samples[0].source}}</text><text class="review-workbench-safe">{{practiceTemplateWorkbench.safetyLine}}</text></view>
       </view>
     </view>
   </scroll-view>

@@ -40,9 +40,9 @@ page {
   border: 1rpx solid rgba(232, 238, 230, 0.94);
   border-radius: 30rpx;
   background:
-    radial-gradient(circle at 8% 4%, rgba(248, 198, 34, 0.18), transparent 24%),
-    radial-gradient(circle at 92% 8%, rgba(34, 185, 92, 0.12), transparent 22%),
-    linear-gradient(180deg, #fffef9 0%, #f7fbf3 100%);
+    radial-gradient(circle at 8% 4%, rgba(248, 198, 34, 0.22), transparent 24%),
+    radial-gradient(circle at 92% 8%, rgba(34, 185, 92, 0.15), transparent 22%),
+    linear-gradient(180deg, #fff9e6 0%, #f3fbef 54%, #eef7ff 100%);
   box-shadow: 0 22rpx 60rpx rgba(38, 58, 43, 0.08);
 }
 
@@ -115,12 +115,19 @@ page {
 
 .yd-review-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 164rpx;
-  gap: 14rpx;
+  grid-template-columns: minmax(0, 1fr) 198rpx;
+  gap: 12rpx;
   align-items: center;
   flex: 0 0 auto;
-  min-height: 238rpx;
+  min-height: 252rpx;
   margin-top: 0;
+  padding: 14rpx;
+  border: 2rpx solid rgba(255, 255, 255, 0.86);
+  border-radius: 26rpx;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.82), rgba(255, 248, 220, 0.62)),
+    #f9f8f5;
+  box-shadow: inset 0 0 0 1rpx rgba(248, 198, 34, 0.12);
 }
 
 .yd-review-title {
@@ -163,8 +170,8 @@ page {
 }
 
 .yd-review-art {
-  width: 158rpx;
-  height: 142rpx;
+  width: 190rpx;
+  height: 178rpx;
   align-self: center;
   object-fit: contain;
   overflow: hidden;
@@ -188,11 +195,13 @@ page {
 }
 
 .review-record-panel {
-  padding: 14rpx 12rpx;
-  border: 1rpx solid rgba(232, 238, 230, 0.95);
-  border-radius: 22rpx;
-  background: rgba(255, 255, 255, 0.94);
-  box-shadow: 0 12rpx 28rpx rgba(38, 58, 43, 0.045);
+  padding: 16rpx 14rpx;
+  border: 2rpx solid rgba(255, 255, 255, 0.9);
+  border-radius: 24rpx;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(250, 255, 245, 0.94)),
+    #ffffff;
+  box-shadow: 0 14rpx 34rpx rgba(38, 58, 43, 0.07);
 }
 
 .review-workshop-lead {
@@ -281,9 +290,9 @@ page {
 .review-tool-card {
   display: grid;
   min-width: 0;
-  min-height: 148rpx;
+  min-height: 166rpx;
   align-content: center;
-  gap: 6rpx;
+  gap: 5rpx;
   padding: 14rpx 12rpx;
   border: 2rpx solid rgba(255, 255, 255, 0.78);
   border-radius: 20rpx;
@@ -304,6 +313,30 @@ page {
   background:
     radial-gradient(circle at 20% 14%, rgba(255, 133, 91, 0.26), transparent 34%),
     linear-gradient(145deg, #fff4e5 0%, #fffef7 100%);
+}
+
+.review-tool-card.theme-whack {
+  background:
+    radial-gradient(circle at 18% 12%, rgba(255, 133, 91, 0.32), transparent 34%),
+    linear-gradient(145deg, #fff4e5 0%, #fffef7 100%);
+}
+
+.review-tool-card.theme-quiz {
+  background:
+    radial-gradient(circle at 82% 12%, rgba(255, 216, 79, 0.38), transparent 34%),
+    linear-gradient(145deg, #f0fbff 0%, #fffaf0 100%);
+}
+
+.review-tool-card.theme-match {
+  background:
+    radial-gradient(circle at 82% 14%, rgba(71, 173, 116, 0.28), transparent 34%),
+    linear-gradient(145deg, #eef9e8 0%, #f8fff5 100%);
+}
+
+.review-tool-card.theme-snake {
+  background:
+    radial-gradient(circle at 18% 14%, rgba(76, 159, 255, 0.28), transparent 34%),
+    linear-gradient(145deg, #eff7ff 0%, #f7fbff 100%);
 }
 
 .review-tool-card.ready:nth-child(3) {
@@ -334,25 +367,37 @@ page {
   text-align: center;
 }
 
-.review-tool-card text:first-child {
+.review-tool-icon {
+  justify-self: center;
+  width: 42rpx;
+  height: 42rpx;
+  border-radius: 16rpx;
+  color: #ffffff;
+  background: #16221d;
+  font-size: 25rpx;
+  font-weight: 950;
+  line-height: 42rpx;
+}
+
+.review-tool-card text:nth-child(2) {
   color: #17211d;
-  font-size: 24rpx;
+  font-size: 25rpx;
   font-weight: 950;
   line-height: 1.12;
 }
 
-.review-tool-card text:nth-child(2) {
+.review-tool-card text:nth-child(3) {
   display: -webkit-box;
   overflow: hidden;
-  color: #66746d;
-  font-size: 20rpx;
-  font-weight: 780;
+  color: #55645d;
+  font-size: 21rpx;
+  font-weight: 820;
   line-height: 1.2;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
 
-.review-tool-card text:nth-child(3) {
+.review-tool-card text:nth-child(4) {
   justify-self: center;
   padding: 5rpx 10rpx;
   border-radius: 999rpx;
@@ -363,9 +408,9 @@ page {
   line-height: 1.12;
 }
 
-.review-tool-card text:nth-child(4) {
+.review-tool-card text:nth-child(5) {
   color: #8a6414;
-  font-size: 20rpx;
+  font-size: 21rpx;
   font-weight: 900;
   line-height: 1.18;
 }
@@ -799,9 +844,9 @@ page {
   height: 94rpx;
   margin-top: 10rpx;
   border-radius: 999rpx;
-  color: #1d261f;
-  background: linear-gradient(180deg, #ffd84f 0%, #f5b300 100%);
-  box-shadow: 0 16rpx 28rpx rgba(248, 198, 34, 0.22);
+  color: #ffffff;
+  background: linear-gradient(180deg, #174c3d 0%, #112d25 100%);
+  box-shadow: 0 16rpx 28rpx rgba(23, 76, 61, 0.22);
   font-size: 31rpx;
   font-weight: 950;
   line-height: 94rpx;
