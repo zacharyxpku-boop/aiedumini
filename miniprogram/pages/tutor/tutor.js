@@ -2246,7 +2246,7 @@ Page({
         label: action.actionLabel,
         route,
         readiness: 'tutor_handoff',
-        capabilityId: action.actionId === 'recall' ? 'game' : action.actionId === 'parent' ? 'parent_action' : 'socratic'
+        capabilityId: action.actionId === 'recall' ? 'revisit' : action.actionId === 'parent' ? 'parent_action' : 'socratic'
       });
     }
     api.submitEvent({
