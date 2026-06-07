@@ -15,7 +15,7 @@
     bindtap="switchTab"
   >
     <view class="yd-tab-icon-wrap"><image class="yd-tab-icon" mode="aspectFit" src="/assets/reference/entry-review.png" /></view>
-    <view class="yd-tab-text">短回访</view>
+    <view class="yd-tab-text">知识乐园</view>
   </view>
   <view
     class="yd-tab-item {{selected === 2 ? 'active' : ''}}"

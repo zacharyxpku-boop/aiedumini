@@ -184,10 +184,10 @@ function buildReviewViewModel(input = {}) {
   const evidence = todayFocus ? focusEvidence(todayFocus) : null;
   const blackboard = buildVisualBlackboard(todayFocus);
   return {
-    routePill: '卡点修复 · 说清最卡一步',
+    routePill: '知识乐园 · 错因玩法',
     companionStrip: companionStrip(input.companionPreference),
-    title: '本次只修一个卡点',
-    subtitle: '不是整题不会，只先把最卡的这一步说清楚。',
+    title: '今天玩哪一关知识游戏',
+    subtitle: '每局都来自真实错因卡：先玩一轮，再说清第一步。',
     primaryCard: buildPrimaryCard(input),
     repairContract: buildRepairContract(todayFocus),
     blackboard,
@@ -213,7 +213,7 @@ function buildReviewViewModel(input = {}) {
       action: 'home'
     },
     nextStep: todayFocus && todayFocus.repairStatus === 'completed'
-      ? '已生成明天回访卡。下一步：去短回访。'
+      ? '已生成明天回访卡。下一步：去知识乐园。'
       : '',
     debugWarnings: []
   };

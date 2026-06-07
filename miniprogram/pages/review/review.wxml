@@ -2,24 +2,24 @@
   <scroll-view class="content-area" scroll-y enhanced show-scrollbar="{{false}}">
     <view class="content-inner">
       <view class="yd-review-screen yd-app-screen yd-review-app">
-        <view class="yd-review-pill">3 分钟回访</view>
+        <view class="yd-review-pill">知识乐园</view>
         <view class="yd-review-top">
-          <view class="yd-review-brand"><image class="yd-review-mark" mode="aspectFit" src="/assets/reference/brand-house.png" /><view><text>短回访</text><text>主动回忆和迁移验证</text></view></view>
+          <view class="yd-review-brand"><image class="yd-review-mark" mode="aspectFit" src="/assets/reference/brand-house.png" /><view><text>知识乐园</text><text>把错因变成互动玩法</text></view></view>
           <view class="yd-review-pill">{{revisitRunway.due || 0}} 张到期</view>
         </view>
 
         <view class="yd-review-hero">
           <view class="yd-review-copy">
             <view class="yd-review-title">{{reviewViewModel.title}}</view>
-            <view class="yd-review-sub route-note short">先回忆一张真卡，再换题验证迁移。</view>
-            <view class="review-chip-row"><text>主动回忆</text><text>错因回放</text><text>明天回流</text></view>
+            <view class="yd-review-sub route-note short">用真实错因卡开一局：先玩，再自评，再生成明天回访证据。</view>
+            <view class="review-chip-row"><text>快闪问答</text><text>错因地鼠</text><text>拼图配对</text><text>路线接龙</text></view>
           </view>
           <image class="yd-review-art" mode="aspectFit" src="/assets/reference/review-world-map-transparent.png" />
         </view>
 
         <view class="review-record-panel">
-          <view class="review-section-head"><text>选一张卡</text><text>回忆、核对、明天再看</text></view>
-          <text class="review-workshop-lead">先完成一轮 3 分钟回访。</text>
+          <view class="review-section-head"><text>选一个玩法</text><text>每局只用真实学习卡</text></view>
+          <text class="review-workshop-lead">先选一局知识玩法，完成后再用四档自评收口。</text>
           <view class="review-feedback-strip" wx:if="{{feedbackText}}">
             <text>{{feedbackText}}</text>
             <text wx:if="{{activeReviewTool && activeReviewTool.repairFocus}}" bindtap="openReviewRepairFocus">修这一张</text>

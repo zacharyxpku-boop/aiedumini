@@ -1,0 +1,17 @@
+{
+  "description": "Yuandian Zhixue miniapp root launcher",
+  "compileType": "miniprogram",
+  "appid": "wx7c5021e01c98ebae",
+  "projectname": "yuandianzhixue-miniapp",
+  "miniprogramRoot": "miniprogram/",
+  "setting": {
+    "urlCheck": true,
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": true,
+    "newFeature": true,
+    "minifyWXML": true,
+    "minifyWXSS": true
+  }
+}

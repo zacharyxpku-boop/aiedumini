@@ -278,7 +278,7 @@ Page({
       sourceSchemaId: String(query.sourceSchemaId || query.source_schema_id || ''),
       title: isTutorEvidenceReturn ? 'AI 点拨后的证据回访' : isEntryReviewReturn ? '来自回访入口' : '来自学习入口',
       line: isTutorEvidenceReturn ? '刚才仍卡住，先用这张小黑板卡复测第一步，不继续追完整题。' : '先选一张真实卡，马上完成 90 秒回忆或迁移验证。',
-      actionLabel: isTutorEvidenceReturn ? '复测小黑板卡' : isEntryReviewReturn ? '开始 90 秒回忆' : '进入短回访',
+      actionLabel: isTutorEvidenceReturn ? '复测小黑板卡' : isEntryReviewReturn ? '开始 90 秒回忆' : '进入知识乐园',
       returnRoute: '/pages/entry-detail/entry-detail?scene=review',
       flowTraceId: String(query.flowTraceId || query.flow_trace_id || from || mode || 'entry_review')
     };
@@ -422,17 +422,19 @@ Page({
     const recommended = revisitEngine.recommendGames
       ? revisitEngine.recommendGames(sourceCards)
       : [];
-    const toolIds = ['quiz', 'match', 'snake'];
+    const toolIds = ['whack', 'quiz', 'match', 'snake'];
     const fallback = {
-      quiz: { title: '90秒回忆', pitch: '先回忆第一步，再翻开核对错因。', readyCount: sourceCards.length, available: !!sourceCards.length },
-      match: { title: '点击配对', pitch: '把卡点和第一步配起来。', readyCount: sourceCards.length, available: sourceCards.length >= 2 },
-      snake: { title: '顺序排一排', pitch: '按题意、条件、第一步排顺。', readyCount: sourceCards.length, available: sourceCards.length >= 2 }
+      whack: { title: '错因地鼠', pitch: '看题面快选第一步，抓住最容易错的点。', readyCount: sourceCards.length, available: !!sourceCards.length },
+      quiz: { title: '快闪问答', pitch: '先回忆第一步，再翻开核对错因。', readyCount: sourceCards.length, available: !!sourceCards.length },
+      match: { title: '拼图配对', pitch: '把卡点和第一步配起来。', readyCount: sourceCards.length, available: sourceCards.length >= 2 },
+      snake: { title: '路线接龙', pitch: '按题意、条件、第一步排顺。', readyCount: sourceCards.length, available: sourceCards.length >= 2 }
     };
     const missionFor = (id, item) => {
       const count = Number(item.readyCount || 0);
-      if (!item.available) return id === 'quiz' ? '先补 1 张真卡' : '先补 2 张真卡';
+      if (!item.available) return id === 'quiz' || id === 'whack' ? '先补 1 张真卡' : '先补 2 张真卡';
       if (id === 'match') return `配对 ${Math.min(4, Math.max(2, count))} 组`;
       if (id === 'snake') return `排序 ${Math.min(3, Math.max(2, count))} 组`;
+      if (id === 'whack') return `快选 ${Math.min(4, Math.max(1, count))} 题`;
       return `90秒回忆 ${Math.min(3, Math.max(1, count))} 张`;
     };
     return toolIds.map((id) => {
@@ -494,7 +496,7 @@ Page({
         }));
     return {
       id: toolId,
-      title: tool.title || (round && round.title) || '短回访工具',
+      title: tool.title || (round && round.title) || '知识玩法',
       status: items.length ? `本轮 ${items.length} 张` : '缺少回访卡',
       line: tool.line || (round && round.subtitle) || '先主动回忆，再核对第一步和错因。',
       mission: tool.mission || (items.length ? `本轮完成 ${items.length} 张真卡` : '先补 1 张真卡'),
@@ -1851,11 +1853,11 @@ Page({
       this.setData({
         activeReviewTool: this.buildActiveReviewTool(Object.assign({}, tool, {
           id: toolId,
-          title: tool.title || '短回访工具',
+          title: tool.title || '知识玩法',
           line: '这个工具需要真实回访卡，不能用空题假跑。',
           status: '先补卡'
         }), null),
-        feedbackText: '先生成一张真实回访卡，再运行短回访工具。'
+        feedbackText: '先生成一张真实学习卡，再打开知识玩法。'
       });
       return;
     }
@@ -1881,7 +1883,7 @@ Page({
       activeReviewTool: this.buildActiveReviewTool(tool, round),
       practiceTemplateWorkbench: Object.assign({}, this.data.practiceTemplateWorkbench || {}, {
         id: `review_tool_${toolId}`,
-        title: tool.title || '短回访工具',
+        title: tool.title || '知识玩法',
         status: tool.status || '可开始',
         line: tool.line || '只使用真实回访卡，不展示原题答案和排名。',
         primaryAction: '开始',
@@ -1892,7 +1894,7 @@ Page({
         })),
         safetyLine: '只记录第一步、错因和明天回访，不展示分数比较或消费入口。'
       }),
-      feedbackText: `已打开${tool.title || '短回访工具'}，本轮使用 ${round && round.total ? round.total : tool.count || 0} 张真实卡。`
+      feedbackText: `已打开${tool.title || '知识玩法'}，本轮使用 ${round && round.total ? round.total : tool.count || 0} 张真实卡。`
     });
   },
 
