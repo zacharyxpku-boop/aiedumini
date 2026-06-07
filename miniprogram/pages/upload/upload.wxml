@@ -47,11 +47,20 @@
             <text>2</text>
             <text>家长报告</text>
           </view>
+          <view>
+            <text>3</text>
+            <text>AI点拨</text>
+          </view>
+          <view>
+            <text>4</text>
+            <text>短回访</text>
+          </view>
         </view>
 
         <view class="yd-upload-primary" bindtap="submit">生成家长报告</view>
         <view class="upload-report-ready" wx:if="{{lastReportCta}}">
           <text class="upload-report-title">报告已生成 · {{lastReportCta.title}}</text><block wx:if="{{parentReportWorkflowView}}">
+            <text class="upload-report-flow">{{parentReportWorkflowView.loopLine}}</text>
             <text class="upload-report-flow">{{parentReportWorkflowView.statusLine}}</text>
             <text class="upload-report-flow">{{parentReportWorkflowView.reasoningLine}}</text>
             <text class="upload-report-flow">{{parentReportWorkflowView.imageLine}}</text>

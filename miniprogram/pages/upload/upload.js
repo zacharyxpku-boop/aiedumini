@@ -1758,6 +1758,7 @@ Page({
     ].filter(Boolean).join(' / ') || '苏格拉底点拨 / 短回访 / 家长报告';
     const parentReportWorkflowView = {
       title: '材料报告已生成',
+      loopLine: '闭环：材料 -> 家长报告 -> AI诊断 -> 短回访 -> 家长决策',
       statusLine: parentReportGenerationWorkflow && parentReportGenerationWorkflow.parentReadableLine
         ? parentReportGenerationWorkflow.parentReadableLine
         : '材料已完成分类，可以查看家长报告。',
