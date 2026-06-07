@@ -186,6 +186,15 @@ Page({
     navigation.navigateLearningRoute(this.data.scene.secondaryRoute);
   },
 
+  openSceneCard(event) {
+    const sceneKey = event && event.currentTarget && event.currentTarget.dataset
+      ? event.currentTarget.dataset.scene
+      : '';
+    const nextScene = SCENES[sceneKey];
+    if (!nextScene || !nextScene.primaryRoute) return;
+    navigation.navigateLearningRoute(nextScene.primaryRoute);
+  },
+
   goBack() {
     if (getCurrentPages().length > 1) {
       wx.navigateBack();

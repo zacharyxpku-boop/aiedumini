@@ -28,9 +28,17 @@ function request(path, options) {
           resolve(res.data);
           return;
         }
-        reject(new Error((res.data && (res.data.message || res.data.error)) || `HTTP ${res.statusCode}`));
+        const error = new Error((res.data && (res.data.message || res.data.error)) || `HTTP ${res.statusCode}`);
+        error.statusCode = res.statusCode;
+        error.code = res.data && (res.data.error || res.data.code);
+        error.data = res.data;
+        reject(error);
       },
       fail(error) {
+        if (error && typeof error === 'object') {
+          error.isNetworkError = true;
+          error.code = error.code || 'network_error';
+        }
         reject(error);
       }
     });

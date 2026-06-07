@@ -446,6 +446,8 @@ Page({
     const questions = round && Array.isArray(round.questions) ? round.questions : [];
     const pairs = round && Array.isArray(round.pairs) ? round.pairs : [];
     const tracks = round && Array.isArray(round.tracks) ? round.tracks : [];
+    const tiles = round && Array.isArray(round.tiles) ? round.tiles : [];
+    const currentTrack = tracks[0] || null;
     const items = toolId === 'match'
       ? pairs.slice(0, 3).map((item, index) => ({
         id: item.id || `match_${index}`,
@@ -476,7 +478,17 @@ Page({
       primary: items[0] || null,
       secondary: items[1] || null,
       third: items[2] || null,
-      items
+      items,
+      gameType: toolId,
+      pairs,
+      tiles: tiles.map((item) => Object.assign({}, item, { selected: false, matched: false })),
+      tracks,
+      currentTrack,
+      currentTrackIndex: 0,
+      selectedTileId: '',
+      matchedPairIds: [],
+      snakePickedIds: [],
+      snakeComplete: false
     };
   },
 
@@ -1833,6 +1845,128 @@ Page({
     if (result === 'remembered') {
       this.rate({ currentTarget: { dataset: { rating: 'good' } } });
     }
+  },
+
+  selectMatchTile(event) {
+    const dataset = event && event.currentTarget ? event.currentTarget.dataset || {} : {};
+    const tileId = dataset.id || '';
+    const active = this.data.activeReviewTool || {};
+    if (active.gameType !== 'match' || !tileId) return;
+    const tiles = Array.isArray(active.tiles) ? active.tiles.slice() : [];
+    const tile = tiles.find((item) => item.id === tileId);
+    if (!tile || tile.matched) return;
+    const selectedTileId = active.selectedTileId || '';
+    if (!selectedTileId) {
+      const nextTiles = tiles.map((item) => Object.assign({}, item, {
+        selected: item.id === tileId,
+        matched: !!item.matched
+      }));
+      this.setData({
+        activeReviewTool: Object.assign({}, active, {
+          tiles: nextTiles,
+          selectedTileId: tileId
+        }),
+        feedbackText: '已选中一个泡泡，再点它对应的另一半。'
+      });
+      return;
+    }
+    if (selectedTileId === tileId) {
+      this.setData({
+        activeReviewTool: Object.assign({}, active, {
+          tiles: tiles.map((item) => Object.assign({}, item, { selected: false })),
+          selectedTileId: ''
+        }),
+        feedbackText: '已取消选择。'
+      });
+      return;
+    }
+    const selected = tiles.find((item) => item.id === selectedTileId) || {};
+    const record = revisitEngine.buildMatchAnswerRecord
+      ? revisitEngine.buildMatchAnswerRecord(selected, tile, active.pairs || [])
+      : { correct: selected.pairId === tile.pairId && selected.side !== tile.side, recordable: true };
+    const matchedPairIds = Array.isArray(active.matchedPairIds) ? active.matchedPairIds.slice() : [];
+    if (record.correct && matchedPairIds.indexOf(tile.pairId) < 0) matchedPairIds.push(tile.pairId);
+    const nextTiles = tiles.map((item) => Object.assign({}, item, {
+      matched: !!item.matched || (record.correct && item.pairId === tile.pairId),
+      selected: false
+    }));
+    if (record.recordable && storage.appendReviewEvent) {
+      storage.appendReviewEvent({
+        kind: 'playable_match_tile_selected',
+        tool_id: active.id,
+        correct: !!record.correct,
+        card_id: record.cardId || '',
+        source: 'review_tab_live_tool',
+        created_at: new Date().toISOString()
+      });
+    }
+    this.setData({
+      activeReviewTool: Object.assign({}, active, {
+        tiles: nextTiles,
+        selectedTileId: '',
+        matchedPairIds
+      }),
+      feedbackText: record.correct ? '配对成功，继续消掉下一组。' : '这组不对应，换一个泡泡再试。'
+    });
+  },
+
+  pickSnakeTile(event) {
+    const dataset = event && event.currentTarget ? event.currentTarget.dataset || {} : {};
+    const tileId = dataset.id || '';
+    const active = this.data.activeReviewTool || {};
+    if (active.gameType !== 'snake' || !tileId) return;
+    const tracks = Array.isArray(active.tracks) ? active.tracks.slice() : [];
+    const currentTrackIndex = Number(active.currentTrackIndex || 0);
+    const currentTrack = tracks[currentTrackIndex] || null;
+    if (!currentTrack || !Array.isArray(currentTrack.tiles)) return;
+    const picked = Array.isArray(active.snakePickedIds) ? active.snakePickedIds.slice() : [];
+    if (picked.indexOf(tileId) >= 0) return;
+    const tile = currentTrack.tiles.find((item) => item.id === tileId);
+    if (!tile) return;
+    const expectedOrder = picked.length;
+    const correct = Number(tile.order) === expectedOrder;
+    if (storage.appendReviewEvent) {
+      storage.appendReviewEvent({
+        kind: 'playable_snake_tile_picked',
+        tool_id: active.id,
+        correct,
+        card_id: tile.cardId || currentTrack.cardId || '',
+        source: 'review_tab_live_tool',
+        created_at: new Date().toISOString()
+      });
+    }
+    if (!correct) {
+      this.setData({
+        activeReviewTool: Object.assign({}, active, {
+          currentTrack: Object.assign({}, currentTrack, {
+            tiles: currentTrack.tiles.map((item) => Object.assign({}, item, { picked: false }))
+          }),
+          snakePickedIds: []
+        }),
+        feedbackText: '顺序不对，回到第一块重新排。'
+      });
+      return;
+    }
+    const nextPicked = picked.concat(tileId);
+    const nextCurrentTrack = Object.assign({}, currentTrack, {
+      tiles: currentTrack.tiles.map((item) => Object.assign({}, item, {
+        picked: nextPicked.indexOf(item.id) >= 0
+      }))
+    });
+    const trackDone = nextPicked.length >= currentTrack.tiles.length;
+    const nextTrackIndex = trackDone ? currentTrackIndex + 1 : currentTrackIndex;
+    const nextTrack = trackDone ? (tracks[nextTrackIndex] || nextCurrentTrack) : nextCurrentTrack;
+    this.setData({
+      activeReviewTool: Object.assign({}, active, {
+        currentTrackIndex: nextTrackIndex,
+        currentTrack: nextTrack,
+        snakePickedIds: trackDone ? [] : nextPicked,
+        snakeComplete: trackDone && nextTrackIndex >= tracks.length
+      }),
+      feedbackText: trackDone
+        ? (nextTrackIndex >= tracks.length ? '步骤排序完成，可以记录本轮。' : '这一组排好了，进入下一组。')
+        : '顺序正确，继续点下一块。'
+    });
   },
 
   runTemplateDeliverable(event) {

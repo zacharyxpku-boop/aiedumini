@@ -29,6 +29,14 @@
     <text class="entry-focus-copy">{{scene.focusCopy}}</text>
   </view>
 
+  <view class="entry-card-grid" wx:if="{{scene.cards && scene.cards.length}}">
+    <view class="entry-card-item" wx:for="{{scene.cards}}" wx:key="label" data-scene="{{item.scene}}" bindtap="openSceneCard">
+      <image mode="aspectFit" src="{{item.icon}}" />
+      <text>{{item.label}}</text>
+      <text>{{item.value}}</text>
+    </view>
+  </view>
+
   <view class="entry-actions">
     <view class="entry-primary" bindtap="goPrimary">{{scene.primaryLabel}}</view>
     <view class="entry-secondary" bindtap="goSecondary">{{scene.secondaryLabel}}</view>

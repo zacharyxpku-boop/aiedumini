@@ -149,15 +149,20 @@ function buildTutorServiceStatus(result = {}, receipt = {}) {
       line: '本轮由模型改写追问，本地规则守住答案边界。'
     };
   }
-  const line = source === 'client_network_error'
-    ? '网络不稳，本轮用本地带学规则，仍不直接给答案。'
-    : '本轮用本地带学规则，仍不直接给答案。';
+  const statusCopy = {
+    bad_session: ['需要重新进入', '会话过期，请重新进入页面后继续。本轮先用本地带学规则。'],
+    rate_limited: ['已切本地带学', '今天对话较多，本轮先用本地带学规则，稍后可再试模型点拨。'],
+    content_check_unavailable: ['安全预检离线', '安全预检暂时不可用，本轮只做本地最小提示。'],
+    network_error: ['网络不稳', '网络不稳，本轮用本地带学规则，仍不直接给答案。'],
+    client_network_error: ['网络不稳', '网络不稳，本轮用本地带学规则，仍不直接给答案。']
+  };
+  const copy = statusCopy[source] || ['本地带学', '本轮用本地带学规则，仍不直接给答案。'];
   return {
     visible: true,
     mode,
     source,
-    label: '本地带学',
-    line
+    label: copy[0],
+    line: copy[1]
   };
 }
 
@@ -1083,7 +1088,49 @@ function safetyReply(result, input, selected, step, misconceptionText) {
       }
     };
   }
-  return fallbackReply(input, selected, step, misconceptionText);
+  return Object.assign(fallbackReply(input, selected, step, misconceptionText), {
+    mastery_signal: {
+      status: 'content_blocked',
+      confidence: 0.9,
+      evidence_needed: result && result.risk_type ? `内容安全分流：${result.risk_type}` : '内容安全分流'
+    },
+    fallback_source: 'content_blocked',
+    upstream_status: 'content_blocked'
+  });
+}
+
+function tutorErrorSource(error, stage = 'tutor_message') {
+  const code = error && (error.code || (error.data && (error.data.error || error.data.code)));
+  const status = Number(error && error.statusCode);
+  if (status === 401 || code === 'bad_session') return 'bad_session';
+  if (status === 429 || code === 'rate_limited') return 'rate_limited';
+  if (stage === 'content_check') return 'content_check_unavailable';
+  if ((error && error.isNetworkError) || code === 'network_error') return 'network_error';
+  return 'network_error';
+}
+
+function tutorFailureReply(error, stage, input, selected, step, misconceptionText) {
+  const source = stage === 'content_check'
+    ? tutorErrorSource(error, 'content_check')
+    : tutorErrorSource(error, 'tutor_message');
+  const base = fallbackReply(input, selected, step, misconceptionText);
+  const replyBySource = {
+    bad_session: '会话过期了。你可以重新进入页面继续；这轮我先用本地带学，只追问第一步。',
+    rate_limited: '今天对话有点多，模型点拨先休息一下。这轮我用本地带学继续，不直接给答案。',
+    content_check_unavailable: '安全预检暂时不可用。这轮先用本地最小提示，不上传更多题面。',
+    network_error: '网络不稳。这轮先用本地带学继续，只追问下一小步。'
+  };
+  return Object.assign({}, base, {
+    reply: replyBySource[source] || base.reply,
+    fallback: true,
+    fallback_source: source,
+    service_contract: {
+      mode: 'client_local_rules',
+      evidence_required: ['student_first_step', 'selected_homework', 'misconception_tags'],
+      boundary: 'no_direct_homework_answer'
+    },
+    upstream_status: source
+  });
 }
 
 Page({
@@ -1450,18 +1497,12 @@ Page({
           : fallbackReply(input, selected, step, misconceptionText);
         this.appendAssistant(guarded, turnState);
         return null;
+      }).catch((error) => {
+        this.appendAssistant(tutorFailureReply(error, 'tutor_message', input, selected, step, misconceptionText), turnState);
+        return null;
       });
-    }).catch(() => {
-      this.appendAssistant(Object.assign(fallbackReply(input, selected, step, misconceptionText), {
-        fallback: true,
-        fallback_source: 'client_network_error',
-        service_contract: {
-          mode: 'client_local_rules',
-          evidence_required: ['student_first_step', 'selected_homework', 'misconception_tags'],
-          boundary: 'no_direct_homework_answer'
-        },
-        upstream_status: 'client_network_error'
-      }), turnState);
+    }).catch((error) => {
+      this.appendAssistant(tutorFailureReply(error, 'content_check', input, selected, step, misconceptionText), turnState);
     });
   },
 
