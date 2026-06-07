@@ -422,32 +422,20 @@ Page({
     const recommended = revisitEngine.recommendGames
       ? revisitEngine.recommendGames(sourceCards)
       : [];
-    const toolIds = ['whack', 'quiz', 'match', 'snake'];
+    const toolIds = ['quiz'];
     const fallback = {
-      whack: { title: '快选回忆', pitch: '看题后马上点自己想起的答案。', readyCount: sourceCards.length, available: !!sourceCards.length },
-      quiz: { title: '90秒回忆', pitch: '先在心里回忆，再翻开核对。', readyCount: sourceCards.length, available: !!sourceCards.length },
-      match: { title: '概念配对', pitch: '把短概念和含义配起来。', readyCount: 0, available: false },
-      snake: { title: '步骤排序', pitch: '把解题步骤排成正确顺序。', readyCount: 0, available: false }
+      quiz: { title: '90秒回忆', pitch: '先回忆第一步，再翻开核对错因。', readyCount: sourceCards.length, available: !!sourceCards.length }
     };
     const missionFor = (id, item) => {
       const count = Number(item.readyCount || 0);
       if (!item.available) return '先补 1 张真卡';
-      if (id === 'whack') return `60秒快选 ${Math.min(4, Math.max(1, count))} 题`;
-      if (id === 'match') return `配对 ${Math.min(4, Math.max(2, count))} 组`;
-      if (id === 'snake') return '排对 3 步';
       return `90秒回忆 ${Math.min(3, Math.max(1, count))} 张`;
     };
     return toolIds.map((id) => {
       const item = recommended.find((tool) => tool.id === id) || fallback[id];
       return {
         id,
-        title: id === 'match'
-          ? '概念配对'
-          : id === 'snake'
-            ? '步骤排序'
-            : id === 'whack'
-              ? '快选回忆'
-              : (item.title || fallback[id].title),
+        title: item.title || fallback[id].title,
         line: item.pitch || fallback[id].pitch,
         count: Number(item.readyCount || 0),
         available: !!item.available,
@@ -1812,8 +1800,10 @@ Page({
 
   runPlayableReviewTool(event) {
     const dataset = event && event.currentTarget ? event.currentTarget.dataset || {} : {};
-    const toolId = dataset.id || 'quiz';
-    const tool = (this.data.playableReviewTools || []).find((item) => item.id === toolId) || {};
+    const requestedToolId = dataset.id || 'quiz';
+    const visibleTools = this.data.playableReviewTools || [];
+    const tool = visibleTools.find((item) => item.id === requestedToolId) || visibleTools.find((item) => item.id === 'quiz') || {};
+    const toolId = tool.id || 'quiz';
     if (!tool.available) {
       this.setData({
         activeReviewTool: this.buildActiveReviewTool(Object.assign({}, tool, {
@@ -1886,7 +1876,7 @@ Page({
         feedbackText: '先完成一次配对、排序或回忆自评，再记录本轮。'
       });
       if (typeof wx !== 'undefined' && wx.showToast) {
-        wx.showToast({ title: '先玩一手再记录', icon: 'none' });
+        wx.showToast({ title: '先完成一次再记录', icon: 'none' });
       }
       if (storage.appendReviewEvent) {
         storage.appendReviewEvent({
