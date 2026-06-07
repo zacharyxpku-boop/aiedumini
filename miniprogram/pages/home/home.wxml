@@ -2,7 +2,7 @@
   <view class="first-run-overlay" wx:if="{{showFirstRunOverlay}}" catchtap="closeFirstRunOverlay">
     <view class="first-run-card">
       <view>原点不直接给答案</view>
-      <text>先去 AI 点拨说清第一步。</text>
+      <text>先去 AI私教说清第一步。</text>
       <text>点一下继续，或等 3 秒自动收起。</text>
     </view>
   </view>

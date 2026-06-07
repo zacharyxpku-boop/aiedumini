@@ -27,7 +27,7 @@
           <view class="review-tool-grid">
             <view wx:for="{{playableReviewTools}}" wx:key="id" class="review-tool-card {{item.available ? 'ready' : 'locked'}} {{item.themeClass}}" data-id="{{item.id}}" bindtap="runPlayableReviewTool"><text class="review-tool-icon">{{item.icon}}</text><text>{{item.title}}</text><text>{{item.line}}</text><text>{{item.status}}｜{{item.count}} 张</text><text>{{item.mission}}</text></view>
           </view>
-          <view class="review-empty-note" wx:if="{{activeReviewTool && activeReviewTool.empty}}"><text>还没有真实卡。先上传材料或完成一次 AI 点拨。</text></view>
+          <view class="review-empty-note" wx:if="{{activeReviewTool && activeReviewTool.empty}}"><text>还没有真实卡。先上传材料或完成一次 AI私教。</text></view>
           <view class="review-live-tool" wx:elif="{{activeReviewTool && activeReviewTool.id}}">
             <text class="review-live-head"><text>{{activeReviewTool.title}}</text><text>{{activeReviewTool.status}}</text></text>
             <text class="review-live-line">{{activeReviewTool.line}}</text>

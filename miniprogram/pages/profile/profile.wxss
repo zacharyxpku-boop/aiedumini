@@ -44,7 +44,7 @@ page {
     linear-gradient(145deg, rgba(255, 216, 79, 0.2) 0%, rgba(255, 216, 79, 0) 32%),
     linear-gradient(205deg, rgba(76, 159, 255, 0.16) 0%, rgba(76, 159, 255, 0) 36%),
     linear-gradient(180deg, #fffef9 0%, #f7fbf3 100%);
-  box-shadow: 0 22rpx 60rpx rgba(38, 58, 43, 0.08);
+  box-shadow: 0 14rpx 32rpx rgba(38, 58, 43, 0.065);
 }
 
 .yd-parent-top,
@@ -72,7 +72,7 @@ page {
   border: 1rpx solid rgba(34, 185, 92, 0.16);
   border-radius: 18rpx;
   background: #ebf9ed;
-  box-shadow: 0 14rpx 26rpx rgba(34, 185, 92, 0.24);
+  box-shadow: 0 10rpx 18rpx rgba(34, 185, 92, 0.18);
 }
 
 .yd-parent-brand text {
@@ -160,7 +160,6 @@ page {
   overflow: hidden;
   border-radius: 26rpx;
   background: #fff1ea;
-  filter: drop-shadow(0 16rpx 22rpx rgba(70, 43, 26, 0.12));
 }
 
 .yd-parent-decision {

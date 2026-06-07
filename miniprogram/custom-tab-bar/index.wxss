@@ -13,8 +13,7 @@
   background: rgba(255, 255, 255, 0.98);
   border: 1rpx solid #f0ede5;
   border-radius: 28rpx;
-  box-shadow: 0 8rpx 24rpx rgba(55, 42, 24, 0.055);
-  backdrop-filter: blur(24rpx);
+  box-shadow: 0 8rpx 18rpx rgba(55, 42, 24, 0.05);
   box-sizing: border-box;
 }
 
