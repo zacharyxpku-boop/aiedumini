@@ -1314,6 +1314,44 @@ Page({
     const current = this.data.current;
     if (!current) return;
     const reviewedCard = reviewCards.reviewCard(current.id, rating);
+    const activeReviewTool = this.data.activeReviewTool || {};
+    let ratedActiveReviewTool = activeReviewTool;
+    if (activeReviewTool.id && activeReviewTool.gameType === 'quiz') {
+      const quizAnswers = Array.isArray(activeReviewTool.answers)
+        ? activeReviewTool.answers.filter((item) => item.cardId !== current.id)
+        : [];
+      const correct = rating === 'good' || rating === 'easy';
+      const nextQuizAnswers = quizAnswers.concat([{
+        cardId: current.id,
+        correct,
+        rating,
+        selfReported: true,
+        evidence: 'active_recall_self_grade',
+        weakEvidence: rating === 'again' || rating === 'hard'
+      }]);
+      ratedActiveReviewTool = Object.assign({}, activeReviewTool, {
+        answers: nextQuizAnswers,
+        attemptSummary: revisitEngine.summarizeAttempt
+          ? revisitEngine.summarizeAttempt({
+            gameType: activeReviewTool.gameType,
+            answers: nextQuizAnswers,
+            expectedTotal: activeReviewTool.itemCount || nextQuizAnswers.length
+          })
+          : activeReviewTool.attemptSummary || null
+      });
+      if (storage.appendReviewEvent) {
+        storage.appendReviewEvent({
+          kind: 'playable_quiz_self_grade',
+          tool_id: activeReviewTool.id,
+          card_id: current.id,
+          rating,
+          correct,
+          evidence: 'active_recall_self_grade',
+          source: 'review_tab_live_tool',
+          created_at: new Date().toISOString()
+        });
+      }
+    }
     if (current.type === 'three_minute_mini_lesson_return' && storage.recordMiniLessonReviewResult) {
       storage.recordMiniLessonReviewResult({
         cardId: current.id,
@@ -1370,6 +1408,7 @@ Page({
         summary,
         revisitRunway: this.buildRevisitRunway(summary, done ? [] : cards.slice(nextIndex))
       }),
+      activeReviewTool: ratedActiveReviewTool,
       feedbackText,
       editQuestion: done ? '' : cards[nextIndex].question,
       editAnswer: done ? '' : cards[nextIndex].answer,
@@ -1855,9 +1894,6 @@ Page({
       }),
       feedbackText: `已打开${tool.title || '短回访工具'}，本轮使用 ${round && round.total ? round.total : tool.count || 0} 张真实卡。`
     });
-    if (toolId === 'quiz') {
-      this.reveal();
-    }
   },
 
   finishPlayableReviewTool(event) {
@@ -1867,14 +1903,6 @@ Page({
     const active = this.data.activeReviewTool || {};
     if (!active.id || active.empty) return;
     let answers = Array.isArray(active.answers) ? active.answers.slice() : [];
-    if (!answers.length && active.gameType === 'quiz') {
-      answers = [{
-        cardId: active.primary && active.primary.id ? active.primary.id : active.id,
-        correct: result === 'remembered',
-        selfReported: true,
-        evidence: 'self_reported_active_recall'
-      }];
-    }
     if (!answers.length) {
       this.setData({
         feedbackText: '先完成一次配对、排序或回忆自评，再记录本轮。'
@@ -1971,9 +1999,6 @@ Page({
         ? `${active.title}已记录：明天只回看同一错因。`
         : `${active.title}已记录：保留到下一轮回看。`
     });
-    if (result === 'remembered') {
-      this.rate({ currentTarget: { dataset: { rating: 'good' } } });
-    }
   },
 
   openReviewRepairFocus() {
