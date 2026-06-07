@@ -340,6 +340,13 @@ page {
   line-height: 1.12;
 }
 
+.review-tool-card text:nth-child(4) {
+  color: #8a6414;
+  font-size: 22rpx;
+  font-weight: 900;
+  line-height: 1.18;
+}
+
 .review-empty-note {
   display: block;
   margin-top: 10rpx;
@@ -395,6 +402,7 @@ page {
 }
 
 .review-live-line,
+.review-live-mission,
 .review-live-empty text {
   display: block;
   color: #52636f;
@@ -403,6 +411,16 @@ page {
   line-height: 1.35;
   overflow-wrap: break-word;
   word-break: break-word;
+}
+
+.review-live-mission {
+  justify-self: start;
+  padding: 7rpx 12rpx;
+  border-radius: 999rpx;
+  color: #8a6414;
+  background: #fff8df;
+  font-size: 21rpx;
+  line-height: 1.12;
 }
 
 .review-live-empty {

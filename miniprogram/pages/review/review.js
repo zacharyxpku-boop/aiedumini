@@ -425,6 +425,14 @@ Page({
       match: { title: '概念配对', pitch: '把短概念和含义配起来。', readyCount: 0, available: false },
       snake: { title: '步骤排序', pitch: '把解题步骤排成正确顺序。', readyCount: 0, available: false }
     };
+    const missionFor = (id, item) => {
+      const count = Number(item.readyCount || 0);
+      if (!item.available) return '先补 1 张真卡';
+      if (id === 'whack') return `60秒快选 ${Math.min(4, Math.max(1, count))} 题`;
+      if (id === 'match') return `配对 ${Math.min(4, Math.max(2, count))} 组`;
+      if (id === 'snake') return '排对 3 步';
+      return `90秒回忆 ${Math.min(3, Math.max(1, count))} 张`;
+    };
     return toolIds.map((id) => {
       const item = recommended.find((tool) => tool.id === id) || fallback[id];
       return {
@@ -439,7 +447,8 @@ Page({
         line: item.pitch || fallback[id].pitch,
         count: Number(item.readyCount || 0),
         available: !!item.available,
-        status: item.available ? '可开始' : '先补卡'
+        status: item.available ? '可开始' : '先补卡',
+        mission: missionFor(id, item)
       };
     });
   },
@@ -492,6 +501,7 @@ Page({
       title: tool.title || (round && round.title) || '短回访工具',
       status: items.length ? `本轮 ${items.length} 张` : '缺少回访卡',
       line: tool.line || (round && round.subtitle) || '先主动回忆，再核对第一步和错因。',
+      mission: tool.mission || (items.length ? `本轮完成 ${items.length} 张真卡` : '先补 1 张真卡'),
       empty: !items.length,
       itemCount: items.length,
       primary: items[0] || null,
