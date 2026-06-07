@@ -22,7 +22,7 @@
           <image class="yd-parent-art" mode="aspectFit" src="/assets/reference/family-avatar-group-transparent.png" />
         </view>
 
-        <view class="yd-parent-decision" data-scene="parent" bindtap="openEntryDetail">
+        <view class="yd-parent-decision" data-scene="parent" data-source="parent_decision_card" bindtap="openEntryDetail">
           <image class="yd-parent-decision-img" mode="aspectFit" src="/assets/reference/report-radar-card-illustration.png" />
           <view class="yd-parent-decision-copy">
             <text>{{profileViewModel.familyDecisionCard.title}}</text>
@@ -51,21 +51,21 @@
         </view>
 
         <view class="yd-parent-loop">
-          <view class="yd-parent-loop-card primary" data-scene="parent" bindtap="openEntryDetail">
+          <view class="yd-parent-loop-card primary" data-scene="parent" data-source="parent_loop_evidence" bindtap="openEntryDetail">
             <image mode="aspectFit" src="/assets/reference/entry-parent.png" />
             <view>
               <text>1 看证据</text>
               <text>{{profileViewModel.parentRecap.evidenceRecap}}</text>
             </view>
           </view>
-          <view class="yd-parent-loop-card" data-scene="parent" bindtap="openEntryDetail">
+          <view class="yd-parent-loop-card" data-scene="parent" data-source="parent_loop_question" bindtap="openEntryDetail">
             <image mode="aspectFit" src="/assets/reference/family-avatar-group-transparent.png" />
             <view>
               <text>2 只问一句</text>
               <text>{{profileViewModel.parentRecap.parentOneQuestion}}</text>
             </view>
           </view>
-          <view class="yd-parent-loop-card final" data-scene="parent" bindtap="openEntryDetail">
+          <view class="yd-parent-loop-card final" data-scene="parent" data-source="parent_loop_tomorrow" bindtap="openEntryDetail">
             <image mode="aspectFit" src="/assets/reference/learning-route-map-transparent.png" />
             <view>
               <text>3 明天再看</text>

@@ -1452,7 +1452,11 @@ Page({
       transfer: '带我做一道变式',
       review: '带我做一句话复盘'
     };
-    const input = stepTextMap[step] || '带我做下一步';
+    const typedInput = String(this.data.input || '').trim();
+    const stepPrompt = stepTextMap[step] || '带我做下一步';
+    const input = typedInput
+      ? `${typedInput}\n${stepPrompt}`
+      : stepPrompt;
     this.setData({
       activeStep: step,
       input

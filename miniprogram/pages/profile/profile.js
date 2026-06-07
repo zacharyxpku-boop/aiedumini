@@ -3881,7 +3881,7 @@ Page({
     const recap = this.data.profileViewModel && this.data.profileViewModel.parentRecap
       ? this.data.profileViewModel.parentRecap
       : {};
-    const path = '/pages/entry-detail/entry-detail?scene=parent';
+    const path = this.buildParentEvidenceRoute(summary, 'profile_parent_primary_cta');
     const event = {
       kind: 'parent_recap_completed',
       event: 'parent_recap_completed',
@@ -3921,6 +3921,36 @@ Page({
       });
     }
     navigation.navigateLearningRoute(path);
+  },
+
+  buildParentEvidenceRoute(summary = {}, source = 'profile_parent_evidence') {
+    const reportRevisitEvidence = summary.reportRevisitEvidence || {};
+    const handoff = summary.uploadedMaterialDecisionDossierHandoff || {};
+    const params = {
+      scene: 'parent',
+      from: source || 'profile_parent_evidence',
+      reportId: summary.uploadedMaterialDecisionDossierHandoffReportId
+        || summary.reportJobCaseId
+        || summary.reportId
+        || handoff.reportId
+        || reportRevisitEvidence.reportId
+        || '',
+      sourceSchemaId: summary.uploadedMaterialDecisionDossierHandoffSourceSchemaId
+        || handoff.sourceSchemaId
+        || reportRevisitEvidence.sourceSchemaId
+        || '',
+      validationStage: summary.reportRevisitValidationStage
+        || reportRevisitEvidence.validationStage
+        || '',
+      flowTraceId: reportRevisitEvidence.flowTraceId
+        || handoff.flowTraceId
+        || ''
+    };
+    const query = Object.keys(params)
+      .filter((key) => params[key] !== undefined && params[key] !== null && String(params[key]).trim())
+      .map((key) => `${key}=${encodeURIComponent(String(params[key]))}`)
+      .join('&');
+    return `/pages/entry-detail/entry-detail?${query || 'scene=parent'}`;
   },
 
   runFamilyDecisionHomepageAction() {
@@ -4302,9 +4332,14 @@ Page({
   },
 
   openEntryDetail(event) {
-    const scene = event && event.currentTarget && event.currentTarget.dataset
-      ? event.currentTarget.dataset.scene
-      : 'parent';
+    const dataset = event && event.currentTarget && event.currentTarget.dataset
+      ? event.currentTarget.dataset
+      : {};
+    const scene = dataset.scene || 'parent';
+    if (scene === 'parent') {
+      wx.navigateTo({ url: this.buildParentEvidenceRoute(this.data.learningReportSummary || {}, dataset.source || 'profile_parent_card') });
+      return;
+    }
     wx.navigateTo({ url: `/pages/entry-detail/entry-detail?scene=${scene || 'parent'}` });
   },
 
