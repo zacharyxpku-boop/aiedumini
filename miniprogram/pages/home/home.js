@@ -137,13 +137,6 @@ Page({
         cta: '找咕点追问'
       },
       {
-        id: 'focus',
-        title: '坐不住，想分心',
-        body: '只围绕一个小目标，安静坐一段。静音模式可用。',
-        action: 'goFocus',
-        cta: '进专注舱'
-      },
-      {
         id: 'repair',
         title: '之前错题又卡了',
         body: '昨天那一步，今天轻轻接一下。',
@@ -1985,20 +1978,6 @@ Page({
     navigation.navigateLearningRoute('/pages/review/review');
   },
 
-  runHomeNextStep() {
-    const nextStep = this.data.homeViewModel && this.data.homeViewModel.nextStep;
-    const action = nextStep && nextStep.action ? nextStep.action : 'review';
-    if (action === 'miniLesson') {
-      this.goMiniLessonResume();
-      return;
-    }
-    if (action === 'first' || action === 'tutor') {
-      this.goTutor();
-      return;
-    }
-    this.goReview();
-  },
-
   runPrimaryNextAction() {
     const next = this.data.homeViewModel && this.data.homeViewModel.primaryNextAction;
     if (!next) return;
@@ -2016,10 +1995,6 @@ Page({
     }
     if (next.dispatchCode === 4) {
       navigation.navigateLearningRoute('/pages/review/review?from=home_share_return');
-      return;
-    }
-    if (next.dispatchCode === 5) {
-      this.goFocus();
       return;
     }
     this.openTutorFromHome(next.route || '/pages/tutor/tutor?from=home_primary_next');
@@ -2051,18 +2026,6 @@ Page({
     const card = this.data.homeViewModel && this.data.homeViewModel.reportServiceResume;
     const route = card && card.route ? card.route : '/pages/upload/upload?from=home_report_service_resume';
     navigation.navigateLearningRoute(route);
-  },
-
-  goFocus() {
-    const session = storage.getTodaySession ? storage.getTodaySession() : null;
-    const canStart = storage.canStartFocusFromTodaySession
-      ? storage.canStartFocusFromTodaySession(session)
-      : !!(session && session.childArticulatedStep);
-    if (!canStart) {
-      wx.showToast({ title: '先回咕点确认今晚第一步，才能进入专注。', icon: 'none' });
-      return;
-    }
-    this.openTutorFromHome('/pages/tutor/tutor?from=home_first_step_focus&open=flow');
   },
 
   continueYesterdayReview() {

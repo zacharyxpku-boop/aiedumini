@@ -30,13 +30,6 @@ function buildNextStep(input) {
       action: 'miniLesson'
     };
   }
-  if (input && input.todayFocus) {
-    return {
-      text: '下一步：去修今晚最卡的一步。',
-      cta: '去修卡点',
-      action: 'review'
-    };
-  }
   return null;
 }
 
@@ -150,17 +143,6 @@ function buildPrimaryHomeNextAction(input = {}) {
       cta: safeText(receiverAction.displayLabel, '接力这一小步')
     });
   }
-  if (input.todayFocus) {
-    candidates.push({
-      type: 'first_step',
-      priority: 50,
-      dispatchCode: 5,
-      kicker: '学习建议',
-      title: '接上已经确认的第一步',
-      body: safeText(input.todayFocus.systemSuggestedStep || input.todayFocus.childArticulatedStep, '先把这一小步做完。'),
-      cta: '去专注舱'
-    });
-  }
   const selected = candidates.sort((a, b) => a.priority - b.priority)[0];
   const fallback = selected || {
     type: 'first_step',
@@ -182,7 +164,7 @@ function buildPrimaryHomeNextAction(input = {}) {
 }
 
 function buildHomeViewModel(input = {}) {
-  const hasPlanOrFocus = !!input.todayFocus;
+  const hasPlanOrFocus = false;
   const miniLessonResume = buildMiniLessonResume(input);
   const reportServiceResume = buildReportServiceResume(input);
   const personalPlan = buildPersonalPlanCard(input);
