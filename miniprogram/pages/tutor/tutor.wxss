@@ -389,6 +389,70 @@ page {
   background: #eaf3ff;
 }
 
+.tutor-socratic-brief {
+  display: grid;
+  gap: 10rpx;
+  padding: 14rpx 16rpx;
+  border: 1rpx solid rgba(24, 169, 79, 0.18);
+  border-radius: 20rpx;
+  background: linear-gradient(135deg, #f2fbf1 0%, #eef7ff 100%);
+}
+
+.tutor-socratic-brief > view:first-child,
+.tutor-socratic-brief > view:last-child {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12rpx;
+}
+
+.tutor-socratic-brief text {
+  min-width: 0;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.tutor-socratic-brief > view:first-child text:first-child {
+  padding: 6rpx 12rpx;
+  border-radius: 999rpx;
+  color: #ffffff;
+  background: #18a94f;
+  font-size: 20rpx;
+  font-weight: 950;
+  white-space: nowrap;
+}
+
+.tutor-socratic-brief > view:first-child text:last-child {
+  color: #173f31;
+  font-size: 24rpx;
+  font-weight: 950;
+}
+
+.tutor-socratic-brief > text {
+  color: #27362e;
+  font-size: 25rpx;
+  font-weight: 860;
+  line-height: 1.36;
+}
+
+.tutor-socratic-brief > view:last-child text:first-child {
+  color: #66746d;
+  font-size: 21rpx;
+  font-weight: 780;
+  line-height: 1.28;
+}
+
+.tutor-socratic-brief > view:last-child text:last-child {
+  flex: 0 0 auto;
+  padding: 8rpx 12rpx;
+  border-radius: 999rpx;
+  color: #0f5f39;
+  background: #ffffff;
+  font-size: 21rpx;
+  font-weight: 950;
+}
+
 .tutor-input-bar {
   display: flex;
   min-height: 86rpx;

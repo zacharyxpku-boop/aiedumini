@@ -119,6 +119,34 @@ function buildParentRecap(input = {}) {
   };
 }
 
+function buildParentEvidenceStrip(input = {}) {
+  const recap = buildParentRecap(input);
+  return {
+    title: '为什么这样问',
+    subtitle: '只用本机学习痕迹，不贴长期标签。',
+    items: [
+      {
+        id: 'first_step',
+        label: '第一步',
+        value: recap.recentFirstStepCount ? `${recap.recentFirstStepCount} 次` : '待记录',
+        line: recap.firstStepLine
+      },
+      {
+        id: 'focus_trace',
+        label: '专注痕迹',
+        value: recap.recentFocusEvidence.indexOf('还没有') >= 0 ? '待补' : '已留下',
+        line: recap.recentFocusEvidence
+      },
+      {
+        id: 'revisit_trace',
+        label: '短回访',
+        value: recap.recentRevisitEvidence.indexOf('已留下') >= 0 ? recap.recentRevisitEvidence.replace(/^已留下\s*/, '').replace(/痕迹。$/, '') : '明天看',
+        line: recap.recentRevisitEvidence
+      }
+    ]
+  };
+}
+
 function buildGrowthMemoryCard(input) {
   const recap = buildParentRecap(input || {});
   return {
@@ -181,6 +209,7 @@ function buildProfileViewModel(input = {}) {
     title: '家长只问这一句',
     subtitle: '不是看分数，是看孩子有没有说出第一步、围绕它坐过一段。',
     parentRecap,
+    parentEvidenceStrip: buildParentEvidenceStrip(input),
     primaryCard: buildPrimaryCard(input),
     primaryCta: '完成今日复盘',
     growthMemoryCard: buildGrowthMemoryCard(input),
@@ -200,5 +229,6 @@ module.exports = {
   formatMiniActionText: safeText,
   formatGrowthMemoryLine: buildGrowthMemoryCard,
   buildParentRecap,
+  buildParentEvidenceStrip,
   proofSummary
 };

@@ -31,6 +31,20 @@
           <view class="yd-parent-decision-badge">查看</view>
         </view>
 
+        <view class="yd-parent-evidence">
+          <view class="yd-parent-evidence-head">
+            <text>为什么这样问</text>
+            <text>{{profileViewModel.parentEvidenceStrip.subtitle}}</text>
+          </view>
+          <view class="yd-parent-evidence-strip">
+            <view class="yd-parent-evidence-chip" wx:for="{{profileViewModel.parentEvidenceStrip.items}}" wx:key="id">
+              <text>{{item.label}}</text>
+              <text>{{item.value}}</text>
+              <text>{{item.line}}</text>
+            </view>
+          </view>
+        </view>
+
         <view class="yd-parent-loop">
           <view class="yd-parent-loop-card primary" data-scene="parent" bindtap="openEntryDetail">
             <image mode="aspectFit" src="/assets/reference/entry-parent.png" />

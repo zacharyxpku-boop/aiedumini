@@ -102,6 +102,33 @@ function buildSocraticPromptWorkflow(receipt = {}, result = {}, selected = {}, n
   };
 }
 
+function buildSocraticBrief(result = {}, receipt = {}, promptWorkflow = {}) {
+  const mastery = result.mastery_signal || receipt.mastery_signal || {};
+  const fallback = result.socratic_fallback_plan || receipt.socratic_fallback_plan || {};
+  const contract = result.socratic_contract || receipt.socratic_contract || {};
+  const probe = result.diagnostic_probe || receipt.diagnostic_probe || {};
+  const hintLevel = Math.max(1, Math.min(5, Number(result.hint_level || receipt.hint_level || 1)));
+  const nextQuestion = (contract && contract.nextQuestion)
+    || (fallback && fallback.childFriendlyLine)
+    || (fallback && fallback.parentScript)
+    || (probe && probe.nextProbe)
+    || (promptWorkflow && promptWorkflow.selectedPrompt)
+    || '先说你刚才是怎么想的。';
+  const boundary = mastery.status === 'blocked_answer_request'
+    ? '不替写答案，改成第一步追问。'
+    : (promptWorkflow && promptWorkflow.workflowLine)
+      ? '本地守边界，AI只改写追问。'
+      : '只追问第一步、依据和错因。';
+  return {
+    label: `提示 ${hintLevel}/5`,
+    title: mastery.status === 'blocked_answer_request' ? '已拦截代写请求' : '本轮点拨',
+    nextQuestion: String(nextQuestion || '').slice(0, 48),
+    boundary,
+    routeLabel: '说完去短回访',
+    route: promptWorkflow && promptWorkflow.nextReviewRoute ? promptWorkflow.nextReviewRoute : '/pages/review/review?from=socratic_prompt_workflow'
+  };
+}
+
 function tutorReadableWorkbenchRows(rows = []) {
   return (Array.isArray(rows) ? rows : []).map((item, index) => ({
     id: item.id || `workbench_${index + 1}`,
@@ -1050,6 +1077,7 @@ Page({
     thinkingReceipt: null,
     socraticReasoningLine: '本地规则决定证据、提示层级和是否放行；AI 只改写成孩子听得懂的话。',
     socraticTrace: buildSocraticTrace({}),
+    socraticBrief: null,
     socraticFeedbackStatus: '',
     socraticFeedbackRecordedAt: '',
     socraticFeedbackNextAction: '',
@@ -1154,9 +1182,11 @@ Page({
       thinkingReceipt: receipt,
       socraticReasoningLine: buildSocraticReasoningLine(receipt),
       socraticTrace: buildSocraticTrace(receipt),
+      socraticBrief: null,
       socraticFeedbackStatus: '',
       socraticFeedbackRecordedAt: '',
       socraticFeedbackNextAction: '',
+      socraticBrief: null,
       miniLessonFeedbackBridge: null,
       miniLessonExitGateStatus: '',
       miniLessonExitGateNextRoute: '',
@@ -1424,11 +1454,17 @@ Page({
       socratic_ai_local_boundary_contract: result && result.socratic_ai_local_boundary_contract ? result.socratic_ai_local_boundary_contract : receipt.socraticAiLocalBoundaryContract || null,
       socraticAiLocalBoundaryContract: result && result.socraticAiLocalBoundaryContract ? result.socraticAiLocalBoundaryContract : receipt.socraticAiLocalBoundaryContract || null,
       answer_boundary_evidence: result && result.answer_boundary_evidence ? result.answer_boundary_evidence : null,
+      engine_version: result && result.engine_version ? result.engine_version : '',
+      service_contract: result && result.service_contract ? result.service_contract : null,
+      fallback: result && Object.prototype.hasOwnProperty.call(result, 'fallback') ? result.fallback : null,
+      output_sanitized: result && Object.prototype.hasOwnProperty.call(result, 'output_sanitized') ? result.output_sanitized : null,
+      upstream_status: result && result.upstream_status ? result.upstream_status : '',
       allowed_moves: result && result.allowed_moves ? result.allowed_moves : [],
       transfer_prompt: result && result.transfer_prompt ? result.transfer_prompt : ''
     });
     diagnosticReceipt.socratic_prompt_workflow.turnId = diagnosticReceipt.turnId;
     diagnosticReceipt.socraticPromptWorkflow.turnId = diagnosticReceipt.turnId;
+    const socraticBrief = buildSocraticBrief(result || {}, diagnosticReceipt, promptWorkflow);
     if (storage.appendThinkingReceipt) {
       storage.appendThinkingReceipt(Object.assign({}, diagnosticReceipt, {
         selected_id: this.data.selected && this.data.selected.id,
@@ -1659,6 +1695,7 @@ Page({
       socraticPromptWorkflow: promptWorkflow,
       socraticReasoningLine: buildSocraticReasoningLine(diagnosticReceipt),
       socraticTrace: buildSocraticTrace(diagnosticReceipt),
+      socraticBrief,
       socraticFeedbackStatus: '',
       socraticFeedbackRecordedAt: '',
       socraticFeedbackNextAction: '',
@@ -1900,6 +1937,11 @@ Page({
     const action = this.data.miniLessonExitGateAction || {};
     const route = action.route || this.data.miniLessonExitGateNextRoute || '/pages/review/review?from=mini_lesson_exit_gate';
     navigation.navigateLearningRoute(route);
+  },
+
+  goSocraticBriefRoute() {
+    const brief = this.data.socraticBrief || {};
+    navigation.navigateLearningRoute(brief.route || '/pages/review/review?from=socratic_prompt_workflow');
   },
 
   clearChat() {

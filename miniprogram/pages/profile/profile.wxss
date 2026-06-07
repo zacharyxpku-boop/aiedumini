@@ -234,6 +234,89 @@ page {
   white-space: nowrap;
 }
 
+.yd-parent-evidence {
+  display: grid;
+  gap: 10rpx;
+  padding: 14rpx;
+  border: 1rpx solid rgba(232, 238, 230, 0.95);
+  border-radius: 22rpx;
+  background: rgba(255, 255, 255, 0.86);
+}
+
+.yd-parent-evidence-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12rpx;
+}
+
+.yd-parent-evidence-head text:first-child {
+  flex: 0 0 auto;
+  color: #173f31;
+  font-size: 24rpx;
+  font-weight: 950;
+  line-height: 1.18;
+}
+
+.yd-parent-evidence-head text:last-child {
+  min-width: 0;
+  color: #6c776f;
+  font-size: 20rpx;
+  font-weight: 760;
+  line-height: 1.26;
+  text-align: right;
+}
+
+.yd-parent-evidence-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8rpx;
+}
+
+.yd-parent-evidence-chip {
+  min-width: 0;
+  min-height: 112rpx;
+  padding: 10rpx;
+  overflow: hidden;
+  border-radius: 18rpx;
+  background: #f6fbf4;
+}
+
+.yd-parent-evidence-chip text {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.yd-parent-evidence-chip text:first-child {
+  color: #66746d;
+  font-size: 20rpx;
+  font-weight: 800;
+  line-height: 1.12;
+  white-space: nowrap;
+}
+
+.yd-parent-evidence-chip text:nth-child(2) {
+  margin-top: 4rpx;
+  color: #18211d;
+  font-size: 25rpx;
+  font-weight: 950;
+  line-height: 1.12;
+  white-space: nowrap;
+}
+
+.yd-parent-evidence-chip text:nth-child(3) {
+  display: -webkit-box;
+  margin-top: 5rpx;
+  color: #68746d;
+  font-size: 20rpx;
+  font-weight: 760;
+  line-height: 1.25;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
 .yd-parent-section-head text:first-child {
   color: #18211d;
   font-size: 24rpx;
@@ -257,19 +340,19 @@ page {
 
 .yd-parent-loop {
   grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: repeat(3, minmax(148rpx, auto));
+  grid-template-rows: repeat(3, minmax(116rpx, auto));
   flex: 1 1 auto;
   margin-top: 0;
-  gap: 12rpx;
+  gap: 10rpx;
 }
 
 .yd-parent-loop-card {
   display: flex;
   min-width: 0;
-  min-height: 190rpx;
+  min-height: 132rpx;
   align-items: center;
   gap: 14rpx;
-  padding: 18rpx 16rpx;
+  padding: 14rpx;
   border: 1rpx solid rgba(232, 238, 230, 0.95);
   border-radius: 20rpx;
   background: rgba(255, 255, 255, 0.86);
@@ -289,9 +372,9 @@ page {
 }
 
 .yd-parent-loop-card image {
-  width: 58rpx;
-  height: 58rpx;
-  flex: 0 0 58rpx;
+  width: 52rpx;
+  height: 52rpx;
+  flex: 0 0 52rpx;
   object-fit: contain;
 }
 
@@ -307,7 +390,7 @@ page {
 
 .yd-parent-loop-card text:first-child {
   color: #17211d;
-  font-size: 25rpx;
+  font-size: 23rpx;
   font-weight: 950;
   line-height: 1.18;
   white-space: normal;
@@ -317,7 +400,7 @@ page {
   display: -webkit-box;
   margin-top: 4rpx;
   color: #66746d;
-  font-size: 22rpx;
+  font-size: 20rpx;
   font-weight: 780;
   line-height: 1.32;
   -webkit-box-orient: vertical;
