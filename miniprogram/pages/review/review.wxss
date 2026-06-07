@@ -448,6 +448,7 @@ page {
   line-height: 1.3;
 }
 
+.review-whack-board,
 .review-match-board,
 .review-snake-board {
   display: grid;
@@ -460,6 +461,46 @@ page {
 
 .review-match-board {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.review-whack-board {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.review-whack-question,
+.review-whack-done {
+  display: block;
+  grid-column: 1 / -1;
+  padding: 10rpx 12rpx;
+  border-radius: 14rpx;
+  background: #eef7ff;
+  color: #23679f;
+  font-size: 22rpx;
+  font-weight: 900;
+  line-height: 1.28;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.review-whack-choice {
+  display: block;
+  min-height: 72rpx;
+  padding: 14rpx 12rpx;
+  border-radius: 16rpx;
+  background: #ffffff;
+  color: #16221d;
+  font-size: 23rpx;
+  font-weight: 900;
+  line-height: 1.2;
+  text-align: center;
+  box-shadow: inset 0 0 0 1rpx rgba(34, 185, 92, 0.16);
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.review-whack-choice:active {
+  transform: scale(0.985);
+  background: #fff8df;
 }
 
 .review-match-tile,

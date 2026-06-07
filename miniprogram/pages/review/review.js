@@ -418,8 +418,9 @@ Page({
     const recommended = revisitEngine.recommendGames
       ? revisitEngine.recommendGames(sourceCards)
       : [];
-    const toolIds = ['quiz', 'match', 'snake'];
+    const toolIds = ['whack', 'quiz', 'match', 'snake'];
     const fallback = {
+      whack: { title: '快选回忆', pitch: '看题后马上点自己想起的答案。', readyCount: sourceCards.length, available: !!sourceCards.length },
       quiz: { title: '90秒回忆', pitch: '先在心里回忆，再翻开核对。', readyCount: sourceCards.length, available: !!sourceCards.length },
       match: { title: '概念配对', pitch: '把短概念和含义配起来。', readyCount: 0, available: false },
       snake: { title: '步骤排序', pitch: '把解题步骤排成正确顺序。', readyCount: 0, available: false }
@@ -432,7 +433,9 @@ Page({
           ? '概念配对'
           : id === 'snake'
             ? '步骤排序'
-            : (item.title || fallback[id].title),
+            : id === 'whack'
+              ? '快选回忆'
+              : (item.title || fallback[id].title),
         line: item.pitch || fallback[id].pitch,
         count: Number(item.readyCount || 0),
         available: !!item.available,
@@ -448,7 +451,23 @@ Page({
     const tracks = round && Array.isArray(round.tracks) ? round.tracks : [];
     const tiles = round && Array.isArray(round.tiles) ? round.tiles : [];
     const currentTrack = tracks[0] || null;
-    const items = toolId === 'match'
+    const whackQuestion = toolId === 'whack' ? (questions[0] || null) : null;
+    const whackChoices = whackQuestion && Array.isArray(whackQuestion.choices)
+      ? whackQuestion.choices.slice(0, 4).map((item, index) => ({
+        id: 'whack_choice_' + index,
+        index,
+        text: item,
+        picked: false
+      }))
+      : [];
+    const items = toolId === 'whack'
+      ? questions.slice(0, 3).map((item, index) => ({
+        id: item.id || 'whack_' + index,
+        label: '快选 ' + (index + 1),
+        prompt: item.question || '看题后马上点选项',
+        check: item.answer ? '核对：' + item.answer : '选完再核对'
+      }))
+      : toolId === 'match'
       ? pairs.slice(0, 3).map((item, index) => ({
         id: item.id || `match_${index}`,
         label: `配对 ${index + 1}`,
@@ -480,6 +499,11 @@ Page({
       third: items[2] || null,
       items,
       gameType: toolId,
+      questions,
+      whackQuestionIndex: 0,
+      whackQuestion,
+      whackChoices,
+      whackComplete: false,
       pairs,
       tiles: tiles.map((item) => Object.assign({}, item, { selected: false, matched: false })),
       tracks,
@@ -1787,7 +1811,9 @@ Page({
       return;
     }
     const cards = this.data.cards || [];
-    const round = toolId === 'match' && revisitEngine.buildMatchRound
+    const round = toolId === 'whack' && revisitEngine.buildWhackRound
+      ? revisitEngine.buildWhackRound(cards, { limit: 4, holes: 4, timeLimit: 60 })
+      : toolId === 'match' && revisitEngine.buildMatchRound
       ? revisitEngine.buildMatchRound(cards, { limit: 4 })
       : toolId === 'snake' && revisitEngine.buildSnakeRound
         ? revisitEngine.buildSnakeRound(cards, { limit: 3 })
@@ -1914,6 +1940,69 @@ Page({
       }));
     }
     navigation.navigateLearningRoute('/pages/tutor/tutor?from=review_repair_focus&open=flow');
+  },
+
+  selectWhackChoice(event) {
+    const dataset = event && event.currentTarget ? event.currentTarget.dataset || {} : {};
+    const choiceIndex = Number(dataset.index || 0);
+    const active = this.data.activeReviewTool || {};
+    if (active.gameType !== 'whack') return;
+    const questions = Array.isArray(active.items) ? active.items : [];
+    const engineQuestions = active.whackQuestion && active.whackQuestion.id
+      ? (active.roundQuestions || [])
+      : [];
+    const whackQuestions = engineQuestions.length ? engineQuestions : (Array.isArray(active.questions) ? active.questions : []);
+    const currentIndex = Number(active.whackQuestionIndex || 0);
+    const question = active.whackQuestion || whackQuestions[currentIndex] || null;
+    const choices = Array.isArray(active.whackChoices) ? active.whackChoices : [];
+    const choice = choices[choiceIndex] || {};
+    if (!question || !choice.text) return;
+    const correct = String(choice.text || '') === String(question.answer || '');
+    const record = {
+      cardId: question.cardId || question.id || '',
+      correct,
+      recordable: true,
+      selected: choice.text || '',
+      answer: question.answer || '',
+      gameType: 'whack',
+      knowledgeType: question.knowledgeType || ''
+    };
+    if (storage.appendReviewEvent) {
+      storage.appendReviewEvent({
+        kind: 'playable_whack_choice_selected',
+        tool_id: active.id,
+        correct,
+        card_id: record.cardId,
+        source: 'review_tab_live_tool',
+        created_at: new Date().toISOString()
+      });
+    }
+    const answers = (Array.isArray(active.answers) ? active.answers.slice() : []).concat([record]);
+    const sourceQuestions = whackQuestions.length ? whackQuestions : (question ? [question] : []);
+    const nextIndex = currentIndex + 1;
+    const nextQuestion = sourceQuestions[nextIndex] || question;
+    const nextChoices = nextQuestion && Array.isArray(nextQuestion.choices)
+      ? nextQuestion.choices.slice(0, 4).map((item, index) => ({
+        id: 'whack_choice_' + index,
+        index,
+        text: item,
+        picked: false
+      }))
+      : [];
+    const whackComplete = nextIndex >= sourceQuestions.length;
+    this.setData({
+      activeReviewTool: Object.assign({}, active, {
+        whackQuestionIndex: whackComplete ? currentIndex : nextIndex,
+        whackQuestion: nextQuestion,
+        whackChoices: nextChoices.length ? nextChoices : choices,
+        whackComplete,
+        answers,
+        attemptSummary: revisitEngine.summarizeAttempt
+          ? revisitEngine.summarizeAttempt({ gameType: 'whack', answers, expectedTotal: active.itemCount || answers.length })
+          : null
+      }),
+      feedbackText: correct ? '快选命中，继续下一张。' : '这张没对上，完成后会进入错因修复。'
+    });
   },
 
   selectMatchTile(event) {
