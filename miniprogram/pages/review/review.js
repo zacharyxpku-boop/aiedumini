@@ -422,23 +422,27 @@ Page({
     const recommended = revisitEngine.recommendGames
       ? revisitEngine.recommendGames(sourceCards)
       : [];
-    const toolIds = ['whack', 'quiz', 'match', 'snake'];
+    const toolIds = ['whack', 'quiz', 'flash', 'match', 'domino', 'snake'];
     const fallback = {
       whack: { title: '错因地鼠', pitch: '看题面快选第一步，抓住最容易错的点。', readyCount: sourceCards.length, available: !!sourceCards.length },
       quiz: { title: '快闪问答', pitch: '先回忆第一步，再翻开核对错因。', readyCount: sourceCards.length, available: !!sourceCards.length },
+      flash: { title: '闪卡翻翻', pitch: '一张卡一轮，先说再翻开。', readyCount: sourceCards.length, available: !!sourceCards.length },
       match: { title: '拼图配对', pitch: '把卡点和第一步配起来。', readyCount: sourceCards.length, available: sourceCards.length >= 2 },
+      domino: { title: '多米诺接龙', pitch: '把相邻的卡点关系接起来。', readyCount: sourceCards.length, available: sourceCards.length >= 2 },
       snake: { title: '路线接龙', pitch: '按题意、条件、第一步排顺。', readyCount: sourceCards.length, available: sourceCards.length >= 2 }
     };
     const display = {
-      whack: { icon: '地', themeClass: 'theme-whack' },
-      quiz: { icon: '快', themeClass: 'theme-quiz' },
-      match: { icon: '拼', themeClass: 'theme-match' },
-      snake: { icon: '路', themeClass: 'theme-snake' }
+      whack: { icon: '地', themeClass: 'theme-whack', engineId: 'whack' },
+      quiz: { icon: '快', themeClass: 'theme-quiz', engineId: 'quiz' },
+      flash: { icon: '闪', themeClass: 'theme-flash', engineId: 'quiz' },
+      match: { icon: '拼', themeClass: 'theme-match', engineId: 'match' },
+      domino: { icon: '接', themeClass: 'theme-domino', engineId: 'match' },
+      snake: { icon: '路', themeClass: 'theme-snake', engineId: 'snake' }
     };
     const missionFor = (id, item) => {
       const count = Number(item.readyCount || 0);
-      if (!item.available) return id === 'quiz' || id === 'whack' ? '先补 1 张真卡' : '先补 2 张真卡';
-      if (id === 'match') return `配对 ${Math.min(4, Math.max(2, count))} 组`;
+      if (!item.available) return id === 'quiz' || id === 'flash' || id === 'whack' ? '先补 1 张真卡' : '先补 2 张真卡';
+      if (id === 'match' || id === 'domino') return `配对 ${Math.min(4, Math.max(2, count))} 组`;
       if (id === 'snake') return `排序 ${Math.min(3, Math.max(2, count))} 组`;
       if (id === 'whack') return `快选 ${Math.min(4, Math.max(1, count))} 题`;
       return `90秒回忆 ${Math.min(3, Math.max(1, count))} 张`;
@@ -454,7 +458,8 @@ Page({
         status: item.available ? '可开始' : '先补卡',
         mission: missionFor(id, item),
         icon: display[id] ? display[id].icon : '练',
-        themeClass: display[id] ? display[id].themeClass : 'theme-quiz'
+        themeClass: display[id] ? display[id].themeClass : 'theme-quiz',
+        engineId: display[id] ? display[id].engineId : id
       };
     });
   },
@@ -1843,7 +1848,7 @@ Page({
       this.setData({
         sessionMode: 'smart',
         todayFocus: focus || this.data.todayFocus,
-        feedbackText: '\u5df2\u8fdb\u5165\u77ed\u56de\u8bbf\uff1a\u5148\u56de\u5fc6\u7b2c\u4e00\u6b65\uff0c\u518d\u505a\u4e00\u5f20\u53d8\u5f0f\u3002'
+        feedbackText: '已进入知识乐园：先回忆第一步，再做一张变式。'
       });
       this.refresh();
       return;
@@ -1856,7 +1861,7 @@ Page({
     const requestedToolId = dataset.id || 'quiz';
     const visibleTools = this.data.playableReviewTools || [];
     const tool = visibleTools.find((item) => item.id === requestedToolId) || visibleTools.find((item) => item.id === 'quiz') || {};
-    const toolId = tool.id || 'quiz';
+    const toolId = tool.engineId || tool.id || 'quiz';
     if (!tool.available) {
       this.setData({
         activeReviewTool: this.buildActiveReviewTool(Object.assign({}, tool, {
@@ -1888,7 +1893,7 @@ Page({
       });
     }
     this.setData({
-      activeReviewTool: this.buildActiveReviewTool(tool, round),
+      activeReviewTool: this.buildActiveReviewTool(Object.assign({}, tool, { id: toolId }), round),
       practiceTemplateWorkbench: Object.assign({}, this.data.practiceTemplateWorkbench || {}, {
         id: `review_tool_${toolId}`,
         title: tool.title || '知识玩法',

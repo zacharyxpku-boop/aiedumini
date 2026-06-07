@@ -12,7 +12,7 @@
           <view class="yd-review-copy">
             <view class="yd-review-title">{{reviewViewModel.title}}</view>
             <view class="yd-review-sub route-note short">用真实错因卡开一局：先玩，再自评，再生成明天回访证据。</view>
-            <view class="review-chip-row"><text>错因地鼠</text><text>快闪问答</text><text>拼图配对</text><text>路线接龙</text></view>
+            <view class="review-chip-row"><text>错因地鼠</text><text>快闪问答</text><text>闪卡翻翻</text><text>拼图配对</text><text>多米诺接龙</text><text>路线接龙</text></view>
           </view>
           <image class="yd-review-art" mode="aspectFit" src="/assets/reference/review-world-map-transparent.png" />
         </view>
