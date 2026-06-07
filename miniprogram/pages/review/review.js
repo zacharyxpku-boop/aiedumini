@@ -465,27 +465,27 @@ Page({
         id: item.id || 'whack_' + index,
         label: '快选 ' + (index + 1),
         prompt: item.question || '看题后马上点选项',
-        check: item.answer ? '核对：' + item.answer : '选完再核对'
+        check: '先选，再看反馈'
       }))
       : toolId === 'match'
       ? pairs.slice(0, 3).map((item, index) => ({
         id: item.id || `match_${index}`,
         label: `配对 ${index + 1}`,
         prompt: item.question || '先看题面',
-        check: item.answer ? `对应：${item.answer}` : '点对应含义'
+        check: '先配对，再看结果'
       }))
       : toolId === 'snake'
         ? tracks.slice(0, 2).map((item, index) => ({
           id: item.id || `snake_${index}`,
           label: `顺序 ${index + 1}`,
           prompt: item.question || '把步骤排好',
-          check: Array.isArray(item.correctOrder) && item.correctOrder.length ? item.correctOrder.join(' → ') : '按第一步到最后一步排序'
+          check: '先排序，再核对断点'
         }))
         : questions.slice(0, 3).map((item, index) => ({
           id: item.id || `quiz_${index}`,
           label: `回忆 ${index + 1}`,
           prompt: item.question || '先闭眼回忆这张卡',
-          check: item.answer ? `核对：${item.answer}` : '再翻开核对'
+          check: '先回忆，再翻开'
         }));
     return {
       id: toolId,
@@ -513,6 +513,8 @@ Page({
       matchedPairIds: [],
       snakePickedIds: [],
       snakeComplete: false,
+      roundSourceTool: tool,
+      roundSourceData: round,
       answers: [],
       attemptSummary: null,
       repairFocus: null
@@ -1893,6 +1895,11 @@ Page({
     const repairFocus = wrongAnswers.length && revisitEngine.buildRepairFocus
       ? revisitEngine.buildRepairFocus(wrongAnswers[0], this.data.cards || [])
       : null;
+    const roundAdvice = attemptSummary && revisitEngine.buildRoundAdvice
+      ? revisitEngine.buildRoundAdvice(attemptSummary, active.gameType || active.id)
+      : null;
+    const reportSourceContext = this.data.reportSourceContext || this.buildReportSourceContext();
+    const reportId = reportSourceContext && (reportSourceContext.reportId || reportSourceContext.sourceReportId || reportSourceContext.id);
     if (storage.appendReviewEvent) {
       storage.appendReviewEvent({
         kind: 'playable_review_tool_finished',
@@ -1910,16 +1917,47 @@ Page({
           tool_id: active.id,
           result,
           summary: attemptSummary,
+          round_advice: roundAdvice,
           repair_focus: repairFocus,
           source: 'review_tab_live_tool',
           created_at: new Date().toISOString()
         });
       }
     }
+    if (storage.recordReportRevisitEvidence && (reportId || repairFocus || attemptSummary)) {
+      storage.recordReportRevisitEvidence(reportId || '', {
+        id: `playable_revisit_${Date.now()}`,
+        status: 'review_completed',
+        route: '/pages/review/review?from=playable_round',
+        firstStep: repairFocus && (repairFocus.decision || repairFocus.title)
+          ? (repairFocus.decision || repairFocus.title)
+          : (roundAdvice && roundAdvice.primary) || '完成一轮主动回忆',
+        wrongCause: repairFocus && (repairFocus.wrongCause || repairFocus.knowledgeType || repairFocus.title)
+          ? (repairFocus.wrongCause || repairFocus.knowledgeType || repairFocus.title)
+          : (attemptSummary && attemptSummary.wrong ? '短回访出现错卡' : '本轮回忆通过'),
+        parentCheck: roundAdvice && roundAdvice.secondary
+          ? roundAdvice.secondary
+          : '家长只看本轮错卡和明天回访',
+        nextDayRevisit: !!(attemptSummary && attemptSummary.total),
+        attemptSummary,
+        repairFocus,
+        source: 'playable_review_round'
+      });
+    }
+    if (result === 'retry' && active.roundSourceTool) {
+      const nextTool = this.buildActiveReviewTool(active.roundSourceTool, active.roundSourceData || null);
+      this.setData({
+        activeReviewTool: nextTool,
+        feedbackText: '已重开一局：这次先凭记忆完成，再看反馈。'
+      });
+      return;
+    }
     this.setData({
       activeReviewTool: Object.assign({}, active, {
         attemptSummary,
-        repairFocus
+        roundAdvice,
+        repairFocus,
+        reportEvidenceReady: true
       }),
       feedbackText: result === 'remembered'
         ? `${active.title}已记录：明天只回看同一错因。`
@@ -1940,6 +1978,10 @@ Page({
       }));
     }
     navigation.navigateLearningRoute('/pages/tutor/tutor?from=review_repair_focus&open=flow');
+  },
+
+  openReviewParentEvidence() {
+    navigation.navigateLearningRoute('/pages/profile/profile?from=playable_review_round&open=flow');
   },
 
   selectWhackChoice(event) {

@@ -463,6 +463,35 @@ page {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.review-round-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8rpx;
+}
+
+.review-round-strip text {
+  display: flex;
+  min-width: 0;
+  min-height: 52rpx;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8rpx;
+  border-radius: 16rpx;
+  color: #174c3d;
+  background: #edf9ef;
+  font-size: 22rpx;
+  font-weight: 930;
+  line-height: 1.12;
+  text-align: center;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.review-round-strip text:nth-child(n + 5) {
+  color: #ffffff;
+  background: #174c3d;
+}
+
 .review-whack-board {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
