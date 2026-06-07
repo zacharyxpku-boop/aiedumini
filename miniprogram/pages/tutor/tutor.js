@@ -358,7 +358,7 @@ function coachConsole(selected, misconceptionTags, masterySignal, pasteRisk, act
     evidence_needed: '孩子先给出自己的第一步，咕点才会继续帮。'
   };
   return {
-    title: '今晚先看',
+    title: '当前证据',
     label: '先问思路，只给最小提示，把错因讲清，再留下一句自己的话。',
     focus: selected && selected.text ? selected.text : '先锁定第一项必须做',
     wrongCause: tags.length ? tags.slice(0, 2).join(' / ') : '还在等卡点',

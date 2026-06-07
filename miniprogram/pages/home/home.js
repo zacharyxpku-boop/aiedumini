@@ -1002,7 +1002,7 @@ Page({
           id: 'tutor',
           value: '2',
           title: '只辅导必须做',
-          body: topMust ? topMust.text : '我会挑出最值得今晚先做的任务。',
+          body: topMust ? topMust.text : '我会先整理材料证据，再给出下一步。',
           action: topMust ? 'startTopMust' : 'goUpload',
           cta: topMust ? '去点拨' : '先分类'
         },

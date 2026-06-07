@@ -693,14 +693,14 @@ function buildDailyShareCard(profile, reviewSummary, revisitEvidenceCard, wrongC
   const parentPath = `/pages/home/home?share=${code}&from=parent_card&mode=parent_recap&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}${sourceChallengeQuery}${openMaicQuery}${courseUnitQuery}${socraticReportQuery}${tonightDecisionQuery}${questionBankRelayQuery}${visualRelayQuery}`;
   const peerPath = `/pages/home/home?share=${code}&from=peer_challenge&challenge=review&mode=same_identity&identity=${encodeURIComponent(identityTag)}&action=${parentNextAction}${unifiedQuery}${capabilityQuery}${challengeQuery}${sourceChallengeQuery}${openMaicQuery}${courseUnitQuery}${socraticReportQuery}${tonightDecisionQuery}${questionBankRelayQuery}${visualRelayQuery}`;
   const parentShareTitle = todayFocus && todayFocus.title
-    ? `今晚先看这一处：${storage.formatIssueType(todayFocus.issueType || '卡点')} · ${todayFocus.title}`
+    ? `家长看这一处证据：${storage.formatIssueType(todayFocus.issueType || '卡点')} · ${todayFocus.title}`
     : '给家里看的今日学习复盘';
   const peerShareTitle = `今天明天验证 5 分钟：${identityTag}`;
   const shareCount = storage.loadShareRuns ? storage.loadShareRuns().length : 0;
   const reportAction = reportDailyActionQueue && reportDailyActionQueue.ready
     ? reportDailyActionQueue
     : (storage.buildReportDailyActionQueue ? storage.buildReportDailyActionQueue() : null);
-  const actionFocus = todayFocus && todayFocus.title ? todayFocus.title : (repaired > 0 ? '最近的高频卡点' : '今晚第一步');
+  const actionFocus = todayFocus && todayFocus.title ? todayFocus.title : (repaired > 0 ? '最近的高频卡点' : '当前第一步');
   const oneQuestion = todayFocus && todayFocus.childArticulatedStep
     ? `你刚才说“${todayFocus.childArticulatedStep}”，下次还先这样做吗？`
     : todayFocus && todayFocus.title
@@ -709,8 +709,8 @@ function buildDailyShareCard(profile, reviewSummary, revisitEvidenceCard, wrongC
   const tonightAction = todayFocus && todayFocus.repairStatus === 'completed'
     ? `今晚只复述一次：${actionFocus} 的第一步。`
     : due > 0
-      ? `今晚清 1 张待回访卡，再说出第一步。`
-      : `今晚只做 1 个小动作：说清 ${actionFocus}。`;
+      ? `先清 1 张待回访卡，再说出第一步。`
+      : `只做 1 个小动作：说清 ${actionFocus}。`;
   const tomorrowCheck = repaired > 0
     ? '明天先回看这张错因卡，确认换题也能开口。'
     : due > 0
@@ -723,7 +723,7 @@ function buildDailyShareCard(profile, reviewSummary, revisitEvidenceCard, wrongC
     todayFocus && todayFocus.repairStatus === 'completed' ? '今晚已修复 1 个卡点' : '',
     reportAction && reportAction.ready ? reportAction.actionLine : '',
     evidenceBrief && evidenceBrief.reportLine ? evidenceBrief.reportLine : ''
-  ].filter(Boolean).join(' · ') || '先从今晚第一步开始沉淀记录';
+    ].filter(Boolean).join(' · ') || '先从当前第一步开始沉淀记录';
   const capabilityLine = nextCapability ? `能力账本下一条：${nextCapability.label} · ${nextCapability.nextAction}` : '';
   const subjectDepthLine = subjectSkillDepth && subjectSkillDepth.label
     ? `${subjectSkillDepth.label}：${subjectSkillDepth.firstStep}`
@@ -771,7 +771,7 @@ function buildDailyShareCard(profile, reviewSummary, revisitEvidenceCard, wrongC
       title: '家庭行动卡',
       judgement: todayFocus && todayFocus.repairStatus === 'completed'
         ? `今天不是多刷题，而是修掉了一个真实卡点：${actionFocus}。`
-        : `今晚先不扩范围，只抓一个动作：${actionFocus}。`,
+        : `先不扩范围，只抓一个证据动作：${actionFocus}。`,
       tonightAction,
       parentQuestion: oneQuestion,
       tomorrowCheck,
@@ -1235,7 +1235,7 @@ function buildFamilyDecisionHomepage(input = {}) {
   return {
     id: 'family_decision_homepage',
     title: '家庭决策书首页',
-    headline: tonightDecisionBrief.headline || familyDecisionMemo.tonightDecision || active.task || '今晚先把一个第一步做稳',
+    headline: tonightDecisionBrief.headline || familyDecisionMemo.tonightDecision || active.task || '把一个第一步做稳',
     status: portraitStatus,
     statusLevel: releaseDecision === 'home_school_safe_handoff' ? 'ready' : releaseDecision === 'tonight_action_only' ? 'action' : 'locked',
     statusSteps,
@@ -1613,7 +1613,7 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
   const sevenDayActionBoard = {
     title: '7天行动板',
     ready: sevenDayPlan.length >= 3,
-    today: dayOne.task || plan.parentLine || '今晚先让孩子说出第一步。',
+    today: dayOne.task || plan.parentLine || '先让孩子说出第一步。',
     tomorrow: dayTwo.task || '明天先回看一张卡，确认不是当场会、转身忘。',
     review: daySeven.task || solutionMap.reviewTrigger || '第 7 天用新错题或小测更新一次画像。',
     parentScript: solutionMap.parentScript || plan.parentLine || '家长先问一句：这一步你准备先看哪里？',
@@ -3172,7 +3172,7 @@ Page({
     });
     const lightProfileEmptyGuide = hasParentEvidence
       ? ''
-      : '再用两晚，咕点会帮你看见孩子常卡在哪一步。今晚先记录一句自己的第一步就够了。';
+      : '再用两次，咕点会帮你看见孩子常卡在哪一步。先记录一句自己的第一步就够了。';
     const reportJobCaseId = this.resolveReportJobCaseId(learningReportState);
     const revisitEvidenceCard = buildRevisitEvidenceCard(reviewSummary);
     const wrongCauseSummary = buildWrongCauseSummary(reviewSummary, thinkingSummary);
@@ -3279,7 +3279,7 @@ Page({
     });
     const profileEmptyGuide = hasParentEvidence
       ? ''
-      : '再用两晚，咕点会帮你看见孩子常卡在哪一步。今晚先记录一句自己的第一步就够了。';
+      : '再用两次，咕点会帮你看见孩子常卡在哪一步。先记录一句自己的第一步就够了。';
     const profileSafeSummary = buildProfileSafeSummary(todayFocus, focusHistory, profileEmptyGuide);
     const localAnalytics = storage.localAnalyticsDashboard ? storage.localAnalyticsDashboard() : null;
     this.setData({
@@ -3505,7 +3505,7 @@ Page({
       share_intent: 'parent_invite',
       from: 'parent_invite',
       mode: 'parent_recap',
-      tonight_action: summary.recentSummary || '今晚先听孩子说出自己的第一步',
+      tonight_action: summary.recentSummary || '先听孩子说出自己的第一步',
       parent_question: summary.parentQuestion || '刚才你第一步先看了哪里？',
       tomorrow_check: '明天只回看一张最不稳的卡',
       relay_blocked_fields: ['original_question', 'full_answer', 'score', 'ranking', 'private_comment']

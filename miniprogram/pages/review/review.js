@@ -956,7 +956,7 @@ Page({
     if (todayFocus && todayFocus.title) {
       const progress = Number(todayFocus.progress || 0);
       return {
-        name: todayFocus.title || (todayFocus.issueType ? storage.formatIssueType(todayFocus.issueType) : '今晚先修这一处'),
+        name: todayFocus.title || (todayFocus.issueType ? storage.formatIssueType(todayFocus.issueType) : '先修这一处证据'),
         evidence: todayFocus.reason || (todayFocus.isStuck ? '你不是整题不会，只是卡在第一步。' : '来自今天的第一步想法。'),
         cause: todayFocus.sourceText || todayFocus.thought ? `原话：${String(todayFocus.sourceText || todayFocus.thought).slice(0, 42)}` : '先把卡住点说清楚。',
         next: todayFocus.issueType ? `对应修法：先说第一步，再做一道小变式。` : (todayFocus.recommendation || '先说清第一步，再做一道小变式'),

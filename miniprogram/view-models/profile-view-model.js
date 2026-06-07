@@ -179,7 +179,7 @@ function buildParentRecap(input = {}) {
     firstStepLine: `他先迈出的第一步是：${evidence.displayStep}`,
     recentFirstStepCount: proof.recentFirstStepCount,
     recentFocusEvidence: focusLine,
-    recentRevisitEvidence: proof.recentRevisitEvidence ? `已留下 ${proof.recentRevisitEvidence} 次短回访痕迹。` : '明天轻轻回访后会留下记录。',
+    recentRevisitEvidence: proof.recentRevisitEvidence ? `已留下 ${proof.recentRevisitEvidence} 次短回访痕迹。` : '明天短回访后会留下记录。',
     trustBoundaryNote: evidence.hasChildStep
       ? '咕点没有给答案，也没有直接给结果，只记录孩子自己说出的第一步。'
       : '咕点没有给答案，也没有直接给结果，只先整理一个可开始的第一步。',
