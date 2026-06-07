@@ -209,6 +209,40 @@ page {
   word-break: break-word;
 }
 
+.review-feedback-strip {
+  display: flex;
+  min-height: 62rpx;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12rpx;
+  margin-top: 10rpx;
+  padding: 10rpx 12rpx;
+  border-radius: 16rpx;
+  background: #eef8ed;
+  box-shadow: inset 0 0 0 1rpx rgba(34, 185, 92, 0.14);
+}
+
+.review-feedback-strip text {
+  min-width: 0;
+  color: #25352c;
+  font-size: 22rpx;
+  font-weight: 840;
+  line-height: 1.26;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.review-feedback-strip text:last-child {
+  flex: 0 0 auto;
+  padding: 8rpx 12rpx;
+  border-radius: 999rpx;
+  color: #ffffff;
+  background: #14854a;
+  font-size: 21rpx;
+  font-weight: 950;
+  white-space: nowrap;
+}
+
 .review-record-steps {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

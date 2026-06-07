@@ -20,6 +20,10 @@
         <view class="review-record-panel">
           <view class="review-section-head"><text>选一张卡</text><text>回忆、核对、明天再看</text></view>
           <text class="review-workshop-lead">先完成一轮 3 分钟回访。</text>
+          <view class="review-feedback-strip" wx:if="{{feedbackText}}">
+            <text>{{feedbackText}}</text>
+            <text wx:if="{{activeReviewTool && activeReviewTool.repairFocus}}" bindtap="openReviewRepairFocus">修这一张</text>
+          </view>
           <view class="review-tool-grid">
             <view wx:for="{{playableReviewTools}}" wx:key="id" class="review-tool-card {{item.available ? 'ready' : 'locked'}}" data-id="{{item.id}}" bindtap="runPlayableReviewTool"><text>{{item.title}}</text><text>{{item.line}}</text><text>{{item.status}}｜{{item.count}} 张</text></view>
           </view>

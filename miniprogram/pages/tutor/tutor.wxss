@@ -468,20 +468,30 @@ page {
 }
 
 .tutor-socratic-brief > view:last-child text:first-child {
+  flex: 1 1 auto;
   color: #66746d;
   font-size: 21rpx;
   font-weight: 780;
   line-height: 1.28;
 }
 
+.tutor-socratic-brief > view:last-child text:nth-child(2),
 .tutor-socratic-brief > view:last-child text:last-child {
   flex: 0 0 auto;
   padding: 8rpx 12rpx;
   border-radius: 999rpx;
-  color: #0f5f39;
-  background: #ffffff;
   font-size: 21rpx;
   font-weight: 950;
+}
+
+.tutor-socratic-brief > view:last-child text:nth-child(2) {
+  color: #23679f;
+  background: #eef7ff;
+}
+
+.tutor-socratic-brief > view:last-child text:last-child {
+  color: #0f5f39;
+  background: #ffffff;
 }
 
 .tutor-input-bar {

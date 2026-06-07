@@ -66,6 +66,7 @@
               <text>{{socraticBrief.nextQuestion}}</text>
               <view>
                 <text>{{socraticBrief.boundary}}</text>
+                <text bindtap="requestSmallerTutorPrompt">再问小一点</text>
                 <text bindtap="goSocraticBriefRoute">{{socraticBrief.routeLabel}}</text>
               </view>
             </view>

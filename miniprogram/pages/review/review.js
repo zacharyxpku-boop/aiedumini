@@ -488,7 +488,10 @@ Page({
       selectedTileId: '',
       matchedPairIds: [],
       snakePickedIds: [],
-      snakeComplete: false
+      snakeComplete: false,
+      answers: [],
+      attemptSummary: null,
+      repairFocus: null
     };
   },
 
@@ -1827,17 +1830,46 @@ Page({
       : 'remembered';
     const active = this.data.activeReviewTool || {};
     if (!active.id || active.empty) return;
+    const answers = Array.isArray(active.answers) ? active.answers : [];
+    const attemptSummary = revisitEngine.summarizeAttempt
+      ? revisitEngine.summarizeAttempt({
+        gameType: active.gameType || active.id,
+        answers,
+        expectedTotal: active.itemCount || answers.length
+      })
+      : null;
+    const wrongAnswers = revisitEngine.uniqueWrongAnswers ? revisitEngine.uniqueWrongAnswers(answers) : [];
+    const repairFocus = wrongAnswers.length && revisitEngine.buildRepairFocus
+      ? revisitEngine.buildRepairFocus(wrongAnswers[0], this.data.cards || [])
+      : null;
     if (storage.appendReviewEvent) {
       storage.appendReviewEvent({
         kind: 'playable_review_tool_finished',
         tool_id: active.id,
         result,
         count: Number(active.itemCount || (Array.isArray(active.items) ? active.items.length : 0)),
+        attempt_summary: attemptSummary,
+        repair_focus: repairFocus,
         source: 'review_tab_live_tool',
         created_at: new Date().toISOString()
       });
+      if (attemptSummary) {
+        storage.appendReviewEvent({
+          kind: 'playable_review_attempt_summary',
+          tool_id: active.id,
+          result,
+          summary: attemptSummary,
+          repair_focus: repairFocus,
+          source: 'review_tab_live_tool',
+          created_at: new Date().toISOString()
+        });
+      }
     }
     this.setData({
+      activeReviewTool: Object.assign({}, active, {
+        attemptSummary,
+        repairFocus
+      }),
       feedbackText: result === 'remembered'
         ? `${active.title}已记录：明天只回看同一错因。`
         : `${active.title}已记录：保留到下一轮回看。`
@@ -1845,6 +1877,18 @@ Page({
     if (result === 'remembered') {
       this.rate({ currentTarget: { dataset: { rating: 'good' } } });
     }
+  },
+
+  openReviewRepairFocus() {
+    const active = this.data.activeReviewTool || {};
+    const repairFocus = active.repairFocus || null;
+    if (repairFocus && storage.saveTodayFocus) {
+      storage.saveTodayFocus(Object.assign({}, repairFocus, {
+        source: 'review_repair_focus',
+        systemSuggestedStep: repairFocus.decision || repairFocus.title
+      }));
+    }
+    navigation.navigateLearningRoute('/pages/tutor/tutor?from=review_repair_focus&open=flow');
   },
 
   selectMatchTile(event) {
@@ -1900,11 +1944,17 @@ Page({
         created_at: new Date().toISOString()
       });
     }
+    const answers = Array.isArray(active.answers) ? active.answers.slice() : [];
+    if (record.recordable) answers.push(record);
     this.setData({
       activeReviewTool: Object.assign({}, active, {
         tiles: nextTiles,
         selectedTileId: '',
-        matchedPairIds
+        matchedPairIds,
+        answers,
+        attemptSummary: revisitEngine.summarizeAttempt
+          ? revisitEngine.summarizeAttempt({ gameType: 'match', answers, expectedTotal: active.itemCount || answers.length })
+          : null
       }),
       feedbackText: record.correct ? '配对成功，继续消掉下一组。' : '这组不对应，换一个泡泡再试。'
     });
@@ -1936,12 +1986,26 @@ Page({
       });
     }
     if (!correct) {
+      const wrongRecord = {
+        cardId: tile.cardId || currentTrack.cardId || '',
+        correct: false,
+        recordable: true,
+        selected: tile.text || '',
+        answer: Array.isArray(currentTrack.correctOrder) ? currentTrack.correctOrder.join(' -> ') : currentTrack.answer || '',
+        gameType: 'snake',
+        knowledgeType: currentTrack.knowledgeType || ''
+      };
+      const answers = (Array.isArray(active.answers) ? active.answers.slice() : []).concat([wrongRecord]);
       this.setData({
         activeReviewTool: Object.assign({}, active, {
           currentTrack: Object.assign({}, currentTrack, {
             tiles: currentTrack.tiles.map((item) => Object.assign({}, item, { picked: false }))
           }),
-          snakePickedIds: []
+          snakePickedIds: [],
+          answers,
+          attemptSummary: revisitEngine.summarizeAttempt
+            ? revisitEngine.summarizeAttempt({ gameType: 'snake', answers, expectedTotal: active.itemCount || answers.length })
+            : null
         }),
         feedbackText: '顺序不对，回到第一块重新排。'
       });
@@ -1956,12 +2020,32 @@ Page({
     const trackDone = nextPicked.length >= currentTrack.tiles.length;
     const nextTrackIndex = trackDone ? currentTrackIndex + 1 : currentTrackIndex;
     const nextTrack = trackDone ? (tracks[nextTrackIndex] || nextCurrentTrack) : nextCurrentTrack;
+    const answers = Array.isArray(active.answers) ? active.answers.slice() : [];
+    if (trackDone) {
+      answers.push({
+        cardId: currentTrack.cardId || tile.cardId || '',
+        correct: true,
+        recordable: true,
+        selected: nextCurrentTrack.tiles
+          .filter((item) => nextPicked.indexOf(item.id) >= 0)
+          .sort((a, b) => Number(a.order) - Number(b.order))
+          .map((item) => item.text)
+          .join(' -> '),
+        answer: Array.isArray(currentTrack.correctOrder) ? currentTrack.correctOrder.join(' -> ') : currentTrack.answer || '',
+        gameType: 'snake',
+        knowledgeType: currentTrack.knowledgeType || ''
+      });
+    }
     this.setData({
       activeReviewTool: Object.assign({}, active, {
         currentTrackIndex: nextTrackIndex,
         currentTrack: nextTrack,
         snakePickedIds: trackDone ? [] : nextPicked,
-        snakeComplete: trackDone && nextTrackIndex >= tracks.length
+        snakeComplete: trackDone && nextTrackIndex >= tracks.length,
+        answers,
+        attemptSummary: revisitEngine.summarizeAttempt
+          ? revisitEngine.summarizeAttempt({ gameType: 'snake', answers, expectedTotal: active.itemCount || answers.length })
+          : null
       }),
       feedbackText: trackDone
         ? (nextTrackIndex >= tracks.length ? '步骤排序完成，可以记录本轮。' : '这一组排好了，进入下一组。')

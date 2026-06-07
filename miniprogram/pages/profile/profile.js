@@ -3869,6 +3869,32 @@ Page({
   goLearningReportCta() {
     const summary = this.data.learningReportSummary || {};
     const path = summary.nextActionRoute || summary.ctaPath || '/pages/tutor/tutor?from=learning_report';
+    const event = {
+      kind: 'parent_recap_completed',
+      event: 'parent_recap_completed',
+      source: 'profile_parent_primary_cta',
+      route: path,
+      evidenceLine: summary.capabilityNextLine || summary.familyDecisionHomepageHeadline || '',
+      nextAction: summary.ctaLabel || summary.primaryActionLabel || '',
+      tomorrowCheck: summary.nextRevisitLine || summary.parentQuestionTomorrow || summary.parentOneQuestion || '',
+      blockedFields: ['original_question', 'full_answer', 'full_dialogue', 'score', 'ranking'],
+      created_at: new Date().toISOString()
+    };
+    if (storage.appendReviewEvent) {
+      storage.appendReviewEvent(event);
+    }
+    if (storage.recordUnifiedNextAction) {
+      storage.recordUnifiedNextAction({
+        source: 'profile_parent_primary_cta',
+        sourceLabel: '家长完成今日复盘',
+        actionId: 'parent_recap_completed',
+        actionLabel: event.nextAction || '继续下一步',
+        route: path,
+        reasonLine: event.evidenceLine,
+        evidenceLine: event.tomorrowCheck,
+        blockedFields: event.blockedFields
+      });
+    }
     if (storage.recordSurfaceDepthAction) {
       storage.recordSurfaceDepthAction({
         surface: 'profile',

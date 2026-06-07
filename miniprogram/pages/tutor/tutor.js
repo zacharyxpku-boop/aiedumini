@@ -2033,6 +2033,22 @@ Page({
     navigation.navigateLearningRoute(brief.route || '/pages/review/review?from=socratic_prompt_workflow');
   },
 
+  requestSmallerTutorPrompt() {
+    if (this.data.loading) return;
+    const turnState = this.data.tutorTurnState || {};
+    const nextQuestion = turnState.nextQuestion || (this.data.socraticBrief && this.data.socraticBrief.nextQuestion) || '';
+    const input = nextQuestion
+      ? `我还是卡住。请把这句改成二选一，只问我下一小步，不要给答案：${nextQuestion}`
+      : '我还是卡住。请改成二选一，只问我下一小步，不要给答案。';
+    this.setData({
+      input,
+      activeStep: 'write_first_step',
+      coachStepLabel: '说第一步'
+    }, () => {
+      this.send();
+    });
+  },
+
   clearChat() {
     const messages = [
       {
