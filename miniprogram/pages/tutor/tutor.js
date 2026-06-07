@@ -1557,7 +1557,11 @@ Page({
           weak_points: state.weak_points || [],
           misconception_tags: this.data.misconceptionTags,
           homework_plan: state.homework_plan || null,
-          safety_check: extraContext.safety_check || 'passed',
+          recent_messages: messages.slice(-6).map((item) => ({
+            role: item.role,
+            text: item.text
+          })),
+          safety_check: extraContext.safety_check || 'server_guard',
           safety_check_error: extraContext.safety_check_error || ''
         }
       }).then((res) => {
@@ -1584,18 +1588,7 @@ Page({
         return null;
       });
 
-    api.checkContent(input).then((check) => {
-      if (check && check.safe === false) {
-        this.appendAssistant(safetyReply(check, input, selected, step, misconceptionText), turnState);
-        return null;
-      }
-      return requestTutorMessage({ safety_check: 'passed' }, 'tutor_message');
-    }).catch((error) => {
-      return requestTutorMessage({
-        safety_check: 'unavailable_server_guard_required',
-        safety_check_error: tutorErrorSource(error, 'content_check')
-      }, 'tutor_message_after_content_check_unavailable');
-    });
+    requestTutorMessage({ safety_check: 'server_guard' }, 'tutor_message');
   },
 
   appendAssistant(result, turnState = null) {
@@ -1614,6 +1607,7 @@ Page({
     const receipt = buildThinkingReceipt(next, masterySignal, pasteRisk, coachStep, this.data.selected, result && result.real_homework_pressure_signal ? result.real_homework_pressure_signal : null);
     const reviewRoute = result && result.next_review_route ? result.next_review_route : '/pages/review/review?from=socratic_prompt_workflow';
     const promptWorkflow = buildSocraticPromptWorkflow(receipt, result || {}, this.data.selected, reviewRoute);
+    const modelBackedDiagnosis = !!(result && result.fallback === false && result.diagnostic_probe);
     const diagnosticReceipt = Object.assign({}, receipt, {
       turnId: makeReceiptId('tutor_turn'),
       socratic_prompt_workflow: promptWorkflow,
@@ -1645,7 +1639,9 @@ Page({
     diagnosticReceipt.socraticPromptWorkflow.turnId = diagnosticReceipt.turnId;
     const socraticBrief = buildSocraticBrief(result || {}, diagnosticReceipt, promptWorkflow);
     const socraticMicroChoices = buildSocraticMicroChoices(result || {}, diagnosticReceipt);
-    const tutorDiagnosticCard = buildTutorDiagnosticCard(result || {}, diagnosticReceipt, this.data.selected || {});
+    const tutorDiagnosticCard = modelBackedDiagnosis
+      ? buildTutorDiagnosticCard(result || {}, diagnosticReceipt, this.data.selected || {})
+      : null;
     const tutorServiceStatus = buildTutorServiceStatus(result || {}, diagnosticReceipt);
     if (storage.appendThinkingReceipt) {
       storage.appendThinkingReceipt(Object.assign({}, diagnosticReceipt, {
@@ -1671,20 +1667,22 @@ Page({
         blockedFields: promptWorkflow.blockedFields,
         created_at: Date.now()
       });
-      storage.appendReviewEvent({
-        event: 'tutor_diagnostic_card_ready',
-        type: 'tutor_diagnostic_card_ready',
-        turnId: diagnosticReceipt.turnId,
-        source: 'tutor_diagnostic_card',
-        taskType: result && result.task_type ? result.task_type : '',
-        issue: tutorDiagnosticCard.issue,
-        firstStep: tutorDiagnosticCard.firstStep,
-        parentCheck: tutorDiagnosticCard.parentCheck,
-        reviewMove: tutorDiagnosticCard.reviewMove,
-        route: '/pages/review/review?from=tutor_diagnostic_card',
-        blockedFields: ['original_question', 'full_answer', 'full_dialogue', 'score', 'ranking'],
-        created_at: Date.now()
-      });
+      if (tutorDiagnosticCard) {
+        storage.appendReviewEvent({
+          event: 'tutor_diagnostic_card_ready',
+          type: 'tutor_diagnostic_card_ready',
+          turnId: diagnosticReceipt.turnId,
+          source: 'tutor_diagnostic_card',
+          taskType: result && result.task_type ? result.task_type : '',
+          issue: tutorDiagnosticCard.issue,
+          firstStep: tutorDiagnosticCard.firstStep,
+          parentCheck: tutorDiagnosticCard.parentCheck,
+          reviewMove: tutorDiagnosticCard.reviewMove,
+          route: '/pages/review/review?from=tutor_diagnostic_card',
+          blockedFields: ['original_question', 'full_answer', 'full_dialogue', 'score', 'ranking'],
+          created_at: Date.now()
+        });
+      }
     }
     if (storage.recordUnifiedNextAction) {
       storage.recordUnifiedNextAction({
@@ -1697,6 +1695,7 @@ Page({
         evidence: promptWorkflow.evidenceRequired,
         blockedFields: promptWorkflow.blockedFields
       });
+      if (tutorDiagnosticCard) {
       storage.recordUnifiedNextAction({
         source: 'tutor_diagnostic_card',
         sourceLabel: 'AI 私教诊断卡',
@@ -1707,6 +1706,7 @@ Page({
         evidence: ['wrong_cause', 'first_step', 'parent_check', 'next_day_revisit'],
         blockedFields: ['original_question', 'full_answer', 'full_dialogue', 'score', 'ranking']
       });
+      }
     }
     if (storage.appendValidationEvent && diagnosticReceipt.openMaicInspiredTaskPlanAudit && diagnosticReceipt.openMaicInspiredTaskPlanAudit.ok) {
       storage.appendValidationEvent('openmaic_inspired_task_plan_ready', {

@@ -272,7 +272,7 @@ function sanitizeAiMaterialAnalysisResult(raw = {}, context = {}) {
       reason: 'AI draft is only released after local evidence and parent confirmation'
     },
     familySolutionBook: Object.assign({
-      onePageDiagnosis: '先把材料降级为可验证假设，不做天赋/能力定性。',
+      onePageDiagnosis: '先把材料转成可验证假设，不做天赋/能力定性。',
       methodCandidatePage: methodCandidates.map((item) => item.label),
       sevenDayActionPage: ['今晚验证一张真实卡', '明天回访第一步', '第 7 天换一个小变式'],
       parentScriptPage: safeQuestions.slice(0, 2),
@@ -853,7 +853,7 @@ function buildAiReportDraftAdapter(packet = {}, evidenceSignals = {}) {
     localSanitizer: {
       rule: 'AI 草案只能作为文案候选；本地二次校验后才写入报告、练习、分享和画像。',
       degradeRule: isTalent
-        ? '测评材料一律降级为学习方法候选，必须补真实错题、隔天回访和第 7 天小变式。'
+        ? '测评材料一律转成学习方法候选，必须补真实错题、隔天回访和第 7 天小变式。'
         : isWrongPaper
           ? '错题材料只放行错因候选、第一步和近迁移，不自动判分、不输出整卷答案。'
           : '家长/学校/摘录材料只放行今晚行动和下一证据，不写长期能力结论。',
@@ -868,7 +868,7 @@ function buildAiReportDraftAdapter(packet = {}, evidenceSignals = {}) {
     },
     draftSeed: {
       parentSummary: isTalent
-        ? `这份测评只能提示可能适合的学习方法：围绕“${questionType}”，今晚先验证一个动作。`
+        ? `这份测评只能提示可能适合的学习方法：围绕“${questionType}”，先验证一个动作。`
         : `这份材料先用于今晚决策：卡点暂定为“${wrongCause}”，先看孩子能否说出第一步。`,
       socraticQuestions: [
         '这题第一步你先看哪里？',

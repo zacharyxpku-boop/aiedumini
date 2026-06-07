@@ -87,7 +87,7 @@ const QUICK_ASSESSMENT_QUESTIONS = [
     prompt: '家长问学习时，孩子更容易回应哪句话？',
     options: [
       { id: 'first_step', label: '第一步先做什么', weights: { structure: 2 } },
-      { id: 'where_stuck', label: '刚才卡在哪里', weights: { emotion: 1, auditory: 1 } },
+      { id: 'first_step_block', label: '刚才第一步卡住点', weights: { emotion: 1, auditory: 1 } },
       { id: 'what_help', label: '你需要哪种帮忙', weights: { emotion: 2 } }
     ]
   },
@@ -970,7 +970,7 @@ function buildTonightDecisionBrief(parts = {}, matrix = [], familyDecision = {},
   const actionLevel = trustScore >= 65 && recallReady ? 'can_try_variant' : trustScore >= 40 ? 'action_only' : 'collect_evidence';
   return {
     id: 'tonight_decision_brief',
-    title: '今晚决策书',
+    title: '学习行动卡',
     actionLevel,
     subject,
     cause,
@@ -978,7 +978,7 @@ function buildTonightDecisionBrief(parts = {}, matrix = [], familyDecision = {},
       ? `${subject} 可以做 1 张小变式，但必须先复述第一步。`
       : actionLevel === 'action_only'
         ? `${subject} 今晚只做一个动作：把「${cause}」退回第一步。`
-        : `${subject} 今晚先收证据，不评价能力，不加题量。`,
+        : `${subject} 先收证据，不评价能力，不加题量。`,
     tonightDo: [
       `先问：这类题第一步先看哪里？`,
       `只处理「${cause}」这一处，不扩到整章。`,
@@ -1180,7 +1180,7 @@ function buildParentDecisionTrustSystem(parts = {}, matrix = [], portraitConfide
       { day: '今晚', check: '孩子是否能说出第一步', action: '只问一句，不讲完整答案。' },
       { day: '明天', check: `${cause} 是否复现`, action: '换一张同类卡回访。' },
       { day: '第 3 天', check: '能不能做近迁移', action: '只换一个条件，不增加难度。' },
-      { day: '第 7 天', check: '证据是否足够稳定', action: '再决定进入长期画像、继续观察或降级。' }
+      { day: '第 7 天', check: '证据是否足够稳定', action: '再决定进入长期画像、继续观察或补证据。' }
     ],
     shareBoundary: '分享只带行动建议、证据缺口和回访时间，不带原题、答案、分数、排名和完整对话。',
     route: familyDecision.route || '/pages/profile/profile?from=parent_decision_trust'
@@ -1244,7 +1244,7 @@ function buildLongitudinalPortraitTimeline(parts = {}, matrix = [], portrait = {
     { id: 'candidate', label: '候选画像', rule: '有今晚第一步 + 明天回访，才进入候选。', evidence: ['child_first_step', 'next_day_revisit'] },
     { id: 'weekly', label: '周画像', rule: '第 7 天至少 3 类证据一致，才更新画像。', evidence: ['wrong_cause_card', 'near_transfer_attempt', 'weekly_action_card'] },
     { id: 'stable', label: '稳定画像', rule: '连续两周同一方法有效，才升级策略。', evidence: ['two_week_stability_check'] },
-    { id: 'downgrade', label: '降级条件', rule: '连续 2 次沉默、要答案或同错因失败，立刻回小黑板。', evidence: ['silent_child', 'answer_request', 'repeated_wrong_cause'] }
+    { id: 'support_boundary', label: '补证据条件', rule: '连续 2 次沉默、要答案或同错因失败，立刻回小黑板。', evidence: ['silent_child', 'answer_request', 'repeated_wrong_cause'] }
   ];
   return {
     id: 'longitudinal_portrait_timeline',
@@ -1563,7 +1563,7 @@ function buildSocraticMemoryReportBridge(input = {}, parentDecisionTrust = {}, p
     scenarioCount,
     actionCount: actions.length,
     summary: hasLiveBridge
-      ? `已有 ${scenarioCount} 个点拨质量场景接入游戏复习，家长报告可以用它判断是否继续观察、降级或进入长期画像。`
+      ? `已有 ${scenarioCount} 个点拨质量场景接入短回访，家长报告可以用它判断是否继续观察、补证据或进入长期画像。`
       : '还缺一次带点拨质量证据的游戏复习，暂不把单次表现写入长期画像。',
     primaryActionLine: primaryAction.title
       ? `${primaryAction.title}：${primaryAction.memoryAction}`
@@ -2133,7 +2133,7 @@ function buildEvidenceBasedMethodologyGuide(methodCandidateCards = [], materialL
       label: '苏格拉底第一步',
       principle: '先追问孩子的第一步和理由，不直接给完整答案。',
       useWhen: hasWrongPaper ? '已有真实错题、试卷或卡住表达。' : '孩子能说出一点想法，但还没有形成稳定步骤。',
-      reportLine: '报告会把它写成“今晚先问哪一句”，而不是写成“孩子不会”。',
+      reportLine: '报告会把它写成“先问哪一句”，而不是写成“孩子不会”。',
       productRoute: '/pages/tutor/tutor?from=methodology_guide',
       evidenceGate: 'child_first_step',
       sourceBasis: '1 对 1 针对性支持、元认知自我解释、Khanmigo 式不直接给答案。'
@@ -2372,7 +2372,7 @@ function buildPersonalizedLearningSolutionBlueprint(materialLanes = [], methodHy
     tonightAction: hasWrongPaper
       ? '只抽一处真实错题卡点：孩子先说第一步，再说错因；说不出时回到苏格拉底点拨。'
       : hasTalentAssessment
-        ? '先把测评结论降级为方法候选：补一张真实作业卡点后再决定用哪种学习方式。'
+        ? '先把测评结论转成方法候选：补一张真实作业卡点后再决定用哪种学习方式。'
         : '先记录今晚真实卡点：题目类型、孩子第一步、卡住位置和家长观察。',
     tomorrowRevisit: hasWrongPaper
       ? '明天只回访同一错因的一张卡，不加题量，不用分数评价。'
@@ -2537,7 +2537,7 @@ function buildUploadedMaterialDecisionDossier(input = {}, parts = {}, sourceEvid
       method: '适合把题目先变成关系图、条件表或小黑板三格，再开口说第一步。',
       evidence: '来自测评或错题中的视觉化线索，只是方法候选。',
       verifyWith: '用一道真实错题让孩子先画条件关系，再看是否能说出第一步。',
-      childLine: '这不是说你只能看图学习，而是今晚先试试把条件画出来。',
+      childLine: '这不是说你只能看图学习，而是先试试把条件画出来。',
       parentCheck: '家长只问：你画出来的是条件、关系，还是答案？'
     },
     {
@@ -3011,7 +3011,7 @@ function buildParentDecisionBook(input = {}) {
     oneSentenceDecision: tonightDecisionBrief.headline
       || familyDecisionMemo.tonightDecision
       || parentDecisionTrustSystem.decisionLine
-      || '今晚先收一条真实证据，只做一个低压动作。',
+      || '先收一条真实证据，只做一个低压动作。',
     whyNow: parentDecisionTrustSystem.decisionLine
       || (portraitConfidenceSystem.portraitStageReason || '当前证据只够支持今晚行动，不够给孩子定性。'),
     tonightDo,
@@ -3250,7 +3250,7 @@ function buildAiLocalImplementationMatrix(input = {}) {
       aiBetterFor: ['追问语气', '孩子能听懂的解释', '家长低压话术', '小黑板口播'],
       aiMustNotOwn: ['最终答案', 'XP 发放', '掌握判定', '长期画像更新'],
       releaseGate: 'AI 只能在本地安全边界内改写表达；孩子说出第一步前不进入完整讲解。',
-      productAction: '用大规模错题/卡点样本压测追问质量，失败时降级到 A/B 微提示。'
+      productAction: '用大规模错题/卡点样本压测追问质量，失败时切到 A/B 微提示。'
     },
     {
       id: 'visual_blackboard',
@@ -3742,7 +3742,7 @@ function buildPersonalizedReportStandard(input = {}, parts = {}, parsed = {}, mo
       '不承诺提分/保分',
       '不展示原题照片、完整答案、完整对话、联系方式',
       '每条方法必须有验证门槛',
-      '材料不足时降级为方法候选'
+      '材料不足时转成方法候选'
     ]
   };
 }
@@ -3791,7 +3791,7 @@ function buildParentReportGenerationWorkflow(input = {}, context = {}) {
   const imageBriefPrompt = [
     '为家长报告生成一张可读的长图/封面视觉 brief。',
     '风格：温暖、清晰、像家庭学习诊断报告，不像营销海报。',
-    '画面包含：资料输入、AI 推理、今晚路线、家长一句话、回访验证。',
+    '画面包含：资料输入、AI 推理、行动证据、家长一句话、回访验证。',
     '不要放孩子隐私、原题、答案、分数排名、夸张承诺。'
   ].join('\n');
   return {

@@ -1072,7 +1072,7 @@ function buildProductReadiness(storage, options = {}) {
         hasSevenDayPlan ? 'sevenDayPlan >= 7' : '',
         tonightPlan && tonightPlan.reportSolution ? 'tonightPlan.reportSolution' : ''
       ],
-      '学习画像必须写入今晚路线、今日卡点、复习卡和 7 天游走方案。'
+      '学习画像必须写入学习行动、今日卡点、复习卡和 7 天游走方案。'
     ),
     evidenceItem(
       'material_to_review',

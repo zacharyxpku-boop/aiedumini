@@ -108,7 +108,7 @@ function buildWeeklySupportSummary(state = loadServiceAccessState()) {
     mode: 'local_service_notice',
     title: '本周第一步记录',
     body: `最近记录里有 ${counts.vague} 次模糊、${counts.empty} 次空白。当前先用本地记录看趋势，更深的连续复盘会在开通后显示。`,
-    actionSuggestion: '今晚先固定只问一句：你第一步准备先看哪里？'
+    actionSuggestion: '先固定只问一句：你第一步准备先看哪里？'
   };
 }
 

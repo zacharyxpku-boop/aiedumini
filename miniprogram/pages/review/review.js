@@ -1934,6 +1934,26 @@ Page({
     const roundAdvice = attemptSummary && revisitEngine.buildRoundAdvice
       ? revisitEngine.buildRoundAdvice(attemptSummary, active.gameType || active.id)
       : null;
+    const reviewWritebacks = active.gameType !== 'quiz' && revisitEngine.uniqueReviewAnswers
+      ? revisitEngine.uniqueReviewAnswers(answers).map((answer) => {
+        const rating = answer.correct ? 'good' : 'again';
+        const reviewedCard = reviewCards.reviewCard(answer.cardId, rating, {
+          xpEvidence: {
+            student_first_step: true,
+            wrong_cause_named: !answer.correct,
+            next_day_revisit_locked: true,
+            playable_review_tool: active.gameType || active.id,
+            playable_review_evidence: answer.evidence || answer.gameType || ''
+          }
+        });
+        return {
+          cardId: answer.cardId,
+          rating,
+          correct: !!answer.correct,
+          reviewed: !!reviewedCard
+        };
+      })
+      : [];
     const reportSourceContext = this.data.reportSourceContext || this.buildReportSourceContext();
     const reportId = reportSourceContext && (reportSourceContext.reportId || reportSourceContext.sourceReportId || reportSourceContext.id);
     if (storage.appendReviewEvent) {
@@ -1944,6 +1964,7 @@ Page({
         count: Number(active.itemCount || (Array.isArray(active.items) ? active.items.length : 0)),
         attempt_summary: attemptSummary,
         repair_focus: repairFocus,
+        review_writebacks: reviewWritebacks,
         source: 'review_tab_live_tool',
         created_at: new Date().toISOString()
       });

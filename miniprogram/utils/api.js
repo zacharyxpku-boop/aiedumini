@@ -115,7 +115,7 @@ function sendTutorMessage(payload) {
     method: 'POST',
     data: payload || {},
     header: session.session_id ? { 'x-mini-session': session.session_id } : {},
-    timeout: 30000
+    timeout: 12000
   });
 }
 

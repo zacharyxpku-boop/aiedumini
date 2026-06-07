@@ -207,7 +207,7 @@ function buildWeeklyReview(axes, weakPoints, homeworkPlan) {
       : '本周先把最有价值的作业做扎实。',
     parent_script: weakest
       ? `先不追求快，先问自己：这道题真正卡在“${weakest.name}”的哪一步？`
-      : '今晚先确认必须做任务，做完再考虑加量。',
+      : '先确认必须做任务，做完再考虑加量。',
     focus: must.slice(0, 2).map((item) => item.text),
     load_advice: skip.length
       ? `可后置 ${skip.length} 项低收益任务，预计释放 ${homeworkPlan.summary?.saved_minutes || 0} 分钟。`

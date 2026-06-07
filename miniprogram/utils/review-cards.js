@@ -2818,7 +2818,7 @@ function practiceTeachingAidCatalog() {
     { id: 'wrong_cause_cards', label: '错因卡', lane: 'worksheet', format: 'card', renderMode: 'wrong_cause_card' },
     { id: 'evidence_cards', label: '证据卡', lane: 'worksheet', format: 'card', renderMode: 'evidence_card' },
     { id: 'concept_map', label: '概念图', lane: 'worksheet', format: 'map', renderMode: 'concept_map' },
-    { id: 'route_map', label: '今晚路线图', lane: 'worksheet', format: 'map', renderMode: 'route_map' },
+    { id: 'route_map', label: '学习行动图', lane: 'worksheet', format: 'map', renderMode: 'route_map' },
     { id: 'mini_whiteboard', label: '小白板', lane: 'live', format: 'board', renderMode: 'projector_board' },
     { id: 'click_recall', label: '可点击回忆', lane: 'live', format: 'web', renderMode: 'tap_recall' },
     { id: 'spin_picker', label: '转盘抽题', lane: 'live', format: 'web', renderMode: 'safe_spinner' },
@@ -3474,7 +3474,7 @@ function commercialReadiness(summary) {
     featureHit(safe.progress && safe.progress.mastered >= 0, 10, '掌握度和练习历史已存在', '补齐跨月保持率分析。'),
     featureHit(sync.readyForCloud, 10, '连续记录协议已就绪', '补齐多端冲突恢复测试。'),
     featureHit(hasStructuredImportExport, 8, '材料记忆桥和分享卡库已构成轻量导入导出', '补齐可复用的家长确认包和外部交接摘要。'),
-    featureHit(hasComposableAbilityRuntime, 10, '卡片、修卡点、点拨和小测可组合成能力运行链', '补齐面向真实会话的能力编排和失败降级。')
+    featureHit(hasComposableAbilityRuntime, 10, '卡片、修卡点、点拨和小测可组合成能力运行链', '补齐面向真实会话的能力编排和补证据路径。')
   ];
   const products = [
     {
