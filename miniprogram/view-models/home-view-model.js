@@ -33,10 +33,6 @@ function buildNextStep(input) {
   return null;
 }
 
-function buildPersonalPlanCard(input = {}) {
-  return null;
-}
-
 function buildMiniLessonResume(input = {}) {
   const source = input.miniLessonResume || null;
   if (!source) return null;
@@ -151,7 +147,7 @@ function buildPrimaryHomeNextAction(input = {}) {
     kicker: '学习建议',
     title: '把材料或卡住点先发过来',
     body: '可以上传作业、错题，也可以直接说一句哪里卡住。',
-    cta: '分析今晚情况'
+    cta: '去 AI 点拨'
   };
   return {
     priority: fallback.priority,
@@ -167,7 +163,6 @@ function buildHomeViewModel(input = {}) {
   const hasPlanOrFocus = false;
   const miniLessonResume = buildMiniLessonResume(input);
   const reportServiceResume = buildReportServiceResume(input);
-  const personalPlan = buildPersonalPlanCard(input);
   const primaryNextAction = buildPrimaryHomeNextAction(Object.assign({}, input, {
     miniLessonResume,
     reportServiceResume
@@ -192,7 +187,6 @@ function buildHomeViewModel(input = {}) {
     emptyState: hasPlanOrFocus ? null : '还没有分析结果。先上传材料或进入 AI 点拨。',
     primaryNextAction,
     nextStep: buildNextStep(Object.assign({}, input, { miniLessonResume })),
-    personalPlan,
     miniLessonResume,
     reportServiceResume,
     debugWarnings: []

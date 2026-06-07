@@ -9,14 +9,14 @@ const reviewViewModels = require('../../view-models/review-view-model');
 const DEFAULT_REVISIT_RUNWAY = {
   due: 0,
   level: 1,
-  xp: 0,
+  evidencePoints: 0,
   streak: 0,
   hearts: [],
   percent: 0,
   missionTitle: '完成今日复习目标',
   missionProgress: 0,
   missionHint: '先完成今天这一轮复习',
-  rewards: [],
+  evidenceRecords: [],
   primaryLabel: '录入错题',
   primaryAction: 'import'
 };
@@ -817,7 +817,7 @@ Page({
       reviewWindows,
       releaseQueue,
       comboLine: combo.totalSeconds ? `${combo.totalSeconds} 秒主动回忆：先说第一步，再说错因，最后核对。` : '90 秒主动回忆：先说第一步，再说错因，最后核对。',
-      xpRule: daily.antiCramRule ? String(daily.antiCramRule).replace(new RegExp(['X', 'P'].join(''), 'g'), '行为反馈') : '行为反馈只记录主动回忆、错因回放和明天回访，不按速度或分数给反馈。',
+      evidenceRule: daily.antiCramRule ? String(daily.antiCramRule).replace(new RegExp(['X', 'P'].join(''), 'g'), '行为反馈') : '行为反馈只记录主动回忆、错因回放和明天回访，不按速度或分数给反馈。',
       parentLine: daily.parentLine || `家长只问一句：这张卡第一步为什么先做「${weakKey}」？`,
       shareLine: daily.shareLine || '分享只带错因和下一步，不带原题、答案、分数或完整对话。',
       nextRoute: '/pages/review/review?from=memory_prescription'
@@ -843,7 +843,7 @@ Page({
       line: active.question || active.prompt || '换一道同类小题，只说第一步和错因。',
       parentLine: active.parentPrompt || '家长只问：这次第一步是什么？为什么先做这一步？',
       blackboardLine: active.blackboardHint || '小黑板只画第一步关系，不画完整解法。',
-      xpRule: active.xpRule || '只记录说清第一步、错因和回访，不按速度或分数给反馈。',
+      evidenceRule: active.evidenceRule || active.xpRule || '只记录说清第一步、错因和回访，不按速度或分数给反馈。',
       releaseGate: retest.releaseGate || '三段复测证据齐之前，不写长期掌握结论。',
       revisitRoute: active.nextPracticePlan && (active.nextPracticePlan.appRoute || active.nextPracticePlan.reviewRoute)
         ? (active.nextPracticePlan.appRoute || active.nextPracticePlan.reviewRoute)
@@ -890,7 +890,7 @@ Page({
         : '没有到期卡时，不硬塞任务。可以先做一轮回访验证。',
       season: season.tier || '青铜',
       level: progress.level || 1,
-      xp: progress.xp || 0,
+      evidencePoints: progress.evidencePoints || progress.xp || 0,
       roundLabel: due ? '今日到期' : '保持手感',
       memoryLabel: due ? `${due} 张待复习` : '暂无到期卡',
       streak: safe.streak || loop.currentStreak || 0,
@@ -910,7 +910,7 @@ Page({
       missionHint: safe.dailyRevisit
         ? `${safe.dailyRevisit.current || 0}/${safe.dailyRevisit.target || 1} · 完成后明天再看`
         : goal.label || '先完成今天这一轮复习',
-      rewards: (safe.rewards || []).slice(0, 2).map((reward) => Object.assign({}, reward, {
+      evidenceRecords: (safe.evidenceRecords || safe.rewards || []).slice(0, 2).map((reward) => Object.assign({}, reward, {
         stateLabel: reward.claimed ? '已记录' : reward.canClaim ? '可记录' : '未完成'
       })),
       primaryLabel: due ? '开始短回访' : '先短回访一下',
@@ -1091,7 +1091,7 @@ Page({
       stats: [
         { id: 'goal', label: '目标', value: `${goal.completed || 0}/${goal.target || 0}` },
         { id: 'quiz', label: '测验', value: quiz.count || 0 },
-        { id: 'xp', label: '回访', value: progress.xp || 0 },
+        { id: 'evidence', label: '回访', value: progress.evidencePoints || progress.xp || 0 },
         { id: 'tier', label: '段位', value: season.tier || '青铜' }
       ]
     };
@@ -1298,10 +1298,10 @@ Page({
     });
   },
 
-  claimReward(event) {
-    const rewardId = event.currentTarget.dataset.id;
-    if (!rewardId) return;
-    const result = reviewCards.claimReward(rewardId, this.data.summary);
+  recordEvidence(event) {
+    const evidenceRecordId = event.currentTarget.dataset.id;
+    if (!evidenceRecordId) return;
+    const result = reviewCards.claimReward(evidenceRecordId, this.data.summary);
     if (!result.ok) {
       wx.showToast({ title: '这条记录还没完成', icon: 'none' });
       return;
@@ -1350,14 +1350,14 @@ Page({
     const done = nextIndex >= cards.length;
     const summary = reviewCards.reviewSummary();
     const lastEvent = (storage.loadReviewEvents ? storage.loadReviewEvents()[0] : null) || {};
-    const xpText = lastEvent.xp ? '，已记进今天回访' : '';
+    const evidenceText = (lastEvent.evidencePoints || lastEvent.xp) ? '，已记进今天回访' : '';
     const feedbackText = (rating === 'again'
       ? '已安排明天再看，先回作业点拨拆一步。'
       : rating === 'hard'
         ? '已缩短间隔，后面还会更快出现。'
         : rating === 'easy'
           ? '已拉长间隔。'
-          : '已记录掌握。') + xpText;
+          : '已记录掌握。') + evidenceText;
     this.setData({
       index: nextIndex,
       current: done ? null : cards[nextIndex],
