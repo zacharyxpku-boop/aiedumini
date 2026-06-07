@@ -3868,15 +3868,19 @@ Page({
 
   goLearningReportCta() {
     const summary = this.data.learningReportSummary || {};
-    const path = summary.nextActionRoute || summary.ctaPath || '/pages/tutor/tutor?from=learning_report';
+    const recap = this.data.profileViewModel && this.data.profileViewModel.parentRecap
+      ? this.data.profileViewModel.parentRecap
+      : {};
+    const path = '/pages/entry-detail/entry-detail?scene=parent';
     const event = {
       kind: 'parent_recap_completed',
       event: 'parent_recap_completed',
       source: 'profile_parent_primary_cta',
       route: path,
       evidenceLine: summary.capabilityNextLine || summary.familyDecisionHomepageHeadline || '',
-      nextAction: summary.ctaLabel || summary.primaryActionLabel || '',
-      tomorrowCheck: summary.nextRevisitLine || summary.parentQuestionTomorrow || summary.parentOneQuestion || '',
+      nextAction: this.data.profileViewModel && this.data.profileViewModel.primaryCta ? this.data.profileViewModel.primaryCta : '查看证据详情',
+      tomorrowCheck: recap.trustBoundaryNote || summary.nextRevisitLine || summary.parentQuestionTomorrow || summary.parentOneQuestion || '',
+      evidenceGate: 'parent_evidence_detail_only',
       blockedFields: ['original_question', 'full_answer', 'full_dialogue', 'score', 'ranking'],
       created_at: new Date().toISOString()
     };

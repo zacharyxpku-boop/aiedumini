@@ -1910,7 +1910,7 @@ Page({
           tiles: nextTiles,
           selectedTileId: tileId
         }),
-        feedbackText: '已选中一个泡泡，再点它对应的另一半。'
+        feedbackText: '已选中一个配对项，再点它对应的另一半。'
       });
       return;
     }
@@ -1956,7 +1956,7 @@ Page({
           ? revisitEngine.summarizeAttempt({ gameType: 'match', answers, expectedTotal: active.itemCount || answers.length })
           : null
       }),
-      feedbackText: record.correct ? '配对成功，继续消掉下一组。' : '这组不对应，换一个泡泡再试。'
+      feedbackText: record.correct ? '配对成功，继续完成下一组。' : '这组不对应，换一个配对项再试。'
     });
   },
 

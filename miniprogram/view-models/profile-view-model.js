@@ -211,7 +211,7 @@ function buildProfileViewModel(input = {}) {
     parentRecap,
     parentEvidenceStrip: buildParentEvidenceStrip(input),
     primaryCard: buildPrimaryCard(input),
-    primaryCta: '完成今日复盘',
+    primaryCta: '查看证据详情',
     growthMemoryCard: buildGrowthMemoryCard(input),
     quickSections: [
       { id: 'learning-records', title: '更多学习记录', collapsed: true },

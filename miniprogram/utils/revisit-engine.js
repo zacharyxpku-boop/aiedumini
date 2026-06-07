@@ -29,9 +29,9 @@ const KNOWLEDGE_TYPES = [
 const GAME_TYPES = [
   {
     id: 'whack',
-    name: '打地鼠速记关',
-    shortName: '打地鼠',
-    verb: '抢答',
+    name: '短卡快回忆',
+    shortName: '快回忆',
+    verb: '快选',
     fit: ['fact', 'skill'],
     status: 'ready',
     minutes: 5
@@ -47,18 +47,18 @@ const GAME_TYPES = [
   },
   {
     id: 'match',
-    name: '泡泡消消乐',
-    shortName: '泡泡消',
-    verb: '消对应',
+    name: '对应配对',
+    shortName: '配对',
+    verb: '配对应',
     fit: ['fact'],
     status: 'ready',
     minutes: 4
   },
   {
     id: 'snake',
-    name: '贪吃蛇顺序关',
-    shortName: '贪吃蛇',
-    verb: '按顺序吃',
+    name: '步骤排序',
+    shortName: '排序',
+    verb: '按顺序点',
     fit: ['problem', 'concept', 'skill'],
     status: 'ready',
     minutes: 5
@@ -219,25 +219,25 @@ function classifyCards(cards = []) {
 
 function gamePitch(gameId, dominantName) {
   const pitches = {
-    whack: '短卡片快速回忆',
+    whack: '短卡快回忆',
     quiz: '概念先回忆再自评',
-    snake: '步骤顺序吃出来',
+    snake: '步骤顺序排出来',
     lab: '调参数看因果',
     sandbox: '搭结构补证明',
     debate: '拼论据讲清楚',
     roleplay: '开口复述表达',
     story: '用故事讲概念',
-    match: '对应关系泡泡消'
+    match: '对应关系配起来'
   };
   return pitches[gameId] || dominantName || '回访验证';
 }
 
 function gameMascot(gameId) {
   const mascots = {
-    whack: '芽锤',
+    whack: '快选',
     quiz: '星门',
-    match: '泡泡',
-    snake: '小藤',
+    match: '配对',
+    snake: '排序',
     lab: '小实验'
   };
   return mascots[gameId] || '回访';
@@ -259,7 +259,7 @@ function gamePrinciple(gameId) {
     },
     snake: {
       title: '练的是步骤不断线',
-      body: '按顺序吃掉步骤块，适合流程、时间线和解题步骤。'
+      body: '按顺序点步骤块，适合流程、时间线和解题步骤。'
     },
     lab: {
       title: '练的是看见变量关系',
@@ -385,8 +385,8 @@ function buildWhackRound(cards = [], options = {}) {
   });
   return {
     gameType: 'whack',
-    title: '打地鼠速记关',
-    subtitle: questions.length ? '只选自己回忆出的选项，错了会进入错因修复。' : '还没有适合打地鼠的真实学习卡。',
+    title: '短卡快回忆',
+    subtitle: questions.length ? '只选自己回忆出的选项，错了会进入错因修复。' : '还没有适合快回忆的真实学习卡。',
     holes,
     total: questions.length,
     timeLimit: Math.max(30, Math.min(180, Number(options.timeLimit || 90))),
@@ -479,8 +479,8 @@ function buildMatchRound(cards = [], options = {}) {
   ])).sort((a, b) => stableSortKey(a.id) - stableSortKey(b.id));
   return {
     gameType: 'match',
-    title: '泡泡消消乐',
-    subtitle: pairs.length ? '点一个题泡泡，再点对应泡泡，配对成功就消掉。' : '还没有适合泡泡消的短对应卡。',
+    title: '对应配对',
+    subtitle: pairs.length ? '点一个题面，再点对应含义，配对成功就收进证据。' : '还没有适合配对的短对应卡。',
     total: pairs.length,
     pairs,
     tiles
@@ -526,8 +526,8 @@ function buildSnakeRound(cards = [], options = {}) {
   });
   return {
     gameType: 'snake',
-    title: '贪吃蛇顺序关',
-    subtitle: tracks.length ? '按正确顺序吃掉步骤块，吃错会回到复习队列。' : '还没有适合顺序关的步骤卡。',
+    title: '步骤排序',
+    subtitle: tracks.length ? '按正确顺序点步骤块，点错会回到复习队列。' : '还没有适合排序的步骤卡。',
     total: tracks.length,
     tracks
   };
@@ -547,7 +547,7 @@ function summarizeAttempt(attempt = {}) {
     skipped: Math.max(0, Number(attempt.expectedTotal || total) - total),
     accuracy,
     bestCombo: Number(attempt.bestCombo || 0),
-    xp: correct * 10 + Math.max(0, Number(attempt.bestCombo || 0) - 2) * 2,
+    evidenceCount: correct,
     passed: total > 0 && accuracy >= 70
   };
 }
@@ -603,11 +603,11 @@ function buildRoundAdvice(result = {}, gameType = 'whack') {
           title: '顺序链路吃通了',
           body: '步骤型知识最怕跳步，已经通关的卡会按间隔回来抽查。',
           primary: '换一组顺序',
-          secondary: wrong ? '重吃错序' : '去复习'
+          secondary: wrong ? '重排错序' : '去复习'
         }
       : {
           title: '顺序断点已经抓到',
-          body: '吃错的位置就是当前断点，先重来一次，把步骤链走顺。',
+          body: '点错的位置就是当前断点，先重来一次，把步骤链走顺。',
           primary: '重吃顺序',
           secondary: '去复习错卡'
         },
@@ -621,7 +621,7 @@ function buildRoundAdvice(result = {}, gameType = 'whack') {
       : {
           title: '有几对还没粘牢',
           body: '错配说明对应关系还不稳，先把第一组错配拿去说清楚。',
-          primary: '重开泡泡局',
+          primary: '重开配对局',
           secondary: '去复习错卡'
         }
   };
