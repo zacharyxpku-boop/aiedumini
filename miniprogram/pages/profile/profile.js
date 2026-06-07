@@ -1,4 +1,4 @@
-const api = require('../../utils/api');
+﻿const api = require('../../utils/api');
 const storage = require('../../utils/storage');
 const navigation = require('../../utils/navigation');
 const reviewCards = require('../../utils/review-cards');
@@ -543,7 +543,7 @@ function buildWrongCauseSummary(reviewSummary, thinkingSummary) {
   };
 }
 
-function buildGameProfileCard(reviewSummary) {
+function buildRevisitEvidenceCard(reviewSummary) {
   const gameProfile = storage.loadGameProfile ? storage.loadGameProfile() : {};
   const progress = (reviewSummary && reviewSummary.progress) || {};
   const evidencePoints = Number(gameProfile.xp || progress.xp || 0);
@@ -555,17 +555,17 @@ function buildGameProfileCard(reviewSummary) {
     streak: Number(gameProfile.streak || progress.streak || 0),
     lives: Number(gameProfile.lives || 5),
     reviewedToday,
-    achievementText: reviewedToday ? `今天已完成 ${reviewedToday} 次短回访` : '完成第一次回访后留下记录',
+    evidenceText: reviewedToday ? `今天已完成 ${reviewedToday} 次短回访` : '完成第一次回访后留下记录',
     comparisonNotice: '这里只看孩子自己的回访记录，不做同伴对比。'
   };
 }
 
-function buildShareCode(profile, reviewSummary, gameProfileCard) {
+function buildShareCode(profile, reviewSummary, revisitEvidenceCard) {
   const name = (profile && profile.name) || 'learner';
   const source = [
     name,
-    safeNumber(gameProfileCard && gameProfileCard.xp, 0),
-    safeNumber(gameProfileCard && gameProfileCard.streak, 0),
+    safeNumber(revisitEvidenceCard && (revisitEvidenceCard.evidencePoints || revisitEvidenceCard.xp), 0),
+    safeNumber(revisitEvidenceCard && revisitEvidenceCard.streak, 0),
     safeNumber(reviewSummary && reviewSummary.total, 0),
     new Date().toISOString().slice(0, 10)
   ].join('|');
@@ -576,15 +576,15 @@ function buildShareCode(profile, reviewSummary, gameProfileCard) {
   return hash.toString(36).slice(0, 6).toUpperCase();
 }
 
-function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCauseSummary, todayFocus, globalEvidenceBrief, reportDailyActionQueue, unifiedNextAction, capabilityEvidenceLedger, subjectSkillDepth, curriculumSpine, visualSocraticMatrix, courseUnitMap, learningReportSummary) {
+function buildDailyShareCard(profile, reviewSummary, revisitEvidenceCard, wrongCauseSummary, todayFocus, globalEvidenceBrief, reportDailyActionQueue, unifiedNextAction, capabilityEvidenceLedger, subjectSkillDepth, curriculumSpine, visualSocraticMatrix, courseUnitMap, learningReportSummary) {
   const review = reviewSummary || {};
-  const game = gameProfileCard || {};
+  const game = revisitEvidenceCard || {};
   const progress = review.progress || {};
   const wrong = wrongCauseSummary || {};
   const repaired = Array.isArray(wrong.cards)
     ? wrong.cards.reduce((sum, item) => sum + safeNumber(item.count, 0), 0)
     : 0;
-  const xp = safeNumber(game.xp, 0);
+  const evidencePoints = safeNumber(game.evidencePoints || game.xp, 0);
   const streak = safeNumber(game.streak, 0);
   const level = game.level || {};
   const due = safeNumber(review.due, 0);
@@ -601,7 +601,7 @@ function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCause
         : '第一步练习者';
   const title = todayFocus && todayFocus.repairStatus === 'completed'
     ? `今天修过一处：${todayFocus.title}`
-    : xp || streak || total
+    : evidencePoints || streak || total
     ? `我今天完成了一次真实明天验证：${identityTag}`
     : '我整理了一张原点智学复盘卡';
   const shareVariant = repaired > 0 ? 'wrong_cause' : streak >= 7 ? 'streak' : total >= 10 ? 'thinking' : 'starter';
@@ -740,9 +740,9 @@ function buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCause
     identityTag,
     inviteCode: code,
     levelText: level.level ? `Lv.${level.level} ${level.title || ''}` : `Lv.${safeNumber(progress.level, 1)}`,
-    achievementText: game.achievementText || '完成复习后留下阶段记录',
+    evidenceText: game.evidenceText || '完成复习后留下阶段记录',
     stats: [
-      { id: 'xp', label: '回访', value: xp },
+      { id: 'evidence', label: '回访', value: evidencePoints },
       { id: 'streak', label: '连续天', value: streak },
       { id: 'cards', label: '学习卡', value: total },
       { id: 'repair', label: '卡点', value: repaired }
@@ -3007,7 +3007,7 @@ Page({
     flywheelCoach: null,
     capabilityPosition: null,
     parentLoopProof: null,
-    gameProfileCard: null,
+    revisitEvidenceCard: null,
     dailyShareCard: null,
     parentInviteCard: null,
     profileSafeSummary: buildProfileSafeSummary(null, [], '再用两晚后，咕点会帮你看见模式。'),
@@ -3174,7 +3174,7 @@ Page({
       ? ''
       : '再用两晚，咕点会帮你看见孩子常卡在哪一步。今晚先记录一句自己的第一步就够了。';
     const reportJobCaseId = this.resolveReportJobCaseId(learningReportState);
-    const gameProfileCard = buildGameProfileCard(reviewSummary);
+    const revisitEvidenceCard = buildRevisitEvidenceCard(reviewSummary);
     const wrongCauseSummary = buildWrongCauseSummary(reviewSummary, thinkingSummary);
     const globalEvidenceBrief = storage.buildGlobalEvidenceBrief ? storage.buildGlobalEvidenceBrief() : null;
     const reportDailyActionQueue = storage.buildReportDailyActionQueue ? storage.buildReportDailyActionQueue({ reportState: learningReportState || {} }) : null;
@@ -3219,7 +3219,7 @@ Page({
       capabilityEvidenceLedger
     }) : null;
     learningReportSummary = buildLearningReportSummary(learningReportState || {}, capabilityEvidenceLedger, subjectSkillDepth, curriculumSpine, visualSocraticMatrix, courseUnitMap, latestThinkingReceipt);
-    const dailyShareCard = buildDailyShareCard(profile, reviewSummary, gameProfileCard, wrongCauseSummary, todayFocus, globalEvidenceBrief, reportDailyActionQueue, unifiedNextAction, capabilityEvidenceLedger, subjectSkillDepth, curriculumSpine, visualSocraticMatrix, courseUnitMap, learningReportSummary);
+    const dailyShareCard = buildDailyShareCard(profile, reviewSummary, revisitEvidenceCard, wrongCauseSummary, todayFocus, globalEvidenceBrief, reportDailyActionQueue, unifiedNextAction, capabilityEvidenceLedger, subjectSkillDepth, curriculumSpine, visualSocraticMatrix, courseUnitMap, learningReportSummary);
     const communityShareRelayBoard = storage.buildCommunityShareRelayBoard
       ? storage.buildCommunityShareRelayBoard({
         focus: todayFocus,
@@ -3343,7 +3343,7 @@ Page({
       flywheelCoach: this.buildFlywheelCoach(reviewSummary, moduleSummary, tutorSummary, thinkingSummary, calibrationProfile, factorySummary, storage.pilotRunSummary ? storage.pilotRunSummary() : null),
       capabilityPosition: this.buildCapabilityPosition(reviewSummary, thinkingSummary),
       parentLoopProof: buildParentLoopProof(reviewSummary, moduleSummary, tutorSummary, thinkingSummary, factorySummary),
-      gameProfileCard,
+      revisitEvidenceCard,
       dailyShareCard,
       communityShareRelayBoard,
       commercialUnlockCard: buildCommercialUnlockCard(reviewSummary, tutorSummary, thinkingSummary, wrongCauseSummary),
