@@ -1602,6 +1602,41 @@ Page({
         serverAnalysisStatus: serverAiMaterialAnalysis.status || 'server_ai_analysis_ready'
       })
       : aiMaterialAnalysisContractBase;
+    const evidenceConfidence = serverAiMaterialAnalysis && serverAiMaterialAnalysis.evidenceConfidence
+      ? serverAiMaterialAnalysis.evidenceConfidence
+      : {};
+    const manualConfirmationFields = serverAiMaterialAnalysis && Array.isArray(serverAiMaterialAnalysis.manual_confirmation_fields)
+      ? serverAiMaterialAnalysis.manual_confirmation_fields
+      : [];
+    const localDraftOnly = !!(
+      !serverAiMaterialAnalysis
+      || serverAiMaterialAnalysis.fallback_required
+      || serverAiMaterialAnalysis.fallback === true
+      || /fallback|pending|not_configured|local/i.test(String(serverAiMaterialAnalysis.status || serverAiMaterialAnalysis.reason || ''))
+      || String(evidenceConfidence.level || '').toLowerCase() === 'low'
+      || manualConfirmationFields.length
+    );
+    const reportReadiness = localDraftOnly
+      ? {
+        status: 'local_draft_needs_confirmation',
+        title: '本地报告草稿',
+        banner: '本地草稿 · 待确认',
+        statusLine: '服务端分析未完成或证据置信度不足，先保存为本地草稿，需家长确认后再作为正式报告。',
+        actionLabel: '补证据确认',
+        route: `/pages/upload/upload?from=report_draft_confirm&${query}`,
+        ready: false
+      }
+      : {
+        status: 'report_ready',
+        title: '材料报告已生成',
+        banner: '报告已生成',
+        statusLine: parentReportGenerationWorkflow && parentReportGenerationWorkflow.parentReadableLine
+          ? parentReportGenerationWorkflow.parentReadableLine
+          : '材料已完成分类，可以查看家长报告。',
+        actionLabel: '',
+        route: `/pages/profile/profile?from=upload_report_ready&${query}`,
+        ready: true
+      };
     const aiMaterialSolutionView = buildUploadAiMaterialSolutionView(aiMaterialAnalysisContract, sourceSchemaId, {
       scoreSignalView,
       contentCoverageReceipt
@@ -1757,11 +1792,9 @@ Page({
       workflowModuleDecision.parentRoute || workflowModuleDecision.reportRoute ? '家长报告' : ''
     ].filter(Boolean).join(' / ') || '苏格拉底点拨 / 短回访 / 家长报告';
     const parentReportWorkflowView = {
-      title: '材料报告已生成',
+      title: reportReadiness.title,
       loopLine: '闭环：材料 -> 家长报告 -> AI诊断 -> 短回访 -> 家长决策',
-      statusLine: parentReportGenerationWorkflow && parentReportGenerationWorkflow.parentReadableLine
-        ? parentReportGenerationWorkflow.parentReadableLine
-        : '材料已完成分类，可以查看家长报告。',
+      statusLine: reportReadiness.statusLine,
       sourceLine: parentReportGenerationWorkflow && parentReportGenerationWorkflow.sourceMap
         ? `上传页资料包：${parentReportGenerationWorkflow.sourceMap.sourceCount || 0} 份资料 / ${parentReportGenerationWorkflow.sourceMap.imageCount || 0} 张图片，家长页可看报告预览`
         : '上传页资料包 / 家长观察，家长页可看报告预览',
@@ -1779,19 +1812,24 @@ Page({
       title: sourceSchemaId === 'talent_assessment'
         ? '方法候选已入证据账本'
         : sourceSchemaId === 'wrong_question_paper'
-          ? '错题已进入家长报告'
-          : '资料已进入家长报告',
+          ? (localDraftOnly ? '错题报告草稿待确认' : '错题已进入家长报告')
+          : (localDraftOnly ? '资料报告草稿待确认' : '资料已进入家长报告'),
       line: sourceSchemaId === 'talent_assessment'
         ? '这里只放行学习方法候选，不生成复习卡、不贴天赋标签；下一步用真实错题和回访验证。'
         : sourceSchemaId === 'wrong_question_paper'
-          ? `已生成报告证据${importedCards ? `，并整理 ${importedCards} 张错题卡` : ''}；先看家长决策，再去修那一张卡。`
-          : '已生成资料证据卷宗；先看本次材料怎么用，再决定是否进入点拨或回访。',
-      route: `/pages/profile/profile?from=upload_report_ready&${query}`,
+          ? (localDraftOnly ? `已整理本地错题草稿${importedCards ? `，并整理 ${importedCards} 张错题卡` : ''}；先补证据确认，再放行家长报告。` : `已生成报告证据${importedCards ? `，并整理 ${importedCards} 张错题卡` : ''}；先看家长决策，再去修那一张卡。`)
+          : (localDraftOnly ? '已整理本地资料草稿；先补证据确认，再作为家长报告使用。' : '已生成资料证据卷宗；先看本次材料怎么用，再决定是否进入点拨或回访。'),
+      route: reportReadiness.route,
       actionRoute,
       revisitRoute,
       actionLabel: sourceSchemaId === 'talent_assessment'
         ? '补真实错题验证'
-        : sourceSchemaId === 'wrong_question_paper' ? '去修这批错题' : '去问第一步',
+        : localDraftOnly
+          ? reportReadiness.actionLabel
+          : sourceSchemaId === 'wrong_question_paper' ? '去修这批错题' : '去问第一步',
+      reportReadiness,
+      localDraftOnly,
+      manualConfirmationRequired: localDraftOnly,
       aiLocalBoundary: {
         localCodeOwns: ['source_type_classification', 'release_gate', 'next_evidence_route', 'portrait_confidence_weight', 'share_fields'],
         aiBetterFor: ['parent_summary_copy', 'child_friendly_prompt', 'method_explanation', 'socratic_question_wording'],
@@ -1877,11 +1915,12 @@ Page({
   saveReportHandoff(cta = {}) {
     if (!storage.set || !cta) return;
     const now = Date.now ? Date.now() : new Date().getTime();
+    const ready = !(cta.reportReadiness && cta.reportReadiness.ready === false) && !cta.localDraftOnly;
     storage.set('upload.report.handoff.v1', Object.assign({}, cta, {
       createdAt: new Date(now).toISOString(),
       expiresAt: new Date(now + 24 * 60 * 60 * 1000).toISOString(),
       consumedAt: '',
-      status: 'ready'
+      status: ready ? 'ready' : 'draft_needs_confirmation'
     }));
   },
 

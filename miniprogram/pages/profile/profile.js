@@ -3380,6 +3380,7 @@ Page({
   },
 
   applyRouteOptions(query = {}) {
+    const hasReportContext = !!(query.reportId || query.flowTraceId || query.sourceSchemaId);
     const panel = query.panel === 'report' ? 'assessment' : (query.panel || '');
     const from = String(query.from || '');
     const quickAssessment = String(query.quick_assessment || '') === '1';
@@ -3391,7 +3392,14 @@ Page({
     if (shouldOpenAssessment) {
       this.setData({
         profilePanel: 'assessment',
-        profilePanelTitle: '测评与方法建议',
+        profilePanelTitle: hasReportContext ? '家长报告与证据' : '测评与方法建议',
+        activeReportContext: hasReportContext ? {
+          reportId: query.reportId || '',
+          sourceSchemaId: query.sourceSchemaId || '',
+          validationStage: query.validationStage || '',
+          flowTraceId: query.flowTraceId || '',
+          from
+        } : this.data.activeReportContext,
         showAdvancedProfile: true,
         showLearningQuestionnaire: quickAssessment ? true : this.data.showLearningQuestionnaire
       });
@@ -3927,8 +3935,8 @@ Page({
     const reportRevisitEvidence = summary.reportRevisitEvidence || {};
     const handoff = summary.uploadedMaterialDecisionDossierHandoff || {};
     const params = {
-      scene: 'parent',
       from: source || 'profile_parent_evidence',
+      panel: 'report',
       reportId: summary.uploadedMaterialDecisionDossierHandoffReportId
         || summary.reportJobCaseId
         || summary.reportId
@@ -3946,11 +3954,15 @@ Page({
         || handoff.flowTraceId
         || ''
     };
+    const hasReportContext = !!(params.reportId || params.flowTraceId);
     const query = Object.keys(params)
       .filter((key) => params[key] !== undefined && params[key] !== null && String(params[key]).trim())
       .map((key) => `${key}=${encodeURIComponent(String(params[key]))}`)
       .join('&');
-    return `/pages/entry-detail/entry-detail?${query || 'scene=parent'}`;
+    if (!hasReportContext) {
+      return `/pages/entry-detail/entry-detail?scene=parent&from=${encodeURIComponent(source || 'profile_parent_evidence')}`;
+    }
+    return `/pages/profile/profile?${query}`;
   },
 
   runFamilyDecisionHomepageAction() {
@@ -4269,7 +4281,7 @@ Page({
       learningMap: '/pages/profile/profile?from=parent_learning_map',
       review: '/pages/review/review',
       upload: '/pages/upload/upload',
-      reportPreview: '/pages/entry-detail/entry-detail?scene=parent&from=parent_report',
+      reportPreview: this.buildParentEvidenceRoute(this.data.learningReportSummary || {}, 'parent_report'),
       revisit: '/pages/review/review',
       tutor: '/pages/tutor/tutor'
     };

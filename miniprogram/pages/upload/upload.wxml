@@ -59,7 +59,7 @@
 
         <view class="yd-upload-primary" bindtap="submit">生成家长报告</view>
         <view class="upload-report-ready" wx:if="{{lastReportCta}}">
-          <text class="upload-report-title">报告已生成 · {{lastReportCta.title}}</text><block wx:if="{{parentReportWorkflowView}}">
+          <text class="upload-report-title">{{lastReportCta.reportReadiness && lastReportCta.reportReadiness.banner ? lastReportCta.reportReadiness.banner : '报告已生成'}} · {{lastReportCta.title}}</text><block wx:if="{{parentReportWorkflowView}}">
             <text class="upload-report-flow">{{parentReportWorkflowView.loopLine}}</text>
             <text class="upload-report-flow">{{parentReportWorkflowView.statusLine}}</text>
             <text class="upload-report-flow">{{parentReportWorkflowView.reasoningLine}}</text>
