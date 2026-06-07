@@ -7,17 +7,17 @@
             <image class="yd-parent-mark" mode="aspectFit" src="/assets/reference/brand-house.png" />
             <view>
               <text>原点智学</text>
-              <text>家长复盘中心</text>
+              <text>家长证据看板</text>
             </view>
           </view>
-          <view class="yd-parent-pill">每日复盘</view>
+          <view class="yd-parent-pill">证据复盘</view>
         </view>
 
         <view class="yd-parent-hero">
           <view class="yd-parent-copy">
             <view class="yd-parent-kicker">家长只看证据</view>
-            <view class="yd-parent-title">证据报告和下一问</view>
-            <view class="yd-parent-sub">看证据，问一句，明天验证。</view>
+            <view class="yd-parent-title">只看证据，少问一句</view>
+            <view class="yd-parent-sub">把今天的材料、AI私教点拨和知识乐园结果，收成家长今晚能执行的一张卡。</view>
           </view>
           <image class="yd-parent-art" mode="aspectFit" src="/assets/reference/family-avatar-group-transparent.png" />
         </view>

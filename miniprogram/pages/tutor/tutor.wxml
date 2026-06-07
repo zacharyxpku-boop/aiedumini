@@ -7,8 +7,8 @@
             <view class="yd-tutor-brand">
               <image class="yd-tutor-mark" mode="aspectFit" src="/assets/reference/brand-house.png" />
               <view>
-                <text>原点 · 咕点 AI点拨</text>
-                <text>首页从这里开始</text>
+                <text>原点 · 咕点 AI私教</text>
+                <text>先追问第一步，再生成练习证据</text>
               </view>
             </view>
             <view class="yd-tutor-pill">不代写</view>
@@ -44,7 +44,7 @@
           </view>
 
           <view class="tutor-chat-card">
-            <view class="tutor-chat-title">把卡点发给原点</view>
+            <view class="tutor-chat-title">把题目、卡点或材料发给 AI私教</view>
             <view class="tutor-service-status" wx:if="{{tutorServiceStatus && tutorServiceStatus.visible}}">
               <text>{{tutorServiceStatus.label}}</text>
               <text>{{tutorServiceStatus.line}}</text>
@@ -71,7 +71,7 @@
                 <text bindtap="goSocraticBriefRoute">{{socraticBrief.routeLabel}}</text>
               </view>
             </view>
-            <text class="tutor-diagnostic-card" wx:if="{{tutorDiagnosticCard}}"><text>{{tutorDiagnosticCard.title}}</text><text>卡点：{{tutorDiagnosticCard.issue}}</text><text>下一步：{{tutorDiagnosticCard.firstStep}}</text><text>家长问：{{tutorDiagnosticCard.parentCheck}}</text><text class="tutor-diagnostic-action primary" data-id="diagnosis_review" data-label="{{tutorDiagnosticCard.reviewMove}}" data-route="{{tutorDiagnosticCard.reviewRoute}}" data-evidence="tutor_diagnostic_card" bindtap="runTutorHandoffAction">去短回访验证</text><text class="tutor-diagnostic-action" data-id="diagnosis_parent" data-label="{{tutorDiagnosticCard.parentCheck}}" data-route="{{tutorDiagnosticCard.parentRoute}}" data-evidence="tutor_diagnostic_parent_check" bindtap="runTutorHandoffAction">给家长看证据</text></text>
+            <text class="tutor-diagnostic-card" wx:if="{{tutorDiagnosticCard}}"><text>{{tutorDiagnosticCard.title}}</text><text>卡点：{{tutorDiagnosticCard.issue}}</text><text>下一步：{{tutorDiagnosticCard.firstStep}}</text><text>家长问：{{tutorDiagnosticCard.parentCheck}}</text><text class="tutor-diagnostic-action primary" data-id="diagnosis_review" data-label="{{tutorDiagnosticCard.reviewMove}}" data-route="{{tutorDiagnosticCard.reviewRoute}}" data-evidence="tutor_diagnostic_card" bindtap="runTutorHandoffAction">去知识乐园验证</text><text class="tutor-diagnostic-action" data-id="diagnosis_parent" data-label="{{tutorDiagnosticCard.parentCheck}}" data-route="{{tutorDiagnosticCard.parentRoute}}" data-evidence="tutor_diagnostic_parent_check" bindtap="runTutorHandoffAction">给家长看证据</text></text>
             <view class="tutor-micro-choice-row" wx:if="{{socraticMicroChoices && socraticMicroChoices.length}}"><text data-id="{{socraticMicroChoices[0].id}}" data-index="0" bindtap="selectSocraticMicroChoice">{{socraticMicroChoices[0].label}} {{socraticMicroChoices[0].text}}</text><text data-id="{{socraticMicroChoices[1].id}}" data-index="1" bindtap="selectSocraticMicroChoice">{{socraticMicroChoices[1].label}} {{socraticMicroChoices[1].text}}</text></view>
             <view class="tutor-input-bar">
               <input value="{{input}}" bindinput="onInput" bindconfirm="send" confirm-type="send" placeholder="写题目、卡点或第一步" />

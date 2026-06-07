@@ -422,14 +422,16 @@ Page({
     const recommended = revisitEngine.recommendGames
       ? revisitEngine.recommendGames(sourceCards)
       : [];
-    const toolIds = ['whack', 'quiz', 'flash', 'match', 'domino', 'snake'];
+    const toolIds = ['whack', 'quiz', 'flash', 'match', 'domino', 'snake', 'uno', 'worksheet'];
     const fallback = {
       whack: { title: '错因地鼠', pitch: '看题面快选第一步，抓住最容易错的点。', readyCount: sourceCards.length, available: !!sourceCards.length },
       quiz: { title: '快闪问答', pitch: '先回忆第一步，再翻开核对错因。', readyCount: sourceCards.length, available: !!sourceCards.length },
       flash: { title: '闪卡翻翻', pitch: '一张卡一轮，先说再翻开。', readyCount: sourceCards.length, available: !!sourceCards.length },
       match: { title: '拼图配对', pitch: '把卡点和第一步配起来。', readyCount: sourceCards.length, available: sourceCards.length >= 2 },
       domino: { title: '多米诺接龙', pitch: '把相邻的卡点关系接起来。', readyCount: sourceCards.length, available: sourceCards.length >= 2 },
-      snake: { title: '路线接龙', pitch: '按题意、条件、第一步排顺。', readyCount: sourceCards.length, available: sourceCards.length >= 2 }
+      snake: { title: '路线接龙', pitch: '按题意、条件、第一步排顺。', readyCount: sourceCards.length, available: sourceCards.length >= 2 },
+      uno: { title: 'UNO错因牌', pitch: '按颜色和错因出牌，说清下一步。', readyCount: sourceCards.length, available: sourceCards.length >= 2 },
+      worksheet: { title: '闪印练习单', pitch: '把错因卡整理成一页练习。', readyCount: sourceCards.length, available: !!sourceCards.length }
     };
     const display = {
       whack: { icon: '地', themeClass: 'theme-whack', engineId: 'whack' },
@@ -437,12 +439,14 @@ Page({
       flash: { icon: '闪', themeClass: 'theme-flash', engineId: 'quiz' },
       match: { icon: '拼', themeClass: 'theme-match', engineId: 'match' },
       domino: { icon: '接', themeClass: 'theme-domino', engineId: 'match' },
-      snake: { icon: '路', themeClass: 'theme-snake', engineId: 'snake' }
+      snake: { icon: '路', themeClass: 'theme-snake', engineId: 'snake' },
+      uno: { icon: '牌', themeClass: 'theme-uno', engineId: 'match' },
+      worksheet: { icon: '单', themeClass: 'theme-worksheet', engineId: 'quiz' }
     };
     const missionFor = (id, item) => {
       const count = Number(item.readyCount || 0);
-      if (!item.available) return id === 'quiz' || id === 'flash' || id === 'whack' ? '先补 1 张真卡' : '先补 2 张真卡';
-      if (id === 'match' || id === 'domino') return `配对 ${Math.min(4, Math.max(2, count))} 组`;
+      if (!item.available) return id === 'quiz' || id === 'flash' || id === 'whack' || id === 'worksheet' ? '先补 1 张真卡' : '先补 2 张真卡';
+      if (id === 'match' || id === 'domino' || id === 'uno') return `配对 ${Math.min(4, Math.max(2, count))} 组`;
       if (id === 'snake') return `排序 ${Math.min(3, Math.max(2, count))} 组`;
       if (id === 'whack') return `快选 ${Math.min(4, Math.max(1, count))} 题`;
       return `90秒回忆 ${Math.min(3, Math.max(1, count))} 张`;

@@ -5,9 +5,9 @@
   bottom: calc(10rpx + env(safe-area-inset-bottom));
   z-index: 999;
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   align-items: stretch;
-  gap: 6rpx;
+  gap: 8rpx;
   height: 110rpx;
   padding: 8rpx 8rpx 12rpx;
   background: rgba(255, 255, 255, 0.98);
@@ -21,11 +21,11 @@
 .yd-tab-item {
   position: relative;
   display: grid;
-  grid-template-rows: 46rpx 32rpx;
+  grid-template-rows: 48rpx 32rpx;
   row-gap: 4rpx;
   width: 100%;
   min-width: 0;
-  height: 88rpx;
+  height: 90rpx;
   align-items: center;
   justify-content: center;
   margin: 0;
@@ -34,7 +34,7 @@
   background: transparent;
   border: 0;
   border-radius: 20rpx;
-  font-size: 17rpx;
+  font-size: 19rpx;
   font-weight: 900;
   line-height: 1;
   overflow: hidden;
@@ -60,8 +60,8 @@
 
 .yd-tab-icon-wrap {
   display: flex;
-  width: 58rpx;
-  height: 46rpx;
+  width: 64rpx;
+  height: 48rpx;
   align-items: center;
   justify-content: center;
   justify-self: center;
@@ -75,9 +75,9 @@
 
 .yd-tab-icon {
   display: block;
-  width: 42rpx;
-  height: 42rpx;
-  flex: 0 0 42rpx;
+  width: 46rpx;
+  height: 46rpx;
+  flex: 0 0 46rpx;
   object-fit: contain;
 }
 

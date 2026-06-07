@@ -41,8 +41,8 @@ page {
   border: 1rpx solid rgba(232, 238, 230, 0.94);
   border-radius: 30rpx;
   background:
-    radial-gradient(circle at 9% 3%, rgba(248, 198, 34, 0.18), transparent 24%),
-    radial-gradient(circle at 92% 12%, rgba(76, 159, 255, 0.12), transparent 22%),
+    linear-gradient(145deg, rgba(255, 216, 79, 0.2) 0%, rgba(255, 216, 79, 0) 32%),
+    linear-gradient(205deg, rgba(76, 159, 255, 0.16) 0%, rgba(76, 159, 255, 0) 36%),
     linear-gradient(180deg, #fffef9 0%, #f7fbf3 100%);
   box-shadow: 0 22rpx 60rpx rgba(38, 58, 43, 0.08);
 }
@@ -111,11 +111,11 @@ page {
 
 .yd-parent-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 184rpx;
+  grid-template-columns: minmax(0, 1fr) 210rpx;
   gap: 18rpx;
   align-items: center;
   flex: 0 0 auto;
-  min-height: 242rpx;
+  min-height: 276rpx;
   margin-top: 0;
 }
 
@@ -133,7 +133,7 @@ page {
 .yd-parent-title {
   margin-top: 7rpx;
   color: #101a16;
-  font-size: 38rpx;
+  font-size: 44rpx;
   font-weight: 950;
   line-height: 1.16;
   letter-spacing: 0;
@@ -149,17 +149,18 @@ page {
   font-size: 24rpx;
   line-height: 1.42;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
 }
 
 .yd-parent-art {
-  width: 178rpx;
-  height: 166rpx;
+  width: 204rpx;
+  height: 188rpx;
   align-self: center;
   object-fit: contain;
   overflow: hidden;
   border-radius: 26rpx;
   background: #fff1ea;
+  filter: drop-shadow(0 16rpx 22rpx rgba(70, 43, 26, 0.12));
 }
 
 .yd-parent-decision {
@@ -171,11 +172,11 @@ page {
 
 .yd-parent-decision {
   display: grid;
-  grid-template-columns: 108rpx minmax(0, 1fr) auto;
+  grid-template-columns: 116rpx minmax(0, 1fr) auto;
   gap: 12rpx;
   align-items: center;
   margin-top: 0;
-  padding: 16rpx;
+  padding: 18rpx;
   background:
     radial-gradient(circle at 88% 16%, rgba(248, 198, 34, 0.16), transparent 36%),
     linear-gradient(135deg, #f2fbef 0%, #ffffff 72%);
