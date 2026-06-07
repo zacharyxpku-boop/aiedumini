@@ -277,38 +277,35 @@ function submitQuiz(payload) {
   });
 }
 
-function fetchAchievements(payload) {
-  const session = storage.get(storage.KEYS.session, {});
-  return request('/api/mini/achievements', {
-    method: 'POST',
-    data: payload || {},
-    header: session.session_id ? { 'x-mini-session': session.session_id } : {},
-    timeout: 12000
+function retiredMiniappInventoryClient(feature) {
+  return Promise.resolve({
+    ok: false,
+    error: 'legacy_client_retired',
+    inventory_status: 'retired_by_default',
+    inventory_decision: 'retire_do_not_expose',
+    feature,
+    replacement_routes: [
+      '/pages/review/review',
+      '/pages/profile/profile',
+      '/pages/tutor/tutor'
+    ]
   });
+}
+
+function fetchAchievements(payload) {
+  return retiredMiniappInventoryClient('achievements');
 }
 
 function fetchShop(payload) {
-  const session = storage.get(storage.KEYS.session, {});
-  return request('/api/mini/shop', {
-    method: 'POST',
-    data: payload || {},
-    header: session.session_id ? { 'x-mini-session': session.session_id } : {},
-    timeout: 12000
-  });
+  return retiredMiniappInventoryClient('shop');
 }
 
 function purchaseShopItem(payload) {
-  return fetchShop(Object.assign({ action: 'purchase' }, payload || {}));
+  return retiredMiniappInventoryClient('shop_purchase');
 }
 
 function fetchLeaderboard(payload) {
-  const session = storage.get(storage.KEYS.session, {});
-  return request('/api/mini/leaderboard', {
-    method: 'POST',
-    data: payload || {},
-    header: session.session_id ? { 'x-mini-session': session.session_id } : {},
-    timeout: 12000
-  });
+  return retiredMiniappInventoryClient('leaderboard');
 }
 
 function fetchGameReport(payload) {

@@ -1538,21 +1538,12 @@ Page({
     const turnState = tutorLadder.nextTutorTurnState
       ? tutorLadder.nextTutorTurnState(input, this.data.messages, this.data.currentHintLevel, selected)
       : null;
-    if (tutorLadder.isAnswerRequest(input) || tutorLadder.isStuckText(input)) {
-      this.appendAssistant(tutorLadder.buildTutorReply(input, {
-        messages: this.data.messages,
-        currentHintLevel: this.data.currentHintLevel,
-        selected
-      }), turnState);
-      return;
-    }
-
-    api.checkContent(input).then((check) => {
-      if (check && check.safe === false) {
-        this.appendAssistant(safetyReply(check, input, selected, step, misconceptionText), turnState);
-        return null;
-      }
-      return api.sendTutorMessage({
+    const localBoundarySignal = tutorLadder.isAnswerRequest(input)
+      ? 'answer_request'
+      : tutorLadder.isStuckText(input)
+        ? 'stuck_text'
+        : '';
+    const requestTutorMessage = (extraContext = {}, failureStage = 'tutor_message') => api.sendTutorMessage({
         mode: 'homework',
         message: input,
         context: {
@@ -1560,13 +1551,16 @@ Page({
           help_mode: step,
           hint_level: localHintLevel,
           hint_ladder: tutorLadder.HINT_LADDER,
+          local_boundary_signal: localBoundarySignal,
           parent_goal: storage.loadParentGoal ? storage.loadParentGoal() : null,
           selected_homework: selected,
           weak_points: state.weak_points || [],
           misconception_tags: this.data.misconceptionTags,
-          homework_plan: state.homework_plan || null
+          homework_plan: state.homework_plan || null,
+          safety_check: extraContext.safety_check || 'passed',
+          safety_check_error: extraContext.safety_check_error || ''
         }
-        }).then((res) => {
+      }).then((res) => {
         const localTaskType = tutorLadder.detectTaskType ? tutorLadder.detectTaskType(input, selected) : 'unknown';
         const localPressureSignal = tutorLadder.inferHomeworkPressureSignal
           ? tutorLadder.inferHomeworkPressureSignal(`${input || ''} ${selected && selected.text ? selected.text : ''}`, localTaskType)
@@ -1586,11 +1580,21 @@ Page({
         this.appendAssistant(guarded, turnState);
         return null;
       }).catch((error) => {
-        this.appendAssistant(tutorFailureReply(error, 'tutor_message', input, selected, step, misconceptionText), turnState);
+        this.appendAssistant(tutorFailureReply(error, failureStage, input, selected, step, misconceptionText), turnState);
         return null;
       });
+
+    api.checkContent(input).then((check) => {
+      if (check && check.safe === false) {
+        this.appendAssistant(safetyReply(check, input, selected, step, misconceptionText), turnState);
+        return null;
+      }
+      return requestTutorMessage({ safety_check: 'passed' }, 'tutor_message');
     }).catch((error) => {
-      this.appendAssistant(tutorFailureReply(error, 'content_check', input, selected, step, misconceptionText), turnState);
+      return requestTutorMessage({
+        safety_check: 'unavailable_server_guard_required',
+        safety_check_error: tutorErrorSource(error, 'content_check')
+      }, 'tutor_message_after_content_check_unavailable');
     });
   },
 

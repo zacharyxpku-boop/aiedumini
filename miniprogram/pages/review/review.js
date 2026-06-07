@@ -422,13 +422,17 @@ Page({
     const recommended = revisitEngine.recommendGames
       ? revisitEngine.recommendGames(sourceCards)
       : [];
-    const toolIds = ['quiz'];
+    const toolIds = ['quiz', 'match', 'snake'];
     const fallback = {
-      quiz: { title: '90秒回忆', pitch: '先回忆第一步，再翻开核对错因。', readyCount: sourceCards.length, available: !!sourceCards.length }
+      quiz: { title: '90秒回忆', pitch: '先回忆第一步，再翻开核对错因。', readyCount: sourceCards.length, available: !!sourceCards.length },
+      match: { title: '点击配对', pitch: '把卡点和第一步配起来。', readyCount: sourceCards.length, available: sourceCards.length >= 2 },
+      snake: { title: '顺序排一排', pitch: '按题意、条件、第一步排顺。', readyCount: sourceCards.length, available: sourceCards.length >= 2 }
     };
     const missionFor = (id, item) => {
       const count = Number(item.readyCount || 0);
-      if (!item.available) return '先补 1 张真卡';
+      if (!item.available) return id === 'quiz' ? '先补 1 张真卡' : '先补 2 张真卡';
+      if (id === 'match') return `配对 ${Math.min(4, Math.max(2, count))} 组`;
+      if (id === 'snake') return `排序 ${Math.min(3, Math.max(2, count))} 组`;
       return `90秒回忆 ${Math.min(3, Math.max(1, count))} 张`;
     };
     return toolIds.map((id) => {

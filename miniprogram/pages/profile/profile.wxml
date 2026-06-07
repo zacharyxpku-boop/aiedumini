@@ -26,7 +26,7 @@
           <image class="yd-parent-decision-img" mode="aspectFit" src="/assets/reference/report-radar-card-illustration.png" />
           <view class="yd-parent-decision-copy">
             <text>{{profileViewModel.familyDecisionCard.title}}</text>
-            <text>{{profileViewModel.familyDecisionCard.subtitle}}｜{{profileViewModel.familyDecisionCard.parentQuestion}}</text>
+            <text>{{profileViewModel.familyDecisionCard.parentQuestion}}</text>
           </view>
           <view class="yd-parent-decision-badge">{{profileViewModel.familyDecisionCard.ready ? '可执行' : '待证据'}}</view>
         </view>
@@ -45,7 +45,6 @@
             <view class="yd-parent-evidence-chip" wx:for="{{profileViewModel.parentEvidenceStrip.items}}" wx:key="id">
               <text>{{item.label}}</text>
               <text>{{item.value}}</text>
-              <text>{{item.line}}</text>
             </view>
           </view>
         </view>
