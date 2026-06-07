@@ -161,6 +161,8 @@ function buildTutorDiagnosticCard(result = {}, receipt = {}, selected = {}) {
     firstStep: String(firstStep || '').slice(0, 28),
     parentCheck: String(parentCheck || '').slice(0, 30),
     reviewMove: String(reviewMove || '').slice(0, 24),
+    reviewRoute: '/pages/review/review?from=tutor_diagnostic_card',
+    parentRoute: '/pages/entry-detail/entry-detail?scene=parent&from=tutor_diagnostic_card',
     source: 'tutor_diagnostic_card'
   };
 }
