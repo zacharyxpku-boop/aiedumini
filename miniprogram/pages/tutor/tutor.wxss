@@ -517,6 +517,35 @@ page {
   background: #ffffff;
 }
 
+.tutor-diagnostic-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8rpx;
+  padding: 12rpx;
+  border-radius: 18rpx;
+  background: #fff8df;
+  box-shadow: inset 0 0 0 1rpx rgba(248, 198, 34, 0.22);
+}
+
+.tutor-diagnostic-card text {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  color: #27362e;
+  font-size: 21rpx;
+  font-weight: 860;
+  line-height: 1.22;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tutor-diagnostic-card text:first-child {
+  grid-column: 1 / -1;
+  color: #8a6414;
+  font-size: 22rpx;
+  font-weight: 950;
+}
+
 .tutor-input-bar {
   display: flex;
   min-height: 86rpx;

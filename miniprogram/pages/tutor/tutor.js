@@ -146,6 +146,25 @@ function buildSocraticBrief(result = {}, receipt = {}, promptWorkflow = {}) {
   };
 }
 
+function buildTutorDiagnosticCard(result = {}, receipt = {}, selected = {}) {
+  const probe = result.diagnostic_probe || receipt.diagnostic_probe || {};
+  const signal = result.real_homework_pressure_signal || receipt.real_homework_pressure_signal || receipt.pressureSignal || {};
+  const taskType = result.task_type || receipt.taskType || selected.taskType || '当前题';
+  const firstStep = probe.goal || signal.firstStep || result.next_action || '先说第一步';
+  const wrongCause = probe.focus || probe.misconception || signal.wrongCause || selected.issueType || '入口不清';
+  const parentCheck = signal.parentCheck || (result.socratic_contract && result.socratic_contract.nextQuestion) || probe.prompt || '家长只问第一步';
+  const reviewMove = result.transfer_prompt || signal.reviewMove || '说完进短回访';
+  return {
+    id: 'tutor_diagnostic_card',
+    title: taskType === 'unknown' ? '本轮诊断' : `本轮诊断 · ${taskType}`,
+    issue: String(wrongCause || '').slice(0, 22),
+    firstStep: String(firstStep || '').slice(0, 28),
+    parentCheck: String(parentCheck || '').slice(0, 30),
+    reviewMove: String(reviewMove || '').slice(0, 24),
+    source: 'tutor_diagnostic_card'
+  };
+}
+
 function buildSocraticMicroChoices(result = {}, receipt = {}) {
   const fallback = result.socratic_fallback_plan || receipt.socratic_fallback_plan || {};
   const probe = result.diagnostic_probe || receipt.diagnostic_probe || {};
@@ -1194,6 +1213,7 @@ Page({
     socraticBrief: null,
     socraticMicroChoices: [],
     tutorServiceStatus: null,
+    tutorDiagnosticCard: null,
     socraticFeedbackStatus: '',
     socraticFeedbackRecordedAt: '',
     socraticFeedbackNextAction: '',
@@ -1591,6 +1611,7 @@ Page({
     diagnosticReceipt.socraticPromptWorkflow.turnId = diagnosticReceipt.turnId;
     const socraticBrief = buildSocraticBrief(result || {}, diagnosticReceipt, promptWorkflow);
     const socraticMicroChoices = buildSocraticMicroChoices(result || {}, diagnosticReceipt);
+    const tutorDiagnosticCard = buildTutorDiagnosticCard(result || {}, diagnosticReceipt, this.data.selected || {});
     const tutorServiceStatus = buildTutorServiceStatus(result || {}, diagnosticReceipt);
     if (storage.appendThinkingReceipt) {
       storage.appendThinkingReceipt(Object.assign({}, diagnosticReceipt, {
@@ -1616,6 +1637,20 @@ Page({
         blockedFields: promptWorkflow.blockedFields,
         created_at: Date.now()
       });
+      storage.appendReviewEvent({
+        event: 'tutor_diagnostic_card_ready',
+        type: 'tutor_diagnostic_card_ready',
+        turnId: diagnosticReceipt.turnId,
+        source: 'tutor_diagnostic_card',
+        taskType: result && result.task_type ? result.task_type : '',
+        issue: tutorDiagnosticCard.issue,
+        firstStep: tutorDiagnosticCard.firstStep,
+        parentCheck: tutorDiagnosticCard.parentCheck,
+        reviewMove: tutorDiagnosticCard.reviewMove,
+        route: '/pages/review/review?from=tutor_diagnostic_card',
+        blockedFields: ['original_question', 'full_answer', 'full_dialogue', 'score', 'ranking'],
+        created_at: Date.now()
+      });
     }
     if (storage.recordUnifiedNextAction) {
       storage.recordUnifiedNextAction({
@@ -1627,6 +1662,16 @@ Page({
         capabilityId: 'socratic_prompt_to_review',
         evidence: promptWorkflow.evidenceRequired,
         blockedFields: promptWorkflow.blockedFields
+      });
+      storage.recordUnifiedNextAction({
+        source: 'tutor_diagnostic_card',
+        sourceLabel: 'AI 私教诊断卡',
+        actionLabel: tutorDiagnosticCard.firstStep,
+        route: '/pages/review/review?from=tutor_diagnostic_card',
+        readiness: 'diagnosis_ready',
+        capabilityId: 'tutor_diagnosis_to_review',
+        evidence: ['wrong_cause', 'first_step', 'parent_check', 'next_day_revisit'],
+        blockedFields: ['original_question', 'full_answer', 'full_dialogue', 'score', 'ranking']
       });
     }
     if (storage.appendValidationEvent && diagnosticReceipt.openMaicInspiredTaskPlanAudit && diagnosticReceipt.openMaicInspiredTaskPlanAudit.ok) {
@@ -1820,6 +1865,7 @@ Page({
       coachConsole: coachConsole(this.data.selected, this.data.misconceptionTags, masterySignal, pasteRisk, coachStep),
       thinkingReceipt: diagnosticReceipt,
       tutorServiceStatus,
+      tutorDiagnosticCard,
       socraticPromptWorkflow: promptWorkflow,
       socraticReasoningLine: buildSocraticReasoningLine(diagnosticReceipt),
       socraticTrace: buildSocraticTrace(diagnosticReceipt),
