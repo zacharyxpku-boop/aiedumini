@@ -18,8 +18,10 @@
             <view class="yd-upload-title">上传材料，生成家长报告</view>
             <view class="yd-upload-sub">作业、错题、成绩或测评都可以。</view>
             <view class="yd-upload-proof">
-              <text>不公开分享</text>
-              <text>先分类再分析</text>
+              <text>材料分类</text>
+              <text>家长报告</text>
+              <text>AI私教</text>
+              <text>知识乐园</text>
             </view>
           </view>
           <image class="yd-upload-mascot" mode="aspectFit" src="/assets/reference/upload-folder-stack-transparent.png" />
