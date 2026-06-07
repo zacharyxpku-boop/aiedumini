@@ -25,10 +25,10 @@
         <view class="yd-parent-decision" data-scene="parent" bindtap="openEntryDetail">
           <image class="yd-parent-decision-img" mode="aspectFit" src="/assets/reference/report-radar-card-illustration.png" />
           <view class="yd-parent-decision-copy">
-            <text>本次证据</text>
-            <text>{{profileViewModel.parentRecap.firstStepLine}}</text>
+            <text>{{profileViewModel.familyDecisionCard.title}}</text>
+            <text>{{profileViewModel.familyDecisionCard.subtitle}}｜{{profileViewModel.familyDecisionCard.parentQuestion}}</text>
           </view>
-          <view class="yd-parent-decision-badge">查看</view>
+          <view class="yd-parent-decision-badge">{{profileViewModel.familyDecisionCard.ready ? '可执行' : '待证据'}}</view>
         </view>
 
         <view class="yd-parent-report-status" wx:if="{{learningReportSummary.parentReportWorkflowTitle}}" bindtap="goLearningReportCta">

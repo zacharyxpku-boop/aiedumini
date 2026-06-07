@@ -111,6 +111,61 @@ function proofSummary(input = {}) {
   };
 }
 
+function latestTutorDiagnostic(input = {}) {
+  const events = Array.isArray(input.reviewEvents) ? input.reviewEvents : [];
+  return events.find((event) => {
+    const type = event && (event.type || event.event || event.kind);
+    return type === 'tutor_diagnostic_card_ready';
+  }) || null;
+}
+
+function latestPlayableRound(input = {}) {
+  const events = Array.isArray(input.reviewEvents) ? input.reviewEvents : [];
+  return events.find((event) => {
+    const type = event && (event.type || event.event || event.kind);
+    return type === 'playable_review_attempt_summary' || type === 'playable_review_tool_finished';
+  }) || null;
+}
+
+function buildFamilyDecisionCard(input = {}) {
+  const evidence = firstStepEvidence(input);
+  const diagnostic = latestTutorDiagnostic(input);
+  const round = latestPlayableRound(input);
+  const materialReady = !!(evidence.latestReviewCard && (
+    evidence.latestReviewCard.reportId ||
+    evidence.latestReviewCard.sourceSchemaId ||
+    evidence.latestReviewCard.reportSourceId ||
+    evidence.latestReviewCard.uploadMaterialType ||
+    /^material_/.test(String(evidence.latestReviewCard.source || ''))
+  ));
+  const tutorReady = !!diagnostic || /tutor_/.test(String(evidence.latestReviewCard && evidence.latestReviewCard.source || ''));
+  const revisitReady = !!round;
+  const sourceLabels = [
+    materialReady ? '材料' : '',
+    tutorReady ? 'AI诊断' : '',
+    revisitReady ? '短回访' : ''
+  ].filter(Boolean);
+  const nextAction = diagnostic && diagnostic.firstStep
+    ? diagnostic.firstStep
+    : evidence.displayStep;
+  const parentCheck = diagnostic && diagnostic.parentCheck
+    ? diagnostic.parentCheck
+    : '家长只问：刚才第一步先看哪里？';
+  const reviewMove = round && round.round_advice && round.round_advice.primary
+    ? round.round_advice.primary
+    : '明天只回访同一张卡';
+  return {
+    title: sourceLabels.length ? `今晚先做：${safeText(nextAction, '只做一个第一步')}` : '先补一条真实学习证据',
+    subtitle: sourceLabels.length
+      ? `已接住${sourceLabels.join(' + ')}，不升级长期标签。`
+      : '上传材料或完成一次 AI 点拨后，这里会变成家庭决策。',
+    parentQuestion: safeText(parentCheck, '家长只问：刚才第一步先看哪里？'),
+    tomorrowCheck: safeText(reviewMove, '明天只回访同一张卡'),
+    evidenceSources: sourceLabels.length ? sourceLabels.join(' / ') : '待补证据',
+    ready: sourceLabels.length >= 2 || !!evidence.hasChildStep
+  };
+}
+
 function buildParentRecap(input = {}) {
   const evidence = firstStepEvidence(input);
   const proof = proofSummary(input);
@@ -220,12 +275,14 @@ function buildPrimaryCard(input) {
 function buildProfileViewModel(input = {}) {
   const hasFocus = !!(input.todayFocus && input.todayFocus.id !== null);
   const parentRecap = buildParentRecap(input);
+  const familyDecisionCard = buildFamilyDecisionCard(input);
   return {
     routePill: '家长复盘 · 5 秒看证据',
     companionStrip: companionStrip(input.companionPreference),
     title: '家长只问这一句',
     subtitle: '不是看分数，是看孩子有没有说出第一步、围绕它坐过一段。',
     parentRecap,
+    familyDecisionCard,
     parentEvidenceStrip: buildParentEvidenceStrip(input),
     primaryCard: buildPrimaryCard(input),
     primaryCta: '查看证据详情',
@@ -246,6 +303,7 @@ module.exports = {
   formatMiniActionText: safeText,
   formatGrowthMemoryLine: buildGrowthMemoryCard,
   buildParentRecap,
+  buildFamilyDecisionCard,
   buildParentEvidenceStrip,
   proofSummary
 };
