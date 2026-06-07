@@ -33,15 +33,22 @@ function firstStepEvidence(input = {}) {
   const todayFocus = input.todayFocus || {};
   const latest = input.latestFocusSession || {};
   const target = latest.focusTarget || {};
+  const card = firstReviewCard(input) || {};
+  const cardPlan = card.nextPracticePlan || {};
   const systemStep = todayFocus.systemSuggestedStep
     || latest.linkedSystemSuggestedStep
     || target.linkedSystemSuggestedStep
     || todayFocus.miniActionText
+    || card.childArticulatedStep
+    || card.checkpoint
+    || cardPlan.checkpoint
+    || card.parentPrompt
     || '';
   const childStep = todayFocus.childArticulatedStep
     || todayFocus.childStepSentence
     || latest.linkedChildArticulatedStep
     || target.linkedChildArticulatedStep
+    || card.childArticulatedStep
     || '';
   const stuck = todayFocus.stuckPointText
     || todayFocus.sourceText
@@ -49,16 +56,19 @@ function firstStepEvidence(input = {}) {
     || latest.linkedStuckPointText
     || target.linkedStuckPointText
     || todayFocus.title
+    || card.question
+    || card.weakPoint
+    || card.wrongCauseLabel
     || '';
-  const displayStep = childStep || systemStep || target.title || '';
+  const displayStep = childStep || systemStep || target.title || card.answer || card.question || '';
   return {
     stuckPointText: safeText(stuck, '本次第一步还没记录清楚'),
     systemSuggestedStep: safeText(systemStep, '咕点建议先看题目问什么'),
     childArticulatedStep: safeText(childStep, ''),
     displayStep: safeText(displayStep, '先把题目问什么说出来'),
-    hasChildStep: !!childStep,
+    hasChildStep: !!(childStep || systemStep || card.id),
     latestFocusSession: latest && latest.id ? latest : null,
-    latestReviewCard: firstReviewCard(input)
+    latestReviewCard: card && card.id ? card : null
   };
 }
 
@@ -68,7 +78,14 @@ function proofSummary(input = {}) {
   const recentSummary = input.recentLearningSummary || {};
   const latest3 = Array.isArray(recentSummary.latest3) ? recentSummary.latest3 : [];
   const latest7 = Array.isArray(recentSummary.latest7) ? recentSummary.latest7 : [];
-  const childSteps = [focus].concat(history).filter((item) => item && (item.childArticulatedStep || item.linkedChildArticulatedStep)).length;
+  const cards = Array.isArray(input.reviewCards) ? input.reviewCards : [];
+  const cardSteps = cards.filter((card) => card && (
+    card.childArticulatedStep ||
+    card.checkpoint ||
+    card.parentPrompt ||
+    (card.nextPracticePlan && card.nextPracticePlan.checkpoint)
+  )).length;
+  const childSteps = [focus].concat(history).filter((item) => item && (item.childArticulatedStep || item.linkedChildArticulatedStep)).length + cardSteps;
   const taskBound = history.filter((item) => item && item.taskBound).length;
   const revisits = (Array.isArray(input.reviewEvents) ? input.reviewEvents : []).filter((event) => {
     const type = event && (event.type || event.kind);

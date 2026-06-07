@@ -71,10 +71,10 @@
       </view>
 
       <view class="home-close-strip">
-        <text>当前路径</text>
-        <text>AI 点拨</text>
-        <text>家长看</text>
-        <text>短回访</text>
+        <text>{{homeViewModel.primaryNextAction.kicker || '最近证据'}}</text>
+        <text>{{homeViewModel.primaryNextAction.title || '先发材料'}}</text>
+        <text>{{homeViewModel.primaryNextAction.cta || '去处理'}}</text>
+        <text bindtap="runPrimaryNextAction">接上</text>
       </view>
     </view>
   </scroll-view>

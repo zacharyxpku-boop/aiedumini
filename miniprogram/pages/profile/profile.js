@@ -3239,7 +3239,12 @@ Page({
     const parentReport = buildParentReport(profile, reviewSummary, moduleSummary, tutorSummary, calibrationProfile, reviewSummary.sync, thinkingSummary, parentGoal, todayFocus);
     const tutorProcessSummary = buildTutorProcessSummary(todayFocus, thinkingReceipts, tutorMessages);
     const todayFocusReviewCards = storage.loadReviewCards
-      ? storage.loadReviewCards().filter((card) => card && (card.source === 'today_focus' || card.sourceFocusId === (todayFocus && todayFocus.id)))
+      ? storage.loadReviewCards().filter((card) => {
+        if (!card) return false;
+        if (card.source === 'today_focus' || card.sourceFocusId === (todayFocus && todayFocus.id)) return true;
+        if (card.reportId || card.sourceSchemaId || card.reportSourceId || card.uploadMaterialType) return true;
+        return /^material_/.test(String(card.source || ''));
+      })
       : [];
     const weeklyGrowthMemory = storage.buildWeeklyGrowthMemory ? storage.buildWeeklyGrowthMemory(companionPreference) : null;
     const recentLearningSummary = storage.buildRecentLearningSummary ? storage.buildRecentLearningSummary() : null;
