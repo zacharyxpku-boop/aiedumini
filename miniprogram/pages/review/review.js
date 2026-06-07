@@ -267,7 +267,8 @@ Page({
   buildEntryReviewContext(query = {}) {
     const from = String(query.from || '');
     const mode = String(query.mode || '');
-    if (from.indexOf('entry_') !== 0 && !mode) return null;
+    const isTutorEvidenceReturn = from === 'tutor_still_blocked_evidence';
+    if (from.indexOf('entry_') !== 0 && !mode && !isTutorEvidenceReturn) return null;
     const isEntryReviewReturn = from === 'entry_review' || mode === 'recall_return';
     return {
       from,
@@ -275,9 +276,9 @@ Page({
       reportId: String(query.reportId || query.report_id || ''),
       cardId: String(query.cardId || query.card_id || ''),
       sourceSchemaId: String(query.sourceSchemaId || query.source_schema_id || ''),
-      title: isEntryReviewReturn ? '来自回访入口' : '来自学习入口',
-      line: '先选一张真实卡，马上完成 90 秒回忆或迁移验证。',
-      actionLabel: isEntryReviewReturn ? '开始 90 秒回忆' : '进入短回访',
+      title: isTutorEvidenceReturn ? 'AI 点拨后的证据回访' : isEntryReviewReturn ? '来自回访入口' : '来自学习入口',
+      line: isTutorEvidenceReturn ? '刚才仍卡住，先用这张小黑板卡复测第一步，不继续追完整题。' : '先选一张真实卡，马上完成 90 秒回忆或迁移验证。',
+      actionLabel: isTutorEvidenceReturn ? '复测小黑板卡' : isEntryReviewReturn ? '开始 90 秒回忆' : '进入短回访',
       returnRoute: '/pages/entry-detail/entry-detail?scene=review',
       flowTraceId: String(query.flowTraceId || query.flow_trace_id || from || mode || 'entry_review')
     };

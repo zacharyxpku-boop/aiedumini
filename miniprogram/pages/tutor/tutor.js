@@ -855,17 +855,41 @@ function buildMiniLessonFeedbackBridge(item = {}, receipt = {}, adjustment = {})
   const canRenderMiniLesson = renderGate.canRender === true || (!modeRouter.nextMode || modeRouter.nextMode === 'three_minute_mini_lesson');
   if (item.status !== 'still_blocked' || !trigger.shouldTrigger || miniLessonAudit.ok !== true) return null;
   if (!canRenderMiniLesson && modeRouter.nextMode === 'parent_handoff') {
+    const evidenceThread = receipt.evidenceThread || miniLesson.evidenceThread || {};
+    const topicCard = miniLesson.topicCard || {};
+    const blackboard = miniLesson.blackboard || {};
+    const blockedFields = ['original_question', 'full_answer', 'full_dialogue', 'score', 'ranking', 'talent_label'];
+    const seed = {
+      source: 'socratic_feedback_still_blocked_evidence',
+      sourceSeedId: `still_blocked_evidence_${item.turnId || item.fallbackId || Date.now()}`,
+      flowTraceId: evidenceThread.flowTraceId || item.turnId || item.fallbackId || '',
+      evidenceThread,
+      topicCardId: evidenceThread.topicCardId || topicCard.id || '',
+      topicLabel: topicCard.label || miniLesson.conceptGap || '当前卡点',
+      conceptGap: miniLesson.conceptGap || topicCard.conceptGap || '第一步还没有说清',
+      firstStep: blackboard.firstStep || blackboard.boardMove || '先说出第一步',
+      blackboardLine: blackboard.boardMove || blackboard.firstStep || '',
+      blackboardFrames: Array.isArray(blackboard.frames) ? blackboard.frames : [],
+      parentCheck: miniLesson.parentCheck || miniLesson.parentLine || '家庭只回看第一步，不追完整答案。',
+      nextDayReview: miniLesson.nextDayReview || (miniLesson.nearTransfer && miniLesson.nearTransfer.prompt) || '明天换一题，只回访第一步。',
+      exitGate: miniLesson.exitGate ? miniLesson.exitGate.passEvidence : 'child_can_say_first_step',
+      route: '/pages/review/review?from=tutor_still_blocked_evidence',
+      subject: receipt.subject || evidenceThread.subject || '',
+      taskType: receipt.taskType || evidenceThread.taskType || '',
+      blockedFields
+    };
     return {
       id: 'socratic_feedback_evidence_review_bridge',
       type: 'evidence_review_required',
       title: '补一张小黑板证据',
       reason: modeRouter.reason || trigger.reason || adjustment.nextAction,
-      route: '/pages/review/review?from=tutor_still_blocked_evidence',
+      route: seed.route,
       nextAction: '先不再加提示，只留 A/B 小黑板证据，回短回访复测同一个卡点。',
+      reviewSeed: seed,
       evidence: {
         triggerEvidence: trigger.triggerEvidence || {},
         releaseGate: modeRouter.releaseGate || 'child_records_micro_choice_and_next_day_revisit',
-        blockedFields: ['original_question', 'full_answer', 'full_dialogue', 'score', 'ranking', 'talent_label']
+        blockedFields
       }
     };
   }
@@ -1933,7 +1957,7 @@ Page({
       storage.appendSyncMutation('socratic_effectiveness_feedback', item);
     }
     const adjustment = buildSocraticFeedbackAdjustment(item, turnState);
-    const miniLessonFeedbackBridge = buildMiniLessonFeedbackBridge(item, receipt, adjustment);
+    let miniLessonFeedbackBridge = buildMiniLessonFeedbackBridge(item, receipt, adjustment);
     const reviewSeed = {
       type: 'socratic_effectiveness_review_seed',
       event: 'socratic_effectiveness_review_seed',
@@ -1953,16 +1977,23 @@ Page({
       storage.appendReviewEvent(reviewSeed);
     }
     let miniLessonReturnCard = null;
-    if (miniLessonFeedbackBridge && miniLessonFeedbackBridge.type !== 'evidence_review_required' && storage.ensureMiniLessonReturnReviewCard) {
+    if (miniLessonFeedbackBridge && miniLessonFeedbackBridge.reviewSeed && storage.ensureMiniLessonReturnReviewCard) {
       miniLessonReturnCard = storage.ensureMiniLessonReturnReviewCard(miniLessonFeedbackBridge.reviewSeed, {
         source: 'socratic_feedback_still_blocked',
         taskType: miniLessonFeedbackBridge.reviewSeed.taskType || '',
         subject: miniLessonFeedbackBridge.reviewSeed.subject || ''
       });
+      if (miniLessonReturnCard && miniLessonReturnCard.id) {
+        const route = miniLessonFeedbackBridge.route || '/pages/review/review?from=tutor_feedback';
+        const joiner = route.indexOf('?') >= 0 ? '&' : '?';
+        miniLessonFeedbackBridge = Object.assign({}, miniLessonFeedbackBridge, {
+          route: `${route}${joiner}cardId=${encodeURIComponent(miniLessonReturnCard.id)}&flowTraceId=${encodeURIComponent(miniLessonReturnCard.flowTraceId || '')}`
+        });
+      }
       if (storage.appendReviewEvent) {
         storage.appendReviewEvent({
-          type: 'socratic_feedback_mini_lesson_triggered',
-          event: 'socratic_feedback_mini_lesson_triggered',
+          type: miniLessonFeedbackBridge.type === 'evidence_review_required' ? 'socratic_feedback_evidence_review_required' : 'socratic_feedback_mini_lesson_triggered',
+          event: miniLessonFeedbackBridge.type === 'evidence_review_required' ? 'socratic_feedback_evidence_review_required' : 'socratic_feedback_mini_lesson_triggered',
           route: miniLessonFeedbackBridge.route,
           cardId: miniLessonReturnCard && miniLessonReturnCard.id ? miniLessonReturnCard.id : '',
           evidence: miniLessonFeedbackBridge.evidence,
