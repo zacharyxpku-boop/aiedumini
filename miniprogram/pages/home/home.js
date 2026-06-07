@@ -1880,9 +1880,6 @@ Page({
     const todayFocus = storage.saveTodayFocusFromThought && importRoute.shouldCreateFocus ? storage.saveTodayFocusFromThought(text, {
       source: 'home_xiaodian_entry'
     }) : null;
-    if (todayFocus && todayFocus.isStuck && storage.updateTonightRouteStatus) {
-      storage.updateTonightRouteStatus('focus_created', { focusId: todayFocus.id });
-    }
     const hint = tutorLadder.buildTutorReply(text, {
       currentHintLevel: todayFocus && todayFocus.isStuck ? 2 : 1
     });

@@ -3737,9 +3737,10 @@ function loadTonightPlan() {
 
 function saveTonightPlan(plan = {}) {
   const saved = set(KEYS.tonightPlan, Object.assign({}, plan || {}, {
+    retiredPlanner: true,
     updated_at: new Date().toISOString()
   }));
-  appendSyncMutation('tonight_route', {
+  appendSyncMutation('retired_planner_handoff', {
     id: saved.id,
     date: saved.date,
     available_minutes: Number(saved.availableMinutes || 0),
@@ -3751,21 +3752,54 @@ function saveTonightPlan(plan = {}) {
 }
 
 function createTonightPlanFromInput(text = '', options = {}) {
-  return saveTonightPlan(buildTonightPlan(text, options));
+  const value = String(text || '').trim();
+  const reportDailyActionQueue = buildReportDailyActionQueue();
+  const active = reportDailyActionQueue && reportDailyActionQueue.ready ? reportDailyActionQueue.active : null;
+  return saveTonightPlan(Object.assign({
+    id: options.id || `retired_planner_${Date.now()}_${randomPart()}`,
+    date: new Date().toISOString().slice(0, 10),
+    source: 'retired_planner_compat',
+    routeStatus: 'retired',
+    availableMinutes: 0,
+    homeworkItems: [],
+    planItems: [],
+    personalPlan: null,
+    focusId: '',
+    reviewCardIds: [],
+    reportDailyAction: active || null,
+    summaryLine: active && active.task
+      ? `学习方案入口已退役；请从家长证据页继续：${active.task}`
+      : '学习方案入口已退役；请从上传材料、AI点拨或短回访继续。',
+    parentAdvice: '不再自动安排整晚任务；家长只看材料证据、AI诊断、短回访结果和下一步。',
+    primaryRoute: active && active.route ? active.route : '/pages/tutor/tutor?from=retired_planner',
+    revisitRoute: '/pages/review/review?from=retired_planner',
+    parentRoute: '/pages/profile/profile?from=retired_planner',
+    inputText: value.slice(0, 120),
+    routeSteps: [
+      { id: 'tutor', label: 'AI点拨', active: true },
+      { id: 'review', label: '短回访', active: false },
+      { id: 'parent', label: '家长证据', active: false }
+    ],
+    created_at: new Date().toISOString()
+  }, options.patch || {}));
 }
 
 function updateTonightRouteStatus(status, patch = {}) {
-  const current = loadTonightPlan() || buildTonightPlan('', {});
+  const current = loadTonightPlan() || createTonightPlanFromInput('', { id: `retired_route_${Date.now()}_${randomPart()}` });
   const activeMap = {
-    needs_input: 'plan',
-    focus_created: 'first_step',
-    repaired: 'repair',
+    needs_input: 'tutor',
+    focus_created: 'tutor',
+    repaired: 'review',
     review_scheduled: 'review',
     parent_ready: 'parent'
   };
   return saveTonightPlan(Object.assign({}, current, patch || {}, {
-    routeStatus: status || current.routeStatus || 'needs_input',
-    routeSteps: buildRouteSteps(activeMap[status] || 'plan')
+    routeStatus: status || current.routeStatus || 'retired',
+    routeSteps: [
+      { id: 'tutor', label: 'AI点拨', active: activeMap[status] === 'tutor' },
+      { id: 'review', label: '短回访', active: activeMap[status] === 'review' },
+      { id: 'parent', label: '家长证据', active: activeMap[status] === 'parent' }
+    ]
   }));
 }
 
