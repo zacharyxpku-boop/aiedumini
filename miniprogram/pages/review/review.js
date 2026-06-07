@@ -679,11 +679,11 @@ Page({
     const completed = !!(focus && focus.repairStatus === 'completed') || !!context.done;
     const evidenceLine = completed
       ? '已留下第一步、回访卡和下一次复核入口。'
-      : `当前还有 ${Number(runway.due || (summary.dueCount || 0) || 0)} 张需要短回访。`;
+      : `当前还有 ${Number(runway.due || (summary.dueCount || 0) || 0)} 张需要知识乐园练习。`;
     const actions = [
       {
         id: 'revisit',
-        label: '5分钟短回访',
+        label: '知识乐园练习',
         route: '/pages/review/review',
         reason: '把修过的卡点放进主动回忆，不靠照抄结果。',
         capabilityId: 'revisit'
@@ -919,12 +919,12 @@ Page({
       evidenceRecords: (safe.evidenceRecords || safe.rewards || []).slice(0, 2).map((reward) => Object.assign({}, reward, {
         stateLabel: reward.claimed ? '已记录' : reward.canClaim ? '可记录' : '未完成'
       })),
-      primaryLabel: due ? '开始短回访' : '先短回访一下',
+      primaryLabel: due ? '进入知识乐园' : '先练一张卡',
       primaryAction: due ? 'review' : 'import',
       secondaryLabel: quiz.count ? '做 3 分钟测验' : '找卡点',
       secondaryAction: quiz.count ? 'quiz' : 'repair',
       lanes: [
-        { id: 'review', title: '短回访', value: due, label: '到期卡', action: 'review' },
+        { id: 'review', title: '知识乐园', value: due, label: '到期卡', action: 'review' },
         { id: 'quiz', title: '主动回忆', value: quiz.count || 0, label: '测验卡', action: 'quiz' },
         { id: 'repair', title: '卡点修复', value: qualityQueue.length || 0, label: '待修复', action: 'repair' }
       ]
@@ -2001,7 +2001,7 @@ Page({
           : (roundAdvice && roundAdvice.primary) || '完成一轮主动回忆',
         wrongCause: repairFocus && (repairFocus.wrongCause || repairFocus.knowledgeType || repairFocus.title)
           ? (repairFocus.wrongCause || repairFocus.knowledgeType || repairFocus.title)
-          : (attemptSummary && attemptSummary.wrong ? '短回访出现错卡' : '本轮回忆通过'),
+          : (attemptSummary && attemptSummary.wrong ? '知识乐园出现错卡' : '本轮回忆通过'),
         parentCheck: roundAdvice && roundAdvice.secondary
           ? roundAdvice.secondary
           : '家长只看本轮错卡和明天回访',
@@ -2512,7 +2512,7 @@ Page({
       source: 'review_post_repair_bridge',
       sourceLabel: '修卡后行动桥',
       actionId: dataset.id || 'revisit',
-      actionLabel: dataset.label || '5分钟短回访',
+      actionLabel: dataset.label || '知识乐园练习',
       route,
       reasonLine: dataset.reason || bridge.headline || '',
       evidenceLine: bridge.evidenceLine || '',
