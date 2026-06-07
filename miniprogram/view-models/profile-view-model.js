@@ -5,7 +5,7 @@ const COMPANION_PROFILE_COPY = {
 };
 
 const UNSAFE_KEY_RE = /^[a-z]+(?:_[a-z0-9]+)+$|[a-z]+[A-Z][a-zA-Z]+/;
-const INSUFFICIENT_PROOF = '再用几晚后，咕点会帮你看见孩子常卡在哪一步。';
+const INSUFFICIENT_PROOF = '再积累几次真实记录后，咕点会帮你看见孩子常卡在哪一类证据。';
 
 function safeText(value, fallback = '先说第一步') {
   const text = String(value || '').replace(/\s+/g, ' ').trim();
@@ -75,7 +75,7 @@ function proofSummary(input = {}) {
     return type === 'today_focus_review_card_created' || type === 'focus_revisit';
   }).length;
   const threeNightText = latest3.length >= 3
-    ? `最近 3 晚：${latest3.filter((item) => item.firstSteps > 0).length} 晚确认第一步，${latest3.filter((item) => item.completedFocus > 0 || item.interruptedFocus > 0).length} 晚留下专注痕迹。`
+    ? `最近 3 次：${latest3.filter((item) => item.firstSteps > 0).length} 次确认第一步，${latest3.filter((item) => item.completedFocus > 0 || item.interruptedFocus > 0).length} 次留下专注痕迹。`
     : INSUFFICIENT_PROOF;
   const sevenNightText = latest7.length >= 7
       ? `最近 7 次：${recentSummary.firstStepDays || 0} 次确认第一步，${recentSummary.focusDays || 0} 次专注，${recentSummary.gameDays || 0} 次短回访。`
@@ -102,7 +102,7 @@ function buildParentRecap(input = {}) {
     ? (interrupted ? '中途停下也算开始过。' : '已经围绕这一小步坐过一段。')
     : '还没有进入专注舱留下痕迹。';
   return {
-    tonightRecap: `本次孩子卡在：${evidence.stuckPointText}`,
+    evidenceRecap: `本次证据显示：${evidence.stuckPointText}`,
     parentOneQuestion: '你可以只问一句：刚才你第一步先看了哪里？',
     firstStepLine: `他先迈出的第一步是：${evidence.displayStep}`,
     recentFirstStepCount: proof.recentFirstStepCount,
@@ -150,7 +150,7 @@ function buildParentEvidenceStrip(input = {}) {
 function buildGrowthMemoryCard(input) {
   const recap = buildParentRecap(input || {});
   return {
-    title: '这几晚先看第一步',
+    title: '这几次先看证据',
     body: recap.threeNightPattern,
     tomorrow: recap.sevenNightReadiness === INSUFFICIENT_PROOF ? '' : recap.sevenNightReadiness,
     week: recap.weeklyPattern,
@@ -167,10 +167,10 @@ function buildPrimaryCard(input) {
     parentRecap: recap,
     sections: [
       {
-        id: 'tonightRecap',
+        id: 'evidenceRecap',
         className: '',
-        label: '本次孩子卡在',
-        text: recap.tonightRecap
+        label: '本次证据显示',
+        text: recap.evidenceRecap
       },
       {
         id: 'firstStep',

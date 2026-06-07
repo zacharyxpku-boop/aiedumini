@@ -232,7 +232,7 @@ function buildUploadPersonalizedClosureView(bridge = {}) {
 function buildUploadServiceHandoffPack(options = {}) {
   const sourceSchemaId = options.sourceSchemaId || '';
   const servicePathway = options.servicePathway || {};
-  const tonightTaskCard = options.tonightTaskCard || {};
+  const evidenceReportCard = options.evidenceReportCard || {};
   const validationPlanView = options.validationPlanView || {};
   const productTierView = options.productTierView || {};
   const partnerWorkbench = options.partnerWorkbench || {};
@@ -249,7 +249,7 @@ function buildUploadServiceHandoffPack(options = {}) {
     title: '家庭解决方案交付包',
     summaryLine: assessmentOnly
       ? '当前只放行“学习方法候选”，需要用真实错题和回访验证后再进入训练。'
-      : '当前可以从材料进入“今晚动作 -> 7 天验证 -> 家长复盘/合作交付”的闭环。',
+      : '当前可以从材料进入“证据报告 -> 7 天验证 -> 家长复盘/合作交付”的闭环。',
     cards: [
       {
         id: 'diagnosis_basis',
@@ -260,10 +260,10 @@ function buildUploadServiceHandoffPack(options = {}) {
         evidenceLine: assessmentOnly ? '测评只作为方法候选，不贴天赋标签。' : '只使用本次材料里的可复核线索。'
       },
       {
-        id: 'tonight_execution',
-        label: '今晚执行',
-        line: tonightTaskCard.firstStep || '先让孩子说出第一步，不追完整答案。',
-        evidenceLine: tonightTaskCard.parentCheck || '家长只问一个可观察问题。'
+        id: 'evidence_report',
+        label: '证据报告',
+        line: evidenceReportCard.firstStep || '先让孩子说出第一步，不追完整答案。',
+        evidenceLine: evidenceReportCard.parentCheck || '家长只问一个可观察问题。'
       },
       {
         id: 'seven_day_validation',
@@ -394,7 +394,7 @@ function buildUploadAiMaterialSolutionView(contract = {}, sourceSchemaId = '', o
 
 function buildUploadDailyExecutionSeed(options = {}) {
   const aiView = options.aiMaterialSolutionView || {};
-  const tonightTaskCard = options.tonightTaskCard || {};
+  const evidenceReportCard = options.evidenceReportCard || {};
   const scoreSignalView = options.scoreSignalView || {};
   const contentCoverageReceipt = options.contentCoverageReceipt || {};
   const reportId = options.reportId || '';
@@ -405,8 +405,8 @@ function buildUploadDailyExecutionSeed(options = {}) {
   const tutorRoute = options.actionRoute || aiView.nextActionRoute || `/pages/tutor/tutor?${query}`;
   const subjectLine = scoreSignalView.subjectLine || aiView.subjectLine || 'subject: pending evidence';
   const coverageLine = contentCoverageReceipt.coverageLine || aiView.coverageLine || 'coverage: local first-step strategy';
-  const firstStep = tonightTaskCard.firstStep || aiView.firstStepLine || 'ask the child to say the first step';
-  const wrongCause = tonightTaskCard.wrongCause || aiView.wrongCauseLine || 'name one wrong-cause candidate';
+  const firstStep = evidenceReportCard.firstStep || aiView.firstStepLine || 'ask the child to say the first step';
+  const wrongCause = evidenceReportCard.wrongCause || aiView.wrongCauseLine || 'name one wrong-cause candidate';
   const revisitUnlocked = !!revisitRoute;
   return {
     id: 'upload_daily_execution_seed',
@@ -474,7 +474,7 @@ function buildUploadValidationPlanView(plan = [], sourceSchemaId = '') {
     summaryLine: assessmentOnly
       ? '测评只生成方法候选；必须用真实错题和第 7 天小变式验证。'
       : '本次材料进入 7 天验证；每天只留一条可复核证据。',
-    successLine: '交付标准：今晚动作、隔天回访、第 7 天小变式三项齐全，才允许进入下一阶段服务。',
+    successLine: '交付标准：证据报告、隔天回访、第 7 天小变式三项齐全，才允许进入下一阶段服务。',
     cards
   };
 }
@@ -1161,9 +1161,6 @@ Page({
       subject: (state && state.subject) || '',
       issueType: weak.name || evidence.relatedIssueType || undefined
     });
-    if (focus && focus.isStuck && storage.updateTonightRouteStatus) {
-      storage.updateTonightRouteStatus('focus_created', { focusId: focus.id });
-    }
     return focus;
   },
 
@@ -1187,7 +1184,7 @@ Page({
       imageCount: Number(packet.imageCount || (this.data.imagePaths || []).length || 0),
       confidence: Number(seed.confidence || (imported ? 0.78 : 0.58)),
       requiresParentConfirmation: true,
-      releaseScope: seed.releaseScope || (imported ? 'tonight_action_first' : 'observation_only'),
+      releaseScope: seed.releaseScope || (imported ? 'evidence_report_first' : 'observation_only'),
       portraitConfidenceWeight: Number(seed.portraitConfidenceWeight || (imported ? 1 : 0)),
       evidenceGap: Array.isArray(seed.evidenceGap) ? seed.evidenceGap : [],
       requiredNextEvidence: Array.isArray(seed.requiredNextEvidence) ? seed.requiredNextEvidence : [],
@@ -1344,7 +1341,7 @@ Page({
     const missing = fields.filter((item) => !item.ready).map((item) => item.label || item.id);
     return {
       title: '材料证据补全',
-      summary: '不同材料补不同证据：测评补方法假设，学校材料补家校交接，家长观察补今晚动作，错题补第一步和错因。',
+      summary: '不同材料补不同证据：测评补方法假设，学校材料补家校交接，家长观察补家庭情境，错题补第一步和错因。',
       releaseGate: '本地规则决定报告、短回访和分享是否放行；AI 只改写追问和家长摘要。',
       fields,
       values,
@@ -1438,7 +1435,7 @@ Page({
     }).catch(() => fallback);
   },
 
-  buildTonightTaskCard(decisionSource = {}, reportState = {}, options = {}) {
+  buildEvidenceReportCard(decisionSource = {}, reportState = {}, options = {}) {
     const sourceSchemaId = decisionSource.sourceSchemaId || 'parent_report';
     const reportDraft = reportState && reportState.reportDraft ? reportState.reportDraft : {};
     const evidence = options.structuredEvidenceSignals || {};
@@ -1482,7 +1479,7 @@ Page({
     )));
     const needsEvidence = sourceSchemaId === 'talent_assessment';
     return {
-      id: 'tonight_task_card',
+      id: 'evidence_report_card',
       title: needsEvidence ? '先验证一种学习方法' : '生成一张学习证据卡',
       status: needsEvidence ? 'method_candidate_only' : 'ready_for_first_step',
       sourceSchemaId,
@@ -1692,7 +1689,7 @@ Page({
     const revisitRoute = sourceSchemaId !== 'talent_assessment' && hasPracticeRecallReleaseEvidence && servicePathwayAllowsPracticeRecall
       ? `/pages/review/review?from=upload_report_ready&${query}`
       : '';
-    const tonightTaskCard = this.buildTonightTaskCard(decisionSource, reportState, {
+    const evidenceReportCard = this.buildEvidenceReportCard(decisionSource, reportState, {
       structuredEvidenceSignals: uploadEvidenceSignals,
       openMaicTaskPlan,
       servicePathway,
@@ -1708,7 +1705,7 @@ Page({
       aiMaterialSolutionView,
       scoreSignalView,
       contentCoverageReceipt,
-      tonightTaskCard
+      evidenceReportCard
     });
     const partnerDeliveryLedgerView = buildUploadPartnerLedgerView(
       servicePathway && servicePathway.partnerServiceDeliveryLedger
@@ -1744,7 +1741,7 @@ Page({
     const serviceHandoffPack = buildUploadServiceHandoffPack({
       sourceSchemaId,
       servicePathway,
-      tonightTaskCard,
+      evidenceReportCard,
       validationPlanView,
       productTierView,
       partnerWorkbench,
@@ -1804,7 +1801,7 @@ Page({
       },
       guardedAiReportDraft,
       aiMaterialAnalysisContract,
-      tonightTaskCard,
+      evidenceReportCard,
       servicePathway,
       partnerDeliveryLedgerView,
       validationPlanView,
@@ -1914,7 +1911,7 @@ Page({
       servicePathway: cta.servicePathway || null,
       partnerDeliveryWorkbench: cta.partnerDeliveryWorkbench || null,
       serviceHandoffPack: cta.serviceHandoffPack || null,
-      tonightTaskCard: cta.tonightTaskCard || null,
+      evidenceReportCard: cta.evidenceReportCard || null,
       uploadedMaterialDecisionDossier,
       uploadReportHandoff: cta,
       flowTraceId: cta.flowTraceId || `upload_report:${cta.reportId || Date.now()}`
@@ -1941,7 +1938,7 @@ Page({
         servicePathway: cta.servicePathway || null,
         partnerDeliveryWorkbench: cta.partnerDeliveryWorkbench || null,
         serviceHandoffPack: cta.serviceHandoffPack || null,
-        tonightTaskCard: cta.tonightTaskCard || null,
+        evidenceReportCard: cta.evidenceReportCard || null,
         uploadedMaterialDecisionDossier,
         uploadReportHandoff: cta,
         flowTraceId: nextState.flowTraceId

@@ -73,7 +73,7 @@
               <input value="{{input}}" bindinput="onInput" bindconfirm="send" confirm-type="send" placeholder="写题目、卡点或第一步" />
               <view bindtap="send">发送</view>
             </view>
-            <view class="tutor-feedback-row" wx:if="{{messages && messages.length}}">
+            <view class="tutor-feedback-row" wx:if="{{hasUserTutorTurn}}">
               <view class="tutor-feedback-good" data-status="first_step_spoken" bindtap="recordSocraticEffectivenessFeedback">我说出第一步了</view>
               <view class="tutor-feedback-stuck" data-status="still_blocked" bindtap="recordSocraticEffectivenessFeedback">还是卡住</view>
             </view>

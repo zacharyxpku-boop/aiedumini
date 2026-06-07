@@ -442,6 +442,23 @@ page {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.review-live-actions.finish {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.review-live-actions.finish button {
+  min-height: 64rpx;
+  line-height: 64rpx;
+  color: #17211d;
+  background: #f4f7fb;
+  box-shadow: inset 0 0 0 1rpx rgba(76, 159, 255, 0.16);
+}
+
+.review-live-actions.finish button:last-child {
+  color: #ffffff;
+  background: #23679f;
+}
+
 .review-live-actions.grade button {
   min-height: 68rpx;
   line-height: 68rpx;

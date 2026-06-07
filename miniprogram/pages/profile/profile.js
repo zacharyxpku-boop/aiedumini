@@ -170,7 +170,7 @@ function normalizeProfileServiceHandoffPack(pack = null) {
   return {
     id: pack.id || 'profile_uploaded_material_service_handoff_pack',
     title: pack.title || '家庭解决方案交付包',
-    summaryLine: pack.summaryLine || '把上传材料、今晚动作、7 天验证和合作交付收成一张可执行卡。',
+    summaryLine: pack.summaryLine || '把上传材料、证据报告、7 天验证和合作交付收成一张可执行卡。',
     cards,
     releaseLine: pack.releaseLine || '放行标准：必须有孩子自己的第一步、错因、回访或家长确认。',
     blockedLine: pack.blockedLine || '不交付：原题、完整答案、分数排名、天赋定性和隐私信息。'
@@ -188,10 +188,10 @@ function buildProfileServiceHandoffActions(pack = null, servicePathway = null, h
     : '/pages/tutor/tutor?from=profile_service_handoff';
   const actions = [
     {
-      id: 'service_handoff_tonight',
-      label: '今晚先做一步',
+      id: 'service_handoff_evidence_report',
+      label: '看证据报告',
       route: actionRoute,
-      reason: '把交付包落到孩子今晚能说出的第一步。'
+      reason: '先确认真实材料、卡点和孩子自己的表达，再决定进入点拨或回访。'
     },
     {
       id: 'service_handoff_day7',
@@ -1196,13 +1196,13 @@ function buildFamilyDecisionHomepage(input = {}) {
   const portraitStatus = releaseDecision === 'home_school_safe_handoff'
     ? '可安全交接'
     : releaseDecision === 'tonight_action_only'
-      ? '只放行今晚动作'
+      ? '只放行证据动作'
       : '继续收证据';
   const actualLongitudinalEvidence = reportEvidenceReleaseGate.actualLongitudinalEvidence || {};
   const statusSteps = [
     {
       id: 'tonight_action',
-      label: '今晚动作',
+      label: '证据动作',
       status: doList.length ? 'ready' : 'missing',
       line: doList[0] || '先补一个第一步动作'
     },
@@ -1276,7 +1276,7 @@ function buildFamilyDecisionHomepage(input = {}) {
   };
 }
 
-function buildTonightParentDecisionCard(input = {}) {
+function buildParentEvidenceDecisionCard(input = {}) {
   const familyDecisionHomepage = input.familyDecisionHomepage || {};
   const tonightDecisionBrief = input.tonightDecisionBrief || {};
   const familyDecisionMemo = input.familyDecisionMemo || {};
@@ -1288,7 +1288,7 @@ function buildTonightParentDecisionCard(input = {}) {
     || active.task
     || doList[0]
     || familyDecisionMemo.tonightDecision
-    || '今晚只做一个第一步动作';
+    || '先确认一个可复核的证据动作';
   const childFirstStep = familyDecisionHomepage.childLine
     || tonightDecisionBrief.childScript
     || '孩子只需要说出第一步，不需要一次讲完整过程。';
@@ -1300,8 +1300,8 @@ function buildTonightParentDecisionCard(input = {}) {
     || active.checkpoint
     || '明天换一题，只回访同一个第一步。';
   return {
-    id: 'tonight_parent_decision_card',
-    title: '今晚四行决策卡',
+    id: 'parent_evidence_decision_card',
+    title: '家长四行证据卡',
     subtitle: '先看这一张，再决定要不要展开完整报告。',
     firstAction,
     childFirstStep,
@@ -1309,12 +1309,12 @@ function buildTonightParentDecisionCard(input = {}) {
     tomorrowCheck,
     evidenceLine: evidenceList.length
       ? `依据：${evidenceList.slice(0, 3).join(' / ')}`
-      : familyDecisionHomepage.sourceLine || '依据不足时，只放行今晚动作，不写长期画像。',
+      : familyDecisionHomepage.sourceLine || '依据不足时，只放行证据动作，不写长期画像。',
     safetyLine: familyDecisionHomepage.shareBoundary || '不带原题、答案、完整对话、分数或排名。',
-    route: familyDecisionHomepage.route || active.route || '/pages/tutor/tutor?from=tonight_parent_decision_card',
+    route: familyDecisionHomepage.route || active.route || '/pages/tutor/tutor?from=parent_evidence_decision_card',
     ctaLabel: familyDecisionHomepage.ctaLabel || (active.task ? '去完成今日动作' : '先补第一步证据'),
     rows: [
-      { id: 'do', label: '今晚先做', text: firstAction },
+      { id: 'do', label: '先看证据', text: firstAction },
       { id: 'child', label: '孩子第一步', text: childFirstStep },
       { id: 'parent', label: '家长只问', text: parentQuestion },
       { id: 'tomorrow', label: '明天回访', text: tomorrowCheck }
@@ -1443,7 +1443,7 @@ function buildPartnerServiceReviewCard(partnerWorkbench = null, servicePathway =
     decisionLine: stage === 'ready_for_review'
       ? '复盘只判断保留、降级或更换学习方法，不承诺提分。'
       : stage === 'run_7_day_loop'
-        ? '先跑 7 天：今晚动作、隔天回访、第 7 天小变式，再决定是否升级。'
+        ? '先跑 7 天：证据动作、隔天回访、第 7 天小变式，再决定是否升级。'
         : '先补真实错题、孩子第一步、隔天回访或家长确认，再讨论服务。',
     evidenceLine: validationPlan.length
       ? `已准备 ${validationPlan.length} 个验证节点；第 7 天证据：${day7Ready ? '已就绪' : '未就绪'}。`
@@ -1723,7 +1723,7 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     homeSchoolCollaborationDigest,
     parentReflectionSummary
   });
-  const tonightParentDecisionCard = buildTonightParentDecisionCard({
+  const parentEvidenceDecisionCard = buildParentEvidenceDecisionCard({
     familyDecisionHomepage,
     tonightDecisionBrief,
     familyDecisionMemo,
@@ -1755,9 +1755,9 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
   const publicK12RevisitDeck = realHomeworkCoverageMatrix && Array.isArray(realHomeworkCoverageMatrix.publicK12IntakeRevisitDeck)
     ? realHomeworkCoverageMatrix.publicK12IntakeRevisitDeck
     : [];
-  const openMaicBorrowWorkbench = {
-    id: 'openmaic_k12_borrow_workbench',
-    title: '小讲堂借力工作台',
+  const publicK12PatternWorkbench = {
+    id: 'public_k12_pattern_workbench',
+    title: '公开教研模式工作台',
     summary: `只借公开资料的结构、场景流和质量门；本地代码处理门禁、回流、过程反馈、隐私和报告放行，AI 用于追问与表达。`,
     statusLine: `已接 ${publicK12Resources.length} 类公开资料线索、${publicK12Workbench.length} 条使用工作台、${publicK12RevisitDeck.length} 张可玩采集卡。`,
     sourcePolicyLine: openMaicDecisionBridge && openMaicDecisionBridge.sourcePolicy
@@ -1802,7 +1802,7 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
       { id: 'review', label: '做一次回访', route: '/pages/review/review?from=openmaic_k12_workbench' }
     ]
   };
-  openMaicBorrowWorkbench.nextRoutes.splice(2, 0, {
+  publicK12PatternWorkbench.nextRoutes.splice(2, 0, {
     id: 'upload_parent_report',
     label: '家长观察',
     route: '/pages/upload/upload?from=openmaic_k12_workbench&type=parent_report'
@@ -2016,10 +2016,10 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     openMaicMiniLessonTeacherSchoolBridge: openMaicDecisionBridge && openMaicDecisionBridge.miniLessonReport ? openMaicDecisionBridge.miniLessonReport.teacherSchoolBridge : null,
     openMaicMiniLessonBoundary: openMaicDecisionBridge && openMaicDecisionBridge.miniLessonReport ? openMaicDecisionBridge.miniLessonReport.boundary : '',
     openMaicHomeSchoolMiniLessonPacket: openMaicDecisionBridge ? openMaicDecisionBridge.homeSchoolMiniLessonPacket : null,
-    openMaicBorrowWorkbench,
-    openMaicBorrowWorkbenchLanes: openMaicBorrowWorkbench.lanes,
-    openMaicBorrowWorkbenchBlockedClaims: openMaicBorrowWorkbench.blockedClaims,
-    openMaicBorrowWorkbenchNextRoutes: openMaicBorrowWorkbench.nextRoutes,
+    publicK12PatternWorkbench,
+    publicK12PatternWorkbenchLanes: publicK12PatternWorkbench.lanes,
+    publicK12PatternWorkbenchBlockedClaims: publicK12PatternWorkbench.blockedClaims,
+    publicK12PatternWorkbenchNextRoutes: publicK12PatternWorkbench.nextRoutes,
     reportPressureTruthAudit,
     reportPressureTruthLine: reportPressureTruthAudit ? reportPressureTruthAudit.sampleLine : '',
     reportPressureTruthRows: reportPressureTruthAudit && Array.isArray(reportPressureTruthAudit.pressureRows)
@@ -2617,7 +2617,7 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     portraitDecisionReleaseSummary: portraitDecisionReleaseSystem ? portraitDecisionReleaseSystem.summary : '',
     portraitDecisionReleaseLanes: portraitDecisionReleaseSystem && Array.isArray(portraitDecisionReleaseSystem.releaseLanes)
       ? portraitDecisionReleaseSystem.releaseLanes.map((item) => Object.assign({}, item, {
-        readableLine: `${item.label || '家庭动作'}：${item.status === 'released' ? '可以今晚执行' : item.status === 'candidate' ? '作为候选继续验证' : '暂时锁住'}；依据：${item.releaseRule || '等孩子第一步、错因和回访证据补齐'}；不做：${item.blockedRule || '不贴长期标签'}`
+        readableLine: `${item.label || '家庭动作'}：${item.status === 'released' ? '可以执行' : item.status === 'candidate' ? '作为候选继续验证' : '暂时锁住'}；依据：${item.releaseRule || '等孩子第一步、错因和回访证据补齐'}；不做：${item.blockedRule || '不贴长期标签'}`
       }))
       : [],
     portraitDecisionReleaseLocks: portraitDecisionReleaseSystem && Array.isArray(portraitDecisionReleaseSystem.releaseLocks)
@@ -2645,10 +2645,10 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
       ? fallbackRecoveryReportBridge.evidenceRequired
       : [],
     familyDecisionHomepage,
-    tonightParentDecisionCard,
-    tonightParentDecisionCardRows: tonightParentDecisionCard.rows,
-    tonightParentDecisionCardRoute: tonightParentDecisionCard.route,
-    tonightParentDecisionCardCtaLabel: tonightParentDecisionCard.ctaLabel,
+    parentEvidenceDecisionCard,
+    parentEvidenceDecisionCardRows: parentEvidenceDecisionCard.rows,
+    parentEvidenceDecisionCardRoute: parentEvidenceDecisionCard.route,
+    parentEvidenceDecisionCardCtaLabel: parentEvidenceDecisionCard.ctaLabel,
     familyDecisionHomepageTitle: familyDecisionHomepage.title,
     familyDecisionHomepageHeadline: familyDecisionHomepage.headline,
     familyDecisionHomepageStatus: familyDecisionHomepage.status,
@@ -2788,7 +2788,7 @@ function buildFamilyDecisionActionBridge(input = {}) {
         label: '发家庭回访卡',
         route: sharePath,
         shareIntent: 'family_decision',
-        reason: memo.shareLine || '把今晚动作发给家里，只看证据，不排行。',
+        reason: memo.shareLine || '把证据动作发给家里，只看证据，不排行。',
         evidence: evidence[2] || '明天能回访同一小步'
       }
     ]
@@ -2981,7 +2981,7 @@ Page({
       title: '家长先看这一步',
       primaryCta: '完成今日复盘',
       parentRecap: {
-        tonightRecap: '本次先看证据',
+        evidenceRecap: '本次先看证据',
         parentOneQuestion: '你刚才先看了哪里？',
         firstStepLine: '先看孩子的第一步',
         trustBoundaryNote: '明天再看一次，确认有没有迁移。'
@@ -3001,7 +3001,7 @@ Page({
     parentGoals: PARENT_GOALS,
     parentGoal: PARENT_GOALS[3],
     hasParentEvidence: false,
-    parentTonightItems: [],
+    parentEvidenceItems: [],
     wrongCauseSummary: null,
     dataFlywheel: null,
     flywheelCoach: null,
@@ -3169,37 +3169,6 @@ Page({
       ? ''
       : '再用两晚，咕点会帮你看见孩子常卡在哪一步。今晚先记录一句自己的第一步就够了。';
     const reportJobCaseId = this.resolveReportJobCaseId(learningReportState);
-    this.setData({
-      profile,
-      consent: !!storage.get(storage.KEYS.consent, false),
-      identity: storage.loadClientIdentity(),
-      moduleSummary,
-      tutorSummary,
-      thinkingSummary,
-      reviewSummary,
-      profileViewModel: lightProfileViewModel,
-      focusCabinSummary,
-      latestFocusSession: focusHistory[0] || null,
-      todayFocus,
-      companionPreference,
-      weeklyGrowthMemory: lightWeeklyGrowthMemory,
-      calibrationProfile,
-      parentGoal,
-      hasParentEvidence,
-      profileEmptyGuide: lightProfileEmptyGuide,
-      parentTonightItems: this.buildParentTonightItems(state),
-      learningReportSummary: {
-        ctaLabel: lightProfileViewModel.primaryCta,
-        nextActionRoute: '/pages/entry-detail/entry-detail?scene=parent&from=profile_recap_done',
-        parentReportWorkflowTitle: '材料报告已生成',
-        parentReportWorkflowSourceLine: '上传页资料包 / 家长观察',
-        parentReportWorkflowReasoningLine: '先看证据，再决定下一步模块',
-        parentReportWorkflowImageLine: '报告预览可先查看，完整图稿稍后补齐',
-        reportJobCaseId
-      }
-    });
-    this.refreshReportJobStatus(reportJobCaseId);
-    return;
     const gameProfileCard = buildGameProfileCard(reviewSummary);
     const wrongCauseSummary = buildWrongCauseSummary(reviewSummary, thinkingSummary);
     const globalEvidenceBrief = storage.buildGlobalEvidenceBrief ? storage.buildGlobalEvidenceBrief() : null;
@@ -3287,7 +3256,7 @@ Page({
       recentLearningSummary
     });
     const parentActionGuide = storage.buildParentActionGuide ? storage.buildParentActionGuide({
-      tonightRecap: profileViewModel.parentRecap && profileViewModel.parentRecap.tonightRecap
+      evidenceRecap: profileViewModel.parentRecap && profileViewModel.parentRecap.evidenceRecap
     }) : null;
     const acceptanceReport = storage.buildAcceptanceReport ? storage.buildAcceptanceReport({ surface: 'profile' }) : null;
     const profileReadinessSnapshot = buildProfileReadinessSnapshot({
@@ -3332,7 +3301,7 @@ Page({
       parentProofCards: (parentReport.recordCards || []).filter((item) => item.id !== 'sync').slice(0, 4),
       hasParentEvidence,
       profileEmptyGuide,
-      parentTonightItems: this.buildParentTonightItems(state),
+      parentEvidenceItems: this.buildParentEvidenceItems(state),
       wrongCauseSummary,
       learningReportState,
       learningReportSummary,
@@ -3387,6 +3356,7 @@ Page({
       isBetaTester: storage.isBetaTester ? storage.isBetaTester() : false,
       pilotSummary: storage.pilotRunSummary ? storage.pilotRunSummary() : null
     });
+    this.refreshReportJobStatus(reportJobCaseId);
   },
 
   onLoad(options = {}) {
@@ -3989,7 +3959,7 @@ Page({
     });
   },
 
-  buildParentTonightItems(state) {
+  buildParentEvidenceItems(state) {
     const plan = (state && state.homework_plan) || {};
     const must = (plan.must_do || []).slice(0, 3);
     const weak = ((state && state.weak_points) || [])[0] || null;
@@ -4005,7 +3975,7 @@ Page({
         {
           id: first.id || 'must_first',
           title: first.text || first.title || '先完成关键练习',
-          label: '今晚必做',
+          label: '证据锚点',
           level: 'mid'
         },
         {
@@ -4017,7 +3987,7 @@ Page({
       ];
     }
     return [
-      { id: 'input', title: '还没有今晚任务', label: '待开始', level: 'high' },
+      { id: 'input', title: '还没有可用证据', label: '待补充', level: 'high' },
       { id: 'pack', title: '先录入作业、错题或卡住点', label: '下一步', level: 'mid' },
       { id: 'review', title: '完成一次任务后再看卡点记录', label: '待积累', level: 'low' }
     ];

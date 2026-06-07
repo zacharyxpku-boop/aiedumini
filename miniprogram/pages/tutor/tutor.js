@@ -1194,6 +1194,7 @@ Page({
     ] : (savedMessages || [
       { role: 'assistant', text: intro }
     ]);
+    const hasUserTutorTurn = messages.some((item) => item && item.role === 'user');
 
     const pasteRisk = pasteRiskSignal(messages);
     const tutorTurnState = tutorLadder.nextTutorTurnState
@@ -1209,6 +1210,7 @@ Page({
       weakPoints,
       misconceptionTags,
       messages,
+      hasUserTutorTurn,
       pedagogy: pedagogyPanel(selected, misconceptionTags, null),
       pasteRisk,
       coachConsole: coachConsole(selected, misconceptionTags, null, pasteRisk, this.data.activeStep),
@@ -1381,7 +1383,7 @@ Page({
     const misconceptionText = this.data.misconceptionTags.map((item) => item.label || item.axis).filter(Boolean).join('、');
     const step = this.data.activeStep || 'read_problem';
     const messages = this.data.messages.concat([{ role: 'user', text: input }]);
-    this.setData({ messages, input: '', loading: true });
+    this.setData({ messages, input: '', loading: true, hasUserTutorTurn: true });
     if (storage.saveTodayFocusFromThought && (selected || input.length >= 4)) {
       storage.saveTodayFocusFromThought(selected && selected.text ? selected.text : input, {
         source: 'tutor',

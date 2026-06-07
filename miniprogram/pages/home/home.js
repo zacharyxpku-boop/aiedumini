@@ -1171,7 +1171,7 @@ Page({
     const relayPackCards = [
       {
         id: 'tonight_action',
-        title: '今晚动作',
+        title: '证据动作',
         line: incoming.tonight_decision || primaryReceiverAction || '用自己的材料完成一个 5 分钟第一步动作。',
         evidence: incoming.tonight_release_gate || '完成后留下自己的第一步和错因证据。',
         route: challengeRoute
@@ -1310,7 +1310,7 @@ Page({
           id: 'parent',
           label: '给家长看',
           route: '/pages/profile/profile?from=share_relay',
-          reason: incoming.socratic_report_decision || '只看今晚动作、证据和明天复核，不做排行。',
+          reason: incoming.socratic_report_decision || '只看证据动作、证据和明天复核，不做排行。',
           evidence: '家庭复盘'
         },
         {
