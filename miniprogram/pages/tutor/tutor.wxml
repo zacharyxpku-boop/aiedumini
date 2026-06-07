@@ -45,6 +45,10 @@
 
           <view class="tutor-chat-card">
             <view class="tutor-chat-title">把卡点发给原点</view>
+            <view class="tutor-service-status" wx:if="{{tutorServiceStatus && tutorServiceStatus.visible}}">
+              <text>{{tutorServiceStatus.label}}</text>
+              <text>{{tutorServiceStatus.line}}</text>
+            </view>
             <block wx:if="{{messages && messages.length}}">
               <block wx:for="{{messages}}" wx:key="index">
                 <view class="tutor-bubble {{item.role === 'user' ? 'me' : ''}}">{{item.text}}</view>

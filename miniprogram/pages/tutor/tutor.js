@@ -129,6 +129,38 @@ function buildSocraticBrief(result = {}, receipt = {}, promptWorkflow = {}) {
   };
 }
 
+function buildTutorServiceStatus(result = {}, receipt = {}) {
+  const serviceContract = (result && result.service_contract) || receipt.service_contract || {};
+  const mode = serviceContract.mode || (result && result.fallback === false ? 'configured_model' : 'local_socratic_rules');
+  const fallback = result && Object.prototype.hasOwnProperty.call(result, 'fallback')
+    ? result.fallback === true
+    : mode !== 'configured_model';
+  const source = (result && (result.fallback_source || result.fallbackSource))
+    || receipt.fallback_source
+    || (mode === 'client_local_rules' ? 'client_network_error' : '')
+    || (fallback && result && result.upstream_status ? 'server_upstream_error' : '')
+    || (fallback ? 'local_socratic_rules' : 'configured_model');
+  if (!fallback && mode === 'configured_model') {
+    return {
+      visible: false,
+      mode,
+      source,
+      label: '模型点拨',
+      line: '本轮由模型改写追问，本地规则守住答案边界。'
+    };
+  }
+  const line = source === 'client_network_error'
+    ? '网络不稳，本轮用本地带学规则，仍不直接给答案。'
+    : '本轮用本地带学规则，仍不直接给答案。';
+  return {
+    visible: true,
+    mode,
+    source,
+    label: '本地带学',
+    line
+  };
+}
+
 function tutorReadableWorkbenchRows(rows = []) {
   return (Array.isArray(rows) ? rows : []).map((item, index) => ({
     id: item.id || `workbench_${index + 1}`,
@@ -1078,6 +1110,7 @@ Page({
     socraticReasoningLine: '本地规则决定证据、提示层级和是否放行；AI 只改写成孩子听得懂的话。',
     socraticTrace: buildSocraticTrace({}),
     socraticBrief: null,
+    tutorServiceStatus: null,
     socraticFeedbackStatus: '',
     socraticFeedbackRecordedAt: '',
     socraticFeedbackNextAction: '',
@@ -1417,7 +1450,16 @@ Page({
         return null;
       });
     }).catch(() => {
-      this.appendAssistant(fallbackReply(input, selected, step, misconceptionText), turnState);
+      this.appendAssistant(Object.assign(fallbackReply(input, selected, step, misconceptionText), {
+        fallback: true,
+        fallback_source: 'client_network_error',
+        service_contract: {
+          mode: 'client_local_rules',
+          evidence_required: ['student_first_step', 'selected_homework', 'misconception_tags'],
+          boundary: 'no_direct_homework_answer'
+        },
+        upstream_status: 'client_network_error'
+      }), turnState);
     });
   },
 
@@ -1457,14 +1499,17 @@ Page({
       engine_version: result && result.engine_version ? result.engine_version : '',
       service_contract: result && result.service_contract ? result.service_contract : null,
       fallback: result && Object.prototype.hasOwnProperty.call(result, 'fallback') ? result.fallback : null,
+      fallback_source: result && (result.fallback_source || result.fallbackSource) ? (result.fallback_source || result.fallbackSource) : '',
       output_sanitized: result && Object.prototype.hasOwnProperty.call(result, 'output_sanitized') ? result.output_sanitized : null,
       upstream_status: result && result.upstream_status ? result.upstream_status : '',
+      model_contract: result && result.model_contract ? result.model_contract : null,
       allowed_moves: result && result.allowed_moves ? result.allowed_moves : [],
       transfer_prompt: result && result.transfer_prompt ? result.transfer_prompt : ''
     });
     diagnosticReceipt.socratic_prompt_workflow.turnId = diagnosticReceipt.turnId;
     diagnosticReceipt.socraticPromptWorkflow.turnId = diagnosticReceipt.turnId;
     const socraticBrief = buildSocraticBrief(result || {}, diagnosticReceipt, promptWorkflow);
+    const tutorServiceStatus = buildTutorServiceStatus(result || {}, diagnosticReceipt);
     if (storage.appendThinkingReceipt) {
       storage.appendThinkingReceipt(Object.assign({}, diagnosticReceipt, {
         selected_id: this.data.selected && this.data.selected.id,
@@ -1692,6 +1737,7 @@ Page({
       pasteRisk,
       coachConsole: coachConsole(this.data.selected, this.data.misconceptionTags, masterySignal, pasteRisk, coachStep),
       thinkingReceipt: diagnosticReceipt,
+      tutorServiceStatus,
       socraticPromptWorkflow: promptWorkflow,
       socraticReasoningLine: buildSocraticReasoningLine(diagnosticReceipt),
       socraticTrace: buildSocraticTrace(diagnosticReceipt),

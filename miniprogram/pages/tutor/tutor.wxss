@@ -373,6 +373,37 @@ page {
   font-weight: 950;
 }
 
+.tutor-service-status {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10rpx;
+  align-items: center;
+  padding: 10rpx 12rpx;
+  border-radius: 18rpx;
+  background: #f2fbf1;
+  box-shadow: inset 0 0 0 1rpx rgba(34, 185, 92, 0.12);
+}
+
+.tutor-service-status text:first-child {
+  min-height: 36rpx;
+  padding: 0 12rpx;
+  border-radius: 999rpx;
+  color: #0d7a3d;
+  background: #ffffff;
+  font-size: 20rpx;
+  font-weight: 950;
+  line-height: 36rpx;
+  white-space: nowrap;
+}
+
+.tutor-service-status text:last-child {
+  min-width: 0;
+  color: #536158;
+  font-size: 21rpx;
+  font-weight: 790;
+  line-height: 1.28;
+}
+
 .tutor-chat-card .tutor-bubble {
   max-width: 82%;
   padding: 12rpx 15rpx;
