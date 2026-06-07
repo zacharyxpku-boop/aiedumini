@@ -3150,7 +3150,12 @@ Page({
     );
     const lightRecentLearningSummary = storage.buildRecentLearningSummary ? storage.buildRecentLearningSummary() : null;
     const lightTodayFocusReviewCards = storage.loadReviewCards
-      ? storage.loadReviewCards().filter((card) => card && (card.source === 'today_focus' || card.sourceFocusId === (todayFocus && todayFocus.id)))
+      ? storage.loadReviewCards().filter((card) => {
+        if (!card) return false;
+        if (card.source === 'today_focus' || card.sourceFocusId === (todayFocus && todayFocus.id)) return true;
+        if (card.reportId || card.sourceSchemaId || card.reportSourceId || card.uploadMaterialType) return true;
+        return /^(material_|tutor_answer_boundary|tutor_first_step|three_minute_mini_lesson)/.test(String(card.source || ''));
+      })
       : [];
     const lightWeeklyGrowthMemory = storage.buildWeeklyGrowthMemory ? storage.buildWeeklyGrowthMemory(companionPreference) : null;
     const lightProfileViewModel = profileViewModels.buildProfileViewModel({
@@ -3243,7 +3248,7 @@ Page({
         if (!card) return false;
         if (card.source === 'today_focus' || card.sourceFocusId === (todayFocus && todayFocus.id)) return true;
         if (card.reportId || card.sourceSchemaId || card.reportSourceId || card.uploadMaterialType) return true;
-        return /^material_/.test(String(card.source || ''));
+        return /^(material_|tutor_answer_boundary|tutor_first_step|three_minute_mini_lesson)/.test(String(card.source || ''));
       })
       : [];
     const weeklyGrowthMemory = storage.buildWeeklyGrowthMemory ? storage.buildWeeklyGrowthMemory(companionPreference) : null;

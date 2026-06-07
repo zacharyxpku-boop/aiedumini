@@ -71,6 +71,7 @@
                 <text bindtap="goSocraticBriefRoute">{{socraticBrief.routeLabel}}</text>
               </view>
             </view>
+            <view class="tutor-micro-choice-row" wx:if="{{socraticMicroChoices && socraticMicroChoices.length}}"><text data-id="{{socraticMicroChoices[0].id}}" data-index="0" bindtap="selectSocraticMicroChoice">{{socraticMicroChoices[0].label}} {{socraticMicroChoices[0].text}}</text><text data-id="{{socraticMicroChoices[1].id}}" data-index="1" bindtap="selectSocraticMicroChoice">{{socraticMicroChoices[1].label}} {{socraticMicroChoices[1].text}}</text></view>
             <view class="tutor-input-bar">
               <input value="{{input}}" bindinput="onInput" bindconfirm="send" confirm-type="send" placeholder="写题目、卡点或第一步" />
               <view bindtap="send">发送</view>

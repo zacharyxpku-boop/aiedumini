@@ -146,6 +146,24 @@ function buildSocraticBrief(result = {}, receipt = {}, promptWorkflow = {}) {
   };
 }
 
+function buildSocraticMicroChoices(result = {}, receipt = {}) {
+  const fallback = result.socratic_fallback_plan || receipt.socratic_fallback_plan || {};
+  const probe = result.diagnostic_probe || receipt.diagnostic_probe || {};
+  const raw = Array.isArray(fallback.microChoices) && fallback.microChoices.length
+    ? fallback.microChoices
+    : [
+      { id: 'choice_condition', label: 'A', text: '先圈一个已知条件' },
+      { id: 'choice_question', label: 'B', text: '先说题目问什么' }
+    ];
+  return raw.slice(0, 3).map((item, index) => ({
+    id: item.id || `choice_${index + 1}`,
+    label: item.label || String.fromCharCode(65 + index),
+    text: String(item.text || item.prompt || '').slice(0, 18),
+    input: `我先选 ${item.label || String.fromCharCode(65 + index)}：${item.text || item.prompt || '先说第一步'}。请继续只问我下一小步，不要给答案。`,
+    axis: probe.axis || fallback.mode || 'first_step_micro_choice'
+  })).filter((item) => item.text);
+}
+
 function buildTutorServiceStatus(result = {}, receipt = {}) {
   const serviceContract = (result && result.service_contract) || receipt.service_contract || {};
   const mode = serviceContract.mode || (result && result.fallback === false ? 'configured_model' : 'local_socratic_rules');
@@ -1174,6 +1192,7 @@ Page({
     socraticReasoningLine: '本地规则决定证据、提示层级和是否放行；AI 只改写成孩子听得懂的话。',
     socraticTrace: buildSocraticTrace({}),
     socraticBrief: null,
+    socraticMicroChoices: [],
     tutorServiceStatus: null,
     socraticFeedbackStatus: '',
     socraticFeedbackRecordedAt: '',
@@ -1282,10 +1301,12 @@ Page({
       socraticReasoningLine: buildSocraticReasoningLine(receipt),
       socraticTrace: buildSocraticTrace(receipt),
       socraticBrief: null,
+      socraticMicroChoices: [],
       socraticFeedbackStatus: '',
       socraticFeedbackRecordedAt: '',
       socraticFeedbackNextAction: '',
       socraticBrief: null,
+      socraticMicroChoices: [],
       miniLessonFeedbackBridge: null,
       miniLessonExitGateStatus: '',
       miniLessonExitGateNextRoute: '',
@@ -1569,6 +1590,7 @@ Page({
     diagnosticReceipt.socratic_prompt_workflow.turnId = diagnosticReceipt.turnId;
     diagnosticReceipt.socraticPromptWorkflow.turnId = diagnosticReceipt.turnId;
     const socraticBrief = buildSocraticBrief(result || {}, diagnosticReceipt, promptWorkflow);
+    const socraticMicroChoices = buildSocraticMicroChoices(result || {}, diagnosticReceipt);
     const tutorServiceStatus = buildTutorServiceStatus(result || {}, diagnosticReceipt);
     if (storage.appendThinkingReceipt) {
       storage.appendThinkingReceipt(Object.assign({}, diagnosticReceipt, {
@@ -1802,6 +1824,7 @@ Page({
       socraticReasoningLine: buildSocraticReasoningLine(diagnosticReceipt),
       socraticTrace: buildSocraticTrace(diagnosticReceipt),
       socraticBrief,
+      socraticMicroChoices,
       socraticFeedbackStatus: '',
       socraticFeedbackRecordedAt: '',
       socraticFeedbackNextAction: '',
@@ -1814,6 +1837,34 @@ Page({
       childExitTicketText: ''
     });
     this.syncTutorSignal(masterySignal, coachStep);
+  },
+
+  selectSocraticMicroChoice(event) {
+    const dataset = event && event.currentTarget && event.currentTarget.dataset
+      ? event.currentTarget.dataset
+      : {};
+    const choices = this.data.socraticMicroChoices || [];
+    const choice = choices.find((item) => item.id === dataset.id) || choices[Number(dataset.index || 0)] || null;
+    if (!choice || this.data.loading) return;
+    if (storage.appendReviewEvent) {
+      storage.appendReviewEvent({
+        event: 'socratic_micro_choice_selected',
+        type: 'socratic_micro_choice_selected',
+        choiceId: choice.id,
+        choiceLabel: choice.label,
+        axis: choice.axis,
+        source: 'tutor_socratic_micro_choice',
+        evidenceRequired: ['child_micro_choice', 'first_step', 'next_day_revisit'],
+        blockedFields: SOCRATIC_EFFECTIVENESS_BLOCKED_FIELDS,
+        created_at: Date.now()
+      });
+    }
+    this.setData({
+      input: choice.input,
+      activeStep: 'micro_choice'
+    }, () => {
+      this.send();
+    });
   },
 
   recordSocraticEffectivenessFeedback(event) {
