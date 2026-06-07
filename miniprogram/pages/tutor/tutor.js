@@ -124,6 +124,23 @@ function buildSocraticBrief(result = {}, receipt = {}, promptWorkflow = {}) {
     title: mastery.status === 'blocked_answer_request' ? '已拦截代写请求' : '本轮点拨',
     nextQuestion: String(nextQuestion || '').slice(0, 48),
     boundary,
+    steps: [
+      {
+        id: 'why',
+        label: '为什么这样问',
+        text: String((promptWorkflow && promptWorkflow.localDecision) || '先守住证据和提示层级').slice(0, 34)
+      },
+      {
+        id: 'say',
+        label: '孩子只说',
+        text: String(nextQuestion || '先说自己的第一步').slice(0, 34)
+      },
+      {
+        id: 'verify',
+        label: '说完去验证',
+        text: promptWorkflow && promptWorkflow.nextReviewRoute ? '生成短回访卡，不在这里堆长方案' : '进入短回访验证'
+      }
+    ],
     routeLabel: '说完去短回访',
     route: promptWorkflow && promptWorkflow.nextReviewRoute ? promptWorkflow.nextReviewRoute : '/pages/review/review?from=socratic_prompt_workflow'
   };

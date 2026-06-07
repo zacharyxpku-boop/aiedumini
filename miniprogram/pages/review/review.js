@@ -1830,7 +1830,32 @@ Page({
       : 'remembered';
     const active = this.data.activeReviewTool || {};
     if (!active.id || active.empty) return;
-    const answers = Array.isArray(active.answers) ? active.answers : [];
+    let answers = Array.isArray(active.answers) ? active.answers.slice() : [];
+    if (!answers.length && active.gameType === 'quiz') {
+      answers = [{
+        cardId: active.primary && active.primary.id ? active.primary.id : active.id,
+        correct: result === 'remembered',
+        selfReported: true,
+        evidence: 'self_reported_active_recall'
+      }];
+    }
+    if (!answers.length) {
+      this.setData({
+        feedbackText: '先完成一次配对、排序或回忆自评，再记录本轮。'
+      });
+      if (typeof wx !== 'undefined' && wx.showToast) {
+        wx.showToast({ title: '先玩一手再记录', icon: 'none' });
+      }
+      if (storage.appendReviewEvent) {
+        storage.appendReviewEvent({
+          kind: 'playable_review_needs_interaction',
+          tool_id: active.id,
+          source: 'review_tab_live_tool',
+          created_at: new Date().toISOString()
+        });
+      }
+      return;
+    }
     const attemptSummary = revisitEngine.summarizeAttempt
       ? revisitEngine.summarizeAttempt({
         gameType: active.gameType || active.id,
