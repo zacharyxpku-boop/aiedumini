@@ -2470,7 +2470,14 @@ Page({
     if (this.data.submitting) return;
     const text = String(this.data.homeworkText || '').trim();
     if (!text) {
-      wx.showToast({ title: '先填作业清单', icon: 'none' });
+      const deck = buildUploadEntryDeck('material');
+      this.setData({
+        uploadEntryMode: 'material',
+        uploadEntryDeck: deck,
+        homeworkPlaceholder: deck.placeholder,
+        showMaterialPanel: true
+      });
+      wx.showToast({ title: '先补一条材料', icon: 'none' });
       return;
     }
     const current = storage.loadState();
