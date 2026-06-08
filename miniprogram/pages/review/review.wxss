@@ -113,7 +113,7 @@ page {
   content: "";
   position: absolute;
   left: 40rpx;
-  bottom: 76rpx;
+  top: 168rpx;
   width: 56rpx;
   height: 8rpx;
   border-radius: 999rpx;
@@ -159,44 +159,106 @@ page {
 
 .yd-review-art {
   position: absolute;
-  right: 0;
-  bottom: 10rpx;
-  width: 220rpx;
-  height: 210rpx;
+  right: 8rpx;
+  bottom: 0;
+  width: 176rpx;
+  height: 164rpx;
   object-fit: contain;
-  opacity: 0.96;
+  opacity: 0.24;
 }
 
-.review-map-rail {
+.review-route-map {
   position: absolute;
-  left: 230rpx;
-  right: 92rpx;
-  bottom: 42rpx;
-  display: grid;
-  grid-template-columns: repeat(4, 28rpx);
-  justify-content: space-between;
-  align-items: center;
-  z-index: 2;
+  inset: 32rpx 0 0;
+  z-index: 0;
   pointer-events: none;
 }
 
-.review-map-rail text {
+.review-route-seg {
+  position: absolute;
   display: block;
-  width: 28rpx;
-  height: 28rpx;
-  border: 6rpx solid #ffffff;
-  border-radius: 50%;
-  background: #14b8a6;
-  box-shadow: 0 6rpx 14rpx rgba(20, 184, 166, 0.24);
+  height: 0;
+  border-top: 5rpx dashed rgba(20, 184, 166, 0.38);
+  border-radius: 999rpx;
+  transform-origin: left center;
 }
 
-.review-map-rail text:nth-child(2) {
+.review-route-seg.seg-a {
+  left: -40rpx;
+  top: 272rpx;
+  width: 194rpx;
+  transform: rotate(-18deg);
+}
+
+.review-route-seg.seg-b {
+  left: 126rpx;
+  top: 170rpx;
+  width: 190rpx;
+  transform: rotate(17deg);
+}
+
+.review-route-seg.seg-c {
+  left: 302rpx;
+  top: 194rpx;
+  width: 176rpx;
+  transform: rotate(-18deg);
+}
+
+.review-route-node {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30rpx;
+  height: 30rpx;
+  border-radius: 50%;
+  background: rgba(20, 184, 166, 0.58);
+  box-shadow: 0 0 0 1rpx rgba(255, 255, 255, 0.6);
+}
+
+.review-route-node text {
+  display: block;
+  width: 10rpx;
+  height: 10rpx;
+  border-radius: 50%;
+  background: #ffffff;
+}
+
+.review-route-node.node-a {
+  left: 126rpx;
+  top: 238rpx;
+}
+
+.review-route-node.node-b {
+  left: 388rpx;
+  top: 166rpx;
+  width: 54rpx;
+  height: 54rpx;
+  background: rgba(245, 158, 11, 0.15);
+  box-shadow: none;
+}
+
+.review-route-node.node-b text {
+  width: 24rpx;
+  height: 24rpx;
   background: #f59e0b;
 }
 
-.review-map-rail text:nth-child(3) {
-  background: #ffffff;
-  border-color: #f59e0b;
+.review-route-node.node-c {
+  left: 614rpx;
+  top: 104rpx;
+  opacity: 0.5;
+}
+
+.review-route-blob {
+  position: absolute;
+  right: -32rpx;
+  bottom: -24rpx;
+  width: 154rpx;
+  height: 126rpx;
+  border-radius: 44% 56% 58% 42%;
+  background: rgba(20, 184, 166, 0.05);
+  transform: rotate(-18deg);
 }
 
 .review-chip-row {

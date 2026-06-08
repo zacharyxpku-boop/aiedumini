@@ -8,12 +8,20 @@
         </view>
 
         <view class="yd-review-hero">
+          <view class="review-route-map" aria-hidden="true">
+            <text class="review-route-seg seg-a"></text>
+            <text class="review-route-seg seg-b"></text>
+            <text class="review-route-seg seg-c"></text>
+            <text class="review-route-node node-a"><text></text></text>
+            <text class="review-route-node node-b"><text></text></text>
+            <text class="review-route-node node-c"><text></text></text>
+            <text class="review-route-blob"></text>
+          </view>
           <view class="yd-review-copy">
             <text class="yd-review-title">选个知识点，开一局</text>
             <text class="yd-review-sub route-note short">没有错题也能先玩；有错题后会变成你的专属练习。</text>
             <view class="review-chip-row"><text>分数</text><text>应用题</text><text>英语单词</text><text>阅读理解</text><text>计算检查</text><text>表达组织</text></view>
           </view>
-          <text class="review-map-rail"><text></text><text></text><text></text><text></text></text>
           <image class="yd-review-art" mode="aspectFit" src="/assets/reference/review-world-map-transparent.png" />
         </view>
 
