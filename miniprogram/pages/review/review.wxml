@@ -11,17 +11,15 @@
         <view class="yd-review-hero">
           <view class="yd-review-copy">
             <view class="yd-review-title">{{reviewViewModel.title}}</view>
-            <view class="yd-review-sub route-note short">用真实错因卡开一局：先玩，再自评，再生成明天回访证据。</view>
-            <view class="review-chip-row"><text>错因地鼠</text><text>快闪问答</text><text>闪卡翻翻</text><text>拼图配对</text><text>多米诺接龙</text><text>路线接龙</text><text>UNO错因牌</text><text>闪印练习单</text></view>
+            <view class="yd-review-sub route-note short">先用一张真实错题生成练习卡，再选一个玩法练一轮。</view>
+            <view class="review-chip-row"><text>错因地鼠</text><text>快闪问答</text><text>闪卡翻翻</text><text>拼图配对</text><text>多米诺接龙</text><text>路线接龙</text><text>UNO错因卡</text><text>打印练习单</text></view>
           </view>
           <image class="yd-review-art" mode="aspectFit" src="/assets/reference/review-world-map-transparent.png" />
         </view>
 
-        <view class="review-play-lanes"><text class="review-play-lane review-lane-sheet"><text>练习单生成器</text><text>闪卡、配对、UNO、打印练习单</text></text><text class="review-play-lane review-lane-live"><text>课堂互动工具</text><text>错因地鼠、路线接龙、快闪问答</text></text><text class="review-play-lane review-lane-solo"><text>自主练习</text><text>做完自评，回到家长证据</text></text></view>
-
         <view class="review-record-panel">
           <view class="review-section-head"><text>乐园地图</text><text>每局只用真实学习卡</text></view>
-          <text class="review-workshop-lead">先选一个岛，完成后用四档自评收口。</text>
+          <text class="review-workshop-lead">选一个玩法，练第一步和错因；不展示原题完整解法。</text>
           <view class="review-feedback-strip" wx:if="{{feedbackText}}">
             <text>{{feedbackText}}</text>
             <text wx:if="{{activeReviewTool && activeReviewTool.repairFocus}}" bindtap="openReviewRepairFocus">修这一张</text>
@@ -52,7 +50,7 @@
           </view>
         </view>
 
-        <view class="review-main-cta" data-action="template" bindtap="runPlaybookAction">生成练习工具包</view>
+        <view class="review-main-cta" data-id="quiz" bindtap="runPlayableReviewTool">开始一局练习</view>
         <view class="review-template-pack compact" wx:if="{{practiceTemplatePack && practiceTemplatePack.id}}"><text class="review-template-title">练习工具包</text><view class="review-template-actions"><text class="review-template-action {{practiceTemplatePack.deliverables[0].ready ? 'ready' : 'pending'}}" data-id="{{practiceTemplatePack.deliverables[0].id}}" data-label="{{practiceTemplatePack.deliverables[0].label}}" data-route="{{practiceTemplatePack.deliverables[0].route}}" bindtap="runTemplateDeliverable">{{practiceTemplatePack.deliverables[0].label}}</text><text class="review-template-action {{practiceTemplatePack.deliverables[1].ready ? 'ready' : 'pending'}}" data-id="{{practiceTemplatePack.deliverables[1].id}}" data-label="{{practiceTemplatePack.deliverables[1].label}}" data-route="{{practiceTemplatePack.deliverables[1].route}}" bindtap="runTemplateDeliverable">{{practiceTemplatePack.deliverables[1].label}}</text><text class="review-template-action {{practiceTemplatePack.deliverables[2].ready ? 'ready' : 'pending'}}" data-id="{{practiceTemplatePack.deliverables[2].id}}" data-label="{{practiceTemplatePack.deliverables[2].label}}" data-route="{{practiceTemplatePack.deliverables[2].route}}" bindtap="runTemplateDeliverable">{{practiceTemplatePack.deliverables[2].label}}</text><text class="review-template-action {{practiceTemplatePack.deliverables[3].ready ? 'ready' : 'pending'}}" data-id="{{practiceTemplatePack.deliverables[3].id}}" data-label="{{practiceTemplatePack.deliverables[3].label}}" data-route="{{practiceTemplatePack.deliverables[3].route}}" bindtap="runTemplateDeliverable">{{practiceTemplatePack.deliverables[3].label}}</text></view></view>
         <view class="review-template-workbench" wx:if="{{practiceTemplateWorkbench && practiceTemplateWorkbench.id}}"><text class="review-workbench-title">{{practiceTemplateWorkbench.title}}</text><text class="review-workbench-status">{{practiceTemplateWorkbench.status}} ｜ {{practiceTemplateWorkbench.count}} 张卡</text><text class="review-workbench-line">{{practiceTemplateWorkbench.line}}</text><text class="review-preview-card">{{practiceTemplateWorkbench.samples[0].label}} ｜ {{practiceTemplateWorkbench.samples[0].source}}</text><text class="review-workbench-safe">{{practiceTemplateWorkbench.safetyLine}}</text></view>
       </view>

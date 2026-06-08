@@ -1,6 +1,6 @@
 const navigation = require('../utils/navigation');
 
-const tabs = ['/pages/tutor/tutor', '/pages/review/review', '/pages/profile/profile', '/pages/upload/upload'];
+const tabs = ['/pages/tutor/tutor', '/pages/review/review', '/pages/profile/profile'];
 
 Component({
   lifetimes: {

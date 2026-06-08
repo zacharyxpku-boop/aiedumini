@@ -24,15 +24,6 @@
     bindtap="switchTab"
   >
     <view class="yd-tab-icon-wrap"><image class="yd-tab-icon" mode="aspectFit" src="/assets/reference/entry-parent.png" /></view>
-    <view class="yd-tab-text">家长</view>
-  </view>
-  <view
-    class="yd-tab-item {{selected === 3 ? 'active' : ''}}"
-    data-index="3"
-    data-path="/pages/upload/upload"
-    bindtap="switchTab"
-  >
-    <view class="yd-tab-icon-wrap"><image class="yd-tab-icon" mode="aspectFit" src="/assets/reference/entry-upload.png" /></view>
-    <view class="yd-tab-text">上传</view>
+    <view class="yd-tab-text">成长报告</view>
   </view>
 </view>

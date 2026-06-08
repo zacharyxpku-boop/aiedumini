@@ -1793,7 +1793,7 @@ Page({
     ].filter(Boolean).join(' / ') || '苏格拉底点拨 / 短回访 / 家长报告';
     const parentReportWorkflowView = {
       title: reportReadiness.title,
-      loopLine: '闭环：材料 -> 家长报告 -> AI诊断 -> 短回访 -> 家长决策',
+      loopLine: '闭环：材料 -> 成长报告 -> AI私教 -> 知识乐园 -> 成长报告',
       statusLine: reportReadiness.statusLine,
       sourceLine: parentReportGenerationWorkflow && parentReportGenerationWorkflow.sourceMap
         ? `上传页资料包：${parentReportGenerationWorkflow.sourceMap.sourceCount || 0} 份资料 / ${parentReportGenerationWorkflow.sourceMap.imageCount || 0} 张图片，家长页可看报告预览`

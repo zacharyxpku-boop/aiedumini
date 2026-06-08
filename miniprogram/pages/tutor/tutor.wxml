@@ -25,7 +25,7 @@
             </view>
           </view>
 
-          <view class="tutor-capability-strip"><view class="tutor-capability-card"><image mode="aspectFit" src="/assets/reference/entry-tutor.png" /><text>追问</text><text>不代写答案</text></view><view class="tutor-capability-card"><image mode="aspectFit" src="/assets/reference/entry-upload.png" /><text>材料</text><text>作业/错题/测评</text></view><view class="tutor-capability-card"><image mode="aspectFit" src="/assets/reference/entry-review.png" /><text>练习</text><text>8种知识乐园</text></view><view class="tutor-capability-card"><image mode="aspectFit" src="/assets/reference/entry-parent.png" /><text>证据</text><text>家长只看重点</text></view></view>
+          <view class="tutor-capability-strip"><view class="tutor-capability-card"><image mode="aspectFit" src="/assets/reference/entry-tutor.png" /><text>追问</text><text>不代写答案</text></view><view class="tutor-capability-card"><image mode="aspectFit" src="/assets/reference/entry-upload.png" /><text>材料</text><text>作业/错题/测评</text></view><view class="tutor-capability-card"><image mode="aspectFit" src="/assets/reference/entry-review.png" /><text>练习</text><text>接到知识乐园</text></view><view class="tutor-capability-card"><image mode="aspectFit" src="/assets/reference/entry-parent.png" /><text>报告</text><text>只看成长线索</text></view></view>
 
           <text class="tutor-care-line">
             <text>先稳住，再说第一步</text>
@@ -42,7 +42,7 @@
               <text class="tutor-mode-card primary" data-step="write_first_step" bindtap="launchFirstStep">先写第一步</text>
               <text class="tutor-mode-card" data-step="find_direction" bindtap="launchFirstStep">我看不懂题</text>
             </view>
-            <text class="tutor-prompt-board">例：题目问什么我没看明白。</text>
+            <text class="tutor-prompt-board">例：题目问什么我没看明白。</text><view class="tutor-start-cta" data-step="write_first_step" bindtap="launchFirstStep">开始问咕点</view>
           </view>
 
           <view class="tutor-chat-card">

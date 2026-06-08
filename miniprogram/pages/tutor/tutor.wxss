@@ -394,6 +394,19 @@ page {
   line-height: 1.32;
 }
 
+.tutor-start-cta {
+  min-height: 72rpx;
+  margin-top: 12rpx;
+  border-radius: 22rpx;
+  color: #17342b;
+  background: linear-gradient(180deg, #ffd84f 0%, #f3b51b 100%);
+  font-size: 27rpx;
+  font-weight: 950;
+  line-height: 72rpx;
+  text-align: center;
+  box-shadow: 0 8rpx 18rpx rgba(248, 198, 34, 0.18);
+}
+
 .tutor-section-head text:first-child {
   color: #18211d;
   font-size: 23rpx;

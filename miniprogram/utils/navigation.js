@@ -3,8 +3,7 @@
 const TAB_ROUTES = [
   '/pages/tutor/tutor',
   '/pages/review/review',
-  '/pages/profile/profile',
-  '/pages/upload/upload'
+  '/pages/profile/profile'
 ];
 
 const LEGACY_ROUTE_ALIASES = {};

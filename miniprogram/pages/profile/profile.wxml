@@ -6,91 +6,67 @@
           <view class="yd-parent-brand">
             <image class="yd-parent-mark" mode="aspectFit" src="/assets/reference/brand-house.png" />
             <view>
-              <text>原点智学</text>
-              <text>家长证据看板</text>
+              <text>成长报告</text>
+              <text>看懂孩子，再安排今天怎么学</text>
             </view>
           </view>
-          <view class="yd-parent-pill">证据复盘</view>
+          <view class="yd-parent-pill">方法候选</view>
         </view>
 
-        <view class="yd-parent-hero">
+        <view class="yd-parent-hero growth">
           <view class="yd-parent-copy">
-            <view class="yd-parent-kicker">家长证据看板</view>
-            <view class="yd-parent-title">今晚只做复盘</view>
-            <view class="yd-parent-sub">不再堆任务，只把材料、AI私教和知识乐园收成一张能执行的家庭卡。</view>
+            <view class="yd-parent-kicker">上传材料 · 生成报告</view>
+            <view class="yd-parent-title">记录错题，找到适合孩子的学习方式</view>
+            <view class="yd-parent-sub">错题、成绩、测评和老师反馈都会沉淀成线索；只做方法候选，不做天赋定论。</view>
           </view>
-          <image class="yd-parent-art" mode="aspectFit" src="/assets/reference/family-avatar-group-transparent.png" />
+          <image class="yd-parent-art" mode="aspectFit" src="/assets/reference/report-radar-card-illustration.png" />
         </view>
 
-        <view class="yd-parent-purpose">
+        <view class="growth-upload-card" data-action="upload" bindtap="runParentReportAction">
+          <image mode="aspectFit" src="/assets/reference/upload-folder-stack-transparent.png" />
           <view>
-            <text>看证据</text>
-            <text>材料和错因是否真实</text>
+            <text>上传错题/成绩/测评，生成成长报告</text>
+            <text>记录错因，推荐举一反三和迁移变形练习</text>
+          </view>
+          <text>去上传</text>
+        </view>
+
+        <view class="growth-signal-grid">
+          <view>
+            <text>错题记录</text>
+            <text>{{learningReportSummary.uploadedMaterialDecisionDossierChildStrengthLine || '先上传一张真实错题或测评'}}</text>
           </view>
           <view>
-            <text>问一句</text>
-            <text>孩子下一步说得出来吗</text>
+            <text>卡点线索</text>
+            <text>{{learningReportSummary.diagnosisLine || profileViewModel.parentRecap.evidenceRecap}}</text>
           </view>
           <view>
-            <text>明天回访</text>
-            <text>只追踪一个小变化</text>
+            <text>举一反三</text>
+            <text>{{learningReportSummary.uploadedMaterialDecisionDossierMethodologyGuidePrimary || '用同类变形题继续验证'}}</text>
+          </view>
+          <view>
+            <text>今晚建议</text>
+            <text>{{profileViewModel.parentRecap.parentOneQuestion}}</text>
           </view>
         </view>
 
-        <view class="yd-parent-decision" data-scene="parent" data-source="parent_decision_card" bindtap="openEntryDetail">
-          <image class="yd-parent-decision-img" mode="aspectFit" src="/assets/reference/report-radar-card-illustration.png" />
+        <view class="yd-parent-decision growth" data-scene="parent" data-source="growth_report_card" bindtap="openEntryDetail">
+          <image class="yd-parent-decision-img" mode="aspectFit" src="/assets/reference/family-avatar-group-transparent.png" />
           <view class="yd-parent-decision-copy">
             <text>{{profileViewModel.familyDecisionCard.title}}</text>
             <text>{{profileViewModel.familyDecisionCard.parentQuestion}}</text>
           </view>
-          <view class="yd-parent-decision-badge">{{profileViewModel.familyDecisionCard.ready ? '可执行' : '待证据'}}</view>
+          <view class="yd-parent-decision-badge">{{profileViewModel.familyDecisionCard.ready ? '可执行' : '待材料'}}</view>
         </view>
 
-        <view class="yd-parent-report-status" wx:if="{{learningReportSummary.parentReportWorkflowTitle}}" bindtap="goLearningReportCta">
-          <text>{{learningReportSummary.parentReportWorkflowTitle}}</text>
-          <text>{{learningReportSummary.parentReportWorkflowSourceLine || learningReportSummary.parentReportWorkflowReasoningLine}}</text>
+        <view class="growth-action-row">
+          <view class="yd-action-primary parent-primary" data-action="upload" bindtap="runParentReportAction">上传错题生成报告</view>
+          <view class="yd-action-secondary parent-secondary" data-action="reportPreview" bindtap="runParentReportAction">查看最新报告</view>
         </view>
 
-        <view class="yd-parent-evidence">
-          <view class="yd-parent-evidence-head">
-            <text>为什么这样问</text>
-            <text>{{profileViewModel.parentEvidenceStrip.subtitle}}</text>
-          </view>
-          <view class="yd-parent-evidence-strip">
-            <view class="yd-parent-evidence-chip" wx:for="{{profileViewModel.parentEvidenceStrip.items}}" wx:key="id">
-              <text>{{item.label}}</text>
-              <text>{{item.value}}</text>
-            </view>
-          </view>
-        </view>
-
-        <view class="yd-parent-loop">
-          <view class="yd-parent-loop-card primary" data-scene="parent" data-source="parent_loop_evidence" bindtap="openEntryDetail">
-            <image mode="aspectFit" src="/assets/reference/entry-parent.png" />
-            <view>
-              <text>1 看证据</text>
-              <text>{{profileViewModel.parentRecap.evidenceRecap}}</text>
-            </view>
-          </view>
-          <view class="yd-parent-loop-card" data-scene="parent" data-source="parent_loop_question" bindtap="openEntryDetail">
-            <image mode="aspectFit" src="/assets/reference/family-avatar-group-transparent.png" />
-            <view>
-              <text>2 只问一句</text>
-              <text>{{profileViewModel.parentRecap.parentOneQuestion}}</text>
-            </view>
-          </view>
-          <view class="yd-parent-loop-card final" data-scene="parent" data-source="parent_loop_tomorrow" bindtap="openEntryDetail">
-            <image mode="aspectFit" src="/assets/reference/learning-route-map-transparent.png" />
-            <view>
-              <text>3 明天再看</text>
-              <text>{{profileViewModel.parentRecap.trustBoundaryNote}}</text>
-            </view>
-          </view>
-        </view>
-
-        <view class="yd-parent-action-row">
-          <view class="yd-action-primary parent-primary" bindtap="goLearningReportCta">{{profileViewModel.primaryCta}}</view>
-          <view class="yd-action-secondary parent-secondary" data-action="reportPreview" bindtap="runParentReportAction">看证据详情</view>
+        <view class="growth-next-row">
+          <view data-action="tutor" bindtap="runParentReportAction"><image mode="aspectFit" src="/assets/reference/entry-tutor.png" /><text>去 AI私教修一个卡点</text></view>
+          <view data-action="review" bindtap="runParentReportAction"><image mode="aspectFit" src="/assets/reference/entry-review.png" /><text>去知识乐园练一局</text></view>
         </view>
       </view>
     </view>

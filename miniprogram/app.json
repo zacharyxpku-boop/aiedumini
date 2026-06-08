@@ -33,11 +33,7 @@
       },
       {
         "pagePath": "pages/profile/profile",
-        "text": "家长"
-      },
-      {
-        "pagePath": "pages/upload/upload",
-        "text": "上传"
+        "text": "成长报告"
       }
     ]
   },
