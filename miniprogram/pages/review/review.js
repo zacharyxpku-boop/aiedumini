@@ -558,8 +558,7 @@ Page({
   selectKnowledgeStarterTopic(event) {
     const topic = event && event.currentTarget ? event.currentTarget.dataset.topic || '' : '';
     this.setData({
-      selectedKnowledgeTopic: topic || '小数乘法',
-      reviewFlowStage: 'tool'
+      selectedKnowledgeTopic: topic || this.data.selectedKnowledgeTopic || '小数乘法'
     });
   },
 

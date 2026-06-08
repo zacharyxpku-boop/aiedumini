@@ -476,8 +476,8 @@ page {
 .growth-report-preview-head text:first-child,
 .growth-parent-action-head text:first-child {
   color: #1f2937;
-  font-size: 36rpx;
-  line-height: 44rpx;
+  font-size: 34rpx;
+  line-height: 42rpx;
   font-weight: 900;
 }
 
@@ -526,8 +526,8 @@ page {
 
 .growth-question-card > text {
   color: #1e293b;
-  font-size: 52rpx;
-  line-height: 62rpx;
+  font-size: 48rpx;
+  line-height: 58rpx;
   font-weight: 900;
   text-align: center;
 }
@@ -544,10 +544,10 @@ page {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 16rpx;
-  min-height: 264rpx;
+  gap: 14rpx;
+  min-height: 224rpx;
   box-sizing: border-box;
-  padding: 34rpx 22rpx 28rpx;
+  padding: 28rpx 18rpx 24rpx;
   border: 2rpx solid transparent;
   border-radius: 48rpx;
   background: #ffffff;
@@ -555,9 +555,9 @@ page {
 }
 
 .growth-question-option-icon {
-  width: 96rpx;
-  height: 96rpx;
-  border-radius: 32rpx;
+  width: 84rpx;
+  height: 84rpx;
+  border-radius: 28rpx;
   background: #ccfbf1;
 }
 
@@ -583,8 +583,8 @@ page {
 
 .growth-question-option-label {
   color: #1e293b;
-  font-size: 30rpx;
-  line-height: 38rpx;
+  font-size: 28rpx;
+  line-height: 34rpx;
   font-weight: 900;
   text-align: center;
 }
@@ -623,7 +623,7 @@ page {
 .growth-upload-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 24rpx;
+  gap: 18rpx;
 }
 
 .growth-upload-card {
@@ -632,9 +632,9 @@ page {
   justify-items: center;
   align-content: center;
   gap: 14rpx;
-  min-height: 214rpx;
+  min-height: 188rpx;
   box-sizing: border-box;
-  padding: 32rpx 24rpx;
+  padding: 26rpx 20rpx;
   overflow: hidden;
   border: 4rpx dashed #e5e7eb;
   border-radius: 48rpx;
@@ -645,7 +645,7 @@ page {
 .growth-upload-card.primary {
   grid-column: 1 / -1;
   justify-items: stretch;
-  min-height: 220rpx;
+  min-height: 204rpx;
   background: #e6f4f1;
   border: 2rpx solid rgba(20, 184, 166, 0.4);
   text-align: left;
@@ -665,15 +665,15 @@ page {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: 96rpx minmax(0, 1fr) auto;
-  gap: 24rpx;
+  grid-template-columns: 88rpx minmax(0, 1fr) auto;
+  gap: 20rpx;
   align-items: start;
 }
 
 .growth-upload-card.primary .growth-upload-title-row image,
 .growth-upload-card.primary > image {
-  width: 96rpx;
-  height: 96rpx;
+  width: 88rpx;
+  height: 88rpx;
   padding: 10rpx;
   border-radius: 36rpx;
   background: #ffffff;
@@ -689,25 +689,25 @@ page {
 
 .growth-upload-title-row view text:first-child {
   color: #0f766e;
-  font-size: 32rpx;
-  line-height: 40rpx;
+  font-size: 30rpx;
+  line-height: 36rpx;
   font-weight: 950;
 }
 
 .growth-upload-title-row view text:last-child {
   color: rgba(15, 118, 110, 0.7);
-  font-size: 24rpx;
-  line-height: 30rpx;
+  font-size: 22rpx;
+  line-height: 28rpx;
 }
 
 .growth-upload-added {
-  padding: 10rpx 18rpx;
+  padding: 8rpx 14rpx;
   border: 1rpx solid rgba(20, 184, 166, 0.24);
   border-radius: 999rpx;
   background: #ffffff;
   color: #0f766e;
-  font-size: 22rpx;
-  line-height: 26rpx;
+  font-size: 20rpx;
+  line-height: 24rpx;
   font-weight: 900;
   box-shadow: 0 8rpx 18rpx rgba(15, 23, 42, 0.06);
 }
@@ -716,21 +716,21 @@ page {
   position: relative;
   z-index: 1;
   margin-top: 4rpx;
-  padding: 22rpx;
+  padding: 18rpx;
   border: 1rpx solid #ffffff;
   border-radius: 24rpx;
   background: rgba(255, 255, 255, 0.62);
   color: #4b5563;
-  font-size: 26rpx;
-  line-height: 32rpx;
+  font-size: 24rpx;
+  line-height: 30rpx;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .growth-upload-card:not(.primary) image {
-  width: 96rpx;
-  height: 96rpx;
+  width: 84rpx;
+  height: 84rpx;
   padding: 10rpx;
   border-radius: 36rpx;
   background: #eff6ff;

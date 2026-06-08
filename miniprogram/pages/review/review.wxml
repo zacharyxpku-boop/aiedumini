@@ -26,10 +26,10 @@
         </view>
 
         <view class="review-main-tool-grid" wx:if="{{reviewFlowStage === 'main'}}">
-          <view class="review-main-tool-card warm" data-id="whack" bindtap="runPlayableReviewTool"><view><text class="review-main-tool-icon">×</text><text class="review-main-tool-time">约3分</text></view><text>错因地鼠</text><text>揪出隐藏的易错点</text></view>
-          <view class="review-main-tool-card yellow" data-id="quiz" bindtap="runPlayableReviewTool"><view><text class="review-main-tool-icon">⚡</text><text class="review-main-tool-time">约2分</text></view><text>快闪问答</text><text>极速反应知识练习</text></view>
-          <view class="review-main-tool-card blue" data-id="match" bindtap="runPlayableReviewTool"><view><text class="review-main-tool-icon">▣</text><text class="review-main-tool-time">约4分</text></view><text>拼图配对</text><text>核心概念连连看</text></view>
-          <view class="review-main-tool-card teal" data-id="snake" bindtap="runPlayableReviewTool"><view><text class="review-main-tool-icon">⌁</text><text class="review-main-tool-time">约5分</text></view><text>路线接龙</text><text>逻辑推导找路径</text></view>
+          <view class="review-main-tool-card warm" data-stage="topic" bindtap="setReviewFlowStage"><view><text class="review-main-tool-icon">×</text><text class="review-main-tool-time">约3分</text></view><text>错因地鼠</text><text>先选知识点，再找易错点</text></view>
+          <view class="review-main-tool-card yellow" data-stage="topic" bindtap="setReviewFlowStage"><view><text class="review-main-tool-icon">⚡</text><text class="review-main-tool-time">约2分</text></view><text>快闪问答</text><text>快速判断一个小知识</text></view>
+          <view class="review-main-tool-card blue" data-stage="topic" bindtap="setReviewFlowStage"><view><text class="review-main-tool-icon">▣</text><text class="review-main-tool-time">约4分</text></view><text>拼图配对</text><text>把概念和例子配起来</text></view>
+          <view class="review-main-tool-card teal" data-stage="topic" bindtap="setReviewFlowStage"><view><text class="review-main-tool-icon">⌁</text><text class="review-main-tool-time">约5分</text></view><text>路线接龙</text><text>一步一步接出思路</text></view>
         </view>
 
         <view class="review-record-panel" wx:if="{{reviewFlowStage !== 'main'}}">
@@ -48,7 +48,7 @@
             <text class="review-topic-card review-topic-chip {{selectedKnowledgeTopic === '认识钟表' ? 'active' : ''}}" data-topic="认识钟表" bindtap="selectKnowledgeStarterTopic">认识钟表&#10;拨盘解密&#10;约 8 分钟</text>
             <text class="review-topic-card review-topic-chip {{selectedKnowledgeTopic === '长度单位' ? 'active' : ''}}" data-topic="长度单位" bindtap="selectKnowledgeStarterTopic">长度单位&#10;魔法尺子&#10;约 10 分钟</text>
           </view>
-          <text class="review-topic-cta" wx:if="{{reviewFlowStage === 'topic'}}" bindtap="selectKnowledgeStarterTopic" data-topic="{{selectedKnowledgeTopic}}">用这个开一局</text>
+          <text class="review-topic-cta" wx:if="{{reviewFlowStage === 'topic'}}" data-stage="tool" bindtap="setReviewFlowStage">用「{{selectedKnowledgeTopic}}」开一局</text>
           <view class="review-workshop-lead review-target-card" wx:if="{{reviewFlowStage !== 'topic'}}"><text>当前攻克目标</text><text>{{selectedKnowledgeTopic || '分数除法'}}</text><text>{{cards.length || 3}} 张卡 · 挑选开局方式，马上开始。</text></view>
           <view class="review-feedback-strip" wx:if="{{feedbackText}}"><text>{{feedbackText}}</text><text wx:if="{{activeReviewTool && activeReviewTool.repairFocus}}" bindtap="openReviewRepairFocus">修这一张</text></view>
           <view class="review-tool-grid" wx:if="{{reviewFlowStage === 'tool'}}">
@@ -79,7 +79,7 @@
           </view>
         </view>
 
-        <text class="review-main-cta" wx:if="{{reviewFlowStage === 'main'}}" data-id="whack" bindtap="runPlayableReviewTool">开始一局练习</text>
+        <text class="review-main-cta" wx:if="{{reviewFlowStage === 'main'}}" data-stage="topic" bindtap="setReviewFlowStage">先选知识点</text>
         <text class="review-main-cta" wx:if="{{reviewFlowStage === 'topic'}}" data-stage="tool" bindtap="setReviewFlowStage">开始一局练习</text>
         <view class="review-main-cta" wx:if="{{reviewFlowStage === 'tool'}}" data-id="whack" bindtap="runPlayableReviewTool">开始错因地鼠</view>
       </view>
