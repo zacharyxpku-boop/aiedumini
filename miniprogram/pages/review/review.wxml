@@ -56,12 +56,10 @@
           </view>
           <view class="review-empty-note" wx:if="{{reviewFlowStage !== 'topic' && activeReviewTool && activeReviewTool.empty}}"><text>还没有真实卡。先上传材料或完成一次 AI 点拨。</text></view>
           <view class="review-live-tool stage-{{reviewFlowStage}}" wx:elif="{{reviewFlowStage !== 'tool' && activeReviewTool && activeReviewTool.id}}">
-            <text class="review-live-head"><text>{{activeReviewTool.title}}</text><text>{{activeReviewTool.status}}</text></text>
-            <view class="review-game-progress"><text>3</text><text>/ 10</text><text>{{selectedKnowledgeTopic}}</text></view>
-            <view class="review-game-bar"><view></view></view>
-            <text class="review-live-line">{{activeReviewTool.line}}</text>
-            <text class="review-live-mission">{{activeReviewTool.mission}}</text>
-            <view class="review-live-reference" wx:if="{{reviewFlowStage === 'live'}}"><text>正在热身 · 找第一步</text><text>遇到“相遇问题”时，脑海里跳出的第一个动作应该是什么？</text><text>先说出第一步，再点击下方按钮。</text></view>
+            <view class="review-play-top" wx:if="{{reviewFlowStage === 'live'}}"><text>×</text><text>{{activeReviewTool.title || '快闪问答'}}</text><text>Ⅱ</text></view>
+            <view class="review-game-progress" wx:if="{{reviewFlowStage === 'live'}}"><view><text>3</text><text>/ 10</text></view><text>正在热身</text></view>
+            <view class="review-game-bar" wx:if="{{reviewFlowStage === 'live'}}"><view></view></view>
+            <view class="review-live-reference" wx:if="{{reviewFlowStage === 'live'}}"><text class="review-live-glow top"></text><text class="review-live-glow bottom"></text><view><text>找第一步</text><text class="review-live-mission">{{activeReviewTool.mission}}</text></view><text class="review-live-brain"></text><text>遇到“相遇问题”时，脑海里跳出的第一个动作应该是什么？</text><text>先说出第一步，再点击下方按钮。</text><text class="review-live-bottom-line"></text></view>
             <view class="review-live-card"><text>{{activeReviewTool.primary.label}}</text><text>{{activeReviewTool.primary.prompt}}</text><text>{{activeReviewTool.primary.check}}</text></view>
             <view class="review-live-card compact" wx:if="{{activeReviewTool.secondary && activeReviewTool.secondary.id}}"><text>{{activeReviewTool.secondary.label}}</text><text>{{activeReviewTool.secondary.prompt}}</text><text>{{activeReviewTool.secondary.check}}</text></view>
             <view class="review-live-card compact" wx:if="{{activeReviewTool.third && activeReviewTool.third.id}}"><text>{{activeReviewTool.third.label}}</text><text>{{activeReviewTool.third.prompt}}</text><text>{{activeReviewTool.third.check}}</text></view>
@@ -69,10 +67,11 @@
             <view class="review-choice-board" wx:elif="{{activeReviewTool.gameType === 'match' && activeReviewTool.tiles && activeReviewTool.tiles.length}}"><text wx:for="{{activeReviewTool.tiles}}" wx:key="id" class="review-choice-tile {{item.selected ? 'selected' : ''}} {{item.matched ? 'matched' : ''}}" data-id="{{item.id}}" bindtap="selectMatchTile">{{item.text}}</text></view>
             <view class="review-choice-board sequence" wx:elif="{{activeReviewTool.gameType === 'snake' && activeReviewTool.currentTrack && activeReviewTool.currentTrack.tiles}}"><text wx:for="{{activeReviewTool.currentTrack.tiles}}" wx:key="id" class="review-choice-tile {{item.picked ? 'selected' : ''}}" data-id="{{item.id}}" bindtap="pickSnakeTile">{{item.text}}</text></view>
             <view class="review-finish-card" wx:if="{{activeReviewTool.attemptSummary}}">
-              <view><text>档案袋留下了 {{activeReviewTool.attemptSummary.correct}} 条证据</text><text>这一局探索结束啦，会的线索留下，模糊的地方明天再认认门。</text></view>
-              <view><text>记住了什么</text><text>搞定了当前卡片的第一步和关键条件。</text></view>
-              <view><text>还卡在哪里</text><text>{{activeReviewTool.repairFocus || '同类变式还需要再认认门。'}}</text></view>
-              <view><text>明天回访什么</text><text>{{activeReviewTool.repairFocus || '反义词小连线'}} · 系统已安排，预计 2 分钟</text></view>
+              <view class="review-finish-hero"><text></text><text>这一局探索结束啦</text><text>档案袋留下了 <text>{{activeReviewTool.attemptSummary.correct}}</text> 条证据</text></view>
+              <view class="review-finish-section remembered"><view><text></text><text>记住了什么</text></view><view><text></text><text>搞定了当前卡片的第一步和关键条件。</text></view><view><text></text><text>认识了容易混淆的条件关系。</text></view></view>
+              <view class="review-finish-section stuck"><view><text></text><text>还卡在哪里</text></view><text>{{activeReviewTool.repairFocus || '同类变式还需要再认认门。'}}<text>大脑正在给它们建新文件夹呢，明天再认认门。</text></text></view>
+              <view class="review-finish-section tomorrow"><view><text></text><text>明天回访什么</text></view><view><text></text><text>{{activeReviewTool.repairFocus || '反义词小连线'}}</text><text>系统已安排 · 预计 2 分钟</text></view></view>
+              <view class="review-finish-bottom"><button data-result="retry" bindtap="finishPlayableReviewTool">再练一局</button><button bindtap="openReviewParentEvidence">给家长看证据</button></view>
             </view>
             <view class="review-round-strip" wx:if="{{activeReviewTool.attemptSummary}}"><text>{{activeReviewTool.attemptSummary.accuracy}}%</text><text>对 {{activeReviewTool.attemptSummary.correct}}</text><text>错 {{activeReviewTool.attemptSummary.wrong}}</text><text>{{activeReviewTool.roundAdvice ? activeReviewTool.roundAdvice.primary : '继续'}}</text><text data-result="retry" bindtap="finishPlayableReviewTool">再练一局</text><text wx:if="{{activeReviewTool.repairFocus}}" bindtap="openReviewRepairFocus">修错卡</text><text bindtap="openReviewParentEvidence">给家长看证据</text></view>
             <view class="review-live-actions finish"><button data-result="remembered" bindtap="finishPlayableReviewTool">记录本轮</button><button data-result="retry" bindtap="finishPlayableReviewTool">再练一局</button></view>
