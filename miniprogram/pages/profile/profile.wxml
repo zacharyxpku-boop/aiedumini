@@ -9,16 +9,15 @@
 
         <view class="yd-parent-hero growth">
           <text class="yd-parent-copy">
-            <text class="yd-parent-kicker">问卷 / 上传 / 报告</text>
             <text class="yd-parent-title">先了解孩子，再安排怎么学</text>
-            <text class="yd-parent-sub">可以先做 1 分钟问卷，也可以上传错题、成绩或测评。不做天赋定论，只给学习偏好和方法建议。</text>
+            <text class="yd-parent-sub">可以先做 1 分钟问卷，也可以上传错题、成绩或测评。材料越多，报告越准。</text>
           </text>
           <image class="yd-parent-art" mode="aspectFit" src="/assets/reference/report-radar-card-illustration.png" />
         </view>
 
         <view class="growth-choice-grid" wx:if="{{growthActiveScene === 'main'}}">
-          <view class="growth-choice-card warm" bindtap="startGrowthQuestionnaire"><image mode="aspectFit" src="/assets/reference/family-avatar-group-transparent.png" /><view><text>做 1 分钟小问卷</text><text>快速勾选，建立孩子状态初像</text></view><text>开始</text></view>
-          <view class="growth-choice-card" data-action="upload" bindtap="runParentReportAction"><image mode="aspectFit" src="/assets/reference/upload-folder-stack-transparent.png" /><view><text>上传错题/测评</text><text>让报告基于真实证据生成</text></view><text>上传</text></view>
+          <view class="growth-choice-card warm" bindtap="startGrowthQuestionnaire"><image mode="aspectFit" src="/assets/reference/family-avatar-group-transparent.png" /><view><text>做 1 分钟小问卷</text><text>快速勾选，建立初像</text></view><text>开始</text></view>
+          <view class="growth-choice-card" data-action="upload" bindtap="runParentReportAction"><image mode="aspectFit" src="/assets/reference/upload-folder-stack-transparent.png" /><view><text>上传错题/测评</text><text>拍照上传，深度诊断</text></view><text>上传</text></view>
         </view>
 
         <view class="growth-flow-tabs" wx:if="{{growthActiveScene !== 'main'}}">
