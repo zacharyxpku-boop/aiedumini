@@ -4,7 +4,7 @@
       <view class="yd-review-screen yd-app-screen yd-review-app">
         <view class="yd-review-top">
           <view class="yd-review-brand"><image class="yd-review-mark" mode="aspectFit" src="/assets/reference/brand-house.png" /><view><text>知识乐园</text><text>把知识点变成一局互动练习</text></view></view>
-          <text class="yd-review-pill">{{revisitRunway.due || 0}} 张待回访</text>
+          <text class="yd-review-pill">{{cards.length || 3}} 张练习卡</text>
         </view>
 
         <view class="yd-review-hero">

@@ -1,10 +1,10 @@
 page {
-  background: #f7f8fa;
+  background: #f9f8f4;
 }
 
 .review-page {
   min-height: 100vh;
-  background: #f7f8fa;
+  background: #f9f8f4;
   color: #111827;
 }
 
@@ -25,8 +25,8 @@ page {
   justify-content: flex-start;
   min-height: calc(100vh - 198rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   box-sizing: border-box;
-  padding: 0 32rpx 176rpx;
-  background: #f7f8fa;
+  padding: 0 32rpx calc(172rpx + env(safe-area-inset-bottom));
+  background: #f9f8f4;
   border-radius: 0;
 }
 
@@ -96,15 +96,16 @@ page {
 .yd-review-hero {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 172rpx;
-  min-height: 292rpx;
+  grid-template-columns: minmax(0, 1fr) 168rpx;
+  min-height: 440rpx;
   margin: 0 -32rpx;
-  padding: 34rpx 40rpx 26rpx;
+  padding: 44rpx 40rpx 34rpx;
   overflow: hidden;
   border-radius: 0 0 48rpx 48rpx;
   background:
-    radial-gradient(circle at 88% 8%, rgba(251, 191, 36, 0.22), transparent 26%),
-    linear-gradient(135deg, rgba(224, 242, 241, 0.86), #f7f8fa 76%);
+    radial-gradient(circle at 86% 12%, rgba(255, 138, 76, 0.2), transparent 26%),
+    radial-gradient(circle at 18% 96%, rgba(20, 184, 166, 0.15), transparent 28%),
+    linear-gradient(180deg, #e0f2f1 0%, #f9f8f4 86%);
   box-shadow: none;
 }
 
@@ -124,15 +125,15 @@ page {
   z-index: 1;
   display: flex;
   flex-direction: column;
-  gap: 16rpx;
+  gap: 18rpx;
   min-width: 0;
 }
 
 .yd-review-title {
-  max-width: 360rpx;
+  max-width: 410rpx;
   color: #111827;
-  font-size: 50rpx;
-  line-height: 58rpx;
+  font-size: 52rpx;
+  line-height: 62rpx;
   font-weight: 950;
 }
 
@@ -140,15 +141,16 @@ page {
   max-width: 520rpx;
   width: fit-content;
   box-sizing: border-box;
-  padding: 12rpx 18rpx;
+  padding: 0;
   border: 1rpx solid rgba(255, 255, 255, 0.7);
-  border-radius: 16rpx;
-  background: rgba(255, 255, 255, 0.42);
+  border-color: transparent;
+  border-radius: 0;
+  background: transparent;
   color: #4b5563;
-  font-size: 24rpx;
-  line-height: 34rpx;
+  font-size: 25rpx;
+  line-height: 36rpx;
   font-weight: 720;
-  box-shadow: 0 4rpx 14rpx rgba(17, 24, 39, 0.04);
+  box-shadow: none;
 }
 
 .route-note.short {
@@ -157,12 +159,12 @@ page {
 
 .yd-review-art {
   position: absolute;
-  right: 12rpx;
-  bottom: 14rpx;
-  width: 188rpx;
-  height: 174rpx;
+  right: 0;
+  bottom: 10rpx;
+  width: 220rpx;
+  height: 210rpx;
   object-fit: contain;
-  opacity: 0.86;
+  opacity: 0.96;
 }
 
 .review-map-rail {
@@ -203,7 +205,7 @@ page {
   gap: 10rpx;
   max-width: 100%;
   overflow: hidden;
-  padding-right: 0;
+  padding: 8rpx 0 2rpx;
 }
 
 .review-chip-row text {
@@ -230,19 +232,20 @@ page {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18rpx;
+  margin-top: -10rpx;
 }
 
 .review-main-tool-card {
   display: flex;
-  min-height: 186rpx;
+  min-height: 188rpx;
   box-sizing: border-box;
   flex-direction: column;
   justify-content: space-between;
-  padding: 22rpx;
-  border: 1rpx solid #edf2f7;
-  border-radius: 20rpx;
+  padding: 24rpx 22rpx;
+  border: 1rpx solid rgba(255, 255, 255, 0.78);
+  border-radius: 28rpx;
   background: #ffffff;
-  box-shadow: 0 4rpx 16rpx rgba(17, 24, 39, 0.045);
+  box-shadow: 0 14rpx 32rpx rgba(37, 45, 55, 0.075);
 }
 
 .review-main-tool-card text {
@@ -279,19 +282,19 @@ page {
 }
 
 .review-main-tool-card.warm {
-  background: #fff7ed;
+  background: #fff6eb;
 }
 
 .review-main-tool-card.yellow {
-  background: #fef3c7;
+  background: #fff7cf;
 }
 
 .review-main-tool-card.blue {
-  background: #eff6ff;
+  background: #eaf5ff;
 }
 
 .review-main-tool-card.teal {
-  background: #ecfdf5;
+  background: #e7f8f4;
 }
 
 .review-record-panel,
@@ -365,16 +368,16 @@ page {
 .review-tool-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14rpx;
+  gap: 16rpx;
 }
 
 .review-topic-card {
   display: block;
-  min-height: 166rpx;
+  min-height: 186rpx;
   box-sizing: border-box;
-  padding: 20rpx;
+  padding: 22rpx;
   border: 2rpx solid #f0ebe1;
-  border-radius: 20rpx;
+  border-radius: 28rpx;
   background: #fff9f5;
   color: #2c2621;
   font-size: 25rpx;
@@ -395,15 +398,15 @@ page {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 94rpx;
+  height: 100rpx;
   margin-top: 8rpx;
-  border-radius: 24rpx;
-  background: #f59e0b;
+  border-radius: 28rpx;
+  background: #ff8a4c;
   color: #ffffff;
   font-size: 30rpx;
   line-height: 34rpx;
   font-weight: 900;
-  box-shadow: 0 14rpx 26rpx rgba(245, 158, 11, 0.28);
+  box-shadow: 0 16rpx 30rpx rgba(255, 138, 76, 0.3);
 }
 
 .review-target-card {
@@ -466,11 +469,11 @@ page {
 .review-tool-card {
   display: grid;
   gap: 8rpx;
-  min-height: 256rpx;
+  min-height: 328rpx;
   box-sizing: border-box;
-  padding: 20rpx;
+  padding: 22rpx;
   border: 2rpx solid #f0f0ef;
-  border-radius: 26rpx;
+  border-radius: 18rpx;
   background: #ffffff;
   box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.035);
 }
@@ -571,7 +574,7 @@ page {
 }
 
 .review-game-bar {
-  height: 14rpx;
+  height: 12rpx;
   overflow: hidden;
   border-radius: 999rpx;
   background: #e5e7eb;
@@ -602,10 +605,10 @@ page {
 .review-live-reference {
   display: grid;
   gap: 18rpx;
-  padding: 48rpx 32rpx;
+  padding: 58rpx 34rpx;
   text-align: center;
   background: #ffffff;
-  box-shadow: 0 18rpx 38rpx rgba(0, 0, 0, 0.055);
+  box-shadow: 0 18rpx 42rpx rgba(44, 38, 33, 0.075);
 }
 
 .review-live-reference text:first-child {
@@ -617,8 +620,8 @@ page {
 
 .review-live-reference text:nth-child(2) {
   color: #2d3748;
-  font-size: 48rpx;
-  line-height: 60rpx;
+  font-size: 44rpx;
+  line-height: 58rpx;
   font-weight: 900;
 }
 
