@@ -105,18 +105,18 @@
           <text class="growth-action-done">完成勾选后，系统将为您更新明日建议 · 我已完成行动 / 稍后提醒</text>
         </view>
 
-        <view class="yd-parent-decision growth" data-scene="parent" data-source="growth_report_card" bindtap="openEntryDetail">
+        <view class="yd-parent-decision growth" wx:if="{{growthActiveScene === 'preview' || growthActiveScene === 'action' || (learningReportSummary && learningReportSummary.reportJobCaseId)}}" data-scene="parent" data-source="growth_report_card" bindtap="openEntryDetail">
           <image class="yd-parent-decision-img" mode="aspectFit" src="/assets/reference/family-avatar-group-transparent.png" />
           <view class="yd-parent-decision-copy"><text>{{profileViewModel.familyDecisionCard.title}}</text><text>{{profileViewModel.familyDecisionCard.parentQuestion}}</text></view>
           <view class="yd-parent-decision-badge">{{profileViewModel.familyDecisionCard.ready ? '可执行' : '待材料'}}</view>
         </view>
 
-        <view class="growth-action-row">
+        <view class="growth-action-row" wx:if="{{growthActiveScene === 'preview' || growthActiveScene === 'action' || (learningReportSummary && learningReportSummary.reportJobCaseId)}}">
           <view class="yd-action-primary parent-primary" data-action="upload" bindtap="runParentReportAction">上传材料生成报告</view>
           <view class="yd-action-secondary parent-secondary" data-action="reportPreview" bindtap="runParentReportAction">查看最新报告</view>
         </view>
 
-        <view class="growth-next-row">
+        <view class="growth-next-row" wx:if="{{growthActiveScene === 'preview' || growthActiveScene === 'action' || (learningReportSummary && learningReportSummary.reportJobCaseId)}}">
           <view data-action="tutor" bindtap="runParentReportAction"><image mode="aspectFit" src="/assets/reference/entry-tutor.png" /><text>去 AI私教修一个卡点</text></view>
           <view data-action="review" bindtap="runParentReportAction"><image mode="aspectFit" src="/assets/reference/entry-review.png" /><text>去知识乐园练一局</text></view>
         </view>

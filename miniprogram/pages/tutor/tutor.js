@@ -334,7 +334,7 @@ const TUTOR_REFERENCE_SCENES = {
     rows: [
       { id: 'p1', text: 'AI 专属私教：把题目发来，咕点只问第一步。拍题、打字都可以，系统会自动保存安全摘要。选择点拨模式后开始。' }
     ],
-    modes: ['看懂题意', '找第一步', '检查错因'],
+    modes: ['看懂题意', '理清条件', '找准问题', '找第一步', '毫无头绪', '找突破口', '检查错因', '算错不对', '定位错因'],
     actions: [
       { id: 'find_direction', label: '开始点拨', action: 'step', step: 'find_direction' }
     ]
