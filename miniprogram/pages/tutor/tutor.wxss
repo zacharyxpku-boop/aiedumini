@@ -17,7 +17,7 @@ page {
 .main-inner {
   min-height: 100vh;
   box-sizing: border-box;
-  padding: calc(96rpx + env(safe-area-inset-top)) 32rpx calc(150rpx + env(safe-area-inset-bottom));
+  padding: calc(96rpx + env(safe-area-inset-top)) 32rpx calc(146rpx + env(safe-area-inset-bottom));
 }
 
 .yd-tutor-screen {
@@ -48,7 +48,7 @@ page {
   position: relative;
   z-index: 8;
   margin: 0 -32rpx;
-  padding: 0 32rpx 8rpx;
+  padding: 0 32rpx 4rpx;
   background: rgba(249, 248, 244, 0.94);
 }
 
@@ -151,7 +151,7 @@ page {
   display: grid;
   grid-template-columns: 144rpx minmax(0, 1fr);
   align-items: center;
-  gap: 28rpx;
+  gap: 32rpx;
   min-height: 196rpx;
   padding: 40rpx;
   overflow: hidden;
@@ -214,10 +214,12 @@ page {
 .tutor-chat-card {
   display: grid;
   align-content: start;
-  gap: 22rpx;
+  gap: 28rpx;
   flex: 0 0 auto;
-  min-height: 344rpx;
+  min-height: 360rpx;
   padding: 32rpx;
+  border-radius: 40rpx;
+  box-shadow: 0 8rpx 28rpx rgba(20, 184, 166, 0.06);
 }
 
 .tutor-chat-card.compact {
@@ -239,55 +241,6 @@ page {
   background: #e6f4f1;
   font-size: 20rpx;
   font-weight: 920;
-}
-
-.tutor-care-line {
-  display: flex;
-  align-items: center;
-  gap: 12rpx;
-  color: #0d9488;
-  font-size: 22rpx;
-  line-height: 28rpx;
-  font-weight: 860;
-}
-
-.tutor-care-line text:first-child {
-  padding: 8rpx 14rpx;
-  border-radius: 999rpx;
-  background: #e6f4f1;
-  color: #0d9488;
-}
-
-.tutor-care-line text:last-child {
-  color: #6b7280;
-}
-
-.tutor-service-status {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 10rpx;
-  align-items: center;
-  padding: 10rpx 12rpx;
-  border-radius: 18rpx;
-  background: #e6f4f1;
-}
-
-.tutor-service-status text:first-child {
-  padding: 6rpx 12rpx;
-  border-radius: 999rpx;
-  color: #0d9488;
-  background: #ffffff;
-  font-size: 20rpx;
-  font-weight: 950;
-  white-space: nowrap;
-}
-
-.tutor-service-status text:last-child {
-  min-width: 0;
-  color: #4b5563;
-  font-size: 21rpx;
-  font-weight: 780;
-  line-height: 1.28;
 }
 
 .tutor-message-row {
@@ -314,7 +267,7 @@ page {
 .tutor-bubble {
   display: block;
   max-width: 100%;
-  padding: 26rpx 28rpx;
+  padding: 28rpx;
   border-radius: 36rpx 36rpx 36rpx 8rpx;
   color: #374151;
   background: #f6f8f3;
@@ -348,36 +301,40 @@ page {
 }
 
 .tutor-input-bar {
-  display: flex;
+  position: relative;
+  display: block;
   min-height: 96rpx;
-  align-items: center;
-  gap: 12rpx;
-  padding: 0 8rpx 0 20rpx;
+  padding: 0;
   border: 3rpx solid #e5e7eb;
   border-radius: 40rpx;
   background: #ffffff;
   box-shadow: inset 0 4rpx 10rpx rgba(17, 24, 39, 0.03);
 }
 
-.tutor-input-bar input {
-  flex: 1 1 auto;
-  min-width: 0;
-  height: 82rpx;
+.tutor-input-bar textarea {
+  width: 100%;
+  min-height: 96rpx;
+  max-height: 200rpx;
+  box-sizing: border-box;
+  padding: 26rpx 104rpx 22rpx 28rpx;
   color: #1f2937;
-  font-size: 27rpx;
+  font-size: 30rpx;
   font-weight: 760;
-  line-height: 82rpx;
+  line-height: 42rpx;
 }
 
 .tutor-input-bar text {
-  flex: 0 0 auto;
-  min-width: 72rpx;
+  position: absolute;
+  right: 12rpx;
+  bottom: 12rpx;
+  min-width: 0;
   height: 72rpx;
+  width: 72rpx;
   padding: 0 18rpx;
   border-radius: 50%;
   color: #ffffff;
   background: #fbbf24;
-  font-size: 24rpx;
+  font-size: 30rpx;
   font-weight: 950;
   line-height: 72rpx;
   text-align: center;
@@ -385,7 +342,7 @@ page {
 
 .tutor-socratic-panel {
   display: grid;
-  gap: 14rpx;
+  gap: 28rpx;
   padding: 0 0 4rpx;
   border-color: transparent;
   background: transparent;
@@ -414,11 +371,11 @@ page {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  min-height: 136rpx;
+  min-height: 148rpx;
   align-items: center;
   justify-content: center;
   gap: 14rpx;
-  padding: 18rpx 8rpx;
+  padding: 22rpx 8rpx;
   border: 1rpx solid #f3f4f6;
   border-radius: 28rpx;
   color: #374151;
@@ -457,15 +414,6 @@ page {
 .tutor-mode-card:nth-child(3) .tutor-mode-icon { background: #eff6ff; color: #2563eb; }
 .tutor-mode-card:nth-child(4) .tutor-mode-icon { background: #f5f3ff; color: #7c3aed; }
 
-.tutor-prompt-board {
-  display: block;
-  color: #6b7280;
-  font-size: 22rpx;
-  font-weight: 760;
-  line-height: 1.35;
-  text-align: center;
-}
-
 .tutor-start-cta {
   display: flex;
   min-height: 104rpx;
@@ -477,6 +425,16 @@ page {
   box-shadow: 0 16rpx 32rpx rgba(251, 191, 36, 0.34);
   font-size: 34rpx;
   font-weight: 950;
+}
+
+.tutor-usage-note {
+  display: block;
+  margin: -12rpx 0 0;
+  color: #9ca3af;
+  font-size: 22rpx;
+  font-weight: 760;
+  line-height: 1.4;
+  text-align: center;
 }
 
 .tutor-reference-panel,
