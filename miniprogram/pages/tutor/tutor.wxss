@@ -1188,3 +1188,154 @@ page {
   line-height: 70rpx;
   text-align: center;
 }
+
+/* Reference child-page alignment: dialogue / blackboard / pointing / recovery. */
+.tutor-reference-panel.dialogue,
+.tutor-reference-panel.knowledge,
+.tutor-reference-panel.pointing,
+.tutor-reference-panel.stuck {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: #f9f8f4;
+  box-shadow: none;
+}
+
+.tutor-reference-panel.dialogue .tutor-reference-head {
+  justify-content: center;
+  padding: 10rpx 0 4rpx;
+}
+
+.tutor-reference-panel.dialogue .tutor-reference-head text:first-child {
+  font-size: 32rpx;
+}
+
+.tutor-reference-panel.dialogue .tutor-dialogue-card {
+  gap: 18rpx;
+  min-height: 520rpx;
+  padding: 28rpx 20rpx 34rpx;
+  border-radius: 0;
+  background: transparent;
+}
+
+.tutor-reference-panel.dialogue .tutor-dialogue-card > text {
+  max-width: 82%;
+  padding: 18rpx 22rpx;
+  border-radius: 28rpx 28rpx 28rpx 8rpx;
+  background: #ffffff;
+  box-shadow: 0 10rpx 26rpx rgba(15, 23, 42, 0.06);
+  color: #374151;
+  font-size: 28rpx;
+  line-height: 1.55;
+}
+
+.tutor-reference-panel.dialogue .tutor-dialogue-card > text.tutor-dialogue-user {
+  justify-self: end;
+  border-radius: 28rpx 28rpx 8rpx 28rpx;
+  color: #ffffff !important;
+  background: #ff8a4c;
+}
+
+.tutor-reference-panel.knowledge .tutor-reference-head,
+.tutor-reference-panel.pointing .tutor-reference-head,
+.tutor-reference-panel.stuck .tutor-reference-head {
+  display: grid;
+  justify-items: start;
+  gap: 10rpx;
+}
+
+.tutor-reference-panel.knowledge .tutor-reference-head text:first-child,
+.tutor-reference-panel.stuck .tutor-reference-head text:first-child {
+  max-width: 560rpx;
+  font-size: 50rpx;
+  line-height: 1.16;
+}
+
+.tutor-reference-panel.pointing .tutor-reference-head text:first-child {
+  max-width: 560rpx;
+  font-size: 46rpx;
+  line-height: 1.18;
+}
+
+.tutor-reference-panel.knowledge .tutor-reference-head text:last-child,
+.tutor-reference-panel.pointing .tutor-reference-head text:last-child,
+.tutor-reference-panel.stuck .tutor-reference-head text:last-child {
+  padding: 8rpx 14rpx;
+  border-radius: 999rpx;
+  color: #0f766e;
+  background: #ccfbf1;
+}
+
+.tutor-reference-panel.knowledge .tutor-dialogue-card {
+  gap: 0;
+  overflow: hidden;
+  padding: 0;
+  border: 1rpx solid #efe7db;
+  border-radius: 32rpx;
+  background: #ffffff;
+  box-shadow: 0 14rpx 34rpx rgba(15, 23, 42, 0.06);
+}
+
+.tutor-reference-panel.knowledge .tutor-dialogue-card > text {
+  padding: 26rpx 30rpx;
+  border-bottom: 1rpx solid #f0ebe1;
+  color: #1f2933;
+  background: #ffffff;
+  font-size: 28rpx;
+  line-height: 1.58;
+}
+
+.tutor-reference-panel.pointing .tutor-dialogue-card {
+  padding: 24rpx;
+  border: 1rpx solid #f0ebe1;
+  border-radius: 30rpx;
+  background: #ffffff;
+  box-shadow: 0 12rpx 30rpx rgba(15, 23, 42, 0.06);
+}
+
+.tutor-reference-panel.pointing .tutor-dialogue-card > text {
+  min-height: 108rpx;
+  padding: 22rpx;
+  border-radius: 24rpx;
+  background: #fff7ed;
+  color: #2c2621;
+  font-size: 30rpx;
+  font-weight: 900;
+  text-align: center;
+}
+
+.tutor-reference-panel.pointing .tutor-pointing-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16rpx;
+}
+
+.tutor-reference-panel.pointing .tutor-pointing-grid text {
+  min-height: 126rpx;
+  border: 2rpx solid transparent;
+  border-radius: 28rpx;
+  background: #ffffff;
+  box-shadow: 0 8rpx 22rpx rgba(15, 23, 42, 0.05);
+  color: #1f2933 !important;
+  font-size: 27rpx !important;
+}
+
+.tutor-reference-panel.stuck .tutor-dialogue-card {
+  gap: 18rpx;
+  padding: 0;
+  background: transparent;
+}
+
+.tutor-reference-panel.stuck .tutor-dialogue-card > text {
+  padding: 22rpx 24rpx;
+  border: 1rpx solid #f1e6dc;
+  border-radius: 28rpx;
+  background: #ffffff;
+  box-shadow: 0 10rpx 24rpx rgba(15, 23, 42, 0.05);
+  font-size: 27rpx;
+}
+
+.tutor-reference-panel.stuck .tutor-dialogue-card > text:nth-child(1),
+.tutor-reference-panel.stuck .tutor-dialogue-card > text:nth-child(2) {
+  border: 2rpx solid #ff8a4c;
+  background: #fff5f0;
+}

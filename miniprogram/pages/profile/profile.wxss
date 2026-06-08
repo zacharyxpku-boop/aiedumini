@@ -1077,6 +1077,234 @@ page {
   box-shadow: 0 16rpx 30rpx rgba(251, 191, 36, 0.28);
 }
 
+/* Reference child-page alignment: questionnaire / upload / preview / action card. */
+.growth-questionnaire-panel {
+  gap: 26rpx;
+  padding: 30rpx 0 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.growth-questionnaire-head {
+  display: grid;
+  gap: 14rpx;
+}
+
+.growth-questionnaire-head text:first-child {
+  max-width: 570rpx;
+  font-size: 50rpx;
+  line-height: 1.28;
+}
+
+.growth-questionnaire-head text:last-child {
+  justify-self: start;
+  padding: 10rpx 18rpx;
+  border-radius: 999rpx;
+  background: #ffffff;
+}
+
+.growth-questionnaire-progress {
+  max-width: 360rpx;
+  padding: 0;
+  background: transparent;
+}
+
+.growth-question-card {
+  padding: 0;
+  background: transparent;
+}
+
+.growth-question-card > text {
+  color: #6b7280;
+  font-size: 26rpx;
+}
+
+.growth-question-card view {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22rpx;
+}
+
+.growth-question-card view text {
+  min-height: 156rpx;
+  border-radius: 36rpx;
+  background: #ffffff;
+  font-size: 28rpx;
+  box-shadow: 0 14rpx 32rpx rgba(15, 23, 42, 0.06);
+}
+
+.growth-question-card view text.active {
+  border-color: #14b8a6;
+  background: #e6fffb;
+}
+
+.growth-upload-panel {
+  gap: 22rpx;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.growth-upload-head {
+  display: grid;
+  gap: 10rpx;
+}
+
+.growth-upload-head text:first-child {
+  font-size: 48rpx;
+  line-height: 1.16;
+}
+
+.growth-upload-head text:last-child {
+  justify-self: start;
+  text-align: left;
+}
+
+.growth-upload-lead {
+  max-width: 610rpx;
+  padding: 24rpx;
+  border-radius: 28rpx;
+  background: #ffffff;
+  box-shadow: 0 10rpx 24rpx rgba(15, 23, 42, 0.05);
+}
+
+.growth-upload-grid {
+  grid-template-columns: 1fr;
+  gap: 18rpx;
+}
+
+.growth-upload-grid text {
+  min-height: 136rpx;
+  padding: 24rpx 26rpx;
+  border-radius: 28rpx;
+  background: #ffffff;
+  font-size: 27rpx;
+  line-height: 1.45;
+  box-shadow: 0 12rpx 30rpx rgba(15, 23, 42, 0.055);
+}
+
+.growth-unlock-strip {
+  padding: 22rpx;
+  border-radius: 28rpx;
+  background: #fff7ed;
+}
+
+.growth-report-preview {
+  gap: 18rpx;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.growth-report-preview-head {
+  display: grid;
+  justify-items: start;
+  gap: 12rpx;
+}
+
+.growth-report-preview-head text:first-child {
+  font-size: 42rpx;
+  line-height: 1.2;
+}
+
+.growth-report-lead,
+.growth-report-more {
+  padding: 18rpx 22rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.growth-report-preview-card {
+  gap: 12rpx;
+  padding: 26rpx;
+  border: 1rpx solid #eaf3ef;
+  border-radius: 24rpx;
+  background: #ffffff;
+  box-shadow: 0 10rpx 26rpx rgba(40, 150, 137, 0.05);
+}
+
+.growth-report-preview-card text:first-child {
+  font-size: 29rpx;
+}
+
+.growth-report-preview-card text:last-child {
+  font-size: 26rpx;
+  line-height: 1.55;
+}
+
+.growth-report-actions {
+  grid-template-columns: 1fr;
+  gap: 14rpx;
+}
+
+.growth-report-actions text {
+  min-height: 86rpx;
+  border-radius: 24rpx;
+  font-size: 26rpx;
+}
+
+.growth-parent-action-card {
+  gap: 18rpx;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.growth-parent-action-head {
+  display: grid;
+  justify-items: start;
+  gap: 12rpx;
+}
+
+.growth-parent-action-head text:first-child {
+  font-size: 42rpx;
+  line-height: 1.2;
+}
+
+.growth-action-boundary {
+  padding: 22rpx;
+  border-radius: 28rpx;
+  background: #fff7ed;
+}
+
+.growth-parent-action-card > view:not(.growth-parent-action-head) {
+  grid-template-columns: 48rpx minmax(0, 1fr);
+  padding: 26rpx;
+  border: 1rpx solid #f1f1ee;
+  border-radius: 28rpx;
+  background: #ffffff;
+  box-shadow: 0 10rpx 26rpx rgba(15, 23, 42, 0.05);
+}
+
+.growth-parent-action-card > view:not(.growth-parent-action-head) > text {
+  width: 40rpx;
+  height: 40rpx;
+  border: 4rpx solid #14b8a6;
+  border-radius: 12rpx;
+}
+
+.growth-parent-action-card view view text:first-child {
+  font-size: 29rpx;
+}
+
+.growth-parent-action-card view view text:last-child {
+  font-size: 26rpx;
+  line-height: 1.55;
+}
+
+.growth-action-done {
+  min-height: 88rpx;
+  border-radius: 24rpx;
+  font-size: 25rpx;
+}
+
 .yd-parent-decision {
   border: 1rpx solid rgba(232, 238, 230, 0.95);
   border-radius: 22rpx;

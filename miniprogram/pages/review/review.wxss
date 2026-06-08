@@ -1222,3 +1222,175 @@ page {
   background: #f97316;
   box-shadow: 0 16rpx 30rpx rgba(249, 115, 22, 0.28);
 }
+
+/* Reference child-page alignment: in-game and finish pages. */
+.review-live-tool.stage-live {
+  min-height: 690rpx;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: #fdfcf8;
+  box-shadow: none;
+}
+
+.review-live-tool.stage-live .review-live-head {
+  padding: 12rpx 10rpx 0;
+}
+
+.review-live-tool.stage-live .review-game-progress {
+  padding: 0 12rpx;
+}
+
+.review-live-tool.stage-live .review-game-bar {
+  margin: 0 12rpx 16rpx;
+}
+
+.review-live-tool.stage-live .review-live-line,
+.review-live-tool.stage-live .review-live-mission {
+  display: none;
+}
+
+.review-live-tool.stage-live .review-live-reference {
+  display: grid;
+  min-height: 440rpx;
+  align-content: center;
+  justify-items: center;
+  gap: 24rpx;
+  padding: 54rpx 38rpx;
+  border: 1rpx solid #fff7ed;
+  border-radius: 32rpx;
+  background:
+    radial-gradient(circle at 82% 8%, rgba(255, 138, 76, 0.12), transparent 34%),
+    radial-gradient(circle at 12% 86%, rgba(45, 212, 191, 0.12), transparent 36%),
+    #ffffff;
+  box-shadow: 0 18rpx 44rpx rgba(15, 23, 42, 0.07);
+}
+
+.review-live-tool.stage-live .review-live-reference text:first-child {
+  padding: 8rpx 16rpx;
+  border-radius: 12rpx;
+  color: #ff8a4c;
+  background: #fff4ed;
+  font-size: 24rpx;
+}
+
+.review-live-tool.stage-live .review-live-reference text:nth-child(2) {
+  max-width: 520rpx;
+  color: #2d3748;
+  font-size: 40rpx;
+  font-weight: 950;
+  line-height: 1.55;
+  text-align: center;
+}
+
+.review-live-tool.stage-live .review-live-reference text:nth-child(3) {
+  max-width: 460rpx;
+  color: #9ca3af;
+  font-size: 26rpx;
+  text-align: center;
+}
+
+.review-live-tool.stage-live .review-live-card,
+.review-live-tool.stage-live .review-choice-board {
+  display: none;
+}
+
+.review-live-tool.stage-live .review-live-actions.finish {
+  display: none;
+}
+
+.review-live-tool.stage-live .review-live-actions.grade {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18rpx;
+}
+
+.review-live-tool.stage-live .review-live-actions.grade button {
+  min-height: 96rpx;
+  border-radius: 24rpx;
+  background: #ffffff;
+  color: #64748b;
+  font-size: 28rpx;
+  line-height: 96rpx;
+}
+
+.review-live-tool.stage-live .review-live-actions.grade button:nth-child(3) {
+  color: #ffffff;
+  background: #ff8a4c;
+  box-shadow: 0 12rpx 26rpx rgba(255, 138, 76, 0.24);
+}
+
+.review-live-tool.stage-finished {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: #f9f8f4;
+  box-shadow: none;
+}
+
+.review-live-tool.stage-finished .review-live-head,
+.review-live-tool.stage-finished .review-game-progress,
+.review-live-tool.stage-finished .review-game-bar,
+.review-live-tool.stage-finished .review-live-line,
+.review-live-tool.stage-finished .review-live-mission,
+.review-live-tool.stage-finished .review-live-card,
+.review-live-tool.stage-finished .review-choice-board,
+.review-live-tool.stage-finished .review-live-actions.grade {
+  display: none;
+}
+
+.review-live-tool.stage-finished::before {
+  content: "这一局探索结束啦";
+  display: block;
+  margin: 10rpx auto 8rpx;
+  color: #2c3e50;
+  font-size: 36rpx;
+  font-weight: 900;
+  text-align: center;
+}
+
+.review-live-tool.stage-finished .review-finish-card {
+  gap: 18rpx;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.review-live-tool.stage-finished .review-finish-card view {
+  padding: 26rpx;
+  border: 1rpx solid #eaf3ef;
+  border-radius: 24rpx;
+  background: #ffffff;
+  box-shadow: 0 8rpx 24rpx rgba(40, 150, 137, 0.05);
+}
+
+.review-live-tool.stage-finished .review-finish-card text:first-child {
+  font-size: 29rpx;
+}
+
+.review-live-tool.stage-finished .review-finish-card text:last-child {
+  margin-top: 8rpx;
+  font-size: 26rpx;
+  line-height: 1.5;
+}
+
+.review-live-tool.stage-finished .review-round-strip {
+  display: none;
+}
+
+.review-live-tool.stage-finished .review-live-actions.finish {
+  grid-template-columns: 1fr;
+  gap: 18rpx;
+}
+
+.review-live-tool.stage-finished .review-live-actions.finish button {
+  min-height: 96rpx;
+  border-radius: 24rpx;
+  color: #ffffff;
+  background: #f0714d;
+  line-height: 96rpx;
+}
+
+.review-live-tool.stage-finished .review-live-actions.finish button:last-child {
+  color: #f0714d;
+  background: #ffffff;
+}

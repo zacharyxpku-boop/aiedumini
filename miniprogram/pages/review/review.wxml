@@ -27,7 +27,7 @@
             <text class="{{reviewFlowStage === 'finished' ? 'active' : ''}}" data-stage="finished" bindtap="setReviewFlowStage">一局结束</text>
           </text>
           <view class="review-topic-row" wx:if="{{reviewFlowStage === 'topic'}}">
-            <text class="review-topic-card review-topic-chip {{selectedKnowledgeTopic === '小数乘法' ? 'active' : ''}}" data-topic="小数乘法" bindtap="selectKnowledgeStarterTopic">小数乘法&#10;消除大挑战&#10;约 10 分钟</text>
+            <text class="review-topic-card review-topic-chip {{selectedKnowledgeTopic === '小数乘法' ? 'active' : ''}}" data-topic="小数乘法" bindtap="selectKnowledgeStarterTopic">小数乘法&#10;消除易错点&#10;约 10 分钟</text>
             <text class="review-topic-card review-topic-chip {{selectedKnowledgeTopic === '认识分数' ? 'active' : ''}}" data-topic="认识分数" bindtap="selectKnowledgeStarterTopic">认识分数&#10;色彩涂涂&#10;约 15 分钟</text>
             <text class="review-topic-card review-topic-chip {{selectedKnowledgeTopic === '面积计算' ? 'active' : ''}}" data-topic="面积计算" bindtap="selectKnowledgeStarterTopic">面积计算&#10;拼图解谜&#10;约 12 分钟</text>
             <text class="review-topic-card review-topic-chip {{selectedKnowledgeTopic === '混合运算' ? 'active' : ''}}" data-topic="混合运算" bindtap="selectKnowledgeStarterTopic">混合运算&#10;极速速算&#10;约 5 分钟</text>
@@ -44,13 +44,13 @@
             <view wx:for="{{playableReviewTools}}" wx:key="id" class="review-tool-card {{item.available ? 'ready' : 'locked'}} {{item.themeClass}}" data-id="{{item.id}}" bindtap="runPlayableReviewTool"><text class="review-tool-icon">{{item.icon}}</text><text>{{item.title}}</text><text>{{item.line}}</text><text>{{item.duration}}</text><text>{{item.status}}｜{{item.count}} 张</text><text>{{item.mission}}</text></view>
           </view>
           <view class="review-empty-note" wx:if="{{reviewFlowStage !== 'topic' && activeReviewTool && activeReviewTool.empty}}"><text>还没有真实卡。先上传材料或完成一次 AI私教。</text></view>
-          <view class="review-live-tool" wx:elif="{{reviewFlowStage !== 'tool' && activeReviewTool && activeReviewTool.id}}">
+          <view class="review-live-tool stage-{{reviewFlowStage}}" wx:elif="{{reviewFlowStage !== 'tool' && activeReviewTool && activeReviewTool.id}}">
             <text class="review-live-head"><text>{{activeReviewTool.title}}</text><text>{{activeReviewTool.status}}</text></text>
             <view class="review-game-progress"><text>3</text><text>/ 10</text><text>{{selectedKnowledgeTopic}}</text></view>
             <view class="review-game-bar"><view></view></view>
             <text class="review-live-line">{{activeReviewTool.line}}</text>
             <text class="review-live-mission">{{activeReviewTool.mission}}</text>
-            <view class="review-live-reference" wx:if="{{reviewFlowStage === 'live'}}"><text>找第一步</text><text>遇到“相遇问题”时，脑海里跳出的第一个动作应该是什么？</text><text>先在心里想好第一步，再点击下方按钮。</text></view>
+            <view class="review-live-reference" wx:if="{{reviewFlowStage === 'live'}}"><text>找第一步</text><text>遇到“相遇问题”时，脑海里跳出的第一个动作应该是什么？</text><text>先说出第一步，再点击下方按钮。</text></view>
             <view class="review-live-card"><text>{{activeReviewTool.primary.label}}</text><text>{{activeReviewTool.primary.prompt}}</text><text>{{activeReviewTool.primary.check}}</text></view>
             <view class="review-live-card compact" wx:if="{{activeReviewTool.secondary && activeReviewTool.secondary.id}}"><text>{{activeReviewTool.secondary.label}}</text><text>{{activeReviewTool.secondary.prompt}}</text><text>{{activeReviewTool.secondary.check}}</text></view>
             <view class="review-live-card compact" wx:if="{{activeReviewTool.third && activeReviewTool.third.id}}"><text>{{activeReviewTool.third.label}}</text><text>{{activeReviewTool.third.prompt}}</text><text>{{activeReviewTool.third.check}}</text></view>
