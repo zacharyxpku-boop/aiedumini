@@ -245,7 +245,7 @@ const QUICK_ACTIONS = [
   { id: 'read_problem', label: '提示 1/5', desc: '先复述题意，找已知条件' },
   { id: 'write_first_step', label: '提示 2/5', desc: '追问第一步想做什么' },
   { id: 'find_direction', label: '提示 3/5', desc: '给方向，不给最终结果' },
-  { id: 'similar_example', label: '提示 4/5', desc: '给相似例子，回到原题' },
+  { id: 'similar_example', label: '提示 4/5', desc: '给相似例子，再回到原题' },
   { id: 'method_summary', label: '提示 5/5', desc: '总结方法，进入复习卡' },
   { id: 'fast_mode', label: '加快一点', desc: '先看方向，再自己说第一步' },
   { id: 'find_conditions', label: '帮我检查思路', desc: '圈已知、未知和单位' },
@@ -255,30 +255,10 @@ const QUICK_ACTIONS = [
 ];
 
 const GUIDED_TUTOR_MODES = [
-  {
-    id: 'homework_coach',
-    title: '作业教练',
-    desc: '只带必须做，先问第一步，不替写答案。',
-    prompt: '带我完成这项必须做，但每次只问一个问题或给一个最小提示。'
-  },
-  {
-    id: 'wrong_cause',
-    title: '错因镜头',
-    desc: '把“粗心”拆成审题、建模、计算、表达。',
-    prompt: '不要解题，先帮我判断我真正错在哪一步。'
-  },
-  {
-    id: 'transfer',
-    title: '举一反三',
-    desc: '基于同一方法换条件，检查是否真的会了。',
-    prompt: '请给我一道同方法的小变式，但先让我说思路，不要给答案。'
-  },
-  {
-    id: 'self_rehearsal',
-    title: '一句复述',
-    desc: '用自己的话说清：我错因是什么，下次先检查什么。',
-    prompt: '请让我用一句话复述本题错因和下次检查点。'
-  }
+  { id: 'homework_coach', title: '作业点拨', desc: '只带必须做，先问第一步，不代写答案。', prompt: '带我完成这项必须做，但每次只问一个问题或给一个最小提示。' },
+  { id: 'wrong_cause', title: '错因镜头', desc: '把粗心拆成审题、建模、计算、表达。', prompt: '不要解题，先帮我判断我真正错在哪一步。' },
+  { id: 'transfer', title: '举一反三', desc: '基于同一方法换条件，检查是不是真的会了。', prompt: '请给我一道同方法的小变式，但先让我说思路，不要给答案。' },
+  { id: 'self_rehearsal', title: '一句复述', desc: '用自己的话说清：错因是什么，下次先检查什么。', prompt: '请让我用一句话复述本题错因和下次检查点。' }
 ];
 
 const PEDAGOGY_LADDER = [
@@ -291,8 +271,8 @@ const PEDAGOGY_LADDER = [
 
 const TUTOR_GUARDRAILS = [
   '不替孩子写完整答案',
-  '只带今晚必须做',
-  '留下自己能复述的一句话',
+  '只带今晚必须做的一小步',
+  '留下孩子自己能复述的一句话',
   '发现抄答案风险会收紧提示'
 ];
 
@@ -301,15 +281,15 @@ const TUTOR_REFERENCE_SCENES = {
     title: '自由对话',
     status: '正在陪你想第一步',
     rows: [
-      { id: 'd1', role: 'user', text: '小原，这道物理题我完全没思路，怎么做呀？' },
-      { id: 'd2', text: '别着急，遇到难题不知道怎么下手很正常哦！拍拍肩膀~' },
-      { id: 'd3', text: '仔细看看题目，最开始提到的小车速度是多少呢？' },
-      { id: 'd4', role: 'user', text: '是 5米/秒。' },
-      { id: 'd5', text: '找得很准！那么第二步，根据“刹车后2秒停下”，你能想到要用哪个公式来算加速度吗？' }
+      { id: 'd1', role: 'user', text: '咕点，这道题我完全没思路，怎么开始？' },
+      { id: 'd2', text: '别急。先不求答案，我们只找第一步。你先把题目问的是什么，用自己的话说一遍。' },
+      { id: 'd3', text: '如果题里有数字、条件或关键词，先圈一个你最确定的。' },
+      { id: 'd4', role: 'user', text: '它好像是在问最后还剩多少。' },
+      { id: 'd5', text: '很好。那第一步先写已知什么、要求什么，不用算完整结果。' }
     ],
     actions: [
       { id: 'smaller', label: '再问小一点', action: 'smaller' },
-      { id: 'review', label: '去知识乐园练一下', action: 'review' }
+      { id: 'review', label: '去知识乐园练一局', action: 'review' }
     ]
   },
   knowledge: {
@@ -318,10 +298,10 @@ const TUTOR_REFERENCE_SCENES = {
     rows: [
       { id: 'k1', text: '小学数学 · 五年级' },
       { id: 'k2', text: '分数除法' },
-      { id: 'k3', text: '咕点小黑板：“别怕，这其实是个变身魔法！”' },
+      { id: 'k3', text: '咕点小黑板：别怕，这其实是一个先变乘号，再翻底朝天的方法。' },
       { id: 'k4', text: '1 这是什么：除以一个分数，等于乘以这个分数的倒数。' },
-      { id: 'k5', text: '2 容易卡在哪里：光顾着把除号变成乘号，却忘了把后面的分数颠倒过来。' },
-      { id: 'k6', text: '3 第一步怎么想：默念口诀，先变乘号，再翻个底朝天！' }
+      { id: 'k5', text: '2 容易卡在哪里：只把除号变乘号，却忘了把后面的分数倒过来。' },
+      { id: 'k6', text: '3 第一步怎么想：先问自己，后面的分数有没有翻成倒数？' }
     ],
     actions: [
       { id: 'read_problem', label: '换个说法', action: 'step', step: 'read_problem' },
@@ -330,42 +310,34 @@ const TUTOR_REFERENCE_SCENES = {
   },
   pointing: {
     title: '题目点拨',
-    status: '只追问，不代写',
-    rows: [
-      { id: 'p1', text: 'AI 专属私教：把题目发来，咕点只问第一步。拍题、打字都可以，系统会自动保存安全摘要。选择点拨模式后开始。' }
-    ],
+    status: '只问第一步',
+    rows: [{ id: 'p1', text: '把题目发来，咕点只问第一步。拍题、打字都可以，系统只保存安全摘要，不代写答案。' }],
     modes: ['看懂题意', '理清条件', '找准问题', '找第一步', '毫无头绪', '找突破口', '检查错因', '算错不对', '定位错因'],
-    actions: [
-      { id: 'find_direction', label: '开始点拨', action: 'step', step: 'find_direction' }
-    ]
+    actions: [{ id: 'find_direction', label: '开始点拨', action: 'step', step: 'find_direction' }]
   },
   stuck: {
-    title: '深呼吸，慢慢来',
-    status: '只追问，不代写',
+    title: '没关系，我们切小一点',
+    status: '只问第一步',
     rows: [
       { id: 's1', text: '没关系，我们把问题切小一点。' },
-      { id: 's2', text: '还是卡住时，接下来想先试试哪个？' },
-      { id: 's3', text: '先圈已知条件：找找题目里给出的数字和关键信息；先说题目问什么：理清最后需要我们求出什么结果。' },
+      { id: 's2', text: '还是卡住时，接下来想先试哪一个？' },
+      { id: 's3', text: '先圈已知条件：找题目给出的数字和关键词；先说题目问什么：理清最后要求的结果。' },
       { id: 's4', text: '刚才的思考小记' },
-      { id: 's5', text: '1 起步很棒：正确列出了算式 4/5 ÷ 2。' },
-      { id: 's6', text: '在这里卡住了一小下：忘记把后面的整数变成倒数了。' }
+      { id: 's5', text: '1 起步很稳：已经能说出题目在问什么。' },
+      { id: 's6', text: '2 还卡在第一步：先把已知条件写出来，再决定用哪个方法。' }
     ],
     actions: [
-      { id: 'find_conditions', label: '先圈已知条件', line: '找找题目里给出的数字和关键信息', action: 'step', step: 'find_conditions' },
-      { id: 'read_problem', label: '先说题目问什么', line: '理清最后需要我们求出什么结果', action: 'step', step: 'read_problem' },
+      { id: 'find_conditions', label: '先圈已知条件', line: '找题目里的数字和关键词', action: 'step', step: 'find_conditions' },
+      { id: 'read_problem', label: '先说题目问什么', line: '理清最后要求什么结果', action: 'step', step: 'read_problem' },
       { id: 'review', label: '去知识乐园复测', action: 'review' },
-      { id: 'smaller', label: '休息一下再来也没关系哦', action: 'smaller' }
+      { id: 'smaller', label: '再问小一点', action: 'smaller' }
     ]
   },
   recap: {
     title: '刚才学了什么',
-    status: '正在陪你想第一步',
-    rows: [
-      { id: 'r1', text: '用一句话复盘：我刚才卡在哪里、第一步是什么、下次先检查什么。' }
-    ],
-    actions: [
-      { id: 'smaller', label: '再问小一点', action: 'smaller' }
-    ]
+    status: '正在陪你复盘',
+    rows: [{ id: 'r1', text: '用一句话复盘：我刚才卡在哪里、第一步是什么、下次先检查什么。' }],
+    actions: [{ id: 'smaller', label: '再问小一点', action: 'smaller' }]
   }
 };
 
@@ -1535,73 +1507,76 @@ Page({
   pickStep(event) {
     const step = event.currentTarget.dataset.step || 'read_problem';
     const action = QUICK_ACTIONS.find((item) => item.id === step);
-    this.setData({
-      activeStep: step,
-      coachStepLabel: action ? action.label : '读题'
-    });
+    this.setData({ activeStep: step, coachStepLabel: action ? action.label : '读题' });
   },
 
   sendQuick(event) {
     const step = event.currentTarget.dataset.step || this.data.activeStep || 'read_problem';
     const selected = this.data.selected;
     const stepTextMap = {
-      read_problem: selected ? `先帮我读题：${selected.text}` : '先帮我读题',
-      write_first_step: '我不知道下一步怎么写',
-      find_direction: '给我一个方向，但不要直接讲最终结果',
-      similar_example: '给我一个相似例子',
-      method_summary: '帮我总结方法，做成复习卡',
+      read_problem: selected ? `先帮我读题：${selected.text}` : '先帮我读题。',
+      write_first_step: '我不知道下一步怎么写，请只问我第一步。',
+      find_direction: '给我一个方向，但不要直接讲最终结果。',
+      similar_example: '给我一个相似例子，再让我回到原题。',
+      method_summary: '帮我总结方法，做成复习卡。',
       fast_mode: selected ? `我想加快一点，只提示方向和第一步。\n${selected.text}` : '我想加快一点，只提示方向和第一步。',
-      find_conditions: '带我找条件',
-      explain_misconception: '帮我判断错因',
-      transfer: '带我做一道举一反三小变式',
-      review: '带我做一句话复盘'
+      find_conditions: '带我找已知条件和要求什么。',
+      explain_misconception: '帮我判断错因，先不要解完整题。',
+      transfer: '带我做一道举一反三小变式。',
+      review: '带我做一句话复盘。'
     };
-    this.setData({
-      activeStep: step,
-      input: stepTextMap[step] || '带我做下一步'
-    });
+    this.setData({ activeStep: step, input: stepTextMap[step] || '带我做下一步。' });
   },
 
   launchFirstStep(event) {
-    const dataset = event && event.currentTarget && event.currentTarget.dataset
-      ? event.currentTarget.dataset
-      : {};
+    const dataset = event && event.currentTarget && event.currentTarget.dataset ? event.currentTarget.dataset : {};
     const step = dataset.step || this.data.activeStep || 'read_problem';
-    const sceneMap = {
-      read_problem: 'knowledge',
-      explain_misconception: 'knowledge',
-      find_direction: 'pointing',
-      review: 'recap',
-      write_first_step: 'stuck',
-      fast_mode: 'stuck'
-    };
+    const sceneMap = { read_problem: 'knowledge', explain_misconception: 'knowledge', find_direction: 'pointing', review: 'recap', write_first_step: 'stuck', fast_mode: 'stuck' };
     const selected = this.data.selected;
     const stepTextMap = {
-      read_problem: selected ? `先帮我读题：${selected.text}` : '先帮我读题',
-      write_first_step: '我不知道下一步怎么写',
-      find_direction: '给我一个方向，但不要直接讲最终结果',
-      similar_example: '给我一个相似例子',
-      method_summary: '帮我总结方法，做成复习卡',
+      read_problem: selected ? `先帮我读题：${selected.text}` : '先帮我读题。',
+      write_first_step: '我不知道下一步怎么写，请只问我第一步。',
+      find_direction: '给我一个方向，但不要直接讲最终结果。',
+      similar_example: '给我一个相似例子，再让我回到原题。',
+      method_summary: '帮我总结方法，做成复习卡。',
       fast_mode: selected ? `我想加快一点，只提示方向和第一步。\n${selected.text}` : '我想加快一点，只提示方向和第一步。',
-      find_conditions: '带我找条件',
-      explain_misconception: '帮我判断错因',
-      transfer: '带我做一道变式',
-      review: '带我做一句话复盘'
+      find_conditions: '带我找已知条件和要求什么。',
+      explain_misconception: '帮我判断错因，先不要解完整题。',
+      transfer: '带我做一道小变式。',
+      review: '带我做一句话复盘。'
     };
     const typedInput = String(this.data.input || '').trim();
-    const stepPrompt = stepTextMap[step] || '带我做下一步';
-    const input = typedInput
-      ? `${typedInput}\n${stepPrompt}`
-      : stepPrompt;
+    const stepPrompt = stepTextMap[step] || '带我做下一步。';
+    const input = typedInput ? `${typedInput}\n${stepPrompt}` : stepPrompt;
     this.setData({
       activeStep: step,
       activeTutorScene: sceneMap[step] || 'dialogue',
       tutorReferenceScene: normalizeTutorReferenceScene(TUTOR_REFERENCE_SCENES[sceneMap[step] || 'dialogue'] || TUTOR_REFERENCE_SCENES.dialogue),
       showTutorDetails: true,
       input
-    }, () => {
-      this.send();
-    });
+    }, () => { this.send(); });
+  },
+
+  attachTutorPhoto() {
+    const finish = (path = '') => {
+      const existing = String(this.data.input || '').trim();
+      const nextInput = existing || '我已经拍题留档，请先让我用自己的话说题目问什么，再只问我第一步。';
+      this.setData({ input: nextInput, activeStep: 'find_direction', activeTutorScene: 'pointing', tutorReferenceScene: normalizeTutorReferenceScene(TUTOR_REFERENCE_SCENES.pointing), showTutorDetails: true });
+      if (storage.recordSurfaceDepthAction) {
+        storage.recordSurfaceDepthAction({ surface: 'tutor', action: 'attach_tutor_photo', source: 'tutor_question_pointing', hasLocalPath: !!path });
+      }
+      if (typeof wx !== 'undefined' && wx.showToast) wx.showToast({ title: '已留档，请补一句卡点', icon: 'none' });
+    };
+    if (typeof wx === 'undefined') { finish(''); return; }
+    if (wx.chooseMedia) {
+      wx.chooseMedia({ count: 1, mediaType: ['image'], sourceType: ['album', 'camera'], success: (res) => { const file = res && res.tempFiles && res.tempFiles[0]; finish(file && file.tempFilePath ? file.tempFilePath : ''); }, fail: () => finish('') });
+      return;
+    }
+    if (wx.chooseImage) {
+      wx.chooseImage({ count: 1, sourceType: ['album', 'camera'], success: (res) => finish(res && res.tempFilePaths && res.tempFilePaths[0] ? res.tempFilePaths[0] : ''), fail: () => finish('') });
+      return;
+    }
+    finish('');
   },
 
   startGuidedTutorMode(event) {
