@@ -1,4 +1,4 @@
-const api = require('../../utils/api');
+﻿const api = require('../../utils/api');
 const priority = require('../../utils/learning-priority');
 const storage = require('../../utils/storage');
 const navigation = require('../../utils/navigation');
@@ -204,7 +204,7 @@ function buildUploadPersonalizedClosureView(bridge = {}) {
     id: 'upload_personalized_closure_view',
     title: '个性化闭环执行桥',
     statusLine: bridge.status === 'ready_for_guided_execution'
-      ? '已具备真实任务证据：可以进入AI点拨、修卡点、回访和家长报告。'
+      ? '已具备真实任务证据：可以进入AI点拨、修卡点、回访和成长报告。'
       : '先补真实任务证据：资料/成绩只能生成方法候选，不能直接放行分享或服务。',
     contentLine: `内容密度：${bridge.contentScalePlan ? bridge.contentScalePlan.density : 'pending'}；题型：${bridge.questionType || 'unknown'}；学科：${bridge.subject || 'unknown'}`,
     socraticLine: bridge.socraticStressFallback
@@ -378,7 +378,7 @@ function buildUploadAiMaterialSolutionView(contract = {}, sourceSchemaId = '', o
     routes: [
       { id: 'socratic', label: 'Socratic', route: executionPath.socraticRoute || '/pages/tutor/tutor?from=ai_material_analysis' },
       { id: 'mini_lesson', label: 'Mini lesson', route: executionPath.miniLessonRoute || '/pages/tutor/tutor?from=ai_material_analysis_mini_lesson' },
-      { id: 'review_recall', label: '短回访验证', route: executionPath.practiceRecallRoute || '/pages/review/review?from=ai_material_analysis' },
+      { id: 'review_recall', label: '明天回访验证', route: executionPath.practiceRecallRoute || '/pages/review/review?from=ai_material_analysis' },
       { id: 'parent_review', label: 'Parent review', route: executionPath.parentReviewRoute || '/pages/profile/profile?from=ai_material_analysis' }
     ],
     releaseLine: releaseGates.length
@@ -420,9 +420,9 @@ function buildUploadDailyExecutionSeed(options = {}) {
     tutorRoute,
     revisitRoute,
     revisitLine: revisitUnlocked
-      ? '短回访已解锁：只练主动回忆，不看速度、分数或同伴比较。'
-      : '短回访暂不解锁：先补孩子第一步或错因证据。',
-    releaseLine: '放行规则：有第一步 + 错因 + 明天回访证据，才进入短回访或分享。',
+      ? '明天回访已解锁：只练主动回忆，不看速度、分数或同伴比较。'
+      : '明天回访暂不解锁：先补孩子第一步或错因证据。',
+    releaseLine: '放行规则：有第一步 + 错因 + 明天回访证据，才进入明天回访或分享。',
     blockedLine: '不带原题、完整答案、分数、名次、天赋标签、孩子姓名或联系方式。',
     evidenceRequired: ['child_first_step', 'wrong_cause_named', 'next_day_revisit', 'parent_check'],
     syncPayload: {
@@ -535,7 +535,7 @@ function buildUploadModeRecommendationView(modes = []) {
   return {
     id: 'upload_mode_recommendation_delivery_view',
     title: '今晚学习模式',
-    summaryLine: '默认仍是一对一苏格拉底点拨；小课堂、短回访和课程只在证据满足时补位。',
+    summaryLine: '默认仍是一对一苏格拉底点拨；小课堂、明天回访和课程只在证据满足时补位。',
     cards
   };
 }
@@ -617,7 +617,7 @@ function uploadReleaseRuleLine(rule = '') {
 
 function uploadReturnRouteLine(route = '') {
   const value = String(route || '');
-  if (value.indexOf('/pages/profile/') >= 0) return '下一步：查看家长报告和证据边界。';
+  if (value.indexOf('/pages/profile/') >= 0) return '下一步：查看成长报告和证据边界。';
   if (value.indexOf('/pages/tutor/') >= 0) return '下一步：回到一对一点拨，让孩子先说第一步。';
   if (value.indexOf('/pages/review/') >= 0) return '下一步：回到错因复盘，锁定明天回访。';
   if (value.indexOf('/pages/upload/') >= 0) return '下一步：继续补材料证据。';
@@ -667,7 +667,7 @@ function buildUploadAiLocalDeliveryView(split = []) {
 function uploadPublicAssetEntryLine(route = '') {
   const value = String(route || '');
   if (value.indexOf('/pages/tutor/') >= 0) return '进入方式：转成第一步点拨或小黑板。';
-  if (value.indexOf('/pages/profile/') >= 0) return '进入方式：沉淀到家长报告和复盘证据。';
+  if (value.indexOf('/pages/profile/') >= 0) return '进入方式：沉淀到成长报告和复盘证据。';
   if (value.indexOf('/pages/upload/') >= 0) return '进入方式：先补材料来源和家长确认。';
   return '进入方式：先登记来源，再决定是否进入学习任务。';
 }
@@ -755,7 +755,7 @@ function buildMaterialTypeGuide(type) {
   };
   return guides[type] || {
     examplePlaceholder: '粘贴课堂笔记、PPT 要点或手动整理：\n今天讲了什么概念；\n老师强调了哪一步；\n孩子具体哪一步没接上。',
-    statusLine: '当前生成本地复习卡和短回访练习，不承诺自动解析文件或直接出答案。',
+    statusLine: '当前生成本地复习卡和明天回访练习，不承诺自动解析文件或直接出答案。',
     modeLine: '验证方式：先拆成概念、步骤、陷阱、填空四类卡。',
     blockedClaimsLine: '不能做：自动抓取、自动批改、完整答案生成。'
   };
@@ -767,7 +767,7 @@ function buildUploadEntryDeck(activeMode = 'homework') {
       id: 'homework',
       label: '贴作业材料',
       title: '材料先变证据',
-      line: '写题型、数量和卡点，生成家长报告和点拨证据。',
+      line: '写题型、数量和卡点，生成成长报告和点拨证据。',
       placeholder: '例如：\n数学方程基础题 8 道；\n应用题 4 道，写完整过程；\n英语听写 20 个词。',
       cta: '写作业清单'
     },
@@ -797,7 +797,7 @@ function buildUploadEntryDeck(activeMode = 'homework') {
     activeMode: active.id,
     placeholder: active.placeholder,
     nextLine: active.id === 'material'
-      ? '下面会打开材料区；先贴摘录，再生成家长报告/复习卡/回访卡。'
+      ? '下面会打开材料区；先贴摘录，再生成成长报告/复习卡/回访卡。'
       : active.id === 'stuck'
         ? '下面只要补一句卡点；系统会优先生成第一步点拨和小讲堂触发证据。'
         : '下面写作业清单；系统会先生成材料分类和家长可看的证据。'
@@ -826,7 +826,7 @@ Page({
     structuredEvidenceCapture: null,
     lastReportCta: null,
     parentReportWorkflowView: null,
-    submitLabel: '生成家长报告',
+    submitLabel: '生成成长报告',
     quickChips: [
       { label: '语文背诵', text: '语文背诵 1 篇，孩子容易卡在开头。' },
       { label: '整理错题', text: '错题订正：题目写这里；我错在审题/等量关系/单位换算；想要举一反三。' },
@@ -959,7 +959,7 @@ Page({
         {
           id: 'memory',
           title: '为什么不是白做',
-          body: '关键错因会进入家长报告、AI 点拨和短回访，变成后面还能用的学习资产。',
+          body: '关键错因会进入成长报告、AI 点拨和明天回访，变成后面还能用的学习资产。',
           tone: 'record'
         }
       ]
@@ -1004,7 +1004,7 @@ Page({
         cards: [],
         readiness: 0,
         nextAction: methodMode
-          ? '粘贴一段真实材料后，会生成来源账本、下一证据、家长报告入口和 AI/本地分工。'
+          ? '粘贴一段真实材料后，会生成来源账本、下一证据、成长报告入口和 AI/本地分工。'
           : '粘贴一段真实摘录，咕点会先生成概念卡、步骤卡、陷阱卡和填空卡。'
       };
     }
@@ -1055,7 +1055,7 @@ Page({
   buildSubmitLabel(text) {
     return this.extractWrongQuestionLines(text).length
       ? '整理错题并生成报告'
-      : '生成家长报告';
+      : '生成成长报告';
   },
 
   buildInputCoach(text, plan) {
@@ -1074,7 +1074,7 @@ Page({
         ? '再补一句孩子哪一步没接上，分类会更可信。'
         : !hasCount
           ? '再补题目数量或预计时间，咕点才能算减负。'
-          : '可以生成家长报告了。';
+          : '可以生成成长报告了。';
     return {
       score,
       next,
@@ -1342,7 +1342,7 @@ Page({
     return {
       title: '材料证据补全',
       summary: '不同材料补不同证据：测评补方法假设，学校材料补家校交接，家长观察补家庭情境，错题补第一步和错因。',
-      releaseGate: '本地规则决定报告、短回访和分享是否放行；AI 只改写追问和家长摘要。',
+      releaseGate: '本地规则决定报告、明天回访和分享是否放行；AI 只改写追问和家长摘要。',
       fields,
       values,
       readyCount,
@@ -1373,8 +1373,8 @@ Page({
     return {
       title: '资料先补证据',
       line: missing.length
-        ? `还差：${missing.slice(0, 2).join(' / ')}。补齐后才生成家长报告、短回访或分享。`
-        : '这类资料必须先补齐结构化证据，不能直接放行报告、短回访或分享。',
+        ? `还差：${missing.slice(0, 2).join(' / ')}。补齐后才生成成长报告、明天回访或分享。`
+        : '这类资料必须先补齐结构化证据，不能直接放行报告、明天回访或分享。',
       route: '/pages/upload/upload?from=material_evidence_gate',
       actionRoute: '/pages/upload/upload?from=material_evidence_gate',
       revisitRoute: '',
@@ -1632,7 +1632,7 @@ Page({
         banner: '报告已生成',
         statusLine: parentReportGenerationWorkflow && parentReportGenerationWorkflow.parentReadableLine
           ? parentReportGenerationWorkflow.parentReadableLine
-          : '材料已完成分类，可以查看家长报告。',
+          : '材料已完成分类，可以查看成长报告。',
         actionLabel: '',
         route: `/pages/profile/profile?from=upload_report_ready&${query}`,
         ready: true
@@ -1675,7 +1675,7 @@ Page({
     const openMaicDecisionBridge = openMaicInspiredPlan.buildOpenMaicInspiredDecisionBridge(openMaicTaskPlan, reportDraft, {
       nextStep: actionRoute
     }, {
-      summary: sourceSchemaId === 'wrong_question_paper' ? '错题先进入错因复现，再放行短回访练习。' : '资料先进入第一步回访，再放行报告。'
+      summary: sourceSchemaId === 'wrong_question_paper' ? '错题先进入错因复现，再放行明天回访练习。' : '资料先进入第一步回访，再放行报告。'
     });
     const safeRelayPayload = Object.assign({}, openMaicDecisionBridge.shareRelayPayload || {}, {
       from: 'upload',
@@ -1788,16 +1788,16 @@ Page({
       : {};
     const workflowModuleLine = [
       workflowModuleDecision.tutorRoute ? '苏格拉底点拨' : '',
-      workflowModuleDecision.reviewRoute ? '短回访' : '',
-      workflowModuleDecision.parentRoute || workflowModuleDecision.reportRoute ? '家长报告' : ''
-    ].filter(Boolean).join(' / ') || '苏格拉底点拨 / 短回访 / 家长报告';
+      workflowModuleDecision.reviewRoute ? '明天回访' : '',
+      workflowModuleDecision.parentRoute || workflowModuleDecision.reportRoute ? '成长报告' : ''
+    ].filter(Boolean).join(' / ') || '苏格拉底点拨 / 明天回访 / 成长报告';
     const parentReportWorkflowView = {
       title: reportReadiness.title,
       loopLine: '闭环：材料 -> 成长报告 -> AI私教 -> 知识乐园 -> 成长报告',
       statusLine: reportReadiness.statusLine,
       sourceLine: parentReportGenerationWorkflow && parentReportGenerationWorkflow.sourceMap
-        ? `上传页资料包：${parentReportGenerationWorkflow.sourceMap.sourceCount || 0} 份资料 / ${parentReportGenerationWorkflow.sourceMap.imageCount || 0} 张图片，家长页可看报告预览`
-        : '上传页资料包 / 家长观察，家长页可看报告预览',
+        ? `上传页资料包：${parentReportGenerationWorkflow.sourceMap.sourceCount || 0} 份资料 / ${parentReportGenerationWorkflow.sourceMap.imageCount || 0} 张图片，成长报告页可看报告预览`
+        : '上传页资料包 / 家长观察，成长报告页可看报告预览',
       reasoningLine: `下一步可进入：${workflowModuleLine}`,
       imageLine: parentReportGenerationWorkflow && parentReportGenerationWorkflow.apiKey && parentReportGenerationWorkflow.apiKey.requiredForImageRender === false
         ? '报告预览已准备好。'
@@ -1812,13 +1812,13 @@ Page({
       title: sourceSchemaId === 'talent_assessment'
         ? '方法候选已入证据账本'
         : sourceSchemaId === 'wrong_question_paper'
-          ? (localDraftOnly ? '错题报告草稿待确认' : '错题已进入家长报告')
-          : (localDraftOnly ? '资料报告草稿待确认' : '资料已进入家长报告'),
+          ? (localDraftOnly ? '错题报告草稿待确认' : '错题已进入成长报告')
+          : (localDraftOnly ? '资料报告草稿待确认' : '资料已进入成长报告'),
       line: sourceSchemaId === 'talent_assessment'
         ? '这里只放行学习方法候选，不生成复习卡、不贴天赋标签；下一步用真实错题和回访验证。'
         : sourceSchemaId === 'wrong_question_paper'
-          ? (localDraftOnly ? `已整理本地错题草稿${importedCards ? `，并整理 ${importedCards} 张错题卡` : ''}；先补证据确认，再放行家长报告。` : `已生成报告证据${importedCards ? `，并整理 ${importedCards} 张错题卡` : ''}；先看家长决策，再去修那一张卡。`)
-          : (localDraftOnly ? '已整理本地资料草稿；先补证据确认，再作为家长报告使用。' : '已生成资料证据卷宗；先看本次材料怎么用，再决定是否进入点拨或回访。'),
+          ? (localDraftOnly ? `已整理本地错题草稿${importedCards ? `，并整理 ${importedCards} 张错题卡` : ''}；先补证据确认，再放行成长报告。` : `已生成报告证据${importedCards ? `，并整理 ${importedCards} 张错题卡` : ''}；先看家长决策，再去修那一张卡。`)
+          : (localDraftOnly ? '已整理本地资料草稿；先补证据确认，再作为成长报告使用。' : '已生成资料证据卷宗；先看本次材料怎么用，再决定是否进入点拨或回访。'),
       route: reportReadiness.route,
       actionRoute,
       revisitRoute,

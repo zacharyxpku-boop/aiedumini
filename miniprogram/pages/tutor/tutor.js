@@ -98,7 +98,7 @@ function buildSocraticPromptWorkflow(receipt = {}, result = {}, selected = {}, n
     parentEvidenceRoute: '/pages/entry-detail/entry-detail?scene=parent&from=tutor_report',
     evidenceRequired: ['first_step', 'wrong_cause', 'safe_share_boundary', 'next_day_revisit'],
     blockedFields: ['original_question', 'full_answer', 'full_dialogue', 'score', 'ranking', 'talent_label'],
-    workflowLine: `本地先选追问与边界，AI 只改写成孩子听得懂的话；下一步进入 ${route.indexOf('/pages/review/review') === 0 ? '短回访' : '学习链路'}。`
+    workflowLine: `本地先选追问与边界，AI 只改写成孩子听得懂的话；下一步进入 ${route.indexOf('/pages/review/review') === 0 ? '知识乐园复测' : '学习链路'}。`
   };
 }
 
@@ -138,10 +138,10 @@ function buildSocraticBrief(result = {}, receipt = {}, promptWorkflow = {}) {
       {
         id: 'verify',
         label: '说完去验证',
-        text: promptWorkflow && promptWorkflow.nextReviewRoute ? '生成短回访卡，不在这里堆长方案' : '进入短回访验证'
+        text: promptWorkflow && promptWorkflow.nextReviewRoute ? '生成明天回访卡，不在这里堆长方案' : '进入知识乐园验证'
       }
     ],
-    routeLabel: '说完去短回访',
+    routeLabel: '说完去复测',
     route: promptWorkflow && promptWorkflow.nextReviewRoute ? promptWorkflow.nextReviewRoute : '/pages/review/review?from=socratic_prompt_workflow'
   };
 }
@@ -153,7 +153,7 @@ function buildTutorDiagnosticCard(result = {}, receipt = {}, selected = {}) {
   const firstStep = probe.goal || signal.firstStep || result.next_action || '先说第一步';
   const wrongCause = probe.focus || probe.misconception || signal.wrongCause || selected.issueType || '入口不清';
   const parentCheck = signal.parentCheck || (result.socratic_contract && result.socratic_contract.nextQuestion) || probe.prompt || '家长只问第一步';
-  const reviewMove = result.transfer_prompt || signal.reviewMove || '说完进短回访';
+  const reviewMove = result.transfer_prompt || signal.reviewMove || '说完进知识乐园复测';
   return {
     id: 'tutor_diagnostic_card',
     title: taskType === 'unknown' ? '本轮诊断' : `本轮诊断 · ${taskType}`,
@@ -537,10 +537,10 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
   const handoffPlan = {
     title: proofSentence ? '点拨后继续走一小步' : blockedAnswer ? '先退回安全点拨' : '点拨还差一句证据',
     summary: proofSentence
-      ? '孩子已经能说回去，下一步不要加讲解，转成修卡点、短回访或给家长看。'
+      ? '孩子已经能说回去，下一步不要加讲解，转成修卡点、知识乐园复测或给家长看。'
       : blockedAnswer
         ? '先拦住直接答案，把动作收窄到第一步和错因。'
-        : '先补一句自己的第一步，再进入修卡点或短回访。',
+        : '先补一句自己的第一步，再进入修卡点或知识乐园复测。',
     evidenceLine: `当前 ${score}/100 · ${studentFirst ? '有第一步' : '缺第一步'} · ${namedWrongCause ? '有错因' : '缺错因'}`,
     actions: [
       {
@@ -552,10 +552,10 @@ function buildThinkingReceipt(messages = [], masterySignal, pasteRisk, activeSte
       },
       {
         id: 'recall',
-        label: '5分钟短回访',
+        label: '5分钟复测',
         route: '/pages/review/review?from=tutor_handoff&mode=recall',
-        reason: proofSentence ? '已经会说方法，马上用一局短回访问是否转身还记得。' : '还没完全说清，先用低负担练习保留手感。',
-        evidence: '短回访结果'
+        reason: proofSentence ? '已经会说方法，马上用一局知识乐园复测看是否转身还记得。' : '还没完全说清，先用低负担练习保留手感。',
+        evidence: '明天回访结果'
       },
       {
         id: 'parent',
@@ -708,7 +708,7 @@ function buildEntryTutorIntent(options = {}) {
     return {
       from,
       open,
-      intro: '我已从短回访回到原点点拨。先修复刚才卡住的错因，不重讲整题。',
+      intro: '我已从知识乐园回到原点点拨。先修复刚才卡住的错因，不重讲整题。',
       resetMessages: true
     };
   }
@@ -884,7 +884,7 @@ function buildMiniLessonFeedbackBridge(item = {}, receipt = {}, adjustment = {})
       title: '补一张小黑板证据',
       reason: modeRouter.reason || trigger.reason || adjustment.nextAction,
       route: seed.route,
-      nextAction: '先不再加提示，只留 A/B 小黑板证据，回短回访复测同一个卡点。',
+      nextAction: '先不再加提示，只留 A/B 小黑板证据，回知识乐园复测同一个卡点。',
       reviewSeed: seed,
       evidence: {
         triggerEvidence: trigger.triggerEvidence || {},
@@ -921,7 +921,7 @@ function buildMiniLessonFeedbackBridge(item = {}, receipt = {}, adjustment = {})
     title: '已切入 3 分钟小讲堂',
     reason: trigger.reason || adjustment.nextAction,
     route: seed.route,
-    nextAction: '看三帧小黑板，写一句退出票，再回短回访复测。',
+    nextAction: '看三帧小黑板，写一句退出票，再回知识乐园复测。',
     reviewSeed: seed,
     evidence: {
       triggerEvidence: trigger.triggerEvidence || {},

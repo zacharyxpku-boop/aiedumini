@@ -82,6 +82,20 @@
           <view class="growth-progress-step"><text></text><view><text>培养建议</text><text>基于证据生成方法和今晚行动</text></view><text>待生成</text></view>
         </view>
 
+        <view class="growth-report-preview">
+          <view class="growth-report-preview-head"><text>成长线索初步发现</text><text>{{learningReportSummary.reportJobCaseId ? '基于材料' : '本地预览'}}</text></view>
+          <view class="growth-report-preview-card"><text>学习偏好线索</text><text>{{learningReportSummary.learningPreferenceLine || '先用问卷和错题判断更适合图像、复述还是动手拆步。'}}</text></view>
+          <view class="growth-report-preview-card warn"><text>当前卡点证据</text><text>{{learningReportSummary.diagnosisLine || profileViewModel.parentRecap.evidenceRecap}}</text></view>
+          <view class="growth-report-preview-card action"><text>今晚建议</text><text>{{profileViewModel.parentRecap.parentOneQuestion}}</text></view>
+        </view>
+
+        <view class="growth-parent-action-card">
+          <view class="growth-parent-action-head"><text>今晚行动卡</text><text>不替孩子学，只帮他开头</text></view>
+          <view><text></text><view><text>具体表扬</text><text>先指出一个真实努力，而不是评价聪不聪明。</text></view></view>
+          <view><text></text><view><text>清空桌面</text><text>给容易分心的孩子减少视觉干扰。</text></view></view>
+          <view><text></text><view><text>只问一问</text><text>孩子求助时只问“这一步和上一步是什么关系？”</text></view></view>
+        </view>
+
         <view class="yd-parent-decision growth" data-scene="parent" data-source="growth_report_card" bindtap="openEntryDetail">
           <image class="yd-parent-decision-img" mode="aspectFit" src="/assets/reference/family-avatar-group-transparent.png" />
           <view class="yd-parent-decision-copy">

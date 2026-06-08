@@ -1,12 +1,12 @@
-const navigation = require('../../utils/navigation');
+﻿const navigation = require('../../utils/navigation');
 
 const SCENES = {
   upload: {
     badge: '材料入口',
-    title: '上传材料，生成家长报告',
-    subtitle: '把作业、错题、成绩或家长观察发进来。系统先分类，再给家长报告。',
+    title: '上传材料，生成成长报告',
+    subtitle: '把作业、错题、成绩或家长观察发进来。系统先分类，再给成长报告。',
     heroImage: '/assets/reference/upload-folder-stack-transparent.png',
-    focusCopy: '先补真实材料；上传后直接生成家长报告。',
+    focusCopy: '先补真实材料；上传后直接生成成长报告。',
     primaryLabel: '上传材料',
     primaryRoute: '/pages/upload/upload?from=entry_upload_file&open=flow',
     secondaryLabel: '做快测',
@@ -28,7 +28,7 @@ const SCENES = {
       points: [
         '作业、错题、成绩、老师反馈和家长观察分开处理。',
         '材料不足时只提示补什么，不硬下结论。',
-        '上传后直接进入家长报告。'
+        '上传后直接进入成长报告。'
       ]
     }
   },
@@ -95,7 +95,7 @@ const SCENES = {
     }
   },
   review: {
-    badge: '短回访',
+    badge: '明天回访',
     title: '5 分钟验证记忆和迁移',
     subtitle: '先选今天要验证的一张真实卡，再进入 90 秒回忆或错因复盘。',
     heroImage: '/assets/reference/review-world-map-transparent.png',

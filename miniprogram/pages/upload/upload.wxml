@@ -1,4 +1,4 @@
-<view class="upload-page">
+﻿<view class="upload-page">
   <scroll-view class="upload-scroll" scroll-y enhanced show-scrollbar="{{false}}">
     <view class="upload-content">
       <view class="yd-upload-screen yd-app-screen yd-upload-app">
@@ -15,11 +15,11 @@
 
         <view class="yd-upload-hero">
           <view class="yd-upload-copy">
-            <view class="yd-upload-title">上传材料，生成家长报告</view>
+            <view class="yd-upload-title">上传材料，生成成长报告</view>
             <view class="yd-upload-sub">作业、错题、成绩或测评都可以。</view>
             <view class="yd-upload-proof">
               <text>材料分类</text>
-              <text>家长报告</text>
+              <text>成长报告</text>
               <text>AI私教</text>
               <text>知识乐园</text>
             </view>
@@ -27,7 +27,15 @@
           <image class="yd-upload-mascot" mode="aspectFit" src="/assets/reference/upload-folder-stack-transparent.png" />
         </view>
 
-        <view class="upload-next-row"><view class="upload-next-card report" bindtap="viewLatestReport"><image mode="aspectFit" src="/assets/reference/entry-report.png" /><text>家长报告</text><text>先出证据卡，再给今晚一句话</text></view><view class="upload-next-card route" bindtap="goReview"><image mode="aspectFit" src="/assets/reference/learning-route-map-transparent.png" /><text>知识乐园路线</text><text>把错因变成四个互动练习</text></view></view>
+        <view class="upload-next-row"><view class="upload-next-card report" bindtap="viewLatestReport"><image mode="aspectFit" src="/assets/reference/entry-report.png" /><text>成长报告</text><text>先出证据卡，再给今晚一句话</text></view><view class="upload-next-card route" bindtap="goReview"><image mode="aspectFit" src="/assets/reference/learning-route-map-transparent.png" /><text>知识乐园路线</text><text>把错因变成四个互动练习</text></view></view>
+
+        <view class="upload-evidence-grid">
+          <view class="upload-evidence-card primary" data-type="wrong_question" bindtap="setMaterialType"><text>错题描述</text><text>记录孩子常卡住的题型</text><text>已添加 1 份</text></view>
+          <view class="upload-evidence-card" data-type="score_sheet" bindtap="setMaterialType"><text>成绩/周测</text><text>分数只做私有线索</text><text>补充</text></view>
+          <view class="upload-evidence-card" data-type="school_material" bindtap="setMaterialType"><text>老师反馈</text><text>评语或聊天截图</text><text>补充</text></view>
+          <view class="upload-evidence-card" data-type="parent_report" bindtap="openMaterialReportPanel"><text>家长观察</text><text>随手写几句现状</text><text>补充</text></view>
+          <view class="upload-evidence-card" data-type="assessment" bindtap="setMaterialType"><text>测评摘要</text><text>过往报告或记录</text><text>补充</text></view>
+        </view>
 
         <view class="upload-intake-workbench">
           <view class="upload-workbench-head"><text>粘贴材料</text><text>生成前先看证据</text></view>
@@ -39,7 +47,7 @@
           <view class="upload-workbench-head"><text>补充报告证据</text><text bindtap="toggleMaterialPanel">收起</text></view>
           <textarea class="upload-textarea material" value="{{materialText}}" bindinput="onMaterialInput" maxlength="1600" placeholder="粘贴测评摘要、老师反馈、错题描述或家长观察。必须有真实作业/错题锚点，报告才放行。" />
           <view class="upload-workbench-actions"><text data-type="parent_report" bindtap="setMaterialType">家长观察</text><text data-type="score_sheet" bindtap="setMaterialType">成绩/周测</text><text data-type="school_material" bindtap="setMaterialType">老师反馈</text></view>
-          <text class="upload-material-submit" bindtap="importMaterialPack">生成家长报告入口</text>
+          <text class="upload-material-submit" bindtap="importMaterialPack">生成成长报告</text>
         </view>
 
         <view class="upload-output-trail">
@@ -49,7 +57,7 @@
           </view>
           <view>
             <text>2</text>
-            <text>家长报告</text>
+            <text>成长报告</text>
           </view>
           <view>
             <text>3</text>
@@ -61,7 +69,7 @@
           </view>
         </view>
 
-        <view class="yd-upload-primary" bindtap="submit">生成家长报告</view>
+        <view class="yd-upload-primary" bindtap="submit">生成成长报告</view>
         <view class="upload-report-ready" wx:if="{{lastReportCta}}">
           <text class="upload-report-title">{{lastReportCta.reportReadiness && lastReportCta.reportReadiness.banner ? lastReportCta.reportReadiness.banner : '材料结果'}} · {{lastReportCta.title}}</text><block wx:if="{{parentReportWorkflowView}}">
             <text class="upload-report-flow">{{parentReportWorkflowView.loopLine}}</text>
@@ -70,7 +78,7 @@
             <text class="upload-report-flow">{{parentReportWorkflowView.imageLine}}</text>
           </block>
           <text class="upload-workflow-actions" wx:if="{{parentReportWorkflowView}}"><text data-workflow="source" bindtap="openReportWorkflowRoute">资料包</text><text data-workflow="modules" bindtap="openReportWorkflowRoute">模块路线</text><text data-workflow="preview" bindtap="openReportWorkflowRoute">报告预览</text></text>
-          <view class="upload-report-actions"><text bindtap="viewLatestReport">家长看报告</text><text bindtap="runReportFollowupAction">{{lastReportCta.actionLabel}}</text></view>
+          <view class="upload-report-actions"><text bindtap="viewLatestReport">查看成长报告</text><text bindtap="runReportFollowupAction">{{lastReportCta.actionLabel}}</text></view>
         </view>
 
       </view>

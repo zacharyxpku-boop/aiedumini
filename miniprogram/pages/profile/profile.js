@@ -240,7 +240,7 @@ function buildProfileDossierDeliveryView(dossier = {}, servicePathway = {}) {
       label: item.label || '学习模式',
       whenLine: item.when || item.trigger || '有真实学习证据时使用。',
       gateLine: profileReadableGate(item.localGate),
-      boundaryLine: '边界：家长页只呈现证据、本次行动和下次验证，不堆其他功能入口。'
+      boundaryLine: '边界：成长报告页只呈现证据、本次行动和下次验证，不堆其他功能入口。'
     })),
     solutionCards: solutionSequence.map((item, index) => ({
       id: item.id || `solution_mode_${index + 1}`,
@@ -355,7 +355,7 @@ function buildParentReport(profile, reviewSummary, moduleSummary, tutorSummary, 
     ? '这周已经能看见孩子卡在哪、怎么改、下次先查什么。'
     : recordScore >= 68
       ? '这套闭环已经开始起作用，但还需要更多复习和卡点记录。'
-      : '先做一项关键点拨、一轮卡点修复、一次短回访。';
+      : '先做一项关键点拨、一轮卡点修复、一次明天回访。';
   const recordStatus = recordScore >= 86 ? '记录稳定' : recordScore >= 68 ? '正在形成' : '继续积累';
   const goal = parentGoal || {};
   const goalLine = goal.strategy ? `家庭目标：${goal.label}。${goal.strategy}` : '';
@@ -549,13 +549,13 @@ function buildRevisitEvidenceCard(reviewSummary) {
   const evidencePoints = Number(gameProfile.xp || progress.xp || 0);
   const reviewedToday = Number((reviewSummary && reviewSummary.reviewedToday) || 0);
   return {
-    title: '短回访证据',
+    title: '明天回访证据',
     xp: evidencePoints,
     evidencePoints,
     streak: Number(gameProfile.streak || progress.streak || 0),
     lives: Number(gameProfile.lives || 5),
     reviewedToday,
-    evidenceText: reviewedToday ? `今天已完成 ${reviewedToday} 次短回访` : '完成第一次回访后留下记录',
+    evidenceText: reviewedToday ? `今天已完成 ${reviewedToday} 次明天回访` : '完成第一次回访后留下记录',
     comparisonNotice: '这里只看孩子自己的回访记录，不做同伴对比。'
   };
 }
@@ -1788,7 +1788,7 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
       },
       {
         id: 'report',
-        label: '家长报告',
+        label: '成长报告',
         owner: '证据账本',
         action: '天赋测评只做学习方法候选；错题/试卷进入错因与回访；学校材料生成家校沟通摘要。',
         route: '/pages/upload/upload?from=openmaic_k12_workbench&type=talent_assessment'
@@ -1854,7 +1854,7 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     ? `上传页 ${workflowSourceMap.sourceCount} 份资料 / ${workflowSourceMap.imageCount || 0} 张图`
     : '上传页资料包 / 家长观察';
   const workflowReasoningLine = workflowModuleDecision.tutorRoute && workflowModuleDecision.reviewRoute
-    ? '已接入点拨、短回访和家长报告'
+    ? '已接入点拨、明天回访和成长报告'
     : '先看证据，再决定下一步模块';
   const workflowImageLine = workflowImagePlan.requiresServerSideKey || workflowApiKey.requiredForImageRender
     ? '报告预览可先查看，完整图稿稍后补齐'
@@ -3392,7 +3392,7 @@ Page({
     if (shouldOpenAssessment) {
       this.setData({
         profilePanel: 'assessment',
-        profilePanelTitle: hasReportContext ? '家长报告与证据' : '测评与方法建议',
+        profilePanelTitle: hasReportContext ? '成长报告与证据' : '测评与方法建议',
         activeReportContext: hasReportContext ? {
           reportId: query.reportId || '',
           sourceSchemaId: query.sourceSchemaId || '',
@@ -4170,7 +4170,7 @@ Page({
         { id: 'content_loop', name: '内容回访', score: review.contentPipeline ? 98 : 94, strength: '材料 -> 卡片 -> 小测 -> 连续记录', gap: '真实材料处理和稳定复盘规模' },
         { id: 'memory_loop', name: '长期记忆', score: review.retentionLab ? 96 : 92, strength: '间隔复习、负载控制和卡点修复', gap: '真实调度参数校准' },
         { id: 'tutor_loop', name: 'AI点拨学伴', score: thinking.total ? 99 : 96, strength: '追问引导和思路记录', gap: '模型级误区复盘' },
-        { id: 'china_student', name: '中国学生场景', score: 100, strength: '材料证据 -> AI 点拨 -> 家长报告', gap: '需要真实体验记录' }
+        { id: 'china_student', name: '中国学生场景', score: 100, strength: '材料证据 -> AI 点拨 -> 成长报告', gap: '需要真实体验记录' }
       ]
     };
   },

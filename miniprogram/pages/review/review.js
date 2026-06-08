@@ -1,4 +1,4 @@
-const reviewCards = require('../../utils/review-cards');
+﻿const reviewCards = require('../../utils/review-cards');
 const storage = require('../../utils/storage');
 const navigation = require('../../utils/navigation');
 const api = require('../../utils/api');
@@ -33,7 +33,7 @@ const DEFAULT_MISTAKE_HUB = {
 function reviewReadableRouteLine(route = '') {
   const value = String(route || '');
   if (value.indexOf('/pages/tutor/') >= 0) return '下一步：回到一对一点拨，只问第一步。';
-  if (value.indexOf('/pages/profile/') >= 0) return '下一步：回到家长报告查看证据。';
+  if (value.indexOf('/pages/profile/') >= 0) return '下一步：回到成长报告查看证据。';
   if (value.indexOf('/pages/upload/') >= 0) return '下一步：继续补材料证据。';
   return '下一步：完成本张卡后再决定是否继续。';
 }
