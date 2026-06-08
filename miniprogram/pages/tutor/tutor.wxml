@@ -57,7 +57,7 @@
             <view class="tutor-start-cta" data-step="write_first_step" bindtap="launchFirstStep">开始问咕点</view>
           </view>
 
-          <view class="tutor-reference-panel {{activeTutorScene}}">
+          <view class="tutor-reference-panel {{activeTutorScene}}" wx:if="{{activeTutorScene !== 'dialogue'}}">
             <view class="tutor-reference-head"><text>{{activeTutorScene === 'knowledge' ? '咕点小黑板' : activeTutorScene === 'pointing' ? '题目点拨' : activeTutorScene === 'stuck' ? '深呼吸，慢慢来' : activeTutorScene === 'recap' ? '刚才学了什么' : '自由对话'}}</text><text>{{activeTutorScene === 'dialogue' ? '正在陪你想第一步' : '只追问，不代写'}}</text></view>
             <view class="tutor-blackboard" wx:if="{{activeTutorScene === 'knowledge'}}"><text>1 这是什么</text><text>除以一个分数，等于乘以这个分数的倒数。</text><text>2 容易卡在哪里</text><text>光顾着把除号变成乘号，却忘了把后面的分数颠倒。</text><text>3 第一步怎么想</text><text>默念：先变乘号，再翻个底朝天。</text></view>
             <view class="tutor-pointing-grid" wx:elif="{{activeTutorScene === 'pointing'}}"><text data-step="read_problem" bindtap="launchFirstStep">看懂题意</text><text data-step="find_conditions" bindtap="launchFirstStep">理清条件</text><text data-step="find_direction" bindtap="launchFirstStep">找突破口</text><text data-step="explain_misconception" bindtap="launchFirstStep">定位错因</text></view>

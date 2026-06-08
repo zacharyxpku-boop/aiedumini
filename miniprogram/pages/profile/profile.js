@@ -3819,6 +3819,32 @@ Page({
     });
   },
 
+  setGrowthScene(event) {
+    const scene = event && event.currentTarget ? event.currentTarget.dataset.panel || 'main' : 'main';
+    if (scene === 'questionnaire') {
+      this.startGrowthQuestionnaire();
+      return;
+    }
+    if (scene === 'preview') {
+      this.setData({
+        growthActiveScene: 'preview',
+        showLearningQuestionnaire: false
+      });
+      return;
+    }
+    if (scene === 'action') {
+      this.setData({
+        growthActiveScene: 'action',
+        showLearningQuestionnaire: false
+      });
+      return;
+    }
+    this.setData({
+      growthActiveScene: 'main',
+      showLearningQuestionnaire: false
+    });
+  },
+
   answerLearningQuestion(event) {
     const id = event.currentTarget.dataset.id || '';
     const optionId = event.currentTarget.dataset.option || '';

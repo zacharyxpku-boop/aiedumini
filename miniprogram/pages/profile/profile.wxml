@@ -42,10 +42,10 @@
         </view>
 
         <view class="growth-flow-tabs">
-          <text class="{{growthActiveScene === 'main' ? 'active' : ''}}">成长报告</text>
-          <text class="{{growthActiveScene === 'questionnaire' ? 'active' : ''}}">1 分钟问卷</text>
-          <text class="{{growthActiveScene === 'preview' ? 'active' : ''}}">报告预览</text>
-          <text class="{{growthActiveScene === 'action' ? 'active' : ''}}">家长行动卡</text>
+          <text class="{{growthActiveScene === 'main' ? 'active' : ''}}" data-panel="main" bindtap="setGrowthScene">成长报告</text>
+          <text class="{{growthActiveScene === 'questionnaire' ? 'active' : ''}}" data-panel="questionnaire" bindtap="setGrowthScene">1 分钟问卷</text>
+          <text class="{{growthActiveScene === 'preview' ? 'active' : ''}}" data-panel="preview" bindtap="setGrowthScene">报告预览</text>
+          <text class="{{growthActiveScene === 'action' ? 'active' : ''}}" data-panel="action" bindtap="setGrowthScene">家长行动卡</text>
         </view>
 
         <view class="growth-questionnaire-panel" wx:if="{{showLearningQuestionnaire}}">

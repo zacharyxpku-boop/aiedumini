@@ -233,6 +233,23 @@ page {
   box-shadow: inset 0 0 0 2rpx rgba(24, 169, 79, 0.14), 0 8rpx 18rpx rgba(24, 169, 79, 0.08);
 }
 
+.review-topic-cta {
+  height: 86rpx;
+  margin-top: 14rpx;
+  border-radius: 999rpx;
+  color: #ffffff;
+  background: linear-gradient(180deg, #18a94f 0%, #128b43 100%);
+  box-shadow: 0 12rpx 24rpx rgba(24, 169, 79, 0.20);
+  font-size: 29rpx;
+  font-weight: 950;
+  line-height: 86rpx;
+  text-align: center;
+}
+
+.review-topic-cta:active {
+  transform: scale(0.985);
+}
+
 .yd-review-art {
   width: 204rpx;
   height: 188rpx;
