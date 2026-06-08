@@ -30,6 +30,16 @@ page {
   border-radius: 0;
 }
 
+.yd-parent-screen:not(.scene-main) {
+  gap: 24rpx;
+  min-height: calc(100vh - 96rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  padding: 0 48rpx calc(132rpx + env(safe-area-inset-bottom));
+  background:
+    radial-gradient(circle at 88% 0%, rgba(254, 243, 199, 0.64), transparent 26%),
+    radial-gradient(circle at 0% 30%, rgba(204, 251, 241, 0.5), transparent 24%),
+    #f8fafc;
+}
+
 .yd-parent-app {
   display: flex;
   flex-direction: column;
@@ -42,6 +52,27 @@ page {
   justify-content: flex-end;
   gap: 16rpx;
   min-height: 68rpx;
+}
+
+.yd-parent-screen:not(.scene-main) .yd-parent-top {
+  justify-content: space-between;
+  margin: 0 -48rpx;
+  padding: 0 48rpx 8rpx;
+  background: rgba(248, 250, 252, 0.9);
+}
+
+.yd-parent-screen:not(.scene-main) .yd-parent-brand {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.yd-parent-screen:not(.scene-main) .yd-parent-brand-copy text:first-child {
+  font-size: 30rpx;
+  line-height: 36rpx;
+}
+
+.yd-parent-screen:not(.scene-main) .yd-parent-brand-copy text:last-child {
+  display: none;
 }
 
 .yd-parent-brand {
@@ -276,6 +307,13 @@ page {
   background: #e2e8f0;
 }
 
+.yd-parent-screen:not(.scene-main) .growth-flow-tabs {
+  min-height: 28rpx;
+  padding: 0;
+  gap: 10rpx;
+  background: transparent;
+}
+
 .growth-flow-tabs text {
   display: flex;
   align-items: center;
@@ -289,10 +327,29 @@ page {
   text-align: center;
 }
 
+.yd-parent-screen:not(.scene-main) .growth-flow-tabs text {
+  min-height: 10rpx;
+  height: 10rpx;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 999rpx;
+  background: rgba(30, 41, 59, 0.1);
+  color: transparent;
+  font-size: 0;
+  line-height: 10rpx;
+  box-shadow: none;
+}
+
 .growth-flow-tabs text.active {
   background: #ffffff;
   color: #0d9488;
   box-shadow: 0 6rpx 16rpx rgba(120, 83, 34, 0.1);
+}
+
+.yd-parent-screen:not(.scene-main) .growth-flow-tabs text.active {
+  background: #14b8a6;
+  color: transparent;
+  box-shadow: none;
 }
 
 .growth-progress-card,
@@ -454,6 +511,31 @@ page {
   border: 1rpx solid #f0ebe1;
 }
 
+.yd-parent-screen:not(.scene-main) .growth-questionnaire-panel,
+.yd-parent-screen:not(.scene-main) .growth-upload-panel,
+.yd-parent-screen:not(.scene-main) .growth-report-preview,
+.yd-parent-screen:not(.scene-main) .growth-parent-action-card {
+  flex: 1;
+  min-height: calc(100vh - 252rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.yd-parent-screen.scene-questionnaire .growth-questionnaire-panel {
+  justify-content: flex-start;
+  padding-top: 28rpx;
+}
+
+.yd-parent-screen.scene-upload .growth-upload-panel,
+.yd-parent-screen.scene-preview .growth-report-preview,
+.yd-parent-screen.scene-action .growth-parent-action-card {
+  justify-content: flex-start;
+  padding-top: 24rpx;
+}
+
 .growth-questionnaire-panel,
 .growth-upload-panel,
 .growth-report-preview,
@@ -471,6 +553,14 @@ page {
   gap: 14rpx;
 }
 
+.yd-parent-screen:not(.scene-main) .growth-questionnaire-head,
+.yd-parent-screen:not(.scene-main) .growth-upload-head,
+.yd-parent-screen:not(.scene-main) .growth-report-preview-head,
+.yd-parent-screen:not(.scene-main) .growth-parent-action-head {
+  display: grid;
+  gap: 10rpx;
+}
+
 .growth-questionnaire-head text:first-child,
 .growth-upload-head text:first-child,
 .growth-report-preview-head text:first-child,
@@ -481,6 +571,18 @@ page {
   font-weight: 900;
 }
 
+.yd-parent-screen:not(.scene-main) .growth-questionnaire-head text:first-child {
+  font-size: 52rpx;
+  line-height: 66rpx;
+}
+
+.yd-parent-screen.scene-upload .growth-upload-head text:first-child,
+.yd-parent-screen.scene-preview .growth-report-preview-head text:first-child,
+.yd-parent-screen.scene-action .growth-parent-action-head text:first-child {
+  font-size: 46rpx;
+  line-height: 58rpx;
+}
+
 .growth-questionnaire-head text:last-child,
 .growth-upload-head text:last-child,
 .growth-report-preview-head text:last-child,
@@ -489,6 +591,15 @@ page {
   font-size: 22rpx;
   line-height: 28rpx;
   text-align: right;
+}
+
+.yd-parent-screen:not(.scene-main) .growth-questionnaire-head text:last-child,
+.yd-parent-screen:not(.scene-main) .growth-upload-head text:last-child,
+.yd-parent-screen:not(.scene-main) .growth-report-preview-head text:last-child,
+.yd-parent-screen:not(.scene-main) .growth-parent-action-head text:last-child {
+  text-align: left;
+  font-size: 26rpx;
+  line-height: 36rpx;
 }
 
 .growth-questionnaire-progress {
@@ -538,6 +649,10 @@ page {
   gap: 18rpx;
 }
 
+.yd-parent-screen.scene-questionnaire .growth-question-options {
+  gap: 20rpx;
+}
+
 .growth-question-option {
   position: relative;
   display: flex;
@@ -552,6 +667,11 @@ page {
   border-radius: 48rpx;
   background: #ffffff;
   box-shadow: 0 10rpx 28rpx rgba(15, 23, 42, 0.055);
+}
+
+.yd-parent-screen.scene-questionnaire .growth-question-option {
+  min-height: 238rpx;
+  border-radius: 48rpx;
 }
 
 .growth-question-option-icon {
@@ -626,6 +746,10 @@ page {
   gap: 18rpx;
 }
 
+.yd-parent-screen.scene-upload .growth-upload-grid {
+  gap: 18rpx;
+}
+
 .growth-upload-card {
   position: relative;
   display: grid;
@@ -640,6 +764,15 @@ page {
   border-radius: 48rpx;
   background: #ffffff;
   text-align: center;
+}
+
+.yd-parent-screen.scene-upload .growth-upload-card {
+  min-height: 188rpx;
+  border-radius: 48rpx;
+}
+
+.yd-parent-screen.scene-upload .growth-upload-card.primary {
+  min-height: 210rpx;
 }
 
 .growth-upload-card.primary {
@@ -855,6 +988,12 @@ page {
   border-radius: 56rpx;
   background: #ffffff;
   box-shadow: 0 18rpx 34rpx rgba(15, 23, 42, 0.065);
+}
+
+.yd-parent-screen.scene-preview .growth-report-preview-card,
+.yd-parent-screen.scene-action .growth-parent-action-card > .growth-parent-action-item {
+  border-radius: 28rpx;
+  box-shadow: 0 4rpx 22rpx rgba(15, 23, 42, 0.045);
 }
 
 .growth-report-corner {
