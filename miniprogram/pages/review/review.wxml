@@ -13,6 +13,7 @@
             <text class="yd-review-sub route-note short">没有错题也能先玩；有错题后会变成你的专属练习。</text>
             <view class="review-chip-row"><text>分数</text><text>应用题</text><text>英语单词</text><text>阅读理解</text><text>计算检查</text><text>表达组织</text></view>
           </view>
+          <text class="review-map-rail"><text></text><text></text><text></text></text>
           <image class="yd-review-art" mode="aspectFit" src="/assets/reference/review-world-map-transparent.png" />
         </view>
 
@@ -40,7 +41,7 @@
             <text class="review-topic-card review-topic-chip {{selectedKnowledgeTopic === '长度单位' ? 'active' : ''}}" data-topic="长度单位" bindtap="selectKnowledgeStarterTopic">长度单位&#10;魔法尺子&#10;约 10 分钟</text>
           </view>
           <text class="review-topic-cta" wx:if="{{reviewFlowStage === 'topic'}}" bindtap="selectKnowledgeStarterTopic" data-topic="{{selectedKnowledgeTopic}}">用这个开一局</text>
-          <view class="review-workshop-lead review-target-card" wx:if="{{reviewFlowStage !== 'topic'}}"><text>当前攻克目标</text><text>{{selectedKnowledgeTopic || '分数除法'}} · {{cards.length || 3}} 张卡</text><text>选一个最适合现在的节奏，马上开始。</text></view>
+          <view class="review-workshop-lead review-target-card" wx:if="{{reviewFlowStage !== 'topic'}}"><text>当前攻克目标</text><text>{{selectedKnowledgeTopic || '分数除法'}}</text><text>{{cards.length || 3}} 张卡 · 选一个最适合现在的节奏，马上开始。</text></view>
           <view class="review-feedback-strip" wx:if="{{feedbackText}}"><text>{{feedbackText}}</text><text wx:if="{{activeReviewTool && activeReviewTool.repairFocus}}" bindtap="openReviewRepairFocus">修这一张</text></view>
           <view class="review-tool-grid" wx:if="{{reviewFlowStage === 'tool'}}">
             <view wx:for="{{playableReviewTools}}" wx:key="id" class="review-tool-card {{item.available ? 'ready' : 'locked'}} {{item.themeClass}}" data-id="{{item.id}}" bindtap="runPlayableReviewTool"><text class="review-tool-icon">{{item.icon}}</text><text>{{item.title}}</text><text>{{item.line}}</text><text>{{item.duration}}</text><text>{{item.status}} · {{item.count}} 张</text><text>{{item.mission}}</text></view>
@@ -52,7 +53,7 @@
             <view class="review-game-bar"><view></view></view>
             <text class="review-live-line">{{activeReviewTool.line}}</text>
             <text class="review-live-mission">{{activeReviewTool.mission}}</text>
-            <view class="review-live-reference" wx:if="{{reviewFlowStage === 'live'}}"><text>找第一步</text><text>遇到“相遇问题”时，脑海里跳出的第一个动作应该是什么？</text><text>先说出第一步，再点击下方按钮。</text></view>
+            <view class="review-live-reference" wx:if="{{reviewFlowStage === 'live'}}"><text>正在热身 · 找第一步</text><text>遇到“相遇问题”时，脑海里跳出的第一个动作应该是什么？</text><text>先说出第一步，再点击下方按钮。</text></view>
             <view class="review-live-card"><text>{{activeReviewTool.primary.label}}</text><text>{{activeReviewTool.primary.prompt}}</text><text>{{activeReviewTool.primary.check}}</text></view>
             <view class="review-live-card compact" wx:if="{{activeReviewTool.secondary && activeReviewTool.secondary.id}}"><text>{{activeReviewTool.secondary.label}}</text><text>{{activeReviewTool.secondary.prompt}}</text><text>{{activeReviewTool.secondary.check}}</text></view>
             <view class="review-live-card compact" wx:if="{{activeReviewTool.third && activeReviewTool.third.id}}"><text>{{activeReviewTool.third.label}}</text><text>{{activeReviewTool.third.prompt}}</text><text>{{activeReviewTool.third.check}}</text></view>

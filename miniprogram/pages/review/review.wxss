@@ -105,6 +105,17 @@ page {
   box-shadow: 0 18rpx 36rpx rgba(17, 24, 39, 0.07);
 }
 
+.yd-review-hero::before {
+  content: "";
+  position: absolute;
+  left: 42rpx;
+  right: 42rpx;
+  bottom: 42rpx;
+  height: 6rpx;
+  border-radius: 999rpx;
+  background: linear-gradient(90deg, rgba(20, 184, 166, 0.18), rgba(245, 158, 11, 0.25));
+}
+
 .yd-review-copy {
   position: relative;
   z-index: 1;
@@ -141,6 +152,38 @@ page {
   width: 204rpx;
   height: 188rpx;
   object-fit: contain;
+}
+
+.review-map-rail {
+  position: absolute;
+  left: 48rpx;
+  right: 210rpx;
+  bottom: 30rpx;
+  display: grid;
+  grid-template-columns: repeat(3, 28rpx);
+  justify-content: space-between;
+  align-items: center;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.review-map-rail text {
+  display: block;
+  width: 28rpx;
+  height: 28rpx;
+  border: 6rpx solid #ffffff;
+  border-radius: 50%;
+  background: #14b8a6;
+  box-shadow: 0 6rpx 14rpx rgba(20, 184, 166, 0.24);
+}
+
+.review-map-rail text:nth-child(2) {
+  background: #f59e0b;
+}
+
+.review-map-rail text:nth-child(3) {
+  background: #ffffff;
+  border-color: #f59e0b;
 }
 
 .review-chip-row {
@@ -304,13 +347,13 @@ page {
 
 .review-topic-card {
   display: block;
-  min-height: 132rpx;
+  min-height: 150rpx;
   box-sizing: border-box;
   padding: 18rpx;
-  border: 2rpx solid #eef2f7;
+  border: 2rpx solid #f0ebe1;
   border-radius: 20rpx;
-  background: #f9fafb;
-  color: #111827;
+  background: #fff9f5;
+  color: #2c2621;
   font-size: 25rpx;
   line-height: 34rpx;
   font-weight: 800;
@@ -318,9 +361,10 @@ page {
 }
 
 .review-topic-card.active {
-  border-color: #14b8a6;
-  background: #ecfdf5;
-  color: #0f766e;
+  border-color: #ff8a4c;
+  background: #fff1e7;
+  color: #ea580c;
+  box-shadow: 0 10rpx 26rpx rgba(255, 138, 76, 0.12);
 }
 
 .review-topic-cta,
@@ -341,26 +385,34 @@ page {
 
 .review-target-card {
   display: grid;
-  gap: 8rpx;
-  padding: 20rpx;
-  box-shadow: 0 10rpx 26rpx rgba(20, 184, 166, 0.12);
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8rpx 14rpx;
+  align-items: center;
+  padding: 22rpx;
+  background: linear-gradient(135deg, #fff5f0, #e8fafa);
+  box-shadow: 0 10rpx 26rpx rgba(255, 125, 64, 0.12);
 }
 
 .review-target-card text:first-child {
-  color: #0f766e;
+  grid-column: 1 / -1;
+  color: #ff7d40;
   font-size: 22rpx;
   line-height: 26rpx;
   font-weight: 900;
 }
 
 .review-target-card text:nth-child(2) {
+  grid-column: 1;
   color: #111827;
-  font-size: 31rpx;
-  line-height: 36rpx;
+  font-size: 38rpx;
+  line-height: 44rpx;
   font-weight: 900;
 }
 
 .review-target-card text:last-child {
+  grid-column: 2;
+  justify-self: end;
+  max-width: 210rpx;
   color: #6b7280;
   font-size: 23rpx;
   line-height: 30rpx;
@@ -389,16 +441,17 @@ page {
 .review-tool-card {
   display: grid;
   gap: 8rpx;
-  min-height: 216rpx;
+  min-height: 238rpx;
   box-sizing: border-box;
-  padding: 18rpx;
-  border: 2rpx solid #eef2f7;
+  padding: 20rpx;
+  border: 2rpx solid #f0f0ef;
   border-radius: 22rpx;
   background: #ffffff;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.035);
 }
 
 .review-tool-card.ready {
-  border-color: rgba(20, 184, 166, 0.34);
+  border-color: rgba(255, 125, 64, 0.32);
 }
 
 .review-tool-card.locked {
@@ -414,8 +467,8 @@ page {
 
 .review-tool-card text:nth-child(2) {
   color: #111827;
-  font-size: 29rpx;
-  line-height: 34rpx;
+  font-size: 32rpx;
+  line-height: 38rpx;
   font-weight: 900;
 }
 
@@ -426,13 +479,13 @@ page {
 }
 
 .review-tool-icon {
-  width: 54rpx;
-  height: 54rpx;
-  border-radius: 16rpx;
-  background: #ecfdf5;
-  color: #0f766e;
+  width: 58rpx;
+  height: 58rpx;
+  border-radius: 14rpx;
+  background: #fff5f0;
+  color: #ff7d40;
   text-align: center;
-  line-height: 54rpx;
+  line-height: 58rpx;
   font-size: 30rpx;
 }
 
@@ -451,9 +504,9 @@ page {
 }
 
 .review-live-tool.stage-live {
-  min-height: 440rpx;
+  min-height: 520rpx;
   justify-content: center;
-  padding: 24rpx 0;
+  padding: 28rpx 0;
 }
 
 .review-live-head {
@@ -500,10 +553,10 @@ page {
 }
 
 .review-game-bar view {
-  width: 32%;
+  width: 30%;
   height: 100%;
   border-radius: inherit;
-  background: #14b8a6;
+  background: linear-gradient(90deg, #ff8a4c, #f27a3d);
 }
 
 .review-live-line,
@@ -523,22 +576,24 @@ page {
 
 .review-live-reference {
   display: grid;
-  gap: 12rpx;
-  padding: 26rpx;
+  gap: 16rpx;
+  padding: 34rpx 28rpx;
   text-align: center;
+  background: #ffffff;
+  box-shadow: 0 12rpx 32rpx rgba(0, 0, 0, 0.04);
 }
 
 .review-live-reference text:first-child {
-  color: #0f766e;
+  color: #ff8a4c;
   font-size: 23rpx;
   line-height: 28rpx;
   font-weight: 900;
 }
 
 .review-live-reference text:nth-child(2) {
-  color: #111827;
-  font-size: 33rpx;
-  line-height: 44rpx;
+  color: #2d3748;
+  font-size: 42rpx;
+  line-height: 54rpx;
   font-weight: 900;
 }
 
@@ -626,7 +681,7 @@ page {
 }
 
 .review-live-actions button {
-  height: 76rpx;
+  height: 86rpx;
   padding: 0;
   border-radius: 18rpx;
   background: #ffffff;
@@ -639,7 +694,7 @@ page {
 
 .review-live-actions.finish button:first-child,
 .review-live-actions.grade button:nth-child(3) {
-  background: #14b8a6;
+  background: #ff8a4c;
   color: #ffffff;
 }
 
@@ -661,9 +716,9 @@ page {
 .review-live-tool.stage-finished::before {
   content: "这一局探索结束啦";
   display: block;
-  color: #111827;
-  font-size: 42rpx;
-  line-height: 50rpx;
+  color: #2c3e50;
+  font-size: 56rpx;
+  line-height: 64rpx;
   font-weight: 900;
   text-align: center;
 }
@@ -672,15 +727,16 @@ page {
   display: grid;
   gap: 14rpx;
   padding: 18rpx;
-  background: #ffffff;
+  background: #f6fbf9;
 }
 
 .review-finish-card view {
   display: grid;
   gap: 6rpx;
-  padding: 16rpx;
-  border-radius: 18rpx;
-  background: #f9fafb;
+  padding: 20rpx;
+  border-radius: 20rpx;
+  background: #ffffff;
+  box-shadow: 0 4rpx 18rpx rgba(40, 150, 137, 0.05);
 }
 
 .review-finish-card text:first-child {
