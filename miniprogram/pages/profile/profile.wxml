@@ -11,14 +11,14 @@
           <text class="yd-parent-copy">
             <text class="yd-parent-kicker">问卷 / 上传 / 报告</text>
             <text class="yd-parent-title">先了解孩子，再安排怎么学</text>
-            <text class="yd-parent-sub">先收集真实线索，再生成学习偏好、卡点证据和今晚行动。不贴标签，不做天赋定论。</text>
+            <text class="yd-parent-sub">可以先做 1 分钟问卷，也可以上传错题、成绩或测评。材料越真实，报告越具体。</text>
           </text>
           <image class="yd-parent-art" mode="aspectFit" src="/assets/reference/report-radar-card-illustration.png" />
         </view>
 
         <view class="growth-choice-grid" wx:if="{{growthActiveScene === 'main'}}">
-          <view class="growth-choice-card warm" bindtap="startGrowthQuestionnaire"><image mode="aspectFit" src="/assets/reference/family-avatar-group-transparent.png" /><view><text>做 1 分钟小问卷</text><text>快速建立孩子状态初像</text></view><text>开始</text></view>
-          <view class="growth-choice-card" data-action="upload" bindtap="runParentReportAction"><image mode="aspectFit" src="/assets/reference/upload-folder-stack-transparent.png" /><view><text>上传错题/成绩/测评，生成成长报告</text><text>让报告基于真实证据</text></view><text>上传</text></view>
+          <view class="growth-choice-card warm" bindtap="startGrowthQuestionnaire"><image mode="aspectFit" src="/assets/reference/family-avatar-group-transparent.png" /><view><text>做 1 分钟小问卷</text><text>快速勾选，建立孩子状态初像</text></view><text>开始</text></view>
+          <view class="growth-choice-card" data-action="upload" bindtap="runParentReportAction"><image mode="aspectFit" src="/assets/reference/upload-folder-stack-transparent.png" /><view><text>上传错题/测评</text><text>让报告基于真实证据生成</text></view><text>上传</text></view>
         </view>
 
         <view class="growth-flow-tabs" wx:if="{{growthActiveScene !== 'main'}}">
@@ -47,7 +47,7 @@
 
         <view class="growth-upload-panel" wx:if="{{growthActiveScene === 'upload'}}">
           <view class="growth-upload-head"><text>收集线索碎片</text><text>材料越真实，建议越具体。</text></view>
-          <text class="growth-upload-lead">直接拍照或打字都可以，先补最真实的一条。</text>
+          <text class="growth-upload-lead">直接拍照或打字都可以，不必全部填满。</text>
           <view class="growth-upload-grid">
             <view class="growth-upload-card primary" data-action="upload" bindtap="runParentReportAction"><image mode="aspectFit" src="/assets/reference/upload-folder-stack-transparent.png" /><view><text>错题描述</text><text>记录孩子常卡住的题型。已添加 1 份：“昨天数学卷子大题第二问，总是列错方程...”</text></view><text>补充</text></view>
             <view class="growth-upload-card" data-action="upload" bindtap="runParentReportAction"><image mode="aspectFit" src="/assets/reference/report-radar-card-illustration.png" /><view><text>成绩/周测</text><text>把分数、错题分布和最近一次周测放进报告证据。</text></view><text>上传</text></view>
@@ -55,7 +55,7 @@
             <view class="growth-upload-card warm" bindtap="startGrowthQuestionnaire"><image mode="aspectFit" src="/assets/reference/family-avatar-group-transparent.png" /><view><text>家长观察</text><text>用 1 分钟问卷记录孩子最近的状态、抗挫和学习习惯。</text></view><text>填写</text></view>
             <view class="growth-upload-card" data-action="upload" bindtap="runParentReportAction"><image mode="aspectFit" src="/assets/reference/learning-route-map-transparent.png" /><view><text>测评摘要</text><text>导入以往测评或诊断摘要，和错题记录一起生成培养建议。</text></view><text>导入</text></view>
           </view>
-          <view class="growth-unlock-strip"><text>生成报告后，将解锁：</text><text>学习偏好线索 · 如：视觉型</text><text>深层卡点定位 · 如：工作记忆瓶颈</text><text>今晚行动建议 · 如：睡前花 5 分钟</text></view>
+          <view class="growth-unlock-strip"><text>生成报告后，将解锁：</text><text>专属学习偏好 · 如：视觉型</text><text>深层卡点定位 · 如：工作记忆瓶颈</text><text>今晚行动建议 · 如：睡前花 5 分钟</text></view>
           <text class="growth-generate-cta" bindtap="generateLearningReport">生成成长报告</text>
         </view>
 
@@ -68,7 +68,7 @@
 
         <view class="growth-report-preview" wx:if="{{growthActiveScene === 'preview' || (learningReportSummary && learningReportSummary.reportJobCaseId)}}">
           <view class="growth-report-preview-head"><text>成长线索初步发现</text><text>{{learningReportSummary.reportJobCaseId ? '初步报告 · 基于材料' : '本地预览'}}</text></view>
-          <text class="growth-report-lead">我们从碎片中拼出了孩子的学习画像。</text>
+          <text class="growth-report-lead">我们从碎片中拼凑出了孩子的学习画像。</text>
           <view class="growth-report-preview-card"><text>学习偏好线索 · 视觉型</text><text>来源：基础问卷。{{learningReportSummary.learningPreferenceLine || '孩子对图像、表格的敏感度高于纯文字，建议讲抽象概念时使用手绘图或实物辅助。'}}</text></view>
           <view class="growth-report-preview-card warn"><text>当前卡点证据 · 计算粗心</text><text>来源：错题描述。{{learningReportSummary.diagnosisLine || '错题集中在最后一步进位，可能是基础计算熟练度不足导致的工作记忆瓶颈。'}}</text></view>
           <view class="growth-report-preview-card action"><text>今晚建议 · 先练口算10分钟</text><text>来源：AI私教。在正式作业前先做短热身，降低后续大题笔误率。</text></view>
@@ -77,9 +77,9 @@
         </view>
 
         <view class="growth-parent-action-card" wx:if="{{growthActiveScene === 'preview' || growthActiveScene === 'action' || (learningReportSummary && learningReportSummary.reportJobCaseId)}}">
-          <view class="growth-parent-action-head"><text>今晚行动卡 · 今晚行动指南</text><text>不替孩子学习，只提供更好的土壤</text></view>
+          <view class="growth-parent-action-head"><text>今晚行动指南</text><text>不替孩子学习，只为成长提供更好的土壤。</text></view>
           <view><text></text><view><text>建立自信 · 预计 2 分钟</text><text>正向具体表扬：“我看到你虽然算错了，但依然耐心把草稿写整齐，这种态度很棒。”</text></view></view>
-          <view><text></text><view><text>环境优化 · 持续进行</text><text>清空桌面非学习用品；对视觉型孩子，清爽空间能降低分心。</text></view></view>
+          <view><text></text><view><text>环境优化 · 持续进行</text><text>清空桌面非学习用品。对于视觉型孩子，清爽空间能降低分心。</text></view></view>
           <view><text></text><view><text>激发思考 · 预计 5 分钟</text><text>只问问题，不讲答案：“你觉得这一步和上一步的关系是什么？”</text></view></view>
           <text class="growth-action-done">完成勾选后，系统将为您更新明日建议 · 我已完成行动 / 稍后提醒</text>
         </view>
