@@ -346,11 +346,13 @@ const TUTOR_REFERENCE_SCENES = {
       { id: 's1', text: '没关系，我们把问题切小一点。' },
       { id: 's2', text: '还是卡住时，接下来想先试试哪个？' },
       { id: 's3', text: '先圈已知条件：找找题目里给出的数字和关键信息；先说题目问什么：理清最后需要我们求出什么结果。' },
-      { id: 's4', text: '刚才的思考小记：起步很棒，正确列出了算式 4/5 ÷ 2；在这里卡住了一小下，忘记把后面的整数变成倒数。' }
+      { id: 's4', text: '刚才的思考小记' },
+      { id: 's5', text: '1 起步很棒：正确列出了算式 4/5 ÷ 2。' },
+      { id: 's6', text: '在这里卡住了一小下：忘记把后面的整数变成倒数了。' }
     ],
     actions: [
-      { id: 'find_conditions', label: '先圈已知条件', action: 'step', step: 'find_conditions' },
-      { id: 'read_problem', label: '先说题目问什么', action: 'step', step: 'read_problem' },
+      { id: 'find_conditions', label: '先圈已知条件', line: '找找题目里给出的数字和关键信息', action: 'step', step: 'find_conditions' },
+      { id: 'read_problem', label: '先说题目问什么', line: '理清最后需要我们求出什么结果', action: 'step', step: 'read_problem' },
       { id: 'review', label: '去知识乐园复测', action: 'review' },
       { id: 'smaller', label: '休息一下再来也没关系哦', action: 'smaller' }
     ]
