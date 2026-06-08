@@ -95,21 +95,22 @@ page {
 
 .yd-parent-hero {
   position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 236rpx;
-  min-height: 318rpx;
+  display: block;
+  min-height: 244rpx;
   overflow: hidden;
   box-sizing: border-box;
-  padding: 34rpx 26rpx;
-  border-radius: 0 0 38rpx 38rpx;
-  background: #e6f4f1;
-  box-shadow: 0 18rpx 42rpx rgba(15, 118, 110, 0.13);
+  margin: 0 -32rpx;
+  padding: 36rpx 40rpx 22rpx;
+  border-radius: 0 0 48rpx 48rpx;
+  background: #f8faf5;
+  box-shadow: none;
 }
 
 .yd-parent-hero.growth {
   background:
-    radial-gradient(circle at 84% 20%, rgba(251, 191, 36, 0.36), transparent 28%),
-    linear-gradient(135deg, #e6f4f1 0%, #ffffff 58%, #fef3c7 100%);
+    radial-gradient(circle at 86% 16%, rgba(251, 191, 36, 0.22), transparent 24%),
+    radial-gradient(circle at 4% 22%, rgba(20, 184, 166, 0.14), transparent 26%),
+    #f8faf5;
 }
 
 .yd-parent-copy {
@@ -117,40 +118,41 @@ page {
   z-index: 1;
   display: flex;
   flex-direction: column;
-  gap: 14rpx;
+  gap: 16rpx;
   min-width: 0;
 }
 
 .yd-parent-kicker {
-  color: #0d9488;
-  font-size: 23rpx;
+  color: #c2410c;
+  font-size: 24rpx;
   line-height: 28rpx;
   font-weight: 900;
 }
 
 .yd-parent-title {
-  max-width: 396rpx;
+  max-width: 540rpx;
   color: #1f2937;
   font-size: 56rpx;
-  line-height: 64rpx;
-  font-weight: 900;
+  line-height: 72rpx;
+  font-weight: 950;
 }
 
 .yd-parent-sub {
-  max-width: 390rpx;
+  max-width: 560rpx;
   color: #475569;
-  font-size: 24rpx;
-  line-height: 33rpx;
-  font-weight: 600;
+  font-size: 25rpx;
+  line-height: 38rpx;
+  font-weight: 720;
 }
 
 .yd-parent-art {
   position: absolute;
-  right: 0;
-  bottom: 8rpx;
-  width: 236rpx;
-  height: 218rpx;
+  right: 14rpx;
+  bottom: 2rpx;
+  width: 142rpx;
+  height: 132rpx;
   object-fit: contain;
+  opacity: 0.18;
 }
 
 .growth-choice-grid,
@@ -177,28 +179,35 @@ page {
 
 .growth-choice-card {
   display: grid;
-  grid-template-columns: 70rpx minmax(0, 1fr);
-  grid-template-areas: "icon copy" "action action";
-  gap: 16rpx;
+  grid-template-columns: 80rpx minmax(0, 1fr);
+  grid-template-areas: "icon copy";
+  gap: 18rpx;
   min-height: 220rpx;
   box-sizing: border-box;
-  padding: 22rpx;
-  border: 1rpx solid #edf2e7;
-  border-radius: 28rpx;
+  padding: 28rpx;
+  border: 1rpx solid rgba(255, 237, 213, 0.95);
+  border-radius: 44rpx;
   background: #ffffff;
-  box-shadow: 0 14rpx 30rpx rgba(15, 23, 42, 0.07);
+  box-shadow: 0 12rpx 32rpx rgba(15, 23, 42, 0.05);
 }
 
 .growth-choice-card.warm {
-  background: #e6f4f1;
-  border-color: #ccfbf1;
+  background: #ffffff;
+  border-color: rgba(255, 237, 213, 0.95);
 }
 
 .growth-choice-card image {
   grid-area: icon;
-  width: 70rpx;
-  height: 70rpx;
+  width: 80rpx;
+  height: 80rpx;
   object-fit: contain;
+  padding: 10rpx;
+  border-radius: 50%;
+  background: #fff7ed;
+}
+
+.growth-choice-card:not(.warm) image {
+  background: #e6f4f1;
 }
 
 .growth-choice-card view {
@@ -211,29 +220,19 @@ page {
 
 .growth-choice-card view text:first-child {
   color: #1f2937;
-  font-size: 28rpx;
-  line-height: 34rpx;
-  font-weight: 900;
+  font-size: 30rpx;
+  line-height: 38rpx;
+  font-weight: 950;
 }
 
 .growth-choice-card view text:last-child {
   color: #64748b;
   font-size: 22rpx;
-  line-height: 29rpx;
+  line-height: 30rpx;
 }
 
 .growth-choice-card > text {
-  grid-area: action;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 64rpx;
-  border-radius: 18rpx;
-  background: #14b8a6;
-  color: #ffffff;
-  font-size: 23rpx;
-  line-height: 28rpx;
-  font-weight: 900;
+  display: none;
 }
 
 .growth-flow-tabs {

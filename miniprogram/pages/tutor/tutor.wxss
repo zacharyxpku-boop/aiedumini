@@ -26,7 +26,7 @@ page {
   flex: 0 0 auto;
   flex-direction: column;
   justify-content: flex-start;
-  gap: 18rpx;
+  gap: 20rpx;
   min-height: calc(100vh - 190rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   overflow: visible;
   border-radius: 0;
@@ -120,24 +120,24 @@ page {
 .yd-tutor-hero {
   position: relative;
   display: grid;
-  grid-template-columns: 226rpx minmax(0, 1fr);
+  grid-template-columns: 148rpx minmax(0, 1fr);
   align-items: center;
-  gap: 22rpx;
-  min-height: 326rpx;
-  padding: 28rpx;
+  gap: 24rpx;
+  min-height: 196rpx;
+  padding: 28rpx 30rpx;
   overflow: hidden;
   background:
-    radial-gradient(circle at 86% 8%, rgba(251, 191, 36, 0.24), transparent 28%),
-    linear-gradient(135deg, #ffffff 0%, #e6f4f1 100%);
+    radial-gradient(circle at 92% -12%, rgba(20, 184, 166, 0.26), transparent 34%),
+    linear-gradient(135deg, #ffffff 0%, #f7fbf8 100%);
 }
 
 .yd-tutor-hero::after {
   content: "";
   position: absolute;
-  top: -70rpx;
-  right: -70rpx;
-  width: 230rpx;
-  height: 230rpx;
+  top: -84rpx;
+  right: -84rpx;
+  width: 236rpx;
+  height: 236rpx;
   border-radius: 50%;
   background: #ccfbf1;
   opacity: 0.7;
@@ -146,10 +146,10 @@ page {
 .yd-tutor-mascot {
   position: relative;
   z-index: 1;
-  width: 226rpx;
-  height: 224rpx;
+  width: 144rpx;
+  height: 144rpx;
   object-fit: contain;
-  border-radius: 30rpx;
+  border-radius: 32rpx;
   background: linear-gradient(135deg, #e6f4f1 0%, #ccfbf1 100%);
   box-shadow: inset 0 0 0 1rpx rgba(20, 184, 166, 0.08);
 }
@@ -165,7 +165,7 @@ page {
 .yd-tutor-bubble-title {
   display: block;
   color: #1f2937;
-  font-size: 50rpx;
+  font-size: 44rpx;
   font-weight: 950;
   line-height: 1.08;
   letter-spacing: 0;
@@ -175,11 +175,11 @@ page {
   display: -webkit-box;
   overflow: hidden;
   color: #6b7280;
-  font-size: 25rpx;
+  font-size: 24rpx;
   font-weight: 760;
   line-height: 1.55;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
 }
 
 .tutor-care-line {
@@ -207,10 +207,10 @@ page {
 .tutor-chat-card {
   display: grid;
   align-content: start;
-  gap: 14rpx;
+  gap: 16rpx;
   flex: 0 0 auto;
   min-height: 300rpx;
-  padding: 24rpx;
+  padding: 28rpx;
 }
 
 .tutor-chat-card.compact {
@@ -366,21 +366,23 @@ page {
 .tutor-mode-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12rpx;
+  gap: 18rpx;
 }
 
 .tutor-mode-card {
   display: flex;
+  flex-direction: column;
   min-width: 0;
-  min-height: 104rpx;
+  min-height: 144rpx;
   align-items: center;
   justify-content: center;
-  padding: 12rpx 8rpx;
+  gap: 14rpx;
+  padding: 18rpx 8rpx;
   border: 1rpx solid #f3f4f6;
-  border-radius: 24rpx;
+  border-radius: 28rpx;
   color: #374151;
   background: #ffffff;
-  box-shadow: 0 4rpx 16rpx rgba(17, 24, 39, 0.04);
+  box-shadow: 0 6rpx 20rpx rgba(17, 24, 39, 0.05);
   font-size: 22rpx;
   font-weight: 860;
   line-height: 1.15;
@@ -389,10 +391,30 @@ page {
   word-break: break-word;
 }
 
-.tutor-mode-card:nth-child(1) { background: #fff7ed; color: #ea580c; }
-.tutor-mode-card:nth-child(2) { background: #f0fdf4; color: #16a34a; }
-.tutor-mode-card:nth-child(3) { background: #eff6ff; color: #2563eb; }
-.tutor-mode-card:nth-child(4) { background: #f5f3ff; color: #7c3aed; }
+.tutor-mode-icon {
+  display: flex;
+  width: 80rpx;
+  height: 80rpx;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 34rpx;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.tutor-mode-card > text:last-child {
+  display: block;
+  color: #374151;
+  font-size: 22rpx;
+  font-weight: 880;
+  line-height: 1.15;
+}
+
+.tutor-mode-card:nth-child(1) .tutor-mode-icon { background: #fff7ed; color: #ea580c; }
+.tutor-mode-card:nth-child(2) .tutor-mode-icon { background: #f0fdf4; color: #16a34a; }
+.tutor-mode-card:nth-child(3) .tutor-mode-icon { background: #eff6ff; color: #2563eb; }
+.tutor-mode-card:nth-child(4) .tutor-mode-icon { background: #f5f3ff; color: #7c3aed; }
 
 .tutor-prompt-board {
   display: block;
@@ -405,14 +427,14 @@ page {
 
 .tutor-start-cta {
   display: flex;
-  min-height: 96rpx;
+  min-height: 104rpx;
   align-items: center;
   justify-content: center;
-  border-radius: 30rpx;
+  border-radius: 36rpx;
   color: #78350f;
   background: #fbbf24;
-  box-shadow: 0 12rpx 28rpx rgba(251, 191, 36, 0.35);
-  font-size: 32rpx;
+  box-shadow: 0 16rpx 32rpx rgba(251, 191, 36, 0.34);
+  font-size: 34rpx;
   font-weight: 950;
 }
 

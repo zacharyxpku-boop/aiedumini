@@ -26,10 +26,10 @@
         <view class="tutor-socratic-panel" wx:if="{{!showTutorDetails}}">
           <text class="tutor-section-head"><text>也可以直接开始</text><text>选一种问法</text></text>
           <view class="tutor-mode-grid">
-            <text class="tutor-mode-card" data-step="read_problem" bindtap="launchFirstStep">问知识点</text>
-            <text class="tutor-mode-card" data-step="explain_misconception" bindtap="launchFirstStep">我听不懂</text>
-            <text class="tutor-mode-card" data-step="find_direction" bindtap="launchFirstStep">题目点拨</text>
-            <text class="tutor-mode-card" data-step="review" bindtap="launchFirstStep">学了什么</text>
+            <text class="tutor-mode-card" data-step="read_problem" bindtap="launchFirstStep"><text class="tutor-mode-icon">?</text><text>问知识点</text></text>
+            <text class="tutor-mode-card" data-step="explain_misconception" bindtap="launchFirstStep"><text class="tutor-mode-icon">!</text><text>我听不懂</text></text>
+            <text class="tutor-mode-card" data-step="find_direction" bindtap="launchFirstStep"><text class="tutor-mode-icon">→</text><text>题目点拨</text></text>
+            <text class="tutor-mode-card" data-step="review" bindtap="launchFirstStep"><text class="tutor-mode-icon">✓</text><text>学了什么</text></text>
           </view>
           <text class="tutor-prompt-board">先发一句话，我帮你切小问题 · 已有 2,451 位同学今天和咕点聊过</text>
           <view class="tutor-start-cta" data-step="write_first_step" bindtap="launchFirstStep">开始问咕点</view>
