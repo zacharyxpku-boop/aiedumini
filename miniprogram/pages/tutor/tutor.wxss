@@ -923,37 +923,296 @@ page {
 }
 
 .tutor-reference-panel.dialogue .tutor-dialogue-card {
-  min-height: 520rpx;
-  padding: 26rpx 0 34rpx;
+  min-height: 680rpx;
+  padding: 0 0 28rpx;
+  gap: 24rpx;
+  background: #f9fafb;
 }
 
-.tutor-reference-panel.dialogue .tutor-dialogue-card > text {
-  max-width: 78%;
-  border-radius: 28rpx 28rpx 28rpx 8rpx;
+.tutor-dialogue-top {
+  display: grid;
+  grid-template-columns: 72rpx minmax(0, 1fr) 72rpx;
+  align-items: center;
+  min-height: 92rpx;
+  padding: 0 8rpx;
+  border-bottom: 1rpx solid rgba(0, 0, 0, 0.03);
+  background: rgba(249, 250, 251, 0.92);
+}
+
+.tutor-dialogue-top > text {
+  color: #6b7280;
+  font-size: 42rpx;
+  line-height: 72rpx;
+  text-align: center;
+}
+
+.tutor-dialogue-top view {
+  display: grid;
+  justify-items: center;
+  gap: 4rpx;
+}
+
+.tutor-dialogue-top view text:first-child {
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 999rpx;
+  background: #4ade80;
+}
+
+.tutor-dialogue-top view text:nth-child(2) {
+  color: #14b8a6;
+  font-size: 22rpx;
+  line-height: 28rpx;
+  font-weight: 800;
+}
+
+.tutor-dialogue-top view text:last-child {
+  color: #1f2937;
+  font-size: 32rpx;
+  line-height: 38rpx;
+  font-weight: 800;
+}
+
+.tutor-dialogue-time {
+  justify-self: center;
+  padding: 6rpx 20rpx;
+  border-radius: 999rpx;
+  background: rgba(243, 244, 246, 0.7);
+  color: #9ca3af;
+  font-size: 24rpx;
+  line-height: 30rpx;
+  font-weight: 700;
+}
+
+.tutor-chatline {
+  display: grid;
+  grid-template-columns: 80rpx minmax(0, 1fr);
+  gap: 18rpx;
+  align-items: start;
+  padding: 0 8rpx;
+}
+
+.tutor-chatline.me {
+  grid-template-columns: minmax(0, 1fr) 80rpx;
+}
+
+.tutor-chatline-avatar {
+  grid-column: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80rpx;
+  height: 80rpx;
+  border: 4rpx solid #ffffff;
+  border-radius: 999rpx;
+  background: linear-gradient(180deg, #5eead4, #14b8a6);
+  color: #ffffff;
+  font-size: 24rpx;
+  line-height: 80rpx;
+  font-weight: 900;
+  box-shadow: 0 8rpx 18rpx rgba(15, 23, 42, 0.08);
+}
+
+.tutor-chatline.me .tutor-chatline-avatar {
+  grid-column: 2;
+  background: #cff1f3;
+  color: #1a818e;
+}
+
+.tutor-chatline-bubble {
+  grid-column: 2;
+  justify-self: start;
+  max-width: 82%;
+  padding: 24rpx 28rpx;
+  border: 1rpx solid rgba(243, 244, 246, 0.65);
+  border-radius: 36rpx 36rpx 36rpx 8rpx;
   background: #ffffff;
+  color: #374151;
+  font-size: 30rpx;
+  line-height: 48rpx;
+  font-weight: 700;
   box-shadow: 0 8rpx 24rpx rgba(15, 23, 42, 0.06);
 }
 
-.tutor-reference-panel.dialogue .tutor-dialogue-card > text.tutor-dialogue-user {
-  border-radius: 28rpx 28rpx 8rpx 28rpx;
+.tutor-chatline.me .tutor-chatline-bubble {
+  grid-column: 1;
+  justify-self: end;
+  border: 0;
+  border-radius: 36rpx 36rpx 8rpx 36rpx;
+  background: #f59e0b;
+  color: #ffffff;
 }
 
-.tutor-reference-panel.knowledge .tutor-dialogue-card {
-  gap: 0;
-  overflow: hidden;
-  border: 1rpx solid #f0ebe1;
-  border-radius: 28rpx;
-  background: #ffffff;
+.tutor-dialogue-composer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 96rpx;
+  gap: 18rpx;
+  align-items: center;
+  margin: 16rpx 0 0;
+  padding: 18rpx;
+  border-top: 1rpx solid rgba(243, 244, 246, 0.7);
+  background: rgba(255, 255, 255, 0.95);
 }
 
-.tutor-reference-panel.knowledge .tutor-dialogue-card > text {
-  border-bottom: 1rpx solid #f0ebe1;
-  border-radius: 0;
-  background: #ffffff;
+.tutor-dialogue-composer input {
+  height: 88rpx;
+  padding: 0 28rpx;
+  border-radius: 999rpx;
+  background: #f3f4f6;
+  color: #1f2937;
+  font-size: 28rpx;
+  font-weight: 700;
+}
+
+.tutor-dialogue-composer text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 999rpx;
+  background: #14b8a6;
+  color: #ffffff;
+  font-size: 34rpx;
+  font-weight: 900;
+  box-shadow: 0 12rpx 24rpx rgba(20, 184, 166, 0.24);
 }
 
 .tutor-reference-panel.knowledge .tutor-knowledge-board {
+  gap: 28rpx;
+  padding: 0;
+  border-radius: 0;
+  background: #f9f8f4;
+  box-shadow: none;
+}
+
+.tutor-reference-panel.knowledge .tutor-knowledge-subject {
+  justify-self: start;
+  height: 48rpx;
+  padding: 0 20rpx;
+  border-radius: 8rpx;
+  background: #e6f4f1;
+  color: #0d9488;
+  font-size: 24rpx;
+  line-height: 48rpx;
+  font-weight: 800;
+}
+
+.tutor-reference-panel.knowledge .tutor-knowledge-title {
+  color: #1f2937;
+  font-size: 64rpx;
+  line-height: 76rpx;
+  font-weight: 950;
+}
+
+.tutor-blackboard-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 176rpx;
+  align-items: center;
+  min-height: 240rpx;
+  overflow: hidden;
+  padding: 0 40rpx;
+  border-radius: 28rpx 28rpx 0 0;
+  background: linear-gradient(135deg, #e2f3f3, #f0f8f8);
+}
+
+.tutor-blackboard-hero view {
+  display: grid;
+  gap: 18rpx;
+}
+
+.tutor-blackboard-hero view text:first-child {
+  justify-self: start;
+  padding: 8rpx 16rpx;
+  border-radius: 8rpx;
+  background: rgba(255, 255, 255, 0.72);
+  color: #0f766e;
+  font-size: 22rpx;
+  line-height: 28rpx;
+  font-weight: 900;
+}
+
+.tutor-blackboard-hero view text:last-child {
+  color: #1a2626;
+  font-size: 30rpx;
+  line-height: 40rpx;
+  font-weight: 800;
+}
+
+.tutor-blackboard-hero > text {
+  position: absolute;
+  right: -18rpx;
+  bottom: 0;
+  width: 210rpx;
+  height: 160rpx;
+  border-radius: 60rpx 0 0 0;
+  background: #ff7a45;
+}
+
+.tutor-reference-panel.knowledge .tutor-blackboard {
+  gap: 0;
+  overflow: hidden;
+  border: 1rpx solid #f0ebe1;
+  border-top: 0;
+  border-radius: 0 0 28rpx 28rpx;
+  background: #ffffff;
+  box-shadow: 0 12rpx 28rpx rgba(15, 23, 42, 0.045);
+}
+
+.tutor-reference-panel.knowledge .tutor-blackboard > view {
+  display: grid;
+  grid-template-columns: 48rpx minmax(0, 1fr);
+  gap: 22rpx;
+  padding: 36rpx 40rpx;
   border-bottom: 1rpx solid #f0ebe1;
+}
+
+.tutor-reference-panel.knowledge .tutor-blackboard > view:last-child {
+  border-bottom: 0;
+}
+
+.tutor-reference-panel.knowledge .tutor-blackboard > view > text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 8rpx;
+  background: #e6f4f1;
+  color: #0d9488;
+  font-size: 26rpx;
+  line-height: 48rpx;
+  font-weight: 900;
+}
+
+.tutor-reference-panel.knowledge .tutor-blackboard > view:nth-child(2) > text {
+  background: #fff0ea;
+  color: #ff7a45;
+}
+
+.tutor-reference-panel.knowledge .tutor-blackboard > view:nth-child(3) > text {
+  background: #fff8e6;
+  color: #d97706;
+}
+
+.tutor-reference-panel.knowledge .tutor-blackboard view view {
+  display: grid;
+  gap: 12rpx;
+}
+
+.tutor-reference-panel.knowledge .tutor-blackboard view view text:first-child {
+  color: #6b7280;
+  font-size: 26rpx;
+  line-height: 32rpx;
+  font-weight: 800;
+}
+
+.tutor-reference-panel.knowledge .tutor-blackboard view view text:last-child {
+  color: #333333;
+  font-size: 32rpx;
+  line-height: 50rpx;
+  font-weight: 750;
 }
 
 .tutor-reference-panel.pointing .tutor-pointing-grid {

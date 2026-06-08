@@ -52,11 +52,14 @@
 
           <block wx:if="{{activeTutorScene === 'dialogue'}}">
             <view class="tutor-dialogue-card">
-              <text wx:if="{{tutorReferenceScene.row0}}" class="{{tutorReferenceScene.row0.role === 'user' ? 'tutor-dialogue-user' : ''}}">{{tutorReferenceScene.row0.text}}</text>
-              <text wx:if="{{tutorReferenceScene.row1}}" class="{{tutorReferenceScene.row1.role === 'user' ? 'tutor-dialogue-user' : ''}}">{{tutorReferenceScene.row1.text}}</text>
-              <text wx:if="{{tutorReferenceScene.row2}}" class="{{tutorReferenceScene.row2.role === 'user' ? 'tutor-dialogue-user' : ''}}">{{tutorReferenceScene.row2.text}}</text>
-              <text wx:if="{{tutorReferenceScene.row3}}" class="{{tutorReferenceScene.row3.role === 'user' ? 'tutor-dialogue-user' : ''}}">{{tutorReferenceScene.row3.text}}</text>
-              <text wx:if="{{tutorReferenceScene.row4}}" class="{{tutorReferenceScene.row4.role === 'user' ? 'tutor-dialogue-user' : ''}}">{{tutorReferenceScene.row4.text}}</text>
+              <view class="tutor-dialogue-top"><text>‹</text><view><text></text><text>咕点在线</text><text>正在陪你想第一步</text></view><text>•••</text></view>
+              <text class="tutor-dialogue-time">今天 15:30</text>
+              <view wx:if="{{tutorReferenceScene.row0}}" class="tutor-chatline {{tutorReferenceScene.row0.role === 'user' ? 'me' : ''}}"><text class="tutor-chatline-bubble">{{tutorReferenceScene.row0.text}}</text><text class="tutor-chatline-avatar">{{tutorReferenceScene.row0.role === 'user' ? '童' : 'AI'}}</text></view>
+              <view wx:if="{{tutorReferenceScene.row1}}" class="tutor-chatline {{tutorReferenceScene.row1.role === 'user' ? 'me' : ''}}"><text class="tutor-chatline-bubble">{{tutorReferenceScene.row1.text}}</text><text class="tutor-chatline-avatar">{{tutorReferenceScene.row1.role === 'user' ? '童' : 'AI'}}</text></view>
+              <view wx:if="{{tutorReferenceScene.row2}}" class="tutor-chatline {{tutorReferenceScene.row2.role === 'user' ? 'me' : ''}}"><text class="tutor-chatline-bubble">{{tutorReferenceScene.row2.text}}</text><text class="tutor-chatline-avatar">{{tutorReferenceScene.row2.role === 'user' ? '童' : 'AI'}}</text></view>
+              <view wx:if="{{tutorReferenceScene.row3}}" class="tutor-chatline {{tutorReferenceScene.row3.role === 'user' ? 'me' : ''}}"><text class="tutor-chatline-bubble">{{tutorReferenceScene.row3.text}}</text><text class="tutor-chatline-avatar">{{tutorReferenceScene.row3.role === 'user' ? '童' : 'AI'}}</text></view>
+              <view wx:if="{{tutorReferenceScene.row4}}" class="tutor-chatline {{tutorReferenceScene.row4.role === 'user' ? 'me' : ''}}"><text class="tutor-chatline-bubble">{{tutorReferenceScene.row4.text}}</text><text class="tutor-chatline-avatar">{{tutorReferenceScene.row4.role === 'user' ? '童' : 'AI'}}</text></view>
+              <view class="tutor-dialogue-composer"><input value="{{input}}" bindinput="onInput" bindconfirm="send" confirm-type="send" placeholder="跟咕点说点什么..." /><text bindtap="send">↗</text></view>
             </view>
             <view class="tutor-dialogue-actions"><text wx:if="{{tutorReferenceScene.action0}}" data-action="{{tutorReferenceScene.action0.action}}" data-step="{{tutorReferenceScene.action0.step}}" bindtap="runTutorReferenceAction">{{tutorReferenceScene.action0.label}}</text><text wx:if="{{tutorReferenceScene.action1}}" data-action="{{tutorReferenceScene.action1.action}}" data-step="{{tutorReferenceScene.action1.step}}" bindtap="runTutorReferenceAction">{{tutorReferenceScene.action1.label}}</text></view>
           </block>
@@ -64,7 +67,8 @@
           <view class="tutor-knowledge-board" wx:elif="{{activeTutorScene === 'knowledge'}}">
             <text class="tutor-knowledge-subject">{{tutorReferenceScene.row0.text}}</text>
             <text class="tutor-knowledge-title">{{tutorReferenceScene.row1.text}}</text>
-            <view class="tutor-blackboard"><text>{{tutorReferenceScene.row2.text}}</text><text>{{tutorReferenceScene.row3.text}}</text><text>{{tutorReferenceScene.row4.text}}</text><text>{{tutorReferenceScene.row5.text}}</text></view>
+            <view class="tutor-blackboard-hero"><view><text>咕点小黑板</text><text>“别怕，这其实是个变身魔法！”</text></view><text></text></view>
+            <view class="tutor-blackboard"><view><text>1</text><view><text>这是什么</text><text>{{tutorReferenceScene.row3.text}}</text></view></view><view><text>2</text><view><text>容易卡在哪里</text><text>{{tutorReferenceScene.row4.text}}</text></view></view><view><text>3</text><view><text>第一步怎么想</text><text>{{tutorReferenceScene.row5.text}}</text></view></view></view>
             <view class="tutor-dialogue-actions"><text data-action="{{tutorReferenceScene.action0.action}}" data-step="{{tutorReferenceScene.action0.step}}" bindtap="runTutorReferenceAction">{{tutorReferenceScene.action0.label}}</text><text data-action="{{tutorReferenceScene.action1.action}}" data-step="{{tutorReferenceScene.action1.step}}" bindtap="runTutorReferenceAction">{{tutorReferenceScene.action1.label}}</text></view>
           </view>
 
