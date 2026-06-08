@@ -897,6 +897,186 @@ page {
   text-align: center;
 }
 
+/* Reference HTML alignment: Growth Report main page is a light report flow, not a dashboard. */
+page {
+  background: #f9f8f4;
+}
+
+.profile-page {
+  background: #f9f8f4;
+}
+
+.profile-shell {
+  padding: calc(88rpx + env(safe-area-inset-top)) 40rpx calc(146rpx + env(safe-area-inset-bottom));
+}
+
+.yd-parent-screen {
+  min-height: calc(100vh - 198rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  padding: 0;
+  gap: 22rpx;
+  border: 0;
+  border-radius: 0;
+  background: #f9f8f4;
+  box-shadow: none;
+}
+
+.yd-parent-top {
+  position: relative;
+  z-index: 8;
+  margin: 0 -40rpx;
+  padding: 24rpx 40rpx 14rpx;
+  background: rgba(249, 248, 244, 0.92);
+}
+
+.yd-parent-mark {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 16rpx;
+  background: #f97316;
+}
+
+.yd-parent-brand text:first-child {
+  font-size: 30rpx;
+}
+
+.yd-parent-brand text:last-child {
+  color: #6b7280;
+  font-size: 20rpx;
+}
+
+.yd-parent-pill {
+  display: none;
+}
+
+.yd-parent-hero.growth {
+  grid-template-columns: minmax(0, 1fr);
+  min-height: 0;
+  padding: 8rpx 0 4rpx;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.yd-parent-kicker,
+.yd-parent-art {
+  display: none;
+}
+
+.yd-parent-title {
+  margin-top: 0;
+  max-width: 560rpx;
+  font-size: 56rpx;
+  line-height: 1.22;
+  letter-spacing: 0;
+}
+
+.yd-parent-sub {
+  display: block;
+  max-width: 620rpx;
+  margin-top: 20rpx;
+  color: #6b7280;
+  font-size: 26rpx;
+  line-height: 1.62;
+}
+
+.growth-choice-grid {
+  gap: 18rpx;
+  margin-top: 10rpx;
+}
+
+.growth-choice-card {
+  min-height: 220rpx;
+  padding: 24rpx;
+  border: 1rpx solid #fff7ed;
+  border-radius: 36rpx;
+  background: #ffffff;
+  box-shadow: 0 14rpx 32rpx rgba(15, 23, 42, 0.06);
+}
+
+.growth-choice-card.warm {
+  background: #ffffff;
+}
+
+.growth-choice-card image {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 999rpx;
+  background: #fff7ed;
+}
+
+.growth-choice-card view text:first-child {
+  font-size: 28rpx;
+  line-height: 1.18;
+  -webkit-line-clamp: 2;
+}
+
+.growth-choice-card view text:nth-child(2) {
+  color: #9ca3af;
+  font-size: 22rpx;
+}
+
+.growth-choice-card > text {
+  color: #9a3412;
+  background: #ffedd5;
+}
+
+.growth-flow-tabs {
+  display: none;
+}
+
+.growth-progress-card {
+  position: relative;
+  gap: 22rpx;
+  padding-left: 44rpx;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.growth-progress-card::before {
+  content: "";
+  position: absolute;
+  top: 86rpx;
+  bottom: 30rpx;
+  left: 22rpx;
+  width: 4rpx;
+  border-radius: 999rpx;
+  background: #eef0ef;
+}
+
+.growth-progress-head {
+  margin-left: -44rpx;
+}
+
+.growth-progress-step {
+  min-height: 120rpx;
+  padding: 24rpx;
+  border: 1rpx solid #f1f1ee;
+  border-radius: 30rpx;
+  background: #ffffff;
+  box-shadow: 0 10rpx 24rpx rgba(15, 23, 42, 0.05);
+}
+
+.growth-upload-panel,
+.growth-report-preview,
+.growth-parent-action-card,
+.yd-parent-decision,
+.growth-action-row,
+.growth-next-row {
+  border-radius: 30rpx;
+  background: #ffffff;
+  box-shadow: 0 12rpx 28rpx rgba(15, 23, 42, 0.055);
+}
+
+.growth-main-cta {
+  min-height: 100rpx;
+  border-radius: 34rpx;
+  color: #78350f;
+  background: #fbbf24;
+  box-shadow: 0 16rpx 30rpx rgba(251, 191, 36, 0.28);
+}
+
 .yd-parent-decision {
   border: 1rpx solid rgba(232, 238, 230, 0.95);
   border-radius: 22rpx;

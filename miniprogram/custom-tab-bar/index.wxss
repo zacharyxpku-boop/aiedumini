@@ -1,27 +1,27 @@
 .yd-tabbar {
   position: fixed;
-  left: 20rpx;
-  right: 20rpx;
-  bottom: calc(10rpx + env(safe-area-inset-bottom));
+  left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 999;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   align-items: stretch;
-  gap: 6rpx;
-  height: 108rpx;
-  padding: 8rpx 8rpx 10rpx;
-  background: rgba(255, 255, 255, 0.98);
-  border: 1rpx solid #f0ede5;
-  border-radius: 28rpx;
-  box-shadow: 0 6rpx 14rpx rgba(55, 42, 24, 0.045);
+  gap: 0;
+  height: calc(116rpx + env(safe-area-inset-bottom));
+  padding: 10rpx 48rpx calc(8rpx + env(safe-area-inset-bottom));
+  background: rgba(255, 255, 255, 0.96);
+  border-top: 1rpx solid #f1f1ee;
+  border-radius: 0;
+  box-shadow: 0 -10rpx 26rpx rgba(15, 23, 42, 0.06);
   box-sizing: border-box;
 }
 
 .yd-tab-item {
   position: relative;
   display: grid;
-  grid-template-rows: 50rpx 32rpx;
-  row-gap: 3rpx;
+  grid-template-rows: 50rpx 30rpx;
+  row-gap: 2rpx;
   width: 100%;
   min-width: 0;
   height: 88rpx;
@@ -32,7 +32,7 @@
   color: #403d37;
   background: transparent;
   border: 0;
-  border-radius: 20rpx;
+  border-radius: 0;
   font-size: 20rpx;
   font-weight: 900;
   line-height: 1;
@@ -41,8 +41,8 @@
 }
 
 .yd-tab-item.active {
-  color: #0c4a3b;
-  background: #f1faef;
+  color: #0f8f7c;
+  background: transparent;
 }
 
 .yd-tab-item.active::after {
@@ -50,16 +50,16 @@
   position: absolute;
   left: 50%;
   bottom: 6rpx;
-  width: 24rpx;
-  height: 6rpx;
+  width: 22rpx;
+  height: 5rpx;
   border-radius: 999rpx;
-  background: #22b95c;
+  background: #14b8a6;
   transform: translateX(-50%);
 }
 
 .yd-tab-icon-wrap {
   display: flex;
-  width: 58rpx;
+  width: 96rpx;
   height: 50rpx;
   align-items: center;
   justify-content: center;
@@ -69,7 +69,7 @@
 }
 
 .yd-tab-item.active .yd-tab-icon-wrap {
-  background: rgba(34, 185, 92, 0.12);
+  background: #e4f7f3;
 }
 
 .yd-tab-icon {

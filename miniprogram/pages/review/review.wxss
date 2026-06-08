@@ -1053,3 +1053,172 @@ page {
   line-height: 94rpx;
   text-align: center;
 }
+
+/* Reference HTML alignment: Knowledge Park uses a flat mobile canvas with playful cards. */
+page {
+  background: #f7f8fa;
+}
+
+.review-page {
+  background: #f7f8fa;
+}
+
+.content-inner {
+  padding: calc(88rpx + env(safe-area-inset-top)) 32rpx calc(146rpx + env(safe-area-inset-bottom));
+}
+
+.yd-review-screen {
+  min-height: calc(100vh - 190rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  padding: 0;
+  gap: 20rpx;
+  border: 0;
+  border-radius: 0;
+  background: #f7f8fa;
+  box-shadow: none;
+}
+
+.yd-review-screen > .yd-review-pill {
+  display: none;
+}
+
+.yd-review-top {
+  position: relative;
+  z-index: 8;
+  margin: 0 -32rpx;
+  padding: 24rpx 32rpx 14rpx;
+  background: rgba(247, 248, 250, 0.9);
+}
+
+.yd-review-mark {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 16rpx;
+  background: #14b8a6;
+}
+
+.yd-review-brand text:first-child {
+  font-size: 34rpx;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.yd-review-brand text:last-child {
+  color: #69716f;
+  font-size: 20rpx;
+}
+
+.yd-review-top .yd-review-pill {
+  color: #6b7280;
+  background: #ffffff;
+  border-color: #e5e7eb;
+}
+
+.yd-review-hero {
+  position: relative;
+  grid-template-columns: minmax(0, 1fr) 150rpx;
+  min-height: 260rpx;
+  padding: 34rpx 28rpx;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0 0 36rpx 36rpx;
+  background: linear-gradient(135deg, rgba(224, 242, 241, 0.86), rgba(247, 248, 250, 1));
+  box-shadow: none;
+}
+
+.yd-review-title {
+  max-width: 430rpx;
+  font-size: 48rpx;
+  line-height: 1.14;
+}
+
+.yd-review-sub {
+  display: inline-block;
+  max-width: 520rpx;
+  padding: 12rpx 16rpx;
+  border: 1rpx solid rgba(255, 255, 255, 0.58);
+  border-radius: 18rpx;
+  background: rgba(255, 255, 255, 0.42);
+  font-size: 24rpx;
+  -webkit-line-clamp: 3;
+}
+
+.yd-review-art {
+  width: 160rpx;
+  height: 160rpx;
+  opacity: 0.96;
+  border: 0;
+  background: transparent;
+}
+
+.review-chip-row {
+  margin-top: 18rpx;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+}
+
+.review-chip-row.games {
+  display: none;
+}
+
+.review-chip-row text {
+  flex: 0 0 auto;
+  padding: 14rpx 24rpx;
+  border-radius: 28rpx;
+  background: #ffffff;
+  border-color: #e5e7eb;
+  color: #4b5563;
+  font-size: 24rpx;
+}
+
+.review-chip-row text:first-child {
+  color: #ffffff;
+  background: #14b8a6;
+  border-color: #14b8a6;
+}
+
+.review-record-panel,
+.review-template-pack,
+.review-template-workbench {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+}
+
+.review-section-head {
+  margin-top: 8rpx;
+}
+
+.review-flow-tabs {
+  display: none;
+}
+
+.review-topic-row,
+.review-tool-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18rpx;
+}
+
+.review-topic-chip,
+.review-tool-card {
+  min-height: 168rpx;
+  border: 1rpx solid #eef0ef;
+  border-radius: 28rpx;
+  background: #ffffff;
+  box-shadow: 0 12rpx 28rpx rgba(15, 23, 42, 0.06);
+}
+
+.review-tool-card text:nth-child(2) {
+  font-size: 28rpx;
+}
+
+.review-main-cta,
+.review-topic-cta {
+  min-height: 92rpx;
+  height: 92rpx;
+  border-radius: 30rpx;
+  color: #ffffff;
+  background: #f97316;
+  box-shadow: 0 16rpx 30rpx rgba(249, 115, 22, 0.28);
+}
