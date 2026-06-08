@@ -296,6 +296,95 @@ const TUTOR_GUARDRAILS = [
   '发现抄答案风险会收紧提示'
 ];
 
+const TUTOR_REFERENCE_SCENES = {
+  dialogue: {
+    title: '自由对话',
+    status: '正在陪你想第一步',
+    rows: [
+      { id: 'd1', role: 'user', text: '小原，这道物理题我完全没思路，怎么做呀？' },
+      { id: 'd2', text: '别着急，遇到难题不知道怎么下手很正常哦！拍拍肩膀~' },
+      { id: 'd3', text: '仔细看看题目，最开始提到的小车速度是多少呢？' },
+      { id: 'd4', role: 'user', text: '是 5米/秒。' },
+      { id: 'd5', text: '找得很准！那么第二步，你能想到要用哪个公式来算加速度吗？' }
+    ],
+    actions: [
+      { id: 'smaller', label: '再问小一点', action: 'smaller' },
+      { id: 'review', label: '去知识乐园练一下', action: 'review' }
+    ]
+  },
+  knowledge: {
+    title: '咕点讲解',
+    status: '只追问，不代写',
+    rows: [
+      { id: 'k1', text: '小学数学 · 五年级' },
+      { id: 'k2', text: '分数除法' },
+      { id: 'k3', text: '“别怕，这其实是个变身魔法！”' },
+      { id: 'k4', text: '1 这是什么：除以一个分数，等于乘以这个分数的倒数。' },
+      { id: 'k5', text: '2 容易卡在哪里：光顾着把除号变成乘号，却忘了把后面的分数颠倒过来。' },
+      { id: 'k6', text: '3 第一步怎么想：默念口诀，先变乘号，再翻个底朝天！' }
+    ],
+    actions: [
+      { id: 'read_problem', label: '换个说法', action: 'step', step: 'read_problem' },
+      { id: 'review', label: '做一题试试', action: 'review' }
+    ]
+  },
+  pointing: {
+    title: '题目点拨',
+    status: '只追问，不代写',
+    rows: [
+      { id: 'p1', text: '把题目发来，咕点只问第一步。拍题、打字都可以，系统会自动保存安全摘要。' }
+    ],
+    modes: ['看懂题意', '理清条件', '找准问题', '找第一步', '毫无头绪', '找突破口', '检查错因', '算错不对', '定位错因'],
+    actions: [
+      { id: 'find_direction', label: '开始点拨', action: 'step', step: 'find_direction' }
+    ]
+  },
+  stuck: {
+    title: '深呼吸，慢慢来',
+    status: '只追问，不代写',
+    rows: [
+      { id: 's1', text: '没关系，我们把问题切小一点。' },
+      { id: 's2', text: '还是卡住时，接下来想先试试哪个？' },
+      { id: 's3', text: '刚才的思考小记：起步很棒，正确列出了算式 4/5 ÷ 2；卡在忘记把后面的整数变成倒数。' }
+    ],
+    actions: [
+      { id: 'find_conditions', label: '先圈已知条件', action: 'step', step: 'find_conditions' },
+      { id: 'read_problem', label: '先说题目问什么', action: 'step', step: 'read_problem' },
+      { id: 'review', label: '去知识乐园复测', action: 'review' },
+      { id: 'smaller', label: '休息一下再来也没关系哦', action: 'smaller' }
+    ]
+  },
+  recap: {
+    title: '刚才学了什么',
+    status: '正在陪你想第一步',
+    rows: [
+      { id: 'r1', text: '用一句话复盘：我刚才卡在哪里、第一步是什么、下次先检查什么。' }
+    ],
+    actions: [
+      { id: 'smaller', label: '再问小一点', action: 'smaller' }
+    ]
+  }
+};
+
+function normalizeTutorReferenceScene(scene = TUTOR_REFERENCE_SCENES.dialogue) {
+  const rows = Array.isArray(scene.rows) ? scene.rows : [];
+  const actions = Array.isArray(scene.actions) ? scene.actions : [];
+  const modes = Array.isArray(scene.modes) ? scene.modes : [];
+  return Object.assign({}, scene, {
+    row0: rows[0] || null,
+    row1: rows[1] || null,
+    row2: rows[2] || null,
+    row3: rows[3] || null,
+    row4: rows[4] || null,
+    row5: rows[5] || null,
+    action0: actions[0] || null,
+    action1: actions[1] || null,
+    action2: actions[2] || null,
+    action3: actions[3] || null,
+    modes
+  });
+}
+
 function hasFirstStepEvidence(text = '') {
   const value = String(text || '');
   return value.length >= 8
@@ -1240,6 +1329,7 @@ Page({
     socraticBrief: null,
     socraticMicroChoices: [],
     tutorServiceStatus: null,
+    tutorReferenceScene: normalizeTutorReferenceScene(TUTOR_REFERENCE_SCENES.dialogue),
     tutorDiagnosticCard: null,
     socraticFeedbackStatus: '',
     socraticFeedbackRecordedAt: '',
@@ -1363,6 +1453,7 @@ Page({
       childExitTicketText: '',
       tutorHomeContext,
       tutorTurnState,
+      tutorReferenceScene: normalizeTutorReferenceScene(TUTOR_REFERENCE_SCENES.dialogue),
       surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('tutor') : null,
       unifiedNextAction: storage.buildUnifiedNextActionController ? storage.buildUnifiedNextActionController({ surface: 'tutor' }) : null
     });
@@ -1493,6 +1584,7 @@ Page({
     this.setData({
       activeStep: step,
       activeTutorScene: sceneMap[step] || 'dialogue',
+      tutorReferenceScene: normalizeTutorReferenceScene(TUTOR_REFERENCE_SCENES[sceneMap[step] || 'dialogue'] || TUTOR_REFERENCE_SCENES.dialogue),
       input
     }, () => {
       this.send();
@@ -1517,6 +1609,22 @@ Page({
       coachStepLabel: action.label,
       input: `${mode.prompt}${target}`
     });
+  },
+
+  runTutorReferenceAction(event) {
+    const dataset = event && event.currentTarget ? event.currentTarget.dataset || {} : {};
+    const action = dataset.action || '';
+    if (action === 'review') {
+      this.goReview();
+      return;
+    }
+    if (action === 'smaller') {
+      this.requestSmallerTutorPrompt();
+      return;
+    }
+    if (action === 'step') {
+      this.launchFirstStep({ currentTarget: { dataset: { step: dataset.step || 'read_problem' } } });
+    }
   },
 
   send() {

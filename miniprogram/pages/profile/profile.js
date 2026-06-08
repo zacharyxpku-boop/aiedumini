@@ -3070,6 +3070,7 @@ Page({
     learningReportAnswers: {},
     showLearningQuestionnaire: false,
     growthActiveScene: 'main',
+    growthQuestionIndex: 0,
     experienceChecklist: [],
     experienceDashboard: null,
     isBetaTester: false,
@@ -3832,6 +3833,13 @@ Page({
       });
       return;
     }
+    if (scene === 'upload') {
+      this.setData({
+        growthActiveScene: 'upload',
+        showLearningQuestionnaire: false
+      });
+      return;
+    }
     if (scene === 'action') {
       this.setData({
         growthActiveScene: 'action',
@@ -3859,6 +3867,13 @@ Page({
     }));
     this.setData({ learningReportQuestionnaire: questionnaire });
     this.syncLearningReportFromInput({ assessmentAnswers: this.learningReportAnswersAsList(learningReportAnswers) });
+  },
+
+  nextGrowthQuestion() {
+    const questions = this.data.learningReportQuestionnaire || [];
+    const maxIndex = Math.max(questions.length - 1, 0);
+    const nextIndex = Math.min(Number(this.data.growthQuestionIndex || 0) + 1, maxIndex);
+    this.setData({ growthQuestionIndex: nextIndex });
   },
 
   generateLearningReport() {
@@ -4081,6 +4096,7 @@ Page({
       showAdvancedProfile: true,
       showLearningQuestionnaire: true,
       growthActiveScene: 'questionnaire',
+      growthQuestionIndex: 0,
       profilePanel: 'assessment',
       profilePanelTitle: '1分钟学习问卷'
     });
@@ -4330,6 +4346,13 @@ Page({
       revisit: '/pages/review/review',
       tutor: '/pages/tutor/tutor'
     };
+    if (action === 'upload') {
+      this.setData({
+        growthActiveScene: 'upload',
+        showLearningQuestionnaire: false
+      });
+      return;
+    }
     if (action === 'reportPreview') {
       this.setData({
         growthActiveScene: 'preview',

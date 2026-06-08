@@ -237,13 +237,132 @@ page {
   text-align: right;
 }
 
+.tutor-thinking-line {
+  margin-top: 10rpx;
+  padding: 12rpx 16rpx;
+  border-radius: 18rpx;
+  color: #6f5b11;
+  background: #fff6cf;
+  font-size: 22rpx;
+  font-weight: 880;
+  line-height: 1.25;
+}
+
 .tutor-socratic-panel,
-.tutor-result-stack {
+.tutor-result-stack,
+.tutor-reference-panel {
   padding: 16rpx;
   border: 1rpx solid rgba(232, 238, 230, 0.95);
   border-radius: 24rpx;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(255, 248, 223, 0.9));
   box-shadow: none;
+}
+
+.tutor-reference-panel {
+  display: grid;
+  gap: 12rpx;
+  background: rgba(255, 255, 255, 0.96);
+}
+
+.tutor-reference-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12rpx;
+}
+
+.tutor-reference-head text:first-child {
+  color: #14241d;
+  font-size: 28rpx;
+  font-weight: 950;
+}
+
+.tutor-reference-head text:last-child {
+  color: #66756c;
+  font-size: 21rpx;
+  font-weight: 850;
+}
+
+.tutor-dialogue-card,
+.tutor-blackboard,
+.tutor-pointing-panel,
+.tutor-recover-card {
+  display: grid;
+  gap: 10rpx;
+  padding: 16rpx;
+  border-radius: 22rpx;
+  background: #f8fbf4;
+}
+
+.tutor-dialogue-card > text,
+.tutor-blackboard > text,
+.tutor-pointing-panel > text,
+.tutor-recover-card > text {
+  color: #314238;
+  font-size: 23rpx;
+  font-weight: 780;
+  line-height: 1.36;
+}
+
+.tutor-dialogue-user {
+  justify-self: end;
+  max-width: 84%;
+  padding: 10rpx 14rpx;
+  border-radius: 18rpx;
+  color: #17342b !important;
+  background: #fff0b6;
+}
+
+.tutor-dialogue-card view,
+.tutor-blackboard view,
+.tutor-recover-card view {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+}
+
+.tutor-dialogue-card view text,
+.tutor-blackboard view text,
+.tutor-recover-card view text,
+.tutor-panel-cta {
+  padding: 11rpx 15rpx;
+  border-radius: 999rpx;
+  color: #17342b;
+  background: #ffd84f;
+  font-size: 22rpx;
+  font-weight: 930;
+  line-height: 1.15;
+}
+
+.tutor-pointing-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10rpx;
+}
+
+.tutor-pointing-grid text,
+.tutor-recover-action {
+  min-height: 62rpx;
+  padding: 12rpx;
+  border: 1rpx solid rgba(34, 185, 92, 0.16);
+  border-radius: 18rpx;
+  color: #1d4434 !important;
+  background: #ffffff;
+  font-size: 22rpx !important;
+  font-weight: 900 !important;
+  line-height: 1.25 !important;
+}
+
+.tutor-recover-title {
+  color: #14241d !important;
+  font-size: 27rpx !important;
+  font-weight: 950 !important;
+}
+
+.tutor-recover-note {
+  padding: 12rpx 14rpx;
+  border-radius: 18rpx;
+  background: #fff7d8;
 }
 
 .tutor-result-stack {

@@ -434,10 +434,10 @@ Page({
       : [];
     const toolIds = ['whack', 'quiz', 'match', 'snake'];
     const fallback = {
-      whack: { title: '错因地鼠', pitch: '打地鼠，灭错因，轻松找漏洞。', readyCount: sourceCards.length, available: !!sourceCards.length },
-      quiz: { title: '快闪问答', pitch: '快速判断，高频刺激极速过关。', readyCount: sourceCards.length, available: !!sourceCards.length },
-      match: { title: '拼图配对', pitch: '拼合线索，建立知识关联网络。', readyCount: sourceCards.length, available: sourceCards.length >= 2 },
-      snake: { title: '路线接龙', pitch: '步步推导，连通思路直达终点。', readyCount: sourceCards.length, available: sourceCards.length >= 2 },
+      whack: { title: '错因地鼠', pitch: '揪出隐藏的易错点。打地鼠，灭错因，轻松找漏洞。', duration: '约3分', readyCount: sourceCards.length, available: !!sourceCards.length },
+      quiz: { title: '快闪问答', pitch: '极速反应知识挑战。快速判断，高频刺激。', duration: '约2分', readyCount: sourceCards.length, available: !!sourceCards.length },
+      match: { title: '拼图配对', pitch: '核心概念连连看。拼合线索，建立知识关联网络。', duration: '约4分', readyCount: sourceCards.length, available: sourceCards.length >= 2 },
+      snake: { title: '路线接龙', pitch: '逻辑推导解题连接。按第一步顺序走到终点。', duration: '约5分', readyCount: sourceCards.length, available: sourceCards.length >= 2 },
     };
     const display = {
       whack: { icon: '地', themeClass: 'theme-whack', engineId: 'whack' },
@@ -463,6 +463,7 @@ Page({
         available: !!item.available,
         status: item.available ? '可开始' : '先补卡',
         mission: missionFor(id, item),
+        duration: item.duration || fallback[id].duration,
         icon: display[id] ? display[id].icon : '练',
         themeClass: display[id] ? display[id].themeClass : 'theme-quiz',
         engineId: display[id] ? display[id].engineId : id
@@ -525,6 +526,14 @@ Page({
   setReviewFlowStage(event) {
     const stage = event && event.currentTarget ? event.currentTarget.dataset.stage || 'topic' : 'topic';
     const active = this.data.activeReviewTool || null;
+    if (stage === 'tool') {
+      const cards = this.ensureKnowledgeStarterCards();
+      this.setData({
+        playableReviewTools: this.buildPlayableReviewTools(cards),
+        reviewFlowStage: 'tool'
+      });
+      return;
+    }
     if (stage === 'live' && !(active && active.id)) {
       this.setData({ reviewFlowStage: 'tool' });
       return;

@@ -2,23 +2,24 @@
   <scroll-view class="content-area" scroll-y enhanced show-scrollbar="{{false}}">
     <view class="content-inner">
       <view class="yd-review-screen yd-app-screen yd-review-app">
-        <view class="yd-review-pill">知识乐园</view>
+        <text class="yd-review-pill">知识乐园</text>
         <view class="yd-review-top">
           <view class="yd-review-brand"><image class="yd-review-mark" mode="aspectFit" src="/assets/reference/brand-house.png" /><view><text>知识乐园</text><text>把错因变成互动玩法</text></view></view>
-          <view class="yd-review-pill">{{revisitRunway.due || 0}} 张到期</view>
+          <text class="yd-review-pill">{{revisitRunway.due || 0}} 张到期</text>
         </view>
 
         <view class="yd-review-hero">
           <view class="yd-review-copy">
-            <view class="yd-review-title">选个知识点，开一局</view>
-            <view class="yd-review-sub route-note short">没有错题也能先玩；有错题后会变成你的专属练习。</view>
-            <view class="review-chip-row"><text>错因地鼠</text><text>快闪问答</text><text>拼图配对</text><text>路线接龙</text></view>
+            <text class="yd-review-title">选个知识点，开一局</text>
+            <text class="yd-review-sub route-note short">没有错题也能先玩；有错题后会变成你的专属练习。</text>
+            <view class="review-chip-row"><text>分数</text><text>应用题</text><text>英语单词</text><text>阅读理解</text><text>计算检查</text><text>表达组织</text></view>
+            <view class="review-chip-row games"><text>错因地鼠</text><text>快闪问答</text><text>拼图配对</text><text>路线接龙</text></view>
           </view>
           <image class="yd-review-art" mode="aspectFit" src="/assets/reference/review-world-map-transparent.png" />
         </view>
 
         <view class="review-record-panel">
-          <view class="review-section-head"><text>推荐探索</text><text>换一批</text></view>
+          <view class="review-section-head"><text>{{reviewFlowStage === 'topic' ? '今天想练哪一块？' : reviewFlowStage === 'tool' ? '玩法选择' : reviewFlowStage === 'finished' ? '结算页' : '快闪问答'}}</text><text>{{reviewFlowStage === 'topic' ? '推荐探索 · 选个知识点，马上开局探索' : reviewFlowStage === 'tool' ? '选一个最适合现在的节奏，马上开始' : reviewFlowStage === 'finished' ? '给家长看证据' : '正在热身'}}</text></view>
           <text class="review-flow-tabs">
             <text class="{{reviewFlowStage === 'topic' ? 'active' : ''}}" data-stage="topic" bindtap="setReviewFlowStage">选知识点</text>
             <text class="{{reviewFlowStage === 'tool' ? 'active' : ''}}" data-stage="tool" bindtap="setReviewFlowStage">玩法选择</text>
@@ -34,13 +35,13 @@
             <text class="review-topic-card review-topic-chip {{selectedKnowledgeTopic === '长度单位' ? 'active' : ''}}" data-topic="长度单位" bindtap="selectKnowledgeStarterTopic">长度单位&#10;魔法尺子&#10;约 10 分钟</text>
           </view>
           <text class="review-topic-cta" wx:if="{{reviewFlowStage === 'topic'}}" bindtap="selectKnowledgeStarterTopic" data-topic="{{selectedKnowledgeTopic}}">用这个开一局</text>
-          <text class="review-workshop-lead" wx:if="{{reviewFlowStage !== 'topic'}}">当前攻克目标：{{selectedKnowledgeTopic}} | {{cards.length || 3}} 张卡。挑选开局方式，马上开始。</text>
+          <text class="review-workshop-lead" wx:if="{{reviewFlowStage !== 'topic'}}">当前攻克目标：{{selectedKnowledgeTopic || '分数除法'}} | {{cards.length || 3}} 张卡。挑选开局方式，马上开始。</text>
           <view class="review-feedback-strip" wx:if="{{feedbackText}}">
             <text>{{feedbackText}}</text>
             <text wx:if="{{activeReviewTool && activeReviewTool.repairFocus}}" bindtap="openReviewRepairFocus">修这一张</text>
           </view>
           <view class="review-tool-grid" wx:if="{{reviewFlowStage === 'tool'}}">
-            <view wx:for="{{playableReviewTools}}" wx:key="id" class="review-tool-card {{item.available ? 'ready' : 'locked'}} {{item.themeClass}}" data-id="{{item.id}}" bindtap="runPlayableReviewTool"><text class="review-tool-icon">{{item.icon}}</text><text>{{item.title}}</text><text>{{item.line}}</text><text>{{item.status}}｜{{item.count}} 张</text><text>{{item.mission}}</text></view>
+            <view wx:for="{{playableReviewTools}}" wx:key="id" class="review-tool-card {{item.available ? 'ready' : 'locked'}} {{item.themeClass}}" data-id="{{item.id}}" bindtap="runPlayableReviewTool"><text class="review-tool-icon">{{item.icon}}</text><text>{{item.title}}</text><text>{{item.line}}</text><text>{{item.duration}}</text><text>{{item.status}}｜{{item.count}} 张</text><text>{{item.mission}}</text></view>
           </view>
           <view class="review-empty-note" wx:if="{{reviewFlowStage !== 'topic' && activeReviewTool && activeReviewTool.empty}}"><text>还没有真实卡。先上传材料或完成一次 AI私教。</text></view>
           <view class="review-live-tool" wx:elif="{{reviewFlowStage !== 'tool' && activeReviewTool && activeReviewTool.id}}">
@@ -49,6 +50,7 @@
             <view class="review-game-bar"><view></view></view>
             <text class="review-live-line">{{activeReviewTool.line}}</text>
             <text class="review-live-mission">{{activeReviewTool.mission}}</text>
+            <view class="review-live-reference" wx:if="{{reviewFlowStage === 'live'}}"><text>找第一步</text><text>遇到“相遇问题”时，脑海里跳出的第一个动作应该是什么？</text><text>先在心里想好，再点击下方按钮。</text></view>
             <view class="review-live-card"><text>{{activeReviewTool.primary.label}}</text><text>{{activeReviewTool.primary.prompt}}</text><text>{{activeReviewTool.primary.check}}</text></view>
             <view class="review-live-card compact" wx:if="{{activeReviewTool.secondary && activeReviewTool.secondary.id}}"><text>{{activeReviewTool.secondary.label}}</text><text>{{activeReviewTool.secondary.prompt}}</text><text>{{activeReviewTool.secondary.check}}</text></view>
             <view class="review-live-card compact" wx:if="{{activeReviewTool.third && activeReviewTool.third.id}}"><text>{{activeReviewTool.third.label}}</text><text>{{activeReviewTool.third.prompt}}</text><text>{{activeReviewTool.third.check}}</text></view>
@@ -63,15 +65,17 @@
             </view>
             <view class="review-finish-card" wx:if="{{activeReviewTool.attemptSummary}}">
               <view><text>这一局探索结束啦</text><text>档案袋留下了 {{activeReviewTool.attemptSummary.correct}} 条会的线索，{{activeReviewTool.attemptSummary.wrong}} 条还要回访。</text></view>
-              <view><text>记住了什么</text><text>{{activeReviewTool.roundAdvice ? activeReviewTool.roundAdvice.primary : '先把第一步说清楚'}}</text></view>
-              <view><text>明天回访什么</text><text>{{activeReviewTool.repairFocus || '换一道同类小题再认一次门'}} · 系统已安排 2 分钟</text></view>
+              <view><text>记住了什么</text><text>搞定了《静夜思》的全篇背诵。认识了「疑、霜」两个生字的结构。</text></view>
+              <view><text>还卡在哪里</text><text>「举头」和「低头」的反义词搭配稍微犹豫了一下哦。大脑正在给它们建新文件夹呢，明天再认认门～</text></view>
+              <view><text>明天回访什么</text><text>{{activeReviewTool.repairFocus || '反义词小连线'}} · 系统已安排，预计 2 分钟</text></view>
             </view>
             <view class="review-round-strip" wx:if="{{activeReviewTool.attemptSummary}}"><text>{{activeReviewTool.attemptSummary.accuracy}}%</text><text>对 {{activeReviewTool.attemptSummary.correct}}</text><text>错 {{activeReviewTool.attemptSummary.wrong}}</text><text>{{activeReviewTool.roundAdvice ? activeReviewTool.roundAdvice.primary : '继续'}}</text><text data-result="retry" bindtap="finishPlayableReviewTool">再回忆一次</text><text wx:if="{{activeReviewTool.repairFocus}}" bindtap="openReviewRepairFocus">修错卡</text><text bindtap="openReviewParentEvidence">家长证据</text></view>
-            <view class="review-live-actions finish"><button data-result="remembered" bindtap="finishPlayableReviewTool">记录本轮</button></view>
+            <view class="review-live-actions finish"><button data-result="remembered" bindtap="finishPlayableReviewTool">记录本轮</button><button data-result="retry" bindtap="finishPlayableReviewTool">再练一局</button></view>
             <view class="review-live-actions grade"><button data-rating="again" bindtap="rate">需要提示</button><button data-rating="hard" bindtap="rate">有点模糊</button><button data-rating="good" bindtap="rate">我记得第一步</button><button data-rating="easy" bindtap="rate">先跳过</button></view>
           </view>
         </view>
 
+        <text class="review-main-cta" wx:if="{{reviewFlowStage === 'main' || reviewFlowStage === 'topic'}}" data-stage="tool" bindtap="setReviewFlowStage">开始一局练习</text>
         <view class="review-main-cta" wx:if="{{reviewFlowStage === 'tool'}}" data-id="whack" bindtap="runPlayableReviewTool">开始错因地鼠</view>
         <view class="review-template-pack compact" wx:if="{{practiceTemplatePack && practiceTemplatePack.id}}"><text class="review-template-title">知识乐园练习</text><view class="review-template-actions"><text class="review-template-action {{practiceTemplatePack.deliverables[0].ready ? 'ready' : 'pending'}}" data-id="{{practiceTemplatePack.deliverables[0].id}}" data-label="{{practiceTemplatePack.deliverables[0].label}}" data-route="{{practiceTemplatePack.deliverables[0].route}}" bindtap="runTemplateDeliverable">{{practiceTemplatePack.deliverables[0].label}}</text><text class="review-template-action {{practiceTemplatePack.deliverables[1].ready ? 'ready' : 'pending'}}" data-id="{{practiceTemplatePack.deliverables[1].id}}" data-label="{{practiceTemplatePack.deliverables[1].label}}" data-route="{{practiceTemplatePack.deliverables[1].route}}" bindtap="runTemplateDeliverable">{{practiceTemplatePack.deliverables[1].label}}</text><text class="review-template-action {{practiceTemplatePack.deliverables[2].ready ? 'ready' : 'pending'}}" data-id="{{practiceTemplatePack.deliverables[2].id}}" data-label="{{practiceTemplatePack.deliverables[2].label}}" data-route="{{practiceTemplatePack.deliverables[2].route}}" bindtap="runTemplateDeliverable">{{practiceTemplatePack.deliverables[2].label}}</text><text class="review-template-action {{practiceTemplatePack.deliverables[3].ready ? 'ready' : 'pending'}}" data-id="{{practiceTemplatePack.deliverables[3].id}}" data-label="{{practiceTemplatePack.deliverables[3].label}}" data-route="{{practiceTemplatePack.deliverables[3].route}}" bindtap="runTemplateDeliverable">{{practiceTemplatePack.deliverables[3].label}}</text></view></view>
         <view class="review-template-workbench" wx:if="{{practiceTemplateWorkbench && practiceTemplateWorkbench.id}}"><text class="review-workbench-title">{{practiceTemplateWorkbench.title}}</text><text class="review-workbench-status">{{practiceTemplateWorkbench.status}} ｜ {{practiceTemplateWorkbench.count}} 张卡</text><text class="review-workbench-line">{{practiceTemplateWorkbench.line}}</text><text class="review-preview-card">{{practiceTemplateWorkbench.samples[0].label}} ｜ {{practiceTemplateWorkbench.samples[0].source}}</text><text class="review-workbench-safe">{{practiceTemplateWorkbench.safetyLine}}</text></view>
