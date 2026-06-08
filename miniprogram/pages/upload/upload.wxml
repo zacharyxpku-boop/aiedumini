@@ -13,18 +13,9 @@
           <view class="yd-upload-pill" bindtap="viewLatestReport">跳过</view>
         </view>
 
-        <view class="yd-upload-hero">
-          <view class="yd-upload-copy">
-            <view class="yd-upload-title">收集线索碎片 🧩</view>
-            <view class="yd-upload-sub">材料越真实，建议越具体。直接拍照或打字都可以，不必全部填满。</view>
-            <view class="yd-upload-proof">
-              <text>错题</text>
-              <text>成绩</text>
-              <text>老师反馈</text>
-              <text>家长观察</text>
-            </view>
-          </view>
-          <image class="yd-upload-mascot" mode="aspectFit" src="/assets/reference/upload-folder-stack-transparent.png" />
+        <view class="yd-upload-heading">
+          <view class="yd-upload-title">收集线索碎片 🧩</view>
+          <view class="yd-upload-sub">材料越真实，建议越具体。直接拍照或打字都可以，不必全部填满。</view>
         </view>
 
         <view class="upload-evidence-grid">
