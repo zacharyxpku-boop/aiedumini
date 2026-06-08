@@ -529,33 +529,92 @@ page {
   text-align: center;
 }
 
-.growth-question-card view {
+.growth-question-options {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14rpx;
+  gap: 18rpx;
 }
 
-.growth-question-card view text {
+.growth-question-option {
+  position: relative;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 172rpx;
+  gap: 16rpx;
+  min-height: 264rpx;
   box-sizing: border-box;
-  padding: 18rpx;
-  border: 2rpx solid #e2e8f0;
-  border-radius: 26rpx;
-  background: #f8fafc;
+  padding: 34rpx 22rpx 28rpx;
+  border: 2rpx solid transparent;
+  border-radius: 48rpx;
+  background: #ffffff;
+  box-shadow: 0 10rpx 28rpx rgba(15, 23, 42, 0.055);
+}
+
+.growth-question-option-icon {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 32rpx;
+  background: #ccfbf1;
+}
+
+.growth-question-option:nth-child(2) .growth-question-option-icon {
+  background: #ffe4e6;
+}
+
+.growth-question-option:nth-child(3) .growth-question-option-icon {
+  background: #fef3c7;
+}
+
+.growth-question-option:nth-child(4) .growth-question-option-icon {
+  background: #dbeafe;
+}
+
+.growth-question-option:nth-child(5) .growth-question-option-icon {
+  background: #ede9fe;
+}
+
+.growth-question-option:nth-child(6) .growth-question-option-icon {
+  background: #f3f4f6;
+}
+
+.growth-question-option-label {
   color: #1e293b;
-  font-size: 29rpx;
-  line-height: 36rpx;
+  font-size: 30rpx;
+  line-height: 38rpx;
   font-weight: 900;
   text-align: center;
 }
 
-.growth-question-card view text.active {
+.growth-question-option-check {
+  position: absolute;
+  right: 18rpx;
+  top: 18rpx;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36rpx;
+  height: 36rpx;
+  border-radius: 999rpx;
+  background: #14b8a6;
+  color: #ffffff;
+  font-size: 22rpx;
+  line-height: 36rpx;
+  font-weight: 900;
+}
+
+.growth-question-option.active {
   border-color: #14b8a6;
-  background: #ccfbf1;
+  background: #f0fdfa;
+  box-shadow: 0 14rpx 30rpx rgba(20, 184, 166, 0.14);
+}
+
+.growth-question-option.active .growth-question-option-label {
   color: #0d9488;
+}
+
+.growth-question-option.active .growth-question-option-check {
+  display: flex;
 }
 
 .growth-upload-grid {

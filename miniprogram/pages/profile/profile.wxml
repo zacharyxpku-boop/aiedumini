@@ -11,7 +11,7 @@
           <text class="yd-parent-copy">
             <text class="yd-parent-kicker">问卷 / 上传 / 报告</text>
             <text class="yd-parent-title">先了解孩子，再安排怎么学</text>
-            <text class="yd-parent-sub">可以先做 1 分钟问卷，也可以上传错题、成绩或测评。材料越真实，报告越具体。</text>
+            <text class="yd-parent-sub">可以先做 1 分钟问卷，也可以上传错题、成绩或测评。不做天赋定论，只给学习偏好和方法建议。</text>
           </text>
           <image class="yd-parent-art" mode="aspectFit" src="/assets/reference/report-radar-card-illustration.png" />
         </view>
@@ -33,7 +33,7 @@
           <view class="growth-questionnaire-head"><text>孩子最近最常卡在哪里？</text><text bindtap="toggleLearningQuestionnaire">收起</text></view>
           <view class="growth-questionnaire-progress"><text></text><text></text><text></text><text></text><text></text></view>
           <text class="growth-question-intro">选出最符合的一项，帮我们建立初步画像。</text>
-          <view class="growth-question-card" data-contract="questionIndex === 0" wx:for="{{learningReportQuestionnaire}}" wx:for-index="questionIndex" wx:key="id" wx:if="{{questionIndex === growthQuestionIndex}}"><text>{{item.prompt}}</text><view><text wx:for="{{item.options}}" wx:for-item="option" wx:key="id" class="{{item.selectedOptionId === option.id ? 'active' : ''}}" data-id="{{item.id}}" data-option="{{option.id}}" bindtap="answerLearningQuestion">{{option.label}}</text></view></view>
+          <view class="growth-question-card" data-contract="questionIndex === 0" wx:for="{{learningReportQuestionnaire}}" wx:for-index="questionIndex" wx:key="id" wx:if="{{questionIndex === growthQuestionIndex}}"><text>{{item.prompt}}</text><view class="growth-question-options"><view wx:for="{{item.options}}" wx:for-item="option" wx:key="id" class="growth-question-option {{item.selectedOptionId === option.id ? 'active' : ''}}" data-id="{{item.id}}" data-option="{{option.id}}" bindtap="answerLearningQuestion"><text class="growth-question-option-icon"></text><text class="growth-question-option-label">{{option.label}}</text><text class="growth-question-option-check">✓</text></view></view></view>
           <text class="growth-question-note">后续上传错题、成绩或老师反馈后，报告会继续变准。</text>
           <view class="growth-action-row"><view class="yd-action-secondary" bindtap="nextGrowthQuestion">下一题</view><view class="yd-action-primary" bindtap="generateLearningReport">生成成长报告</view></view>
         </view>
