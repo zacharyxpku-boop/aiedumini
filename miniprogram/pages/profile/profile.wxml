@@ -46,6 +46,7 @@
             <text>1 分钟学习问卷</text>
             <text bindtap="toggleLearningQuestionnaire">收起</text>
           </view>
+          <view class="growth-questionnaire-progress"><text></text><text></text><text></text><text></text><text></text></view>
           <view class="growth-question-card" wx:for="{{learningReportQuestionnaire}}" wx:key="id">
             <text>{{item.prompt}}</text>
             <view>
@@ -74,6 +75,13 @@
           </view>
         </view>
 
+        <view class="growth-progress-card">
+          <view class="growth-progress-head"><text>报告生成进度</text><text>{{learningReportSummary.reportJobCaseId ? '已接入材料' : '等待材料'}}</text></view>
+          <view class="growth-progress-step done"><text></text><view><text>学习偏好</text><text>1 分钟问卷会先形成方法候选</text></view><text bindtap="startGrowthQuestionnaire">去填写</text></view>
+          <view class="growth-progress-step active"><text></text><view><text>材料证据</text><text>错题、成绩、测评和老师反馈</text></view><text data-action="upload" bindtap="runParentReportAction">去上传</text></view>
+          <view class="growth-progress-step"><text></text><view><text>培养建议</text><text>基于证据生成方法和今晚行动</text></view><text>待生成</text></view>
+        </view>
+
         <view class="yd-parent-decision growth" data-scene="parent" data-source="growth_report_card" bindtap="openEntryDetail">
           <image class="yd-parent-decision-img" mode="aspectFit" src="/assets/reference/family-avatar-group-transparent.png" />
           <view class="yd-parent-decision-copy">
@@ -92,6 +100,7 @@
           <view data-action="tutor" bindtap="runParentReportAction"><image mode="aspectFit" src="/assets/reference/entry-tutor.png" /><text>去 AI私教修一个卡点</text></view>
           <view data-action="review" bindtap="runParentReportAction"><image mode="aspectFit" src="/assets/reference/entry-review.png" /><text>去知识乐园练一局</text></view>
         </view>
+        <view class="growth-main-cta" bindtap="startGrowthQuestionnaire">开始了解孩子</view>
       </view>
     </view>
   </scroll-view>

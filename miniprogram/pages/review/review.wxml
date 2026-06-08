@@ -37,6 +37,8 @@
           <view class="review-empty-note" wx:if="{{activeReviewTool && activeReviewTool.empty}}"><text>还没有真实卡。先上传材料或完成一次 AI私教。</text></view>
           <view class="review-live-tool" wx:elif="{{activeReviewTool && activeReviewTool.id}}">
             <text class="review-live-head"><text>{{activeReviewTool.title}}</text><text>{{activeReviewTool.status}}</text></text>
+            <view class="review-game-progress"><text>3</text><text>/ 10</text><text>{{selectedKnowledgeTopic}}</text></view>
+            <view class="review-game-bar"><view></view></view>
             <text class="review-live-line">{{activeReviewTool.line}}</text>
             <text class="review-live-mission">{{activeReviewTool.mission}}</text>
             <view class="review-live-card"><text>{{activeReviewTool.primary.label}}</text><text>{{activeReviewTool.primary.prompt}}</text><text>{{activeReviewTool.primary.check}}</text></view>

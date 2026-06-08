@@ -249,12 +249,15 @@ page {
 
 .growth-questionnaire-panel {
   display: grid;
-  gap: 12rpx;
-  padding: 16rpx;
+  gap: 18rpx;
+  padding: 22rpx;
   border: 1rpx solid rgba(232, 238, 230, 0.96);
-  border-radius: 24rpx;
-  background: rgba(255, 255, 255, 0.96);
-  box-shadow: 0 8rpx 18rpx rgba(38, 58, 43, 0.045);
+  border-radius: 32rpx;
+  background:
+    radial-gradient(circle at 92% 0%, rgba(251, 191, 36, 0.18), transparent 36%),
+    radial-gradient(circle at 0% 60%, rgba(20, 184, 166, 0.12), transparent 40%),
+    rgba(255, 255, 255, 0.97);
+  box-shadow: 0 16rpx 34rpx rgba(38, 58, 43, 0.06);
 }
 
 .growth-questionnaire-head {
@@ -266,7 +269,7 @@ page {
 
 .growth-questionnaire-head text:first-child {
   color: #14241d;
-  font-size: 28rpx;
+  font-size: 34rpx;
   font-weight: 950;
 }
 
@@ -276,54 +279,81 @@ page {
   font-weight: 900;
 }
 
+.growth-questionnaire-progress {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8rpx;
+  padding: 8rpx 10rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.growth-questionnaire-progress text {
+  height: 12rpx;
+  border-radius: 999rpx;
+  background: #dbe7e1;
+}
+
+.growth-questionnaire-progress text:first-child {
+  background: #14b8a6;
+}
+
 .growth-question-card {
   display: grid;
-  gap: 9rpx;
-  padding: 12rpx;
-  border-radius: 18rpx;
-  background: #f7fbf3;
+  gap: 14rpx;
+  padding: 18rpx;
+  border-radius: 28rpx;
+  background: #f8fafc;
 }
 
 .growth-question-card > text {
   color: #173f31;
-  font-size: 23rpx;
+  font-size: 29rpx;
   font-weight: 950;
-  line-height: 1.2;
+  line-height: 1.28;
 }
 
 .growth-question-card view {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8rpx;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12rpx;
 }
 
 .growth-question-card view text {
+  display: flex;
   max-width: 100%;
-  padding: 8rpx 12rpx;
-  border: 1rpx solid rgba(34, 185, 92, 0.16);
-  border-radius: 999rpx;
-  color: #26754c;
+  min-height: 86rpx;
+  align-items: center;
+  justify-content: center;
+  padding: 10rpx 12rpx;
+  border: 2rpx solid transparent;
+  border-radius: 24rpx;
+  color: #334155;
   background: #ffffff;
-  font-size: 21rpx;
-  font-weight: 860;
-  line-height: 1.15;
+  font-size: 23rpx;
+  font-weight: 900;
+  line-height: 1.18;
+  text-align: center;
+  box-shadow: 0 6rpx 14rpx rgba(38, 58, 43, 0.035);
 }
 
 .growth-question-card view text.active {
-  color: #ffffff;
-  border-color: #18a94f;
-  background: #18a94f;
+  color: #0f766e;
+  border-color: #14b8a6;
+  background: #ccfbf1;
+  box-shadow: none;
 }
 
 .growth-generate-cta {
-  min-height: 76rpx;
-  border-radius: 999rpx;
+  min-height: 96rpx;
+  border-radius: 28rpx;
   color: #17342b;
-  background: linear-gradient(180deg, #ffd84f 0%, #f4b51b 100%);
-  font-size: 27rpx;
+  background: #fbbf24;
+  font-size: 31rpx;
   font-weight: 950;
-  line-height: 76rpx;
+  line-height: 96rpx;
   text-align: center;
+  box-shadow: 0 12rpx 28rpx rgba(251, 191, 36, 0.28);
 }
 
 .growth-upload-card {
@@ -426,6 +456,105 @@ page {
   -webkit-line-clamp: 2;
 }
 
+.growth-progress-card {
+  display: grid;
+  gap: 14rpx;
+  padding: 18rpx;
+  border: 1rpx solid rgba(255, 255, 255, 0.9);
+  border-radius: 28rpx;
+  background:
+    radial-gradient(circle at 8% 0%, rgba(34, 185, 92, 0.14), transparent 34%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(247, 251, 243, 0.94));
+  box-shadow: 0 8rpx 18rpx rgba(38, 58, 43, 0.045);
+}
+
+.growth-progress-head,
+.growth-progress-step {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14rpx;
+}
+
+.growth-progress-head text:first-child {
+  color: #14241d;
+  font-size: 29rpx;
+  font-weight: 950;
+}
+
+.growth-progress-head text:last-child {
+  padding: 8rpx 14rpx;
+  border-radius: 999rpx;
+  color: #14854a;
+  background: #ebf9ed;
+  font-size: 21rpx;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.growth-progress-step {
+  position: relative;
+  min-height: 92rpx;
+}
+
+.growth-progress-step > text:first-child {
+  flex: 0 0 auto;
+  width: 24rpx;
+  height: 24rpx;
+  border: 5rpx solid #d7e5d4;
+  border-radius: 999rpx;
+  background: #ffffff;
+}
+
+.growth-progress-step.done > text:first-child,
+.growth-progress-step.active > text:first-child {
+  border-color: #18a94f;
+  background: #18a94f;
+}
+
+.growth-progress-step view {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 16rpx;
+  border: 1rpx solid rgba(232, 238, 230, 0.95);
+  border-radius: 22rpx;
+  background: #ffffff;
+}
+
+.growth-progress-step view text {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.growth-progress-step view text:first-child {
+  color: #14241d;
+  font-size: 25rpx;
+  font-weight: 950;
+  line-height: 1.18;
+  white-space: nowrap;
+}
+
+.growth-progress-step view text:nth-child(2) {
+  margin-top: 5rpx;
+  color: #66746d;
+  font-size: 21rpx;
+  font-weight: 800;
+  line-height: 1.22;
+  white-space: nowrap;
+}
+
+.growth-progress-step > text:last-child {
+  flex: 0 0 auto;
+  padding: 9rpx 14rpx;
+  border-radius: 999rpx;
+  color: #14854a;
+  background: #ebf9ed;
+  font-size: 21rpx;
+  font-weight: 950;
+  white-space: nowrap;
+}
+
 .yd-parent-decision.growth {
   background:
     radial-gradient(circle at 88% 16%, rgba(255, 216, 79, 0.22), transparent 36%),
@@ -477,6 +606,18 @@ page {
   line-height: 1.18;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+}
+
+.growth-main-cta {
+  min-height: 94rpx;
+  border-radius: 28rpx;
+  color: #78350f;
+  background: linear-gradient(180deg, #ffd84f 0%, #f4b51b 100%);
+  box-shadow: 0 12rpx 24rpx rgba(248, 198, 34, 0.24);
+  font-size: 32rpx;
+  font-weight: 950;
+  line-height: 94rpx;
+  text-align: center;
 }
 
 .yd-parent-purpose {

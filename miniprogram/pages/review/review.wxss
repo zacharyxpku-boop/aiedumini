@@ -309,22 +309,22 @@ page {
 
 .review-tool-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 7rpx;
-  margin-top: 10rpx;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14rpx;
+  margin-top: 16rpx;
 }
 
 .review-tool-card {
   display: grid;
   min-width: 0;
-  min-height: 136rpx;
-  align-content: center;
-  gap: 5rpx;
-  padding: 10rpx 6rpx;
+  min-height: 186rpx;
+  align-content: start;
+  gap: 8rpx;
+  padding: 18rpx;
   border: 1rpx solid rgba(226, 235, 222, 0.94);
-  border-radius: 18rpx;
+  border-radius: 24rpx;
   background: #ffffff;
-  box-shadow: none;
+  box-shadow: 0 8rpx 18rpx rgba(38, 58, 43, 0.045);
 }
 
 .review-tool-card.ready {
@@ -388,26 +388,35 @@ page {
 }
 
 .review-tool-icon {
-  justify-self: center;
-  width: 40rpx;
-  height: 40rpx;
-  border-radius: 14rpx;
+  justify-self: start;
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 18rpx;
   color: #ffffff;
   background: #16221d;
-  font-size: 22rpx;
+  font-size: 25rpx;
   font-weight: 950;
-  line-height: 40rpx;
+  line-height: 56rpx;
 }
 
 .review-tool-card text:nth-child(2) {
   color: #17211d;
-  font-size: 21rpx;
+  font-size: 28rpx;
   font-weight: 950;
-  line-height: 1.08;
+  line-height: 1.12;
+  text-align: left;
 }
 
 .review-tool-card text:nth-child(3) {
-  display: none;
+  display: -webkit-box;
+  color: #64706a;
+  font-size: 21rpx;
+  font-weight: 790;
+  line-height: 1.22;
+  text-align: left;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .review-tool-card text:nth-child(4) {
@@ -426,6 +435,7 @@ page {
   font-size: 20rpx;
   font-weight: 900;
   line-height: 1.18;
+  text-align: left;
 }
 
 .review-empty-note {
@@ -449,12 +459,16 @@ page {
 
 .review-live-tool {
   display: grid;
-  gap: 12rpx;
-  margin-top: 10rpx;
-  padding: 14rpx;
-  border: 2rpx solid rgba(76, 159, 255, 0.18);
-  border-radius: 22rpx;
-  background: #eef7ff;
+  gap: 14rpx;
+  margin-top: 12rpx;
+  padding: 18rpx;
+  border: 1rpx solid rgba(255, 138, 76, 0.18);
+  border-radius: 28rpx;
+  background:
+    radial-gradient(circle at 92% 12%, rgba(255, 138, 76, 0.14), transparent 34%),
+    radial-gradient(circle at 8% 90%, rgba(33, 159, 173, 0.12), transparent 38%),
+    #ffffff;
+  box-shadow: 0 14rpx 32rpx rgba(38, 58, 43, 0.06);
 }
 
 .review-live-head {
@@ -480,6 +494,56 @@ page {
   font-size: 20rpx;
   font-weight: 900;
   white-space: nowrap;
+}
+
+.review-game-progress {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10rpx;
+}
+
+.review-game-progress text:first-child {
+  color: #219fad;
+  font-size: 36rpx;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.review-game-progress text:nth-child(2) {
+  flex: 1 1 auto;
+  color: #9aa49f;
+  font-size: 22rpx;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.review-game-progress text:last-child {
+  flex: 0 1 auto;
+  min-width: 0;
+  padding: 7rpx 12rpx;
+  border-radius: 999rpx;
+  color: #1a818e;
+  background: #eaf9fa;
+  font-size: 21rpx;
+  font-weight: 900;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.review-game-bar {
+  height: 12rpx;
+  overflow: hidden;
+  border-radius: 999rpx;
+  background: #f0ebe1;
+}
+
+.review-game-bar view {
+  width: 30%;
+  height: 100%;
+  border-radius: 999rpx;
+  background: linear-gradient(90deg, #21a9b6, #69d0d9);
 }
 
 .review-live-line,
@@ -515,10 +579,10 @@ page {
 .review-live-card {
   display: grid;
   gap: 7rpx;
-  padding: 14rpx;
-  border-radius: 18rpx;
+  padding: 24rpx 20rpx;
+  border-radius: 24rpx;
   background: rgba(255, 255, 255, 0.92);
-  box-shadow: inset 0 0 0 1rpx rgba(76, 159, 255, 0.1);
+  box-shadow: inset 0 0 0 1rpx rgba(255, 138, 76, 0.12);
 }
 
 .review-live-card text {
@@ -535,9 +599,10 @@ page {
 
 .review-live-card text:nth-child(2) {
   color: #16221d;
-  font-size: 25rpx;
+  font-size: 31rpx;
   font-weight: 930;
-  line-height: 1.28;
+  line-height: 1.42;
+  text-align: center;
 }
 
 .review-live-card text:nth-child(3) {
@@ -563,16 +628,16 @@ page {
 
 .review-choice-tile {
   display: flex;
-  min-height: 64rpx;
+  min-height: 86rpx;
   align-items: center;
   justify-content: center;
   padding: 8rpx 10rpx;
   overflow: hidden;
-  border: 1rpx solid rgba(76, 159, 255, 0.14);
-  border-radius: 16rpx;
+  border: 2rpx solid rgba(226, 232, 240, 0.95);
+  border-radius: 22rpx;
   color: #1f4d61;
-  background: #eff8ff;
-  font-size: 21rpx;
+  background: #ffffff;
+  font-size: 24rpx;
   font-weight: 900;
   line-height: 1.18;
   text-align: center;
@@ -654,16 +719,18 @@ page {
 }
 
 .review-live-actions.finish button {
-  min-height: 64rpx;
-  line-height: 64rpx;
-  color: #17211d;
-  background: #f4f7fb;
-  box-shadow: inset 0 0 0 1rpx rgba(76, 159, 255, 0.16);
+  min-height: 76rpx;
+  border-radius: 22rpx;
+  line-height: 76rpx;
+  color: #64748b;
+  background: #ffffff;
+  box-shadow: inset 0 0 0 2rpx rgba(226, 232, 240, 0.95);
 }
 
 .review-live-actions.finish button:last-child {
   color: #ffffff;
-  background: #23679f;
+  background: #ff8a4c;
+  box-shadow: 0 8rpx 18rpx rgba(255, 138, 76, 0.22);
 }
 
 .review-live-actions.grade button {
@@ -859,11 +926,11 @@ page {
 
 .review-main-cta {
   height: 94rpx;
-  margin-top: 10rpx;
-  border-radius: 999rpx;
+  margin-top: 14rpx;
+  border-radius: 28rpx;
   color: #ffffff;
-  background: linear-gradient(180deg, #174c3d 0%, #112d25 100%);
-  box-shadow: 0 8rpx 18rpx rgba(23, 76, 61, 0.14);
+  background: linear-gradient(180deg, #ff8a4c 0%, #f0714d 100%);
+  box-shadow: 0 12rpx 24rpx rgba(255, 138, 76, 0.26);
   font-size: 31rpx;
   font-weight: 950;
   line-height: 94rpx;

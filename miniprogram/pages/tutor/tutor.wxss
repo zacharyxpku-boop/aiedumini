@@ -311,35 +311,49 @@ page {
 
 .tutor-mode-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10rpx;
-  margin-top: 12rpx;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12rpx;
+  margin-top: 14rpx;
 }
 
 .tutor-mode-card {
   display: flex;
   min-width: 0;
-  min-height: 66rpx;
+  min-height: 112rpx;
   align-items: center;
   justify-content: center;
-  padding: 0 10rpx;
-  border: 1rpx solid rgba(34, 185, 92, 0.18);
-  border-radius: 20rpx;
-  color: #13723f;
-  background: #f2fbf1;
+  padding: 12rpx 8rpx;
+  border: 1rpx solid rgba(232, 238, 230, 0.95);
+  border-radius: 22rpx;
+  color: #31423a;
+  background: #ffffff;
   overflow-wrap: break-word;
   word-break: break-word;
   text-align: center;
-  font-size: 22rpx;
+  font-size: 23rpx;
   font-weight: 950;
-  line-height: 1.22;
+  line-height: 1.16;
+  box-shadow: 0 6rpx 14rpx rgba(38, 58, 43, 0.04);
 }
 
-.tutor-mode-card.primary {
-  color: #16221d;
-  background: linear-gradient(180deg, #ffd84f 0%, #f3b51b 100%);
-  border-color: rgba(245, 179, 0, 0.72);
-  box-shadow: 0 6rpx 12rpx rgba(248, 198, 34, 0.12);
+.tutor-mode-card:nth-child(1) {
+  color: #c96a1d;
+  background: #fff7ed;
+}
+
+.tutor-mode-card:nth-child(2) {
+  color: #14854a;
+  background: #f0fdf4;
+}
+
+.tutor-mode-card:nth-child(3) {
+  color: #2376d2;
+  background: #eff6ff;
+}
+
+.tutor-mode-card:nth-child(4) {
+  color: #6d4fd7;
+  background: #f5f3ff;
 }
 
 .tutor-prompt-board {
@@ -357,16 +371,16 @@ page {
 }
 
 .tutor-start-cta {
-  min-height: 72rpx;
-  margin-top: 12rpx;
-  border-radius: 22rpx;
+  min-height: 92rpx;
+  margin-top: 16rpx;
+  border-radius: 28rpx;
   color: #17342b;
   background: linear-gradient(180deg, #ffd84f 0%, #f3b51b 100%);
-  font-size: 27rpx;
+  font-size: 32rpx;
   font-weight: 950;
-  line-height: 72rpx;
+  line-height: 92rpx;
   text-align: center;
-  box-shadow: 0 8rpx 18rpx rgba(248, 198, 34, 0.18);
+  box-shadow: 0 12rpx 24rpx rgba(248, 198, 34, 0.24);
 }
 
 .tutor-section-head text:first-child {
@@ -384,23 +398,55 @@ page {
 .tutor-chat-card {
   display: grid;
   align-content: start;
-  gap: 12rpx;
+  gap: 14rpx;
   flex: 0 0 auto;
-  min-height: 252rpx;
+  min-height: 352rpx;
   max-height: none;
   margin-top: 0;
-  padding: 20rpx;
+  padding: 20rpx 18rpx 18rpx;
   border: 1rpx solid rgba(232, 238, 230, 0.95);
-  border-radius: 24rpx;
+  border-radius: 30rpx;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(247, 251, 243, 0.94));
-  box-shadow: 0 6rpx 14rpx rgba(38, 58, 43, 0.035);
+    radial-gradient(circle at 92% 4%, rgba(255, 216, 79, 0.18), transparent 35%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(247, 251, 243, 0.96));
+  box-shadow: 0 14rpx 30rpx rgba(38, 58, 43, 0.055);
+}
+
+.tutor-chat-head {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12rpx;
 }
 
 .tutor-chat-title {
   color: #18211d;
   font-size: 30rpx;
   font-weight: 950;
+}
+
+.tutor-chat-online,
+.tutor-chat-clock {
+  display: block;
+  color: #18a94f;
+  font-size: 20rpx;
+  font-weight: 900;
+}
+
+.tutor-chat-online {
+  flex: 0 0 auto;
+  padding: 7rpx 12rpx;
+  border-radius: 999rpx;
+  background: #edf9ef;
+}
+
+.tutor-chat-clock {
+  justify-self: center;
+  padding: 7rpx 14rpx;
+  border-radius: 999rpx;
+  color: #8a958f;
+  background: #f2f4ef;
 }
 
 .tutor-service-status {
@@ -435,19 +481,23 @@ page {
 }
 
 .tutor-chat-card .tutor-bubble {
-  max-width: 82%;
-  padding: 12rpx 15rpx;
-  border-radius: 20rpx;
+  max-width: 78%;
+  padding: 16rpx 18rpx;
+  border-radius: 24rpx 24rpx 24rpx 8rpx;
   color: #31423a;
-  background: #f1f7ef;
+  background: #ffffff;
   font-size: 27rpx;
   font-weight: 760;
-  line-height: 1.42;
+  line-height: 1.46;
+  box-shadow: 0 8rpx 18rpx rgba(38, 58, 43, 0.05);
 }
 
 .tutor-chat-card .tutor-bubble.me {
   justify-self: end;
-  background: #eaf3ff;
+  border-radius: 24rpx 24rpx 8rpx 24rpx;
+  color: #ffffff;
+  background: #2aa9b5;
+  box-shadow: 0 10rpx 20rpx rgba(42, 169, 181, 0.16);
 }
 
 .tutor-socratic-brief {
@@ -601,24 +651,25 @@ page {
 
 .tutor-input-bar {
   display: flex;
-  min-height: 86rpx;
+  min-height: 96rpx;
   align-items: center;
   justify-content: space-between;
   gap: 12rpx;
-  padding: 0 8rpx 0 18rpx;
+  margin-top: 4rpx;
+  padding: 0 9rpx 0 22rpx;
   border: 1rpx solid rgba(232, 238, 230, 0.95);
   border-radius: 999rpx;
-  background: #ffffff;
+  background: #f3f0eb;
 }
 
 .tutor-input-bar input {
   flex: 1 1 auto;
   min-width: 0;
-  height: 78rpx;
+  height: 88rpx;
   color: #8a958f;
-  font-size: 24rpx;
+  font-size: 26rpx;
   font-weight: 760;
-  line-height: 78rpx;
+  line-height: 88rpx;
 }
 
 .tutor-feedback-row {
@@ -755,12 +806,14 @@ page {
 
 .tutor-input-bar text {
   flex: 0 0 auto;
-  height: 58rpx;
+  height: 70rpx;
+  min-width: 70rpx;
   padding: 0 18rpx;
   border-radius: 999rpx;
-  color: #1d261f;
-  background: linear-gradient(180deg, #ffd84f 0%, #f5b300 100%);
+  color: #ffffff;
+  background: #ff7a1a;
   font-size: 25rpx;
   font-weight: 950;
-  line-height: 58rpx;
+  line-height: 70rpx;
+  text-align: center;
 }
