@@ -4373,6 +4373,40 @@ Page({
     }
   },
 
+  completeParentActionCard() {
+    if (storage.appendReviewEvent) {
+      storage.appendReviewEvent({
+        kind: 'parent_action_card_completed',
+        source: 'growth_report_action_card',
+        created_at: new Date().toISOString()
+      });
+    }
+    if (storage.recordUnifiedNextAction) {
+      storage.recordUnifiedNextAction({
+        source: 'growth_report_action_card',
+        sourceLabel: '今晚行动卡',
+        actionId: 'parent_action_completed',
+        actionLabel: '明天回看孩子能否说出第一步',
+        route: '/pages/profile/profile?open=preview',
+        reasonLine: '家长已完成今晚行动卡',
+        evidenceLine: '明天只看孩子能否独立说出第一步，不看分数排名'
+      });
+    }
+    wx.showToast({ title: '已记录，明天回看', icon: 'none' });
+    this.setData({ growthActiveScene: 'preview', showLearningQuestionnaire: false });
+  },
+
+  remindParentActionLater() {
+    if (storage.appendReviewEvent) {
+      storage.appendReviewEvent({
+        kind: 'parent_action_card_remind_later',
+        source: 'growth_report_action_card',
+        created_at: new Date().toISOString()
+      });
+    }
+    wx.showToast({ title: '已放到稍后提醒', icon: 'none' });
+  },
+
   recordRealTrialSample(event) {
     const dataset = event.currentTarget.dataset || {};
     const todayFocus = this.data.todayFocus || {};

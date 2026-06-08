@@ -1061,7 +1061,7 @@ page {
 
 .review-live-tool.stage-finished {
   gap: 0;
-  min-height: 690rpx;
+  min-height: 720rpx;
   justify-content: flex-start;
   padding: 0;
 }
@@ -1079,7 +1079,7 @@ page {
 .review-finish-card {
   flex: 1;
   display: grid;
-  gap: 32rpx;
+  gap: 24rpx;
   padding: 0;
   border-radius: 0;
   background: transparent;
@@ -1088,8 +1088,8 @@ page {
 .review-finish-hero {
   display: grid;
   justify-items: center;
-  gap: 14rpx;
-  margin: 16rpx 0 18rpx;
+  gap: 12rpx;
+  margin: 6rpx 0 10rpx;
   text-align: center;
 }
 
@@ -1126,8 +1126,8 @@ page {
 
 .review-finish-section {
   display: grid;
-  gap: 20rpx;
-  padding: 32rpx;
+  gap: 16rpx;
+  padding: 28rpx;
   border: 1rpx solid #eaf3ef;
   border-radius: 24rpx;
   background: #ffffff;
@@ -1157,8 +1157,8 @@ page {
 .review-finish-section.remembered > view:not(:first-child) {
   display: grid;
   grid-template-columns: 34rpx minmax(0, 1fr);
-  gap: 18rpx;
-  padding: 24rpx;
+  gap: 16rpx;
+  padding: 20rpx;
   border: 1rpx solid #eef7f4;
   border-radius: 16rpx;
   background: #f6fbf9;
@@ -1175,8 +1175,8 @@ page {
 .review-finish-section.stuck > text,
 .review-finish-section.tomorrow > view:nth-child(2) text {
   color: #455a64;
-  font-size: 28rpx;
-  line-height: 40rpx;
+  font-size: 26rpx;
+  line-height: 36rpx;
 }
 
 .review-finish-section.stuck {
@@ -1189,7 +1189,7 @@ page {
 
 .review-finish-section.stuck > text {
   position: relative;
-  padding: 28rpx;
+  padding: 22rpx;
   border: 1rpx solid #fdf0eb;
   border-radius: 16rpx;
   background: #fff9f6;
@@ -1213,9 +1213,9 @@ page {
 .review-finish-section.tomorrow > view:nth-child(2) {
   display: grid;
   grid-template-columns: 80rpx minmax(0, 1fr);
-  gap: 20rpx;
+  gap: 18rpx;
   align-items: center;
-  padding: 24rpx;
+  padding: 20rpx;
   border: 1rpx solid #f2f0ea;
   border-radius: 16rpx;
   background: #fcfbf8;
@@ -1236,8 +1236,8 @@ page {
 
 .review-finish-bottom {
   display: grid;
-  gap: 18rpx;
-  padding: 8rpx 0 20rpx;
+  gap: 16rpx;
+  padding: 4rpx 0 20rpx;
 }
 
 .review-finish-bottom button {

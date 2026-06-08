@@ -58,14 +58,7 @@
           <text class="growth-generate-cta" bindtap="generateLearningReport">生成成长报告</text>
         </view>
 
-        <view class="growth-signal-grid" wx:if="{{growthActiveScene === 'preview' || (learningReportSummary && learningReportSummary.reportJobCaseId)}}">
-          <view><text>错题记录</text><text>{{learningReportSummary.uploadedMaterialDecisionDossierChildStrengthLine || '先上传一张真实错题或测评。'}}</text></view>
-          <view><text>卡点线索</text><text>{{learningReportSummary.diagnosisLine || profileViewModel.parentRecap.evidenceRecap}}</text></view>
-          <view><text>举一反三</text><text>{{learningReportSummary.uploadedMaterialDecisionDossierMethodologyGuidePrimary || '用同类变形题继续验证。'}}</text></view>
-          <view><text>今晚建议</text><text>{{profileViewModel.parentRecap.parentOneQuestion}}</text></view>
-        </view>
-
-        <view class="growth-report-preview" wx:if="{{growthActiveScene === 'preview' || (learningReportSummary && learningReportSummary.reportJobCaseId)}}">
+        <view class="growth-report-preview" wx:if="{{growthActiveScene === 'preview'}}">
           <view class="growth-report-preview-head"><text>成长线索初步发现</text><text>{{learningReportSummary.reportJobCaseId ? '初步报告 · 基于材料' : '本地预览'}}</text></view>
           <text class="growth-report-lead">我们从碎片中拼凑出了孩子的学习画像。</text>
           <view class="growth-report-preview-card"><text class="growth-report-corner"></text><view class="growth-report-card-head"><text class="growth-report-icon"></text><view><text>学习偏好线索</text><text><text>视觉型</text><text>来源：基础问卷</text></text></view></view><text class="growth-report-body">{{learningReportSummary.learningPreferenceLine || '孩子对图像、表格的敏感度高于纯文字。建议在讲解抽象概念时，多使用手绘思维导图或实物辅助。'}}</text></view>
@@ -75,19 +68,14 @@
           <view class="growth-report-actions"><text data-action="upload" bindtap="runParentReportAction">补充材料让报告更准</text><text data-action="tutor" bindtap="runParentReportAction">去AI私教</text><text data-action="review" bindtap="runParentReportAction">知识乐园</text></view>
         </view>
 
-        <view class="growth-parent-action-card" wx:if="{{growthActiveScene === 'preview' || growthActiveScene === 'action' || (learningReportSummary && learningReportSummary.reportJobCaseId)}}">
+        <view class="growth-parent-action-card" wx:if="{{growthActiveScene === 'action'}}">
           <view class="growth-parent-action-head"><text>今晚行动指南</text><text>不替孩子学习，只为成长提供更好的土壤。</text></view>
           <view class="growth-parent-action-item"><text></text><view><text><text>建立自信</text><text>预计 2 分钟</text></text><text>正向具体表扬</text><text>“我看到你刚才虽然算错了，但依然耐心地把草稿纸写得很整齐，这种态度很棒。”</text></view></view>
           <view class="growth-parent-action-item warm"><text></text><view><text><text>环境优化</text><text>持续进行</text></text><text>清空桌面非学习用品</text><text>将桌上的玩具、漫画或零食移开。对于视觉型孩子，清爽空间能降低分心。</text></view></view>
           <view class="growth-parent-action-item indigo"><text></text><view><text><text>激发思考</text><text>预计 5 分钟</text></text><text>只问问题，不讲答案</text><text>当孩子求助时，尝试问：“你觉得这一步和上一步的关系是什么？”</text></view></view>
           <text class="growth-action-done">完成勾选后，系统将为您更新明日建议</text>
-          <view class="growth-parent-bottom-actions"><text>我已完成行动</text><text>稍后提醒</text></view>
+          <view class="growth-parent-bottom-actions"><text bindtap="completeParentActionCard">我已完成行动</text><text bindtap="remindParentActionLater">稍后提醒</text></view>
         </view>
-
-        <view class="yd-parent-decision growth" wx:if="{{growthActiveScene === 'preview' || growthActiveScene === 'action' || (learningReportSummary && learningReportSummary.reportJobCaseId)}}" data-scene="parent" data-source="growth_report_card" bindtap="openEntryDetail"><image class="yd-parent-decision-img" mode="aspectFit" src="/assets/reference/family-avatar-group-transparent.png" /><view class="yd-parent-decision-copy"><text>{{profileViewModel.familyDecisionCard.title}}</text><text>{{profileViewModel.familyDecisionCard.parentQuestion}}</text></view><view class="yd-parent-decision-badge">{{profileViewModel.familyDecisionCard.ready ? '可执行' : '待材料'}}</view></view>
-
-        <view class="growth-action-row" wx:if="{{growthActiveScene === 'preview' || growthActiveScene === 'action' || (learningReportSummary && learningReportSummary.reportJobCaseId)}}"><view class="yd-action-primary parent-primary" data-action="upload" bindtap="runParentReportAction">上传材料生成报告</view><view class="yd-action-secondary parent-secondary" data-action="reportPreview" bindtap="runParentReportAction">查看最新报告</view></view>
-        <view class="growth-next-row" wx:if="{{growthActiveScene === 'preview' || growthActiveScene === 'action' || (learningReportSummary && learningReportSummary.reportJobCaseId)}}"><view data-action="tutor" bindtap="runParentReportAction"><image mode="aspectFit" src="/assets/reference/entry-tutor.png" /><text>去AI私教修一个卡点</text></view><view data-action="review" bindtap="runParentReportAction"><image mode="aspectFit" src="/assets/reference/entry-review.png" /><text>去知识乐园练一局</text></view></view>
         <view class="growth-main-cta" wx:if="{{growthActiveScene === 'main'}}" bindtap="startGrowthQuestionnaire">开始了解孩子</view>
       </view>
     </view>
