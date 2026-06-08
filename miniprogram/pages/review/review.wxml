@@ -13,7 +13,7 @@
             <text class="yd-review-sub route-note short">没有错题也能先玩；有错题后会变成你的专属练习。</text>
             <view class="review-chip-row"><text>分数</text><text>应用题</text><text>英语单词</text><text>阅读理解</text><text>计算检查</text><text>表达组织</text></view>
           </view>
-          <text class="review-map-rail"><text></text><text></text><text></text></text>
+          <text class="review-map-rail"><text></text><text></text><text></text><text></text></text>
           <image class="yd-review-art" mode="aspectFit" src="/assets/reference/review-world-map-transparent.png" />
         </view>
 
@@ -61,7 +61,7 @@
             <view class="review-choice-board" wx:elif="{{activeReviewTool.gameType === 'match' && activeReviewTool.tiles && activeReviewTool.tiles.length}}"><text wx:for="{{activeReviewTool.tiles}}" wx:key="id" class="review-choice-tile {{item.selected ? 'selected' : ''}} {{item.matched ? 'matched' : ''}}" data-id="{{item.id}}" bindtap="selectMatchTile">{{item.text}}</text></view>
             <view class="review-choice-board sequence" wx:elif="{{activeReviewTool.gameType === 'snake' && activeReviewTool.currentTrack && activeReviewTool.currentTrack.tiles}}"><text wx:for="{{activeReviewTool.currentTrack.tiles}}" wx:key="id" class="review-choice-tile {{item.picked ? 'selected' : ''}}" data-id="{{item.id}}" bindtap="pickSnakeTile">{{item.text}}</text></view>
             <view class="review-finish-card" wx:if="{{activeReviewTool.attemptSummary}}">
-              <view><text>这一局探索结束啦</text><text>档案袋留下了 {{activeReviewTool.attemptSummary.correct}} 条会的线索，{{activeReviewTool.attemptSummary.wrong}} 条还要回访。</text></view>
+              <view><text>档案袋留下了 {{activeReviewTool.attemptSummary.correct}} 条证据</text><text>这一局探索结束啦，会的线索留下，模糊的地方明天再认认门。</text></view>
               <view><text>记住了什么</text><text>搞定了当前卡片的第一步和关键条件。</text></view>
               <view><text>还卡在哪里</text><text>{{activeReviewTool.repairFocus || '同类变式还需要再认认门。'}}</text></view>
               <view><text>明天回访什么</text><text>{{activeReviewTool.repairFocus || '反义词小连线'}} · 系统已安排，预计 2 分钟</text></view>

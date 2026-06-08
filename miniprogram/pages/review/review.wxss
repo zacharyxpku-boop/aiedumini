@@ -83,10 +83,10 @@ page {
 .yd-review-pill {
   flex: 0 0 auto;
   padding: 12rpx 18rpx;
-  border: 1rpx solid #e5e7eb;
+  border: 1rpx solid #ccfbf1;
   border-radius: 999rpx;
   background: #ffffff;
-  color: #0f766e;
+  color: #0d9488;
   font-size: 22rpx;
   line-height: 28rpx;
   font-weight: 700;
@@ -96,22 +96,24 @@ page {
 .yd-review-hero {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 214rpx;
-  min-height: 246rpx;
-  padding: 28rpx 24rpx 24rpx;
+  grid-template-columns: minmax(0, 1fr) 236rpx;
+  min-height: 318rpx;
+  padding: 34rpx 26rpx 30rpx;
   overflow: hidden;
   border-radius: 0 0 36rpx 36rpx;
-  background: linear-gradient(135deg, #e6f4f1 0%, #ffffff 54%, #fff7ed 100%);
-  box-shadow: 0 18rpx 36rpx rgba(17, 24, 39, 0.07);
+  background:
+    radial-gradient(circle at 84% 10%, rgba(251, 191, 36, 0.42), transparent 26%),
+    linear-gradient(135deg, #e6f4f1 0%, #ffffff 54%, #fff7ed 100%);
+  box-shadow: 0 18rpx 38rpx rgba(17, 24, 39, 0.08);
 }
 
 .yd-review-hero::before {
   content: "";
   position: absolute;
-  left: 42rpx;
-  right: 42rpx;
-  bottom: 42rpx;
-  height: 6rpx;
+  left: 44rpx;
+  right: 88rpx;
+  bottom: 54rpx;
+  height: 8rpx;
   border-radius: 999rpx;
   background: linear-gradient(90deg, rgba(20, 184, 166, 0.18), rgba(245, 158, 11, 0.25));
 }
@@ -121,20 +123,20 @@ page {
   z-index: 1;
   display: flex;
   flex-direction: column;
-  gap: 16rpx;
+  gap: 18rpx;
   min-width: 0;
 }
 
 .yd-review-title {
-  max-width: 360rpx;
+  max-width: 390rpx;
   color: #111827;
-  font-size: 54rpx;
-  line-height: 60rpx;
+  font-size: 58rpx;
+  line-height: 66rpx;
   font-weight: 900;
 }
 
 .yd-review-sub {
-  max-width: 370rpx;
+  max-width: 386rpx;
   color: #4b5563;
   font-size: 25rpx;
   line-height: 36rpx;
@@ -147,20 +149,20 @@ page {
 
 .yd-review-art {
   position: absolute;
-  right: 12rpx;
-  bottom: 2rpx;
-  width: 204rpx;
-  height: 188rpx;
+  right: 4rpx;
+  bottom: 8rpx;
+  width: 236rpx;
+  height: 218rpx;
   object-fit: contain;
 }
 
 .review-map-rail {
   position: absolute;
-  left: 48rpx;
-  right: 210rpx;
-  bottom: 30rpx;
+  left: 50rpx;
+  right: 198rpx;
+  bottom: 42rpx;
   display: grid;
-  grid-template-columns: repeat(3, 28rpx);
+  grid-template-columns: repeat(4, 28rpx);
   justify-content: space-between;
   align-items: center;
   z-index: 2;
@@ -190,7 +192,7 @@ page {
   display: flex;
   flex-wrap: wrap;
   gap: 10rpx;
-  padding-right: 116rpx;
+  padding-right: 96rpx;
 }
 
 .review-chip-row text {
@@ -207,19 +209,19 @@ page {
 .review-main-tool-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18rpx;
+  gap: 20rpx;
 }
 
 .review-main-tool-card {
   display: flex;
-  min-height: 180rpx;
+  min-height: 202rpx;
   box-sizing: border-box;
   flex-direction: column;
   justify-content: space-between;
-  padding: 22rpx;
-  border-radius: 22rpx;
+  padding: 24rpx;
+  border-radius: 26rpx;
   background: #ffffff;
-  box-shadow: 0 12rpx 28rpx rgba(17, 24, 39, 0.07);
+  box-shadow: 0 14rpx 30rpx rgba(17, 24, 39, 0.075);
 }
 
 .review-main-tool-card text {
@@ -239,8 +241,8 @@ page {
 
 .review-main-tool-card text:nth-child(2) {
   color: #111827;
-  font-size: 31rpx;
-  line-height: 36rpx;
+  font-size: 34rpx;
+  line-height: 40rpx;
   font-weight: 900;
 }
 
@@ -285,9 +287,9 @@ page {
 .review-record-panel {
   display: flex;
   flex-direction: column;
-  gap: 20rpx;
-  padding: 22rpx;
-  border-radius: 24rpx;
+  gap: 22rpx;
+  padding: 24rpx;
+  border-radius: 28rpx;
 }
 
 .review-section-head {
@@ -347,9 +349,9 @@ page {
 
 .review-topic-card {
   display: block;
-  min-height: 150rpx;
+  min-height: 166rpx;
   box-sizing: border-box;
-  padding: 18rpx;
+  padding: 20rpx;
   border: 2rpx solid #f0ebe1;
   border-radius: 20rpx;
   background: #fff9f5;
@@ -388,8 +390,10 @@ page {
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 8rpx 14rpx;
   align-items: center;
-  padding: 22rpx;
-  background: linear-gradient(135deg, #fff5f0, #e8fafa);
+  padding: 26rpx;
+  background:
+    radial-gradient(circle at 92% 12%, rgba(20, 184, 166, 0.18), transparent 28%),
+    linear-gradient(135deg, #fff5f0, #e8fafa);
   box-shadow: 0 10rpx 26rpx rgba(255, 125, 64, 0.12);
 }
 
@@ -441,11 +445,11 @@ page {
 .review-tool-card {
   display: grid;
   gap: 8rpx;
-  min-height: 238rpx;
+  min-height: 256rpx;
   box-sizing: border-box;
   padding: 20rpx;
   border: 2rpx solid #f0f0ef;
-  border-radius: 22rpx;
+  border-radius: 26rpx;
   background: #ffffff;
   box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.035);
 }
@@ -504,9 +508,9 @@ page {
 }
 
 .review-live-tool.stage-live {
-  min-height: 520rpx;
+  min-height: 620rpx;
   justify-content: center;
-  padding: 28rpx 0;
+  padding: 34rpx 0;
 }
 
 .review-live-head {
@@ -576,11 +580,11 @@ page {
 
 .review-live-reference {
   display: grid;
-  gap: 16rpx;
-  padding: 34rpx 28rpx;
+  gap: 18rpx;
+  padding: 48rpx 32rpx;
   text-align: center;
   background: #ffffff;
-  box-shadow: 0 12rpx 32rpx rgba(0, 0, 0, 0.04);
+  box-shadow: 0 18rpx 38rpx rgba(0, 0, 0, 0.055);
 }
 
 .review-live-reference text:first-child {
@@ -592,8 +596,8 @@ page {
 
 .review-live-reference text:nth-child(2) {
   color: #2d3748;
-  font-size: 42rpx;
-  line-height: 54rpx;
+  font-size: 48rpx;
+  line-height: 60rpx;
   font-weight: 900;
 }
 
@@ -648,7 +652,7 @@ page {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 78rpx;
+  min-height: 88rpx;
   padding: 12rpx;
   border: 2rpx solid #e5e7eb;
   border-radius: 18rpx;
@@ -681,13 +685,13 @@ page {
 }
 
 .review-live-actions button {
-  height: 86rpx;
+  height: 92rpx;
   padding: 0;
   border-radius: 18rpx;
   background: #ffffff;
   color: #374151;
   font-size: 24rpx;
-  line-height: 76rpx;
+  line-height: 82rpx;
   font-weight: 800;
   box-shadow: none;
 }
@@ -699,7 +703,9 @@ page {
 }
 
 .review-live-tool.stage-finished {
-  gap: 18rpx;
+  gap: 22rpx;
+  min-height: 620rpx;
+  justify-content: center;
 }
 
 .review-live-tool.stage-finished .review-live-head,
@@ -717,24 +723,24 @@ page {
   content: "这一局探索结束啦";
   display: block;
   color: #2c3e50;
-  font-size: 56rpx;
-  line-height: 64rpx;
+  font-size: 60rpx;
+  line-height: 68rpx;
   font-weight: 900;
   text-align: center;
 }
 
 .review-finish-card {
   display: grid;
-  gap: 14rpx;
-  padding: 18rpx;
+  gap: 16rpx;
+  padding: 20rpx;
   background: #f6fbf9;
 }
 
 .review-finish-card view {
   display: grid;
   gap: 6rpx;
-  padding: 20rpx;
-  border-radius: 20rpx;
+  padding: 22rpx;
+  border-radius: 22rpx;
   background: #ffffff;
   box-shadow: 0 4rpx 18rpx rgba(40, 150, 137, 0.05);
 }
