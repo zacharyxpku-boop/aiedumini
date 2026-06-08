@@ -1305,18 +1305,20 @@ page {
 }
 
 .tutor-reference-panel.pointing .tutor-pointing-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16rpx;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14rpx;
 }
 
 .tutor-reference-panel.pointing .tutor-pointing-grid text {
-  min-height: 126rpx;
+  min-height: 152rpx;
+  padding: 22rpx 14rpx;
   border: 2rpx solid transparent;
   border-radius: 28rpx;
   background: #ffffff;
   box-shadow: 0 8rpx 22rpx rgba(15, 23, 42, 0.05);
   color: #1f2933 !important;
   font-size: 27rpx !important;
+  line-height: 1.22;
 }
 
 .tutor-reference-panel.stuck .tutor-dialogue-card {
