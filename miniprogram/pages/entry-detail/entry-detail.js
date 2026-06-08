@@ -30,6 +30,17 @@ const SCENES = {
         '材料不足时只提示补什么，不硬下结论。',
         '上传后直接进入成长报告。'
       ]
+    },
+    reference: {
+      type: 'upload',
+      title: '收集线索碎片 🧩',
+      subtitle: '材料越真实，建议越具体。',
+      items: [
+        { title: '错题描述', line: '记录孩子常卡住的题型', icon: '/assets/reference/upload-folder-stack-transparent.png' },
+        { title: '成绩/周测', line: '支持拍照识别', icon: '/assets/reference/report-radar-card-illustration.png' },
+        { title: '老师反馈', line: '聊天截图/评语', icon: '/assets/reference/tutor-socratic-board-transparent.png' },
+        { title: '家长观察', line: '随意写几句现状', icon: '/assets/reference/family-avatar-group-transparent.png' }
+      ]
     }
   },
   report: {
@@ -60,6 +71,16 @@ const SCENES = {
         '先把测评、成绩、错题和家长观察分开看。',
         '只把互相支持的信号写进结论，弱证据进入待补充。',
         '每个建议都必须落到可观察、可复查的一步。'
+      ]
+    },
+    reference: {
+      type: 'report',
+      title: '成长线索初步发现 ✨',
+      subtitle: '我们从碎片中拼凑孩子的学习画像',
+      items: [
+        { title: '学习偏好线索 · 视觉型', line: '来源：基础问卷。孩子对图像、表格的敏感度更高。' },
+        { title: '当前卡点证据 · 计算粗心', line: '来源：错题描述。先看最后一步进位和工作记忆负担。', theme: 'warn' },
+        { title: '今晚建议 · 先练口算10分钟', line: '来源：AI私教。正式作业前先做短热身。', theme: 'action' }
       ]
     }
   },
@@ -92,6 +113,21 @@ const SCENES = {
         '只给最小提示：条件、依据、反例三选一。',
         '对话结束后生成回访卡，避免一次讲完就忘。'
       ]
+    },
+    reference: {
+      type: 'tutor',
+      title: '题目点拨',
+      subtitle: '把题目发来，咕点只问第一步',
+      items: [
+        { title: '看懂题意' },
+        { title: '理清条件' },
+        { title: '找准问题' },
+        { title: '找第一步' },
+        { title: '毫无头绪' },
+        { title: '找突破口' },
+        { title: '检查错因' },
+        { title: '定位错因' }
+      ]
     }
   },
   review: {
@@ -122,6 +158,17 @@ const SCENES = {
         '回访不是刷题，而是验证昨天那一步还记不记得。',
         '换一道同类题，看孩子能不能自己启动。',
         '只把错因和可迁移动作回流给报告和家长。'
+      ]
+    },
+    reference: {
+      type: 'review',
+      title: '今天想练哪一块？',
+      subtitle: '选个知识点，马上开局探索',
+      items: [
+        { title: '小数乘法', line: '消除易错点 · 约 10 分钟' },
+        { title: '认识分数', line: '色彩涂涂 · 约 15 分钟' },
+        { title: '面积计算', line: '拼图解谜 · 约 12 分钟' },
+        { title: '混合运算', line: '极速速算 · 约 5 分钟' }
       ]
     }
   },
@@ -154,10 +201,32 @@ const SCENES = {
         '记录孩子说出的第一步和卡住原因。',
         '明天用同类小题回忆，不翻旧账。'
       ]
+    },
+    reference: {
+      type: 'parent',
+      title: '今晚行动已为你准备好 🎯',
+      subtitle: '不替孩子学习，只提供更好的土壤',
+      items: [
+        { title: '建立自信 · 预计 2 分钟', line: '正向具体表扬孩子留下的努力证据。' },
+        { title: '环境优化 · 持续进行', line: '清空桌面非学习用品，减少分心。' },
+        { title: '激发思考 · 预计 5 分钟', line: '只问问题，不讲答案。' }
+      ]
     }
   }
 };
 
+Object.keys(SCENES).forEach((key) => {
+  const spotlight = SCENES[key].spotlight;
+  if (!spotlight) return;
+  const metrics = spotlight.metrics || [];
+  const points = spotlight.points || [];
+  spotlight.metricOne = metrics[0] || { label: '', value: '' };
+  spotlight.metricTwo = metrics[1] || { label: '', value: '' };
+  spotlight.metricThree = metrics[2] || { label: '', value: '' };
+  spotlight.pointOne = points[0] || '';
+  spotlight.pointTwo = points[1] || '';
+  spotlight.pointThree = points[2] || '';
+});
 
 Page({
   data: {

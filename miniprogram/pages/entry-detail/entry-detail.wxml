@@ -1,22 +1,15 @@
 <view class="entry-detail-page">
   <view class="entry-detail-top">
     <view class="entry-back" bindtap="goBack">‹</view>
-    <view class="entry-brand">
-      <image mode="aspectFit" src="/assets/reference/brand-house.png" />
-      <text>原点智学</text>
-    </view>
+    <view class="entry-brand"><image mode="aspectFit" src="/assets/reference/brand-house.png" /><text>原点智学</text></view>
   </view>
 
   <view class="entry-detail-hero scene-{{sceneKey}}">
     <view>
-      <view class="entry-badge">{{scene.badge}}</view>
-      <view class="entry-title">{{scene.title}}</view>
-      <view class="entry-subtitle">{{scene.subtitle}}</view>
-      <view class="entry-mini-path">
-        <text>看证据</text>
-        <text>去执行</text>
-        <text>留记录</text>
-      </view>
+      <text class="entry-badge">{{scene.badge}}</text>
+      <text class="entry-title">{{scene.title}}</text>
+      <text class="entry-subtitle">{{scene.subtitle}}</text>
+      <view class="entry-mini-path"><text>看证据</text><text>做一步</text><text>回看结果</text></view>
     </view>
     <image class="entry-image" mode="aspectFit" src="{{scene.heroImage}}" />
   </view>
@@ -38,27 +31,35 @@
   </view>
 
   <view class="entry-actions">
-    <view class="entry-primary" bindtap="goPrimary">{{scene.primaryLabel}}</view>
-    <view class="entry-secondary" bindtap="goSecondary">{{scene.secondaryLabel}}</view>
+    <text class="entry-primary" bindtap="goPrimary">{{scene.primaryLabel}}</text>
+    <text class="entry-secondary" bindtap="goSecondary">{{scene.secondaryLabel}}</text>
+  </view>
+
+  <view class="entry-reference-panel type-{{scene.reference.type}}" wx:if="{{scene.reference}}">
+    <view class="entry-reference-title"><text>{{scene.reference.title}}</text><text>{{scene.reference.subtitle}}</text></view>
+    <view class="entry-reference-grid" wx:if="{{scene.reference.type === 'upload' || scene.reference.type === 'review' || scene.reference.type === 'tutor'}}">
+      <view wx:for="{{scene.reference.items}}" wx:key="title" class="entry-reference-item"><image wx:if="{{item.icon}}" mode="aspectFit" src="{{item.icon}}" /><text>{{item.title}}</text><text>{{item.line}}</text></view>
+    </view>
+    <view class="entry-reference-list" wx:else>
+      <view wx:for="{{scene.reference.items}}" wx:key="title" class="{{item.theme || ''}}"><text></text><text>{{item.title}}</text><text>{{item.line}}</text></view>
+    </view>
   </view>
 
   <view class="entry-spotlight scene-{{sceneKey}}" wx:if="{{scene.spotlight}}">
     <view class="entry-spotlight-main">
-      <view class="entry-spotlight-kicker">{{scene.spotlight.kicker}}</view>
-      <view class="entry-spotlight-title">{{scene.spotlight.title}}</view>
+      <text class="entry-spotlight-kicker">{{scene.spotlight.kicker}}</text>
+      <text class="entry-spotlight-title">{{scene.spotlight.title}}</text>
       <view class="entry-spotlight-metrics">
-        <view wx:for="{{scene.spotlight.metrics}}" wx:key="label">
-          <text>{{item.label}}</text>
-          <text>{{item.value}}</text>
-        </view>
+        <view><text>{{scene.spotlight.metricOne.label}}</text><text>{{scene.spotlight.metricOne.value}}</text></view>
+        <view><text>{{scene.spotlight.metricTwo.label}}</text><text>{{scene.spotlight.metricTwo.value}}</text></view>
+        <view><text>{{scene.spotlight.metricThree.label}}</text><text>{{scene.spotlight.metricThree.value}}</text></view>
       </view>
     </view>
     <image class="entry-spotlight-image" mode="aspectFit" src="{{scene.spotlight.image}}" />
     <view class="entry-spotlight-points">
-      <view wx:for="{{scene.spotlight.points}}" wx:key="*this">
-        <text></text>
-        <text>{{item}}</text>
-      </view>
+      <view><text></text><text>{{scene.spotlight.pointOne}}</text></view>
+      <view><text></text><text>{{scene.spotlight.pointTwo}}</text></view>
+      <view><text></text><text>{{scene.spotlight.pointThree}}</text></view>
     </view>
   </view>
 </view>
