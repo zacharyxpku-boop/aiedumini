@@ -1,63 +1,87 @@
 <view class="tutor-page safe-bottom">
   <scroll-view class="tutor-main" scroll-y enhanced show-scrollbar="{{false}}">
-      <view class="main-inner">
-        <view class="yd-tutor-screen yd-app-screen yd-tutor-app">
-          <view class="yd-tutor-top"><view class="yd-tutor-brand"><image class="yd-tutor-mark" mode="aspectFit" src="/assets/reference/brand-house.png" /><text class="yd-tutor-brand-lines"><text>原点 · 咕点 AI私教</text><text>先问第一步 不代写答案</text></text></view><text class="yd-tutor-pill">不代写</text></view>
-          <view class="yd-tutor-hero"><image class="yd-tutor-mascot" mode="aspectFit" src="/assets/reference/tutor-socratic-board-transparent.png" /><view class="yd-tutor-bubble"><text class="yd-tutor-bubble-title">和咕点聊聊</text><text>可以直接聊天、问知识点、说卡住了、发题目；咕点会追问第一步，不代写答案。</text></view></view>
-          <text class="tutor-care-line"><text>把题目、卡点发给 AI私教</text><text>只追下一小步</text></text>
-          <view class="tutor-chat-card">
-            <view class="tutor-chat-head"><text class="tutor-chat-title">AI私教在线</text><text class="tutor-chat-online">咕点在线</text></view>
-            <text class="tutor-chat-clock">今天 15:30 · 正在陪你想第一步</text>
-            <view class="tutor-service-status" wx:if="{{tutorServiceStatus && tutorServiceStatus.visible}}"><text>{{tutorServiceStatus.label}}</text><text>{{tutorServiceStatus.line}}</text></view>
-            <block wx:if="{{messages && messages.length}}"><block wx:for="{{messages}}" wx:key="index"><view class="tutor-bubble {{item.role === 'user' ? 'me' : ''}}">{{item.text}}</view></block></block>
-            <block wx:else><view class="tutor-bubble">先告诉我：你现在是看不懂题、不会第一步，还是心里有点急？</view></block>
-            <view class="tutor-thinking-line" wx:if="{{loading}}">咕点正在思考你的第一步...</view>
-            <view class="tutor-input-bar"><input value="{{input}}" bindinput="onInput" bindconfirm="send" confirm-type="send" placeholder="写题目、卡点或第一步" /><text bindtap="send">发送</text></view>
+    <view class="main-inner">
+      <view class="yd-tutor-screen yd-app-screen yd-tutor-app">
+        <view class="yd-tutor-top">
+          <view class="yd-tutor-brand"><image class="yd-tutor-mark" mode="aspectFit" src="/assets/reference/brand-house.png" /><text class="yd-tutor-brand-lines"><text>原点 · 咕点 AI私教</text><text>先问第一步 不代写答案</text></text></view>
+          <text class="yd-tutor-pill">AI私教</text>
+        </view>
+
+        <view class="yd-tutor-hero" wx:if="{{!showTutorDetails}}" data-reference="先变乘号，再翻个底朝天">
+          <image class="yd-tutor-mascot" mode="aspectFit" src="/assets/reference/tutor-socratic-board-transparent.png" />
+          <text class="yd-tutor-bubble"><text class="yd-tutor-bubble-title">和咕点聊聊</text><text>可以直接聊天、问知识点、说卡住了、发题目；咕点会追问第一步，不代写答案。</text></text>
+        </view>
+        <text class="tutor-care-line"><text>把题目、卡点发给 AI私教</text><text>只追下一小步</text></text>
+
+        <view class="tutor-chat-card">
+          <view class="tutor-chat-head"><text class="tutor-chat-title">AI私教在线</text><text class="tutor-chat-online">今天 15:30</text></view>
+          <text class="tutor-chat-clock">正在陪你想第一步</text>
+          <view class="tutor-service-status" wx:if="{{tutorServiceStatus && tutorServiceStatus.visible}}"><text>{{tutorServiceStatus.label}}</text><text>{{tutorServiceStatus.line}}</text></view>
+          <block wx:if="{{messages && messages.length}}"><block wx:for="{{messages}}" wx:key="index"><view class="tutor-bubble {{item.role === 'user' ? 'me' : ''}}">{{item.text}}</view></block></block>
+          <block wx:else><view class="tutor-bubble">先告诉我：你现在是看不懂题、不会第一步，还是心里有点急？</view></block>
+          <view class="tutor-thinking-line" wx:if="{{loading}}">咕点正在思考你的第一步...</view>
+          <view class="tutor-input-bar"><input value="{{input}}" bindinput="onInput" bindconfirm="send" confirm-type="send" placeholder="写题目、卡点或第一步" /><text bindtap="send">发送</text></view>
+        </view>
+
+        <view class="tutor-socratic-panel" wx:if="{{!showTutorDetails}}">
+          <text class="tutor-section-head"><text>也可以直接开始</text><text>选一种问法</text></text>
+          <view class="tutor-mode-grid">
+            <text class="tutor-mode-card" data-step="read_problem" bindtap="launchFirstStep">问知识点</text>
+            <text class="tutor-mode-card" data-step="explain_misconception" bindtap="launchFirstStep">我听不懂</text>
+            <text class="tutor-mode-card" data-step="find_direction" bindtap="launchFirstStep">题目点拨</text>
+            <text class="tutor-mode-card" data-step="review" bindtap="launchFirstStep">学了什么</text>
           </view>
-          <view class="tutor-socratic-panel">
-            <text class="tutor-section-head"><text>也可以直接开始</text><text>选一种问法</text></text>
-            <view class="tutor-mode-grid">
-              <text class="tutor-mode-card" data-step="read_problem" bindtap="launchFirstStep">问知识点</text>
-              <text class="tutor-mode-card" data-step="explain_misconception" bindtap="launchFirstStep">我听不懂</text>
-              <text class="tutor-mode-card" data-step="find_direction" bindtap="launchFirstStep">题目点拨</text>
-              <text class="tutor-mode-card" data-step="review" bindtap="launchFirstStep">学了什么</text>
+          <text class="tutor-prompt-board">先发一句话，我帮你切小问题 · 已有 2,451 位同学今天和咕点聊过</text>
+          <view class="tutor-start-cta" data-step="write_first_step" bindtap="launchFirstStep">开始问咕点</view>
+        </view>
+
+        <view class="tutor-reference-panel {{activeTutorScene}}" wx:if="{{showTutorDetails}}">
+          <text class="tutor-reference-head"><text>{{tutorReferenceScene.title}}</text><text>{{tutorReferenceScene.status}}</text></text>
+
+          <block wx:if="{{activeTutorScene === 'dialogue'}}">
+            <view class="tutor-dialogue-card">
+              <text wx:if="{{tutorReferenceScene.row0}}" class="{{tutorReferenceScene.row0.role === 'user' ? 'tutor-dialogue-user' : ''}}">{{tutorReferenceScene.row0.text}}</text>
+              <text wx:if="{{tutorReferenceScene.row1}}" class="{{tutorReferenceScene.row1.role === 'user' ? 'tutor-dialogue-user' : ''}}">{{tutorReferenceScene.row1.text}}</text>
+              <text wx:if="{{tutorReferenceScene.row2}}" class="{{tutorReferenceScene.row2.role === 'user' ? 'tutor-dialogue-user' : ''}}">{{tutorReferenceScene.row2.text}}</text>
+              <text wx:if="{{tutorReferenceScene.row3}}" class="{{tutorReferenceScene.row3.role === 'user' ? 'tutor-dialogue-user' : ''}}">{{tutorReferenceScene.row3.text}}</text>
+              <text wx:if="{{tutorReferenceScene.row4}}" class="{{tutorReferenceScene.row4.role === 'user' ? 'tutor-dialogue-user' : ''}}">{{tutorReferenceScene.row4.text}}</text>
             </view>
-            <text class="tutor-prompt-board">先发一句话，我帮你切小问题 · 已有 2,451 位同学今天和咕点聊过</text>
-            <view class="tutor-start-cta" data-step="write_first_step" bindtap="launchFirstStep">开始问咕点</view>
+            <view class="tutor-dialogue-actions"><text wx:if="{{tutorReferenceScene.action0}}" data-action="{{tutorReferenceScene.action0.action}}" data-step="{{tutorReferenceScene.action0.step}}" bindtap="runTutorReferenceAction">{{tutorReferenceScene.action0.label}}</text><text wx:if="{{tutorReferenceScene.action1}}" data-action="{{tutorReferenceScene.action1.action}}" data-step="{{tutorReferenceScene.action1.step}}" bindtap="runTutorReferenceAction">{{tutorReferenceScene.action1.label}}</text></view>
+          </block>
+
+          <view class="tutor-knowledge-board" wx:elif="{{activeTutorScene === 'knowledge'}}">
+            <text class="tutor-knowledge-subject">{{tutorReferenceScene.row0.text}}</text>
+            <text class="tutor-knowledge-title">{{tutorReferenceScene.row1.text}}</text>
+            <view class="tutor-blackboard"><text>{{tutorReferenceScene.row2.text}}</text><text>{{tutorReferenceScene.row3.text}}</text><text>{{tutorReferenceScene.row4.text}}</text><text>{{tutorReferenceScene.row5.text}}</text></view>
+            <view class="tutor-dialogue-actions"><text data-action="{{tutorReferenceScene.action0.action}}" data-step="{{tutorReferenceScene.action0.step}}" bindtap="runTutorReferenceAction">{{tutorReferenceScene.action0.label}}</text><text data-action="{{tutorReferenceScene.action1.action}}" data-step="{{tutorReferenceScene.action1.step}}" bindtap="runTutorReferenceAction">{{tutorReferenceScene.action1.label}}</text></view>
           </view>
-          <view class="tutor-reference-panel {{activeTutorScene}}" wx:if="{{showTutorDetails}}">
-            <view class="tutor-reference-head"><text>{{tutorReferenceScene.title}}</text><text>{{tutorReferenceScene.status}}</text></view>
-            <view class="tutor-stuck-panel" wx:if="{{activeTutorScene === 'stuck'}}">
-              <text class="tutor-stuck-lead">{{tutorReferenceScene.row0.text}}</text>
-              <text class="tutor-stuck-question">{{tutorReferenceScene.row1.text}}</text>
-              <view class="tutor-stuck-action-grid"><text class="tutor-stuck-action-card" data-action="{{tutorReferenceScene.action0.action}}" data-step="{{tutorReferenceScene.action0.step}}" bindtap="runTutorReferenceAction"><text>{{tutorReferenceScene.action0.label}}</text><text>{{tutorReferenceScene.action0.line}}</text></text><text class="tutor-stuck-action-card" data-action="{{tutorReferenceScene.action1.action}}" data-step="{{tutorReferenceScene.action1.step}}" bindtap="runTutorReferenceAction"><text>{{tutorReferenceScene.action1.label}}</text><text>{{tutorReferenceScene.action1.line}}</text></text></view>
-              <view class="tutor-stuck-journal"><text>{{tutorReferenceScene.row3.text}}</text><text>{{tutorReferenceScene.row4.text}}</text><text>{{tutorReferenceScene.row5.text}}</text></view>
-              <view class="tutor-stuck-footer"><text data-action="{{tutorReferenceScene.action2.action}}" data-step="{{tutorReferenceScene.action2.step}}" bindtap="runTutorReferenceAction">{{tutorReferenceScene.action2.label}}</text><text data-action="{{tutorReferenceScene.action3.action}}" data-step="{{tutorReferenceScene.action3.step}}" bindtap="runTutorReferenceAction">{{tutorReferenceScene.action3.label}}</text></view>
+
+          <view class="tutor-pointing-panel" wx:elif="{{activeTutorScene === 'pointing'}}">
+            <text class="tutor-pointing-lead"><text>题目点拨</text><text>把题目发来，咕点只问第一步。</text><text>看懂题意 · 找突破口 · 定位错因</text><text>拍题 · 自动保存 · 安全摘要</text></text>
+            <view class="tutor-pointing-grid">
+              <text wx:for="{{tutorReferenceScene.modes}}" wx:key="*this" data-action="step" data-step="{{item === '看懂题意' ? 'read_problem' : item === '理清条件' ? 'find_conditions' : item === '找第一步' ? 'write_first_step' : item === '检查错因' || item === '算错不对' || item === '定位错因' ? 'explain_misconception' : 'find_direction'}}" bindtap="runTutorReferenceAction">{{item}}</text>
             </view>
-            <view class="tutor-dialogue-card" wx:if="{{activeTutorScene !== 'stuck'}}" data-contract="先变乘号，再翻个底朝天｜题目点拨｜找突破口｜还是卡住｜刚才的思考小记">
-              <text wx:if="{{tutorReferenceScene.row0}}" class="{{tutorReferenceScene.row0.role === 'user' ? 'tutor-dialogue-user' : ''}}">{{tutorReferenceScene.row0.text}}</text><text wx:if="{{tutorReferenceScene.row1}}" class="{{tutorReferenceScene.row1.role === 'user' ? 'tutor-dialogue-user' : ''}}">{{tutorReferenceScene.row1.text}}</text>
-              <text wx:if="{{tutorReferenceScene.row2}}" class="{{tutorReferenceScene.row2.role === 'user' ? 'tutor-dialogue-user' : ''}}">{{tutorReferenceScene.row2.text}}</text><text wx:if="{{tutorReferenceScene.row3}}" class="{{tutorReferenceScene.row3.role === 'user' ? 'tutor-dialogue-user' : ''}}">{{tutorReferenceScene.row3.text}}</text>
-              <text wx:if="{{tutorReferenceScene.row4}}" class="{{tutorReferenceScene.row4.role === 'user' ? 'tutor-dialogue-user' : ''}}">{{tutorReferenceScene.row4.text}}</text><text wx:if="{{tutorReferenceScene.row5}}" class="{{tutorReferenceScene.row5.role === 'user' ? 'tutor-dialogue-user' : ''}}">{{tutorReferenceScene.row5.text}}</text>
-              <view class="tutor-pointing-grid" wx:if="{{tutorReferenceScene.modes && tutorReferenceScene.modes.length}}">
-                <text wx:for="{{tutorReferenceScene.modes}}" wx:key="*this" data-action="step" data-step="{{item === '看懂题意' ? 'read_problem' : item === '理清条件' ? 'find_conditions' : item === '找第一步' ? 'write_first_step' : item === '检查错因' || item === '算错不对' || item === '定位错因' ? 'explain_misconception' : 'find_direction'}}" bindtap="runTutorReferenceAction">{{item}}</text>
-              </view>
-              <text class="tutor-dialogue-actions"><text wx:if="{{tutorReferenceScene.action0}}" data-action="{{tutorReferenceScene.action0.action}}" data-step="{{tutorReferenceScene.action0.step}}" bindtap="runTutorReferenceAction">{{tutorReferenceScene.action0.label}}</text><text wx:if="{{tutorReferenceScene.action1}}" data-action="{{tutorReferenceScene.action1.action}}" data-step="{{tutorReferenceScene.action1.step}}" bindtap="runTutorReferenceAction">{{tutorReferenceScene.action1.label}}</text><text wx:if="{{tutorReferenceScene.action2}}" data-action="{{tutorReferenceScene.action2.action}}" data-step="{{tutorReferenceScene.action2.step}}" bindtap="runTutorReferenceAction">{{tutorReferenceScene.action2.label}}</text><text wx:if="{{tutorReferenceScene.action3}}" data-action="{{tutorReferenceScene.action3.action}}" data-step="{{tutorReferenceScene.action3.step}}" bindtap="runTutorReferenceAction">{{tutorReferenceScene.action3.label}}</text></text>
-            </view>
+            <view class="tutor-start-cta" data-step="find_direction" bindtap="launchFirstStep">开始点拨</view>
           </view>
-          <view class="tutor-result-stack" wx:if="{{showTutorDetails || socraticBrief || tutorDiagnosticCard || socraticMicroChoices.length || socraticFeedbackNextAction || miniLessonFeedbackBridge}}">
-            <view class="tutor-socratic-brief" wx:if="{{socraticBrief}}">
-              <text class="tutor-brief-head"><text>{{socraticBrief.label}}</text><text>{{socraticBrief.title}}</text></text>
-              <text class="tutor-brief-question">{{socraticBrief.nextQuestion}}</text>
-              <view class="tutor-brief-steps"><text class="tutor-brief-step">{{socraticBrief.steps[0].label}}：{{socraticBrief.steps[0].text}}</text><text class="tutor-brief-step">{{socraticBrief.steps[1].label}}：{{socraticBrief.steps[1].text}}</text><text class="tutor-brief-step">{{socraticBrief.steps[2].label}}：{{socraticBrief.steps[2].text}}</text></view>
-              <text class="tutor-brief-actions"><text>{{socraticBrief.boundary}}</text><text bindtap="requestSmallerTutorPrompt">再问小一点</text><text bindtap="goSocraticBriefRoute">{{socraticBrief.routeLabel}}</text></text>
-            </view>
-            <text class="tutor-diagnostic-card" wx:if="{{tutorDiagnosticCard}}"><text>{{tutorDiagnosticCard.title}}</text><text>卡点：{{tutorDiagnosticCard.issue}}</text><text>下一步：{{tutorDiagnosticCard.firstStep}}</text><text>家长问：{{tutorDiagnosticCard.parentCheck}}</text><text class="tutor-diagnostic-action primary" data-id="diagnosis_review" data-label="{{tutorDiagnosticCard.reviewMove}}" data-route="{{tutorDiagnosticCard.reviewRoute}}" data-evidence="tutor_diagnostic_card" bindtap="runTutorHandoffAction">去知识乐园验证</text><text class="tutor-diagnostic-action" data-id="diagnosis_parent" data-label="{{tutorDiagnosticCard.parentCheck}}" data-route="{{tutorDiagnosticCard.parentRoute}}" data-evidence="tutor_diagnostic_parent_check" bindtap="runTutorHandoffAction">给家长看证据</text></text>
-            <view class="tutor-micro-choice-row" wx:if="{{socraticMicroChoices && socraticMicroChoices.length}}"><text data-id="{{socraticMicroChoices[0].id}}" data-index="0" bindtap="selectSocraticMicroChoice">{{socraticMicroChoices[0].label}} {{socraticMicroChoices[0].text}}</text><text data-id="{{socraticMicroChoices[1].id}}" data-index="1" bindtap="selectSocraticMicroChoice">{{socraticMicroChoices[1].label}} {{socraticMicroChoices[1].text}}</text></view>
-            <view class="tutor-feedback-row" wx:if="{{hasUserTutorTurn}}"><text class="tutor-feedback-good" data-status="first_step_spoken" bindtap="recordSocraticEffectivenessFeedback">我说出第一步了</text><text class="tutor-feedback-stuck" data-status="still_blocked" bindtap="recordSocraticEffectivenessFeedback">还是卡住</text></view>
-            <text class="tutor-feedback-note" wx:if="{{socraticFeedbackNextAction}}">{{socraticFeedbackNextAction}}</text>
-            <view class="tutor-bridge-card" wx:if="{{miniLessonFeedbackBridge && miniLessonFeedbackBridge.nextAction}}"><text class="tutor-bridge-head"><text>补一张证据</text><text>{{miniLessonFeedbackBridge.nextAction}}</text></text><text>{{miniLessonFeedbackBridge.type === 'evidence_review_required' ? '只留 A/B 小黑板证据，回知识乐园复测。' : '转成 3 分钟小讲堂，做完回知识乐园。'}}</text><text class="tutor-bridge-action" data-id="mini_lesson_bridge" data-label="{{miniLessonFeedbackBridge.nextAction}}" data-route="{{miniLessonFeedbackBridge.route}}" data-evidence="still_blocked_feedback" bindtap="runTutorHandoffAction">继续</text></view>
+
+          <view class="tutor-stuck-panel" wx:elif="{{activeTutorScene === 'stuck'}}" data-reference="刚才的思考小记">
+            <text class="tutor-stuck-lead">{{tutorReferenceScene.row0.text}}</text>
+            <text class="tutor-stuck-question">{{tutorReferenceScene.row1.text}}</text>
+            <view class="tutor-stuck-action-grid"><text class="tutor-stuck-action-card" data-action="{{tutorReferenceScene.action0.action}}" data-step="{{tutorReferenceScene.action0.step}}" bindtap="runTutorReferenceAction"><text>{{tutorReferenceScene.action0.label}}</text><text>{{tutorReferenceScene.action0.line}}</text></text><text class="tutor-stuck-action-card" data-action="{{tutorReferenceScene.action1.action}}" data-step="{{tutorReferenceScene.action1.step}}" bindtap="runTutorReferenceAction"><text>{{tutorReferenceScene.action1.label}}</text><text>{{tutorReferenceScene.action1.line}}</text></text></view>
+            <view class="tutor-stuck-journal"><text>{{tutorReferenceScene.row3.text}}</text><text>{{tutorReferenceScene.row4.text}}</text><text>{{tutorReferenceScene.row5.text}}</text></view>
+            <view class="tutor-stuck-footer"><text data-action="{{tutorReferenceScene.action2.action}}" data-step="{{tutorReferenceScene.action2.step}}" bindtap="runTutorReferenceAction">{{tutorReferenceScene.action2.label}}</text><text data-action="{{tutorReferenceScene.action3.action}}" data-step="{{tutorReferenceScene.action3.step}}" bindtap="runTutorReferenceAction">{{tutorReferenceScene.action3.label}}</text></view>
           </view>
         </view>
+
+        <view class="tutor-result-stack" wx:if="{{showTutorDetails && (socraticBrief || tutorDiagnosticCard || socraticMicroChoices.length || socraticFeedbackNextAction || miniLessonFeedbackBridge)}}">
+          <view class="tutor-socratic-brief" wx:if="{{socraticBrief}}"><text class="tutor-brief-head"><text>{{socraticBrief.label}}</text><text>{{socraticBrief.title}}</text></text><text class="tutor-brief-question">{{socraticBrief.nextQuestion}}</text><view class="tutor-brief-steps"><text class="tutor-brief-step">{{socraticBrief.steps[0].label}}：{{socraticBrief.steps[0].text}}</text><text class="tutor-brief-step">{{socraticBrief.steps[1].label}}：{{socraticBrief.steps[1].text}}</text><text class="tutor-brief-step">{{socraticBrief.steps[2].label}}：{{socraticBrief.steps[2].text}}</text></view><text class="tutor-brief-actions"><text>{{socraticBrief.boundary}}</text><text bindtap="requestSmallerTutorPrompt">再问小一点</text><text bindtap="goSocraticBriefRoute">{{socraticBrief.routeLabel}}</text></text></view>
+          <text class="tutor-diagnostic-card" wx:if="{{tutorDiagnosticCard}}"><text>{{tutorDiagnosticCard.title}}</text><text>卡点：{{tutorDiagnosticCard.issue}}</text><text>下一步：{{tutorDiagnosticCard.firstStep}}</text><text>家长问：{{tutorDiagnosticCard.parentCheck}}</text><text class="tutor-diagnostic-action primary" data-id="diagnosis_review" data-label="{{tutorDiagnosticCard.reviewMove}}" data-route="{{tutorDiagnosticCard.reviewRoute}}" data-evidence="tutor_diagnostic_card" bindtap="runTutorHandoffAction">去知识乐园验证</text><text class="tutor-diagnostic-action" data-id="diagnosis_parent" data-label="{{tutorDiagnosticCard.parentCheck}}" data-route="{{tutorDiagnosticCard.parentRoute}}" data-evidence="tutor_diagnostic_parent_check" bindtap="runTutorHandoffAction">给家长看证据</text></text>
+          <view class="tutor-micro-choice-row" wx:if="{{socraticMicroChoices && socraticMicroChoices.length}}"><text data-id="{{socraticMicroChoices[0].id}}" data-index="0" bindtap="selectSocraticMicroChoice">{{socraticMicroChoices[0].label}} {{socraticMicroChoices[0].text}}</text><text data-id="{{socraticMicroChoices[1].id}}" data-index="1" bindtap="selectSocraticMicroChoice">{{socraticMicroChoices[1].label}} {{socraticMicroChoices[1].text}}</text></view>
+          <view class="tutor-feedback-row" wx:if="{{hasUserTutorTurn}}"><text class="tutor-feedback-good" data-status="first_step_spoken" bindtap="recordSocraticEffectivenessFeedback">我说出第一步了</text><text class="tutor-feedback-stuck" data-status="still_blocked" bindtap="recordSocraticEffectivenessFeedback">还是卡住</text></view>
+          <text class="tutor-feedback-note" wx:if="{{socraticFeedbackNextAction}}">{{socraticFeedbackNextAction}}</text>
+          <view class="tutor-bridge-card" wx:if="{{miniLessonFeedbackBridge && miniLessonFeedbackBridge.nextAction}}"><text class="tutor-bridge-head"><text>补一张证据</text><text>{{miniLessonFeedbackBridge.nextAction}}</text></text><text>{{miniLessonFeedbackBridge.type === 'evidence_review_required' ? '只留 A/B 小黑板证据，回知识乐园复测。' : '转成 3 分钟小讲堂，做完回知识乐园。'}}</text><text class="tutor-bridge-action" data-id="mini_lesson_bridge" data-label="{{miniLessonFeedbackBridge.nextAction}}" data-route="{{miniLessonFeedbackBridge.route}}" data-evidence="still_blocked_feedback" bindtap="runTutorHandoffAction">继续</text></view>
+        </view>
       </view>
+    </view>
   </scroll-view>
 </view>

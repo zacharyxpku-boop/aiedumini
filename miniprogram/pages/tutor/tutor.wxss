@@ -191,6 +191,11 @@ page {
   padding: 28rpx;
 }
 
+.tutor-chat-card.compact {
+  min-height: 0;
+  padding: 22rpx;
+}
+
 .tutor-chat-title {
   color: #1f2937;
   font-size: 30rpx;
@@ -393,6 +398,10 @@ page {
   padding: 24rpx;
 }
 
+.tutor-reference-panel {
+  min-height: 520rpx;
+}
+
 .tutor-reference-head {
   display: flex;
   align-items: center;
@@ -484,6 +493,97 @@ page {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12rpx;
+}
+
+.tutor-reference-dialogue {
+  display: grid;
+  gap: 16rpx;
+}
+
+.tutor-knowledge-board {
+  display: grid;
+  gap: 16rpx;
+  padding: 24rpx;
+  border-radius: 34rpx;
+  background: #fffaf0;
+}
+
+.tutor-knowledge-subject {
+  color: #0d9488;
+  font-size: 24rpx;
+  font-weight: 900;
+}
+
+.tutor-knowledge-title {
+  color: #1f2937;
+  font-size: 46rpx;
+  font-weight: 950;
+  line-height: 1.1;
+}
+
+.tutor-blackboard {
+  display: grid;
+  gap: 0;
+  overflow: hidden;
+  border: 1rpx solid #f0ebe1;
+  border-radius: 28rpx;
+  background: #ffffff;
+}
+
+.tutor-blackboard text {
+  display: block;
+  padding: 20rpx;
+  border-bottom: 1rpx solid #f0ebe1;
+  color: #374151;
+  font-size: 25rpx;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.tutor-blackboard text:first-child {
+  color: #1f2937;
+  font-size: 31rpx;
+  font-weight: 950;
+}
+
+.tutor-blackboard text:last-child {
+  border-bottom: 0;
+}
+
+.tutor-pointing-panel {
+  display: grid;
+  gap: 18rpx;
+  padding: 24rpx;
+  border-radius: 34rpx;
+  background: #eef6ff;
+}
+
+.tutor-pointing-lead {
+  display: grid;
+  gap: 8rpx;
+}
+
+.tutor-pointing-lead text:first-child {
+  color: #1f2937;
+  font-size: 42rpx;
+  font-weight: 950;
+  line-height: 1.1;
+}
+
+.tutor-pointing-lead text:nth-child(2) {
+  color: #374151;
+  font-size: 26rpx;
+  font-weight: 850;
+}
+
+.tutor-pointing-lead text:last-child {
+  justify-self: start;
+  padding: 8rpx 14rpx;
+  border-radius: 999rpx;
+  color: #2563eb;
+  background: #ffffff;
+  font-size: 21rpx;
+  font-weight: 900;
 }
 
 .tutor-stuck-action-card {
@@ -670,6 +770,10 @@ page {
   border-bottom: 1rpx solid #f0ebe1;
   border-radius: 0;
   background: #ffffff;
+}
+
+.tutor-reference-panel.knowledge .tutor-knowledge-board {
+  border-bottom: 1rpx solid #f0ebe1;
 }
 
 .tutor-reference-panel.pointing .tutor-pointing-grid {
