@@ -21,11 +21,14 @@ try {
 const QUICK_ASSESSMENT_QUESTIONS = [
   {
     id: 'start_mode',
-    prompt: '遇到新题时，孩子更常怎么开始？',
+    prompt: '孩子最近最常卡在哪里？',
     options: [
-      { id: 'circle', label: '先圈条件', weights: { visual: 2, structure: 2 } },
-      { id: 'read', label: '先完整读一遍', weights: { reading: 2, auditory: 1 } },
-      { id: 'write', label: '先写一步试试', weights: { kinesthetic: 2, structure: 1 } }
+      { id: 'concept', label: '听不懂知识点', weights: { auditory: 1, structure: 2 } },
+      { id: 'careless', label: '会做但总错', weights: { focus: 2, structure: 1 } },
+      { id: 'avoid', label: '不愿开始', weights: { emotion: 2, persistence: 1 } },
+      { id: 'slow', label: '写得慢', weights: { focus: 1, kinesthetic: 1 } },
+      { id: 'forget', label: '容易忘', weights: { visual: 1, reading: 1 } },
+      { id: 'unsure_parent', label: '家长不确定', weights: { emotion: 1, structure: 1 } }
     ]
   },
   {

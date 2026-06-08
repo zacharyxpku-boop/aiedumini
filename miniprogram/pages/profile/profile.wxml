@@ -54,12 +54,13 @@
             <text bindtap="toggleLearningQuestionnaire">收起</text>
           </view>
           <view class="growth-questionnaire-progress"><text></text><text></text><text></text><text></text><text></text></view>
-          <view class="growth-question-card" wx:for="{{learningReportQuestionnaire}}" wx:key="id">
+          <view class="growth-question-card" wx:for="{{learningReportQuestionnaire}}" wx:for-index="questionIndex" wx:key="id" wx:if="{{questionIndex === 0}}">
             <text>{{item.prompt}}</text>
             <view>
               <text wx:for="{{item.options}}" wx:for-item="option" wx:key="id" class="{{item.selectedOptionId === option.id ? 'active' : ''}}" data-id="{{item.id}}" data-option="{{option.id}}" bindtap="answerLearningQuestion">{{option.label}}</text>
             </view>
           </view>
+          <text class="growth-question-note">先选最像孩子的一项；后续上传错题、成绩或老师反馈后，报告会继续变准。</text>
           <view class="growth-generate-cta" bindtap="generateLearningReport">生成成长报告</view>
         </view>
 
@@ -91,9 +92,9 @@
 
         <view class="growth-report-preview" wx:if="{{growthActiveScene === 'preview' || (learningReportSummary && learningReportSummary.reportJobCaseId)}}">
           <view class="growth-report-preview-head"><text>成长线索初步发现 ✨</text><text>{{learningReportSummary.reportJobCaseId ? '基于材料' : '本地预览'}}</text></view>
-          <view class="growth-report-preview-card"><text>学习偏好线索</text><text>{{learningReportSummary.learningPreferenceLine || '先用问卷和错题判断更适合图像、复述还是动手拆步。'}}</text></view>
-          <view class="growth-report-preview-card warn"><text>当前卡点证据</text><text>{{learningReportSummary.diagnosisLine || profileViewModel.parentRecap.evidenceRecap}}</text></view>
-          <view class="growth-report-preview-card action"><text>今晚建议</text><text>{{profileViewModel.parentRecap.parentOneQuestion}}</text></view>
+          <view class="growth-report-preview-card"><text>学习偏好线索 · 视觉型</text><text>来源：基础问卷。{{learningReportSummary.learningPreferenceLine || '对图像、表格更敏感，讲抽象概念时优先用手绘图或实物辅助。'}}</text></view>
+          <view class="growth-report-preview-card warn"><text>当前卡点证据 · 计算粗心</text><text>来源：错题描述。{{learningReportSummary.diagnosisLine || profileViewModel.parentRecap.evidenceRecap}}</text></view>
+          <view class="growth-report-preview-card action"><text>今晚建议 · 先练口算10分钟</text><text>来源：AI私教。{{profileViewModel.parentRecap.parentOneQuestion}}</text></view>
         </view>
 
         <view class="growth-parent-action-card" wx:if="{{growthActiveScene === 'preview' || growthActiveScene === 'action' || (learningReportSummary && learningReportSummary.reportJobCaseId)}}">
@@ -101,6 +102,7 @@
           <view><text></text><view><text>建立自信 · 2 分钟</text><text>具体表扬一个真实努力，而不是评价聪不聪明。</text></view></view>
           <view><text></text><view><text>环境优化 · 持续进行</text><text>清空桌面非学习用品，减少视觉干扰。</text></view></view>
           <view><text></text><view><text>激发思考 · 5 分钟</text><text>孩子求助时只问：“这一步和上一步是什么关系？”</text></view></view>
+          <text class="growth-action-done">完成勾选后，系统将为您更新明日建议 · 我已完成行动 / 稍后提醒</text>
         </view>
 
         <view class="yd-parent-decision growth" data-scene="parent" data-source="growth_report_card" bindtap="openEntryDetail">

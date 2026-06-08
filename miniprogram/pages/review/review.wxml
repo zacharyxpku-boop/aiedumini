@@ -18,7 +18,7 @@
         </view>
 
         <view class="review-record-panel">
-          <view class="review-section-head"><text>先选知识点</text><text>{{selectedKnowledgeTopic}}</text></view>
+          <view class="review-section-head"><text>推荐探索</text><text>换一批</text></view>
           <text class="review-flow-tabs">
             <text class="{{reviewFlowStage === 'topic' ? 'active' : ''}}">选知识点</text>
             <text class="{{reviewFlowStage === 'tool' ? 'active' : ''}}">玩法选择</text>
@@ -26,13 +26,14 @@
             <text class="{{reviewFlowStage === 'finished' ? 'active' : ''}}">一局结束</text>
           </text>
           <view class="review-topic-row">
-            <text class="review-topic-chip {{selectedKnowledgeTopic === '应用题第一步' ? 'active' : ''}}" data-topic="应用题第一步" bindtap="selectKnowledgeStarterTopic">应用题第一步</text>
-            <text class="review-topic-chip {{selectedKnowledgeTopic === '阅读理解' ? 'active' : ''}}" data-topic="阅读理解" bindtap="selectKnowledgeStarterTopic">阅读理解</text>
-            <text class="review-topic-chip {{selectedKnowledgeTopic === '方程关系' ? 'active' : ''}}" data-topic="方程关系" bindtap="selectKnowledgeStarterTopic">方程关系</text>
-            <text class="review-topic-chip {{selectedKnowledgeTopic === '英语语法' ? 'active' : ''}}" data-topic="英语语法" bindtap="selectKnowledgeStarterTopic">英语语法</text>
-            <text class="review-topic-chip {{selectedKnowledgeTopic === '科学概念' ? 'active' : ''}}" data-topic="科学概念" bindtap="selectKnowledgeStarterTopic">科学概念</text>
+            <text class="review-topic-card review-topic-chip {{selectedKnowledgeTopic === '小数乘法' ? 'active' : ''}}" data-topic="小数乘法" bindtap="selectKnowledgeStarterTopic">小数乘法&#10;消除大挑战&#10;约 10 分钟</text>
+            <text class="review-topic-card review-topic-chip {{selectedKnowledgeTopic === '认识分数' ? 'active' : ''}}" data-topic="认识分数" bindtap="selectKnowledgeStarterTopic">认识分数&#10;色彩涂涂&#10;约 15 分钟</text>
+            <text class="review-topic-card review-topic-chip {{selectedKnowledgeTopic === '面积计算' ? 'active' : ''}}" data-topic="面积计算" bindtap="selectKnowledgeStarterTopic">面积计算&#10;拼图解谜&#10;约 12 分钟</text>
+            <text class="review-topic-card review-topic-chip {{selectedKnowledgeTopic === '混合运算' ? 'active' : ''}}" data-topic="混合运算" bindtap="selectKnowledgeStarterTopic">混合运算&#10;极速速算&#10;约 5 分钟</text>
+            <text class="review-topic-card review-topic-chip {{selectedKnowledgeTopic === '认识钟表' ? 'active' : ''}}" data-topic="认识钟表" bindtap="selectKnowledgeStarterTopic">认识钟表&#10;拨盘解密&#10;约 8 分钟</text>
+            <text class="review-topic-card review-topic-chip {{selectedKnowledgeTopic === '长度单位' ? 'active' : ''}}" data-topic="长度单位" bindtap="selectKnowledgeStarterTopic">长度单位&#10;魔法尺子&#10;约 10 分钟</text>
           </view>
-          <text class="review-workshop-lead">选一个玩法，练第一步和错因；不展示完整解法。</text>
+          <text class="review-workshop-lead">当前攻克目标：{{selectedKnowledgeTopic}} | {{cards.length || 3}} 张卡。挑选开局方式，马上开始。</text>
           <view class="review-feedback-strip" wx:if="{{feedbackText}}">
             <text>{{feedbackText}}</text>
             <text wx:if="{{activeReviewTool && activeReviewTool.repairFocus}}" bindtap="openReviewRepairFocus">修这一张</text>
@@ -66,11 +67,11 @@
             </view>
             <view class="review-round-strip" wx:if="{{activeReviewTool.attemptSummary}}"><text>{{activeReviewTool.attemptSummary.accuracy}}%</text><text>对 {{activeReviewTool.attemptSummary.correct}}</text><text>错 {{activeReviewTool.attemptSummary.wrong}}</text><text>{{activeReviewTool.roundAdvice ? activeReviewTool.roundAdvice.primary : '继续'}}</text><text data-result="retry" bindtap="finishPlayableReviewTool">再回忆一次</text><text wx:if="{{activeReviewTool.repairFocus}}" bindtap="openReviewRepairFocus">修错卡</text><text bindtap="openReviewParentEvidence">家长证据</text></view>
             <view class="review-live-actions finish"><button data-result="remembered" bindtap="finishPlayableReviewTool">记录本轮</button></view>
-            <view class="review-live-actions grade"><button data-rating="again" bindtap="rate">忘了</button><button data-rating="hard" bindtap="rate">模糊</button><button data-rating="good" bindtap="rate">想起来了</button><button data-rating="easy" bindtap="rate">很轻松</button></view>
+            <view class="review-live-actions grade"><button data-rating="again" bindtap="rate">需要提示</button><button data-rating="hard" bindtap="rate">有点模糊</button><button data-rating="good" bindtap="rate">我记得第一步</button><button data-rating="easy" bindtap="rate">先跳过</button></view>
           </view>
         </view>
 
-        <view class="review-main-cta" data-id="quiz" bindtap="runPlayableReviewTool">开始一局练习</view>
+        <view class="review-main-cta" data-id="whack" bindtap="runPlayableReviewTool">开始错因地鼠</view>
         <view class="review-template-pack compact" wx:if="{{practiceTemplatePack && practiceTemplatePack.id}}"><text class="review-template-title">知识乐园练习</text><view class="review-template-actions"><text class="review-template-action {{practiceTemplatePack.deliverables[0].ready ? 'ready' : 'pending'}}" data-id="{{practiceTemplatePack.deliverables[0].id}}" data-label="{{practiceTemplatePack.deliverables[0].label}}" data-route="{{practiceTemplatePack.deliverables[0].route}}" bindtap="runTemplateDeliverable">{{practiceTemplatePack.deliverables[0].label}}</text><text class="review-template-action {{practiceTemplatePack.deliverables[1].ready ? 'ready' : 'pending'}}" data-id="{{practiceTemplatePack.deliverables[1].id}}" data-label="{{practiceTemplatePack.deliverables[1].label}}" data-route="{{practiceTemplatePack.deliverables[1].route}}" bindtap="runTemplateDeliverable">{{practiceTemplatePack.deliverables[1].label}}</text><text class="review-template-action {{practiceTemplatePack.deliverables[2].ready ? 'ready' : 'pending'}}" data-id="{{practiceTemplatePack.deliverables[2].id}}" data-label="{{practiceTemplatePack.deliverables[2].label}}" data-route="{{practiceTemplatePack.deliverables[2].route}}" bindtap="runTemplateDeliverable">{{practiceTemplatePack.deliverables[2].label}}</text><text class="review-template-action {{practiceTemplatePack.deliverables[3].ready ? 'ready' : 'pending'}}" data-id="{{practiceTemplatePack.deliverables[3].id}}" data-label="{{practiceTemplatePack.deliverables[3].label}}" data-route="{{practiceTemplatePack.deliverables[3].route}}" bindtap="runTemplateDeliverable">{{practiceTemplatePack.deliverables[3].label}}</text></view></view>
         <view class="review-template-workbench" wx:if="{{practiceTemplateWorkbench && practiceTemplateWorkbench.id}}"><text class="review-workbench-title">{{practiceTemplateWorkbench.title}}</text><text class="review-workbench-status">{{practiceTemplateWorkbench.status}} ｜ {{practiceTemplateWorkbench.count}} 张卡</text><text class="review-workbench-line">{{practiceTemplateWorkbench.line}}</text><text class="review-preview-card">{{practiceTemplateWorkbench.samples[0].label}} ｜ {{practiceTemplateWorkbench.samples[0].source}}</text><text class="review-workbench-safe">{{practiceTemplateWorkbench.safetyLine}}</text></view>
       </view>

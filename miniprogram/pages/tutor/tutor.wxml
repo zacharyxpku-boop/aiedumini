@@ -23,10 +23,10 @@
 
           <view class="tutor-chat-card">
             <view class="tutor-chat-head">
-              <text class="tutor-chat-title">把问题发给 AI私教</text>
+              <text class="tutor-chat-title">AI私教在线</text>
               <text class="tutor-chat-online">咕点在线</text>
             </view>
-            <text class="tutor-chat-clock">今天 · 只问下一小步</text>
+            <text class="tutor-chat-clock">今天 15:30 · 正在陪你想第一步</text>
             <view class="tutor-service-status" wx:if="{{tutorServiceStatus && tutorServiceStatus.visible}}"><text>{{tutorServiceStatus.label}}</text><text>{{tutorServiceStatus.line}}</text></view>
             <block wx:if="{{messages && messages.length}}">
               <block wx:for="{{messages}}" wx:key="index">
@@ -34,7 +34,7 @@
               </block>
             </block>
             <block wx:else>
-              <view class="tutor-bubble">先说一句：你想问知识点，还是卡在题目的第一步？</view>
+              <view class="tutor-bubble">先告诉我：你现在是看不懂题、不会第一步，还是心里有点急？</view>
             </block>
             <view class="tutor-input-bar">
               <input value="{{input}}" bindinput="onInput" bindconfirm="send" confirm-type="send" placeholder="写题目、卡点或第一步" />
@@ -53,15 +53,15 @@
               <text class="tutor-mode-card" data-step="find_direction" bindtap="launchFirstStep">题目点拨</text>
               <text class="tutor-mode-card" data-step="review" bindtap="launchFirstStep">学了什么</text>
             </view>
-            <text class="tutor-prompt-board">例：题目问什么我没看明白。</text>
+            <text class="tutor-prompt-board">先发一句话，我帮你切小问题 · 已有 2,451 位同学今天和咕点聊过</text>
             <view class="tutor-start-cta" data-step="write_first_step" bindtap="launchFirstStep">开始问咕点</view>
           </view>
 
           <view class="tutor-reference-panel {{activeTutorScene}}">
             <view class="tutor-reference-head"><text>{{activeTutorScene === 'knowledge' ? '咕点小黑板' : activeTutorScene === 'pointing' ? '题目点拨' : activeTutorScene === 'stuck' ? '深呼吸，慢慢来' : activeTutorScene === 'recap' ? '刚才学了什么' : '自由对话'}}</text><text>{{activeTutorScene === 'dialogue' ? '正在陪你想第一步' : '只追问，不代写'}}</text></view>
-            <view class="tutor-blackboard" wx:if="{{activeTutorScene === 'knowledge'}}"><text>1 这是什么</text><text>先把知识点说成一句孩子听得懂的话。</text><text>2 容易卡在哪里</text><text>只指出一个最可能的错因，不展开长课。</text><text>3 第一步怎么想</text><text>让孩子先说已知条件、关键词或最小动作。</text></view>
-            <view class="tutor-pointing-grid" wx:elif="{{activeTutorScene === 'pointing'}}"><text data-step="read_problem" bindtap="launchFirstStep">看懂题意</text><text data-step="find_conditions" bindtap="launchFirstStep">理清条件</text><text data-step="find_direction" bindtap="launchFirstStep">找第一步</text><text data-step="explain_misconception" bindtap="launchFirstStep">检查错因</text></view>
-            <view class="tutor-recover-card" wx:elif="{{activeTutorScene === 'stuck'}}"><text>没关系，我们把问题切小一点。</text><text class="tutor-recover-action" data-step="find_conditions" bindtap="launchFirstStep">先圈已知条件</text><text class="tutor-recover-action" data-step="read_problem" bindtap="launchFirstStep">先说题目问什么</text></view>
+            <view class="tutor-blackboard" wx:if="{{activeTutorScene === 'knowledge'}}"><text>1 这是什么</text><text>除以一个分数，等于乘以这个分数的倒数。</text><text>2 容易卡在哪里</text><text>光顾着把除号变成乘号，却忘了把后面的分数颠倒。</text><text>3 第一步怎么想</text><text>默念：先变乘号，再翻个底朝天。</text></view>
+            <view class="tutor-pointing-grid" wx:elif="{{activeTutorScene === 'pointing'}}"><text data-step="read_problem" bindtap="launchFirstStep">看懂题意</text><text data-step="find_conditions" bindtap="launchFirstStep">理清条件</text><text data-step="find_direction" bindtap="launchFirstStep">找突破口</text><text data-step="explain_misconception" bindtap="launchFirstStep">定位错因</text></view>
+            <view class="tutor-recover-card" wx:elif="{{activeTutorScene === 'stuck'}}"><text>没关系，我们把问题切小一点。刚才的思考小记会留下来。</text><text class="tutor-recover-action" data-step="find_conditions" bindtap="launchFirstStep">先圈已知条件</text><text class="tutor-recover-action" data-step="read_problem" bindtap="launchFirstStep">先说题目问什么</text></view>
             <view class="tutor-dialogue-card" wx:else><text>你可以直接聊天、问知识点、发题目，咕点会从“第一步”开始追问。</text><text bindtap="requestSmallerTutorPrompt">再问小一点</text></view>
           </view>
 

@@ -112,13 +112,14 @@ Page({
     reportSourcePanel: null,
     miniLessonReturnPanel: null,
     reviewFlowStage: 'topic',
-    selectedKnowledgeTopic: '应用题第一步',
+    selectedKnowledgeTopic: '小数乘法',
     knowledgeStarterTopics: [
-      '应用题第一步',
-      '阅读理解',
-      '方程关系',
-      '英语语法',
-      '科学概念'
+      '小数乘法',
+      '认识分数',
+      '面积计算',
+      '混合运算',
+      '认识钟表',
+      '长度单位'
     ]
   },
 
@@ -433,10 +434,10 @@ Page({
       : [];
     const toolIds = ['whack', 'quiz', 'match', 'snake'];
     const fallback = {
-      whack: { title: '错因地鼠', pitch: '看题面快选第一步，抓住最容易错的点。', readyCount: sourceCards.length, available: !!sourceCards.length },
-      quiz: { title: '快闪问答', pitch: '先回忆第一步，再翻开核对错因。', readyCount: sourceCards.length, available: !!sourceCards.length },
-      match: { title: '拼图配对', pitch: '把卡点和第一步配起来。', readyCount: sourceCards.length, available: sourceCards.length >= 2 },
-      snake: { title: '路线接龙', pitch: '按题意、条件、第一步排顺。', readyCount: sourceCards.length, available: sourceCards.length >= 2 },
+      whack: { title: '错因地鼠', pitch: '打地鼠，灭错因，轻松找漏洞。', readyCount: sourceCards.length, available: !!sourceCards.length },
+      quiz: { title: '快闪问答', pitch: '快速判断，高频刺激极速过关。', readyCount: sourceCards.length, available: !!sourceCards.length },
+      match: { title: '拼图配对', pitch: '拼合线索，建立知识关联网络。', readyCount: sourceCards.length, available: sourceCards.length >= 2 },
+      snake: { title: '路线接龙', pitch: '步步推导，连通思路直达终点。', readyCount: sourceCards.length, available: sourceCards.length >= 2 },
     };
     const display = {
       whack: { icon: '地', themeClass: 'theme-whack', engineId: 'whack' },
@@ -450,7 +451,7 @@ Page({
       if (id === 'match') return `配对 ${Math.min(4, Math.max(2, count))} 组`;
       if (id === 'snake') return `排序 ${Math.min(3, Math.max(2, count))} 组`;
       if (id === 'whack') return `快选 ${Math.min(4, Math.max(1, count))} 题`;
-      return `90秒回忆 ${Math.min(3, Math.max(1, count))} 张`;
+      return `1-2 分钟 ${Math.min(3, Math.max(1, count))} 张`;
     };
     return toolIds.map((id) => {
       const item = recommended.find((tool) => tool.id === id) || fallback[id];
@@ -471,7 +472,7 @@ Page({
 
   buildKnowledgeStarterCards(topic = '') {
     const now = new Date().toISOString();
-    const label = topic || this.data.selectedKnowledgeTopic || '应用题第一步';
+    const label = topic || this.data.selectedKnowledgeTopic || '小数乘法';
     const baseId = `starter_${String(label).replace(/[^a-zA-Z0-9_\u4e00-\u9fa5]/g, '_')}`;
     return [
       {
@@ -516,7 +517,7 @@ Page({
   selectKnowledgeStarterTopic(event) {
     const topic = event && event.currentTarget ? event.currentTarget.dataset.topic || '' : '';
     this.setData({
-      selectedKnowledgeTopic: topic || '应用题第一步',
+      selectedKnowledgeTopic: topic || '小数乘法',
       reviewFlowStage: 'tool'
     });
   },
@@ -1868,7 +1869,7 @@ Page({
 
   runPlayableReviewTool(event) {
     const dataset = event && event.currentTarget ? event.currentTarget.dataset || {} : {};
-    const requestedToolId = dataset.id || 'quiz';
+    const requestedToolId = dataset.id || 'whack';
     const visibleTools = this.data.playableReviewTools || [];
     const tool = visibleTools.find((item) => item.id === requestedToolId) || visibleTools.find((item) => item.id === 'quiz') || {};
     const toolId = tool.engineId || tool.id || 'quiz';
