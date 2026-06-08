@@ -127,6 +127,7 @@ Page({
     this.setData({
       reportSourceContext: this.buildReportSourceContext(query) || this.buildTemplateRouteContext(query)
     });
+    this.applyReferenceStageRoute(query);
   },
 
   onShow() {
@@ -143,6 +144,7 @@ Page({
       if (context) {
         this.setData({ reportSourceContext: context });
       }
+      this.applyReferenceStageRoute(pendingRoute.options);
     }
     const publicK12Context = this.consumePublicK12ReviewContext();
     if (publicK12Context) {
@@ -152,6 +154,40 @@ Page({
     if (yesterday && storage.markReviewCardRevisited) storage.markReviewCardRevisited(yesterday.id);
     this.refresh();
     this.refreshServerReviewState();
+  },
+
+  applyReferenceStageRoute(query = {}) {
+    const stage = String(query.stage || '').trim();
+    if (!['topic', 'tool', 'live', 'finished'].includes(stage)) return;
+    if (stage === 'topic') {
+      this.setData({ reviewFlowStage: 'topic' });
+      return;
+    }
+    const cards = this.ensureKnowledgeStarterCards();
+    const tools = this.buildPlayableReviewTools(cards);
+    if (stage === 'tool') {
+      this.setData({
+        playableReviewTools: tools,
+        reviewFlowStage: 'tool'
+      });
+      return;
+    }
+    const tool = tools.find((item) => item.id === 'whack') || tools.find((item) => item.available) || tools[0] || {};
+    const round = tool && tool.available && revisitEngine.buildWhackRound
+      ? revisitEngine.buildWhackRound(cards, { limit: 4, holes: 4, timeLimit: 60 })
+      : null;
+    const activeReviewTool = this.buildActiveReviewTool(Object.assign({}, tool, { id: tool.engineId || tool.id || 'whack' }), round);
+    this.setData({
+      playableReviewTools: tools,
+      activeReviewTool: stage === 'finished'
+        ? Object.assign({}, activeReviewTool, {
+          attemptSummary: { total: Math.max(1, Number(activeReviewTool.itemCount || 1)), remembered: 1, wrong: 0 },
+          roundAdvice: { primary: '明天再换一张同类卡回忆第一步。', secondary: '家长只看孩子能不能说出原因。' },
+          reportEvidenceReady: true
+        })
+        : activeReviewTool,
+      reviewFlowStage: stage
+    });
   },
 
   consumePublicK12ReviewContext() {

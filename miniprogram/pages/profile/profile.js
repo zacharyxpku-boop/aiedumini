@@ -3406,6 +3406,10 @@ Page({
         showLearningQuestionnaire: quickAssessment ? true : this.data.showLearningQuestionnaire
       });
     }
+    const growthScene = String(query.panel || '').trim();
+    if (['main', 'questionnaire', 'upload', 'preview', 'action'].includes(growthScene)) {
+      this.applyGrowthScene(growthScene);
+    }
   },
 
   onShareAppMessage() {
@@ -3822,6 +3826,10 @@ Page({
 
   setGrowthScene(event) {
     const scene = event && event.currentTarget ? event.currentTarget.dataset.panel || 'main' : 'main';
+    this.applyGrowthScene(scene);
+  },
+
+  applyGrowthScene(scene = 'main') {
     if (scene === 'questionnaire') {
       this.startGrowthQuestionnaire();
       return;

@@ -39,7 +39,7 @@ const SCENES = {
     heroImage: '/assets/reference/report-radar-card-illustration.png',
     focusCopy: '先看证据是否足够，再决定用哪一种学习方法。',
     primaryLabel: '查看证据报告',
-    primaryRoute: '/pages/profile/profile?from=entry_report_evidence&open=flow',
+    primaryRoute: '/pages/profile/profile?from=entry_report_evidence&panel=preview&open=flow',
     secondaryLabel: '补充测评/错题',
     secondaryRoute: '/pages/upload/upload?from=entry_report_material',
     cards: [
@@ -70,9 +70,9 @@ const SCENES = {
     heroImage: '/assets/reference/tutor-socratic-board-transparent.png',
     focusCopy: '先问一个更小的问题，不替孩子写完整答案。',
     primaryLabel: '进入追问对话',
-    primaryRoute: '/pages/tutor/tutor?from=entry_tutor_first_step&open=flow',
+    primaryRoute: '/pages/tutor/tutor?from=entry_tutor_first_step&scene=pointing&open=flow',
     secondaryLabel: '说完去回访卡',
-    secondaryRoute: '/pages/review/review?from=entry_tutor_card',
+    secondaryRoute: '/pages/review/review?from=entry_tutor_card&stage=tool',
     cards: [
       { label: '孩子说', value: '我准备先看哪一个条件、哪一句话。', icon: '/assets/reference/entry-tutor.png', scene: 'tutor' },
       { label: 'AI问', value: '下一步只问一个更小的问题。', icon: '/assets/reference/entry-tutor.png', scene: 'tutor' },
@@ -101,9 +101,9 @@ const SCENES = {
     heroImage: '/assets/reference/review-world-map-transparent.png',
     focusCopy: '先跑一张真实卡：回忆、迁移、记录明天要回看的点。',
     primaryLabel: '开始 90 秒回忆',
-    primaryRoute: '/pages/review/review?mode=recall_return&from=entry_review',
+    primaryRoute: '/pages/review/review?mode=recall_return&from=entry_review&stage=topic',
     secondaryLabel: '回到AI点拨',
-    secondaryRoute: '/pages/tutor/tutor?from=entry_review_repair',
+    secondaryRoute: '/pages/tutor/tutor?from=entry_review_repair&scene=stuck',
     cards: [
       { label: '记忆', value: '能不能说出关键概念。', icon: '/assets/reference/entry-review.png', scene: 'review' },
       { label: '迁移', value: '换一道同类题还会不会开始。', icon: '/assets/reference/entry-review.png', scene: 'review' },
@@ -132,7 +132,7 @@ const SCENES = {
     heroImage: '/assets/reference/family-avatar-group-transparent.png',
     focusCopy: '先看孩子今天留下了什么证据，再问一句能启动行动的问题。',
     primaryLabel: '打开家长中心',
-    primaryRoute: '/pages/profile/profile?from=entry_parent_report&open=flow',
+    primaryRoute: '/pages/profile/profile?from=entry_parent_report&panel=action&open=flow',
     secondaryLabel: '补一条证据',
     secondaryRoute: '/pages/upload/upload?from=entry_parent_material',
     cards: [

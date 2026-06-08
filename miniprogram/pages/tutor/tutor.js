@@ -386,6 +386,11 @@ function normalizeTutorReferenceScene(scene = TUTOR_REFERENCE_SCENES.dialogue) {
   });
 }
 
+function normalizeTutorReferenceSceneKey(value = '') {
+  const key = String(value || '').trim();
+  return TUTOR_REFERENCE_SCENES[key] ? key : 'dialogue';
+}
+
 function hasFirstStepEvidence(text = '') {
   const value = String(text || '');
   return value.length >= 8
@@ -1419,12 +1424,13 @@ Page({
 
     const pasteRisk = pasteRiskSignal(messages);
     const tutorTurnState = tutorLadder.nextTutorTurnState
-      ? tutorLadder.nextTutorTurnState('', messages, this.data.currentHintLevel, selected)
+      ? tutorLadder.nextTutorTurnState('', messages, this.data.currentHintLevel, selected || {})
       : null;
     const receipt = Object.assign({}, buildThinkingReceipt(messages, null, pasteRisk, this.data.activeStep, selected), {
       fallbackId: `initial_${messages.length}`
     });
-    const tutorHomeContext = buildTutorHomeContext(selected, state, routeOptions);
+    const tutorHomeContext = buildTutorHomeContext(selected || {}, state, routeOptions);
+    const activeTutorScene = normalizeTutorReferenceSceneKey(routeOptions.scene || routeOptions.mode || this.data.activeTutorScene);
     this.setData({
       selected,
       selectedEvidence,
@@ -1454,7 +1460,8 @@ Page({
       childExitTicketText: '',
       tutorHomeContext,
       tutorTurnState,
-      tutorReferenceScene: normalizeTutorReferenceScene(TUTOR_REFERENCE_SCENES.dialogue),
+      activeTutorScene,
+      tutorReferenceScene: normalizeTutorReferenceScene(TUTOR_REFERENCE_SCENES[activeTutorScene]),
       surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('tutor') : null,
       unifiedNextAction: storage.buildUnifiedNextActionController ? storage.buildUnifiedNextActionController({ surface: 'tutor' }) : null
     });
