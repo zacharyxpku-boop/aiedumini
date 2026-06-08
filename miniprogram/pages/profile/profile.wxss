@@ -1,10 +1,10 @@
 page {
-  background: #f9f8f4;
+  background: #f8faf5;
 }
 
 .profile-page {
   min-height: 100vh;
-  background: #f9f8f4;
+  background: #f8faf5;
   color: #1f2937;
 }
 
@@ -26,7 +26,7 @@ page {
   min-height: calc(100vh - 198rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   box-sizing: border-box;
   padding: 0 40rpx calc(172rpx + env(safe-area-inset-bottom));
-  background: #f9f8f4;
+  background: #f8faf5;
   border-radius: 0;
 }
 
@@ -39,8 +39,9 @@ page {
 .yd-parent-top {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 16rpx;
+  min-height: 68rpx;
 }
 
 .yd-parent-brand {
@@ -49,6 +50,8 @@ page {
   align-items: center;
   gap: 14rpx;
   min-width: 0;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .yd-parent-mark {
@@ -82,35 +85,64 @@ page {
 
 .yd-parent-pill {
   flex: 0 0 auto;
-  padding: 12rpx 18rpx;
-  border: 1rpx solid #ccfbf1;
+  width: 168rpx;
+  height: 64rpx;
+  box-sizing: border-box;
+  padding: 0 18rpx;
+  border: 1rpx solid rgba(0, 0, 0, 0.05);
   border-radius: 999rpx;
-  background: #ffffff;
-  color: #0d9488;
-  font-size: 22rpx;
-  line-height: 28rpx;
+  background: rgba(255, 255, 255, 0.62);
+  color: transparent;
+  font-size: 0;
+  line-height: 64rpx;
   font-weight: 800;
-  box-shadow: 0 8rpx 20rpx rgba(20, 184, 166, 0.08);
+  box-shadow: none;
+}
+
+.yd-parent-pill::before,
+.yd-parent-pill::after {
+  content: "";
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.yd-parent-pill::before {
+  width: 52rpx;
+  height: 8rpx;
+  border-top: 6rpx solid #111827;
+  border-bottom: 6rpx solid #111827;
+  opacity: 0.78;
+}
+
+.yd-parent-pill::after {
+  width: 1rpx;
+  height: 32rpx;
+  margin-left: 28rpx;
+  padding-left: 28rpx;
+  border-left: 1rpx solid rgba(0, 0, 0, 0.12);
+  border-radius: 50%;
+  background: #111827;
+  opacity: 0.78;
 }
 
 .yd-parent-hero {
   position: relative;
   display: block;
-  min-height: 244rpx;
+  min-height: 0;
   overflow: hidden;
   box-sizing: border-box;
-  margin: 0 -40rpx;
-  padding: 42rpx 50rpx 26rpx;
-  border-radius: 0 0 48rpx 48rpx;
-  background: #f9f8f4;
+  margin: 0 0 32rpx;
+  padding: 6rpx 0 0;
+  border-radius: 0;
+  background: #f8faf5;
   box-shadow: none;
 }
 
 .yd-parent-hero.growth {
   background:
-    radial-gradient(circle at 82% 14%, rgba(255, 138, 76, 0.2), transparent 24%),
-    radial-gradient(circle at 8% 20%, rgba(20, 184, 166, 0.16), transparent 26%),
-    #f9f8f4;
+    radial-gradient(circle at 84% 0%, rgba(254, 243, 199, 0.74), transparent 23%),
+    radial-gradient(circle at 6% 58%, rgba(230, 244, 241, 0.74), transparent 26%),
+    #f8faf5;
 }
 
 .yd-parent-copy {
@@ -123,17 +155,14 @@ page {
 }
 
 .yd-parent-kicker {
-  color: #c2410c;
-  font-size: 24rpx;
-  line-height: 28rpx;
-  font-weight: 900;
+  display: none;
 }
 
 .yd-parent-title {
   max-width: 540rpx;
   color: #1f2937;
   font-size: 56rpx;
-  line-height: 70rpx;
+  line-height: 73rpx;
   font-weight: 950;
 }
 
@@ -141,7 +170,7 @@ page {
   max-width: 560rpx;
   color: #475569;
   font-size: 26rpx;
-  line-height: 38rpx;
+  line-height: 39rpx;
   font-weight: 720;
 }
 
@@ -162,7 +191,7 @@ page {
 .growth-report-actions {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18rpx;
+  gap: 24rpx;
 }
 
 .growth-signal-grid {
@@ -179,16 +208,19 @@ page {
 
 .growth-choice-card {
   display: grid;
-  grid-template-columns: 80rpx minmax(0, 1fr);
-  grid-template-areas: "icon copy";
-  gap: 18rpx;
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "icon"
+    "copy";
+  align-content: space-between;
+  gap: 12rpx;
   min-height: 220rpx;
   box-sizing: border-box;
-  padding: 24rpx;
-  border: 1rpx solid rgba(255, 237, 213, 0.95);
+  padding: 32rpx;
+  border: 1rpx solid rgba(255, 237, 213, 0.9);
   border-radius: 44rpx;
   background: #ffffff;
-  box-shadow: 0 16rpx 36rpx rgba(82, 67, 54, 0.075);
+  box-shadow: 0 4rpx 24rpx rgba(0, 0, 0, 0.04);
 }
 
 .growth-choice-card.warm {
@@ -214,21 +246,21 @@ page {
   grid-area: copy;
   display: flex;
   flex-direction: column;
-  gap: 8rpx;
+  gap: 4rpx;
   min-width: 0;
 }
 
 .growth-choice-card view text:first-child {
   color: #1f2937;
-  font-size: 31rpx;
+  font-size: 30rpx;
   line-height: 38rpx;
   font-weight: 950;
 }
 
 .growth-choice-card view text:last-child {
-  color: #64748b;
+  color: #9ca3af;
   font-size: 22rpx;
-  line-height: 30rpx;
+  line-height: 28rpx;
 }
 
 .growth-choice-card > text {
@@ -277,10 +309,11 @@ page {
 .growth-progress-card {
   display: flex;
   flex-direction: column;
-  gap: 18rpx;
-  padding: 26rpx;
-  border: 1rpx solid #edf2e7;
-  box-shadow: 0 16rpx 36rpx rgba(82, 67, 54, 0.075);
+  gap: 24rpx;
+  padding: 0 0 0 44rpx;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .growth-progress-head {
@@ -302,23 +335,26 @@ page {
 .growth-progress-step {
   position: relative;
   display: grid;
-  grid-template-columns: 40rpx minmax(0, 1fr) auto;
-  gap: 14rpx;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16rpx;
   align-items: center;
-  padding: 16rpx;
-  border-radius: 22rpx;
-  background: #f8faf5;
+  min-height: 112rpx;
+  padding: 22rpx 24rpx;
+  border: 1rpx solid #f9fafb;
+  border-radius: 36rpx;
+  background: #ffffff;
+  box-shadow: 0 4rpx 18rpx rgba(0, 0, 0, 0.035);
 }
 
 .growth-progress-step::before {
   content: "";
   position: absolute;
-  left: 35rpx;
-  top: -18rpx;
+  left: -28rpx;
+  top: -26rpx;
   width: 4rpx;
-  height: 18rpx;
+  height: 28rpx;
   border-radius: 999rpx;
-  background: #dbe7de;
+  background: #f3f4f6;
 }
 
 .growth-progress-step:first-of-type::before {
@@ -326,16 +362,22 @@ page {
 }
 
 .growth-progress-step > text:first-child {
+  position: absolute;
+  left: -42rpx;
+  top: 28rpx;
   width: 28rpx;
   height: 28rpx;
+  box-sizing: border-box;
+  border: 4rpx solid #fed7aa;
   border-radius: 999rpx;
-  background: #d1d5db;
+  background: #ffffff;
 }
 
 .growth-progress-step.done > text:first-child,
 .growth-progress-step.active > text:first-child {
+  border-color: #99f6e4;
   background: #14b8a6;
-  box-shadow: 0 0 0 8rpx rgba(20, 184, 166, 0.12);
+  box-shadow: none;
 }
 
 .growth-progress-step view {
@@ -359,9 +401,9 @@ page {
 
 .growth-progress-step > text:last-child {
   padding: 8rpx 12rpx;
-  border-radius: 12rpx;
-  background: #ffffff;
-  color: #0d9488;
+  border-radius: 999rpx;
+  background: #fef3c7;
+  color: #f59e0b;
   font-size: 21rpx;
   line-height: 25rpx;
   font-weight: 900;
