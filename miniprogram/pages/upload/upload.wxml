@@ -28,11 +28,11 @@
         </view>
 
         <view class="upload-evidence-grid">
-          <view class="upload-evidence-card primary" data-type="wrong_question" bindtap="setMaterialType"><text>错题描述</text><text>记录孩子常卡住的题型</text><text>已添加 1 份</text></view>
-          <view class="upload-evidence-card" data-type="score_sheet" bindtap="setMaterialType"><text>成绩/周测</text><text>分数只做私有线索</text><text>补充</text></view>
-          <view class="upload-evidence-card" data-type="school_material" bindtap="setMaterialType"><text>老师反馈</text><text>评语或聊天截图</text><text>补充</text></view>
-          <view class="upload-evidence-card" data-type="parent_report" bindtap="openMaterialReportPanel"><text>家长观察</text><text>随手写几句现状</text><text>补充</text></view>
-          <view class="upload-evidence-card" data-type="assessment" bindtap="setMaterialType"><text>测评摘要</text><text>过往报告或记录</text><text>补充</text></view>
+          <view class="upload-evidence-card primary" data-type="wrong_question" bindtap="setMaterialType"><image mode="aspectFit" src="/assets/reference/upload-folder-stack-transparent.png" /><text class="upload-evidence-copy"><text>错题描述</text><text>记录孩子常卡住的题型，已添加 1 份：“昨天数学卷子大题第二问，总是列错方程...”</text></text><text>已添加 1 份</text></view>
+          <view class="upload-evidence-card" data-type="score_sheet" bindtap="setMaterialType"><image mode="aspectFit" src="/assets/reference/report-radar-card-illustration.png" /><text class="upload-evidence-copy"><text>成绩/周测</text><text>分数只做私有线索，用来观察波动和错题分布。</text></text><text>补充</text></view>
+          <view class="upload-evidence-card" data-type="school_material" bindtap="setMaterialType"><image mode="aspectFit" src="/assets/reference/tutor-socratic-board-transparent.png" /><text class="upload-evidence-copy"><text>老师反馈</text><text>评语或聊天截图，帮助定位课堂里的真实卡点。</text></text><text>补充</text></view>
+          <view class="upload-evidence-card" data-type="parent_report" bindtap="openMaterialReportPanel"><image mode="aspectFit" src="/assets/reference/family-avatar-group-transparent.png" /><text class="upload-evidence-copy"><text>家长观察</text><text>随手写几句现状，记录抗挫、拖延和开始难度。</text></text><text>补充</text></view>
+          <view class="upload-evidence-card" data-type="assessment" bindtap="setMaterialType"><image mode="aspectFit" src="/assets/reference/learning-route-map-transparent.png" /><text class="upload-evidence-copy"><text>测评摘要</text><text>导入过往诊断，和错题记录一起生成培养建议。</text></text><text>补充</text></view>
         </view>
 
         <view class="upload-intake-workbench">
