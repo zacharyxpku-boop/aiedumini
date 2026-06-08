@@ -19,7 +19,7 @@
         </view>
 
         <view class="review-record-panel">
-          <view class="review-section-head"><text>{{reviewFlowStage === 'topic' ? '今天想练哪一块？' : reviewFlowStage === 'tool' ? '玩法选择' : reviewFlowStage === 'finished' ? '结算页' : '快闪问答'}}</text><text>{{reviewFlowStage === 'topic' ? '推荐探索 · 选个知识点，马上开局探索' : reviewFlowStage === 'tool' ? '选一个最适合现在的节奏，马上开始' : reviewFlowStage === 'finished' ? '给家长看证据' : '正在热身'}}</text></view>
+          <view class="review-section-head"><text>{{reviewFlowStage === 'topic' ? '今天想练哪一块？' : reviewFlowStage === 'tool' ? '玩法选择' : reviewFlowStage === 'finished' ? '结算页' : '快闪问答'}}</text><text>{{reviewFlowStage === 'topic' ? '推荐探索 · 换一批 · 选个知识点，马上开局探索' : reviewFlowStage === 'tool' ? '选一个最适合现在的节奏，马上开始' : reviewFlowStage === 'finished' ? '给家长看证据' : '正在热身'}}</text></view>
           <text class="review-flow-tabs">
             <text class="{{reviewFlowStage === 'topic' ? 'active' : ''}}" data-stage="topic" bindtap="setReviewFlowStage">选知识点</text>
             <text class="{{reviewFlowStage === 'tool' ? 'active' : ''}}" data-stage="tool" bindtap="setReviewFlowStage">玩法选择</text>
@@ -50,7 +50,7 @@
             <view class="review-game-bar"><view></view></view>
             <text class="review-live-line">{{activeReviewTool.line}}</text>
             <text class="review-live-mission">{{activeReviewTool.mission}}</text>
-            <view class="review-live-reference" wx:if="{{reviewFlowStage === 'live'}}"><text>找第一步</text><text>遇到“相遇问题”时，脑海里跳出的第一个动作应该是什么？</text><text>先在心里想好，再点击下方按钮。</text></view>
+            <view class="review-live-reference" wx:if="{{reviewFlowStage === 'live'}}"><text>找第一步</text><text>遇到“相遇问题”时，脑海里跳出的第一个动作应该是什么？</text><text>先在心里想好第一步，再点击下方按钮。</text></view>
             <view class="review-live-card"><text>{{activeReviewTool.primary.label}}</text><text>{{activeReviewTool.primary.prompt}}</text><text>{{activeReviewTool.primary.check}}</text></view>
             <view class="review-live-card compact" wx:if="{{activeReviewTool.secondary && activeReviewTool.secondary.id}}"><text>{{activeReviewTool.secondary.label}}</text><text>{{activeReviewTool.secondary.prompt}}</text><text>{{activeReviewTool.secondary.check}}</text></view>
             <view class="review-live-card compact" wx:if="{{activeReviewTool.third && activeReviewTool.third.id}}"><text>{{activeReviewTool.third.label}}</text><text>{{activeReviewTool.third.prompt}}</text><text>{{activeReviewTool.third.check}}</text></view>
