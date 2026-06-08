@@ -68,7 +68,13 @@
         <view class="growth-upload-panel" wx:if="{{growthActiveScene === 'upload'}}">
           <view class="growth-upload-head"><text>收集线索碎片</text><text>材料越真实，建议越具体。</text></view>
           <text class="growth-upload-lead">直接拍照或打字都可以，不必全部填满哦～</text>
-          <view class="growth-upload-grid"><text>错题描述\n记录孩子常卡住的题型\n已添加 1 份\n“昨天数学卷子大题第二问，总是列错方程...”</text><text>成绩/周测\n支持拍照识别</text><text>老师反馈\n聊天截图/评语</text><text>家长观察\n随意写几句现状</text><text>测评摘要\n以往的诊断报告</text></view>
+          <view class="growth-upload-grid">
+            <view class="growth-upload-card primary" data-action="upload" bindtap="runParentReportAction"><image mode="aspectFit" src="/assets/reference/upload-folder-stack-transparent.png" /><view><text>错题描述</text><text>记录孩子常卡住的题型。已添加 1 份：“昨天数学卷子大题第二问，总是列错方程...”</text></view><text>补充</text></view>
+            <view class="growth-upload-card" data-action="upload" bindtap="runParentReportAction"><image mode="aspectFit" src="/assets/reference/report-radar-card-illustration.png" /><view><text>成绩/周测</text><text>把分数、错题分布和最近一次周测放进报告证据。</text></view><text>上传</text></view>
+            <view class="growth-upload-card" data-action="upload" bindtap="runParentReportAction"><image mode="aspectFit" src="/assets/reference/tutor-socratic-board-transparent.png" /><view><text>老师反馈</text><text>聊天截图、评语或老师提醒，帮助定位课堂里的真实卡点。</text></view><text>添加</text></view>
+            <view class="growth-upload-card warm" bindtap="startGrowthQuestionnaire"><image mode="aspectFit" src="/assets/reference/family-avatar-group-transparent.png" /><view><text>家长观察</text><text>用 1 分钟问卷记录孩子最近的状态、抗挫和学习习惯。</text></view><text>填写</text></view>
+            <view class="growth-upload-card" data-action="upload" bindtap="runParentReportAction"><image mode="aspectFit" src="/assets/reference/learning-route-map-transparent.png" /><view><text>测评摘要</text><text>导入以往测评或诊断摘要，和错题记录一起生成培养建议。</text></view><text>导入</text></view>
+          </view>
           <view class="growth-unlock-strip"><text>生成报告后，将解锁：</text><text>专属学习偏好 如：视觉型</text><text>深层卡点定位 如：工作记忆受限</text><text>今晚行动建议 如：睡前花 5 分钟</text></view>
           <text class="growth-generate-cta" data-action="upload" bindtap="runParentReportAction">生成成长报告</text>
         </view>

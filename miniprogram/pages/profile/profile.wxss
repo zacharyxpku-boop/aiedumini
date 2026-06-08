@@ -1176,14 +1176,40 @@ page {
   gap: 18rpx;
 }
 
-.growth-upload-grid text {
+.growth-upload-card {
   min-height: 136rpx;
   padding: 24rpx 26rpx;
   border-radius: 28rpx;
   background: #ffffff;
-  font-size: 27rpx;
-  line-height: 1.45;
   box-shadow: 0 12rpx 30rpx rgba(15, 23, 42, 0.055);
+}
+
+.growth-upload-card image {
+  width: 86rpx;
+  height: 86rpx;
+}
+
+.growth-upload-card view text:first-child {
+  font-size: 29rpx;
+}
+
+.growth-upload-card view text:nth-child(2) {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  line-height: 1.36;
+  -webkit-line-clamp: 3;
+}
+
+.growth-upload-card.primary {
+  border-color: rgba(34, 185, 92, 0.34);
+  background:
+    radial-gradient(circle at 92% 8%, rgba(255, 216, 79, 0.22), transparent 34%),
+    #ffffff;
+}
+
+.growth-upload-card.warm {
+  border-color: rgba(251, 191, 36, 0.36);
+  background: #fffaf0;
 }
 
 .growth-unlock-strip {
