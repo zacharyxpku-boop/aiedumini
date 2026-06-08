@@ -178,7 +178,7 @@ function buildImportMemoryMetadata(source, fields = {}, meta = {}) {
     highFrequency: {
       mode: isTrapOrWrong ? 'wrong_cause_replay' : 'active_recall',
       dailyCap: isTrapOrWrong ? 3 : 2,
-      releaseGate: '先说第一步，再看答案；不奖励速度、分数或排名。',
+      releaseGate: '先说第一步，再核对依据；不奖励速度、分数或排名。',
       reviewRoute: '/pages/review/review?from=material_memory'
     },
     nextRevisitWindow,
@@ -2804,58 +2804,18 @@ function publicDeckTemplates(summary) {
 
 function practiceTeachingAidCatalog() {
   const base = [
-    { id: 'flashcards', label: '闪卡', lane: 'worksheet', format: 'card', renderMode: 'print_card' },
-    { id: 'matching_pairs', label: '配对卡', lane: 'worksheet', format: 'cutout', renderMode: 'cut_and_match' },
-    { id: 'domino_chain', label: '多米诺骨牌', lane: 'worksheet', format: 'cutout', renderMode: 'domino_chain' },
-    { id: 'puzzle_match', label: '拼图配对', lane: 'worksheet', format: 'cutout', renderMode: 'puzzle_match' },
-    { id: 'rule_cards', label: '规则练习牌', lane: 'worksheet', format: 'card', renderMode: 'rule_card' },
-    { id: 'bingo_grid', label: 'Bingo 九宫格', lane: 'worksheet', format: 'grid', renderMode: 'bingo_grid' },
-    { id: 'word_wall', label: '词墙卡', lane: 'worksheet', format: 'wall', renderMode: 'word_wall' },
-    { id: 'sort_cards', label: '分类卡', lane: 'worksheet', format: 'card', renderMode: 'sort_stack' },
-    { id: 'sequence_strip', label: '排序条', lane: 'worksheet', format: 'strip', renderMode: 'sequence_strip' },
-    { id: 'cloze_sheet', label: '填空练习单', lane: 'worksheet', format: 'sheet', renderMode: 'cloze_sheet' },
-    { id: 'first_step_ticket', label: '第一步票据', lane: 'worksheet', format: 'ticket', renderMode: 'first_step_ticket' },
-    { id: 'wrong_cause_cards', label: '错因卡', lane: 'worksheet', format: 'card', renderMode: 'wrong_cause_card' },
-    { id: 'evidence_cards', label: '证据卡', lane: 'worksheet', format: 'card', renderMode: 'evidence_card' },
-    { id: 'concept_map', label: '概念图', lane: 'worksheet', format: 'map', renderMode: 'concept_map' },
-    { id: 'route_map', label: '学习行动图', lane: 'worksheet', format: 'map', renderMode: 'route_map' },
-    { id: 'mini_whiteboard', label: '小白板', lane: 'live', format: 'board', renderMode: 'projector_board' },
-    { id: 'click_recall', label: '可点击回忆', lane: 'live', format: 'web', renderMode: 'tap_recall' },
-    { id: 'spin_picker', label: '转盘抽题', lane: 'live', format: 'web', renderMode: 'safe_spinner' },
-    { id: 'card_flip', label: '翻卡练习', lane: 'live', format: 'web', renderMode: 'flip_card' },
-    { id: 'drag_sort', label: '拖拽排序', lane: 'live', format: 'web', renderMode: 'drag_sort' },
-    { id: 'tap_match', label: '点击配对', lane: 'live', format: 'web', renderMode: 'tap_match' },
-    { id: 'timer_round', label: '计时轮次', lane: 'live', format: 'web', renderMode: 'timer_round' },
-    { id: 'team_relay', label: '小组接力', lane: 'live', format: 'classroom', renderMode: 'team_relay_safe' },
-    { id: 'board_race_safe', label: '白板共做', lane: 'live', format: 'classroom', renderMode: 'board_race_safe' },
-    { id: 'story_path', label: '情境路径', lane: 'live', format: 'web', renderMode: 'story_path' },
-    { id: 'ppt_scene_cards', label: 'PPT 场景卡', lane: 'live', format: 'slide', renderMode: 'slide_to_web' },
-    { id: 'home_recall_pack', label: '课后回忆包', lane: 'self', format: 'assignment', renderMode: 'home_recall' },
-    { id: 'near_transfer_pack', label: '同类换题包', lane: 'self', format: 'assignment', renderMode: 'near_transfer' },
-    { id: 'teach_parent_card', label: '教家长卡', lane: 'self', format: 'assignment', renderMode: 'teach_back' },
-    { id: 'day2_return', label: '隔天回访', lane: 'self', format: 'assignment', renderMode: 'day2_return' },
-    { id: 'day7_variant', label: '第 7 天变式', lane: 'self', format: 'assignment', renderMode: 'day7_variant' },
-    { id: 'self_checklist', label: '自查清单', lane: 'self', format: 'assignment', renderMode: 'self_checklist' },
-    { id: 'audio_retell', label: '口头复述', lane: 'self', format: 'assignment', renderMode: 'audio_retell' },
-    { id: 'micro_goal_card', label: '小目标卡', lane: 'self', format: 'assignment', renderMode: 'micro_goal' },
-    { id: 'parent_receipt', label: '家长回执', lane: 'self', format: 'assignment', renderMode: 'parent_receipt' },
-    { id: 'template_save', label: '保存模板', lane: 'community', format: 'template', renderMode: 'local_save' },
-    { id: 'template_remix', label: '改编模板', lane: 'community', format: 'template', renderMode: 'remix_local' },
-    { id: 'structure_card', label: '结构卡', lane: 'community', format: 'template', renderMode: 'reuse_local' },
-    { id: 'subject_pack', label: '学科模板包', lane: 'community', format: 'template', renderMode: 'subject_pack' },
-    { id: 'teacher_note', label: '老师备注', lane: 'community', format: 'template', renderMode: 'teacher_note' },
-    { id: 'family_template', label: '家庭模板', lane: 'community', format: 'template', renderMode: 'family_template' },
-    { id: 'share_safe_card', label: '安全分享卡', lane: 'community', format: 'template', renderMode: 'share_safe_card' },
-    { id: 'print_bundle', label: '打印合集', lane: 'community', format: 'print', renderMode: 'print_bundle' },
-    { id: 'privacy_filter', label: '隐私过滤', lane: 'community', format: 'template', renderMode: 'privacy_filter' }
+    { id: 'whack', label: '错因地鼠', lane: 'whack', format: 'game', renderMode: 'wrong_cause_choice' },
+    { id: 'quiz', label: '快闪问答', lane: 'quiz', format: 'game', renderMode: 'active_recall_quiz' },
+    { id: 'match', label: '拼图配对', lane: 'match', format: 'game', renderMode: 'concept_match' },
+    { id: 'snake', label: '路线接龙', lane: 'snake', format: 'game', renderMode: 'step_sequence' }
   ];
   return base.map((item) => Object.assign({}, item, {
-    printReady: item.lane === 'worksheet' || item.format === 'print',
-    pinyinReady: true,
-    colorPrintReady: true,
-    studentAssignable: item.lane === 'self' || item.lane === 'worksheet',
-    communityReusable: item.lane === 'community' || item.lane === 'worksheet',
-    requiresParentConfirm: item.lane === 'community'
+    printReady: false,
+    pinyinReady: false,
+    colorPrintReady: false,
+    studentAssignable: true,
+    communityReusable: false,
+    requiresParentConfirm: false
   }));
 }
 
@@ -2864,12 +2824,6 @@ function practiceTemplateWorkshop(summary = {}, cards = []) {
   const safeCards = Array.isArray(cards) ? cards : [];
   const templates = Array.isArray(safe.templates) ? safe.templates : templateBreakdown(safeCards);
   const catalog = practiceTeachingAidCatalog();
-  const catalogByLane = catalog.reduce((acc, item) => {
-    const key = item.lane || 'worksheet';
-    acc[key] = acc[key] || [];
-    acc[key].push(item);
-    return acc;
-  }, {});
   const readyCount = Math.max(
     Number(safe.due || 0),
     safeCards.length,
@@ -2877,80 +2831,53 @@ function practiceTemplateWorkshop(summary = {}, cards = []) {
   );
   const topTemplate = templates.find((item) => Number(item.total || 0) > 0) || null;
   const topic = topTemplate && topTemplate.label ? topTemplate.label : '今天卡点';
-  const lanes = [
-    {
-      id: 'worksheet',
-      label: '练习单',
-      line: '闪卡、配对、拼图、多米诺、规则卡',
-      mode: 'worksheet_generator',
-      source: topic,
-      ready: readyCount > 0,
-      action: '生成一页可打印练习单',
-      catalogCount: (catalogByLane.worksheet || []).length,
-      catalog: (catalogByLane.worksheet || []).map((item) => item.id)
-    },
-    {
-      id: 'live',
-      label: '课堂互动',
-      line: '点击回忆、翻卡、拖拽、转盘、小组共做',
-      mode: 'interactive_lesson',
-      source: '本地回访卡',
-      ready: readyCount > 0,
-      action: '把卡点变成一轮可点练习',
-      catalogCount: (catalogByLane.live || []).length,
-      catalog: (catalogByLane.live || []).map((item) => item.id)
-    },
-    {
-      id: 'self',
-      label: '自主练习',
-      line: '课后回忆、同类换题、错因复述、隔天回看',
-      mode: 'home_assignment',
-      route: '/pages/review/review?from=template_self_practice',
-      ready: readyCount > 0,
-      action: '留给孩子自己完成一轮',
-      catalogCount: (catalogByLane.self || []).length,
-      catalog: (catalogByLane.self || []).map((item) => item.id)
-    },
-    {
-      id: 'community',
-      label: '结构卡',
-      line: '本地保存、下次使用、家长确认、安全分享',
-      mode: 'local_structure_card',
-      ready: true,
-      action: '先本地保存，云端共创后续接入',
-      catalogCount: (catalogByLane.community || []).length,
-      catalog: (catalogByLane.community || []).map((item) => item.id)
-    }
-  ];
+  const lanes = catalog.map((item) => ({
+    id: item.id,
+    label: item.label,
+    line: item.id === 'whack'
+      ? '先选错因，不抢答案'
+      : item.id === 'quiz'
+        ? '主动回忆，再自评'
+        : item.id === 'match'
+          ? '把概念和证据配上'
+          : '按第一步顺序接龙',
+    mode: item.id,
+    route: `/pages/review/review?tool=${item.id}&from=practice_engine_pack`,
+    source: topic,
+    ready: readyCount > 0,
+    action: `开始${item.label}`,
+    catalogCount: 1,
+    catalog: [item.id]
+  }));
   return {
-    id: 'practice_template_workshop',
-    title: '练习卡生成',
-    subtitle: '从卡点生成 ' + catalog.length + ' 款教具、课堂互动和自主练习，不做排名刺激',
-    catalogLine: catalog.length + ' 款练习卡：多米诺、拼图配对、规则卡、闪卡、课堂互动和课后自主练习',
+    id: 'practice_engine_pack',
+    title: '知识乐园练习',
+    subtitle: '从错题卡生成 4 个可玩的短练习，不做排名刺激',
+    catalogLine: '4 个真实练习：错因地鼠、快闪问答、拼图配对、路线接龙',
     readyCount,
     sourceCount: safeCards.length,
     catalogCount: catalog.length,
     teachingAidCatalog: catalog,
     printOptions: {
-      colorPrint: true,
-      pinyinFieldReady: true,
-      cutoutReady: true,
-      pdfExport: 'server_or_h5_print_after_parent_review'
+      colorPrint: false,
+      pinyinFieldReady: false,
+      cutoutReady: false,
+      pdfExport: 'not_exposed_in_miniapp'
     },
     assignmentPlan: {
-      mode: 'student_independent_practice',
-      route: '/pages/review/review?from=template_assignment',
-      releaseGate: 'first_step_and_wrong_cause_before_assignment'
+      mode: 'playable_revisit_round',
+      route: '/pages/review/review?from=practice_engine_pack',
+      releaseGate: 'first_step_and_wrong_cause_before_practice'
     },
     communityPlan: {
-      mode: 'local_structure_card_first',
+      mode: 'private_local_evidence_only',
       saveReady: true,
       shareReady: false,
-      rule: '先本地保存和复用；云端共创必须经过家长确认和隐私字段过滤。'
+      rule: '只保存本机练习证据，不开放模板社区。'
     },
-    printFieldsReady: true,
-    pinyinFieldsReady: true,
-    safetyLine: '只做练习材料、课堂互动和复用模板，不做排名刺激、分数比较或答案代写。',
+    printFieldsReady: false,
+    pinyinFieldsReady: false,
+    safetyLine: '只做错因练习、主动回忆和迁移验证，不做排名刺激、分数比较或答案代写。',
     lanes
   };
 }

@@ -287,32 +287,32 @@ Page({
   buildTemplateRouteContext(query = {}) {
     const from = String(query.from || '');
     const templateModes = {
-      template_worksheet: {
-        title: '练习卡',
-        line: '已进入练习卡预览：只使用本机错因卡和第一步证据。',
-        actionLabel: '查看练习卡'
+      play_whack: {
+        title: '错因地鼠',
+        line: '先判断错因，不抢完整答案。',
+        actionLabel: '开始错因地鼠'
       },
-      template_live: {
-        title: '课堂互动工具',
-        line: '已进入课堂互动包：翻卡、拖拽、投屏和 90 秒回忆只记录过程，不做名次榜。',
-        actionLabel: '运行互动包'
+      play_quiz: {
+        title: '快闪问答',
+        line: '先主动回忆，再自评是否记住。',
+        actionLabel: '开始快闪问答'
       },
-      template_assignment: {
-        title: '学生自主练习',
-        line: '已进入学生作业包：先说第一步和错因，明天回访，第 7 天做小变式。',
-        actionLabel: '布置自主练习'
+      play_match: {
+        title: '拼图配对',
+        line: '把卡点、证据和第一步配起来。',
+        actionLabel: '开始拼图配对'
       },
-      template_structure: {
-        title: '本机结构卡',
-        line: '只保存练习结构，不分享原题、答案、分数、身份或完整对话。',
-        actionLabel: '保存结构卡'
+      play_snake: {
+        title: '路线接龙',
+        line: '按第一步顺序接一遍，不跳到完整解法。',
+        actionLabel: '开始路线接龙'
       }
     };
     const mode = templateModes[from];
     if (!mode) return null;
     return Object.assign({
       from,
-      mode: 'practice_template_deliverable',
+      mode: 'practice_engine_round',
       returnRoute: '/pages/review/review',
       flowTraceId: from
     }, mode);
@@ -422,31 +422,23 @@ Page({
     const recommended = revisitEngine.recommendGames
       ? revisitEngine.recommendGames(sourceCards)
       : [];
-    const toolIds = ['whack', 'quiz', 'flash', 'match', 'domino', 'snake', 'uno', 'worksheet'];
+    const toolIds = ['whack', 'quiz', 'match', 'snake'];
     const fallback = {
       whack: { title: '错因地鼠', pitch: '看题面快选第一步，抓住最容易错的点。', readyCount: sourceCards.length, available: !!sourceCards.length },
       quiz: { title: '快闪问答', pitch: '先回忆第一步，再翻开核对错因。', readyCount: sourceCards.length, available: !!sourceCards.length },
-      flash: { title: '闪卡翻翻', pitch: '一张卡一轮，先说再翻开。', readyCount: sourceCards.length, available: !!sourceCards.length },
       match: { title: '拼图配对', pitch: '把卡点和第一步配起来。', readyCount: sourceCards.length, available: sourceCards.length >= 2 },
-      domino: { title: '多米诺接龙', pitch: '把相邻的卡点关系接起来。', readyCount: sourceCards.length, available: sourceCards.length >= 2 },
       snake: { title: '路线接龙', pitch: '按题意、条件、第一步排顺。', readyCount: sourceCards.length, available: sourceCards.length >= 2 },
-      uno: { title: 'UNO错因牌', pitch: '按颜色和错因出牌，说清下一步。', readyCount: sourceCards.length, available: sourceCards.length >= 2 },
-      worksheet: { title: '闪印练习单', pitch: '把错因卡整理成一页练习。', readyCount: sourceCards.length, available: !!sourceCards.length }
     };
     const display = {
       whack: { icon: '地', themeClass: 'theme-whack', engineId: 'whack' },
       quiz: { icon: '快', themeClass: 'theme-quiz', engineId: 'quiz' },
-      flash: { icon: '闪', themeClass: 'theme-flash', engineId: 'quiz' },
       match: { icon: '拼', themeClass: 'theme-match', engineId: 'match' },
-      domino: { icon: '接', themeClass: 'theme-domino', engineId: 'match' },
-      snake: { icon: '路', themeClass: 'theme-snake', engineId: 'snake' },
-      uno: { icon: '牌', themeClass: 'theme-uno', engineId: 'match' },
-      worksheet: { icon: '单', themeClass: 'theme-worksheet', engineId: 'quiz' }
+      snake: { icon: '路', themeClass: 'theme-snake', engineId: 'snake' }
     };
     const missionFor = (id, item) => {
       const count = Number(item.readyCount || 0);
-      if (!item.available) return id === 'quiz' || id === 'flash' || id === 'whack' || id === 'worksheet' ? '先补 1 张真卡' : '先补 2 张真卡';
-      if (id === 'match' || id === 'domino' || id === 'uno') return `配对 ${Math.min(4, Math.max(2, count))} 组`;
+      if (!item.available) return id === 'quiz' || id === 'whack' ? '先补 1 张真卡' : '先补 2 张真卡';
+      if (id === 'match') return `配对 ${Math.min(4, Math.max(2, count))} 组`;
       if (id === 'snake') return `排序 ${Math.min(3, Math.max(2, count))} 组`;
       if (id === 'whack') return `快选 ${Math.min(4, Math.max(1, count))} 题`;
       return `90秒回忆 ${Math.min(3, Math.max(1, count))} 张`;
@@ -1614,158 +1606,105 @@ Page({
       firstStep: card.firstStep || card.prompt || card.question || '先说出第一步',
       wrongCause: card.wrongCause || card.reason || card.errorType || '待孩子复述错因'
     }));
-    const byLane = (lane) => catalog
-      .filter((item) => item && item.lane === lane)
-      .map((item, index) => ({
-        id: item.id,
-        label: item.label,
-        format: item.format,
-        renderMode: item.renderMode || item.format,
-        printReady: !!item.printReady,
-        pinyinReady: !!item.pinyinReady,
-        colorPrintReady: !!item.colorPrintReady,
-        studentAssignable: !!item.studentAssignable,
-        communityReusable: !!item.communityReusable,
-        requiresParentConfirm: !!item.requiresParentConfirm,
-        sourceCardId: sourceCards[index % Math.max(sourceCards.length, 1)] ? sourceCards[index % sourceCards.length].id : '',
-        source: sourceCards[index % Math.max(sourceCards.length, 1)] ? sourceCards[index % sourceCards.length].weakPoint : '今日卡点'
-      }));
-    const worksheet = byLane('worksheet');
-    const live = byLane('live');
-    const selfPractice = byLane('self');
-    const communityReuse = byLane('community');
     const now = new Date().toISOString();
-    const packId = 'practice_template_pack_' + now.slice(0, 10).replace(/-/g, '');
-    const printOptions = Object.assign({
-      colorPrint: true,
-      pinyinFieldReady: true,
-      cutoutReady: true,
-      paperSize: 'A4',
-      parentReviewRequired: true
-    }, safeWorkshop.printOptions || {});
-    const worksheetBundle = {
-      id: 'worksheet_bundle',
-      route: '/pages/review/review?from=template_worksheet',
-      printOptions,
-      templates: worksheet,
-      sourceCards,
-      exportFields: ['title', 'prompt', 'first_step', 'wrong_cause', 'pinyin_hint', 'cut_line', 'color_tag'],
-      readyToPreview: worksheet.length >= 8 && sourceCards.length > 0
-    };
-    const classroomInteractiveRun = {
-      id: 'classroom_interactive_run',
-      route: '/pages/review/review?from=template_live',
-      templates: live,
-      modes: ['tap_recall', 'flip_card', 'drag_sort', 'safe_spinner', 'projector_board'],
-      timerSeconds: 90,
-      groupMode: 'cooperate_without_scoreboard',
-      projectorReady: live.some((item) => item.format === 'slide' || item.format === 'board'),
-      readyToRun: live.length >= 8 && sourceCards.length > 0
-    };
-    const studentAssignment = {
-      id: 'student_assignment',
-      route: '/pages/review/review?from=template_assignment',
-      templates: selfPractice,
-      releaseGate: 'child_can_finish_one_round_without_full_answer',
-      due: 'tonight_or_next_morning',
-      revisitPlan: ['day2_return', 'day7_variant'],
-      evidenceRequired: ['first_step', 'wrong_cause', 'next_day_recall'],
-      parentVisible: true,
-      readyToAssign: selfPractice.length >= 8 && sourceCards.length > 0
-    };
-    const communityReusePlan = {
-      id: 'local_structure_card',
-      route: '/pages/review/review?from=template_structure',
-      templates: communityReuse,
-      localSaveKey: 'review.practice.template.pack.v1',
-      saveReady: true,
-      remixReady: communityReuse.some((item) => item.id === 'template_remix'),
-      privacyBoundary: '只复用结构；不分享原题、答案、分数、完整对话或孩子身份信息',
-      requiresParentConfirm: true,
-      readyToReuse: communityReuse.length >= 8
-    };
-    const deliverables = [
-      { id: 'worksheet_generator', label: '练习卡', count: worksheet.length, route: worksheetBundle.route, ready: worksheetBundle.readyToPreview },
-      { id: 'classroom_interactive', label: '课堂互动工具', count: live.length, route: classroomInteractiveRun.route, ready: classroomInteractiveRun.readyToRun },
-      { id: 'student_assignment', label: '学生自主练习', count: selfPractice.length, route: studentAssignment.route, ready: studentAssignment.readyToAssign },
-      { id: 'local_structure_card', label: '本机结构卡', count: communityReuse.length, route: communityReusePlan.route, ready: communityReusePlan.readyToReuse }
-    ];
+    const packId = 'practice_engine_pack_' + now.slice(0, 10).replace(/-/g, '');
+    const engineCatalog = ['whack', 'quiz', 'match', 'snake'].map((id) => {
+      const catalogItem = catalog.find((item) => item && item.id === id) || {};
+      const labels = { whack: '错因地鼠', quiz: '快闪问答', match: '拼图配对', snake: '路线接龙' };
+      const source = sourceCards[0] || {};
+      return {
+        id,
+        label: catalogItem.label || labels[id],
+        gameType: id,
+        renderMode: catalogItem.renderMode || id,
+        sourceCardId: source.id || '',
+        source: source.weakPoint || '今日卡点',
+        route: `/pages/review/review?from=play_${id}`,
+        ready: sourceCards.length > 0
+      };
+    });
+    const deliverables = engineCatalog.map((item) => ({
+      id: item.id,
+      label: item.label,
+      gameType: item.gameType,
+      count: sourceCards.length,
+      route: item.route,
+      ready: item.ready
+    }));
     return {
       id: packId,
-      title: safeWorkshop.title || '练习卡生成',
+      title: safeWorkshop.title || '知识乐园练习',
       createdAt: now,
       sourceCount: sourceCards.length,
-      catalogCount: Number(safeWorkshop.catalogCount || catalog.length || 0),
-      worksheet,
-      live,
-      selfPractice,
-      communityReuse,
-      worksheetBundle,
-      classroomInteractiveRun,
-      studentAssignment,
-      communityReusePlan,
+      catalogCount: engineCatalog.length,
+      engineCatalog,
       deliverables,
       teacherWorkflow: {
         input: 'review cards + wrong-cause evidence',
-        output: 'printable worksheets + classroom interaction pack + assignment + reusable template',
+        output: 'four playable revisit rounds',
         guardrail: 'no ranking, no score race, no full-answer copying'
       },
       reuseWorkflow: {
         saveReady: true,
-        reuseRule: 'local template first, parent confirmation before sharing',
-        communityBoundary: communityReusePlan.privacyBoundary
+        reuseRule: 'local evidence only',
+        communityBoundary: '不分享原题、答案、分数、完整对话或孩子身份信息'
       },
-      printOptions,
+      printOptions: {
+        colorPrint: false,
+        pinyinFieldReady: false,
+        cutoutReady: false,
+        parentReviewRequired: true
+      },
       assignmentPlan: safeWorkshop.assignmentPlan || {
-        route: studentAssignment.route,
-        releaseGate: studentAssignment.releaseGate
+        route: '/pages/review/review?from=practice_engine_pack',
+        releaseGate: 'first_step_and_wrong_cause_before_practice'
       },
       communityPlan: safeWorkshop.communityPlan || {
         saveReady: true,
-        rule: '先本地保存；需要家长确认后再分享复用。'
+        rule: '只保存本机练习证据。'
       },
       sourceCards,
-      safetyLine: safeWorkshop.safetyLine || '只做练习材料、课堂互动和自主回访，不做排名、比较刺激或答案代写。'
+      safetyLine: safeWorkshop.safetyLine || '只做错因练习、主动回忆和迁移验证，不做排名、比较刺激或答案代写。'
     };
   },
 
   buildPracticeTemplateWorkbench(deliverable = {}, pack = {}) {
-    const id = deliverable.id || 'worksheet_generator';
+    const id = deliverable.id || 'whack';
     const laneMap = {
-      worksheet_generator: {
-        title: '练习单生成器',
-        status: '可预览',
-        line: '把今日错因卡转成 A4 彩色练习单，先看第一步、再做配对和拼图。',
-        primaryAction: '预览练习单',
-        sampleTitle: '今日练习单',
-        samples: (pack.worksheet || []).slice(0, 3)
+      whack: {
+        title: '错因地鼠',
+        status: '可开始',
+        line: '先选出最像的错因，再回到原题说第一步。',
+        primaryAction: '开始错因地鼠',
+        sampleTitle: '错因练习',
+        samples: (pack.engineCatalog || []).filter((item) => item.id === 'whack')
       },
-      classroom_interactive: {
-        title: '课堂互动工具',
-        status: '可运行',
-        line: '把同一批卡点转成翻卡、拖拽和 90 秒回忆，课堂只记录过程证据。',
-        primaryAction: '开始互动',
-        sampleTitle: '课堂互动包',
-        samples: (pack.live || []).slice(0, 3)
+      quiz: {
+        title: '快闪问答',
+        status: '可开始',
+        line: '先主动回忆，再点击自评，系统记录回访证据。',
+        primaryAction: '开始快闪问答',
+        sampleTitle: '主动回忆',
+        samples: (pack.engineCatalog || []).filter((item) => item.id === 'quiz')
       },
-      student_assignment: {
-        title: '学生自主练习',
-        status: '可布置',
-        line: '只布置能自己说第一步的短练习，明天回访同一个错因。',
-        primaryAction: '布置自主练习',
-        sampleTitle: '自主练习包',
-        samples: (pack.selfPractice || []).slice(0, 3)
+      match: {
+        title: '拼图配对',
+        status: '可开始',
+        line: '把卡点、证据和第一步配上，避免只找完整解法。',
+        primaryAction: '开始拼图配对',
+        sampleTitle: '配对练习',
+        samples: (pack.engineCatalog || []).filter((item) => item.id === 'match')
       },
-      local_structure_card: {
-        title: '本机结构卡',
-        status: '可保存',
-        line: '只保存练习结构，家长确认后才能再次使用，不带原题、答案或身份信息。',
-        primaryAction: '保存结构卡',
-        sampleTitle: '可保存结构',
-        samples: (pack.communityReuse || []).slice(0, 3)
+      snake: {
+        title: '路线接龙',
+        status: '可开始',
+        line: '按第一步顺序接一遍，检查方法能不能迁移。',
+        primaryAction: '开始路线接龙',
+        sampleTitle: '步骤练习',
+        samples: (pack.engineCatalog || []).filter((item) => item.id === 'snake')
       }
     };
-    const lane = laneMap[id] || laneMap.worksheet_generator;
+    const lane = laneMap[id] || laneMap.whack;
     const baseSamples = lane.samples.length ? lane.samples : [{
       label: deliverable.label || lane.title,
       format: 'preview',
@@ -1781,7 +1720,7 @@ Page({
       primaryAction: lane.primaryAction,
       sampleTitle: lane.sampleTitle,
       count: deliverable.count || samples.length,
-      route: deliverable.route || '/pages/review/review?from=template_worksheet',
+      route: deliverable.route || `/pages/review/review?from=play_${id}`,
       samples: samples.map((item, index) => ({
         id: item.id || `${id}_${index}`,
         label: item.label || lane.title,
@@ -1809,10 +1748,8 @@ Page({
           catalog_count: pack.catalogCount,
           source_count: pack.sourceCount,
           deliverable_ids: pack.deliverables.map((item) => item.id),
-          worksheet_count: pack.worksheet.length,
-          live_count: pack.live.length,
-          self_practice_count: pack.selfPractice.length,
-          local_structure_card_count: pack.communityReuse.length,
+          engine_ids: (pack.engineCatalog || []).map((item) => item.id),
+          engine_count: (pack.engineCatalog || []).length,
           created_at: pack.createdAt
         });
       }
@@ -2284,14 +2221,15 @@ Page({
 
   runTemplateDeliverable(event) {
     const dataset = event && event.currentTarget ? event.currentTarget.dataset || {} : {};
-    const route = dataset.route || '/pages/review/review?from=template_worksheet';
+    const route = dataset.route || '/pages/review/review?from=play_whack';
     const pack = this.data.practiceTemplatePack && this.data.practiceTemplatePack.id
       ? this.data.practiceTemplatePack
       : this.buildPracticeTemplatePack(this.data.practiceTemplateWorkshop, this.data.cards);
     const deliverable = (pack.deliverables || []).find((item) => item.id === dataset.id)
       || {
-        id: dataset.id || 'worksheet_generator',
-        label: dataset.label || '练习单生成器',
+        id: dataset.id || 'whack',
+        label: dataset.label || '错因地鼠',
+        gameType: dataset.id || 'whack',
         route,
         count: 0,
         ready: true
@@ -2312,8 +2250,8 @@ Page({
       practiceTemplatePack: pack,
       practiceTemplateWorkbench: workbench,
       feedbackText: dataset.label
-        ? `${dataset.label} 工作台已打开，本机只使用错因卡和第一步证据。`
-        : '练习工坊交付物已打开，本机只使用错因卡和第一步证据。'
+        ? `${dataset.label} 已打开，本机只使用错因卡和第一步证据。`
+        : '知识乐园练习已打开，本机只使用错因卡和第一步证据。'
     });
   },
 
