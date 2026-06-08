@@ -111,6 +111,7 @@ Page({
     reportSourceContext: null,
     reportSourcePanel: null,
     miniLessonReturnPanel: null,
+    reviewFlowStage: 'topic',
     selectedKnowledgeTopic: '应用题第一步',
     knowledgeStarterTopics: [
       '应用题第一步',
@@ -514,7 +515,10 @@ Page({
 
   selectKnowledgeStarterTopic(event) {
     const topic = event && event.currentTarget ? event.currentTarget.dataset.topic || '' : '';
-    this.setData({ selectedKnowledgeTopic: topic || '应用题第一步' });
+    this.setData({
+      selectedKnowledgeTopic: topic || '应用题第一步',
+      reviewFlowStage: 'tool'
+    });
   },
 
   ensureKnowledgeStarterCards() {
@@ -1880,6 +1884,7 @@ Page({
         return;
       }
       this.setData({
+        reviewFlowStage: 'topic',
         activeReviewTool: this.buildActiveReviewTool(Object.assign({}, tool, {
           id: toolId,
           title: tool.title || '知识玩法',
@@ -1909,6 +1914,7 @@ Page({
       });
     }
     this.setData({
+      reviewFlowStage: 'live',
       activeReviewTool: this.buildActiveReviewTool(Object.assign({}, tool, { id: toolId }), round),
       practiceTemplateWorkbench: Object.assign({}, this.data.practiceTemplateWorkbench || {}, {
         id: `review_tool_${toolId}`,
@@ -1936,6 +1942,7 @@ Page({
     let answers = Array.isArray(active.answers) ? active.answers.slice() : [];
     if (!answers.length) {
       this.setData({
+        reviewFlowStage: 'live',
         feedbackText: '先完成一次配对、排序或回忆自评，再记录本轮。'
       });
       if (typeof wx !== 'undefined' && wx.showToast) {
@@ -2041,6 +2048,7 @@ Page({
       return;
     }
     this.setData({
+      reviewFlowStage: 'finished',
       activeReviewTool: Object.assign({}, active, {
         attemptSummary,
         roundAdvice,

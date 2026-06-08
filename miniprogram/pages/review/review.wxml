@@ -19,6 +19,12 @@
 
         <view class="review-record-panel">
           <view class="review-section-head"><text>先选知识点</text><text>{{selectedKnowledgeTopic}}</text></view>
+          <text class="review-flow-tabs">
+            <text class="{{reviewFlowStage === 'topic' ? 'active' : ''}}">选知识点</text>
+            <text class="{{reviewFlowStage === 'tool' ? 'active' : ''}}">玩法选择</text>
+            <text class="{{reviewFlowStage === 'live' ? 'active' : ''}}">游戏进行中</text>
+            <text class="{{reviewFlowStage === 'finished' ? 'active' : ''}}">一局结束</text>
+          </text>
           <view class="review-topic-row">
             <text class="review-topic-chip {{selectedKnowledgeTopic === '应用题第一步' ? 'active' : ''}}" data-topic="应用题第一步" bindtap="selectKnowledgeStarterTopic">应用题第一步</text>
             <text class="review-topic-chip {{selectedKnowledgeTopic === '阅读理解' ? 'active' : ''}}" data-topic="阅读理解" bindtap="selectKnowledgeStarterTopic">阅读理解</text>
@@ -54,9 +60,9 @@
               <text wx:for="{{activeReviewTool.currentTrack.tiles}}" wx:key="id" class="review-choice-tile {{item.picked ? 'selected' : ''}}" data-id="{{item.id}}" bindtap="pickSnakeTile">{{item.text}}</text>
             </view>
             <view class="review-finish-card" wx:if="{{activeReviewTool.attemptSummary}}">
-              <view><text>这一局探索结束</text><text>证据袋留下了 {{activeReviewTool.attemptSummary.correct}} 条会的线索，{{activeReviewTool.attemptSummary.wrong}} 条还要回访。</text></view>
+              <view><text>这一局探索结束啦</text><text>档案袋留下了 {{activeReviewTool.attemptSummary.correct}} 条会的线索，{{activeReviewTool.attemptSummary.wrong}} 条还要回访。</text></view>
               <view><text>记住了什么</text><text>{{activeReviewTool.roundAdvice ? activeReviewTool.roundAdvice.primary : '先把第一步说清楚'}}</text></view>
-              <view><text>明天回访什么</text><text>{{activeReviewTool.repairFocus || '换一道同类小题再认一次门'}}</text></view>
+              <view><text>明天回访什么</text><text>{{activeReviewTool.repairFocus || '换一道同类小题再认一次门'}} · 系统已安排 2 分钟</text></view>
             </view>
             <view class="review-round-strip" wx:if="{{activeReviewTool.attemptSummary}}"><text>{{activeReviewTool.attemptSummary.accuracy}}%</text><text>对 {{activeReviewTool.attemptSummary.correct}}</text><text>错 {{activeReviewTool.attemptSummary.wrong}}</text><text>{{activeReviewTool.roundAdvice ? activeReviewTool.roundAdvice.primary : '继续'}}</text><text data-result="retry" bindtap="finishPlayableReviewTool">再回忆一次</text><text wx:if="{{activeReviewTool.repairFocus}}" bindtap="openReviewRepairFocus">修错卡</text><text bindtap="openReviewParentEvidence">家长证据</text></view>
             <view class="review-live-actions finish"><button data-result="remembered" bindtap="finishPlayableReviewTool">记录本轮</button></view>

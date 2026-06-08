@@ -41,6 +41,13 @@
           </view>
         </view>
 
+        <view class="growth-flow-tabs">
+          <text class="{{growthActiveScene === 'main' ? 'active' : ''}}">成长报告</text>
+          <text class="{{growthActiveScene === 'questionnaire' ? 'active' : ''}}">1 分钟问卷</text>
+          <text class="{{growthActiveScene === 'preview' ? 'active' : ''}}">报告预览</text>
+          <text class="{{growthActiveScene === 'action' ? 'active' : ''}}">家长行动卡</text>
+        </view>
+
         <view class="growth-questionnaire-panel" wx:if="{{showLearningQuestionnaire}}">
           <view class="growth-questionnaire-head">
             <text>1 分钟学习问卷</text>
@@ -56,7 +63,14 @@
           <view class="growth-generate-cta" bindtap="generateLearningReport">生成成长报告</view>
         </view>
 
-        <view class="growth-signal-grid">
+        <view class="growth-progress-card">
+          <view class="growth-progress-head"><text>报告生成进度</text><text>{{learningReportSummary.reportJobCaseId ? '已接入材料' : '等待材料'}}</text></view>
+          <view class="growth-progress-step done"><text></text><view><text>学习偏好</text><text>1 分钟问卷会先形成方法候选</text></view><text bindtap="startGrowthQuestionnaire">去填写</text></view>
+          <view class="growth-progress-step active"><text></text><view><text>材料证据</text><text>错题、成绩、测评和老师反馈</text></view><text data-action="upload" bindtap="runParentReportAction">去上传</text></view>
+          <view class="growth-progress-step"><text></text><view><text>培养建议</text><text>基于证据生成方法和今晚行动</text></view><text>待生成</text></view>
+        </view>
+
+        <view class="growth-signal-grid" wx:if="{{growthActiveScene === 'preview' || (learningReportSummary && learningReportSummary.reportJobCaseId)}}">
           <view>
             <text>错题记录</text>
             <text>{{learningReportSummary.uploadedMaterialDecisionDossierChildStrengthLine || '先上传一张真实错题或测评'}}</text>
@@ -75,25 +89,18 @@
           </view>
         </view>
 
-        <view class="growth-progress-card">
-          <view class="growth-progress-head"><text>报告生成进度</text><text>{{learningReportSummary.reportJobCaseId ? '已接入材料' : '等待材料'}}</text></view>
-          <view class="growth-progress-step done"><text></text><view><text>学习偏好</text><text>1 分钟问卷会先形成方法候选</text></view><text bindtap="startGrowthQuestionnaire">去填写</text></view>
-          <view class="growth-progress-step active"><text></text><view><text>材料证据</text><text>错题、成绩、测评和老师反馈</text></view><text data-action="upload" bindtap="runParentReportAction">去上传</text></view>
-          <view class="growth-progress-step"><text></text><view><text>培养建议</text><text>基于证据生成方法和今晚行动</text></view><text>待生成</text></view>
-        </view>
-
-        <view class="growth-report-preview">
-          <view class="growth-report-preview-head"><text>成长线索初步发现</text><text>{{learningReportSummary.reportJobCaseId ? '基于材料' : '本地预览'}}</text></view>
+        <view class="growth-report-preview" wx:if="{{growthActiveScene === 'preview' || (learningReportSummary && learningReportSummary.reportJobCaseId)}}">
+          <view class="growth-report-preview-head"><text>成长线索初步发现 ✨</text><text>{{learningReportSummary.reportJobCaseId ? '基于材料' : '本地预览'}}</text></view>
           <view class="growth-report-preview-card"><text>学习偏好线索</text><text>{{learningReportSummary.learningPreferenceLine || '先用问卷和错题判断更适合图像、复述还是动手拆步。'}}</text></view>
           <view class="growth-report-preview-card warn"><text>当前卡点证据</text><text>{{learningReportSummary.diagnosisLine || profileViewModel.parentRecap.evidenceRecap}}</text></view>
           <view class="growth-report-preview-card action"><text>今晚建议</text><text>{{profileViewModel.parentRecap.parentOneQuestion}}</text></view>
         </view>
 
-        <view class="growth-parent-action-card">
-          <view class="growth-parent-action-head"><text>今晚行动卡</text><text>不替孩子学，只帮他开头</text></view>
-          <view><text></text><view><text>具体表扬</text><text>先指出一个真实努力，而不是评价聪不聪明。</text></view></view>
-          <view><text></text><view><text>清空桌面</text><text>给容易分心的孩子减少视觉干扰。</text></view></view>
-          <view><text></text><view><text>只问一问</text><text>孩子求助时只问“这一步和上一步是什么关系？”</text></view></view>
+        <view class="growth-parent-action-card" wx:if="{{growthActiveScene === 'preview' || growthActiveScene === 'action' || (learningReportSummary && learningReportSummary.reportJobCaseId)}}">
+          <view class="growth-parent-action-head"><text>今晚行动卡 🎯</text><text>不替孩子学，只帮他开头</text></view>
+          <view><text></text><view><text>建立自信 · 2 分钟</text><text>具体表扬一个真实努力，而不是评价聪不聪明。</text></view></view>
+          <view><text></text><view><text>环境优化 · 持续进行</text><text>清空桌面非学习用品，减少视觉干扰。</text></view></view>
+          <view><text></text><view><text>激发思考 · 5 分钟</text><text>孩子求助时只问：“这一步和上一步是什么关系？”</text></view></view>
         </view>
 
         <view class="yd-parent-decision growth" data-scene="parent" data-source="growth_report_card" bindtap="openEntryDetail">

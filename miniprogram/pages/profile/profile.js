@@ -3069,6 +3069,7 @@ Page({
     learningReportQuestionnaire: [],
     learningReportAnswers: {},
     showLearningQuestionnaire: false,
+    growthActiveScene: 'main',
     experienceChecklist: [],
     experienceDashboard: null,
     isBetaTester: false,
@@ -3811,7 +3812,11 @@ Page({
   },
 
   toggleLearningQuestionnaire() {
-    this.setData({ showLearningQuestionnaire: !this.data.showLearningQuestionnaire });
+    const next = !this.data.showLearningQuestionnaire;
+    this.setData({
+      showLearningQuestionnaire: next,
+      growthActiveScene: next ? 'questionnaire' : 'main'
+    });
   },
 
   answerLearningQuestion(event) {
@@ -3833,6 +3838,10 @@ Page({
   generateLearningReport() {
     const reportState = this.syncLearningReportFromInput();
     const title = reportState.reportStatus && reportState.reportStatus.requiresConfirmation ? '已生成，待确认' : '已生成学习画像';
+    this.setData({
+      growthActiveScene: 'preview',
+      showLearningQuestionnaire: false
+    });
     wx.showToast({ title, icon: 'none' });
   },
 
@@ -4045,6 +4054,7 @@ Page({
     this.setData({
       showAdvancedProfile: true,
       showLearningQuestionnaire: true,
+      growthActiveScene: 'questionnaire',
       profilePanel: 'assessment',
       profilePanelTitle: '1分钟学习问卷'
     });
@@ -4294,6 +4304,13 @@ Page({
       revisit: '/pages/review/review',
       tutor: '/pages/tutor/tutor'
     };
+    if (action === 'reportPreview') {
+      this.setData({
+        growthActiveScene: 'preview',
+        showLearningQuestionnaire: false
+      });
+      return;
+    }
     if (routeTargets[action]) {
       navigation.navigateLearningRoute(routeTargets[action]);
     }

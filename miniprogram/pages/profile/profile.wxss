@@ -247,6 +247,36 @@ page {
   font-weight: 950;
 }
 
+.growth-flow-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6rpx;
+  padding: 7rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.76);
+  box-shadow: inset 0 0 0 1rpx rgba(226, 235, 222, 0.92);
+}
+
+.growth-flow-tabs text {
+  display: flex;
+  min-width: 0;
+  min-height: 50rpx;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999rpx;
+  color: #6a766f;
+  font-size: 21rpx;
+  font-weight: 900;
+  line-height: 1.08;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.growth-flow-tabs text.active {
+  color: #17342b;
+  background: #ffd84f;
+}
+
 .growth-questionnaire-panel {
   display: grid;
   gap: 18rpx;

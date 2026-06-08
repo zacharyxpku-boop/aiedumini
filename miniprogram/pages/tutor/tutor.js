@@ -1222,6 +1222,7 @@ Page({
     weakPoints: [],
     misconceptionTags: [],
     activeStep: 'read_problem',
+    activeTutorScene: 'dialogue',
     coachStepLabel: '提示 1/5',
     currentHintLevel: 1,
     nextAction: '先用一句话说清题目真正问什么。',
@@ -1463,6 +1464,14 @@ Page({
       ? event.currentTarget.dataset
       : {};
     const step = dataset.step || this.data.activeStep || 'read_problem';
+    const sceneMap = {
+      read_problem: 'knowledge',
+      explain_misconception: 'knowledge',
+      find_direction: 'pointing',
+      review: 'recap',
+      write_first_step: 'stuck',
+      fast_mode: 'stuck'
+    };
     const selected = this.data.selected;
     const stepTextMap = {
       read_problem: selected ? `先帮我读题：${selected.text}` : '先帮我读题',
@@ -1483,6 +1492,7 @@ Page({
       : stepPrompt;
     this.setData({
       activeStep: step,
+      activeTutorScene: sceneMap[step] || 'dialogue',
       input
     }, () => {
       this.send();

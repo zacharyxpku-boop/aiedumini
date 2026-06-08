@@ -6,28 +6,26 @@
           <view class="yd-upload-brand">
             <image class="yd-upload-mark" mode="aspectFit" src="/assets/reference/brand-house.png" />
             <view>
-              <text>原点智学</text>
-              <text>先看证据再生成报告</text>
+              <text>完善信息</text>
+              <text>先收集线索，再生成报告</text>
             </view>
           </view>
-          <view class="yd-upload-pill">学习包</view>
+          <view class="yd-upload-pill" bindtap="viewLatestReport">跳过</view>
         </view>
 
         <view class="yd-upload-hero">
           <view class="yd-upload-copy">
-            <view class="yd-upload-title">上传材料，生成成长报告</view>
-            <view class="yd-upload-sub">作业、错题、成绩或测评都可以。</view>
+            <view class="yd-upload-title">收集线索碎片 🧩</view>
+            <view class="yd-upload-sub">材料越真实，建议越具体。直接拍照或打字都可以，不必全部填满。</view>
             <view class="yd-upload-proof">
-              <text>材料分类</text>
-              <text>成长报告</text>
-              <text>AI私教</text>
-              <text>知识乐园</text>
+              <text>错题</text>
+              <text>成绩</text>
+              <text>老师反馈</text>
+              <text>家长观察</text>
             </view>
           </view>
           <image class="yd-upload-mascot" mode="aspectFit" src="/assets/reference/upload-folder-stack-transparent.png" />
         </view>
-
-        <view class="upload-next-row"><view class="upload-next-card report" bindtap="viewLatestReport"><image mode="aspectFit" src="/assets/reference/entry-report.png" /><text>成长报告</text><text>先出证据卡，再给今晚一句话</text></view><view class="upload-next-card route" bindtap="goReview"><image mode="aspectFit" src="/assets/reference/learning-route-map-transparent.png" /><text>知识乐园路线</text><text>把错因变成四个互动练习</text></view></view>
 
         <view class="upload-evidence-grid">
           <view class="upload-evidence-card primary" data-type="wrong_question" bindtap="setMaterialType"><text>错题描述</text><text>记录孩子常卡住的题型</text><text>已添加 1 份</text></view>
@@ -50,23 +48,11 @@
           <text class="upload-material-submit" bindtap="importMaterialPack">生成成长报告</text>
         </view>
 
-        <view class="upload-output-trail">
-          <view>
-            <text>1</text>
-            <text>材料分类</text>
-          </view>
-          <view>
-            <text>2</text>
-            <text>成长报告</text>
-          </view>
-          <view>
-            <text>3</text>
-            <text>AI私教</text>
-          </view>
-          <view>
-            <text>4</text>
-            <text>知识乐园</text>
-          </view>
+        <view class="upload-unlock-panel">
+          <text>生成报告后，将解锁：</text>
+          <view><text>专属学习偏好</text><text>如：更适合图像、复述还是动手拆步</text></view>
+          <view><text>深层卡点定位</text><text>如：概念脱节、审题跳步或记忆负担</text></view>
+          <view><text>今晚行动建议</text><text>给孩子一个可开始的小动作</text></view>
         </view>
 
         <view class="yd-upload-primary" bindtap="submit">生成成长报告</view>
