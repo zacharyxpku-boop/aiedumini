@@ -111,7 +111,7 @@ Page({
     reportSourceContext: null,
     reportSourcePanel: null,
     miniLessonReturnPanel: null,
-    reviewFlowStage: 'topic',
+    reviewFlowStage: 'main',
     selectedKnowledgeTopic: '小数乘法',
     knowledgeStarterTopics: [
       '小数乘法',
@@ -158,7 +158,11 @@ Page({
 
   applyReferenceStageRoute(query = {}) {
     const stage = String(query.stage || '').trim();
-    if (!['topic', 'tool', 'live', 'finished'].includes(stage)) return;
+    if (!['main', 'topic', 'tool', 'live', 'finished'].includes(stage)) return;
+    if (stage === 'main') {
+      this.setData({ reviewFlowStage: 'main' });
+      return;
+    }
     if (stage === 'topic') {
       this.setData({ reviewFlowStage: 'topic' });
       return;

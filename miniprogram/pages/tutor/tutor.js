@@ -1433,6 +1433,7 @@ Page({
     });
     const tutorHomeContext = buildTutorHomeContext(selected || {}, state, routeOptions);
     const activeTutorScene = normalizeTutorReferenceSceneKey(routeOptions.scene || routeOptions.mode || this.data.activeTutorScene);
+    const hasExplicitTutorScene = !!(routeOptions.scene || routeOptions.mode || routeOptions.from);
     this.setData({
       selected,
       selectedEvidence,
@@ -1464,6 +1465,7 @@ Page({
       tutorTurnState,
       activeTutorScene,
       tutorReferenceScene: normalizeTutorReferenceScene(TUTOR_REFERENCE_SCENES[activeTutorScene]),
+      showTutorDetails: hasExplicitTutorScene || hasUserTutorTurn || activeTutorScene !== 'dialogue',
       surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('tutor') : null,
       unifiedNextAction: storage.buildUnifiedNextActionController ? storage.buildUnifiedNextActionController({ surface: 'tutor' }) : null
     });
@@ -1595,6 +1597,7 @@ Page({
       activeStep: step,
       activeTutorScene: sceneMap[step] || 'dialogue',
       tutorReferenceScene: normalizeTutorReferenceScene(TUTOR_REFERENCE_SCENES[sceneMap[step] || 'dialogue'] || TUTOR_REFERENCE_SCENES.dialogue),
+      showTutorDetails: true,
       input
     }, () => {
       this.send();
@@ -1646,7 +1649,7 @@ Page({
     const misconceptionText = this.data.misconceptionTags.map((item) => item.label || item.axis).filter(Boolean).join('、');
     const step = this.data.activeStep || 'read_problem';
     const messages = this.data.messages.concat([{ role: 'user', text: input }]);
-    this.setData({ messages, input: '', loading: true, hasUserTutorTurn: true });
+    this.setData({ messages, input: '', loading: true, hasUserTutorTurn: true, showTutorDetails: true });
     if (storage.saveTodayFocusFromThought && (selected || input.length >= 4)) {
       storage.saveTodayFocusFromThought(selected && selected.text ? selected.text : input, {
         source: 'tutor',
@@ -2057,6 +2060,7 @@ Page({
       socraticTrace: buildSocraticTrace(diagnosticReceipt),
       socraticBrief,
       socraticMicroChoices,
+      showTutorDetails: true,
       socraticFeedbackStatus: '',
       socraticFeedbackRecordedAt: '',
       socraticFeedbackNextAction: '',

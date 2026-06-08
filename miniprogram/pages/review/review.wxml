@@ -18,7 +18,9 @@
           <image class="yd-review-art" mode="aspectFit" src="/assets/reference/review-world-map-transparent.png" />
         </view>
 
-        <view class="review-record-panel">
+        <view class="review-main-tool-grid" wx:if="{{reviewFlowStage === 'main'}}"><text class="review-main-tool-card warm" data-id="whack" bindtap="runPlayableReviewTool"><text>约3分</text><text>错因地鼠</text><text>揪出隐藏的易错点</text></text><text class="review-main-tool-card yellow" data-id="quiz" bindtap="runPlayableReviewTool"><text>约2分</text><text>快闪问答</text><text>极速反应知识练习</text></text><text class="review-main-tool-card blue" data-id="match" bindtap="runPlayableReviewTool"><text>约4分</text><text>拼图配对</text><text>核心概念连连看</text></text><text class="review-main-tool-card teal" data-id="snake" bindtap="runPlayableReviewTool"><text>约5分</text><text>路线接龙</text><text>逻辑推导找路径</text></text></view>
+
+        <view class="review-record-panel" wx:if="{{reviewFlowStage !== 'main'}}">
           <view class="review-section-head"><text>{{reviewFlowStage === 'topic' ? '今天想练哪一块？' : reviewFlowStage === 'tool' ? '玩法选择' : reviewFlowStage === 'finished' ? '结算页' : '快闪问答'}}</text><text>{{reviewFlowStage === 'topic' ? '推荐探索 · 换一批 · 选个知识点，马上开局探索' : reviewFlowStage === 'tool' ? '选一个最适合现在的节奏，马上开始' : reviewFlowStage === 'finished' ? '给家长看证据' : '正在热身'}}</text></view>
           <text class="review-flow-tabs">
             <text class="{{reviewFlowStage === 'topic' ? 'active' : ''}}" data-stage="topic" bindtap="setReviewFlowStage">选知识点</text>

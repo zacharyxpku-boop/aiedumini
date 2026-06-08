@@ -41,7 +41,7 @@
           </view>
         </view>
 
-        <view class="growth-flow-tabs">
+        <view class="growth-flow-tabs" wx:if="{{growthActiveScene !== 'main'}}">
           <text class="{{growthActiveScene === 'main' ? 'active' : ''}}" data-panel="main" bindtap="setGrowthScene">成长报告</text>
           <text class="{{growthActiveScene === 'questionnaire' ? 'active' : ''}}" data-panel="questionnaire" bindtap="setGrowthScene">1 分钟问卷</text>
           <text class="{{growthActiveScene === 'preview' ? 'active' : ''}}" data-panel="preview" bindtap="setGrowthScene">报告预览</text>

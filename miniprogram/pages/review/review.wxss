@@ -1431,3 +1431,69 @@ page {
   color: #f0714d;
   background: #ffffff;
 }
+
+.review-main-tool-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16rpx;
+}
+
+.review-main-tool-card {
+  display: grid;
+  min-width: 0;
+  min-height: 156rpx;
+  align-content: space-between;
+  gap: 8rpx;
+  padding: 22rpx;
+  border: 1rpx solid #e5e7eb;
+  border-radius: 20rpx;
+  background: #ffffff;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+}
+
+.review-main-tool-card text {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.review-main-tool-card text:first-child {
+  justify-self: end;
+  color: #9ca3af;
+  font-size: 20rpx;
+  font-weight: 850;
+}
+
+.review-main-tool-card text:nth-child(2) {
+  color: #111827;
+  font-size: 28rpx;
+  font-weight: 950;
+}
+
+.review-main-tool-card text:last-child {
+  color: #6b7280;
+  font-size: 22rpx;
+  font-weight: 760;
+}
+
+.review-main-tool-card.warm {
+  background: #fff7ed;
+  border-color: #fed7aa;
+}
+
+.review-main-tool-card.yellow {
+  background: #fffbeb;
+  border-color: #fde68a;
+}
+
+.review-main-tool-card.blue {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.review-main-tool-card.teal {
+  background: #ecfdf5;
+  border-color: #bbf7d0;
+}
