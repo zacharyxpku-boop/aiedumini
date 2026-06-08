@@ -27,7 +27,7 @@
           <image class="yd-upload-mascot" mode="aspectFit" src="/assets/reference/upload-folder-stack-transparent.png" />
         </view>
 
-        <view class="upload-next-row"><view class="upload-next-card report" bindtap="viewLatestReport"><image mode="aspectFit" src="/assets/reference/entry-report.png" /><text>家长报告</text><text>先出证据卡，再给今晚一句话</text></view><view class="upload-next-card route" bindtap="goReview"><image mode="aspectFit" src="/assets/reference/learning-route-map-transparent.png" /><text>知识乐园路线</text><text>把错因变成互动练习和练习单</text></view></view>
+        <view class="upload-next-row"><view class="upload-next-card report" bindtap="viewLatestReport"><image mode="aspectFit" src="/assets/reference/entry-report.png" /><text>家长报告</text><text>先出证据卡，再给今晚一句话</text></view><view class="upload-next-card route" bindtap="goReview"><image mode="aspectFit" src="/assets/reference/learning-route-map-transparent.png" /><text>知识乐园路线</text><text>把错因变成四个互动练习</text></view></view>
 
         <view class="upload-intake-workbench">
           <view class="upload-workbench-head"><text>粘贴材料</text><text>生成前先看证据</text></view>

@@ -1547,7 +1547,7 @@ Page({
           id: 'next',
           label: '下一步引擎',
           value: module ? module.score : 0,
-          body: module ? module.title : '打开回访验证生成器。'
+          body: module ? module.title : '打开知识乐园练一局。'
         }
       ]
     };
