@@ -15,20 +15,44 @@
 
         <view class="yd-parent-hero growth">
           <view class="yd-parent-copy">
-            <view class="yd-parent-kicker">上传材料 · 生成报告</view>
-            <view class="yd-parent-title">记录错题，找到适合孩子的学习方式</view>
-            <view class="yd-parent-sub">错题、成绩、测评和老师反馈都会沉淀成线索；只做方法候选，不做天赋定论。</view>
+            <view class="yd-parent-kicker">问卷 · 上传 · 报告</view>
+            <view class="yd-parent-title">先了解孩子，再安排怎么学</view>
+            <view class="yd-parent-sub">用问卷和材料沉淀学习线索；只做方法候选，不做天赋定论。</view>
           </view>
           <image class="yd-parent-art" mode="aspectFit" src="/assets/reference/report-radar-card-illustration.png" />
         </view>
 
-        <view class="growth-upload-card" data-action="upload" bindtap="runParentReportAction">
-          <image mode="aspectFit" src="/assets/reference/upload-folder-stack-transparent.png" />
-          <view>
-            <text>上传错题/成绩/测评，生成成长报告</text>
-            <text>记录错因，推荐举一反三和迁移变形练习</text>
+        <view class="growth-choice-grid">
+          <view class="growth-choice-card warm" bindtap="startGrowthQuestionnaire">
+            <image mode="aspectFit" src="/assets/reference/family-avatar-group-transparent.png" />
+            <view>
+              <text>做 1 分钟小问卷</text>
+              <text>先了解学习偏好和卡点感受</text>
+            </view>
+            <text>开始</text>
           </view>
-          <text>去上传</text>
+          <view class="growth-choice-card" data-action="upload" bindtap="runParentReportAction">
+            <image mode="aspectFit" src="/assets/reference/upload-folder-stack-transparent.png" />
+            <view>
+              <text>上传错题/成绩/测评，生成成长报告</text>
+              <text>把错因、成绩和反馈沉淀成证据</text>
+            </view>
+            <text>上传</text>
+          </view>
+        </view>
+
+        <view class="growth-questionnaire-panel" wx:if="{{showLearningQuestionnaire}}">
+          <view class="growth-questionnaire-head">
+            <text>1 分钟学习问卷</text>
+            <text bindtap="toggleLearningQuestionnaire">收起</text>
+          </view>
+          <view class="growth-question-card" wx:for="{{learningReportQuestionnaire}}" wx:key="id">
+            <text>{{item.prompt}}</text>
+            <view>
+              <text wx:for="{{item.options}}" wx:for-item="option" wx:key="id" class="{{item.selectedOptionId === option.id ? 'active' : ''}}" data-id="{{item.id}}" data-option="{{option.id}}" bindtap="answerLearningQuestion">{{option.label}}</text>
+            </view>
+          </view>
+          <view class="growth-generate-cta" bindtap="generateLearningReport">生成成长报告</view>
         </view>
 
         <view class="growth-signal-grid">
@@ -60,7 +84,7 @@
         </view>
 
         <view class="growth-action-row">
-          <view class="yd-action-primary parent-primary" data-action="upload" bindtap="runParentReportAction">上传错题生成报告</view>
+          <view class="yd-action-primary parent-primary" data-action="upload" bindtap="runParentReportAction">上传材料生成报告</view>
           <view class="yd-action-secondary parent-secondary" data-action="reportPreview" bindtap="runParentReportAction">查看最新报告</view>
         </view>
 

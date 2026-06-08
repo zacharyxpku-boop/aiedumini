@@ -110,7 +110,15 @@ Page({
     lastWrongCard: null,
     reportSourceContext: null,
     reportSourcePanel: null,
-    miniLessonReturnPanel: null
+    miniLessonReturnPanel: null,
+    selectedKnowledgeTopic: '应用题第一步',
+    knowledgeStarterTopics: [
+      '应用题第一步',
+      '阅读理解',
+      '方程关系',
+      '英语语法',
+      '科学概念'
+    ]
   },
 
   onLoad(query = {}) {
@@ -458,6 +466,63 @@ Page({
         engineId: display[id] ? display[id].engineId : id
       };
     });
+  },
+
+  buildKnowledgeStarterCards(topic = '') {
+    const now = new Date().toISOString();
+    const label = topic || this.data.selectedKnowledgeTopic || '应用题第一步';
+    const baseId = `starter_${String(label).replace(/[^a-zA-Z0-9_\u4e00-\u9fa5]/g, '_')}`;
+    return [
+      {
+        id: `${baseId}_first_step`,
+        type: 'knowledge_starter_first_step',
+        source: 'knowledge_starter_topic',
+        state: 'new',
+        due: now,
+        created_at: now,
+        question: `${label}：先说题目在问什么？`,
+        answer: '先圈出已知条件，再说第一步要找的量。',
+        subject: label,
+        taskType: 'first_step',
+        weakPoint: '第一步入口',
+        wrongCauseBucket: 'condition_to_step',
+        parentPrompt: '家长只问：你第一步为什么先这样做？',
+        checkpoint: '能说出已知条件和第一步',
+        prompt: '先说已知条件，再说第一步',
+        noFullAnswer: true
+      },
+      {
+        id: `${baseId}_trap`,
+        type: 'knowledge_starter_trap',
+        source: 'knowledge_starter_topic',
+        state: 'new',
+        due: now,
+        created_at: now,
+        question: `${label}：最容易看错哪一处？`,
+        answer: '把关键词和单位先读准，再决定方法。',
+        subject: label,
+        taskType: 'wrong_cause',
+        weakPoint: '关键词和条件',
+        wrongCauseBucket: 'key_signal_missed',
+        parentPrompt: '家长只问：这题最容易漏掉哪一个词？',
+        checkpoint: '能指出一个易错信号',
+        prompt: '先找易错信号',
+        noFullAnswer: true
+      }
+    ];
+  },
+
+  selectKnowledgeStarterTopic(event) {
+    const topic = event && event.currentTarget ? event.currentTarget.dataset.topic || '' : '';
+    this.setData({ selectedKnowledgeTopic: topic || '应用题第一步' });
+  },
+
+  ensureKnowledgeStarterCards() {
+    const existing = storage.loadReviewCards ? storage.loadReviewCards() : [];
+    if (existing.length || !storage.saveReviewCards) return existing;
+    const starterCards = this.buildKnowledgeStarterCards(this.data.selectedKnowledgeTopic);
+    storage.saveReviewCards(starterCards);
+    return starterCards;
   },
 
   buildActiveReviewTool(tool = {}, round = null) {
@@ -1804,6 +1869,16 @@ Page({
     const tool = visibleTools.find((item) => item.id === requestedToolId) || visibleTools.find((item) => item.id === 'quiz') || {};
     const toolId = tool.engineId || tool.id || 'quiz';
     if (!tool.available) {
+      const starterCards = this.ensureKnowledgeStarterCards();
+      if (starterCards.length) {
+        this.refresh();
+        const nextTools = this.buildPlayableReviewTools(starterCards);
+        const nextTool = nextTools.find((item) => item.id === requestedToolId) || nextTools.find((item) => item.id === 'quiz') || {};
+        this.setData({ playableReviewTools: nextTools }, () => {
+          this.runPlayableReviewTool({ currentTarget: { dataset: { id: nextTool.id || 'quiz' } } });
+        });
+        return;
+      }
       this.setData({
         activeReviewTool: this.buildActiveReviewTool(Object.assign({}, tool, {
           id: toolId,

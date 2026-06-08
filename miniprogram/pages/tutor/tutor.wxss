@@ -35,7 +35,7 @@ page {
   display: flex;
   flex: 0 0 auto;
   flex-direction: column;
-  gap: 14rpx;
+  gap: 16rpx;
   justify-content: flex-start;
   min-height: calc(100vh - 190rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   padding: 22rpx;
@@ -148,7 +148,7 @@ page {
 .yd-tutor-bubble-title {
   display: block;
   color: #101a16;
-  font-size: 50rpx;
+  font-size: 48rpx;
   font-weight: 950;
   line-height: 1.12;
   overflow-wrap: break-word;
@@ -185,51 +185,6 @@ page {
   line-height: 1.18;
   overflow-wrap: break-word;
   word-break: break-word;
-}
-
-.tutor-capability-strip {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 8rpx;
-}
-
-.tutor-capability-card {
-  display: grid;
-  min-width: 0;
-  min-height: 118rpx;
-  align-content: center;
-  justify-items: center;
-  gap: 5rpx;
-  padding: 12rpx 6rpx;
-  border: 1rpx solid rgba(232, 238, 230, 0.9);
-  border-radius: 18rpx;
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: none;
-}
-
-.tutor-capability-card image {
-  width: 42rpx;
-  height: 42rpx;
-  object-fit: contain;
-}
-
-.tutor-capability-card text:nth-child(2) {
-  color: #13241c;
-  font-size: 23rpx;
-  font-weight: 950;
-  line-height: 1.08;
-}
-
-.tutor-capability-card text:nth-child(3) {
-  display: -webkit-box;
-  color: #65746c;
-  font-size: 20rpx;
-  font-weight: 820;
-  line-height: 1.16;
-  text-align: center;
-  overflow: hidden;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
 }
 
 .tutor-chip-row {
@@ -282,12 +237,19 @@ page {
   text-align: right;
 }
 
-.tutor-socratic-panel {
+.tutor-socratic-panel,
+.tutor-result-stack {
   padding: 16rpx;
   border: 1rpx solid rgba(232, 238, 230, 0.95);
   border-radius: 24rpx;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(255, 248, 223, 0.9));
   box-shadow: none;
+}
+
+.tutor-result-stack {
+  display: grid;
+  gap: 12rpx;
+  background: rgba(255, 255, 255, 0.94);
 }
 
 .tutor-socratic-steps {
@@ -424,7 +386,7 @@ page {
   align-content: start;
   gap: 12rpx;
   flex: 0 0 auto;
-  min-height: 344rpx;
+  min-height: 252rpx;
   max-height: none;
   margin-top: 0;
   padding: 20rpx;
@@ -437,7 +399,7 @@ page {
 
 .tutor-chat-title {
   color: #18211d;
-  font-size: 28rpx;
+  font-size: 30rpx;
   font-weight: 950;
 }
 
@@ -478,7 +440,7 @@ page {
   border-radius: 20rpx;
   color: #31423a;
   background: #f1f7ef;
-  font-size: 24rpx;
+  font-size: 27rpx;
   font-weight: 760;
   line-height: 1.42;
 }
@@ -798,7 +760,7 @@ page {
   border-radius: 999rpx;
   color: #1d261f;
   background: linear-gradient(180deg, #ffd84f 0%, #f5b300 100%);
-  font-size: 22rpx;
+  font-size: 25rpx;
   font-weight: 950;
   line-height: 58rpx;
 }

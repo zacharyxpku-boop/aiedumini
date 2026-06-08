@@ -6,10 +6,7 @@
           <view class="yd-tutor-top">
             <view class="yd-tutor-brand">
               <image class="yd-tutor-mark" mode="aspectFit" src="/assets/reference/brand-house.png" />
-              <text class="yd-tutor-brand-lines">
-                <text>原点 · 咕点 AI私教</text>
-                <text>先追问第一步，再生成练习证据</text>
-              </text>
+              <text class="yd-tutor-brand-lines"><text>原点 · 咕点 AI私教</text><text>先问第一步 不代写答案</text></text>
             </view>
             <text class="yd-tutor-pill">不代写</text>
           </view>
@@ -17,49 +14,46 @@
           <view class="yd-tutor-hero">
             <image class="yd-tutor-mascot" mode="aspectFit" src="/assets/reference/tutor-socratic-board-transparent.png" />
             <view class="yd-tutor-bubble">
-              <text class="yd-tutor-bubble-title">{{tutorHomeContext.title}}</text>
-              <text>{{tutorHomeContext.line}}</text>
-              <view class="tutor-context-chips">
-                <text wx:for="{{tutorHomeContext.chips}}" wx:key="index">{{item}}</text>
-              </view>
+              <text class="yd-tutor-bubble-title">和咕点聊聊</text>
+              <text>想聊知识点、题目、卡住的地方都可以。咕点会追问第一步，不代写答案。</text>
+              <view class="tutor-context-chips"><text>问知识点</text><text>我听不懂</text><text>题目点拨</text></view>
             </view>
           </view>
 
-          <view class="tutor-capability-strip"><view class="tutor-capability-card"><image mode="aspectFit" src="/assets/reference/entry-tutor.png" /><text>追问</text><text>不代写答案</text></view><view class="tutor-capability-card"><image mode="aspectFit" src="/assets/reference/entry-upload.png" /><text>材料</text><text>作业/错题/测评</text></view><view class="tutor-capability-card"><image mode="aspectFit" src="/assets/reference/entry-review.png" /><text>练习</text><text>接到知识乐园</text></view><view class="tutor-capability-card"><image mode="aspectFit" src="/assets/reference/entry-parent.png" /><text>报告</text><text>只看成长线索</text></view></view>
-
-          <text class="tutor-care-line">
-            <text>先稳住，再说第一步</text>
-            <text>不直接给答案</text>
-          </text>
-
-          <view class="tutor-socratic-panel">
-            <text class="tutor-section-head">
-              <text>先选一句真实情况</text>
-              <text>咕点只追下一小步</text>
-            </text>
-            <view class="tutor-mode-grid">
-              <text class="tutor-mode-card" data-step="read_problem" bindtap="launchFirstStep">我有点慌</text>
-              <text class="tutor-mode-card primary" data-step="write_first_step" bindtap="launchFirstStep">先写第一步</text>
-              <text class="tutor-mode-card" data-step="find_direction" bindtap="launchFirstStep">我看不懂题</text>
-            </view>
-            <text class="tutor-prompt-board">例：题目问什么我没看明白。</text><view class="tutor-start-cta" data-step="write_first_step" bindtap="launchFirstStep">开始问咕点</view>
-          </view>
+          <text class="tutor-care-line"><text>把题目、卡点或想问的知识点发来</text><text>只追下一小步</text></text>
 
           <view class="tutor-chat-card">
-            <text class="tutor-chat-title">把题目、卡点或材料发给 AI私教</text>
-            <view class="tutor-service-status" wx:if="{{tutorServiceStatus && tutorServiceStatus.visible}}">
-              <text>{{tutorServiceStatus.label}}</text>
-              <text>{{tutorServiceStatus.line}}</text>
-            </view>
+            <text class="tutor-chat-title">把问题发给 AI私教</text>
+            <view class="tutor-service-status" wx:if="{{tutorServiceStatus && tutorServiceStatus.visible}}"><text>{{tutorServiceStatus.label}}</text><text>{{tutorServiceStatus.line}}</text></view>
             <block wx:if="{{messages && messages.length}}">
               <block wx:for="{{messages}}" wx:key="index">
                 <view class="tutor-bubble {{item.role === 'user' ? 'me' : ''}}">{{item.text}}</view>
               </block>
             </block>
             <block wx:else>
-              <view class="tutor-bubble">先告诉我：你现在是看不懂题、不会第一步，还是心里有点急？</view>
-              <view class="tutor-bubble me">我会先说自己的第一步，不要直接给答案。</view>
+              <view class="tutor-bubble">先说一句：你想问知识点，还是卡在题目的第一步？</view>
             </block>
+            <view class="tutor-input-bar">
+              <input value="{{input}}" bindinput="onInput" bindconfirm="send" confirm-type="send" placeholder="写题目、卡点或第一步" />
+              <text bindtap="send">发送</text>
+            </view>
+          </view>
+
+          <view class="tutor-socratic-panel">
+            <text class="tutor-section-head">
+              <text>也可以直接开始</text>
+              <text>选一种问法</text>
+            </text>
+            <view class="tutor-mode-grid">
+              <text class="tutor-mode-card" data-step="read_problem" bindtap="launchFirstStep">问知识点</text>
+              <text class="tutor-mode-card primary" data-step="write_first_step" bindtap="launchFirstStep">先写第一步</text>
+              <text class="tutor-mode-card" data-step="find_direction" bindtap="launchFirstStep">题目点拨</text>
+            </view>
+            <text class="tutor-prompt-board">例：题目问什么我没看明白。</text>
+            <view class="tutor-start-cta" data-step="write_first_step" bindtap="launchFirstStep">开始问咕点</view>
+          </view>
+
+          <view class="tutor-result-stack">
             <view class="tutor-socratic-brief" wx:if="{{socraticBrief}}">
               <view>
                 <text>{{socraticBrief.label}}</text>
@@ -75,10 +69,6 @@
             </view>
             <text class="tutor-diagnostic-card" wx:if="{{tutorDiagnosticCard}}"><text>{{tutorDiagnosticCard.title}}</text><text>卡点：{{tutorDiagnosticCard.issue}}</text><text>下一步：{{tutorDiagnosticCard.firstStep}}</text><text>家长问：{{tutorDiagnosticCard.parentCheck}}</text><text class="tutor-diagnostic-action primary" data-id="diagnosis_review" data-label="{{tutorDiagnosticCard.reviewMove}}" data-route="{{tutorDiagnosticCard.reviewRoute}}" data-evidence="tutor_diagnostic_card" bindtap="runTutorHandoffAction">去知识乐园验证</text><text class="tutor-diagnostic-action" data-id="diagnosis_parent" data-label="{{tutorDiagnosticCard.parentCheck}}" data-route="{{tutorDiagnosticCard.parentRoute}}" data-evidence="tutor_diagnostic_parent_check" bindtap="runTutorHandoffAction">给家长看证据</text></text>
             <view class="tutor-micro-choice-row" wx:if="{{socraticMicroChoices && socraticMicroChoices.length}}"><text data-id="{{socraticMicroChoices[0].id}}" data-index="0" bindtap="selectSocraticMicroChoice">{{socraticMicroChoices[0].label}} {{socraticMicroChoices[0].text}}</text><text data-id="{{socraticMicroChoices[1].id}}" data-index="1" bindtap="selectSocraticMicroChoice">{{socraticMicroChoices[1].label}} {{socraticMicroChoices[1].text}}</text></view>
-            <view class="tutor-input-bar">
-              <input value="{{input}}" bindinput="onInput" bindconfirm="send" confirm-type="send" placeholder="写题目、卡点或第一步" />
-              <text bindtap="send">发送</text>
-            </view>
             <view class="tutor-feedback-row" wx:if="{{hasUserTutorTurn}}"><view class="tutor-feedback-good" data-status="first_step_spoken" bindtap="recordSocraticEffectivenessFeedback">我说出第一步了</view><view class="tutor-feedback-stuck" data-status="still_blocked" bindtap="recordSocraticEffectivenessFeedback">还是卡住</view></view>
             <text class="tutor-feedback-note" wx:if="{{socraticFeedbackNextAction}}">{{socraticFeedbackNextAction}}</text>
             <view class="tutor-bridge-card" wx:if="{{miniLessonFeedbackBridge && miniLessonFeedbackBridge.nextAction}}"><view><text>补一张证据</text><text>{{miniLessonFeedbackBridge.nextAction}}</text></view><text>{{miniLessonFeedbackBridge.type === 'evidence_review_required' ? '只留 A/B 小黑板证据，回知识乐园复测。' : '转成 3 分钟小讲堂，做完回知识乐园。'}}</text><view class="tutor-bridge-action" data-id="mini_lesson_bridge" data-label="{{miniLessonFeedbackBridge.nextAction}}" data-route="{{miniLessonFeedbackBridge.route}}" data-evidence="still_blocked_feedback" bindtap="runTutorHandoffAction">继续</view></view>

@@ -4041,6 +4041,15 @@ Page({
     });
   },
 
+  startGrowthQuestionnaire() {
+    this.setData({
+      showAdvancedProfile: true,
+      showLearningQuestionnaire: true,
+      profilePanel: 'assessment',
+      profilePanelTitle: '1分钟学习问卷'
+    });
+  },
+
   buildParentEvidenceItems(state) {
     const plan = (state && state.homework_plan) || {};
     const must = (plan.must_do || []).slice(0, 3);

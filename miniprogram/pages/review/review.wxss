@@ -167,6 +167,35 @@ page {
   white-space: nowrap;
 }
 
+.review-topic-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+  margin-top: 10rpx;
+}
+
+.review-topic-chip {
+  display: inline-flex;
+  min-height: 62rpx;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20rpx;
+  border: 1rpx solid rgba(226, 235, 222, 0.96);
+  border-radius: 999rpx;
+  color: #4f5f55;
+  background: #ffffff;
+  font-size: 23rpx;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.review-topic-chip.active {
+  color: #ffffff;
+  border-color: #18a94f;
+  background: #18a94f;
+  box-shadow: 0 6rpx 12rpx rgba(24, 169, 79, 0.14);
+}
+
 .yd-review-art {
   width: 204rpx;
   height: 188rpx;

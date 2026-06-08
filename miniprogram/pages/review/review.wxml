@@ -10,16 +10,23 @@
 
         <view class="yd-review-hero">
           <view class="yd-review-copy">
-            <view class="yd-review-title">{{reviewViewModel.title}}</view>
-            <view class="yd-review-sub route-note short">先用一张真实错题生成练习卡，再选一个玩法练一轮。</view>
+            <view class="yd-review-title">选个知识点，开一局</view>
+            <view class="yd-review-sub route-note short">没有错题也能先玩；有错题后会变成你的专属练习。</view>
             <view class="review-chip-row"><text>错因地鼠</text><text>快闪问答</text><text>拼图配对</text><text>路线接龙</text></view>
           </view>
           <image class="yd-review-art" mode="aspectFit" src="/assets/reference/review-world-map-transparent.png" />
         </view>
 
         <view class="review-record-panel">
-          <view class="review-section-head"><text>乐园地图</text><text>每局只用真实学习卡</text></view>
-          <text class="review-workshop-lead">选一个玩法，练第一步和错因；不展示原题完整解法。</text>
+          <view class="review-section-head"><text>先选知识点</text><text>{{selectedKnowledgeTopic}}</text></view>
+          <view class="review-topic-row">
+            <text class="review-topic-chip {{selectedKnowledgeTopic === '应用题第一步' ? 'active' : ''}}" data-topic="应用题第一步" bindtap="selectKnowledgeStarterTopic">应用题第一步</text>
+            <text class="review-topic-chip {{selectedKnowledgeTopic === '阅读理解' ? 'active' : ''}}" data-topic="阅读理解" bindtap="selectKnowledgeStarterTopic">阅读理解</text>
+            <text class="review-topic-chip {{selectedKnowledgeTopic === '方程关系' ? 'active' : ''}}" data-topic="方程关系" bindtap="selectKnowledgeStarterTopic">方程关系</text>
+            <text class="review-topic-chip {{selectedKnowledgeTopic === '英语语法' ? 'active' : ''}}" data-topic="英语语法" bindtap="selectKnowledgeStarterTopic">英语语法</text>
+            <text class="review-topic-chip {{selectedKnowledgeTopic === '科学概念' ? 'active' : ''}}" data-topic="科学概念" bindtap="selectKnowledgeStarterTopic">科学概念</text>
+          </view>
+          <text class="review-workshop-lead">选一个玩法，练第一步和错因；不展示完整解法。</text>
           <view class="review-feedback-strip" wx:if="{{feedbackText}}">
             <text>{{feedbackText}}</text>
             <text wx:if="{{activeReviewTool && activeReviewTool.repairFocus}}" bindtap="openReviewRepairFocus">修这一张</text>
