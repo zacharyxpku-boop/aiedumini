@@ -1608,6 +1608,19 @@ Page({
     const reviewRoute = result && result.next_review_route ? result.next_review_route : '/pages/review/review?from=socratic_prompt_workflow';
     const promptWorkflow = buildSocraticPromptWorkflow(receipt, result || {}, this.data.selected, reviewRoute);
     const modelBackedDiagnosis = !!(result && result.fallback === false && result.diagnostic_probe);
+    const apiSocraticRuntime = result && result.socratic_runtime ? result.socratic_runtime : null;
+    const apiThreeRoundProtocol = result && result.three_round_protocol
+      ? result.three_round_protocol
+      : (apiSocraticRuntime && apiSocraticRuntime.threeRoundProtocol ? apiSocraticRuntime.threeRoundProtocol : null);
+    const apiBlackboardRecovery = result && result.blackboard_recovery
+      ? result.blackboard_recovery
+      : (apiSocraticRuntime && apiSocraticRuntime.blackboardRecovery ? apiSocraticRuntime.blackboardRecovery : null);
+    const apiTransferCheck = result && result.transfer_check
+      ? result.transfer_check
+      : (apiSocraticRuntime && apiSocraticRuntime.transferCheck ? apiSocraticRuntime.transferCheck : null);
+    const apiAllowedMoves = result && result.allowed_moves
+      ? result.allowed_moves
+      : (apiSocraticRuntime && apiSocraticRuntime.allowedMoves ? apiSocraticRuntime.allowedMoves : []);
     const diagnosticReceipt = Object.assign({}, receipt, {
       turnId: makeReceiptId('tutor_turn'),
       socratic_prompt_workflow: promptWorkflow,
@@ -1620,7 +1633,11 @@ Page({
       socratic_fallback_plan: result && result.socratic_fallback_plan ? result.socratic_fallback_plan : null,
       visual_socratic_recovery: result && result.visual_socratic_recovery ? result.visual_socratic_recovery : null,
       fallback_recovery_bridge: result && result.fallback_recovery_bridge ? result.fallback_recovery_bridge : null,
-      three_round_socratic_protocol: result && result.three_round_socratic_protocol ? result.three_round_socratic_protocol : null,
+      socratic_runtime: apiSocraticRuntime,
+      three_round_protocol: apiThreeRoundProtocol,
+      blackboard_recovery: apiBlackboardRecovery,
+      transfer_check: apiTransferCheck,
+      three_round_socratic_protocol: result && result.three_round_socratic_protocol ? result.three_round_socratic_protocol : apiThreeRoundProtocol,
       socratic_prompt_quality_judge: result && result.socratic_prompt_quality_judge ? result.socratic_prompt_quality_judge : receipt.socraticPromptQualityJudge || null,
       socratic_ai_local_boundary_contract: result && result.socratic_ai_local_boundary_contract ? result.socratic_ai_local_boundary_contract : receipt.socraticAiLocalBoundaryContract || null,
       socraticAiLocalBoundaryContract: result && result.socraticAiLocalBoundaryContract ? result.socraticAiLocalBoundaryContract : receipt.socraticAiLocalBoundaryContract || null,
@@ -1632,7 +1649,7 @@ Page({
       output_sanitized: result && Object.prototype.hasOwnProperty.call(result, 'output_sanitized') ? result.output_sanitized : null,
       upstream_status: result && result.upstream_status ? result.upstream_status : '',
       model_contract: result && result.model_contract ? result.model_contract : null,
-      allowed_moves: result && result.allowed_moves ? result.allowed_moves : [],
+      allowed_moves: apiAllowedMoves,
       transfer_prompt: result && result.transfer_prompt ? result.transfer_prompt : ''
     });
     diagnosticReceipt.socratic_prompt_workflow.turnId = diagnosticReceipt.turnId;
@@ -1851,9 +1868,16 @@ Page({
         fallback_recovery_evidence: result.fallback_recovery_bridge && Array.isArray(result.fallback_recovery_bridge.evidenceRequired)
           ? result.fallback_recovery_bridge.evidenceRequired.length
           : 0,
-        three_round_socratic_protocol: result.three_round_socratic_protocol || null,
+        socratic_runtime: apiSocraticRuntime,
+        api_socratic_runtime_id: apiSocraticRuntime && apiSocraticRuntime.id ? apiSocraticRuntime.id : '',
+        three_round_protocol: apiThreeRoundProtocol,
+        blackboard_recovery: apiBlackboardRecovery,
+        transfer_check: apiTransferCheck,
+        three_round_socratic_protocol: result.three_round_socratic_protocol || apiThreeRoundProtocol || null,
         three_round_socratic_rounds: result.three_round_socratic_protocol && Array.isArray(result.three_round_socratic_protocol.rounds)
           ? result.three_round_socratic_protocol.rounds.length
+          : Array.isArray(apiThreeRoundProtocol)
+            ? apiThreeRoundProtocol.length
           : 0,
         three_round_socratic_fallbacks: result.three_round_socratic_protocol && Array.isArray(result.three_round_socratic_protocol.fallbackBranches)
           ? result.three_round_socratic_protocol.fallbackBranches.length
@@ -1881,7 +1905,7 @@ Page({
         prompt_quality_stop_count: result.socratic_prompt_quality_judge && Array.isArray(result.socratic_prompt_quality_judge.stopConditions)
           ? result.socratic_prompt_quality_judge.stopConditions.length
           : 0,
-        allowed_moves: result.allowed_moves || [],
+        allowed_moves: apiAllowedMoves,
         transfer_prompt: result.transfer_prompt || ''
       });
     }
