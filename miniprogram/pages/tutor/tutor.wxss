@@ -211,34 +211,12 @@ page {
   -webkit-line-clamp: 2;
 }
 
-.tutor-care-line {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16rpx;
-  padding: 0 4rpx;
-  color: #374151;
-  font-size: 25rpx;
-  line-height: 32rpx;
-  font-weight: 900;
-}
-
-.tutor-care-line text:last-child {
-  flex: 0 0 auto;
-  padding: 8rpx 14rpx;
-  border-radius: 999rpx;
-  background: #e6f4f1;
-  color: #0d9488;
-  font-size: 21rpx;
-  line-height: 26rpx;
-}
-
 .tutor-chat-card {
   display: grid;
   align-content: start;
-  gap: 16rpx;
+  gap: 22rpx;
   flex: 0 0 auto;
-  min-height: 314rpx;
+  min-height: 344rpx;
   padding: 32rpx;
 }
 
@@ -263,14 +241,25 @@ page {
   font-weight: 920;
 }
 
-.tutor-chat-clock {
-  justify-self: center;
-  padding: 7rpx 16rpx;
+.tutor-care-line {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  color: #0d9488;
+  font-size: 22rpx;
+  line-height: 28rpx;
+  font-weight: 860;
+}
+
+.tutor-care-line text:first-child {
+  padding: 8rpx 14rpx;
   border-radius: 999rpx;
-  color: #9ca3af;
-  background: #f3f4f6;
-  font-size: 21rpx;
-  font-weight: 820;
+  background: #e6f4f1;
+  color: #0d9488;
+}
+
+.tutor-care-line text:last-child {
+  color: #6b7280;
 }
 
 .tutor-service-status {
@@ -301,9 +290,30 @@ page {
   line-height: 1.28;
 }
 
+.tutor-message-row {
+  display: grid;
+  grid-template-columns: 64rpx minmax(0, 1fr);
+  gap: 16rpx;
+  align-items: start;
+}
+
+.tutor-avatar-dot {
+  display: flex;
+  width: 64rpx;
+  height: 64rpx;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #14b8a6;
+  color: #ffffff;
+  font-size: 20rpx;
+  font-weight: 950;
+  box-shadow: 0 8rpx 18rpx rgba(20, 184, 166, 0.18);
+}
+
 .tutor-bubble {
   display: block;
-  max-width: 86%;
+  max-width: 100%;
   padding: 26rpx 28rpx;
   border-radius: 36rpx 36rpx 36rpx 8rpx;
   color: #374151;
@@ -317,6 +327,8 @@ page {
 
 .tutor-bubble.me {
   justify-self: end;
+  grid-column: 1 / -1;
+  max-width: 86%;
   border-radius: 28rpx 28rpx 8rpx 28rpx;
   color: #ffffff;
   background: #14b8a6;
