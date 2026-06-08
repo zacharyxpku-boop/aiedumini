@@ -321,6 +321,43 @@ page {
   word-break: break-word;
 }
 
+.review-target-card {
+  display: grid;
+  gap: 10rpx;
+  padding: 22rpx;
+  border: 1rpx solid #f0ebe1;
+  border-radius: 16rpx;
+  background: #ffffff;
+  box-shadow: 0 10rpx 26rpx rgba(15, 23, 42, 0.055);
+}
+
+.review-target-card text {
+  display: block;
+  min-width: 0;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.review-target-card text:first-child {
+  color: #8a958f;
+  font-size: 22rpx;
+  font-weight: 860;
+}
+
+.review-target-card text:nth-child(2) {
+  color: #1f2933;
+  font-size: 32rpx;
+  font-weight: 950;
+  line-height: 1.18;
+}
+
+.review-target-card text:last-child {
+  color: #6b7280;
+  font-size: 24rpx;
+  font-weight: 820;
+  line-height: 1.28;
+}
+
 .review-feedback-strip {
   display: flex;
   min-height: 62rpx;

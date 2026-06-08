@@ -35,7 +35,11 @@
             <text class="review-topic-card review-topic-chip {{selectedKnowledgeTopic === '长度单位' ? 'active' : ''}}" data-topic="长度单位" bindtap="selectKnowledgeStarterTopic">长度单位&#10;魔法尺子&#10;约 10 分钟</text>
           </view>
           <text class="review-topic-cta" wx:if="{{reviewFlowStage === 'topic'}}" bindtap="selectKnowledgeStarterTopic" data-topic="{{selectedKnowledgeTopic}}">用这个开一局</text>
-          <text class="review-workshop-lead" wx:if="{{reviewFlowStage !== 'topic'}}">当前攻克目标：{{selectedKnowledgeTopic || '分数除法'}} | {{cards.length || 3}} 张卡。挑选开局方式，马上开始。</text>
+          <view class="review-workshop-lead review-target-card" wx:if="{{reviewFlowStage !== 'topic'}}">
+            <text>当前攻克目标</text>
+            <text>{{selectedKnowledgeTopic || '分数除法'}} | {{cards.length || 3}} 张卡</text>
+            <text>挑选开局方式，马上开始</text>
+          </view>
           <view class="review-feedback-strip" wx:if="{{feedbackText}}">
             <text>{{feedbackText}}</text>
             <text wx:if="{{activeReviewTool && activeReviewTool.repairFocus}}" bindtap="openReviewRepairFocus">修这一张</text>
