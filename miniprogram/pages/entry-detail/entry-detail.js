@@ -44,7 +44,7 @@ const SCENES = {
     }
   },
   report: {
-    badge: '个性化报告',
+    badge: '成长报告',
     title: '先讲清证据，再匹配学习方法',
     subtitle: '报告先看材料来源、学习画像和当前表现是否互相支持，再给出能执行的方法。',
     heroImage: '/assets/reference/report-radar-card-illustration.png',
