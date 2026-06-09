@@ -37,7 +37,7 @@ const SCENES = {
       subtitle: '材料越真实，建议越具体。',
       items: [
         { title: '错题描述', line: '记录孩子常卡住的题型', icon: '/assets/reference/upload-folder-stack-transparent.png' },
-        { title: '成绩/周测', line: '支持拍照识别', icon: '/assets/reference/report-radar-card-illustration.png' },
+        { title: '成绩/周测', line: '拍照留存/手动摘录', icon: '/assets/reference/report-radar-card-illustration.png' },
         { title: '老师反馈', line: '聊天截图/评语', icon: '/assets/reference/tutor-socratic-board-transparent.png' },
         { title: '家长观察', line: '随意写几句现状', icon: '/assets/reference/family-avatar-group-transparent.png' }
       ]
