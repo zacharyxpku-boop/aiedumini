@@ -457,7 +457,7 @@ const HIGH_LEVERAGE_LOCAL_STRETCH_BACKLOG = [
   },
   {
     id: 'ai_socratic_quality_eval',
-    label: 'AI 点拨质量与失败兜底压测',
+    label: 'AI私教质量与失败兜底压测',
     currentPercent: 68,
     targetPercent: 100,
     owner: 'local_eval_plus_ai_wording',
@@ -628,7 +628,7 @@ function buildCompetitiveMoatBoard(readiness = {}, finalTargetGapMeter = {}) {
     {
       id: 'ai_socratic_quality_eval',
       fallbackTargetId: 'socratic_tutor_depth',
-      label: 'AI 点拨质量',
+      label: 'AI私教质量',
       route: '/pages/tutor/tutor?from=competitive_moat_board',
       owner: 'AI 追问 + 本地门禁',
       nextAction: '继续压测三轮苏格拉底追问、儿童表达适配和失败兜底，AI 只改写表达，不决定答案。'
@@ -677,7 +677,7 @@ function buildCompetitiveMoatBoard(readiness = {}, finalTargetGapMeter = {}) {
   return {
     id: 'competitive_moat_board',
     title: '竞品护城河推进板',
-    summary: '把内容深度、AI 点拨、游戏留存、家长决策和安全分享放在同一张推进板里。',
+    summary: '把内容深度、AI私教、游戏留存、家长决策和安全分享放在同一张推进板里。',
     score,
     readyCount,
     totalCount: boardRows.length,

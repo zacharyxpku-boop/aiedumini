@@ -4329,7 +4329,7 @@ Page({
         { id: 'content_loop', name: '内容回访', score: review.contentPipeline ? 98 : 94, strength: '材料 -> 卡片 -> 小测 -> 连续记录', gap: '真实材料处理和稳定复盘规模' },
         { id: 'memory_loop', name: '长期记忆', score: review.retentionLab ? 96 : 92, strength: '间隔复习、负载控制和卡点修复', gap: '真实调度参数校准' },
         { id: 'tutor_loop', name: 'AI私教学伴', score: thinking.total ? 99 : 96, strength: '追问引导和思路记录', gap: '模型级误区复盘' },
-        { id: 'china_student', name: '中国学生场景', score: 100, strength: '材料证据 -> AI 点拨 -> 成长报告', gap: '需要真实体验记录' }
+        { id: 'china_student', name: '中国学生场景', score: 100, strength: '材料证据 -> AI私教 -> 成长报告', gap: '需要真实体验记录' }
       ]
     };
   },

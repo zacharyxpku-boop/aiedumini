@@ -158,7 +158,7 @@ function buildFamilyDecisionCard(input = {}) {
     title: sourceLabels.length ? `下一步：${safeText(nextAction, '只做一个第一步')}` : '先补一条真实学习证据',
     subtitle: sourceLabels.length
       ? `已接住${sourceLabels.join(' + ')}，不升级长期标签。`
-      : '上传材料或完成一次 AI 点拨后，这里会变成家庭决策。',
+      : '上传材料或完成一次 AI私教后，这里会变成家庭决策。',
     parentQuestion: safeText(parentCheck, '家长只问：刚才第一步先看哪里？'),
     tomorrowCheck: safeText(reviewMove, '明天只回访同一张卡'),
     evidenceSources: sourceLabels.length ? sourceLabels.join(' / ') : '待补证据',

@@ -171,20 +171,20 @@ function buildHomeViewModel(input = {}) {
     routePill: hasPlanOrFocus ? '已分析 · 继续下一步' : '先处理材料',
     companionStrip: companionStrip(input.companionPreference),
     title: hasPlanOrFocus ? '已看清下一步' : '把材料发过来',
-    subtitle: hasPlanOrFocus ? '接下来进 AI 点拨或回看练习，不在首页堆完整方案。' : '孩子可以上传材料，也可以直接说题目。',
+    subtitle: hasPlanOrFocus ? '接下来进 AI私教或回看练习，不在首页堆完整方案。' : '孩子可以上传材料，也可以直接说题目。',
     inputCard: {
       title: hasPlanOrFocus ? '修改情况后重新分析' : '用文字补充情况',
       placeholder: '比如：数学方程 8 道，应用题第一步不清楚；也可以先上传材料。',
       helper: hasPlanOrFocus
-        ? '材料变了就重新分析；卡住进 AI 点拨，做完进回看练习。'
+        ? '材料变了就重新分析；卡住进 AI私教，做完进回看练习。'
         : '不用写长，先说题目、材料或第一步线索；这里不直接给答案。'
     },
     primaryCta: hasPlanOrFocus ? '重新分析材料' : '分析材料',
-    secondaryAction: '直接去 AI 点拨',
+    secondaryAction: '直接去 AI私教',
     teacherPickerLabel: '咕点在旁边',
     teacherPickerHint: '把材料发来，我先帮你拆出可验证的一步。',
     selectedCompanionLabel: safeText((companionPreference(input.companionPreference) || {}).selectedLabel, '咕点'),
-    emptyState: hasPlanOrFocus ? null : '还没有分析结果。先上传材料或进入 AI 点拨。',
+    emptyState: hasPlanOrFocus ? null : '还没有分析结果。先上传材料或进入 AI私教。',
     primaryNextAction,
     nextStep: buildNextStep(Object.assign({}, input, { miniLessonResume })),
     miniLessonResume,

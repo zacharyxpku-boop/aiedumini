@@ -67,7 +67,7 @@ Page({
     gameHero: {
       title: '把卡点先说清',
       subtitle: '材料、题目或卡点先发来；卡住时，先说第一步。',
-      primaryLabel: '进入 AI 点拨',
+      primaryLabel: '进入 AI私教',
       primaryAction: 'goTutor',
       secondaryLabel: '生成回访验证',
       secondaryAction: 'goLearningMap',
@@ -1358,8 +1358,8 @@ Page({
     const hasTask = !!topMust;
     return {
       title: '入口已收口',
-      subtitle: '从 AI 点拨开始，说题目、材料或第一步。',
-      primaryLabel: '进入 AI 点拨',
+      subtitle: '从 AI私教开始，说题目、材料或第一步。',
+      primaryLabel: '进入 AI私教',
       primaryAction: 'goTutor',
       secondaryLabel: '生成回访验证',
       secondaryAction: 'goLearningMap',

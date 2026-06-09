@@ -3268,7 +3268,7 @@ function buildAiLocalImplementationMatrix(input = {}) {
       id: 'game_retention',
       label: '游戏和间隔回访',
       localCodeOwns: ['review_queue', 'spaced_recall_policy', 'xp_gate', 'daily_return_contract', 'leech_rule'],
-      aiBetterFor: ['挑战文案', '鼓励语', '错因卡换一种说法'],
+      aiBetterFor: ['练习文案', '鼓励语', '错因卡换一种说法'],
       aiMustNotOwn: ['外部排名刺激', '分数排名', '刷题量奖励', '掌握结论'],
       releaseGate: gameReturnEvidence.releaseGate || 'first_step_and_wrong_cause_before_xp_or_share',
       productAction: '把 XP 绑定第一步、错因复述、次日回访和第 7 天变式，不奖励盲刷数量。'
@@ -3286,7 +3286,7 @@ function buildAiLocalImplementationMatrix(input = {}) {
       id: 'safe_share_relay',
       label: '安全分享接力',
       localCodeOwns: ['allowlist_payload', 'denylist_payload', 'relay_completion', 'privacy_boundary'],
-      aiBetterFor: ['分享标题', '挑战钩子', '接收者提示'],
+      aiBetterFor: ['分享标题', '练习钩子', '接收者提示'],
       aiMustNotOwn: ['可分享字段决策', '原题/照片/答案外传', '公开社区排名'],
       releaseGate: '分享只带行动、第一步、错因标签和回访窗口。',
       productAction: '社区化先做安全接力，不做开放题库社区。'
@@ -3313,7 +3313,7 @@ function buildAiLocalImplementationMatrix(input = {}) {
     blockedFields,
     sourceUsePolicy: sourceEvidenceLedger.aiBoundary || 'AI 只做摘要、追问和表达改写；不做天赋定性、掌握结论、分数排名或完整答案。',
     productBoundaryLine: '要加厚的是本地可验证闭环；AI 只在本地边界内提升讲解和表达，不替代证据闸。',
-    nextBuildOrder: ['次日回访回执', 'Tutor 有效性回执', '公开资料挑战卡入游戏', '安全分享接收测试', '家长报告周/月证据'],
+    nextBuildOrder: ['次日回访回执', 'Tutor 有效性回执', '公开资料练习卡入游戏', '安全分享接收测试', '家长报告周/月证据'],
     releaseGate: '任何新能力必须同时说明 localCodeOwns、aiBetterFor、aiMustNotOwn、blockedFields 和 evidenceRequired。'
   };
 }
@@ -3700,8 +3700,8 @@ function buildPersonalizedReportStandard(input = {}, parts = {}, parsed = {}, mo
       },
       {
         id: 'synthesis_game_loop',
-        benchmark: 'Synthesis 的强项是把挑战做成游戏化任务，靠参与感和可见进展留住孩子。',
-        productAnswer: '原点不做泛娱乐练习，只在真实错因通过门槛后开放回访验证/回忆挑战。',
+        benchmark: 'Synthesis 的强项是把练习做成游戏化任务，靠参与感和可见进展留住孩子。',
+        productAnswer: '原点不做泛娱乐练习，只在真实错因通过门槛后开放回访验证/回忆练习。',
         route: '/pages/review/review?from=parent_report_standard',
         evidenceReturn: 'retrieval_result + xp_gate + parent_receipt'
       },

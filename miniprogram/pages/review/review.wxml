@@ -77,7 +77,7 @@
             </text>
             <text class="review-template-safe">{{practiceTemplateWorkbench.safetyLine}}</text>
           </view>
-          <view class="review-empty-note" wx:if="{{reviewFlowStage !== 'topic' && activeReviewTool && activeReviewTool.empty}}"><text>还没有真实卡。先上传材料或完成一次 AI 点拨。</text></view>
+          <view class="review-empty-note" wx:if="{{reviewFlowStage !== 'topic' && activeReviewTool && activeReviewTool.empty}}"><text>还没有真实卡。先上传材料或完成一次 AI私教。</text></view>
           <view class="review-live-tool stage-{{reviewFlowStage}}" wx:elif="{{reviewFlowStage !== 'tool' && activeReviewTool && activeReviewTool.id}}">
             <view class="review-play-top" wx:if="{{reviewFlowStage === 'live'}}"><text bindtap="closeReviewSubpage">×</text><text>{{activeReviewTool.title || '快闪问答'}}</text><text>Ⅱ</text></view>
             <view class="review-game-progress" wx:if="{{reviewFlowStage === 'live'}}"><view><text>1</text><text>/ {{activeReviewTool.itemCount || 3}}</text></view><text>正在热身</text></view>

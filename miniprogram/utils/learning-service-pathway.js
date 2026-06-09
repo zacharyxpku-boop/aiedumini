@@ -126,7 +126,7 @@ const AI_LOCAL_DECISION_MATRIX = [
     id: 'practice_recall_evidence',
     module: '回看练习验证',
     betterOwner: 'local_code',
-    aiUse: '改写挑战文案和鼓励语。',
+    aiUse: '改写练习文案和鼓励语。',
     localRule: '本地代码决定 XP、间隔复习、失败重练、外部排名禁用和分享字段。',
     releaseGate: 'reward_only_first_step_wrong_cause_revisit'
   },

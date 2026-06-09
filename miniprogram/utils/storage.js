@@ -1641,7 +1641,7 @@ function buildRealTrialRevisitRelayBridge(options = {}) {
     route: `/pages/review/review?from=real_trial_revisit&trial_id=${encodeURIComponent(card.sourceTrialId || card.id)}`,
     reviewRoute: '/pages/review/review?from=real_trial_revisit',
     gameRule: '90 秒内只说第一步和错因，不看最终答案，不比较速度。',
-    shareHook: '把这次真实卡点变成同类第一步挑战，对方必须用自己的材料复刻。',
+    shareHook: '把这次真实卡点变成同类第一步练习，对方必须用自己的材料复刻。',
     allowedFields: ['subject', 'task_type', 'first_step', 'wrong_cause', 'parent_check', 'revisit_route'],
     blockedFields: ['original_question', 'full_answer', 'photo', 'score', 'ranking', 'full_dialogue']
   }));
@@ -2219,7 +2219,7 @@ function buildRealTrialRuleRetestReviewBridge(options = {}) {
     reportLine: reviewCards.length
       ? `复测入队：${reviewCards.length} 张规则复测卡已可进入回看练习，其中 ${newCards.length} 张等待写入。`
       : '复测入队：暂无可执行复测卡，先回到真实试用失败样本。' ,
-    releaseGate: '复测卡没有进入回看练习和挑战前，不写长期画像、不扩题库、不做分享传播。',
+    releaseGate: '复测卡没有进入回看练习和练习前，不写长期画像、不扩题库、不做分享传播。',
     localRuleLine: '本地代码负责入队、去重、节奏、XP、报告放行和分享边界；AI 只润色追问语气。'
   };
 }
@@ -6689,7 +6689,7 @@ function buildPeerRelayChallengeLadder(input = {}) {
   };
   return {
     id: 'peer_relay_challenge_ladder',
-    title: '同伴接力挑战阶梯',
+    title: '同伴接力练习阶梯',
     stages,
     copyableChallengeTemplates,
     localSpreadReleaseGate,
@@ -6783,7 +6783,7 @@ function buildWrongCauseViralChallengePack(input = {}) {
     {
       id: 'same_mistake_no_question',
       title: '同错因，不同题',
-      copy: `我不发原题，只发一个错因挑战：${wrongCause}。你用自己的题说出第一步：${firstStep}`,
+      copy: `我不发原题，只发一个错因练习：${wrongCause}。你用自己的题说出第一步：${firstStep}`,
       whyItSpreads: '朋友可以用自己的作业复刻，不需要看到原题和答案。',
       proof: 'receiver_own_first_step'
     },
@@ -6818,7 +6818,7 @@ function buildWrongCauseViralChallengePack(input = {}) {
   };
   return {
     id: 'wrong_cause_viral_challenge_pack',
-    title: '错因挑战传播包',
+    title: '错因练习传播包',
     wrongCause,
     firstStep,
     parentCheck,
@@ -6896,7 +6896,7 @@ function buildShareChallengePlan(input = {}) {
   const shareHookDeck = [
     {
       id: 'ninety_second_recall',
-      title: '90 秒回忆挑战',
+      title: '90 秒回忆练习',
       visibleLine: `不看答案，说出这类题第一步：${firstStep}`,
       receiverPrompt: '你也用自己的作业试一次，只说第一步。',
       proofSignal: '留下 1 句孩子自己的第一步。'
@@ -6952,7 +6952,7 @@ function buildShareChallengePlan(input = {}) {
   const communityRipplePlan = {
     id: 'safe_learning_ripple',
     title: '安全学习涟漪',
-    rule: '一个分享最多带出一个同类第一步挑战，不扩散原题、不扩散答案、不扩散排名。',
+    rule: '一个分享最多带出一个同类第一步练习，不扩散原题、不扩散答案、不扩散排名。',
     loop: ['发起者留第一步', '接收者用自己的材料复刻', '家长只问一句', '明天回访同一错因'],
     conversionLine: '自然裂变只建立在可复用动作上，不建立在晒成绩或制造焦虑上。'
   };
@@ -6990,7 +6990,7 @@ function buildShareChallengePlan(input = {}) {
     : [];
   const sourceBackedChallengeDeck = oerResources.slice(0, 8).map((resource, index) => ({
     id: `source_backed_${resource.id || index}`,
-    title: `${resource.label || '公开资料'} · 90 秒同类挑战`,
+    title: `${resource.label || '公开资料'} · 90 秒同类练习`,
     sourceLabel: resource.label || '',
     sourceUrl: resource.sourceUrl || '',
     licenseSignal: resource.licenseSignal || '使用前检查来源边界',
@@ -7575,7 +7575,7 @@ function buildReceiverOwnMaterialAction(incoming = {}) {
   const taskType = inferReceiverActionType(incoming);
   const label = relayText(
     incoming.question_bank_relay_label || incoming.wrong_cause_label || incoming.capability_label || incoming.course_unit_label,
-    '同题型第一步挑战'
+    '同题型第一步练习'
   );
   const receiverAction = relayText(
     incoming.relay_receiver_action || incoming.wrong_cause_receiver_action || incoming.source_challenge_prompt,
@@ -7616,7 +7616,7 @@ function buildReceiverOwnMaterialAction(incoming = {}) {
     },
     allowedFields: ['share_code', 'task_type', 'relay_label', 'receiver_action', 'parent_check', 'next_revisit'],
     blockedFields: ['original_question', 'original_answer', 'full_answer', 'photo', 'score', 'ranking', 'full_dialogue'],
-    shareBoundary: '接收者必须使用自己的作业材料完成第一步挑战；不复用发送者原题、答案、照片、分数、排名或完整对话。'
+    shareBoundary: '接收者必须使用自己的作业材料完成第一步练习；不复用发送者原题、答案、照片、分数、排名或完整对话。'
   };
 }
 
@@ -10457,8 +10457,8 @@ function buildSevenSubjectMasterySprint(options = {}) {
     activeSubject: sprintSubjects[0] || null,
     lanes: [
       { id: 'content_scale', label: '内容规模', target: '每科至少 3 个单元、9 张可复用题卡，先覆盖高频家庭作业题型。' },
-      { id: 'ai_depth', label: 'AI 点拨深度', target: '题型轴 + 第一问 + 小黑板第一笔 + 失败兜底，不走直接答案。' },
-      { id: 'memory_game', label: '游戏记忆反馈', target: '主动回忆、错因回放、隔天回看、近迁移挑战进入同一条 quest。' },
+      { id: 'ai_depth', label: 'AI私教深度', target: '题型轴 + 第一问 + 小黑板第一笔 + 失败兜底，不走直接答案。' },
+      { id: 'memory_game', label: '游戏记忆反馈', target: '主动回忆、错因回放、隔天回看、近迁移练习进入同一条 quest。' },
       { id: 'parent_trust', label: '家长报告可信度', target: '报告只给家庭动作、证据是否足够、是否需要陪做，不给排名焦虑。' },
       { id: 'safe_share', label: '安全分享接力', target: '分享只传行动、证据、下一步，屏蔽原图、完整对话、分数、排名和私密评论。' }
     ],
@@ -12491,7 +12491,7 @@ function buildCompetitiveMoatWorkbench(options = {}) {
       target: '每天只有一个主回忆动作：90秒遮答案说第一步、错因回声、明日回访、第7天迁移。',
       currentEvidence: sevenSubjectMasterySprint.gameIntensityLine || 'Review/Arcade 已接主动回忆和错因回流。',
       localCodeOwns: ['spaced_recall_scheduler', 'xp_gate', 'streak_rescue', 'non_ranking_board'],
-      aiBetterFor: ['鼓励语和挑战卡文案改写'],
+      aiBetterFor: ['鼓励语和练习卡文案改写'],
       nextAction: '把每日回访从“可见面板”继续压成首页第一行动。'
     },
     {
@@ -12510,7 +12510,7 @@ function buildCompetitiveMoatWorkbench(options = {}) {
       currentEvidence: '分享回流已接 home/profile/review 路由和 blockedFields。',
       localCodeOwns: ['allowlist_payload', 'denylist_payload', 'return_route', 'relay_completion'],
       aiBetterFor: ['邀请语改写'],
-      nextAction: '把接收者自己的材料接入同题型第一步挑战。'
+      nextAction: '把接收者自己的材料接入同题型第一步练习。'
     }
   ];
   const sourcePolicyRows = [

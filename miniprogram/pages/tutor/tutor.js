@@ -1854,7 +1854,7 @@ Page({
       if (tutorDiagnosticCard) {
       storage.recordUnifiedNextAction({
         source: 'tutor_diagnostic_card',
-        sourceLabel: 'AI 点拨诊断卡',
+        sourceLabel: 'AI私教诊断卡',
         actionLabel: tutorDiagnosticCard.firstStep,
         route: '/pages/review/review?from=tutor_diagnostic_card',
         readiness: 'diagnosis_ready',

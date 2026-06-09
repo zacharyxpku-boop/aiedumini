@@ -618,7 +618,7 @@ function classifyImportInput(text = '') {
       kind: 'link_excerpt_needs_text',
       route: 'upload',
       shouldCreateFocus: false,
-      feedback: '只收到链接。请粘贴一小段摘录或写一句孩子卡住点；我不会自动抓取网页，也不会把裸链接交给 AI 点拨。'
+      feedback: '只收到链接。请粘贴一小段摘录或写一句孩子卡住点；我不会自动抓取网页，也不会把裸链接交给 AI私教。'
     };
   }
   if (looksLikeReviewRequest(value)) {
@@ -688,12 +688,12 @@ function buildNextActionQueue(kind, classified = {}, materialSource = null, imag
     },
     {
       id: 'first_step_challenge',
-      label: '90秒第一步挑战',
+      label: '90秒第一步练习',
       route: '/pages/review/review?from=upload_intake',
       owner: 'local_rule',
       status: needsText ? 'locked' : 'optional',
-      releaseGate: '挑战只带动作和回访窗口，不带原题、答案、分数或排名',
-      action: images.length ? '用自己的材料说第一步' : '用当前文字生成低压挑战'
+      releaseGate: '练习只带动作和回访窗口，不带原题、答案、分数或排名',
+      action: images.length ? '用自己的材料说第一步' : '用当前文字生成低压练习'
     },
     {
       id: 'parent_report_seed',

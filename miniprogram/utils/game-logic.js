@@ -1001,7 +1001,7 @@ function buildGizmoLikeMemoryProtocol(profile = {}, cards = [], events = [], res
       { id: 'miss_twice', trigger: '同错因错 2 次', action: '冻结新题，回第一步小黑板。' },
       { id: 'miss_after_sleep', trigger: '隔天忘记', action: '只做原错因复现，不加题。' }
     ],
-    shareNudge: '可以分享“90 秒回忆挑战”，只带动作和回访时间，不带原题、答案、分数或排名。'
+    shareNudge: '可以分享“90 秒回忆练习”，只带动作和回访时间，不带原题、答案、分数或排名。'
   };
   const greenWordClozeProtocol = buildGreenWordClozeProtocol(safeCards, weakKey, result);
   return {
@@ -1027,9 +1027,9 @@ function buildGizmoLikeMemoryProtocol(profile = {}, cards = [], events = [], res
     greenWordClozeProtocol,
     shareSafeChallenge: {
       id: 'share_safe_memory_challenge',
-      title: '分享一个安全回忆挑战',
+      title: '分享一个安全回忆练习',
       payloadFields: ['weak_key', 'return_window', 'parent_contract', 'no_score', 'no_original_photo'],
-      line: '分享只带挑战动作和回访时间，不带原题照片、完整对话、分数、排名或私密评价。'
+      line: '分享只带练习动作和回访时间，不带原题照片、完整对话、分数、排名或私密评价。'
     },
     habitHookLoop,
     recentMisses,
@@ -1978,7 +1978,7 @@ function buildDailyMemorySeasonPlan(peerMemoryRelayLeague = {}, dailyMemoryPresc
       ? '家长今晚只见证第一步和错因修复；变式和同伴接力先锁住。'
       : '家长看连续回访是否兑现；孩子能隔天说出第一步，再开放小变式。',
     retentionLine: '目标不是刷题数量，而是 7 天内把第一步、错因、隔天回访和小变式连起来。',
-    aiBoundary: 'AI 可改写挑战文案；本地代码决定赛季天数、解锁、XP、分享字段和画像放行。',
+    aiBoundary: 'AI 可改写练习文案；本地代码决定赛季天数、解锁、XP、分享字段和画像放行。',
     evidenceRequired: ['daily_memory_season_plan', 'non_ranking_board', 'next_day_revisit', 'day7_transfer_gate', 'safe_share_payload', 'local_unlock_rule']
   };
 }
@@ -2111,7 +2111,7 @@ function buildNinetySecondRecallComboEngine(microRecallPrescriptionEngine = {}, 
       ? '急救模式只记录完成证据，不释放新卡和掌握奖励。'
       : '必须有第一步、错因、明日回访三项证据，才释放小额 XP。',
     parentEvidenceLine: '家长只看四个证据：遮住答案、孩子说第一步、说出错因、锁定明天回访。',
-    shareBoundary: '可分享 90 秒挑战名和第一步动作；不分享原题、答案、分数、排名、照片或完整对话。',
+    shareBoundary: '可分享 90 秒练习名和第一步动作；不分享原题、答案、分数、排名、照片或完整对话。',
     blockedFields: ['original_question', 'original_answer', 'photo', 'score', 'ranking', 'full_dialogue', 'private_comment'],
     aiBoundary: 'AI 只能改写提示语；连击、奖励、降级、回访和分享字段由本地代码决定。',
     evidenceRequired: ['answer_hidden', 'student_first_step', 'wrong_cause_named', 'next_day_revisit_locked', 'local_reward_gate', 'safe_share_boundary']

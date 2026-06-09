@@ -346,7 +346,7 @@ Page({
       reportId: String(query.reportId || query.report_id || ''),
       cardId: String(query.cardId || query.card_id || ''),
       sourceSchemaId: String(query.sourceSchemaId || query.source_schema_id || ''),
-      title: isTutorEvidenceReturn ? 'AI 点拨后的证据回访' : isEntryReviewReturn ? '来自回访入口' : '来自学习入口',
+      title: isTutorEvidenceReturn ? 'AI私教后的证据回访' : isEntryReviewReturn ? '来自回访入口' : '来自学习入口',
       line: isTutorEvidenceReturn ? '刚才仍卡住，先用这张小黑板卡复测第一步，不继续追完整题。' : '先选一张真实卡，马上完成 90 秒回忆或迁移验证。',
       actionLabel: isTutorEvidenceReturn ? '复测小黑板卡' : isEntryReviewReturn ? '开始 90 秒回忆' : '进入知识乐园',
       returnRoute: '/pages/entry-detail/entry-detail?scene=review',
@@ -1363,7 +1363,7 @@ Page({
       ],
       longTermRecord: {
         title: '长期记忆资产',
-        label: `${sources.length} 类来源汇入同一套卡组：作业、错题、AI 点拨、学习模块和导入材料都会沉淀。`,
+        label: `${sources.length} 类来源汇入同一套卡组：作业、错题、AI私教、学习模块和导入材料都会沉淀。`,
         score: safe.assetCompounding ? safe.assetCompounding.score : (safe.maturity ? safe.maturity.overall : 0)
       }
     };
