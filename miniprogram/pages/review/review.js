@@ -637,9 +637,23 @@ Page({
   },
 
   startSelectedPlayableReviewTool() {
-    const tools = this.data.visiblePlayableReviewTools || this.data.playableReviewTools || [];
+    const cards = this.ensureKnowledgeStarterCards();
+    const tools = this.data.playableReviewTools && this.data.playableReviewTools.length
+      ? this.data.playableReviewTools
+      : this.buildPlayableReviewTools(cards);
+    const visibleTools = this.data.visiblePlayableReviewTools && this.data.visiblePlayableReviewTools.length
+      ? this.data.visiblePlayableReviewTools
+      : this.buildVisiblePlayableReviewTools(tools);
     const tool = this.resolveSelectedPlayableReviewTool(tools);
-    this.runPlayableReviewTool({ currentTarget: { dataset: { id: tool.id || 'whack' } } });
+    this.setData({
+      playableReviewTools: tools,
+      visiblePlayableReviewTools: visibleTools,
+      selectedPlayableReviewToolId: tool.id || 'whack',
+      selectedPlayableReviewToolTitle: tool.title || '错因地鼠',
+      selectedPlayableReviewToolStartText: `开始${tool.title || '错因地鼠'}`
+    }, () => {
+      this.openPlayableReviewStage('live', tools);
+    });
   },
 
   openPlayableReviewStage(stage = 'live', tools = null) {

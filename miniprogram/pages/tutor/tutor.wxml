@@ -105,8 +105,8 @@
             <view class="tutor-stuck-footer"><text data-action="{{tutorReferenceScene.action2.action}}" data-step="{{tutorReferenceScene.action2.step}}" bindtap="runTutorReferenceAction">{{tutorReferenceScene.action2.label}}</text><text data-action="{{tutorReferenceScene.action3.action}}" data-step="{{tutorReferenceScene.action3.step}}" bindtap="runTutorReferenceAction">{{tutorReferenceScene.action3.label}}</text></view>
           </view>
 
-          <view class="tutor-recap-panel" wx:elif="{{activeTutorScene === 'recap'}}"><text class="tutor-subpage-top"><text bindtap="closeTutorScene">‹</text><text>刚才学了什么</text><text>···</text></text><text class="tutor-recap-hero"><text>把刚才的第一步收进档案袋</text><text>{{tutorReferenceScene.row0.text}}</text></text>
-            <label class="tutor-recap-card"><text>我刚才卡在哪里？</text><textarea value="{{input}}" bindinput="onInput" auto-height maxlength="-1" placeholder="例如：我一开始没看出题目问的是加速度..." /></label><text class="tutor-dialogue-actions"><text data-action="{{tutorReferenceScene.action0.action}}" data-step="{{tutorReferenceScene.action0.step}}" bindtap="runTutorReferenceAction">{{tutorReferenceScene.action0.label}}</text><text data-action="review" bindtap="runTutorReferenceAction">去知识乐园练一下</text></text>
+          <view class="tutor-recap-panel" wx:elif="{{activeTutorScene === 'recap'}}"><text class="tutor-subpage-top"><text bindtap="closeTutorScene">‹</text><text>刚才学了什么</text><text>···</text></text><text class="tutor-recap-hero"><text>把刚才的第一步</text><text>收进档案袋</text><text>{{tutorReferenceScene.row0.text}}</text></text><label class="tutor-recap-card"><text>我刚才卡在哪里？</text><textarea value="{{input}}" bindinput="onInput" auto-height maxlength="-1" placeholder="例如：我一开始没看出题目问的是加速度..." /></label>
+            <view class="tutor-dialogue-actions"><text data-action="{{tutorReferenceScene.action0.action}}" data-step="{{tutorReferenceScene.action0.step}}" bindtap="runTutorReferenceAction">{{tutorReferenceScene.action0.label}}</text><text data-action="review" bindtap="runTutorReferenceAction">去知识乐园练一下</text></view>
           </view>
         </view>
 

@@ -1238,7 +1238,8 @@ page {
 .tutor-reference-panel.dialogue,
 .tutor-reference-panel.knowledge,
 .tutor-reference-panel.pointing,
-.tutor-reference-panel.stuck {
+.tutor-reference-panel.stuck,
+.tutor-reference-panel.recap {
   padding: 0;
   border: 0;
   border-radius: 0;
@@ -1248,13 +1249,15 @@ page {
 
 .tutor-reference-panel.knowledge > .tutor-reference-head,
 .tutor-reference-panel.pointing > .tutor-reference-head,
-.tutor-reference-panel.stuck > .tutor-reference-head {
+.tutor-reference-panel.stuck > .tutor-reference-head,
+.tutor-reference-panel.recap > .tutor-reference-head {
   display: none;
 }
 
 .yd-tutor-screen.detail-on .tutor-reference-panel.knowledge,
 .yd-tutor-screen.detail-on .tutor-reference-panel.pointing,
-.yd-tutor-screen.detail-on .tutor-reference-panel.stuck {
+.yd-tutor-screen.detail-on .tutor-reference-panel.stuck,
+.yd-tutor-screen.detail-on .tutor-reference-panel.recap {
   min-height: calc(100vh - 112rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   margin: calc(-72rpx - env(safe-area-inset-top)) -32rpx calc(-166rpx - env(safe-area-inset-bottom));
   padding: calc(20rpx + env(safe-area-inset-top)) 32rpx 0;
@@ -1525,7 +1528,7 @@ page {
 .tutor-reference-panel.knowledge .tutor-knowledge-board {
   gap: 28rpx;
   min-height: calc(100vh - 292rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-  padding: 0 8rpx 184rpx;
+  padding: 0 8rpx 220rpx;
   border-radius: 0;
   background: #f9f8f4;
   box-shadow: none;
@@ -1718,7 +1721,7 @@ page {
 .tutor-reference-panel.pointing .tutor-pointing-panel {
   min-height: calc(100vh - 198rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   gap: 22rpx;
-  padding: 0 0 166rpx;
+  padding: 0 0 214rpx;
 }
 
 .tutor-reference-panel.pointing .tutor-subpage-top {
@@ -1796,7 +1799,7 @@ page {
 
 .tutor-reference-panel.stuck .tutor-stuck-panel {
   min-height: calc(100vh - 198rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-  padding: 0 0 176rpx;
+  padding: 0 0 216rpx;
 }
 
 .tutor-reference-panel.stuck .tutor-subpage-top {
@@ -1866,4 +1869,110 @@ page {
   color: #9ca3af;
   background: transparent;
   box-shadow: none;
+}
+
+.tutor-reference-panel.recap {
+  padding-bottom: calc(176rpx + env(safe-area-inset-bottom));
+}
+
+.tutor-reference-panel.recap .tutor-recap-panel {
+  position: relative;
+  min-height: calc(100vh - 198rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  gap: 24rpx;
+  padding: 0 8rpx 216rpx;
+  overflow: hidden;
+  border-radius: 0;
+  background:
+    radial-gradient(circle at 92% 8%, rgba(20, 184, 166, 0.16), transparent 28%),
+    radial-gradient(circle at -8% 42%, rgba(255, 122, 69, 0.10), transparent 26%),
+    #f9f8f4;
+  box-shadow: none;
+}
+
+.tutor-reference-panel.recap .tutor-recap-hero {
+  display: grid;
+  gap: 12rpx;
+  padding: 34rpx 32rpx;
+  border: 1rpx solid rgba(255, 255, 255, 0.9);
+  border-radius: 36rpx;
+  background: #ffffff;
+  box-shadow: 0 14rpx 34rpx rgba(15, 23, 42, 0.06);
+}
+
+.tutor-reference-panel.recap .tutor-recap-hero text:first-child,
+.tutor-reference-panel.recap .tutor-recap-hero text:nth-child(2) {
+  color: #1f2937;
+  font-size: 48rpx;
+  line-height: 58rpx;
+  font-weight: 950;
+}
+
+.tutor-reference-panel.recap .tutor-recap-hero text:nth-child(2) {
+  color: #14b8a6;
+}
+
+.tutor-reference-panel.recap .tutor-recap-hero text:last-child {
+  display: block;
+  max-width: 560rpx;
+  color: #6b7280;
+  font-size: 25rpx;
+  line-height: 40rpx;
+  font-weight: 780;
+}
+
+.tutor-reference-panel.recap .tutor-recap-card {
+  display: grid;
+  gap: 18rpx;
+  padding: 30rpx;
+  border: 1rpx solid rgba(240, 235, 225, 0.9);
+  border-radius: 32rpx;
+  background: #ffffff;
+  box-shadow: 0 12rpx 28rpx rgba(15, 23, 42, 0.045);
+}
+
+.tutor-reference-panel.recap .tutor-recap-card > text {
+  color: #1f2937;
+  font-size: 30rpx;
+  line-height: 38rpx;
+  font-weight: 930;
+}
+
+.tutor-reference-panel.recap .tutor-recap-card textarea {
+  width: 100%;
+  min-height: 156rpx;
+  box-sizing: border-box;
+  padding: 24rpx;
+  border-radius: 26rpx;
+  background: #f6f8f3;
+  color: #1f2937;
+  font-size: 28rpx;
+  line-height: 42rpx;
+  font-weight: 720;
+}
+
+.tutor-reference-panel.recap .tutor-dialogue-actions {
+  position: fixed;
+  left: 32rpx;
+  right: 32rpx;
+  bottom: calc(108rpx + env(safe-area-inset-bottom));
+  z-index: 8;
+  display: grid;
+  grid-template-columns: 220rpx minmax(0, 1fr);
+  gap: 20rpx;
+  padding: 18rpx 0 calc(18rpx + env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, rgba(249, 248, 244, 0), #f9f8f4 42%, #f9f8f4);
+}
+
+.tutor-reference-panel.recap .tutor-dialogue-actions > text {
+  min-height: 96rpx;
+  border-radius: 30rpx;
+  color: #6b7280;
+  background: #ffffff;
+  box-shadow: 0 10rpx 24rpx rgba(15, 23, 42, 0.055);
+}
+
+.tutor-reference-panel.recap .tutor-dialogue-actions > text:last-child {
+  color: #ffffff;
+  background: #14b8a6;
+  box-shadow: 0 14rpx 28rpx rgba(20, 184, 166, 0.2);
 }
