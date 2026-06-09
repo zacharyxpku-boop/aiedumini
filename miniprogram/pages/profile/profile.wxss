@@ -659,7 +659,11 @@ page {
   background: rgba(203, 213, 225, 0.72);
 }
 
-.growth-questionnaire-progress text:first-child {
+.growth-questionnaire-progress text.done {
+  background: rgba(20, 184, 166, 0.42);
+}
+
+.growth-questionnaire-progress text.active {
   background: #14b8a6;
 }
 
@@ -1293,8 +1297,8 @@ page {
 
 .growth-bottom-bar.question {
   display: grid;
-  grid-template-columns: 0.8fr 1.2fr;
-  gap: 18rpx;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
 }
 
 .growth-bottom-bar.single {

@@ -30,10 +30,10 @@
 
         <view class="growth-questionnaire-panel" wx:if="{{showLearningQuestionnaire}}">
           <view class="growth-subpage-nav"><text data-panel="main" bindtap="setGrowthScene">‹</text><text>1分钟问卷</text><text bindtap="toggleLearningQuestionnaire">×</text></view>
-          <view class="growth-questionnaire-head"><text>孩子最近最常卡在哪里？</text><text>选出最符合的一项，帮我们建立初步画像</text></view>
-          <view class="growth-questionnaire-progress"><text></text><text></text><text></text><text></text><text></text></view>
+          <view class="growth-questionnaire-head"><text>{{growthQuestionPrompt}}</text><text>{{growthQuestionHint}}</text></view>
+          <view class="growth-questionnaire-progress"><text wx:for="{{growthQuestionProgressDots}}" wx:key="id" class="{{item.done ? 'done' : ''}} {{item.active ? 'active' : ''}}"></text></view>
           <view class="growth-question-card" data-contract="questionIndex === 0" wx:for="{{learningReportQuestionnaire}}" wx:for-index="questionIndex" wx:key="id" wx:if="{{questionIndex === growthQuestionIndex}}"><text>{{item.prompt}}</text><view class="growth-question-options"><view wx:for="{{item.options}}" wx:for-item="option" wx:key="id" class="growth-question-option {{item.selectedOptionId === option.id ? 'active' : ''}}" data-id="{{item.id}}" data-option="{{option.id}}" bindtap="answerLearningQuestion"><text class="growth-question-option-icon"></text><text class="growth-question-option-label">{{option.label}}</text><text class="growth-question-option-check">✓</text></view></view></view>
-          <view class="growth-bottom-bar question"><view class="yd-action-secondary" bindtap="nextGrowthQuestion">下一题</view><view class="yd-action-primary" bindtap="generateLearningReport">生成成长报告</view></view>
+          <view class="growth-bottom-bar question"><view class="yd-action-primary" bindtap="continueGrowthQuestionnaire">{{growthQuestionCtaText}}</view></view>
         </view>
 
         <view class="growth-progress-card" wx:if="{{growthActiveScene === 'main'}}">

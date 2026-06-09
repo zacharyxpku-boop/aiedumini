@@ -3071,6 +3071,16 @@ Page({
     showLearningQuestionnaire: false,
     growthActiveScene: 'main',
     growthQuestionIndex: 0,
+    growthQuestionProgressDots: [
+      { id: 'growth_q_1', active: true, done: false },
+      { id: 'growth_q_2', active: false, done: false },
+      { id: 'growth_q_3', active: false, done: false },
+      { id: 'growth_q_4', active: false, done: false },
+      { id: 'growth_q_5', active: false, done: false }
+    ],
+    growthQuestionPrompt: '孩子最近最常卡在哪里？',
+    growthQuestionHint: '选出最符合的一项，帮我们建立初步画像',
+    growthQuestionCtaText: '下一题',
     parentActionSelections: {
       praise: false,
       environment: false,
@@ -3796,7 +3806,10 @@ Page({
       learningReportRecognitionSummary: buildRecognitionSummary(payload.recognitionDraft || (reportState && reportState.recognitionDraft) || { mode: 'unavailable' }),
       learningReportQuestionnaire: (learningReport.buildQuickAssessmentQuestions ? learningReport.buildQuickAssessmentQuestions() : []).map((item) => Object.assign({}, item, {
         selectedOptionId: selectedMap[item.id] || ''
-      }))
+      })),
+      ...this.buildGrowthQuestionUiState(Number(this.data.growthQuestionIndex || 0), (learningReport.buildQuickAssessmentQuestions ? learningReport.buildQuickAssessmentQuestions() : []).map((item) => Object.assign({}, item, {
+        selectedOptionId: selectedMap[item.id] || ''
+      })))
     });
     return reportState;
   },
@@ -3882,11 +3895,42 @@ Page({
     this.syncLearningReportFromInput({ assessmentAnswers: this.learningReportAnswersAsList(learningReportAnswers) });
   },
 
+  buildGrowthQuestionUiState(index = 0, questions = null) {
+    const source = Array.isArray(questions) && questions.length
+      ? questions
+      : (this.data.learningReportQuestionnaire || []);
+    const total = Math.max(source.length || 5, 1);
+    const boundedIndex = Math.max(0, Math.min(Number(index || 0), total - 1));
+    const current = source[boundedIndex] || {};
+    return {
+      growthQuestionIndex: boundedIndex,
+      growthQuestionProgressDots: Array.from({ length: Math.min(total, 5) }).map((_, dotIndex) => ({
+        id: `growth_q_${dotIndex + 1}`,
+        active: dotIndex === boundedIndex,
+        done: dotIndex < boundedIndex
+      })),
+      growthQuestionPrompt: current.prompt || '孩子最近最常卡在哪里？',
+      growthQuestionHint: `第 ${boundedIndex + 1} / ${total} 题 · 选出最符合的一项，帮我们建立初步画像`,
+      growthQuestionCtaText: boundedIndex >= total - 1 ? '生成成长报告' : '下一题'
+    };
+  },
+
   nextGrowthQuestion() {
     const questions = this.data.learningReportQuestionnaire || [];
     const maxIndex = Math.max(questions.length - 1, 0);
     const nextIndex = Math.min(Number(this.data.growthQuestionIndex || 0) + 1, maxIndex);
-    this.setData({ growthQuestionIndex: nextIndex });
+    this.setData(this.buildGrowthQuestionUiState(nextIndex, questions));
+  },
+
+  continueGrowthQuestionnaire() {
+    const questions = this.data.learningReportQuestionnaire || [];
+    const maxIndex = Math.max(questions.length - 1, 0);
+    const currentIndex = Number(this.data.growthQuestionIndex || 0);
+    if (currentIndex >= maxIndex) {
+      this.generateLearningReport();
+      return;
+    }
+    this.nextGrowthQuestion();
   },
 
   generateLearningReport() {
@@ -4105,11 +4149,17 @@ Page({
   },
 
   startGrowthQuestionnaire() {
+    const questions = (this.data.learningReportQuestionnaire && this.data.learningReportQuestionnaire.length
+      ? this.data.learningReportQuestionnaire
+      : (learningReport.buildQuickAssessmentQuestions ? learningReport.buildQuickAssessmentQuestions() : []).map((item) => Object.assign({}, item, {
+        selectedOptionId: (this.data.learningReportAnswers || {})[item.id] || ''
+      })));
     this.setData({
       showAdvancedProfile: true,
       showLearningQuestionnaire: true,
       growthActiveScene: 'questionnaire',
-      growthQuestionIndex: 0,
+      learningReportQuestionnaire: questions,
+      ...this.buildGrowthQuestionUiState(0, questions),
       profilePanel: 'assessment',
       profilePanelTitle: '1分钟学习问卷'
     });
