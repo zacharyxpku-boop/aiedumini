@@ -1462,7 +1462,7 @@ page {
   align-items: center;
   min-height: 232rpx;
   overflow: hidden;
-  padding: 0 40rpx;
+  padding: 0 24rpx 0 40rpx;
   border-radius: 28rpx 28rpx 0 0;
   background: linear-gradient(135deg, #e2f3f3, #f0f8f8);
 }
@@ -1490,14 +1490,25 @@ page {
   font-weight: 800;
 }
 
-.tutor-blackboard-hero > text {
+.tutor-blackboard-hero-art {
+  position: relative;
+  z-index: 1;
+  justify-self: end;
+  width: 190rpx;
+  height: 178rpx;
+  object-fit: contain;
+  transform: translate(14rpx, 10rpx);
+}
+
+.tutor-blackboard-hero::after {
+  content: "";
   position: absolute;
-  right: -18rpx;
-  bottom: 0;
-  width: 210rpx;
-  height: 160rpx;
-  border-radius: 60rpx 0 0 0;
-  background: #ff7a45;
+  right: -34rpx;
+  bottom: -24rpx;
+  width: 190rpx;
+  height: 138rpx;
+  border-radius: 80rpx 0 0 0;
+  background: rgba(255, 122, 69, 0.18);
 }
 
 .tutor-reference-panel.knowledge .tutor-blackboard {
