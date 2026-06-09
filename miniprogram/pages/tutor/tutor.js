@@ -1602,7 +1602,11 @@ Page({
     const dataset = event && event.currentTarget ? event.currentTarget.dataset || {} : {};
     const action = dataset.action || '';
     if (action === 'review') {
-      this.goReview();
+      this.goReview({
+        source: 'tutor_reference_action',
+        actionId: dataset.id || 'reference_review',
+        label: dataset.label || '去知识乐园练一局'
+      });
       return;
     }
     if (action === 'smaller') {
@@ -2389,8 +2393,76 @@ Page({
     navigation.navigateLearningRoute('/pages/review/review?from=tutor_focus');
   },
 
-  goReview() {
-    navigation.navigateLearningRoute('/pages/review/review');
+  goReview(options = {}) {
+    const handoff = this.prepareTutorReviewHandoff(Object.assign({
+      source: 'tutor_review_button',
+      actionId: 'go_review',
+      label: '去知识乐园练一局'
+    }, options || {}));
+    navigation.navigateLearningRoute(handoff.route);
+  },
+
+  prepareTutorReviewHandoff(options = {}) {
+    const now = new Date().toISOString();
+    const selected = this.data.selected || {};
+    const messages = Array.isArray(this.data.messages) ? this.data.messages : [];
+    const latestUser = messages.slice().reverse().find((item) => item && item.role === 'user');
+    const latestAssistant = messages.slice().reverse().find((item) => item && item.role !== 'user');
+    const scene = this.data.activeTutorScene || 'dialogue';
+    const topic = selected.subject || selected.title || selected.text || this.data.input || (latestUser && latestUser.text) || '刚才卡住的一小步';
+    const firstStep = this.data.nextAction
+      || (this.data.tutorTurnState && this.data.tutorTurnState.nextQuestion)
+      || (latestAssistant && latestAssistant.text)
+      || '先说题目在问什么，再说第一步。';
+    const cardId = `tutor_handoff_${Date.now()}`;
+    const card = {
+      id: cardId,
+      type: 'tutor_to_knowledge_park',
+      source: options.source || 'tutor_review_handoff',
+      state: 'new',
+      due: now,
+      created_at: now,
+      question: `${String(topic).slice(0, 42)}：先复测第一步`,
+      answer: String(firstStep).slice(0, 80),
+      subject: selected.subject || this.data.coachStepLabel || 'AI私教卡点',
+      taskType: 'first_step_revisit',
+      weakPoint: scene === 'stuck' ? '卡住恢复' : scene === 'knowledge' ? '知识点讲解' : scene === 'pointing' ? '题目点拨' : '自由对话',
+      wrongCauseBucket: scene === 'stuck' ? 'still_blocked' : scene === 'pointing' ? 'problem_entry' : 'first_step_unclear',
+      parentPrompt: '家长只问：你现在第一步想先做什么？',
+      checkpoint: '能说出第一步和一个原因',
+      prompt: '先说第一步，不说完整答案',
+      noFullAnswer: true,
+      evidenceTag: 'tutor_to_knowledge_park',
+      route: '/pages/review/review?from=tutor_reference_action&stage=tool'
+    };
+    if (storage.loadReviewCards && storage.saveReviewCards) {
+      const cards = storage.loadReviewCards();
+      storage.saveReviewCards([card].concat(Array.isArray(cards) ? cards : []).slice(0, 260));
+    }
+    if (storage.appendReviewEvent) {
+      storage.appendReviewEvent({
+        type: 'tutor_to_knowledge_park_handoff',
+        event: 'tutor_to_knowledge_park_handoff',
+        source: options.source || 'tutor_review_handoff',
+        actionId: options.actionId || '',
+        actionLabel: options.label || '去知识乐园练一局',
+        cardId,
+        scene,
+        topic: String(topic).slice(0, 80),
+        firstStep: String(firstStep).slice(0, 120),
+        route: card.route
+      });
+    }
+    if (storage.saveTodayFocusFromThought) {
+      storage.saveTodayFocusFromThought(String(topic).slice(0, 80), {
+        source: 'tutor_to_knowledge_park',
+        stuckPointText: String(firstStep).slice(0, 120)
+      });
+    }
+    return {
+      card,
+      route: `${card.route}&cardId=${encodeURIComponent(cardId)}&focus=${encodeURIComponent(card.wrongCauseBucket)}`
+    };
   },
 
   runTutorHandoffAction(event) {
