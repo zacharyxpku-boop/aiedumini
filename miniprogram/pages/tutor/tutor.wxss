@@ -691,13 +691,15 @@ page {
   box-shadow: 0 12rpx 30rpx rgba(15, 23, 42, 0.055);
 }
 
-.tutor-question-box input {
+.tutor-question-box textarea {
   width: 100%;
-  height: 176rpx;
+  min-height: 176rpx;
+  max-height: 260rpx;
+  box-sizing: border-box;
   color: #1f2937;
   font-size: 30rpx;
   font-weight: 760;
-  line-height: 1.35;
+  line-height: 42rpx;
 }
 
 .tutor-question-media-row {
