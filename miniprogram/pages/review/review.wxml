@@ -63,7 +63,7 @@
           <view class="review-workshop-lead review-target-card" wx:if="{{reviewFlowStage !== 'topic'}}"><text>当前攻克目标</text><text>{{selectedKnowledgeTopic || '分数除法'}}</text><text>{{cards.length || 3}} 张卡 · 挑选开局方式，马上开始。</text></view>
           <view class="review-feedback-strip" wx:if="{{feedbackText}}"><text>{{feedbackText}}</text><text wx:if="{{activeReviewTool && activeReviewTool.repairFocus}}" bindtap="openReviewRepairFocus">修这一张</text></view>
           <view class="review-tool-grid" wx:if="{{reviewFlowStage === 'tool'}}">
-            <view wx:for="{{playableReviewTools}}" wx:key="id" class="review-tool-card {{item.available ? 'ready' : 'locked'}} {{item.themeClass}}" data-id="{{item.id}}" bindtap="runPlayableReviewTool"><text class="review-tool-icon">{{item.icon}}</text><text>{{item.title}}</text><text>{{item.line}}</text><text>{{item.duration}}</text><text>{{item.status}} · {{item.count}} 张</text><text>{{item.mission}}</text></view>
+            <view wx:for="{{visiblePlayableReviewTools}}" wx:key="id" class="review-tool-card {{item.available ? 'ready' : 'locked'}} {{item.themeClass}}" data-id="{{item.id}}" bindtap="runPlayableReviewTool"><text class="review-tool-icon">{{item.icon}}</text><text>{{item.title}}</text><text>{{item.line}}</text><text>{{item.duration}}</text><text>{{item.status}} · {{item.count}} 张</text><text>{{item.mission}}</text></view>
           </view>
           <view class="review-template-workbench" wx:if="{{reviewFlowStage === 'tool' && practiceTemplateWorkbench && practiceTemplateWorkbench.id}}">
             <text class="review-template-head"><text>{{practiceTemplateWorkbench.title}}</text><text>{{practiceTemplateWorkbench.status}}</text></text>

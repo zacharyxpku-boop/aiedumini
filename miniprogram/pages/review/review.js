@@ -89,6 +89,7 @@ Page({
     revisitProofCard: null,
     revisitRunway: DEFAULT_REVISIT_RUNWAY,
     playableReviewTools: [],
+    visiblePlayableReviewTools: [],
     activeReviewTool: null,
     practiceTemplateWorkshop: null,
     practiceTemplatePack: null,
@@ -172,6 +173,7 @@ Page({
     if (stage === 'tool') {
       this.setData({
         playableReviewTools: tools,
+        visiblePlayableReviewTools: this.buildVisiblePlayableReviewTools(tools),
         reviewFlowStage: 'tool'
       });
       return;
@@ -185,6 +187,7 @@ Page({
     const demoRoundAdvice = { primary: '明天再换一张同类卡回忆第一步。', secondary: '家长只看孩子能不能说出原因。' };
     this.setData({
       playableReviewTools: tools,
+      visiblePlayableReviewTools: this.buildVisiblePlayableReviewTools(tools),
       activeReviewTool: stage === 'finished'
         ? Object.assign({}, activeReviewTool, this.buildFinishReviewSummary(activeReviewTool, demoAttemptSummary, null, demoRoundAdvice), {
           attemptSummary: demoAttemptSummary,
@@ -527,6 +530,13 @@ Page({
     });
   },
 
+  buildVisiblePlayableReviewTools(tools = []) {
+    const source = Array.isArray(tools) ? tools : [];
+    return ['whack', 'quiz', 'match', 'snake']
+      .map((id) => source.find((item) => item && item.id === id))
+      .filter(Boolean);
+  },
+
   buildKnowledgeStarterCards(topic = '') {
     const now = new Date().toISOString();
     const label = topic || this.data.selectedKnowledgeTopic || '小数乘法';
@@ -583,8 +593,10 @@ Page({
     const active = this.data.activeReviewTool || null;
     if (stage === 'tool') {
       const cards = this.ensureKnowledgeStarterCards();
+      const tools = this.buildPlayableReviewTools(cards);
       this.setData({
-        playableReviewTools: this.buildPlayableReviewTools(cards),
+        playableReviewTools: tools,
+        visiblePlayableReviewTools: this.buildVisiblePlayableReviewTools(tools),
         reviewFlowStage: 'tool'
       });
       return;
@@ -753,6 +765,7 @@ Page({
     const profile = storage.loadGameProfile ? storage.loadGameProfile() : {};
     const revisitRunway = this.buildRevisitRunway(summary, cards);
     const playableReviewTools = this.buildPlayableReviewTools(cards);
+    const visiblePlayableReviewTools = this.buildVisiblePlayableReviewTools(playableReviewTools);
     const practiceTemplateWorkshop = summary.practiceTemplateWorkshop
       || (reviewCards.practiceTemplateWorkshop ? reviewCards.practiceTemplateWorkshop(summary, cards) : null);
     const focusProgress = todayFocus ? Number(todayFocus.progress || 0) : revisitRunway.percent;
@@ -790,6 +803,7 @@ Page({
         percent: Math.max(Number(revisitRunway.percent || 0), Math.max(0, Math.min(100, focusProgress || 0)))
       }),
       playableReviewTools,
+      visiblePlayableReviewTools,
       practiceTemplateWorkshop,
       practiceTemplatePack: this.data.practiceTemplatePack,
       mistakeHub: this.buildMistakeHub(summary, todayFocus),
@@ -2072,7 +2086,10 @@ Page({
         this.refresh();
         const nextTools = this.buildPlayableReviewTools(starterCards);
         const nextTool = nextTools.find((item) => item.id === requestedToolId) || nextTools.find((item) => item.id === 'quiz') || {};
-        this.setData({ playableReviewTools: nextTools }, () => {
+        this.setData({
+          playableReviewTools: nextTools,
+          visiblePlayableReviewTools: this.buildVisiblePlayableReviewTools(nextTools)
+        }, () => {
           this.runPlayableReviewTool({ currentTarget: { dataset: { id: nextTool.id || 'quiz' } } });
         });
         return;
