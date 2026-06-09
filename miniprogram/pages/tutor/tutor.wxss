@@ -483,6 +483,7 @@ page {
 
 .tutor-dialogue-card,
 .tutor-stuck-panel,
+.tutor-recap-panel,
 .tutor-socratic-brief,
 .tutor-bridge-card {
   display: grid;
@@ -550,6 +551,51 @@ page {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12rpx;
+}
+
+.tutor-recap-panel {
+  padding: 28rpx;
+  border-radius: 34rpx;
+  background:
+    radial-gradient(circle at 90% 6%, rgba(20, 184, 166, 0.18), transparent 25%),
+    #f8fffd;
+}
+
+.tutor-recap-hero,
+.tutor-recap-card {
+  display: grid;
+  gap: 12rpx;
+  padding: 24rpx;
+  border: 1rpx solid rgba(20, 184, 166, 0.1);
+  border-radius: 28rpx;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 8rpx 22rpx rgba(15, 23, 42, 0.04);
+}
+
+.tutor-recap-hero text:first-child,
+.tutor-recap-card > text {
+  color: #0d9488;
+  font-size: 24rpx;
+  font-weight: 950;
+}
+
+.tutor-recap-hero text:last-child {
+  color: #1f2937;
+  font-size: 34rpx;
+  line-height: 46rpx;
+  font-weight: 920;
+}
+
+.tutor-recap-card textarea {
+  width: 100%;
+  min-height: 150rpx;
+  box-sizing: border-box;
+  padding: 20rpx;
+  border-radius: 24rpx;
+  color: #1f2937;
+  background: #f6f8f3;
+  font-size: 27rpx;
+  line-height: 38rpx;
 }
 
 .tutor-reference-dialogue {

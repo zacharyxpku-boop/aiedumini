@@ -38,7 +38,7 @@
             <text class="tutor-mode-card" data-step="read_problem" bindtap="openTutorScene"><text class="tutor-mode-icon">?</text><text>问知识点</text></text>
             <text class="tutor-mode-card" data-step="explain_misconception" bindtap="openTutorScene"><text class="tutor-mode-icon">!</text><text>我听不懂</text></text>
             <text class="tutor-mode-card" data-step="find_direction" bindtap="openTutorScene"><text class="tutor-mode-icon">→</text><text>题目点拨</text></text>
-            <text class="tutor-mode-card" data-step="write_first_step" bindtap="openTutorScene"><text class="tutor-mode-icon">?</text><text>还是卡住</text></text>
+            <text class="tutor-mode-card" data-step="review" bindtap="openTutorScene"><text class="tutor-mode-icon">✓</text><text>学了什么</text></text>
           </view>
           <view class="tutor-start-cta" data-step="write_first_step" bindtap="openTutorScene">开始问咕点</view>
           <text class="tutor-usage-note">已有 2,451 位同学今天和咕点聊过</text>
@@ -62,7 +62,7 @@
                 <view wx:if="{{tutorReferenceScene.row3}}" class="tutor-chatline {{tutorReferenceScene.row3.role === 'user' ? 'me' : ''}}"><text class="tutor-chatline-bubble">{{tutorReferenceScene.row3.text}}</text><text class="tutor-chatline-avatar">{{tutorReferenceScene.row3.role === 'user' ? '童' : 'AI'}}</text></view>
                 <view wx:if="{{tutorReferenceScene.row4}}" class="tutor-chatline {{tutorReferenceScene.row4.role === 'user' ? 'me' : ''}}"><text class="tutor-chatline-bubble">{{tutorReferenceScene.row4.text}}</text><text class="tutor-chatline-avatar">{{tutorReferenceScene.row4.role === 'user' ? '童' : 'AI'}}</text></view>
               </block>
-              <view class="tutor-dialogue-composer"><input value="{{input}}" bindinput="onInput" bindconfirm="send" confirm-type="send" placeholder="跟咕点说点什么..." /><text bindtap="send">↗</text></view>
+              <view class="tutor-dialogue-composer"><input value="{{input}}" bindinput="onInput" bindconfirm="send" confirm-type="send" placeholder="跟小原说点什么..." /><text bindtap="send">↗</text></view>
             </view>
             <view class="tutor-dialogue-actions"><text wx:if="{{tutorReferenceScene.action0}}" data-action="{{tutorReferenceScene.action0.action}}" data-step="{{tutorReferenceScene.action0.step}}" bindtap="runTutorReferenceAction">{{tutorReferenceScene.action0.label}}</text><text wx:if="{{tutorReferenceScene.action1}}" data-action="{{tutorReferenceScene.action1.action}}" data-step="{{tutorReferenceScene.action1.step}}" bindtap="runTutorReferenceAction">{{tutorReferenceScene.action1.label}}</text></view>
           </block>
@@ -103,6 +103,10 @@
             <view class="tutor-stuck-action-grid"><text class="tutor-stuck-action-card" data-action="{{tutorReferenceScene.action0.action}}" data-step="{{tutorReferenceScene.action0.step}}" bindtap="runTutorReferenceAction"><text>{{tutorReferenceScene.action0.label}}</text><text>{{tutorReferenceScene.action0.line}}</text></text><text class="tutor-stuck-action-card" data-action="{{tutorReferenceScene.action1.action}}" data-step="{{tutorReferenceScene.action1.step}}" bindtap="runTutorReferenceAction"><text>{{tutorReferenceScene.action1.label}}</text><text>{{tutorReferenceScene.action1.line}}</text></text></view>
             <view class="tutor-stuck-journal"><text>刚才的思考小记</text><view><text>1</text><text>{{tutorReferenceScene.row4.text}}</text></view><view><text>?</text><text>{{tutorReferenceScene.row5.text}}</text></view></view>
             <view class="tutor-stuck-footer"><text data-action="{{tutorReferenceScene.action2.action}}" data-step="{{tutorReferenceScene.action2.step}}" bindtap="runTutorReferenceAction">{{tutorReferenceScene.action2.label}}</text><text data-action="{{tutorReferenceScene.action3.action}}" data-step="{{tutorReferenceScene.action3.step}}" bindtap="runTutorReferenceAction">{{tutorReferenceScene.action3.label}}</text></view>
+          </view>
+
+          <view class="tutor-recap-panel" wx:elif="{{activeTutorScene === 'recap'}}"><text class="tutor-subpage-top"><text bindtap="closeTutorScene">‹</text><text>刚才学了什么</text><text>···</text></text><text class="tutor-recap-hero"><text>把刚才的第一步收进档案袋</text><text>{{tutorReferenceScene.row0.text}}</text></text>
+            <label class="tutor-recap-card"><text>我刚才卡在哪里？</text><textarea value="{{input}}" bindinput="onInput" auto-height maxlength="-1" placeholder="例如：我一开始没看出题目问的是加速度..." /></label><text class="tutor-dialogue-actions"><text data-action="{{tutorReferenceScene.action0.action}}" data-step="{{tutorReferenceScene.action0.step}}" bindtap="runTutorReferenceAction">{{tutorReferenceScene.action0.label}}</text><text data-action="review" bindtap="runTutorReferenceAction">去知识乐园练一下</text></text>
           </view>
         </view>
 
