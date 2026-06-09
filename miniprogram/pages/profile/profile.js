@@ -3071,6 +3071,11 @@ Page({
     showLearningQuestionnaire: false,
     growthActiveScene: 'main',
     growthQuestionIndex: 0,
+    parentActionSelections: {
+      praise: false,
+      environment: false,
+      question: false
+    },
     experienceChecklist: [],
     experienceDashboard: null,
     isBetaTester: false,
@@ -4381,11 +4386,22 @@ Page({
     }
   },
 
+  toggleParentActionItem(event) {
+    const id = event.currentTarget.dataset.id;
+    const selections = Object.assign({}, this.data.parentActionSelections || {});
+    if (!Object.prototype.hasOwnProperty.call(selections, id)) return;
+    selections[id] = !selections[id];
+    this.setData({ parentActionSelections: selections });
+  },
+
   completeParentActionCard() {
+    const selections = this.data.parentActionSelections || {};
+    const selectedActions = Object.keys(selections).filter((key) => selections[key]);
     if (storage.appendReviewEvent) {
       storage.appendReviewEvent({
         kind: 'parent_action_card_completed',
         source: 'growth_report_action_card',
+        selected_actions: selectedActions,
         created_at: new Date().toISOString()
       });
     }
@@ -4397,7 +4413,9 @@ Page({
         actionLabel: '明天回看孩子能否说出第一步',
         route: '/pages/profile/profile?open=preview',
         reasonLine: '家长已完成今晚行动卡',
-        evidenceLine: '明天只看孩子能否独立说出第一步，不看分数排名'
+        evidenceLine: selectedActions.length
+          ? `已勾选 ${selectedActions.length} 项今晚行动，明天只看孩子能否独立说出第一步。`
+          : '明天只看孩子能否独立说出第一步，不看分数排名'
       });
     }
     wx.showToast({ title: '已记录，明天回看', icon: 'none' });
