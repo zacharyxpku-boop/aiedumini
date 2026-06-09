@@ -255,7 +255,7 @@ const QUICK_ACTIONS = [
 ];
 
 const GUIDED_TUTOR_MODES = [
-  { id: 'homework_coach', title: '作业点拨', desc: '只带必须做，先问第一步，不代写答案。', prompt: '带我完成这项必须做，但每次只问一个问题或给一个最小提示。' },
+  { id: 'homework_coach', title: 'AI私教', desc: '只带必须做，先问第一步，不代写答案。', prompt: '带我完成这项必须做，但每次只问一个问题或给一个最小提示。' },
   { id: 'wrong_cause', title: '错因镜头', desc: '把粗心拆成审题、建模、计算、表达。', prompt: '不要解题，先帮我判断我真正错在哪一步。' },
   { id: 'transfer', title: '举一反三', desc: '基于同一方法换条件，检查是不是真的会了。', prompt: '请给我一道同方法的小变式，但先让我说思路，不要给答案。' },
   { id: 'self_rehearsal', title: '一句复述', desc: '用自己的话说清：错因是什么，下次先检查什么。', prompt: '请让我用一句话复述本题错因和下次检查点。' }
@@ -411,7 +411,7 @@ function pasteRiskSignal(messages = []) {
     title: '别急着要答案',
     level: longPaste && answerSeeking ? 'high' : longPaste ? 'watch' : 'low',
     label: longPaste && answerSeeking
-      ? '检测到大段粘贴加直接要答案，作业点拨会只保留边界提示。'
+      ? '检测到大段粘贴加直接要答案，AI私教会只保留边界提示。'
       : longPaste
         ? '检测到大段粘贴，先让孩子交出第一步再继续。'
         : '最近几轮没有明显抄答案捷径。'
@@ -437,7 +437,7 @@ function coachConsole(selected, misconceptionTags, masterySignal, pasteRisk, act
     risk: pasteRisk ? pasteRisk.level : 'low',
     cards: [
       { id: 'ask', title: '先说第一步', body: '孩子先说题目要干嘛，准备先怎么动。' },
-      { id: 'hint', title: '只推下一步', body: '作业点拨只打开下一步，不会整题代做。' },
+      { id: 'hint', title: '只推下一步', body: 'AI私教只打开下一步，不会整题代做。' },
       { id: 'cause', title: '说出错因', body: tags[0] || '先确认错在审题、建模、计算还是表达。' },
       { id: 'proof', title: '说回去', body: mastery.evidence_needed }
     ]

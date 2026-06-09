@@ -1,4 +1,4 @@
-﻿const priority = require('./learning-priority');
+const priority = require('./learning-priority');
 function createShareRelaySchemaFallback() {
   const allowlist = [
     'code',
@@ -207,14 +207,14 @@ const COMPANION_OPTIONS = [
     copy: {
       home: '咕点陪你先找当前第一步。',
       review: '咕点陪你只修这一小步，不讲完整答案。',
-      revisit: '咕点陪你短回访昨天那一步。',
+      revisit: '咕点陪你回看练习昨天那一步。',
       profile: '咕点帮你整理成家长能看懂的一句话。'
     }
   }
 ];
 
 const INTERNAL_LABELS = {
-  home_xiaodian_entry: '作业点拨入口',
+  home_xiaodian_entry: 'AI私教入口',
   home_route_cta: '学习行动入口',
   home_top_must: '今晚关键任务',
   auto_first_must: '今晚第一项任务',
@@ -235,11 +235,11 @@ const INTERNAL_LABELS = {
   method_summary: '总结方法',
   fast_mode: '快一点看方向',
   transfer: '举一反三',
-  review: '短回访',
+  review: '回看练习',
   today_focus: '今天修过的卡点',
   thinking_receipt: '思路记录',
   homework_plan: '学习行动',
-  tutor: '作业点拨',
+  tutor: 'AI私教',
   module: '学习模块',
   manual_import: '手动整理',
   remote_ai_content_engine_v1: '学习材料整理',
@@ -250,7 +250,7 @@ const ROUTE_STAGE_LABELS = {
   plan: '排顺序',
   first_step: '说第一步',
   repair: '修卡点',
-  review: '短回访',
+  review: '回看练习',
   parent: '整理给家长看'
 };
 
@@ -290,8 +290,8 @@ const COMPANION_STAGE_COPY = {
     home_stuck: '咕点懂你卡住了，我们先说清入口。',
     review_focus: '咕点陪你只修这一小步，不讲完整答案。',
     review_repairing: '咕点陪你先看第一眼，再说出自己的第一步。',
-    review_completed: '咕点帮你记下这一小步，明天短回访。',
-    revisit_recall: '咕点陪你短回访昨天那一步。',
+    review_completed: '咕点帮你记下这一小步，明天回看练习。',
+    revisit_recall: '咕点陪你回看练习昨天那一步。',
     revisit_empty: '还没有回访卡。先修过一小步，明天咕点再来轻轻看。',
     profile_summary: '咕点帮你整理成家长能看懂的一句话。',
     profile_empty: '完成一次卡点修复后，咕点会整理给家长看。',
@@ -313,7 +313,7 @@ function stripPrefixLabel(value) {
   }
   if (text.indexOf('module:') === 0) return '学习模块';
   if (text.indexOf('review:') === 0) return '复习回访';
-  if (text.indexOf('revisit:') === 0) return '短回访';
+  if (text.indexOf('revisit:') === 0) return '回看练习';
   if (text.indexOf('factory_') === 0 || text.indexOf('factory:') === 0) return '学习材料整理';
   return text;
 }
@@ -702,7 +702,7 @@ function growthMemoryCopyFor(stage, preference) {
     return `你不是整题不会，只是卡在${memory.issueType}。对应修法：先说第一步，再做一道小变式。`;
   }
   if (stage === 'revisit') {
-    return '咕点陪你短回访一下，不用一次做很多。';
+    return '咕点陪你回看练习一下，不用一次做很多。';
   }
   if (stage === 'profile') {
     return getGrowthMemoryLine(memory, preference).oneLine;
@@ -1651,8 +1651,8 @@ function buildRealTrialRevisitRelayBridge(options = {}) {
     ready: revisitRelayCards.length > 0,
     count: revisitRelayCards.length,
     reportLine: revisitRelayCards.length
-      ? `已把 ${revisitRelayCards.length} 张真实试用回访卡接到短回访验证：只练第一步、错因和明天回访。`
-      : '真实试用回访卡生成后，会自动接到短回访验证和安全分享接力。',
+      ? `已把 ${revisitRelayCards.length} 张真实试用回访卡接到回看练习验证：只练第一步、错因和明天回访。`
+      : '真实试用回访卡生成后，会自动接到回看练习验证和安全分享接力。',
     revisitMode: 'first_step_revisit',
     localRuleLine: '本地代码决定哪些真实试用卡能进入回访验证、分享和回访；AI 只负责把追问改得更自然。',
     shareBoundary: '分享只带第一步、错因、家长检查和回访路线；不带原题、答案、照片、分数、排名和完整对话。',
@@ -1806,7 +1806,7 @@ function buildRealTrialSocraticStressAudit(options = {}) {
         : `回访：${revisitPlan}`,
       localRepair: risks.length
         ? '先由本地规则补第一步、错因、小黑板和回访，再允许 AI 改写语气。'
-        : '可进入苏格拉底、报告和短回访的下一轮压测。',
+        : '可进入苏格拉底、报告和回看练习的下一轮压测。',
       tutorRoute: item.tutorRoute,
       reviewRoute: item.reviewRoute,
       revisitRoute: item.revisitRoute || item.reviewRoute,
@@ -2217,9 +2217,9 @@ function buildRealTrialRuleRetestReviewBridge(options = {}) {
     firstRevisit: revisitCards[0] || null,
     firstReviewCard: reviewCards[0] || null,
     reportLine: reviewCards.length
-      ? `复测入队：${reviewCards.length} 张规则复测卡已可进入短回访，其中 ${newCards.length} 张等待写入。`
+      ? `复测入队：${reviewCards.length} 张规则复测卡已可进入回看练习，其中 ${newCards.length} 张等待写入。`
       : '复测入队：暂无可执行复测卡，先回到真实试用失败样本。' ,
-    releaseGate: '复测卡没有进入短回访和挑战前，不写长期画像、不扩题库、不做分享传播。',
+    releaseGate: '复测卡没有进入回看练习和挑战前，不写长期画像、不扩题库、不做分享传播。',
     localRuleLine: '本地代码负责入队、去重、节奏、XP、报告放行和分享边界；AI 只润色追问语气。'
   };
 }
@@ -2236,7 +2236,7 @@ function ensureRealTrialRuleRetestReviewCards(options = {}) {
   });
   return Object.assign({}, bridge, {
     persisted: true,
-    reportLine: `复测入队：已写入 ${bridge.newCards.length} 张规则复测卡到短回访。`
+    reportLine: `复测入队：已写入 ${bridge.newCards.length} 张规则复测卡到回看练习。`
   });
 }
 
@@ -2361,8 +2361,8 @@ function buildRealTrialRecoveryLoop(options = {}) {
       ? `真实试用：${evidenceReady}/${total} 条证据完整，零帮助率 ${total ? Math.round((zeroHelp / total) * 100) : 0}%，待转压力样本 ${shouldPromote.length} 条，已生成 ${realTrialReviewCards.length} 张回访卡。`
       : '真实试用：待回收 12 个家庭夜间作业样本后，才放行更强的长期画像和传播判断。',
     reviewQueueLine: realTrialReviewCards.length
-      ? `已把 ${realTrialReviewCards.length} 次真实试用接入短回访，下一轮只检查第一步、错因和迁移。`
-      : '真实试用记录完整后会自动生成短回访卡，避免只写报告不复练。',
+      ? `已把 ${realTrialReviewCards.length} 次真实试用接入回看练习，下一轮只检查第一步、错因和迁移。`
+      : '真实试用记录完整后会自动生成回看练习卡，避免只写报告不复练。',
     shareBoundary: '分享只带第一步、错因、家长检查和回访动作；不带原题、照片、完整答案、完整对话和排行。',
     marginalRule: '若连续两轮只增加静态资料、没有新增真实试用样本或失败样本，停止加厚并汇报差距。',
     targetGap
@@ -2767,9 +2767,9 @@ function buildCapabilityEvidenceLedger(options = {}) {
       evidenceLine: questSignals.length
         ? `已有 ${questSignals.length} 条主动回忆证据`
         : gameCount
-          ? `今日短回访 ${gameCount} 次`
-          : '还缺一次能写回学习记录的短回访',
-      nextAction: '做一次短回访，把错因或迁移结果写回复习队列',
+          ? `今日回看练习 ${gameCount} 次`
+          : '还缺一次能写回学习记录的回看练习',
+      nextAction: '做一次回看练习，把错因或迁移结果写回复习队列',
       route: '/pages/review/review'
     },
     {
@@ -2904,7 +2904,7 @@ function buildCapabilityMaturityQueue(options = {}) {
       route: '/pages/review/review',
       capabilities: ['socratic', 'game', 'report', 'module_flow', 'next_action'],
       competitorLine: '对标成熟错题系统：错因不是静态标签，要回到同类变式和隔天回看。',
-      nextAction: '先修一张真实卡点，再进入短回访或家长复盘。'
+      nextAction: '先修一张真实卡点，再进入回看练习或家长复盘。'
     },
     {
       id: 'light_entry_scale',
@@ -2945,7 +2945,7 @@ function buildCapabilityMaturityQueue(options = {}) {
   ];
   const maturityContracts = {
     socratic_depth: {
-      acceptanceCriteria: ['孩子先说出自己的第一步', '系统只追问误区和证据', '点拨回执能转成修卡点或短回访'],
+      acceptanceCriteria: ['孩子先说出自己的第一步', '系统只追问误区和证据', '点拨回执能转成修卡点或回看练习'],
       fallbackPlan: ['沉默时给 A/B 微选择', '直接要答案时退回第一步小黑板', '连续卡住时交给家长只问一句'],
       evidenceRequired: ['child_first_step', 'diagnostic_probe', 'handoff_to_review']
     },
@@ -2960,7 +2960,7 @@ function buildCapabilityMaturityQueue(options = {}) {
       evidenceRequired: ['long_term_portrait', 'classroom_observation', 'seven_day_action']
     },
     repair_to_recall: {
-      acceptanceCriteria: ['卡点有明确错因', '修复后生成同类变式', '结果进入短回访或家长复盘'],
+      acceptanceCriteria: ['卡点有明确错因', '修复后生成同类变式', '结果进入回看练习或家长复盘'],
       fallbackPlan: ['错因不清先回点拨', '同类题失败时回到第一步', '次日未记住则重新排入回忆'],
       evidenceRequired: ['wrong_cause_label', 'near_transfer_attempt', 'next_day_recall']
     },
@@ -2975,7 +2975,7 @@ function buildCapabilityMaturityQueue(options = {}) {
       evidenceRequired: ['capability_gap_share', 'share_landing_next_action', 'no_ranking_boundary']
     },
     material_factory: {
-      acceptanceCriteria: ['材料变成复习卡', '卡片能进入短回访', '材料来源可追溯'],
+      acceptanceCriteria: ['材料变成复习卡', '卡片能进入回看练习', '材料来源可追溯'],
       fallbackPlan: ['材料太薄时要求补一句卡点', '外部识别不可用时本地手动录入', '不把输入框伪装成自动导入'],
       evidenceRequired: ['material_to_card', 'source_trace', 'practice_asset']
     },
@@ -3189,7 +3189,7 @@ function buildEvidenceRouteBias(options = {}) {
     gameModeBias = 'active_recall';
     weakKey = 'first_step';
     questBias = 'review';
-    reasonLine = '孩子已经留下第一步，下一步需要一次短回访把结果写回记录。';
+    reasonLine = '孩子已经留下第一步，下一步需要一次回看练习把结果写回记录。';
     evidenceLine = '把追问证据接到回访验证';
   }
 
@@ -3244,7 +3244,7 @@ function tutorEventSummary() {
     completed,
     blocked,
     moduleRuns,
-    label: list.length ? `已记录 ${list.length} 次作业点拨信号` : '还没有作业点拨记录'
+    label: list.length ? `已记录 ${list.length} 次AI私教信号` : '还没有AI私教记录'
   };
 }
 
@@ -3531,15 +3531,15 @@ function createTonightPlanFromInput(text = '', options = {}) {
     reportDailyAction: active || null,
     summaryLine: active && active.task
       ? `学习方案入口已退役；请从家长证据页继续：${active.task}`
-      : '学习方案入口已退役；请从上传材料、AI点拨或短回访继续。',
-    parentAdvice: '不再自动安排整晚任务；家长只看材料证据、AI诊断、短回访结果和下一步。',
+      : '学习方案入口已退役；请从上传材料、AI私教或回看练习继续。',
+    parentAdvice: '不再自动安排整晚任务；家长只看材料证据、AI诊断、回看练习结果和下一步。',
     primaryRoute: active && active.route ? active.route : '/pages/tutor/tutor?from=retired_planner',
     revisitRoute: '/pages/review/review?from=retired_planner',
     parentRoute: '/pages/profile/profile?from=retired_planner',
     inputText: value.slice(0, 120),
     routeSteps: [
-      { id: 'tutor', label: 'AI点拨', active: true },
-      { id: 'review', label: '短回访', active: false },
+      { id: 'tutor', label: 'AI私教', active: true },
+      { id: 'review', label: '回看练习', active: false },
       { id: 'parent', label: '家长证据', active: false }
     ],
     created_at: new Date().toISOString()
@@ -3558,8 +3558,8 @@ function updateTonightRouteStatus(status, patch = {}) {
   return saveTonightPlan(Object.assign({}, current, patch || {}, {
     routeStatus: status || current.routeStatus || 'retired',
     routeSteps: [
-      { id: 'tutor', label: 'AI点拨', active: activeMap[status] === 'tutor' },
-      { id: 'review', label: '短回访', active: activeMap[status] === 'review' },
+      { id: 'tutor', label: 'AI私教', active: activeMap[status] === 'tutor' },
+      { id: 'review', label: '回看练习', active: activeMap[status] === 'review' },
       { id: 'parent', label: '家长证据', active: activeMap[status] === 'parent' }
     ]
   }));
@@ -6504,14 +6504,14 @@ function parentNextActionLabel(action = '') {
   if (action === 'wrong_cause_revisit') return '明天先回看这张错因卡';
   if (action === 'due_card_revisit') return '明天先清一张待回访卡';
   if (action === 'first_step_revisit') return '明天继续说出第一步';
-  return '先用自己的材料完成一组短回访';
+  return '先用自己的材料完成一组回看练习';
 }
 
 function parentNextActionDetail(action = '') {
   if (action === 'wrong_cause_revisit') return '先让孩子说出这张错因卡的第一步，再做一道同类小题。';
   if (action === 'due_card_revisit') return '先回忆再核对，忘了就回到第一步提示卡。';
   if (action === 'first_step_revisit') return '家长只问一句，不接管答案：你第一步先看哪里？';
-  return '用自己的作业或错题生成一张卡，再完成一次 5 分钟短回访。';
+  return '用自己的作业或错题生成一张卡，再完成一次 5 分钟回看练习。';
 }
 
 const SHARE_RELAY_ALLOWED_FIELDS = [
@@ -6863,7 +6863,7 @@ function buildShareChallengePlan(input = {}) {
     ? subjectDepth.firstStep
     : (focus.childArticulatedStep || focus.systemSuggestedStep || '先说清第一步');
   const route = capability.route || input.route || '/pages/review/review';
-  const goal = `用自己的材料完成一次「${subjectLabel}」短回访验证`;
+  const goal = `用自己的材料完成一次「${subjectLabel}」回看练习验证`;
   const steps = [
     { id: 'recall', label: '主动回忆', text: `先不看答案，说出：${firstStep}` },
     { id: 'repair', label: '错因修复', text: actionLabel || '错了也只退回第一步提示卡。' },
@@ -6874,11 +6874,11 @@ function buildShareChallengePlan(input = {}) {
     { id: 'tomorrow', label: '明天', text: '只回访最不稳的 1 张卡，不扩题量。' },
     { id: 'day_7', label: '第 7 天', text: '用 1 道小变式确认能不能迁移。' }
   ];
-  const privacyBoundary = '分享只带短回访验证、第一步、能力缺口和回访动作，不带孩子完整对话、分数、原题照片。';
+  const privacyBoundary = '分享只带回看练习验证、第一步、能力缺口和回访动作，不带孩子完整对话、分数、原题照片。';
   const peerSafeLine = '同伴只接同类动作，不比较速度、不比较正确率。';
   const returnPathContract = [
     { id: 'land', label: '落地页', text: '先解释这不是外部排名，而是一张可复用的学习动作卡。' },
-    { id: 'choose', label: '选动作', text: '从修卡点、短回访、给家长看三条路里选一条。' },
+    { id: 'choose', label: '选动作', text: '从修卡点、回看练习、给家长看三条路里选一条。' },
     { id: 'persist', label: '留证据', text: '完成后写入分享接力、统一下一步和页面能力账本。' }
   ];
   const relayChain = [
@@ -6912,7 +6912,7 @@ function buildShareChallengePlan(input = {}) {
       id: 'day7_return',
       title: '第 7 天回访',
       visibleLine: '现在会不算结束，第 7 天还能说出来才算稳。',
-      receiverPrompt: '接收后自动带回短回访，不进入题海。',
+      receiverPrompt: '接收后自动带回回看练习，不进入题海。',
       proofSignal: '留下回访时间，不晒分数。'
     }
   ];
@@ -7033,7 +7033,7 @@ function buildShareChallengePlan(input = {}) {
   });
   const shareRelayActions = [
     { id: 'repair', label: '修卡点', route: wrongCauseReplayPayload.entry, evidence: 'wrong_cause_relay' },
-    { id: 'revisit', label: '做短回访', route, evidence: 'active_recall_relay' },
+    { id: 'revisit', label: '做回看练习', route, evidence: 'active_recall_relay' },
     { id: 'parent', label: '给家长看', route: '/pages/profile/profile?from=share_relay', evidence: 'parent_decision_relay' }
   ];
   const safeRelayChallengePacket = buildSafeRelayChallengePacket({
@@ -7088,7 +7088,7 @@ function buildShareChallengePlan(input = {}) {
   };
   return {
     id: 'share_challenge_plan',
-    title: '同伴短回访',
+    title: '同伴回看练习',
     goal,
     route,
     noRankingLine: '不排行、不晒分，只看有没有说清第一步。',
@@ -8294,7 +8294,7 @@ function buildRecentLearningSummary(nowInput = new Date()) {
       ? `最近 3 晚有 ${latest3.filter((item) => item.firstSteps > 0).length} 晚说出了第一步，${latest3.filter((item) => item.completedFocus > 0).length} 晚完成了专注。`
       : '再用两晚后，咕点会帮你看见模式。',
     sevenNightText: latest7.length >= 7
-      ? `最近 7 晚有 ${firstStepDays} 晚确认第一步、${focusDays} 晚留下专注记录、${gameDays} 晚做了短回访。`
+      ? `最近 7 晚有 ${firstStepDays} 晚确认第一步、${focusDays} 晚留下专注记录、${gameDays} 晚做了回看练习。`
       : '用满 7 晚后，咕点再整理一条更稳的复盘线索。',
     firstStepDays,
     focusDays,
@@ -10191,7 +10191,7 @@ function buildCourseUnitDepthExpansionAtlas(options = {}) {
     id: 'course_unit_depth_expansion_atlas',
     title: '题型深度扩展图谱',
     subjectLabel: active ? active.label : '',
-    summary: `已把 ${unitAtlases.length} 个单元扩展为原型题、误区变体、第一步小黑板、家长检查、短回访和安全分享。`,
+    summary: `已把 ${unitAtlases.length} 个单元扩展为原型题、误区变体、第一步小黑板、家长检查、回看练习和安全分享。`,
     boundary: '这是题型级内容厚度，不是全科拍题讲完整答案。',
     unitCount: unitAtlases.length,
     archetypeCount: unitAtlases.reduce((sum, item) => sum + item.archetypeCount, 0),
@@ -10331,7 +10331,7 @@ function buildWeeklyEvidenceFlywheel(options = {}) {
       childAction: activeCards[2] ? activeCards[2].prompt : '做一张小变式',
       evidence: 'near_transfer_attempted',
       parentDecision: '看方法能不能搬家，不用刷题量证明',
-      gameReturn: '小变式短回访'
+      gameReturn: '小变式回看练习'
     },
     {
       day: 4,
@@ -10798,8 +10798,8 @@ function buildLearningDecisionPath(options = {}) {
     reason = '已有错因卡，但迁移练习还没有完成。';
   } else if (todaySession.childArticulatedStep && !todaySession.gamePlayed) {
     route = '/pages/review/review';
-    action = '做一次短回访';
-    reason = '孩子已经说出第一步，下一步让短回访结果写回记录。';
+    action = '做一次回看练习';
+    reason = '孩子已经说出第一步，下一步让回看练习结果写回记录。';
   } else if (!parentReflection.ready) {
     route = '/pages/profile/profile';
     action = '留下家长追问回执';
@@ -11212,13 +11212,13 @@ function buildParentActionGuide(input = {}) {
     { day: 3, action: '做 1 道同类题', script: '这道同类题，第一步和昨天一样吗？', evidence: 'same_type_try_once' },
     { day: 4, action: '检查错因', script: '这次卡住，是读题、列式、步骤还是检查？', evidence: 'wrong_cause_named' },
     { day: 5, action: '让孩子教家长', script: '你用一句话教我：这类题第一步看什么？', evidence: 'child_explains_back' },
-    { day: 6, action: '主动回忆回访', script: '做一次短回访后，说一张错卡为什么回来。', evidence: 'revisit_wrong_card_returned' },
+    { day: 6, action: '主动回忆回访', script: '做一次回看练习后，说一张错卡为什么回来。', evidence: 'revisit_wrong_card_returned' },
     { day: 7, action: '形成周小结', script: '这一周最常卡的是哪一步？下周先修哪一类？', evidence: 'weekly_pattern_named' }
   ];
   return {
     tonightRecap: input.tonightRecap || '先看孩子有没有说出自己的第一步。',
     weekPattern: repeatedLine,
-    monthSuggestion: '接下来 7 天，每天只做一件事：让孩子先说出自己的第一步，再用一张卡短回访。',
+    monthSuggestion: '接下来 7 天，每天只做一件事：让孩子先说出自己的第一步，再用一张卡回看练习。',
     parentPhraseTraining: {
       title: '7 天家长陪伴脚本',
       preview: '先练“少讲答案，多问对一句”。',
@@ -11339,11 +11339,11 @@ function buildLearningDepthMap(options = {}) {
     },
     {
       id: 'practice_feedback',
-      label: '短回访会反哺',
+      label: '回看练习会反哺',
       ready: hasPracticeFeedback,
       evidence: hasPracticeFeedback
         ? `今日练习 ${Number(gameProfile.reviewed_today || gameProfile.reviewedToday || 0)} 次，正确 ${Number(gameProfile.correct_today || gameProfile.correctToday || 0)} 次`
-        : '先做一次短回访，让结果写回学习记录'
+        : '先做一次回看练习，让结果写回学习记录'
     },
     {
       id: 'parent_coaching',
@@ -11402,7 +11402,7 @@ function buildLearningDepthMap(options = {}) {
   return {
     title: '能力厚度地图',
     summary: depthScore >= 84
-      ? '追问、短回访、家长陪伴和回流已经连成一条可复用路线。'
+      ? '追问、回看练习、家长陪伴和回流已经连成一条可复用路线。'
       : '核心路线能跑，继续补齐追问、回访或家长陪伴证据。',
     depthScore,
     readyCount,
@@ -11439,7 +11439,7 @@ function buildLearningQuestArc(options = {}) {
       title: tonightPlan && tonightPlan.summaryLine ? tonightPlan.summaryLine : '先排今晚第一步',
       body: '先把材料排顺序，再让孩子说出第一步。',
       action: 'goTutor',
-      actionLabel: '去作业点拨',
+      actionLabel: '去AI私教',
       done: !!tonightPlan
     },
     {
@@ -11542,7 +11542,7 @@ function buildQuestArcGameBridge(options = {}) {
     repair: {
       title: bossKey ? `修补 ${bossKey}` : '修补一个真卡点',
       missionLine: bossKey ? `本局围绕高频卡点：${bossKey}` : '本局围绕最近的真实卡点。',
-      playRule: '错了不扣成就感，直接回到复习队列生成下一步。',
+      playRule: '错了不打击信心，直接回到复习队列生成下一步。',
       evidenceRequired: ['wrong_cause_returned', 'repair_card']
     },
     transfer: {
@@ -11664,7 +11664,7 @@ function buildModuleFlowCompass(options = {}) {
     },
     {
       id: 'review',
-      label: '短回访',
+      label: '回看练习',
       route: '/pages/review/review',
       ready: dueReviewCount > 0 || reviewCards.some((card) => card && card.isRevisited),
       evidence: dueReviewCount ? `${dueReviewCount} 张待回访` : `${reviewCards.length} 张本地学习卡`,
@@ -11673,13 +11673,13 @@ function buildModuleFlowCompass(options = {}) {
     },
     {
       id: 'revisit',
-      label: '短回访验证',
+      label: '回看练习验证',
       route: '/pages/review/review',
       ready: Number(gameProfile.reviewed_today || gameProfile.reviewedToday || 0) > 0,
       evidence: Number(gameProfile.reviewed_today || gameProfile.reviewedToday || 0)
-        ? `今日短回访 ${Number(gameProfile.reviewed_today || gameProfile.reviewedToday || 0)} 题`
-        : '还没把短回访写回证据',
-      nextAction: '做一次短回访，错卡回队列',
+        ? `今日回看练习 ${Number(gameProfile.reviewed_today || gameProfile.reviewedToday || 0)} 题`
+        : '还没把回看练习写回证据',
+      nextAction: '做一次回看练习，错卡回队列',
       action: 'goRevisit'
     },
     {
@@ -11770,9 +11770,9 @@ function buildSurfaceDepthPack(surface = 'home', options = {}) {
   const surfaces = {
     home: {
       title: '首页厚度包',
-      summary: '把今晚第一步、点拨、修卡点、短回访和家长证据串成一个入口。',
+      summary: '把今晚第一步、点拨、修卡点、回看练习和家长证据串成一个入口。',
       focusIds: ['guided_tutor', 'light_entry_evidence', 'material_to_review', 'game_retention', 'parent_evidence', 'local_resilience'],
-      nextAction: '先把今晚第一步说清，再去点拨 / 修卡点 / 短回访。',
+      nextAction: '先把今晚第一步说清，再去点拨 / 修卡点 / 回看练习。',
       benchmark: '首页不只是入口，要能把孩子推进到下一步证据。'
     },
     tutor: {
@@ -11791,7 +11791,7 @@ function buildSurfaceDepthPack(surface = 'home', options = {}) {
     },
     revisit: {
       title: '游戏厚度包',
-      summary: '短回访必须写回学习证据，而不是只给一个好玩外壳。',
+      summary: '回看练习必须写回学习证据，而不是只给一个好玩外壳。',
       focusIds: ['game_retention', 'spaced_recall', 'parent_evidence', 'depth_compounding'],
       nextAction: '先打一局，再看它把哪张卡写回复习。',
       benchmark: '游戏不是装饰入口，是证据回流的动力层。'
@@ -12222,7 +12222,7 @@ function familyCalibrationProfile() {
   }
 
   if (tutorCompleted) {
-    signals.push(`作业点拨已形成 ${tutorCompleted} 次掌握记录`);
+    signals.push(`AI私教已形成 ${tutorCompleted} 次掌握记录`);
   }
 
   if (tutorBlocked) {
@@ -12478,7 +12478,7 @@ function buildCompetitiveMoatWorkbench(options = {}) {
     },
     {
       id: 'ai_tutor_depth',
-      label: 'AI点拨深度',
+      label: 'AI私教深度',
       target: 'AI 只负责苏格拉底追问、家长解释和小黑板话术；答案边界、停止条件、本地兜底必须可跑。',
       currentEvidence: `${reportPressureTruthAudit.threeRoundSocraticRiskCount || 0} 个三轮追问风险 / 本地答案边界已接入`,
       localCodeOwns: ['answer_boundary', 'hint_level', 'stop_condition', 'fallback_recovery'],

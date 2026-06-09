@@ -574,7 +574,7 @@ function proofSummary(history = loadHistory(), todayFocus = storage.loadTodayFoc
       ? `今晚已记录 ${childStepCount ? '孩子自己的第一步' : '咕点建议的第一步'}，并留下 ${taskBoundFocusCount} 次绑定专注证据。`
       : insufficient,
     threeNightPattern: list.length >= 3
-      ? `近几晚：孩子说出第一步 ${childStepCount} 次，绑定专注 ${taskBoundFocusCount} 次，短回访 ${revisitCount} 次${commonTaskType ? `，常见任务类型：${commonTaskType}` : ''}。`
+      ? `近几晚：孩子说出第一步 ${childStepCount} 次，绑定专注 ${taskBoundFocusCount} 次，回看练习 ${revisitCount} 次${commonTaskType ? `，常见任务类型：${commonTaskType}` : ''}。`
       : insufficient,
     sevenNightReadiness: list.length >= 7
       ? '已有 7 晚左右的本地痕迹，可以开始看孩子是否更容易说出第一步。'

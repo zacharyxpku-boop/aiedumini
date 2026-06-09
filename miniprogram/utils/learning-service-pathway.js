@@ -17,9 +17,9 @@ const MODE_CATALOG = [
   },
   {
     id: 'practice_recall',
-    label: '短回访验证',
+    label: '回看练习验证',
     fit: ['会了容易忘', '需要重复巩固', '需要提高坚持度'],
-    action: '用一次短回访复查同一错因，不奖励最终答案。',
+    action: '用一次回看练习复查同一错因，不奖励最终答案。',
     route: '/pages/review/review?from=service_pathway'
   },
   {
@@ -124,7 +124,7 @@ const AI_LOCAL_DECISION_MATRIX = [
   },
   {
     id: 'practice_recall_evidence',
-    module: '短回访验证',
+    module: '回看练习验证',
     betterOwner: 'local_code',
     aiUse: '改写挑战文案和鼓励语。',
     localRule: '本地代码决定 XP、间隔复习、失败重练、外部排名禁用和分享字段。',
@@ -189,7 +189,7 @@ const PUBLIC_K12_BORROW_PLAYBOOK = [
     localCodeOwns: ['答案释放', 'XP 奖励', '间隔复习', '分享字段'],
     aiBetterFor: ['改写题面语气', '生成更自然的孩子话术'],
     mustNotUse: ['直接给完整答案', '把变式包装成新题库版权', '替代真实回访'],
-    productEntry: '短回访 / 迁移验证 / 证据回流'
+    productEntry: '回看练习 / 迁移验证 / 证据回流'
   }
 ];
 
@@ -197,7 +197,7 @@ const SEVEN_DAY_VALIDATION_PLAN = [
   { day: 1, label: '今晚', action: '只试一个学习方法候选，并记录孩子自己的第一步。', evidence: 'child_first_step' },
   { day: 2, label: '明天', action: '遮住答案回访同一第一步，看是否转身还记得。', evidence: 'next_day_revisit' },
   { day: 3, label: '第 3 天', action: '换一道同题型小变式，只看是否能迁移第一步。', evidence: 'near_transfer' },
-  { day: 5, label: '第 5 天', action: '做一次短回访，验证错因是否复现。', evidence: 'practice_recall' },
+  { day: 5, label: '第 5 天', action: '做一次回看练习，验证错因是否复现。', evidence: 'practice_recall' },
   { day: 7, label: '第 7 天', action: '家长复盘：保留、降级或换一种学习方法。', evidence: 'family_decision' }
 ];
 
@@ -682,7 +682,7 @@ function buildLearningServicePathway(input = {}) {
     title: '学习服务路径建议',
     summary: requiresEvidenceBeforeCommercialPush
       ? '先把测评报告转成学习方法候选，再用真实错题或作业验证。'
-      : '已可把本次材料接到今晚行动、短回访、家长复盘和后续课程服务。',
+      : '已可把本次材料接到今晚行动、回看练习、家长复盘和后续课程服务。',
     primaryMode: firstMode,
     primaryTier: firstTier,
     modeRecommendations,

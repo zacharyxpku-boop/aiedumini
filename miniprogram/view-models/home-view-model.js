@@ -121,7 +121,7 @@ function buildPrimaryHomeNextAction(input = {}) {
       type: 'review_return',
       priority: 30,
       dispatchCode: 3,
-      kicker: '短回访',
+      kicker: '回看练习',
       title: safeText(input.yesterdayReviewCard.noticeText, '接上昨天那一步'),
       body: safeText(input.yesterdayReviewCard.childArticulatedStep, '先复述昨天的第一步。'),
       cta: '继续回访'
@@ -171,12 +171,12 @@ function buildHomeViewModel(input = {}) {
     routePill: hasPlanOrFocus ? '已分析 · 继续下一步' : '先处理材料',
     companionStrip: companionStrip(input.companionPreference),
     title: hasPlanOrFocus ? '已看清下一步' : '把材料发过来',
-    subtitle: hasPlanOrFocus ? '接下来进 AI 点拨或短回访，不在首页堆完整方案。' : '孩子可以上传材料，也可以直接说题目。',
+    subtitle: hasPlanOrFocus ? '接下来进 AI 点拨或回看练习，不在首页堆完整方案。' : '孩子可以上传材料，也可以直接说题目。',
     inputCard: {
       title: hasPlanOrFocus ? '修改情况后重新分析' : '用文字补充情况',
       placeholder: '比如：数学方程 8 道，应用题第一步不清楚；也可以先上传材料。',
       helper: hasPlanOrFocus
-        ? '材料变了就重新分析；卡住进 AI 点拨，做完进短回访。'
+        ? '材料变了就重新分析；卡住进 AI 点拨，做完进回看练习。'
         : '不用写长，先说题目、材料或第一步线索；这里不直接给答案。'
     },
     primaryCta: hasPlanOrFocus ? '重新分析材料' : '分析材料',

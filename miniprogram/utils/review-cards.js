@@ -396,13 +396,13 @@ function generatedFromTutorSignals() {
           ? `这类题为什么不能直接要答案：${normalizeText(event.selected_text)}`
           : `复盘一句话：${normalizeText(event.selected_text)}`,
         answer: isBlocked
-          ? '先写自己的第一步或卡点，作业点拨只给最小提示。'
+          ? '先写自己的第一步或卡点，AI私教只给最小提示。'
           : '说清本题错因和下次先检查哪一步。',
         context: event.selected_text,
         weakPoint: storage.formatInternalLabel ? storage.formatInternalLabel(event.mastery_status, '先说第一步') : '',
-        calibrationKey: storage.formatSourceLabel ? storage.formatSourceLabel(event.source, '作业点拨') : ''
+        calibrationKey: storage.formatSourceLabel ? storage.formatSourceLabel(event.source, 'AI私教') : ''
       },
-      { calibrationKey: storage.formatSourceLabel ? storage.formatSourceLabel(event.source, '作业点拨') : '' }
+      { calibrationKey: storage.formatSourceLabel ? storage.formatSourceLabel(event.source, 'AI私教') : '' }
     );
   });
 }
@@ -414,7 +414,7 @@ function generatedFromThinkingReceipts() {
     const missing = checks.filter((check) => !check.done).map((check) => check.label).filter(Boolean);
     const done = checks.filter((check) => check.done).map((check) => check.label).filter(Boolean);
     const answer = receipt.status === 'answer shortcut blocked'
-      ? '先写自己的第一步或卡点；作业点拨只能给最小提示，不能代写答案。'
+      ? '先写自己的第一步或卡点；AI私教只能给最小提示，不能代写答案。'
       : (receipt.shareLine || `复述本题错因，并说明下次先检查哪一步。`);
     return makeNote(
       stableId('note_thinking', [receipt.id || receipt.created_at || index]),
@@ -427,9 +427,9 @@ function generatedFromThinkingReceipts() {
           ? `还要补：${missing.join('、')}`
           : `已完成：${done.join('、') || 'student first thought / wrong cause / safe help / proof sentence'}`,
         weakPoint: storage.formatInternalLabel ? storage.formatInternalLabel(receipt.mastery_status || receipt.status, '思路记录') : (receipt.status || ''),
-        calibrationKey: storage.formatInternalLabel ? storage.formatInternalLabel(receipt.coach_step || receipt.source, '作业点拨') : ''
+        calibrationKey: storage.formatInternalLabel ? storage.formatInternalLabel(receipt.coach_step || receipt.source, 'AI私教') : ''
       },
-      { calibrationKey: storage.formatInternalLabel ? storage.formatInternalLabel(receipt.coach_step || receipt.source, '作业点拨') : '' }
+      { calibrationKey: storage.formatInternalLabel ? storage.formatInternalLabel(receipt.coach_step || receipt.source, 'AI私教') : '' }
     );
   });
 }
@@ -1008,7 +1008,7 @@ function contentEnginePlan(rawText, options = {}) {
     nextActions: [
       missingTypes.length ? `补齐 ${missingTypes.join(' / ')} 卡型` : '覆盖 concept / step / trap / cloze',
       counts.transfer ? '已生成举一反三卡，可用于错题回访' : '如是错题，补一句错因会生成举一反三卡',
-      avgQuality < 76 ? '导入后先做一次错因修补' : '直接进入每日短回访',
+      avgQuality < 76 ? '导入后先做一次错因修补' : '直接进入每日回看练习',
       adapter.remoteReady ? '可切换稳定服务增强' : '本地规则已可用，后续接入稳定服务后增强'
     ]
   });
@@ -2092,7 +2092,7 @@ function sessionFeedback(mode, reviewedCards) {
       : mode === 'leech'
         ? `本轮处理 ${leechCount} 张顽固错因，先把最难的压住`
         : againCount >= Math.max(2, Math.ceil(list.length / 2))
-          ? '本轮遗忘偏多，建议回到作业点拨或降低新卡'
+          ? '本轮遗忘偏多，建议回到AI私教或降低新卡'
           : easyCount >= Math.max(2, Math.ceil(list.length / 2))
             ? '本轮状态较稳，可以逐步扩大覆盖面'
             : '本轮节奏正常，继续按目标推进'
@@ -2413,7 +2413,7 @@ function userSessionFeedback(mode, reviewedCards) {
       : mode === 'leech'
         ? `本轮处理 ${leechCount} 张顽固错因，先把最难的压住`
         : againCount >= Math.max(2, Math.ceil(list.length / 2))
-          ? '本轮遗忘偏多，建议回到作业点拨或降低新卡'
+          ? '本轮遗忘偏多，建议回到AI私教或降低新卡'
           : easyCount >= Math.max(2, Math.ceil(list.length / 2))
             ? '本轮状态较稳，可以逐步扩大覆盖面'
             : '本轮节奏正常，继续按目标推进'
@@ -2590,7 +2590,7 @@ function dailyMissionCenter(summary) {
   return {
     missions,
     primary,
-    label: primary ? `先从「${primary.title}」开始。` : '先完成今天的短回访。'
+    label: primary ? `先从「${primary.title}」开始。` : '先完成今天的回看练习。'
   };
 }
 
@@ -2666,7 +2666,7 @@ function studySeason(summary) {
     streakShield,
     lives: Number(loop.lives || 0),
     target: Math.max(60, Number(goal.target || 1) * 18),
-    checkpoint: dailyRevisit.title || '完成今天的短回访',
+    checkpoint: dailyRevisit.title || '完成今天的回看练习',
     status: weekXp >= 100 ? 'Season target cleared.' : `${Math.max(0, 100 - weekXp)}% to the weekly checkpoint.`
   };
 }
@@ -2914,10 +2914,10 @@ function localProgressShareShell(summary) {
     }
   ];
   return {
-    title: '本机短回访',
+    title: '本机回看练习',
     mode: 'local_preview_cloud_ready',
     inviteCode: '',
-    dailyPrompt: revisitTarget.title || '完成今天的短回访',
+    dailyPrompt: revisitTarget.title || '完成今天的回看练习',
     missions,
     label: '当前只展示本机进展，多端连续记录开通后再合并显示。'
   };
@@ -3080,7 +3080,7 @@ function syntheticCohortLab(summary) {
     {
       id: 'steady',
       title: 'Steady user',
-      assumption: '每天 5 次回忆、一次短回访、每周一次错因修补',
+      assumption: '每天 5 次回忆、一次回看练习、每周一次错因修补',
       clarity: clampScore(base * 0.88),
       retention: clampScore(base * 0.82),
       fatigue: 'balanced'
@@ -3380,7 +3380,7 @@ function commercialReadiness(summary) {
     featureHit(hasModulePack, 10, '模块内容可沉淀成复习包', '把更多模块题型转成可直接回访的小卡组。'),
     featureHit(hasRepair, 12, '本机错因修复已能处理薄弱卡片', '接入稳定评分规则后再扩展复杂修复。'),
     featureHit(hasQuizLoop, 10, '小测结果已能回写记忆排程和修卡点', '补齐限时小测和更细的答题校验。'),
-    featureHit(hasRevisitLoop, 14, '短回访、任务、学习记录已形成回访证据', '补齐连续任务和阶段检查点。'),
+    featureHit(hasRevisitLoop, 14, '回看练习、任务、学习记录已形成回访证据', '补齐连续任务和阶段检查点。'),
     featureHit(hasSelfEvidenceSnapshot, 8, '本机进展快照已存在', '多人排行等强社交功能先保持隐藏，等连续记录稳定后再开放。'),
     featureHit(
       safe.materialMemoryBridge && Array.isArray(safe.materialMemoryBridge.sourceRows) && safe.materialMemoryBridge.sourceRows.length > 0,

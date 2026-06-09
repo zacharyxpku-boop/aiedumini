@@ -95,7 +95,7 @@ function proofSummary(input = {}) {
     ? `最近 3 次：${latest3.filter((item) => item.firstSteps > 0).length} 次确认第一步，${latest3.filter((item) => item.completedFocus > 0 || item.interruptedFocus > 0).length} 次留下专注痕迹。`
     : INSUFFICIENT_PROOF;
   const sevenNightText = latest7.length >= 7
-      ? `最近 7 次：${recentSummary.firstStepDays || 0} 次确认第一步，${recentSummary.focusDays || 0} 次专注，${recentSummary.gameDays || 0} 次短回访。`
+      ? `最近 7 次：${recentSummary.firstStepDays || 0} 次确认第一步，${recentSummary.focusDays || 0} 次专注，${recentSummary.gameDays || 0} 次回看练习。`
     : INSUFFICIENT_PROOF;
   return {
     oneNightProof: history.length || focus
@@ -143,7 +143,7 @@ function buildFamilyDecisionCard(input = {}) {
   const sourceLabels = [
     materialReady ? '材料' : '',
     tutorReady ? 'AI诊断' : '',
-    revisitReady ? '短回访' : ''
+    revisitReady ? '回看练习' : ''
   ].filter(Boolean);
   const nextAction = diagnostic && diagnostic.firstStep
     ? diagnostic.firstStep
@@ -179,7 +179,7 @@ function buildParentRecap(input = {}) {
     firstStepLine: `他先迈出的第一步是：${evidence.displayStep}`,
     recentFirstStepCount: proof.recentFirstStepCount,
     recentFocusEvidence: focusLine,
-    recentRevisitEvidence: proof.recentRevisitEvidence ? `已留下 ${proof.recentRevisitEvidence} 次短回访痕迹。` : '明天短回访后会留下记录。',
+    recentRevisitEvidence: proof.recentRevisitEvidence ? `已留下 ${proof.recentRevisitEvidence} 次回看练习痕迹。` : '明天回看练习后会留下记录。',
     trustBoundaryNote: evidence.hasChildStep
       ? '咕点没有给答案，也没有直接给结果，只记录孩子自己说出的第一步。'
       : '咕点没有给答案，也没有直接给结果，只先整理一个可开始的第一步。',
@@ -211,7 +211,7 @@ function buildParentEvidenceStrip(input = {}) {
       },
       {
         id: 'revisit_trace',
-        label: '短回访',
+        label: '回看练习',
         value: recap.recentRevisitEvidence.indexOf('已留下') >= 0 ? recap.recentRevisitEvidence.replace(/^已留下\s*/, '').replace(/痕迹。$/, '') : '明天看',
         line: recap.recentRevisitEvidence
       }

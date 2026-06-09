@@ -48,7 +48,7 @@ function recommendCapability(text) {
   if (/复习|练习|巩固|回访/i.test(value)) {
     return {
       id: 'revisit',
-      label: '短回访与练习',
+      label: '回看练习与练习',
       reason: '先回看昨天那一步，再做一短时回访验证'
     };
   }
@@ -218,7 +218,7 @@ function buildLearningAssessment(text) {
     tutor: '用咕点追问，让孩子把第一步说出来。',
     focus: '先进入专注舱，围绕这一小步坐一段。',
     review: '先修错题卡点，留下下次检查点。',
-    revisit: '先做短回访，再做主动回忆验证。'
+    revisit: '先做回看练习，再做主动回忆验证。'
   }[capability.id] || '先从最小动作开始。';
 
   return {

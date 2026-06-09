@@ -731,7 +731,7 @@ Page({
     const quiz = Number((reviewSummary && reviewSummary.quiz && reviewSummary.quiz.count) || 0);
     return {
       brand: '原点智学',
-      subtitle: '作业点拨',
+      subtitle: 'AI私教',
       status: topMust ? '已找到下一步' : '等待学习上下文',
       weak: weak.name || '先找到卡点',
       pack: currentModule ? currentModule.title : '可生成回访验证',
@@ -773,9 +773,9 @@ Page({
         ? `先把材料做成「${module.title}」。`
         : '先发题目和你想到的一步，点拨会继续追问。';
     const helper = topMust
-      ? '先用作业点拨拆下一步，做错了再去修卡点。'
+      ? '先用AI私教拆下一步，做错了再去修卡点。'
       : due
-        ? '先去复习；错了再回作业点拨拆卡点。'
+        ? '先去复习；错了再回AI私教拆卡点。'
         : '先问一个小问题，不急着讲最终结果。';
     const confidence = Math.min(96, 48
       + (weak.score ? Math.round(Number(weak.score || 0) / 5) : 0)
@@ -789,7 +789,7 @@ Page({
       tonight,
       helper,
       confidence,
-      primaryLabel: topMust ? '去作业点拨' : due ? '先复习一轮' : '先发一道题',
+      primaryLabel: topMust ? '去AI私教' : due ? '先复习一轮' : '先发一道题',
       primaryAction: topMust ? 'startTopMust' : due ? 'goReview' : 'goTutor',
       secondaryLabel: '去修卡点',
       secondaryAction: 'goReview'
@@ -876,7 +876,7 @@ Page({
         id: 'tutor',
         category: 'today',
         tone: 'mint',
-        title: '作业点拨',
+        title: 'AI私教',
         desc: '不会直接代写结果，只陪你说清题目和第一步。',
         status: '思路引导',
         cta: '提问',
@@ -934,7 +934,7 @@ Page({
       label: topMust ? '建议先做这个' : '等待你的作业清单',
       time: topMust ? `${topMust.minutes || 10} 分钟` : '约 3 分钟规划',
       lives: goal.completed >= goal.target ? '已完成' : '今晚',
-      pack: currentModule ? '可生成回访验证' : '先做作业点拨'
+      pack: currentModule ? '可生成回访验证' : '先做AI私教'
     };
   },
 
@@ -1401,7 +1401,7 @@ Page({
       {
         id: 'first_step',
         label: '只给提示',
-        title: '作业点拨问下一步',
+        title: 'AI私教问下一步',
         body: topMust ? topMust.text : '不会直接讲最终结果，只帮你检查思路和下一步。',
         value: '2',
         action: topMust ? 'startTopMust' : 'submitAiDraft',
@@ -1590,13 +1590,13 @@ Page({
         {
           id: 'coach',
           kicker: '2 / 辅导',
-          title: currentModule ? currentModule.title : '用作业点拨迈出第一步',
+          title: currentModule ? currentModule.title : '用AI私教迈出第一步',
           desc: currentModule
             ? currentModule.scene
             : '先听你想到哪一步，再问一个能帮你继续想的问题。',
           proof: currentModule ? `${currentModule.minutes} 分钟模块` : '3-5分钟',
           action: currentModule ? 'goLearningMap' : 'goTutor',
-          cta: currentModule ? '打开回访验证' : '打开作业点拨'
+          cta: currentModule ? '打开回访验证' : '打开AI私教'
         },
         {
           id: 'memory',

@@ -281,7 +281,7 @@ const AI_USAGE_DECISION_MATRIX = [
     id: 'socratic_hint_generation',
     module: 'tutor',
     decision: 'ai_required_with_local_guardrail',
-    label: '作业点拨追问生成',
+    label: 'AI私教追问生成',
     reason: '用户输入高熵，AI 负责把题干、卡点和孩子原话改写成合适追问。',
     localFallback: 'tutor-ladder 题型规则、答案拦截、第一步提示、错因模板必须本地可用。',
     guardrail: 'AI 不得直接给最终答案；本地规则先拦截代写、拍题出答案、完整板书。'
@@ -335,9 +335,9 @@ const AI_USAGE_DECISION_MATRIX = [
     id: 'game_reward_xp',
     module: 'revisit',
     decision: 'local_rule_required',
-    label: 'XP、任务、成就和游戏反馈',
+    label: '练习记录、任务和学习反馈',
     reason: '奖励系统需要一致、公平、无模型漂移。',
-    localFallback: 'XP、等级、streak、成就、每日任务全部本地规则。',
+    localFallback: '练习记录、连续学习和每日任务全部本地规则。',
     guardrail: '不做排名刺激，不用 AI 生成比较同学、分数或班级地位。'
   },
   {
@@ -1053,7 +1053,7 @@ function buildProductReadiness(storage, options = {}) {
   const dimensions = [
     evidenceItem(
       'guided_tutor',
-      '引导式作业点拨',
+      '引导式AI私教',
       guidedEvidence && (tutorBlocked || hasText(currentSession.childArticulatedStep) || hasText(todayFocus && todayFocus.systemSuggestedStep)),
       [
         todayFocus && todayFocus.systemSuggestedStep ? 'todayFocus.systemSuggestedStep' : '',
@@ -1114,7 +1114,7 @@ function buildProductReadiness(storage, options = {}) {
         Number(gameProfile.review_count || 0) ? `review_count ${gameProfile.review_count}` : '',
         Number(gameProfile.xp || 0) ? `xp ${gameProfile.xp}` : ''
       ],
-      '短回访必须写回学习记录，而不是只做装饰入口。'
+      '回看练习必须写回学习记录，而不是只做装饰入口。'
     ),
     evidenceItem(
       'parent_evidence',
@@ -1162,7 +1162,7 @@ function buildProductReadiness(storage, options = {}) {
         depthMap ? `readyDimensions ${depthMap.readyCount}/${depthMap.totalCount}` : '',
         depthMap && depthMap.nextBestAction ? `next: ${depthMap.nextBestAction}` : ''
       ],
-      '需要追问、方案、短回访、家长陪伴和回流至少 5 个维度有本地证据。'
+      '需要追问、方案、回看练习、家长陪伴和回流至少 5 个维度有本地证据。'
     ),
     evidenceItem(
       'weekly_pattern',

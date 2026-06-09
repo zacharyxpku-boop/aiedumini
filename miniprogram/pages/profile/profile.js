@@ -379,7 +379,7 @@ function buildParentReport(profile, reviewSummary, moduleSummary, tutorSummary, 
         id: 'must_do',
         value: safeNumber(tutor.completed, 0),
         label: '关键点拨',
-        note: '作业点拨只用在最值得先做的任务上。'
+        note: 'AI私教只用在最值得先做的任务上。'
       },
       {
         id: 'memory',
@@ -2833,7 +2833,7 @@ function buildCommercialUnlockCard(reviewSummary, tutorSummary, thinkingSummary,
     : 0;
   const hasReview = repaired > 0 || (safeNumber(review.total, 0) > 0 && safeNumber(review.due, 0) === 0);
   const steps = [
-    { id: 'tutor', label: '作业点拨', done: hasTutor },
+    { id: 'tutor', label: 'AI私教', done: hasTutor },
     { id: 'challenge', label: '明天验证', done: hasChallenge },
     { id: 'review', label: '复习回访', done: hasReview }
   ];
@@ -2842,7 +2842,7 @@ function buildCommercialUnlockCard(reviewSummary, tutorSummary, thinkingSummary,
     title: done >= 3 ? '本周复盘已可整理' : '先跑通一次完整闭环',
     body: done >= 3
       ? '你已经完成一次带学、一次明天验证和一次家长回访，可以整理成本周复盘。'
-      : '完成 1 次作业点拨 + 1 次明天验证 + 1 次家长回访后，就能整理成本周复盘。',
+      : '完成 1 次AI私教 + 1 次明天验证 + 1 次家长回访后，就能整理成本周复盘。',
     done,
     total: steps.length,
     steps,
@@ -2878,7 +2878,7 @@ function buildProfileReadinessSnapshot(input = {}) {
     : '还有本地闭环待补齐，先按下一步把证据补上。';
   const flowLine = compass && compass.readyCount !== undefined
     ? `${compass.readyCount} / ${compass.totalCount || 0} 个环节已接上：${compass.summary || '先跑通一次完整学习回路'}`
-    : '先从作业点拨、错题修复、明天验证和家长复盘跑通一次。';
+    : '先从AI私教、错题修复、明天验证和家长复盘跑通一次。';
   const evidenceLine = evidence.reportLine || evidence.shareLine || surface.familyLine || depth.summary || '目前先看本机学习记录，资料越完整，建议越具体。';
   const boundaryLine = localPassed
     ? (externalBlocked ? '当前适合小范围家庭试用；公开分发前再完成正式小程序身份。' : '当前可以用真实材料做一轮家庭试用。')
@@ -2887,7 +2887,7 @@ function buildProfileReadinessSnapshot(input = {}) {
     {
       id: 'need_ai',
       label: '需要智能生成',
-      body: `${socraticAi.label || '作业点拨追问'}：把题干、卡点和孩子原话改写成追问；本地规则先拦截直接给答案。`
+      body: `${socraticAi.label || 'AI私教追问'}：把题干、卡点和孩子原话改写成追问；本地规则先拦截直接给答案。`
     },
     {
       id: 'ai_enhanced',
@@ -4253,7 +4253,7 @@ Page({
     const assets = [
       { id: 'weakness', label: '卡点图谱', value: calibration.weakPoint || '形成中', source: '复盘 + 作业' },
       { id: 'decision', label: '作业决策', value: safeNumber(calibration.homework && calibration.homework.accuracyRate, 0) + '%', source: '反馈校准' },
-      { id: 'tutor', label: '思路记录', value: safeNumber(thinking.total, 0), source: '作业点拨' },
+      { id: 'tutor', label: '思路记录', value: safeNumber(thinking.total, 0), source: 'AI私教' },
       { id: 'memory', label: '记忆卡', value: safeNumber(review.total, 0), source: '复习引擎' },
       { id: 'method_fit', label: '方法适配', value: safeNumber(modules.useful, 0), source: '学习方法' },
       { id: 'factory', label: '回访生成', value: safeNumber(factory.generated, 0), source: '材料 -> 回访卡' }
@@ -4273,7 +4273,7 @@ Page({
       loop: [
         '收集卡点和作业信号。',
         '选择必须做，过滤低价值负担。',
-        '作业点拨要一句自己的话，不直接讲最终结果。',
+        'AI私教要一句自己的话，不直接讲最终结果。',
         '把错误转成卡片、测验和修复。',
         '反馈校准下一次推荐。'
       ]
@@ -4314,7 +4314,7 @@ Page({
     }
     return {
       title: '飞轮建议',
-      label: '根据复习、作业点拨、内容工厂、真实体验和反馈校准信号，判断下一步。',
+      label: '根据复习、AI私教、内容工厂、真实体验和反馈校准信号，判断下一步。',
       actions: actions.slice(0, 4)
     };
   },
@@ -4328,7 +4328,7 @@ Page({
       rows: [
         { id: 'content_loop', name: '内容回访', score: review.contentPipeline ? 98 : 94, strength: '材料 -> 卡片 -> 小测 -> 连续记录', gap: '真实材料处理和稳定复盘规模' },
         { id: 'memory_loop', name: '长期记忆', score: review.retentionLab ? 96 : 92, strength: '间隔复习、负载控制和卡点修复', gap: '真实调度参数校准' },
-        { id: 'tutor_loop', name: 'AI点拨学伴', score: thinking.total ? 99 : 96, strength: '追问引导和思路记录', gap: '模型级误区复盘' },
+        { id: 'tutor_loop', name: 'AI私教学伴', score: thinking.total ? 99 : 96, strength: '追问引导和思路记录', gap: '模型级误区复盘' },
         { id: 'china_student', name: '中国学生场景', score: 100, strength: '材料证据 -> AI 点拨 -> 成长报告', gap: '需要真实体验记录' }
       ]
     };

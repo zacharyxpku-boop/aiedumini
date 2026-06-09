@@ -204,7 +204,7 @@ function buildUploadPersonalizedClosureView(bridge = {}) {
     id: 'upload_personalized_closure_view',
     title: '个性化闭环执行桥',
     statusLine: bridge.status === 'ready_for_guided_execution'
-      ? '已具备真实任务证据：可以进入AI点拨、修卡点、回访和成长报告。'
+      ? '已具备真实任务证据：可以进入AI私教、修卡点、回访和成长报告。'
       : '先补真实任务证据：资料/成绩只能生成方法候选，不能直接放行分享或服务。',
     contentLine: `内容密度：${bridge.contentScalePlan ? bridge.contentScalePlan.density : 'pending'}；题型：${bridge.questionType || 'unknown'}；学科：${bridge.subject || 'unknown'}`,
     socraticLine: bridge.socraticStressFallback
@@ -952,7 +952,7 @@ Page({
           id: 'preview',
           title: '下一步会发生什么',
           body: plan && plan.must_do[0]
-            ? `第一项必须做会自动进入作业点拨：${plan.must_do[0].text}`
+            ? `第一项必须做会自动进入AI私教：${plan.must_do[0].text}`
             : '至少写一项作业，就能预览今晚第一件该做的事。',
           tone: 'next'
         },

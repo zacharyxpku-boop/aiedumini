@@ -1029,7 +1029,7 @@ function buildPrivateTutorModeRouter(input = {}, miniLesson = {}) {
   const reasonByMode = {
     socratic_private_tutor: '孩子还在正常追问区间，继续苏格拉底 1 对 1，不提前上课。',
     three_minute_mini_lesson: '孩子连续卡住或有答案捷径风险，只补一个概念缺口和三帧小黑板。',
-    practice_recall: '孩子已经写出退出票据，进入短回访巩固第一步和错因。',
+    practice_recall: '孩子已经写出退出票据，进入回看练习巩固第一步和错因。',
     parent_handoff: '孩子仍说不出第一步，降级为家长一句低压检查和明天回访。'
   };
   return {

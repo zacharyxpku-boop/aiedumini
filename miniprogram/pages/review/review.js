@@ -1187,7 +1187,7 @@ Page({
       eyebrow: '今日回访',
       title: due ? '今天先赢这一关' : '今天保持手感',
       subtitle: due
-        ? `咕点只推 ${due} 张最该复习的卡，卡住再回作业点拨拆一步。`
+        ? `咕点只推 ${due} 张最该复习的卡，卡住再回AI私教拆一步。`
         : '没有到期卡时，不硬塞任务。可以先做一轮回访验证。',
       season: season.tier || '青铜',
       level: progress.level || 1,
@@ -1305,7 +1305,7 @@ Page({
       evidence: evidence.length ? evidence.join(' · ') : '等待更多真实记录',
       cause,
       next,
-      helper: wrongEvents || repeatedWrong ? '先回作业点拨拆卡点，再生成一道同类题。' : '先录入一道真实错题，再用作业点拨问清卡点。',
+      helper: wrongEvents || repeatedWrong ? '先回AI私教拆卡点，再生成一道同类题。' : '先录入一道真实错题，再用AI私教问清卡点。',
       confidence: Math.min(96, 52 + Math.min(18, repeatedWrong * 6) + Math.min(18, wrongEvents * 3) + Math.min(8, Number(thinking.total || 0) * 2))
     };
   },
@@ -1355,10 +1355,10 @@ Page({
         },
         {
           id: 'tutor',
-          title: '回作业点拨',
-          desc: '如果又卡住，先回作业点拨拆一步，再继续加卡。',
+          title: '回AI私教',
+          desc: '如果又卡住，先回AI私教拆一步，再继续加卡。',
           action: 'tutor',
-          cta: '打开作业点拨'
+          cta: '打开AI私教'
         }
       ],
       longTermRecord: {
@@ -1691,7 +1691,7 @@ Page({
     const lastEvent = (storage.loadReviewEvents ? storage.loadReviewEvents()[0] : null) || {};
     const evidenceText = (lastEvent.evidencePoints || lastEvent.xp) ? '，已记进今天回访' : '';
     const feedbackText = (rating === 'again'
-      ? '已安排明天再看，先回作业点拨拆一步。'
+      ? '已安排明天再看，先回AI私教拆一步。'
       : rating === 'hard'
         ? '已缩短间隔，后面还会更快出现。'
         : rating === 'easy'

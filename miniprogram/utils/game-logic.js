@@ -35,7 +35,7 @@ const ACHIEVEMENTS = [
 
 const SHOP_ITEMS = [
   { id: 'avatar_origin_gold', type: 'avatar_frame', title: '原点金色头像框', recordCost: 60, description: '装饰性头像框，不影响学习收益。' },
-  { id: 'theme_forest_focus', type: 'theme', title: '森林专注主题', recordCost: 90, description: '深绿护眼短回访主题。' },
+  { id: 'theme_forest_focus', type: 'theme', title: '森林专注主题', recordCost: 90, description: '深绿护眼回看练习主题。' },
   { id: 'card_warm_grid', type: 'card_back', title: '暖色网格卡背', recordCost: 50, description: '闪卡背面装饰。' },
   { id: 'streak_freeze', type: 'streak_freeze', title: '补签卡', recordCost: 180, description: '保护一次断签，只能用本机学习点换取。' }
 ];

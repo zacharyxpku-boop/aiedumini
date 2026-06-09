@@ -39,7 +39,7 @@ const GAME_TYPES = [
   {
     id: 'quiz',
     name: '轻回忆',
-    shortName: '短回访',
+    shortName: '回看练习',
     verb: '逐题推进',
     fit: ['concept', 'problem', 'fact', 'skill'],
     status: 'ready',
@@ -577,7 +577,7 @@ function buildRoundAdvice(result = {}, gameType = 'whack') {
           title: '短卡片已经热起来了',
           body: '趁手感还在，再来一小局可以把检索速度稳住。',
           primary: '再来一小局',
-          secondary: wrong ? '修错卡' : '去短回访'
+          secondary: wrong ? '修错卡' : '去回看练习'
         }
       : {
           title: '先别硬冲速度',
@@ -589,12 +589,12 @@ function buildRoundAdvice(result = {}, gameType = 'whack') {
       ? {
           title: '概念能说出来了',
           body: '下一步可以继续轻回忆，或把模糊卡沉淀成更短的回忆卡。',
-          primary: '继续短回访',
+          primary: '继续回看练习',
           secondary: wrong ? '修一个错因' : '回到复习'
         }
       : {
           title: '概念还需要补一刀',
-          body: '先看错题提示和自己的思路，再用作业点拨把卡住处说清楚。',
+          body: '先看错题提示和自己的思路，再用AI私教把卡住处说清楚。',
           primary: '再练一次',
           secondary: '去复习错卡'
         },
@@ -640,7 +640,7 @@ function buildRepairFocus(answer = {}, cards = []) {
     answer: correctAnswer,
     weakPoint: answer.knowledgeType || ''
   });
-  const gameName = (GAME_TYPES.find((item) => item.id === gameType) || {}).shortName || '短回访';
+  const gameName = (GAME_TYPES.find((item) => item.id === gameType) || {}).shortName || '回看练习';
   return {
     id: `revisit_repair_${answer.cardId || Date.now()}`,
     title: question ? `修这一题：${question}` : '修本局第一张错卡',
@@ -655,7 +655,7 @@ function buildRepairFocus(answer = {}, cards = []) {
     decision: selected
       ? `来自${gameName}，刚才选了「${selected}」，先说清为什么应为「${correctAnswer}」。`
       : `来自${gameName}，先把这张错卡的关键原因说清楚。`,
-    tags: ['短回访', gameName, answer.knowledgeType || type.name].filter(Boolean),
+    tags: ['回看练习', gameName, answer.knowledgeType || type.name].filter(Boolean),
     cardId: answer.cardId || '',
     calibrationKey: card.calibrationKey || `revisit:${gameType}:${answer.cardId || 'unknown'}`
   };
@@ -669,9 +669,9 @@ function buildHomeRevisitEntry(summary = {}, cards = []) {
     title: '回访验证',
     label: primary && primary.available ? `${primary.shortName} · ${primary.minutes} 分钟` : '生成学习卡后可开始',
     body: due
-      ? `今天有 ${due} 张卡可以做短回访。`
-      : '把作业、错题或知识点生成学习卡，再进入短回访。',
-    cta: primary && primary.available ? '进入今日短回访' : '先生成学习卡',
+      ? `今天有 ${due} 张卡可以做回看练习。`
+      : '把作业、错题或知识点生成学习卡，再进入回看练习。',
+    cta: primary && primary.available ? '进入今日回看练习' : '先生成学习卡',
     action: primary && primary.available ? 'goRevisit' : 'goLearningMap',
     gameId: primary ? primary.id : 'whack'
   };
