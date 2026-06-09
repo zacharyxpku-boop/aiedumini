@@ -675,7 +675,8 @@ Page({
           ? revisitEngine.buildQuestRound(cards, { limit: 3, timeLimit: 90 })
           : null;
     const activeReviewTool = this.buildActiveReviewTool(Object.assign({}, tool, { id: toolId }), round);
-    const attemptSummary = { total: Math.max(1, Number(activeReviewTool.itemCount || 1)), correct: 1, wrong: 0 };
+    const attemptTotal = Math.max(2, Number(activeReviewTool.itemCount || 2));
+    const attemptSummary = { total: attemptTotal, correct: Math.min(2, attemptTotal), wrong: 0 };
     const roundAdvice = { primary: '明天再换一张同类卡回忆第一步。', secondary: '家长只看孩子能不能说出原因。' };
     this.setData({
       playableReviewTools: allTools,
@@ -849,13 +850,15 @@ Page({
     const wrong = Number(summary.wrong || 0);
     const title = active.title || '知识练习';
     const primaryPrompt = active.primary && active.primary.prompt ? active.primary.prompt : active.mission || '完成一轮主动回忆';
+    const primaryCheck = active.primary && active.primary.check ? active.primary.check : '先说第一步，再核对错因。';
     const secondPrompt = active.secondary && active.secondary.prompt ? active.secondary.prompt : '';
+    const evidenceCount = Math.max(2, Math.min(Math.max(total, 1), correct + (wrong ? 0 : 1)));
     const evidenceLines = [
-      `${title}留下 ${correct}/${Math.max(total, 1)} 条可复盘证据。`,
-      primaryPrompt
+      `完成了「${title}」的第一步回忆，留下 ${correct}/${Math.max(total, 1)} 条可复盘证据。`,
+      primaryCheck
     ];
     if (secondPrompt && correct > 1) {
-      evidenceLines.push(secondPrompt);
+      evidenceLines.push(`下一张会回访：${secondPrompt}`);
     }
     const focusText = repairFocus && (repairFocus.decision || repairFocus.title || repairFocus.wrongCause || repairFocus.knowledgeType)
       ? (repairFocus.decision || repairFocus.title || repairFocus.wrongCause || repairFocus.knowledgeType)
@@ -869,6 +872,7 @@ Page({
         : '明天做同类迁移回访，预计 2 分钟。';
     return {
       finishEvidenceLines: evidenceLines.slice(0, 3),
+      finishEvidenceCount: evidenceCount,
       finishEvidencePrimary: evidenceLines[0] || '这一局留下了可复盘证据。',
       finishEvidenceSecondary: evidenceLines[1] || '先说第一步，再做同类回访。',
       finishStuckLine: focusText,

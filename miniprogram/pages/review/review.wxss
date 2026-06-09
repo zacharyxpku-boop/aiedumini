@@ -1725,7 +1725,7 @@ page {
 .review-finish-card {
   flex: 1;
   display: grid;
-  gap: 20rpx;
+  gap: 24rpx;
   padding: 0 0 244rpx;
   border-radius: 0;
   background: transparent;
@@ -1784,8 +1784,8 @@ page {
 
 .review-finish-section {
   display: grid;
-  gap: 14rpx;
-  padding: 24rpx;
+  gap: 16rpx;
+  padding: 28rpx;
   border: 1rpx solid #eaf3ef;
   border-radius: 24rpx;
   background: #ffffff;
@@ -1828,17 +1828,30 @@ page {
   display: grid;
   grid-template-columns: 34rpx minmax(0, 1fr);
   gap: 16rpx;
-  padding: 20rpx;
+  padding: 22rpx;
   border: 1rpx solid #eef7f4;
   border-radius: 16rpx;
   background: #f6fbf9;
 }
 
 .review-finish-section.remembered > view:not(:first-child) > text:first-child {
+  position: relative;
   width: 34rpx;
   height: 34rpx;
   border-radius: 999rpx;
   background: #289689;
+}
+
+.review-finish-section.remembered > view:not(:first-child) > text:first-child::before {
+  content: "";
+  position: absolute;
+  left: 10rpx;
+  top: 8rpx;
+  width: 10rpx;
+  height: 16rpx;
+  border-right: 3rpx solid #ffffff;
+  border-bottom: 3rpx solid #ffffff;
+  transform: rotate(45deg);
 }
 
 .review-finish-section.remembered > view:not(:first-child) > text:last-child,
@@ -1863,7 +1876,7 @@ page {
 
 .review-finish-section.stuck > text {
   position: relative;
-  padding: 22rpx;
+  padding: 24rpx;
   border: 1rpx solid #fdf0eb;
   border-radius: 16rpx;
   background: #fff9f6;
@@ -1890,21 +1903,42 @@ page {
 
 .review-finish-section.tomorrow > view:nth-child(2) {
   display: grid;
-  grid-template-columns: 80rpx minmax(0, 1fr);
+  grid-template-columns: 72rpx minmax(0, 1fr);
   gap: 18rpx;
   align-items: center;
-  padding: 20rpx;
+  padding: 22rpx;
   border: 1rpx solid #f2f0ea;
   border-radius: 16rpx;
   background: #fcfbf8;
 }
 
 .review-finish-section.tomorrow > view:nth-child(2) > text:first-child {
-  width: 80rpx;
-  height: 80rpx;
+  position: relative;
+  width: 72rpx;
+  height: 72rpx;
   border: 1rpx solid #f2f0ea;
   border-radius: 16rpx;
   background: #ffffff;
+}
+
+.review-finish-section.tomorrow > view:nth-child(2) > text:first-child::before,
+.review-finish-section.tomorrow > view:nth-child(2) > text:first-child::after {
+  content: "";
+  position: absolute;
+  left: 18rpx;
+  right: 18rpx;
+  height: 6rpx;
+  border-radius: 999rpx;
+  background: #f0714d;
+}
+
+.review-finish-section.tomorrow > view:nth-child(2) > text:first-child::before {
+  top: 24rpx;
+}
+
+.review-finish-section.tomorrow > view:nth-child(2) > text:first-child::after {
+  top: 42rpx;
+  background: #289689;
 }
 
 .review-finish-section.tomorrow > view:nth-child(2) > text:nth-child(2) {
