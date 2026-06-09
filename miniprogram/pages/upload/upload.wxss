@@ -1,14 +1,14 @@
 page {
-  background: #fdfbf7;
+  background: #f9f8f4;
 }
 
 .upload-page {
   min-height: 100vh;
-  color: #2c2621;
+  color: #1f2937;
   background:
-    radial-gradient(circle at 92% 0%, rgba(255, 237, 213, 0.46), transparent 34%),
-    radial-gradient(circle at 4% 28%, rgba(204, 251, 241, 0.34), transparent 28%),
-    #fdfbf7;
+    radial-gradient(circle at 92% 0%, rgba(255, 237, 213, 0.56), transparent 30%),
+    radial-gradient(circle at 0% 28%, rgba(204, 251, 241, 0.46), transparent 28%),
+    #f9f8f4;
 }
 
 .upload-scroll {
@@ -17,11 +17,11 @@ page {
 }
 
 .upload-content {
-  padding: calc(48rpx + env(safe-area-inset-top)) 44rpx calc(188rpx + env(safe-area-inset-bottom));
-  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  box-sizing: border-box;
+  padding: calc(58rpx + env(safe-area-inset-top)) 44rpx calc(190rpx + env(safe-area-inset-bottom));
 }
 
 .yd-upload-screen {
@@ -29,7 +29,7 @@ page {
   display: flex;
   flex: 0 0 auto;
   flex-direction: column;
-  gap: 26rpx;
+  gap: 22rpx;
   justify-content: flex-start;
   min-height: auto;
   margin-bottom: 0;
@@ -76,17 +76,17 @@ page {
 }
 
 .yd-upload-brand text:first-child {
-  color: #2c2621;
-  font-size: 27rpx;
+  color: #1f2937;
+  font-size: 28rpx;
   font-weight: 950;
   line-height: 1.15;
 }
 
 .yd-upload-brand text:last-child {
   margin-top: 3rpx;
-  color: #8c837a;
+  color: #0d9488;
   font-size: 21rpx;
-  font-weight: 760;
+  font-weight: 820;
 }
 
 .yd-upload-pill {
@@ -102,14 +102,15 @@ page {
 
 .yd-upload-heading {
   flex: 0 0 auto;
-  margin: 18rpx 0 4rpx;
+  margin: 18rpx 0 8rpx;
 }
 
 .yd-upload-title {
-  color: #2c2621;
-  font-size: 52rpx;
+  max-width: 620rpx;
+  color: #1f2937;
+  font-size: 56rpx;
   font-weight: 950;
-  line-height: 1.18;
+  line-height: 1.2;
   letter-spacing: 0;
   overflow-wrap: break-word;
   word-break: break-word;
@@ -119,9 +120,10 @@ page {
   display: -webkit-box;
   margin-top: 14rpx;
   overflow: hidden;
-  color: #8c837a;
+  color: #6b7280;
   font-size: 28rpx;
-  line-height: 1.55;
+  font-weight: 700;
+  line-height: 1.46;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
@@ -129,7 +131,7 @@ page {
 .upload-evidence-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 22rpx;
+  gap: 18rpx;
 }
 
 .upload-evidence-card {
@@ -137,27 +139,29 @@ page {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  min-height: 198rpx;
+  min-height: 176rpx;
   align-items: center;
   justify-content: center;
-  gap: 14rpx;
-  padding: 24rpx 18rpx 38rpx;
+  gap: 12rpx;
+  padding: 22rpx 18rpx 36rpx;
   border: 2rpx dashed #e2e8f0;
-  border-radius: 34rpx;
-  background: rgba(255, 255, 255, 0.88);
+  border-radius: 36rpx;
+  background: rgba(255, 255, 255, 0.9);
   text-align: center;
-  box-shadow: 0 8rpx 24rpx rgba(44, 38, 33, 0.035);
+  box-shadow: 0 8rpx 22rpx rgba(15, 23, 42, 0.035);
 }
 
 .upload-evidence-card.primary {
   grid-column: 1 / -1;
-  min-height: 210rpx;
+  min-height: 208rpx;
   align-items: stretch;
   justify-content: flex-start;
-  padding: 30rpx;
+  padding: 28rpx 28rpx 34rpx;
   border-style: solid;
-  border-color: rgba(20, 184, 166, 0.2);
-  background: linear-gradient(135deg, rgba(230, 244, 241, 0.92), rgba(255, 255, 255, 0.92));
+  border-color: rgba(20, 184, 166, 0.24);
+  background:
+    radial-gradient(circle at 92% 0%, rgba(20, 184, 166, 0.13), transparent 26%),
+    #e6f4f1;
   text-align: left;
 }
 
@@ -165,8 +169,15 @@ page {
   width: 96rpx;
   height: 96rpx;
   object-fit: contain;
-  border-radius: 28rpx;
-  background: #fffaf0;
+  padding: 8rpx;
+  border-radius: 30rpx;
+  background: #fff7ed;
+  box-sizing: border-box;
+}
+
+.upload-evidence-card.primary image {
+  background: #ffffff;
+  box-shadow: 0 8rpx 18rpx rgba(15, 23, 42, 0.06);
 }
 
 .upload-evidence-copy {
@@ -182,7 +193,7 @@ page {
 }
 
 .upload-evidence-copy text:first-child {
-  color: #2c2621;
+  color: #1f2937;
   font-size: 30rpx;
   font-weight: 950;
   line-height: 1.18;
@@ -193,7 +204,7 @@ page {
   display: -webkit-box;
   margin-top: 8rpx;
   overflow: hidden;
-  color: #8c837a;
+  color: #6b7280;
   font-size: 23rpx;
   font-weight: 780;
   line-height: 1.35;
@@ -205,10 +216,10 @@ page {
   position: absolute;
   right: 20rpx;
   bottom: 18rpx;
-  padding: 9rpx 14rpx;
+  padding: 8rpx 14rpx;
   border-radius: 999rpx;
-  color: #8c837a;
-  background: #f9f8f4;
+  color: #9ca3af;
+  background: #f8fafc;
   font-size: 22rpx;
   font-weight: 950;
 }
@@ -216,11 +227,13 @@ page {
 .upload-evidence-card.primary > text {
   color: #0f766e;
   background: #ffffff;
+  box-shadow: 0 8rpx 16rpx rgba(15, 23, 42, 0.05);
 }
 
 .upload-unlock-panel {
   display: grid;
-  gap: 16rpx;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12rpx;
   padding: 0;
   border: 0;
   border-radius: 0;
@@ -228,8 +241,9 @@ page {
 }
 
 .upload-unlock-panel > text {
-  color: #2c2621;
-  font-size: 32rpx;
+  grid-column: 1 / -1;
+  color: #1f2937;
+  font-size: 30rpx;
   font-weight: 950;
   line-height: 1.2;
 }
@@ -237,14 +251,30 @@ page {
 .upload-unlock-panel view {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 8rpx;
-  align-items: center;
-  min-height: 92rpx;
-  padding: 22rpx 24rpx;
+  gap: 7rpx;
+  align-items: start;
+  min-height: 112rpx;
+  padding: 18rpx 16rpx;
   border: 1rpx solid rgba(240, 235, 225, 0.9);
   border-radius: 28rpx;
-  background: rgba(255, 255, 255, 0.78);
-  box-shadow: 0 6rpx 18rpx rgba(44, 38, 33, 0.035);
+  background: rgba(255, 255, 255, 0.84);
+  box-shadow: 0 6rpx 18rpx rgba(15, 23, 42, 0.035);
+}
+
+.upload-unlock-panel view::before {
+  content: "";
+  width: 38rpx;
+  height: 38rpx;
+  border-radius: 15rpx;
+  background: #ccfbf1;
+}
+
+.upload-unlock-panel view:nth-of-type(2)::before {
+  background: #fce7f3;
+}
+
+.upload-unlock-panel view:nth-of-type(3)::before {
+  background: #fef3c7;
 }
 
 .upload-unlock-panel view text {
@@ -255,28 +285,28 @@ page {
 }
 
 .upload-unlock-panel view text:first-child {
-  color: #2c2621;
-  font-size: 28rpx;
+  color: #1f2937;
+  font-size: 23rpx;
   font-weight: 950;
-  line-height: 1.18;
+  line-height: 1.2;
   -webkit-line-clamp: 1;
 }
 
 .upload-unlock-panel view text:last-child {
-  color: #8c837a;
-  font-size: 22rpx;
+  color: #64748b;
+  font-size: 20rpx;
   font-weight: 800;
-  line-height: 1.24;
+  line-height: 1.28;
   -webkit-line-clamp: 2;
 }
 
 .upload-intake-workbench,
 .upload-material-panel,
 .upload-report-ready {
-  padding: 22rpx;
-  border: 1rpx solid rgba(226, 232, 240, 0.95);
-  border-radius: 32rpx;
-  background: rgba(255, 255, 255, 0.94);
+  padding: 24rpx;
+  border: 1rpx solid rgba(226, 232, 240, 0.92);
+  border-radius: 34rpx;
+  background: rgba(255, 255, 255, 0.96);
   box-shadow: none;
 }
 
@@ -288,34 +318,34 @@ page {
 }
 
 .upload-workbench-head text:first-child {
-  color: #18211d;
-  font-size: 24rpx;
+  color: #1f2937;
+  font-size: 27rpx;
   font-weight: 950;
   line-height: 1.2;
 }
 
 .upload-workbench-head text:last-child {
   max-width: 360rpx;
-  color: #738077;
-  font-size: 20rpx;
-  font-weight: 780;
+  color: #64748b;
+  font-size: 22rpx;
+  font-weight: 820;
   line-height: 1.28;
   text-align: right;
 }
 
 .upload-textarea {
   width: 100%;
-  min-height: 148rpx;
+  min-height: 156rpx;
   margin-top: 16rpx;
-  padding: 20rpx;
+  padding: 22rpx;
   box-sizing: border-box;
-  border: 1rpx solid rgba(226, 232, 240, 0.95);
+  border: 1rpx solid rgba(226, 232, 240, 0.86);
   border-radius: 28rpx;
-  color: #27352f;
+  color: #1f2937;
   background: #f8fafc;
-  font-size: 24rpx;
+  font-size: 25rpx;
   font-weight: 760;
-  line-height: 1.35;
+  line-height: 1.42;
 }
 
 .upload-textarea.material {
@@ -336,11 +366,15 @@ page {
 .upload-report-actions text,
 .upload-material-submit {
   display: inline-flex;
-  padding: 12rpx 18rpx;
+  align-items: center;
+  justify-content: center;
+  min-height: 56rpx;
+  padding: 0 18rpx;
+  box-sizing: border-box;
   border-radius: 999rpx;
-  color: #174533;
-  background: #f0fbf0;
-  font-size: 20rpx;
+  color: #0f766e;
+  background: #ecfdf5;
+  font-size: 21rpx;
   font-weight: 900;
   line-height: 1.2;
 }
@@ -349,8 +383,8 @@ page {
 .upload-workflow-actions text:first-child,
 .upload-report-actions text:first-child,
 .upload-material-submit {
-  color: #1d261f;
-  background: linear-gradient(180deg, #ffd84f 0%, #f5b300 100%);
+  color: #78350f;
+  background: #fbbf24;
 }
 
 .upload-workflow-actions {
@@ -371,28 +405,28 @@ page {
 
 .upload-report-ready {
   position: fixed;
-  right: 28rpx;
-  bottom: calc(132rpx + env(safe-area-inset-bottom));
-  left: 28rpx;
+  right: 32rpx;
+  bottom: calc(136rpx + env(safe-area-inset-bottom));
+  left: 32rpx;
   z-index: 20;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr);
   gap: 12rpx;
   align-items: center;
-  background: linear-gradient(135deg, #f2fbef 0%, #ffffff 72%);
-  box-shadow: 0 12rpx 30rpx rgba(38, 58, 43, 0.12);
+  background: #ffffff;
+  box-shadow: 0 12rpx 30rpx rgba(15, 23, 42, 0.12);
 }
 
 .upload-material-panel,
 .upload-intake-workbench {
   position: fixed;
-  right: 28rpx;
-  bottom: calc(132rpx + env(safe-area-inset-bottom));
-  left: 28rpx;
+  right: 32rpx;
+  bottom: calc(136rpx + env(safe-area-inset-bottom));
+  left: 32rpx;
   z-index: 22;
-  max-height: 54vh;
-  overflow: hidden;
-  box-shadow: 0 12rpx 30rpx rgba(38, 58, 43, 0.12);
+  max-height: 58vh;
+  overflow-y: auto;
+  box-shadow: 0 12rpx 30rpx rgba(15, 23, 42, 0.12);
 }
 
 .upload-report-ready text {
@@ -403,8 +437,8 @@ page {
 }
 
 .upload-report-title {
-  color: #173f31;
-  font-size: 24rpx;
+  color: #1f2937;
+  font-size: 26rpx;
   font-weight: 950;
   line-height: 1.3;
 }
@@ -414,9 +448,9 @@ page {
   grid-column: 1 / -1;
   padding: 6rpx 10rpx;
   border-radius: 18rpx;
-  color: #506157;
-  background: rgba(255, 255, 255, 0.72);
-  font-size: 20rpx;
+  color: #64748b;
+  background: #f8fafc;
+  font-size: 21rpx;
   font-weight: 780;
   line-height: 1.28;
 }
@@ -450,4 +484,16 @@ page {
   font-weight: 950;
   line-height: 92rpx;
   text-align: center;
+}
+
+.yd-upload-primary::before {
+  content: "";
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  height: 170rpx;
+  background: linear-gradient(180deg, rgba(249, 248, 244, 0), #f9f8f4 48%, #f9f8f4);
+  pointer-events: none;
 }

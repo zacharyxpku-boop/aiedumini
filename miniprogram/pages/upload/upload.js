@@ -2289,13 +2289,13 @@ Page({
   },
 
   setMaterialType(event) {
-    const materialType = event.currentTarget.dataset.type || 'class_notes';
+    const materialType = normalizeMaterialType({ type: event.currentTarget.dataset.type || 'class_notes' }, 'class_notes');
     this.setData({ materialType });
     this.updateMaterialPreview(this.data.materialText, materialType);
   },
 
   openMaterialReportPanel(event) {
-    const materialType = normalizeMaterialType(event.currentTarget.dataset.type || 'parent_report');
+    const materialType = normalizeMaterialType({ type: event.currentTarget.dataset.type || 'parent_report' }, 'parent_report');
     const deck = buildUploadEntryDeck('material');
     this.setData({
       uploadEntryMode: 'material',

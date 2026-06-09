@@ -14,30 +14,30 @@
         </view>
 
         <view class="yd-upload-heading">
-          <view class="yd-upload-title">收集线索碎片 🧩</view>
-          <view class="yd-upload-sub">材料越真实，建议越具体。直接拍照或打字都可以，不必全部填满哦～</view>
+          <view class="yd-upload-title">上传一条真实材料</view>
+          <view class="yd-upload-sub">先放进成长报告，再决定去问咕点修卡点，还是去知识乐园练一局。</view>
         </view>
 
         <view class="upload-evidence-grid">
-          <view class="upload-evidence-card primary" data-type="wrong_question" bindtap="openMaterialReportPanel"><image mode="aspectFit" src="/assets/reference/upload-folder-stack-transparent.png" /><text class="upload-evidence-copy"><text>错题描述</text><text>记录孩子常卡住的题型，已添加 1 份："昨天数学卷子大题第二问，总是列错方程..."</text></text><text>已添加 1 份</text></view>
-          <view class="upload-evidence-card" data-type="score_sheet" bindtap="openMaterialReportPanel"><image mode="aspectFit" src="/assets/reference/report-radar-card-illustration.png" /><text class="upload-evidence-copy"><text>成绩/周测</text><text>支持拍照识别，只做私有线索，观察波动和错题分布。</text></text><text>补充</text></view>
-          <view class="upload-evidence-card" data-type="school_material" bindtap="openMaterialReportPanel"><image mode="aspectFit" src="/assets/reference/tutor-socratic-board-transparent.png" /><text class="upload-evidence-copy"><text>老师反馈</text><text>评语或聊天截图，帮助定位课堂里的真实卡点。</text></text><text>补充</text></view>
-          <view class="upload-evidence-card" data-type="parent_report" bindtap="openMaterialReportPanel"><image mode="aspectFit" src="/assets/reference/family-avatar-group-transparent.png" /><text class="upload-evidence-copy"><text>家长观察</text><text>随手写几句现状，记录抗挫、拖延和开始难度。</text></text><text>补充</text></view>
-          <view class="upload-evidence-card" data-type="assessment" bindtap="openMaterialReportPanel"><image mode="aspectFit" src="/assets/reference/learning-route-map-transparent.png" /><text class="upload-evidence-copy"><text>测评摘要</text><text>导入过往诊断，和错题记录一起生成培养建议。</text></text><text>补充</text></view>
+          <view class="upload-evidence-card primary" data-type="wrong_question_paper" bindtap="openMaterialReportPanel"><image mode="aspectFit" src="/assets/reference/upload-folder-stack-transparent.png" /><text class="upload-evidence-copy"><text>错题/作业卡点</text><text>写下题型、孩子原想法和卡住的第一步。</text></text><text>优先添加</text></view>
+          <view class="upload-evidence-card" data-type="score_sheet" bindtap="openMaterialReportPanel"><image mode="aspectFit" src="/assets/reference/report-radar-card-illustration.png" /><text class="upload-evidence-copy"><text>成绩/周测</text><text>只做私有线索，看波动和错题分布。</text></text><text>补充</text></view>
+          <view class="upload-evidence-card" data-type="school_material" bindtap="openMaterialReportPanel"><image mode="aspectFit" src="/assets/reference/tutor-socratic-board-transparent.png" /><text class="upload-evidence-copy"><text>老师反馈</text><text>评语或聊天截图，定位课堂卡点。</text></text><text>补充</text></view>
+          <view class="upload-evidence-card" data-type="parent_report" bindtap="openMaterialReportPanel"><image mode="aspectFit" src="/assets/reference/family-avatar-group-transparent.png" /><text class="upload-evidence-copy"><text>家长观察</text><text>写几句现状，记录开始难和抗挫。</text></text><text>补充</text></view>
+          <view class="upload-evidence-card" data-type="talent_assessment" bindtap="openMaterialReportPanel"><image mode="aspectFit" src="/assets/reference/learning-route-map-transparent.png" /><text class="upload-evidence-copy"><text>测评摘要</text><text>只作为方法候选，不做天赋定论。</text></text><text>补充</text></view>
         </view>
 
         <view class="upload-intake-workbench" wx:if="{{showMaterialPanel}}">
-          <view class="upload-workbench-head"><text>补充报告证据</text><text bindtap="toggleMaterialPanel">收起</text></view>
-          <textarea class="upload-textarea material" value="{{materialText}}" bindinput="onMaterialInput" maxlength="1600" placeholder="粘贴测评摘要、老师反馈、错题描述或家长观察。必须有真实作业/错题锚点，报告才放行。" />
+          <view class="upload-workbench-head"><text>补一条可验证线索</text><text bindtap="toggleMaterialPanel">收起</text></view>
+          <textarea class="upload-textarea material" value="{{materialText}}" bindinput="onMaterialInput" maxlength="1600" placeholder="例如：六年级数学应用题，孩子看到“多 3 倍”就直接乘，卡在先设哪个量。必须有真实作业/错题锚点，报告才放行。" />
           <view class="upload-workbench-actions"><text bindtap="chooseImage">照片留存</text><text data-type="parent_report" bindtap="setMaterialType">家长观察</text><text data-type="score_sheet" bindtap="setMaterialType">成绩/周测</text><text data-type="school_material" bindtap="setMaterialType">老师反馈</text></view>
           <text class="upload-material-submit" bindtap="importMaterialPack">生成成长报告</text>
         </view>
 
         <view class="upload-unlock-panel">
-          <text>生成报告后，将解锁：</text>
-          <view><text>专属学习偏好</text><text>如：视觉型 / 听觉型...</text></view>
-          <view><text>深层卡点定位</text><text>如：工作记忆受限 / 概念脱节...</text></view>
-          <view><text>今晚行动建议</text><text>如：睡前花 5 分钟...复盘第一步</text></view>
+          <text>生成报告后，你会得到</text>
+          <view><text>学习偏好线索</text><text>用材料和问卷交叉验证。</text></view>
+          <view><text>当前卡点定位</text><text>先找孩子卡住的第一步。</text></view>
+          <view><text>今晚行动建议</text><text>接到问咕点和知识乐园。</text></view>
         </view>
 
         <view class="yd-upload-primary" bindtap="submit">生成成长报告</view>
