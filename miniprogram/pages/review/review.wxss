@@ -21,7 +21,7 @@ page {
 .yd-review-screen {
   display: flex;
   flex-direction: column;
-  gap: 24rpx;
+  gap: 20rpx;
   justify-content: flex-start;
   min-height: calc(100vh - 198rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   box-sizing: border-box;
@@ -269,15 +269,16 @@ page {
 .review-chip-row {
   display: flex;
   flex-wrap: nowrap;
-  gap: 10rpx;
+  gap: 20rpx;
   max-width: calc(100vw - 64rpx);
-  overflow: visible;
-  padding: 8rpx 0 2rpx;
+  overflow-x: auto;
+  margin: 0 0 14rpx;
+  padding: 2rpx 0 4rpx;
 }
 
 .review-chip-row text {
   flex: 0 0 auto;
-  padding: 14rpx 28rpx;
+  padding: 16rpx 32rpx;
   border: 1rpx solid #e5e7eb;
   border-radius: 36rpx;
   background: #ffffff;
