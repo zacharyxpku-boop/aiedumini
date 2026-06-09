@@ -54,6 +54,16 @@
           <view class="review-tool-grid" wx:if="{{reviewFlowStage === 'tool'}}">
             <view wx:for="{{playableReviewTools}}" wx:key="id" class="review-tool-card {{item.available ? 'ready' : 'locked'}} {{item.themeClass}}" data-id="{{item.id}}" bindtap="runPlayableReviewTool"><text class="review-tool-icon">{{item.icon}}</text><text>{{item.title}}</text><text>{{item.line}}</text><text>{{item.duration}}</text><text>{{item.status}} · {{item.count}} 张</text><text>{{item.mission}}</text></view>
           </view>
+          <view class="review-template-workbench" wx:if="{{reviewFlowStage === 'tool' && practiceTemplateWorkbench && practiceTemplateWorkbench.id}}">
+            <text class="review-template-head"><text>{{practiceTemplateWorkbench.title}}</text><text>{{practiceTemplateWorkbench.status}}</text></text>
+            <text class="review-template-line">{{practiceTemplateWorkbench.line}}</text>
+            <text class="review-template-samples">
+              <text class="review-template-sample"><text>{{practiceTemplateWorkbench.samples[0].label}}</text><text>{{practiceTemplateWorkbench.samples[0].source}}</text></text>
+              <text class="review-template-sample"><text>{{practiceTemplateWorkbench.samples[1].label}}</text><text>{{practiceTemplateWorkbench.samples[1].source}}</text></text>
+              <text class="review-template-sample"><text>{{practiceTemplateWorkbench.samples[2].label}}</text><text>{{practiceTemplateWorkbench.samples[2].source}}</text></text>
+            </text>
+            <text class="review-template-safe">{{practiceTemplateWorkbench.safetyLine}}</text>
+          </view>
           <view class="review-empty-note" wx:if="{{reviewFlowStage !== 'topic' && activeReviewTool && activeReviewTool.empty}}"><text>还没有真实卡。先上传材料或完成一次 AI 点拨。</text></view>
           <view class="review-live-tool stage-{{reviewFlowStage}}" wx:elif="{{reviewFlowStage !== 'tool' && activeReviewTool && activeReviewTool.id}}">
             <view class="review-play-top" wx:if="{{reviewFlowStage === 'live'}}"><text>×</text><text>{{activeReviewTool.title || '快闪问答'}}</text><text>Ⅱ</text></view>

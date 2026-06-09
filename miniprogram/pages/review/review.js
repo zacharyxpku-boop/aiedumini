@@ -474,22 +474,34 @@ Page({
     const recommended = revisitEngine.recommendGames
       ? revisitEngine.recommendGames(sourceCards)
       : [];
-    const toolIds = ['whack', 'quiz', 'match', 'snake'];
+    const toolIds = ['whack', 'quiz', 'flashcard', 'match', 'snake', 'uno', 'variant', 'print'];
     const fallback = {
-      whack: { title: '错因地鼠', pitch: '揪出隐藏的易错点，打地鼠，灭错因，轻松找漏洞。', duration: '约3分', readyCount: sourceCards.length, available: !!sourceCards.length },
-      quiz: { title: '快闪问答', pitch: '快速判断，高频刺激极速练习。先说第一步，再核对线索。', duration: '约2分', readyCount: sourceCards.length, available: !!sourceCards.length },
-      match: { title: '拼图配对', pitch: '核心概念连连看。拼合线索，建立知识关联网络。', duration: '约4分', readyCount: sourceCards.length, available: sourceCards.length >= 2 },
-      snake: { title: '路线接龙', pitch: '步步推导，连通思路直达终点。', duration: '约5分', readyCount: sourceCards.length, available: sourceCards.length >= 2 },
+      whack: { title: '错因地鼠', pitch: '揪出隐藏的易错点，先判断错因。', duration: '约3分', readyCount: sourceCards.length, available: !!sourceCards.length, engineId: 'whack' },
+      quiz: { title: '快闪问答', pitch: '快速判断，先说第一步再核对线索。', duration: '约2分', readyCount: sourceCards.length, available: !!sourceCards.length, engineId: 'quiz' },
+      flashcard: { title: '闪卡翻翻', pitch: '先主动回忆，再翻开看线索。', duration: '约2分', readyCount: sourceCards.length, available: !!sourceCards.length, engineId: 'quiz' },
+      match: { title: '拼图配对', pitch: '拼合卡点、证据和第一步。', duration: '约4分', readyCount: sourceCards.length, available: sourceCards.length >= 2, engineId: 'match' },
+      snake: { title: '路线接龙', pitch: '按第一步顺序接一遍。', duration: '约5分', readyCount: sourceCards.length, available: sourceCards.length >= 2, engineId: 'snake' },
+      uno: { title: 'UNO错因卡', pitch: '把同类错因归到一组再复述。', duration: '约3分', readyCount: sourceCards.length, available: !!sourceCards.length, engineId: 'match', templateOnly: true },
+      variant: { title: '变式三连', pitch: '同一方法换条件，练迁移。', duration: '约5分', readyCount: sourceCards.length, available: !!sourceCards.length, engineId: 'snake', templateOnly: true },
+      print: { title: '打印练习单', pitch: '生成本机纸面复习包。', duration: '纸面', readyCount: sourceCards.length, available: !!sourceCards.length, engineId: 'print', templateOnly: true },
     };
     const display = {
       whack: { icon: '地', themeClass: 'theme-whack', engineId: 'whack' },
       quiz: { icon: '快', themeClass: 'theme-quiz', engineId: 'quiz' },
+      flashcard: { icon: '翻', themeClass: 'theme-flashcard', engineId: 'quiz' },
       match: { icon: '拼', themeClass: 'theme-match', engineId: 'match' },
-      snake: { icon: '路', themeClass: 'theme-snake', engineId: 'snake' }
+      snake: { icon: '路', themeClass: 'theme-snake', engineId: 'snake' },
+      uno: { icon: 'U', themeClass: 'theme-uno', engineId: 'match' },
+      variant: { icon: '变', themeClass: 'theme-variant', engineId: 'snake' },
+      print: { icon: '印', themeClass: 'theme-print', engineId: 'print' }
     };
     const missionFor = (id, item) => {
       const count = Number(item.readyCount || 0);
-      if (!item.available) return id === 'quiz' || id === 'whack' ? '先补 1 张真卡' : '先补 2 张真卡';
+      if (!item.available) return id === 'match' || id === 'snake' ? '先补 2 张真卡' : '先补 1 张真卡';
+      if (id === 'flashcard') return `翻看 ${Math.min(4, Math.max(1, count))} 张`;
+      if (id === 'uno') return `归类 ${Math.min(4, Math.max(1, count))} 张`;
+      if (id === 'variant') return '做 3 个变式';
+      if (id === 'print') return `整理 ${Math.min(6, Math.max(1, count))} 张`;
       if (id === 'match') return `配对 ${Math.min(4, Math.max(2, count))} 组`;
       if (id === 'snake') return `排序 ${Math.min(3, Math.max(2, count))} 组`;
       if (id === 'whack') return `快选 ${Math.min(4, Math.max(1, count))} 题`;
@@ -497,6 +509,7 @@ Page({
     };
     return toolIds.map((id) => {
       const item = recommended.find((tool) => tool.id === id) || fallback[id];
+      const displayItem = display[id] || {};
       return {
         id,
         title: item.title || fallback[id].title,
@@ -506,9 +519,10 @@ Page({
         status: item.available ? '可开始' : '先补卡',
         mission: missionFor(id, item),
         duration: item.duration || fallback[id].duration,
-        icon: display[id] ? display[id].icon : '练',
-        themeClass: display[id] ? display[id].themeClass : 'theme-quiz',
-        engineId: display[id] ? display[id].engineId : id
+        icon: displayItem.icon || '练',
+        themeClass: displayItem.themeClass || 'theme-quiz',
+        engineId: item.engineId || displayItem.engineId || id,
+        templateOnly: !!item.templateOnly
       };
     });
   },
@@ -1781,14 +1795,29 @@ Page({
     }));
     const now = new Date().toISOString();
     const packId = 'practice_engine_pack_' + now.slice(0, 10).replace(/-/g, '');
-    const engineCatalog = ['whack', 'quiz', 'match', 'snake'].map((id) => {
+    const engineCatalog = ['whack', 'quiz', 'flashcard', 'match', 'snake', 'uno', 'variant', 'print'].map((id) => {
       const catalogItem = catalog.find((item) => item && item.id === id) || {};
-      const labels = { whack: '错因地鼠', quiz: '快闪问答', match: '拼图配对', snake: '路线接龙' };
+      const labels = {
+        whack: '错因地鼠',
+        quiz: '快闪问答',
+        flashcard: '闪卡翻翻',
+        match: '拼图配对',
+        snake: '路线接龙',
+        uno: 'UNO错因卡',
+        variant: '变式三连',
+        print: '打印练习单'
+      };
+      const gameTypeMap = {
+        flashcard: 'quiz',
+        uno: 'match',
+        variant: 'snake',
+        print: 'print'
+      };
       const source = sourceCards[0] || {};
       return {
         id,
         label: catalogItem.label || labels[id],
-        gameType: id,
+        gameType: gameTypeMap[id] || id,
         renderMode: catalogItem.renderMode || id,
         sourceCardId: source.id || '',
         source: source.weakPoint || '今日卡点',
@@ -1860,6 +1889,14 @@ Page({
         sampleTitle: '主动回忆',
         samples: (pack.engineCatalog || []).filter((item) => item.id === 'quiz')
       },
+      flashcard: {
+        title: '闪卡翻翻',
+        status: '可开始',
+        line: '先遮住线索主动回忆，再翻开核对第一步。',
+        primaryAction: '开始闪卡翻翻',
+        sampleTitle: '闪卡预览',
+        samples: (pack.engineCatalog || []).filter((item) => item.id === 'flashcard')
+      },
       match: {
         title: '拼图配对',
         status: '可开始',
@@ -1875,6 +1912,30 @@ Page({
         primaryAction: '开始路线接龙',
         sampleTitle: '步骤练习',
         samples: (pack.engineCatalog || []).filter((item) => item.id === 'snake')
+      },
+      uno: {
+        title: 'UNO错因卡',
+        status: '可开始',
+        line: '把同类错因归到一组，孩子只需要说出分类理由。',
+        primaryAction: '开始UNO错因卡',
+        sampleTitle: '错因归类',
+        samples: (pack.engineCatalog || []).filter((item) => item.id === 'uno')
+      },
+      variant: {
+        title: '变式三连',
+        status: '可开始',
+        line: '同一方法换三个条件，检查能不能迁移到新题。',
+        primaryAction: '开始变式三连',
+        sampleTitle: '迁移练习',
+        samples: (pack.engineCatalog || []).filter((item) => item.id === 'variant')
+      },
+      print: {
+        title: '打印练习单',
+        status: '可生成',
+        line: '把本机卡点整理成纸面复习包，适合离屏复看。',
+        primaryAction: '生成打印练习单',
+        sampleTitle: '纸面练习',
+        samples: (pack.engineCatalog || []).filter((item) => item.id === 'print')
       }
     };
     const lane = laneMap[id] || laneMap.whack;
@@ -1976,6 +2037,22 @@ Page({
     const visibleTools = this.data.playableReviewTools || [];
     const tool = visibleTools.find((item) => item.id === requestedToolId) || visibleTools.find((item) => item.id === 'quiz') || {};
     const toolId = tool.engineId || tool.id || 'quiz';
+    if (tool.templateOnly) {
+      this.runTemplateDeliverable({
+        currentTarget: {
+          dataset: {
+            id: tool.id,
+            label: tool.title,
+            route: `/pages/review/review?from=play_${tool.id}`
+          }
+        }
+      });
+      this.setData({
+        reviewFlowStage: 'tool',
+        feedbackText: `${tool.title || '练习包'} 已打开，下面使用真实卡点生成可复用材料。`
+      });
+      return;
+    }
     if (!tool.available) {
       const starterCards = this.ensureKnowledgeStarterCards();
       if (starterCards.length) {
