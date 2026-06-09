@@ -7,7 +7,7 @@ const revisitEngine = require('../../utils/revisit-engine');
 const reviewViewModels = require('../../view-models/review-view-model');
 
 const KNOWLEDGE_STARTER_TOPIC_CARDS = [
-  { topic: '小数乘法', tag: '消除易错点', duration: '约 10 分钟', theme: 'teal' },
+  { topic: '小数乘法', tag: '消除大练习', duration: '约 10 分钟', theme: 'teal' },
   { topic: '认识分数', tag: '色彩涂涂', duration: '约 15 分钟', theme: 'rose' },
   { topic: '面积计算', tag: '拼图解谜', duration: '约 12 分钟', theme: 'green' },
   { topic: '混合运算', tag: '极速速算', duration: '约 5 分钟', theme: 'orange' },
