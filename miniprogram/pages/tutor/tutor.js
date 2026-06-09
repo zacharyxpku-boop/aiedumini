@@ -279,13 +279,12 @@ const TUTOR_GUARDRAILS = [
 const TUTOR_REFERENCE_SCENES = {
   dialogue: {
     title: '自由对话',
-    status: '正在陪你想第一步',
+    status: 'AI 私教在线',
     rows: [
-      { id: 'd1', role: 'user', text: '咕点，这道题我完全没思路，怎么开始？' },
-      { id: 'd2', text: '别急。先不求答案，我们只找第一步。你先把题目问的是什么，用自己的话说一遍。' },
-      { id: 'd3', text: '如果题里有数字、条件或关键词，先圈一个你最确定的。' },
-      { id: 'd4', role: 'user', text: '它好像是在问最后还剩多少。' },
-      { id: 'd5', text: '很好。那第一步先写已知什么、要求什么，不用算完整结果。' }
+      { id: 'd1', role: 'user', text: '小原，这道物理题我完全没思路，怎么做呀？' },
+      { id: 'd2', text: '别着急，遇到难题不知道怎么下手很正常哦！拍拍肩膀~ 仔细看看题目，最开始提到的小车速度是多少呢？' },
+      { id: 'd3', role: 'user', text: '是 5米/秒。' },
+      { id: 'd4', text: '找得很准！那第二步，根据“刹车后2秒停下”，你能想到要用哪个公式来算加速度吗？' }
     ],
     actions: [
       { id: 'smaller', label: '再问小一点', action: 'smaller' },
@@ -300,8 +299,8 @@ const TUTOR_REFERENCE_SCENES = {
       { id: 'k2', text: '分数除法' },
       { id: 'k3', text: '咕点小黑板：别怕，这其实是一个先变乘号，再翻底朝天的方法。' },
       { id: 'k4', text: '1 这是什么：除以一个分数，等于乘以这个分数的倒数。' },
-      { id: 'k5', text: '2 容易卡在哪里：只把除号变乘号，却忘了把后面的分数倒过来。' },
-      { id: 'k6', text: '3 第一步怎么想：先问自己，后面的分数有没有翻成倒数？' }
+      { id: 'k5', text: '光顾着把除号变成乘号，却忘了把后面的分数颠倒过来。' },
+      { id: 'k6', text: '默念口诀：先变乘号，再翻个底朝天！' }
     ],
     actions: [
       { id: 'read_problem', label: '换个说法', action: 'step', step: 'read_problem' },
@@ -321,16 +320,16 @@ const TUTOR_REFERENCE_SCENES = {
     rows: [
       { id: 's1', text: '没关系，我们把问题切小一点。' },
       { id: 's2', text: '还是卡住时，接下来想先试哪一个？' },
-      { id: 's3', text: '先圈已知条件：找题目给出的数字和关键词；先说题目问什么：理清最后要求的结果。' },
+      { id: 's3', text: '先圈已知条件：找找题目里给出的数字和关键信息；先说题目问什么：理清最后需要我们求出什么结果。' },
       { id: 's4', text: '刚才的思考小记' },
-      { id: 's5', text: '1 起步很稳：已经能说出题目在问什么。' },
-      { id: 's6', text: '2 还卡在第一步：先把已知条件写出来，再决定用哪个方法。' }
+      { id: 's5', text: '起步很棒：正确列出了算式 4/5 ÷ 2。' },
+      { id: 's6', text: '在这里卡住了一小下：忘记把后面的整数变成倒数了。' }
     ],
     actions: [
-      { id: 'find_conditions', label: '先圈已知条件', line: '找题目里的数字和关键词', action: 'step', step: 'find_conditions' },
-      { id: 'read_problem', label: '先说题目问什么', line: '理清最后要求什么结果', action: 'step', step: 'read_problem' },
+      { id: 'find_conditions', label: '先圈已知条件', line: '找找题目里给出的数字和关键信息', action: 'step', step: 'find_conditions' },
+      { id: 'read_problem', label: '先说题目问什么', line: '理清最后需要我们求出什么结果', action: 'step', step: 'read_problem' },
       { id: 'review', label: '去知识乐园复测', action: 'review' },
-      { id: 'smaller', label: '再问小一点', action: 'smaller' }
+      { id: 'smaller', label: '休息一下再来也没关系哦', action: 'smaller' }
     ]
   },
   recap: {
