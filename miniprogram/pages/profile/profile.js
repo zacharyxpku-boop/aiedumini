@@ -3498,6 +3498,50 @@ Page({
     this.setData({ shareIntent: intent });
   },
 
+  shareGrowthReportPreview() {
+    const summary = this.data.learningReportSummary || {};
+    const card = this.data.dailyShareCard || {};
+    const lines = [
+      '原点智学成长报告初步摘要',
+      `学习偏好：${summary.learningPreferenceLine || '更适合用图像、步骤和例子辅助理解。'}`,
+      `当前卡点：${summary.diagnosisLine || '先定位最近一类反复出错的步骤。'}`,
+      `今晚建议：${summary.tonightActionLine || '先做一个可完成的小步骤，再回看孩子能否说出思路。'}`,
+      '边界：只分享行动和线索，不带原题、答案、分数、排名或完整对话。'
+    ];
+    const payload = {
+      share_intent: 'parent_card',
+      share_code: card.code || '',
+      allowed_fields: ['learning_preference', 'diagnosis_hint', 'tonight_action'],
+      blocked_fields: ['raw_question', 'answer', 'score', 'rank', 'full_dialogue']
+    };
+    this.setData({ shareIntent: 'parent_card' });
+    if (storage.appendShareRun) {
+      storage.appendShareRun({
+        code: card.code || '',
+        title: '成长报告初步摘要',
+        path: (resolveShareIntent(card, 'parent_card') || {}).path || '/pages/profile/profile?panel=preview',
+        type: 'growth_report_preview_share',
+        share_intent: 'parent_card',
+        payload
+      });
+    }
+    sendMiniEvent({
+      event: 'growth_report_preview_share',
+      source: 'profile_growth_report_preview',
+      entity_id: card.code || '',
+      page: 'profile',
+      payload
+    });
+    if (wx.setClipboardData) {
+      wx.setClipboardData({
+        data: lines.join('\n'),
+        success: () => wx.showToast({ title: '报告摘要已复制', icon: 'none' })
+      });
+      return;
+    }
+    wx.showToast({ title: '可从右上角分享报告摘要', icon: 'none' });
+  },
+
   toggleAdvancedProfile() {
     this.setData({ showAdvancedProfile: !this.data.showAdvancedProfile });
   },

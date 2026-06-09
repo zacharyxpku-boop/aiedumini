@@ -1326,16 +1326,6 @@ page {
   text-align: center;
 }
 
-.growth-bottom-bar.report > text.growth-report-action-card-link {
-  min-height: 42rpx;
-  border: 0;
-  background: transparent;
-  color: #64748b;
-  font-size: 23rpx;
-  line-height: 30rpx;
-  box-shadow: none;
-}
-
 .growth-bottom-bar.action {
   background: rgba(255, 255, 255, 0.9);
 }
