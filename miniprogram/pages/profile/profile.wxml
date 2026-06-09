@@ -17,7 +17,7 @@
 
         <view class="growth-choice-grid" wx:if="{{growthActiveScene === 'main'}}">
           <view class="growth-choice-card warm" bindtap="startGrowthQuestionnaire"><image mode="aspectFit" src="/assets/reference/family-avatar-group-transparent.png" /><view><text>做 1 分钟小问卷</text><text>快速勾选，建立初像</text></view><text>开始</text></view>
-          <view class="growth-choice-card" data-action="upload" bindtap="runParentReportAction"><image mode="aspectFit" src="/assets/reference/upload-folder-stack-transparent.png" /><view><text>上传错题/测评</text><text>拍照上传，深度诊断</text></view><text>上传</text></view>
+          <view class="growth-choice-card" data-action="upload" bindtap="runParentReportAction"><image mode="aspectFit" src="/assets/reference/upload-folder-stack-transparent.png" /><view><text>上传错题/测评</text><text>拍照留存，手动摘录</text></view><text>上传</text></view>
         </view>
 
         <view class="growth-flow-tabs growth-progress-dots" wx:if="{{growthActiveScene !== 'main'}}">

@@ -3,12 +3,9 @@
     <view class="upload-content">
       <view class="yd-upload-screen yd-app-screen yd-upload-app">
         <view class="yd-upload-top">
-          <view class="yd-upload-brand">
-            <image class="yd-upload-mark" mode="aspectFit" src="/assets/reference/brand-house.png" />
-            <view>
-              <text>完善信息</text>
-              <text>先收集线索，再生成报告</text>
-            </view>
+          <view class="yd-upload-back" bindtap="viewLatestReport">‹</view>
+          <view class="yd-upload-titlebar">
+            <text>完善信息</text>
           </view>
           <view class="yd-upload-pill" bindtap="viewLatestReport">跳过</view>
         </view>

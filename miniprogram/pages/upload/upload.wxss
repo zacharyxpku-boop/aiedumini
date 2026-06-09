@@ -41,63 +41,67 @@ page {
   box-shadow: none;
 }
 
-.yd-upload-top,
-.yd-upload-brand {
+.yd-upload-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 18rpx;
+  gap: 16rpx;
+  min-height: 80rpx;
 }
 
-.yd-upload-brand {
-  min-width: 0;
-  justify-content: flex-start;
-}
-
-.yd-upload-mark {
-  display: block;
+.yd-upload-back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex: 0 0 auto;
   width: 80rpx;
   height: 80rpx;
-  object-fit: contain;
-  padding: 0;
-  border: 2rpx solid #ffffff;
-  border-radius: 24rpx;
+  border: 1rpx solid #f3f4f6;
+  border-radius: 999rpx;
   background: #ffffff;
-  box-shadow: 0 8rpx 18rpx rgba(44, 38, 33, 0.05);
+  color: #374151;
+  font-size: 46rpx;
+  line-height: 76rpx;
+  font-weight: 700;
+  box-shadow: 0 8rpx 18rpx rgba(44, 38, 33, 0.045);
 }
 
-.yd-upload-brand text {
+.yd-upload-titlebar {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  height: 80rpx;
+  min-width: 0;
+}
+
+.yd-upload-titlebar text {
   display: block;
-  max-width: 340rpx;
+  max-width: 360rpx;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.yd-upload-brand text:first-child {
   color: #1f2937;
-  font-size: 28rpx;
-  font-weight: 950;
-  line-height: 1.15;
-}
-
-.yd-upload-brand text:last-child {
-  margin-top: 3rpx;
-  color: #0d9488;
-  font-size: 21rpx;
-  font-weight: 820;
+  font-size: 27rpx;
+  line-height: 34rpx;
+  font-weight: 900;
 }
 
 .yd-upload-pill {
   flex: 0 0 auto;
-  padding: 14rpx 18rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 80rpx;
+  height: 80rpx;
+  padding: 0 8rpx;
   border: 0;
   border-radius: 999rpx;
   color: #a89f93;
   background: transparent;
-  font-size: 28rpx;
-  font-weight: 900;
+  font-size: 27rpx;
+  line-height: 34rpx;
+  font-weight: 800;
 }
 
 .yd-upload-heading {
