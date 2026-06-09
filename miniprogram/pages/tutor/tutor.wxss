@@ -1453,3 +1453,122 @@ page {
 .tutor-reference-panel.pointing .tutor-pointing-grid text {
   min-height: 106rpx;
 }
+
+.tutor-reference-panel.knowledge {
+  padding-bottom: calc(160rpx + env(safe-area-inset-bottom));
+}
+
+.tutor-reference-panel.knowledge .tutor-dialogue-actions {
+  position: fixed;
+  left: 32rpx;
+  right: 32rpx;
+  bottom: calc(108rpx + env(safe-area-inset-bottom));
+  z-index: 8;
+  grid-template-columns: 220rpx minmax(0, 1fr);
+  padding: 14rpx;
+  border-top: 1rpx solid rgba(240, 235, 225, 0.82);
+  background: rgba(249, 248, 244, 0.96);
+}
+
+.tutor-reference-panel.knowledge .tutor-dialogue-actions > text {
+  min-height: 96rpx;
+  border-radius: 28rpx;
+}
+
+.tutor-reference-panel.knowledge .tutor-dialogue-actions > text:last-child {
+  color: #ffffff;
+  background: #14b8a6;
+  box-shadow: 0 12rpx 26rpx rgba(20, 184, 166, 0.18);
+}
+
+.tutor-reference-panel.pointing {
+  padding-bottom: calc(170rpx + env(safe-area-inset-bottom));
+}
+
+.tutor-reference-panel.pointing .tutor-pointing-panel {
+  min-height: calc(100vh - 198rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  padding-bottom: 34rpx;
+}
+
+.tutor-reference-panel.pointing .tutor-start-cta {
+  position: fixed;
+  left: 32rpx;
+  right: 32rpx;
+  bottom: calc(108rpx + env(safe-area-inset-bottom));
+  z-index: 8;
+  height: 108rpx;
+  min-height: 108rpx;
+  border-radius: 34rpx;
+  box-shadow: 0 18rpx 34rpx rgba(255, 122, 69, 0.24);
+}
+
+.tutor-reference-panel.pointing .tutor-start-cta::before {
+  content: "↺";
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 76rpx;
+  height: 76rpx;
+  margin-right: 16rpx;
+  border-radius: 24rpx;
+  background: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+  font-size: 32rpx;
+  font-weight: 900;
+}
+
+.tutor-reference-panel.stuck {
+  padding-bottom: calc(176rpx + env(safe-area-inset-bottom));
+}
+
+.tutor-reference-panel.stuck .tutor-stuck-panel {
+  min-height: calc(100vh - 198rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  padding-bottom: 36rpx;
+}
+
+.tutor-reference-panel.stuck .tutor-stuck-action-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20rpx;
+}
+
+.tutor-reference-panel.stuck .tutor-stuck-action-card {
+  min-height: 132rpx;
+  border-radius: 30rpx;
+  background: rgba(255, 255, 255, 0.76);
+}
+
+.tutor-reference-panel.stuck .tutor-stuck-action-card:first-child {
+  background: #fff5f0;
+}
+
+.tutor-reference-panel.stuck .tutor-stuck-footer {
+  position: fixed;
+  left: 32rpx;
+  right: 32rpx;
+  bottom: calc(108rpx + env(safe-area-inset-bottom));
+  z-index: 8;
+  gap: 10rpx;
+  padding: 14rpx;
+  border-top: 1rpx solid rgba(240, 235, 225, 0.82);
+  background: rgba(249, 248, 244, 0.96);
+}
+
+.tutor-reference-panel.stuck .tutor-stuck-footer text:first-child {
+  min-height: 96rpx;
+  border-radius: 32rpx;
+  color: #ffffff;
+  background: #14b8a6;
+  box-shadow: 0 14rpx 28rpx rgba(20, 184, 166, 0.2);
+}
+
+.tutor-reference-panel.stuck .tutor-stuck-footer text:last-child {
+  min-height: 42rpx;
+  padding: 0;
+  border: 0;
+  color: #9ca3af;
+  background: transparent;
+  box-shadow: none;
+}
