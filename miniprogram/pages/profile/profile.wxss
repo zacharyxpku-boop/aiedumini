@@ -58,27 +58,6 @@ page {
   min-height: 68rpx;
 }
 
-.yd-parent-screen:not(.scene-main) .yd-parent-top {
-  justify-content: space-between;
-  margin: 0 -48rpx;
-  padding: 0 48rpx 8rpx;
-  background: rgba(248, 250, 252, 0.9);
-}
-
-.yd-parent-screen:not(.scene-main) .yd-parent-brand {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.yd-parent-screen:not(.scene-main) .yd-parent-brand-copy text:first-child {
-  font-size: 30rpx;
-  line-height: 36rpx;
-}
-
-.yd-parent-screen:not(.scene-main) .yd-parent-brand-copy text:last-child {
-  display: none;
-}
-
 .yd-parent-brand {
   display: grid;
   grid-template-columns: 52rpx minmax(0, 1fr);
