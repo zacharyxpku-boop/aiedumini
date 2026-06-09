@@ -2152,22 +2152,29 @@ Page({
     if (!active.id || active.empty) return;
     let answers = Array.isArray(active.answers) ? active.answers.slice() : [];
     if (!answers.length) {
-      this.setData({
-        reviewFlowStage: 'live',
-        feedbackText: '先完成一次配对、排序或回忆自评，再记录本轮。'
-      });
-      if (typeof wx !== 'undefined' && wx.showToast) {
-        wx.showToast({ title: '先完成一次再记录', icon: 'none' });
-      }
+      const primary = active.primary || {};
+      const current = this.data.current || {};
+      answers = [{
+        cardId: primary.id || current.id || active.id,
+        correct: result !== 'again',
+        recordable: true,
+        selected: 'child_said_first_step',
+        answer: primary.check || current.answer || active.mission || '能说出第一步',
+        rating: result === 'retry' ? 'hard' : 'good',
+        selfReported: true,
+        evidence: 'reference_live_first_step_button',
+        gameType: active.gameType || active.id,
+        knowledgeType: primary.label || active.title || ''
+      }];
       if (storage.appendReviewEvent) {
         storage.appendReviewEvent({
-          kind: 'playable_review_needs_interaction',
+          kind: 'playable_review_reference_first_step_confirmed',
           tool_id: active.id,
+          card_id: answers[0].cardId,
           source: 'review_tab_live_tool',
           created_at: new Date().toISOString()
         });
       }
-      return;
     }
     const attemptSummary = revisitEngine.summarizeAttempt
       ? revisitEngine.summarizeAttempt({

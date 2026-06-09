@@ -1041,8 +1041,6 @@ page {
 }
 
 .review-live-reference,
-.review-live-card,
-.review-choice-board,
 .review-finish-card {
   border-radius: 22rpx;
   background: #f9fafb;
@@ -1154,70 +1152,6 @@ page {
   background: linear-gradient(90deg, #ffedd5, #fed7aa, #ccfbf1);
 }
 
-.review-live-card {
-  display: grid;
-  gap: 8rpx;
-  padding: 18rpx;
-}
-
-.review-live-card.compact {
-  padding: 14rpx 16rpx;
-}
-
-.review-live-card text:first-child {
-  color: #0f766e;
-  font-size: 22rpx;
-  line-height: 26rpx;
-  font-weight: 900;
-}
-
-.review-live-card text:nth-child(2) {
-  color: #111827;
-  font-size: 27rpx;
-  line-height: 34rpx;
-  font-weight: 800;
-}
-
-.review-live-card text:last-child {
-  color: #6b7280;
-  font-size: 22rpx;
-  line-height: 28rpx;
-}
-
-.review-choice-board {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12rpx;
-  padding: 14rpx;
-}
-
-.review-choice-board.sequence {
-  grid-template-columns: 1fr;
-}
-
-.review-choice-tile {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 88rpx;
-  padding: 12rpx;
-  border: 2rpx solid #e5e7eb;
-  border-radius: 18rpx;
-  background: #ffffff;
-  color: #374151;
-  font-size: 24rpx;
-  line-height: 30rpx;
-  font-weight: 800;
-  text-align: center;
-}
-
-.review-choice-tile.selected,
-.review-choice-tile.matched {
-  border-color: #14b8a6;
-  background: #ecfdf5;
-  color: #0f766e;
-}
-
 .review-live-actions {
   display: grid;
   gap: 12rpx;
@@ -1226,10 +1160,6 @@ page {
 .review-live-actions.grade {
   grid-template-columns: 1fr 1.4fr;
   gap: 18rpx;
-}
-
-.review-live-actions.finish {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .review-live-actions button {
@@ -1271,9 +1201,6 @@ page {
 
 .review-live-tool.stage-finished .review-game-progress,
 .review-live-tool.stage-finished .review-game-bar,
-.review-live-tool.stage-finished .review-live-card,
-.review-live-tool.stage-finished .review-choice-board,
-.review-live-tool.stage-finished .review-live-actions.finish,
 .review-live-tool.stage-finished .review-live-actions.grade {
   display: none;
 }
