@@ -279,7 +279,7 @@ const TUTOR_GUARDRAILS = [
 const TUTOR_REFERENCE_SCENES = {
   dialogue: {
     title: '自由对话',
-    status: 'AI 私教在线',
+    status: '咕点在线',
     rows: [
       { id: 'd1', role: 'user', text: '小原，这道物理题我完全没思路，怎么做呀？' },
       { id: 'd2', text: '别着急，遇到难题不知道怎么下手很正常哦！拍拍肩膀~ 仔细看看题目，最开始提到的小车速度是多少呢？' },
