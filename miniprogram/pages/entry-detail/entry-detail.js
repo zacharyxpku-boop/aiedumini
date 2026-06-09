@@ -85,7 +85,7 @@ const SCENES = {
     }
   },
   tutor: {
-    badge: 'AI点拨提示',
+    badge: 'AI私教提示',
     title: '先问一句，不替孩子做完',
     subtitle: '把题目、卡点或第一步发进来，系统只给最小提示，并把可复习的点沉淀下来。',
     heroImage: '/assets/reference/tutor-socratic-board-transparent.png',
@@ -138,7 +138,7 @@ const SCENES = {
     focusCopy: '先跑一张真实卡：回忆、迁移、记录明天要回看的点。',
     primaryLabel: '开始 90 秒回忆',
     primaryRoute: '/pages/review/review?mode=recall_return&from=entry_review&stage=topic',
-    secondaryLabel: '回到AI点拨',
+    secondaryLabel: '回到AI私教',
     secondaryRoute: '/pages/tutor/tutor?from=entry_review_repair&scene=stuck',
     cards: [
       { label: '记忆', value: '能不能说出关键概念。', icon: '/assets/reference/entry-review.png', scene: 'review' },

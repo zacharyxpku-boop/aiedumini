@@ -148,7 +148,7 @@ Page({
         title: '想练一小会',
         body: '用 3 分钟，把第一步练熟。',
         action: 'goRevisit',
-        cta: '做短回访'
+        cta: '去知识乐园'
       }
     ],
     parentClassroom: [
@@ -347,14 +347,14 @@ Page({
             ? '明天先清一张待回访卡'
             : query.action === 'first_step_revisit'
               ? '明天继续说出第一步'
-              : '先用自己的材料完成一组短回访',
+              : '先用自己的材料完成一组知识乐园练习',
         action_detail: query.action === 'wrong_cause_revisit'
           ? '先让孩子说出这张错因卡的第一步，再做一道同类小题。'
           : query.action === 'due_card_revisit'
             ? '先回忆再核对，忘了就回到第一步提示卡。'
             : query.action === 'first_step_revisit'
               ? '家长只问一句，不接管答案：你第一步先看哪里？'
-              : '用自己的作业或错题生成一张卡，再完成一次 5 分钟短回访。'
+              : '用自己的作业或错题生成一张卡，再完成一次 5 分钟回看练习。'
       };
       if (storage.appendShareRun) {
         storage.appendShareRun({
@@ -737,7 +737,7 @@ Page({
       pack: currentModule ? currentModule.title : '可生成回访验证',
       review: `${due} 张复习 · ${quiz} 道小测`,
       actions: [
-        { id: 'revisit', label: '短回访', action: 'goLearningMap' },
+        { id: 'revisit', label: '知识乐园', action: 'goLearningMap' },
         { id: 'profile', label: '我的', action: 'goProfile' }
       ]
     };
@@ -865,7 +865,7 @@ Page({
         id: 'review',
         category: 'review',
         tone: 'violet',
-        title: '5 分钟短回访',
+      title: '5 分钟回看练习',
         desc: `今天 ${due} 张到期，先回忆再核对思路。`,
         status: '5 分钟一关',
         cta: '开始',
@@ -1026,9 +1026,9 @@ Page({
       title: '回访验证',
       label: due ? `今日 ${due} 张 · 5 分钟` : '生成学习卡后可开始',
       body: due
-        ? `今天有 ${due} 张卡可以做短回访。`
-        : '把作业、错题或知识点生成学习卡，再进入短回访。',
-      cta: due ? '进入今日短回访' : '先生成学习卡',
+      ? `今天有 ${due} 张卡可以做回看练习。`
+      : '把作业、错题或知识点生成学习卡，再进知识乐园练一局。',
+      cta: due ? '进入今日练习' : '先生成学习卡',
       action: due ? 'goRevisit' : 'goLearningMap'
     };
   },
@@ -1036,7 +1036,7 @@ Page({
   buildIncomingShareRelay(incoming = null) {
     if (!incoming || !incoming.share_code) return null;
     const actionLabel = incoming.action_label || '先接住这张学习复盘卡';
-    const actionDetail = incoming.action_detail || incoming.capability_next_action || '用自己的材料走一遍：第一步、短回访、家长回访。';
+    const actionDetail = incoming.action_detail || incoming.capability_next_action || '用自己的材料走一遍：第一步、知识乐园练习、成长报告回看。';
     const challengeRoute = navigation.normalizeRoute(incoming.challenge_route || incoming.capability_route || '/pages/review/review');
     const unitRoute = navigation.normalizeRoute(incoming.course_unit_game_route || incoming.course_unit_recall_route || challengeRoute);
     const firstStep = incoming.relay_first_step || incoming.challenge_goal || actionLabel;
@@ -1294,10 +1294,10 @@ Page({
         },
         {
           id: 'challenge',
-          label: incoming.course_unit_label ? '练这个单元' : '短回访',
+          label: incoming.course_unit_label ? '练这个单元' : '知识乐园',
           route: questionBankRelayRoute,
           reason: naturalSpread.receiverPrompt || incoming.question_bank_relay_parent_check || incoming.course_unit_parent_decision || incoming.challenge_goal || actionLabel,
-          evidence: incoming.challenge_rule || '5分钟短回访'
+          evidence: incoming.challenge_rule || '5分钟回看练习'
         },
         {
           id: 'parent',
@@ -1502,7 +1502,7 @@ Page({
       },
       {
         id: 'learningMap',
-        label: '短回访',
+        label: '知识乐园',
         meta: modulePath.current ? '已推荐' : '材料',
         action: 'goLearningMap'
       },
@@ -1667,7 +1667,7 @@ Page({
     }
     actions.push({
       id: 'review',
-      title: '短回访',
+      title: '知识乐园',
       desc: `${reviewSummary.due || 0} 张到期，${reviewSummary.quiz ? reviewSummary.quiz.count : 0} 张测验卡`,
       meta: '5 分钟',
       action: 'goReview'
@@ -2140,7 +2140,7 @@ Page({
       source: 'incoming_share_relay',
       sourceLabel: '分享回流接力',
       actionId: dataset.id || 'challenge',
-      actionLabel: dataset.label || '短回访',
+      actionLabel: dataset.label || '知识乐园',
       route: target,
       reasonLine: dataset.reason || '',
       evidenceLine: dataset.evidence || ''

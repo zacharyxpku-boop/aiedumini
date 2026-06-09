@@ -1265,7 +1265,7 @@ Page({
         evidence: todayFocus.reason || (todayFocus.isStuck ? '你不是整题不会，只是卡在第一步。' : '来自今天的第一步想法。'),
         cause: todayFocus.sourceText || todayFocus.thought ? `原话：${String(todayFocus.sourceText || todayFocus.thought).slice(0, 42)}` : '先把卡住点说清楚。',
         next: todayFocus.issueType ? `对应修法：先说第一步，再做一道小变式。` : (todayFocus.recommendation || '先说清第一步，再做一道小变式'),
-        helper: todayFocus.helper || 'AI点拨会先问一步，不直接讲最终结果。',
+        helper: todayFocus.helper || 'AI私教会先问一步，不直接讲最终结果。',
         status: todayFocus.repairStatus || 'not_started',
         statusText: todayFocus.repairStatus === 'completed' ? '明天回访' : todayFocus.repairStatus === 'in_progress' ? '进行中' : '未开始',
         confidence: Math.max(62, Math.min(96, progress ? progress + 28 : 72))
