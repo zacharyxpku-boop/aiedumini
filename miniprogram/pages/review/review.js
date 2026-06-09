@@ -2343,6 +2343,7 @@ Page({
     if (result === 'retry' && active.roundSourceTool) {
       const nextTool = this.buildActiveReviewTool(active.roundSourceTool, active.roundSourceData || null);
       this.setData({
+        reviewFlowStage: 'live',
         activeReviewTool: nextTool,
         feedbackText: '已重开一局：这次先凭记忆完成，再看反馈。'
       });
