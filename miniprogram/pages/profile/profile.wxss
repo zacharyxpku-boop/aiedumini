@@ -69,6 +69,17 @@ page {
   pointer-events: auto;
 }
 
+.yd-parent-screen.scene-main .yd-parent-brand {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.yd-parent-screen.scene-main .yd-parent-pill {
+  border-color: rgba(0, 0, 0, 0.05);
+  background: rgba(255, 255, 255, 0.62);
+  color: #111827;
+}
+
 .yd-parent-mark {
   width: 52rpx;
   height: 52rpx;
@@ -264,10 +275,7 @@ page {
 }
 
 .yd-parent-screen:not(.scene-main) .growth-flow-tabs {
-  min-height: 28rpx;
-  padding: 0;
-  gap: 10rpx;
-  background: transparent;
+  display: none;
 }
 
 .growth-flow-tabs text {

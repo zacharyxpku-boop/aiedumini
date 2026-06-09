@@ -18,8 +18,8 @@
             <text class="review-route-blob"></text>
           </view>
             <view class="yd-review-copy">
-              <text class="yd-review-title">选个知识点，开一局</text>
-              <text class="yd-review-sub route-note short">没有错题也能先玩；有错题后会变成你的专属练习。选个知识点，马上开局探索。</text>
+              <text class="yd-review-title"><text>选个知识点，</text><text>开一局</text></text>
+              <text class="yd-review-sub route-note short"><text>没有错题也能先玩；</text><text>有错题后会变成你的<text class="review-sub-highlight">专属练习</text></text></text>
             </view>
             <image class="yd-review-art" mode="aspectFit" src="/assets/reference/review-world-map-transparent.png" />
           </view>
@@ -39,7 +39,7 @@
             <text>{{reviewFlowStage === 'topic' ? '选知识点' : reviewFlowStage === 'tool' ? '玩法选择' : reviewFlowStage === 'finished' ? '结算页' : (activeReviewTool.title || '快闪问答')}}</text>
             <text>{{reviewFlowStage === 'topic' ? ':)' : '···'}}</text>
           </text>
-          <view class="review-section-head" wx:if="{{reviewFlowStage === 'topic' || reviewFlowStage === 'tool'}}"><text>{{reviewFlowStage === 'topic' ? '今天想练哪一块？' : '玩法选择'}}</text><text>{{reviewFlowStage === 'topic' ? '推荐探索 · 换一批 · 选个知识点，马上开局探索' : '选一个最适合现在的节奏，马上开始'}}</text></view>
+          <view class="review-section-head" wx:if="{{reviewFlowStage === 'topic' || reviewFlowStage === 'tool'}}"><text>{{reviewFlowStage === 'topic' ? '今天想练哪一块？' : '挑选开局方式'}}</text><text>{{reviewFlowStage === 'topic' ? '选个知识点，马上开局探索' : '选一个最适合现在的节奏，马上开始'}}</text></view>
           <text class="review-flow-tabs" wx:if="{{reviewFlowStage === 'topic' || reviewFlowStage === 'tool'}}">
             <text class="{{reviewFlowStage === 'topic' ? 'active' : ''}}" data-stage="topic" bindtap="setReviewFlowStage">选知识点</text>
             <text class="{{reviewFlowStage === 'tool' ? 'active' : ''}}" data-stage="tool" bindtap="setReviewFlowStage">玩法选择</text>
