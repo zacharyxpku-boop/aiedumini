@@ -79,7 +79,7 @@
           <view class="tutor-pointing-panel" wx:elif="{{activeTutorScene === 'pointing'}}">
             <text class="tutor-pointing-pattern"></text>
             <text class="tutor-subpage-top"><text bindtap="closeTutorScene">‹</text><text>题目点拨</text><text>···</text></text>
-            <text class="tutor-pointing-lead"><text>AI 专属私教</text><text>把题目发来，咕点只问第一步。</text><text>看懂题意 · 找第一步 · 检查错因</text><text>打字/拍照留档 · 安全摘要 · 不代写答案</text></text>
+            <text class="tutor-pointing-lead"><text>AI 专属私教</text><text>把题目发来，<text>咕点</text>只问第一步。</text><text>看懂题意 · 找第一步 · 检查错因</text><text>打字/拍照留档 · 安全摘要 · 不代写答案</text></text>
             <view class="tutor-question-box">
               <textarea value="{{input}}" bindinput="onInput" auto-height maxlength="-1" placeholder="这道题有些搞不懂，在这里输入题目文字，或直接点击下方拍题..." />
               <view class="tutor-question-media-row"><text class="tutor-question-thumb"></text><text class="tutor-question-camera" bindtap="attachTutorPhoto">拍题</text><text class="tutor-question-safe">自动保存</text></view>
@@ -91,7 +91,7 @@
               <text data-action="step" data-step="write_first_step" bindtap="runTutorReferenceAction"><text class="tutor-mode-check"></text><text>找第一步</text><text>毫无头绪&#10;找突破口</text></text>
               <text data-action="step" data-step="explain_misconception" bindtap="runTutorReferenceAction"><text class="tutor-mode-check"></text><text>检查错因</text><text>算错不对&#10;定位错因</text></text>
             </view>
-            <view class="tutor-start-cta" data-step="find_direction" bindtap="launchFirstStep">开始点拨</view>
+            <text class="tutor-start-row"><text class="tutor-start-secondary" data-step="write_first_step" bindtap="launchFirstStep">◷</text><text class="tutor-start-cta" data-step="find_direction" bindtap="launchFirstStep">开始点拨</text></text>
           </view>
 
           <view class="tutor-stuck-panel" wx:elif="{{activeTutorScene === 'stuck'}}">
