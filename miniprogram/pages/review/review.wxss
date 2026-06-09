@@ -298,18 +298,18 @@ page {
 .review-main-tool-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 20rpx;
-  margin-top: -2rpx;
+  gap: 24rpx;
+  margin-top: 0;
 }
 
 .review-main-tool-card {
   display: flex;
-  min-height: 190rpx;
+  min-height: 184rpx;
   box-sizing: border-box;
   flex-direction: column;
   justify-content: flex-start;
   gap: 10rpx;
-  padding: 24rpx;
+  padding: 26rpx;
   border: 1rpx solid #e5e7eb;
   border-radius: 20rpx;
   background: #ffffff;
@@ -670,6 +670,29 @@ page {
   line-height: 34rpx;
   font-weight: 900;
   box-shadow: 0 10rpx 30rpx rgba(255, 138, 76, 0.28);
+}
+
+.yd-review-screen.stage-main > .review-main-cta {
+  position: fixed;
+  left: 32rpx;
+  right: 32rpx;
+  bottom: calc(100rpx + env(safe-area-inset-bottom));
+  z-index: 22;
+  height: 92rpx;
+  margin-top: 0;
+  border-radius: 28rpx;
+}
+
+.yd-review-screen.stage-main > .review-main-cta::before {
+  content: "";
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(80rpx + env(safe-area-inset-bottom));
+  z-index: -1;
+  height: 148rpx;
+  background: linear-gradient(180deg, rgba(247, 248, 250, 0), #f7f8fa 42%, #f7f8fa);
+  pointer-events: none;
 }
 
 .yd-review-screen:not(.stage-main) > .review-main-cta,

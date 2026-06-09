@@ -31,7 +31,7 @@
           <view class="review-main-tool-card blue" data-stage="topic" bindtap="setReviewFlowStage"><view><text class="review-main-tool-icon">▣</text><text class="review-main-tool-time">约4分</text></view><text>拼图配对</text><text>把概念和例子配起来</text></view>
           <view class="review-main-tool-card teal" data-stage="topic" bindtap="setReviewFlowStage"><view><text class="review-main-tool-icon">⌁</text><text class="review-main-tool-time">约5分</text></view><text>路线接龙</text><text>逻辑推导解题练习</text></view>
         </view>
-        <text class="review-mini-play-row" wx:if="{{reviewFlowStage === 'main'}}">
+        <text class="review-mini-play-row" wx:if="{{false}}">
           <text data-stage="topic" bindtap="setReviewFlowStage">闪卡翻翻</text>
           <text data-stage="topic" bindtap="setReviewFlowStage">UNO错因卡</text>
           <text data-stage="topic" bindtap="setReviewFlowStage">变式三连</text>

@@ -6,10 +6,7 @@ page {
   min-height: 100vh;
   overflow: hidden;
   color: #1f2937;
-  background:
-    radial-gradient(circle at 88% 10%, rgba(251, 191, 36, 0.16), transparent 34%),
-    radial-gradient(circle at 8% 34%, rgba(20, 184, 166, 0.12), transparent 30%),
-    #f6f8f3;
+  background: #f6f8f3;
 }
 
 .tutor-main {
@@ -20,7 +17,7 @@ page {
 .main-inner {
   min-height: 100vh;
   box-sizing: border-box;
-  padding: calc(96rpx + env(safe-area-inset-top)) 30rpx calc(138rpx + env(safe-area-inset-bottom));
+  padding: calc(96rpx + env(safe-area-inset-top)) 32rpx calc(166rpx + env(safe-area-inset-bottom));
 }
 
 .yd-tutor-screen {
@@ -29,7 +26,7 @@ page {
   flex: 0 0 auto;
   flex-direction: column;
   justify-content: flex-start;
-  gap: 18rpx;
+  gap: 20rpx;
   min-height: calc(100vh - 190rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   overflow: visible;
   border-radius: 0;
@@ -54,8 +51,9 @@ page {
 .yd-tutor-top {
   position: relative;
   z-index: 8;
-  margin: 0 -30rpx;
-  padding: 0 30rpx 6rpx;
+  min-height: 64rpx;
+  margin: 0 -32rpx;
+  padding: 0 32rpx 4rpx;
   background: rgba(246, 248, 243, 0.98);
 }
 
@@ -70,9 +68,9 @@ page {
   height: 56rpx;
   object-fit: contain;
   padding: 6rpx;
-  border-radius: 18rpx;
+  border-radius: 16rpx;
   background: #14b8a6;
-  box-shadow: 0 10rpx 22rpx rgba(20, 184, 166, 0.18);
+  box-shadow: 0 4rpx 12rpx rgba(20, 184, 166, 0.16);
 }
 
 .yd-tutor-brand-lines {
@@ -91,14 +89,14 @@ page {
 
 .yd-tutor-brand-lines text:first-child {
   color: #1f2937;
-  font-size: 25rpx;
+  font-size: 26rpx;
   font-weight: 950;
   line-height: 1.12;
 }
 
 .yd-tutor-brand-lines text:last-child {
   color: #0d9488;
-  font-size: 21rpx;
+  font-size: 20rpx;
   font-weight: 820;
 }
 
@@ -156,41 +154,43 @@ page {
 .yd-tutor-hero {
   position: relative;
   display: grid;
-  grid-template-columns: 176rpx minmax(0, 1fr);
+  grid-template-columns: 144rpx minmax(0, 1fr);
   align-items: center;
-  gap: 26rpx;
-  min-height: 228rpx;
-  padding: 34rpx 34rpx 32rpx;
+  gap: 32rpx;
+  min-height: 208rpx;
+  padding: 40rpx;
   overflow: hidden;
-  background:
-    radial-gradient(circle at 86% -8%, rgba(251, 191, 36, 0.2), transparent 38%),
-    radial-gradient(circle at 3% 94%, rgba(20, 184, 166, 0.18), transparent 34%),
-    linear-gradient(135deg, #ffffff 0%, #f4fbef 100%);
+  border-radius: 40rpx;
+  background: #ffffff;
+  box-shadow: 0 12rpx 32rpx rgba(15, 23, 42, 0.055);
 }
 
 .yd-tutor-hero::after {
   content: "";
   position: absolute;
-  top: -84rpx;
-  right: -84rpx;
-  width: 236rpx;
-  height: 236rpx;
+  top: -80rpx;
+  right: -80rpx;
+  width: 256rpx;
+  height: 256rpx;
   border-radius: 50%;
-  background: #fef3c7;
-  opacity: 0.82;
+  background: #e6f4f1;
+  opacity: 0.72;
 }
 
 .yd-tutor-mascot {
   position: relative;
   z-index: 1;
-  width: 176rpx;
-  height: 176rpx;
+  width: 144rpx;
+  height: 144rpx;
   object-fit: contain;
-  border-radius: 36rpx;
-  background: linear-gradient(135deg, #e6f4f1 0%, #fff7ed 100%);
+  box-sizing: border-box;
+  padding: 18rpx;
+  border: 1rpx solid #ccfbf1;
+  border-radius: 32rpx;
+  background: linear-gradient(135deg, #e6f4f1 0%, #ccfbf1 100%);
   box-shadow:
-    inset 0 0 0 1rpx rgba(20, 184, 166, 0.08),
-    0 14rpx 28rpx rgba(20, 184, 166, 0.1);
+    inset 0 0 0 1rpx rgba(255, 255, 255, 0.72),
+    0 6rpx 18rpx rgba(20, 184, 166, 0.08);
 }
 
 .yd-tutor-bubble {
@@ -204,9 +204,9 @@ page {
 .yd-tutor-bubble-title {
   display: block;
   color: #1f2937;
-  font-size: 48rpx;
+  font-size: 44rpx;
   font-weight: 950;
-  line-height: 1.08;
+  line-height: 1.12;
   letter-spacing: 0;
 }
 
@@ -216,7 +216,7 @@ page {
   color: #6b7280;
   font-size: 24rpx;
   font-weight: 760;
-  line-height: 1.5;
+  line-height: 1.6;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
 }
@@ -224,12 +224,13 @@ page {
 .tutor-chat-card {
   display: grid;
   align-content: start;
-  gap: 22rpx;
+  gap: 24rpx;
   flex: 0 0 auto;
-  min-height: 322rpx;
-  padding: 30rpx;
-  border-radius: 42rpx;
-  box-shadow: 0 10rpx 30rpx rgba(20, 184, 166, 0.07);
+  min-height: 286rpx;
+  padding: 32rpx;
+  border: 1rpx solid #f8fafc;
+  border-radius: 40rpx;
+  box-shadow: 0 10rpx 30rpx rgba(15, 23, 42, 0.045);
 }
 
 .tutor-chat-card.compact {
@@ -239,7 +240,7 @@ page {
 
 .tutor-chat-title {
   color: #1f2937;
-  font-size: 29rpx;
+  font-size: 30rpx;
   font-weight: 950;
 }
 
@@ -277,11 +278,11 @@ page {
 .tutor-bubble {
   display: block;
   max-width: 100%;
-  padding: 24rpx 26rpx;
-  border-radius: 34rpx 34rpx 34rpx 8rpx;
+  padding: 22rpx 24rpx;
+  border-radius: 36rpx 36rpx 36rpx 8rpx;
   color: #374151;
   background: #f6f8f3;
-  font-size: 27rpx;
+  font-size: 28rpx;
   font-weight: 760;
   line-height: 1.48;
   overflow-wrap: break-word;
@@ -313,32 +314,30 @@ page {
 .tutor-input-bar {
   position: relative;
   display: block;
-  min-height: 102rpx;
+  min-height: 96rpx;
   padding: 0;
-  border: 2rpx solid #e6ece3;
-  border-radius: 999rpx;
+  border: 3rpx solid #e5e7eb;
+  border-radius: 40rpx;
   background: #ffffff;
-  box-shadow:
-    inset 0 4rpx 10rpx rgba(17, 24, 39, 0.025),
-    0 8rpx 20rpx rgba(35, 71, 45, 0.05);
+  box-shadow: inset 0 4rpx 12rpx rgba(17, 24, 39, 0.025);
 }
 
 .tutor-input-bar textarea {
   width: 100%;
-  min-height: 102rpx;
-  max-height: 168rpx;
+  min-height: 96rpx;
+  max-height: 152rpx;
   box-sizing: border-box;
-  padding: 28rpx 106rpx 22rpx 32rpx;
+  padding: 26rpx 104rpx 20rpx 32rpx;
   color: #1f2937;
-  font-size: 29rpx;
+  font-size: 30rpx;
   font-weight: 760;
-  line-height: 42rpx;
+  line-height: 40rpx;
 }
 
 .tutor-input-bar text {
   position: absolute;
   right: 12rpx;
-  bottom: 14rpx;
+  bottom: 12rpx;
   min-width: 0;
   height: 72rpx;
   width: 72rpx;
@@ -354,7 +353,7 @@ page {
 
 .tutor-socratic-panel {
   display: grid;
-  gap: 22rpx;
+  gap: 24rpx;
   padding: 0 0 4rpx;
   border-color: transparent;
   background: transparent;
@@ -376,24 +375,24 @@ page {
 .tutor-mode-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14rpx;
+  gap: 20rpx;
 }
 
 .tutor-mode-card {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  min-height: 136rpx;
+  min-height: 154rpx;
   align-items: center;
   justify-content: center;
-  gap: 12rpx;
-  padding: 20rpx 6rpx;
+  gap: 14rpx;
+  padding: 24rpx 8rpx;
   border: 1rpx solid #f3f4f6;
-  border-radius: 26rpx;
+  border-radius: 28rpx;
   color: #374151;
   background: #ffffff;
-  box-shadow: 0 6rpx 20rpx rgba(17, 24, 39, 0.05);
-  font-size: 21rpx;
+  box-shadow: 0 6rpx 18rpx rgba(17, 24, 39, 0.045);
+  font-size: 22rpx;
   font-weight: 860;
   line-height: 1.15;
   text-align: center;
@@ -403,12 +402,12 @@ page {
 
 .tutor-mode-icon {
   display: flex;
-  width: 72rpx;
-  height: 72rpx;
+  width: 80rpx;
+  height: 80rpx;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  font-size: 32rpx;
+  font-size: 34rpx;
   font-weight: 950;
   line-height: 1;
 }
@@ -416,7 +415,7 @@ page {
 .tutor-mode-card > text:last-child {
   display: block;
   color: #374151;
-  font-size: 21rpx;
+  font-size: 22rpx;
   font-weight: 880;
   line-height: 1.15;
 }
@@ -428,10 +427,10 @@ page {
 
 .tutor-start-cta {
   display: flex;
-  min-height: 108rpx;
+  min-height: 104rpx;
   align-items: center;
   justify-content: center;
-  border-radius: 38rpx;
+  border-radius: 36rpx;
   color: #78350f;
   background: #fbbf24;
   box-shadow: 0 18rpx 34rpx rgba(251, 191, 36, 0.35);
@@ -441,7 +440,7 @@ page {
 
 .tutor-usage-note {
   display: block;
-  margin: -10rpx 0 0;
+  margin: -2rpx 0 0;
   color: #9ca3af;
   font-size: 22rpx;
   font-weight: 760;
