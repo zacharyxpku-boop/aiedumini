@@ -1104,6 +1104,20 @@ page {
   box-shadow: none;
 }
 
+.tutor-reference-panel.knowledge > .tutor-reference-head,
+.tutor-reference-panel.pointing > .tutor-reference-head,
+.tutor-reference-panel.stuck > .tutor-reference-head {
+  display: none;
+}
+
+.yd-tutor-screen.detail-on .tutor-reference-panel.knowledge,
+.yd-tutor-screen.detail-on .tutor-reference-panel.pointing,
+.yd-tutor-screen.detail-on .tutor-reference-panel.stuck {
+  min-height: calc(100vh - 112rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  margin: calc(-72rpx - env(safe-area-inset-top)) -32rpx calc(-166rpx - env(safe-area-inset-bottom));
+  padding: calc(20rpx + env(safe-area-inset-top)) 32rpx 0;
+}
+
 .tutor-reference-panel.dialogue .tutor-dialogue-card {
   min-height: calc(100vh - 150rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   padding: calc(128rpx + env(safe-area-inset-top)) 0 268rpx;
@@ -1369,7 +1383,8 @@ page {
 
 .tutor-reference-panel.knowledge .tutor-knowledge-board {
   gap: 28rpx;
-  padding: 0;
+  min-height: calc(100vh - 292rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  padding: 0 8rpx 184rpx;
   border-radius: 0;
   background: #f9f8f4;
   box-shadow: none;
@@ -1399,7 +1414,7 @@ page {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 176rpx;
   align-items: center;
-  min-height: 240rpx;
+  min-height: 232rpx;
   overflow: hidden;
   padding: 0 40rpx;
   border-radius: 28rpx 28rpx 0 0;
@@ -1513,30 +1528,35 @@ page {
 }
 
 .tutor-reference-panel.knowledge {
-  padding-bottom: calc(160rpx + env(safe-area-inset-bottom));
+  padding-bottom: calc(168rpx + env(safe-area-inset-bottom));
 }
 
 .tutor-reference-panel.knowledge .tutor-dialogue-actions {
   position: fixed;
-  left: 32rpx;
-  right: 32rpx;
+  left: 0;
+  right: 0;
   bottom: calc(108rpx + env(safe-area-inset-bottom));
   z-index: 8;
   grid-template-columns: 220rpx minmax(0, 1fr);
-  padding: 14rpx;
+  gap: 24rpx;
+  padding: 22rpx 32rpx calc(22rpx + env(safe-area-inset-bottom));
   border-top: 1rpx solid rgba(240, 235, 225, 0.82);
-  background: rgba(249, 248, 244, 0.96);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 -12rpx 32rpx rgba(15, 23, 42, 0.04);
 }
 
 .tutor-reference-panel.knowledge .tutor-dialogue-actions > text {
-  min-height: 96rpx;
-  border-radius: 28rpx;
+  min-height: 104rpx;
+  border-radius: 18rpx;
+  color: #6b7280;
+  background: #f5f5f5;
+  font-size: 29rpx;
 }
 
 .tutor-reference-panel.knowledge .tutor-dialogue-actions > text:last-child {
   color: #ffffff;
-  background: #14b8a6;
-  box-shadow: 0 12rpx 26rpx rgba(20, 184, 166, 0.18);
+  background: #ff7a45;
+  box-shadow: 0 12rpx 26rpx rgba(255, 122, 69, 0.22);
 }
 
 .tutor-reference-panel.pointing {
@@ -1545,7 +1565,36 @@ page {
 
 .tutor-reference-panel.pointing .tutor-pointing-panel {
   min-height: calc(100vh - 198rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-  padding-bottom: 34rpx;
+  gap: 22rpx;
+  padding: 0 0 166rpx;
+}
+
+.tutor-reference-panel.pointing .tutor-subpage-top {
+  margin: 0 -8rpx 0;
+}
+
+.tutor-reference-panel.pointing .tutor-pointing-lead {
+  padding: 8rpx 8rpx 0;
+}
+
+.tutor-reference-panel.pointing .tutor-pointing-lead text:nth-child(2) {
+  max-width: 520rpx;
+  font-size: 48rpx;
+  line-height: 62rpx;
+}
+
+.tutor-reference-panel.pointing .tutor-pointing-lead text:last-child {
+  display: none;
+}
+
+.tutor-reference-panel.pointing .tutor-question-box {
+  min-height: 238rpx;
+  padding: 24rpx;
+  border-radius: 32rpx;
+}
+
+.tutor-reference-panel.pointing .tutor-question-tools {
+  display: none;
 }
 
 .tutor-reference-panel.pointing .tutor-start-cta {
@@ -1581,7 +1630,29 @@ page {
 
 .tutor-reference-panel.stuck .tutor-stuck-panel {
   min-height: calc(100vh - 198rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-  padding-bottom: 36rpx;
+  padding: 0 0 176rpx;
+}
+
+.tutor-reference-panel.stuck .tutor-subpage-top {
+  min-height: 88rpx;
+  margin: 0 0 18rpx;
+  grid-template-columns: 72rpx minmax(0, 1fr) 72rpx;
+}
+
+.tutor-reference-panel.stuck .tutor-subpage-top text:nth-child(2),
+.tutor-reference-panel.stuck .tutor-subpage-top text:last-child {
+  color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+
+.tutor-reference-panel.stuck .tutor-stuck-chip,
+.tutor-reference-panel.stuck .tutor-stuck-lead,
+.tutor-reference-panel.stuck .tutor-stuck-question,
+.tutor-reference-panel.stuck .tutor-stuck-action-grid,
+.tutor-reference-panel.stuck .tutor-stuck-journal {
+  margin-left: 8rpx;
+  margin-right: 8rpx;
 }
 
 .tutor-reference-panel.stuck .tutor-stuck-action-grid {
@@ -1609,9 +1680,9 @@ page {
   bottom: calc(108rpx + env(safe-area-inset-bottom));
   z-index: 8;
   gap: 10rpx;
-  padding: 14rpx;
-  border-top: 1rpx solid rgba(240, 235, 225, 0.82);
-  background: rgba(249, 248, 244, 0.96);
+  padding: 18rpx 0 calc(18rpx + env(safe-area-inset-bottom));
+  border-top: 0;
+  background: linear-gradient(180deg, rgba(249, 248, 244, 0), #f9f8f4 42%, #f9f8f4);
 }
 
 .tutor-reference-panel.stuck .tutor-stuck-footer text:first-child {
