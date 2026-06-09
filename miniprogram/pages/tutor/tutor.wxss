@@ -1105,10 +1105,25 @@ page {
 }
 
 .tutor-reference-panel.dialogue .tutor-dialogue-card {
-  min-height: calc(100vh - 198rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-  padding: 0 0 28rpx;
-  gap: 24rpx;
-  background: #f9fafb;
+  min-height: calc(100vh - 150rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  padding: calc(128rpx + env(safe-area-inset-top)) 0 268rpx;
+  gap: 28rpx;
+  background: #fbf9f7;
+}
+
+.tutor-reference-panel.dialogue > .tutor-reference-head {
+  display: none;
+}
+
+.yd-tutor-screen.detail-on .yd-tutor-top {
+  display: none;
+}
+
+.yd-tutor-screen.detail-on .tutor-reference-panel.dialogue {
+  min-height: calc(100vh - 112rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  margin: calc(-72rpx - env(safe-area-inset-top)) -32rpx calc(-166rpx - env(safe-area-inset-bottom));
+  padding: calc(20rpx + env(safe-area-inset-top)) 32rpx 0;
+  background: #fbf9f7;
 }
 
 .tutor-subpage-top {
@@ -1150,13 +1165,19 @@ page {
 }
 
 .tutor-dialogue-top {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
   display: grid;
   grid-template-columns: 72rpx minmax(0, 1fr) 72rpx;
   align-items: center;
-  min-height: 104rpx;
-  padding: 0 8rpx 8rpx;
+  min-height: 112rpx;
+  margin: 0;
+  padding: calc(18rpx + env(safe-area-inset-top)) 32rpx 10rpx;
   border-bottom: 1rpx solid rgba(0, 0, 0, 0.03);
-  background: rgba(249, 250, 251, 0.92);
+  background: rgba(251, 249, 247, 0.94);
+  z-index: 6;
 }
 
 .tutor-dialogue-top > text {
@@ -1222,11 +1243,12 @@ page {
   grid-template-columns: 80rpx minmax(0, 1fr);
   gap: 18rpx;
   align-items: start;
-  padding: 0 8rpx;
+  padding: 0 32rpx 0 0;
 }
 
 .tutor-chatline.me {
   grid-template-columns: minmax(0, 1fr) 80rpx;
+  padding: 0 0 0 32rpx;
 }
 
 .tutor-chatline-avatar {
@@ -1255,8 +1277,8 @@ page {
 .tutor-chatline-bubble {
   grid-column: 2;
   justify-self: start;
-  max-width: 82%;
-  padding: 24rpx 28rpx;
+  max-width: 86%;
+  padding: 24rpx 30rpx;
   border: 1rpx solid rgba(243, 244, 246, 0.65);
   border-radius: 36rpx 36rpx 36rpx 8rpx;
   background: #ffffff;
@@ -1272,19 +1294,53 @@ page {
   justify-self: end;
   border: 0;
   border-radius: 36rpx 36rpx 8rpx 36rpx;
-  background: #f59e0b;
+  background: #219fad;
   color: #ffffff;
 }
 
+.tutor-reference-panel.dialogue .tutor-dialogue-actions {
+  position: fixed;
+  left: 32rpx;
+  right: 32rpx;
+  bottom: calc(248rpx + env(safe-area-inset-bottom));
+  z-index: 12;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12rpx;
+  pointer-events: auto;
+}
+
+.tutor-reference-panel.dialogue .tutor-dialogue-actions > text {
+  min-height: 88rpx;
+  justify-content: space-between;
+  padding: 0 28rpx;
+  border: 1rpx solid rgba(207, 241, 243, 0.8);
+  border-radius: 24rpx;
+  color: #1a818e;
+  background: rgba(234, 249, 250, 0.96);
+  box-shadow: 0 8rpx 24rpx rgba(26, 129, 142, 0.08);
+}
+
+.tutor-reference-panel.dialogue .tutor-dialogue-actions > text:first-child {
+  color: #bf4b07;
+  border-color: rgba(255, 211, 173, 0.86);
+  background: rgba(255, 246, 240, 0.96);
+}
+
 .tutor-dialogue-composer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(108rpx + env(safe-area-inset-bottom));
+  z-index: 12;
   display: grid;
   grid-template-columns: minmax(0, 1fr) 96rpx;
   gap: 18rpx;
   align-items: center;
   margin: auto 0 0;
-  padding: 18rpx;
+  padding: 18rpx 32rpx 24rpx;
   border-top: 1rpx solid rgba(243, 244, 246, 0.7);
   background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 -20rpx 36rpx rgba(15, 23, 42, 0.04);
 }
 
 .tutor-dialogue-composer input {
