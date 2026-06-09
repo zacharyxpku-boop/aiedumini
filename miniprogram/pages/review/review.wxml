@@ -8,15 +8,6 @@
         </view>
 
         <view class="yd-review-hero" wx:if="{{reviewFlowStage === 'main'}}">
-          <view class="review-route-map" aria-hidden="true">
-            <text class="review-route-seg seg-a"></text>
-            <text class="review-route-seg seg-b"></text>
-            <text class="review-route-seg seg-c"></text>
-            <text class="review-route-node node-a"><text></text></text>
-            <text class="review-route-node node-b"><text></text></text>
-            <text class="review-route-node node-c"><text></text></text>
-            <text class="review-route-blob"></text>
-          </view>
             <view class="yd-review-copy">
               <text class="yd-review-title"><text>选个知识点，</text><text>开一局</text></text>
               <text class="yd-review-sub route-note short"><text>没有错题也能先玩；</text><text>有错题后会变成你的<text class="review-sub-highlight">专属练习</text></text></text>
@@ -46,10 +37,6 @@
             <text class="{{reviewFlowStage === 'live' ? 'active' : ''}}" data-stage="live" bindtap="setReviewFlowStage">进行中</text>
             <text class="{{reviewFlowStage === 'finished' ? 'active' : ''}}" data-stage="finished" bindtap="setReviewFlowStage">一局结束</text>
           </text>
-          <view class="review-topic-search" wx:if="{{reviewFlowStage === 'topic'}}">
-            <text class="review-topic-search-icon">⌕</text>
-            <input value="{{topicSearchText}}" bindinput="onTopicSearchInput" placeholder="搜索知识点，如：小数乘法" />
-          </view>
           <view class="review-topic-toolbar" wx:if="{{reviewFlowStage === 'topic'}}">
             <text>推荐探索</text>
             <text bindtap="shuffleKnowledgeStarterTopics">换一批</text>
