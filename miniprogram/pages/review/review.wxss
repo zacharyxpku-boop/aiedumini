@@ -1070,7 +1070,6 @@ page {
 .review-live-tool.stage-finished .review-game-bar,
 .review-live-tool.stage-finished .review-live-card,
 .review-live-tool.stage-finished .review-choice-board,
-.review-live-tool.stage-finished .review-round-strip,
 .review-live-tool.stage-finished .review-live-actions.finish,
 .review-live-tool.stage-finished .review-live-actions.grade {
   display: none;
@@ -1257,20 +1256,4 @@ page {
   background: #ffffff;
   color: #f0714d;
   box-shadow: 0 4rpx 16rpx rgba(15, 23, 42, 0.02);
-}
-
-.review-round-strip {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10rpx;
-}
-
-.review-round-strip text {
-  padding: 9rpx 12rpx;
-  border-radius: 12rpx;
-  background: #ecfdf5;
-  color: #0f766e;
-  font-size: 22rpx;
-  line-height: 26rpx;
-  font-weight: 800;
 }
