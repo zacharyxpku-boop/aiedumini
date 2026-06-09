@@ -27,15 +27,9 @@
         </view>
 
         <view class="upload-intake-workbench" wx:if="{{showMaterialPanel}}">
-          <view class="upload-workbench-head"><text>粘贴材料</text><text>生成前先看证据</text></view>
-          <textarea class="upload-textarea" value="{{homeworkText}}" bindinput="onInput" maxlength="1200" placeholder="例：数学应用题 4 道，孩子卡在等量关系；英语听写 20 个，容易错前 8 个。" />
-          <view class="upload-workbench-actions"><text bindtap="chooseImage">照片留存</text><text data-type="parent_report" bindtap="openMaterialReportPanel">补充观察</text></view>
-        </view>
-
-        <view class="upload-material-panel" wx:if="{{showMaterialPanel}}">
           <view class="upload-workbench-head"><text>补充报告证据</text><text bindtap="toggleMaterialPanel">收起</text></view>
           <textarea class="upload-textarea material" value="{{materialText}}" bindinput="onMaterialInput" maxlength="1600" placeholder="粘贴测评摘要、老师反馈、错题描述或家长观察。必须有真实作业/错题锚点，报告才放行。" />
-          <view class="upload-workbench-actions"><text data-type="parent_report" bindtap="setMaterialType">家长观察</text><text data-type="score_sheet" bindtap="setMaterialType">成绩/周测</text><text data-type="school_material" bindtap="setMaterialType">老师反馈</text></view>
+          <view class="upload-workbench-actions"><text bindtap="chooseImage">照片留存</text><text data-type="parent_report" bindtap="setMaterialType">家长观察</text><text data-type="score_sheet" bindtap="setMaterialType">成绩/周测</text><text data-type="school_material" bindtap="setMaterialType">老师反馈</text></view>
           <text class="upload-material-submit" bindtap="importMaterialPack">生成成长报告</text>
         </view>
 

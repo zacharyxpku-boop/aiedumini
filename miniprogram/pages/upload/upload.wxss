@@ -380,7 +380,8 @@ page {
   box-shadow: 0 12rpx 30rpx rgba(38, 58, 43, 0.12);
 }
 
-.upload-material-panel {
+.upload-material-panel,
+.upload-intake-workbench {
   position: fixed;
   right: 28rpx;
   bottom: calc(132rpx + env(safe-area-inset-bottom));
