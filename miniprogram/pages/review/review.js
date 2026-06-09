@@ -664,13 +664,25 @@ Page({
   },
 
   setReviewFlowStage(event) {
-    const stage = event && event.currentTarget ? event.currentTarget.dataset.stage || 'topic' : 'topic';
+    const dataset = event && event.currentTarget ? event.currentTarget.dataset || {} : {};
+    const stage = dataset.stage || 'topic';
+    const requestedToolId = dataset.toolId || '';
     const active = this.data.activeReviewTool || null;
+    if (stage === 'topic') {
+      this.setData({
+        reviewFlowStage: 'topic',
+        selectedPlayableReviewToolId: requestedToolId || this.data.selectedPlayableReviewToolId || 'whack',
+        feedbackText: ''
+      });
+      return;
+    }
     if (stage === 'tool') {
       const cards = this.ensureKnowledgeStarterCards();
       const tools = this.buildPlayableReviewTools(cards);
       const visibleTools = this.buildVisiblePlayableReviewTools(tools);
-      const selectedTool = this.resolveSelectedPlayableReviewTool(visibleTools);
+      const preferredToolId = requestedToolId || this.data.selectedPlayableReviewToolId || 'whack';
+      const selectedTool = visibleTools.find((item) => item && item.id === preferredToolId)
+        || this.resolveSelectedPlayableReviewTool(visibleTools);
       this.setData({
         playableReviewTools: tools,
         visiblePlayableReviewTools: visibleTools,
