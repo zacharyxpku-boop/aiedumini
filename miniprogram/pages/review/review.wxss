@@ -593,6 +593,59 @@ page {
   gap: 28rpx;
 }
 
+.review-topic-search {
+  display: grid;
+  grid-template-columns: 48rpx minmax(0, 1fr);
+  align-items: center;
+  min-height: 92rpx;
+  box-sizing: border-box;
+  padding: 8rpx 22rpx;
+  border: 2rpx solid #f0ebe1;
+  border-radius: 32rpx;
+  background: #ffffff;
+  box-shadow: 0 8rpx 24rpx rgba(44, 38, 33, 0.035);
+}
+
+.review-topic-search-icon {
+  color: #a89f93;
+  font-size: 34rpx;
+  line-height: 42rpx;
+  font-weight: 900;
+}
+
+.review-topic-search input {
+  min-width: 0;
+  height: 70rpx;
+  color: #2c2621;
+  font-size: 28rpx;
+  line-height: 70rpx;
+  font-weight: 760;
+}
+
+.review-topic-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+  margin: -4rpx 2rpx -2rpx;
+}
+
+.review-topic-toolbar text:first-child {
+  color: #5c544d;
+  font-size: 28rpx;
+  line-height: 34rpx;
+  font-weight: 900;
+}
+
+.review-topic-toolbar text:last-child {
+  flex: 0 0 auto;
+  padding: 10rpx 4rpx 10rpx 20rpx;
+  color: #ff8a4c;
+  font-size: 25rpx;
+  line-height: 32rpx;
+  font-weight: 900;
+}
+
 .yd-review-screen.stage-topic .review-topic-row {
   gap: 28rpx;
 }
@@ -609,11 +662,54 @@ page {
   border-radius: 28rpx;
   background: #ffffff;
   color: #2c2621;
-  font-size: 27rpx;
+  box-shadow: 0 6rpx 20rpx rgba(44, 38, 33, 0.035);
+}
+
+.review-topic-card text {
+  display: block;
+}
+
+.review-topic-card > text:first-child {
+  color: #2c2621;
+  font-size: 31rpx;
   line-height: 38rpx;
   font-weight: 900;
-  white-space: pre-line;
-  box-shadow: 0 6rpx 20rpx rgba(44, 38, 33, 0.035);
+}
+
+.review-topic-card > text:nth-child(2) {
+  justify-self: start;
+  align-self: start;
+  margin-top: 18rpx;
+  padding: 8rpx 14rpx;
+  border-radius: 12rpx;
+  background: #e5f7f5;
+  color: #0d9488;
+  font-size: 22rpx;
+  line-height: 26rpx;
+  font-weight: 900;
+}
+
+.review-topic-card.theme-rose > text:nth-child(2) {
+  background: #fff1f2;
+  color: #e11d48;
+}
+
+.review-topic-card.theme-green > text:nth-child(2) {
+  background: #ecfdf5;
+  color: #059669;
+}
+
+.review-topic-card.theme-orange > text:nth-child(2) {
+  background: #fff7ed;
+  color: #ea580c;
+}
+
+.review-topic-card > text:last-child {
+  margin-top: auto;
+  color: #8c837a;
+  font-size: 24rpx;
+  line-height: 30rpx;
+  font-weight: 760;
 }
 
 .yd-review-screen.stage-topic .review-topic-card {
@@ -769,6 +865,7 @@ page {
 }
 
 .review-tool-card {
+  position: relative;
   display: grid;
   gap: 10rpx;
   min-height: 328rpx;
@@ -787,8 +884,41 @@ page {
 }
 
 .review-tool-card.ready {
-  border-color: rgba(255, 138, 76, 0.42);
-  background: #fff9f5;
+  border-color: transparent;
+  background: #ffffff;
+}
+
+.review-tool-card.selected {
+  border-color: #ff7d40;
+  background: #fff5f0;
+  box-shadow: 0 12rpx 34rpx rgba(255, 125, 64, 0.14);
+}
+
+.review-tool-selected-mark {
+  display: none;
+}
+
+.review-tool-card.selected .review-tool-selected-mark {
+  position: absolute;
+  right: -2rpx;
+  top: -2rpx;
+  display: block;
+  width: 54rpx;
+  height: 54rpx;
+  border-radius: 0 16rpx 0 18rpx;
+  background: #ff7d40;
+}
+
+.review-tool-card.selected .review-tool-selected-mark::after {
+  content: "";
+  position: absolute;
+  left: 18rpx;
+  top: 12rpx;
+  width: 14rpx;
+  height: 24rpx;
+  border-right: 4rpx solid #ffffff;
+  border-bottom: 4rpx solid #ffffff;
+  transform: rotate(45deg);
 }
 
 .review-tool-card.locked {
@@ -802,21 +932,21 @@ page {
   line-height: 28rpx;
 }
 
-.review-tool-card text:nth-child(2) {
+.review-tool-card text:nth-child(3) {
   color: #111827;
   font-size: 32rpx;
   line-height: 38rpx;
   font-weight: 900;
 }
 
-.review-tool-card text:nth-child(3),
+.review-tool-card text:nth-child(4),
 .review-tool-card text:last-child {
   color: #374151;
   font-weight: 700;
 }
 
-.review-tool-card text:nth-child(4),
-.review-tool-card text:nth-child(5) {
+.review-tool-card text:nth-child(5),
+.review-tool-card text:nth-child(6) {
   align-self: end;
   justify-self: start;
   padding: 7rpx 12rpx;
@@ -829,6 +959,7 @@ page {
 }
 
 .review-tool-icon {
+  display: block;
   width: 88rpx;
   height: 88rpx;
   border-radius: 16rpx;

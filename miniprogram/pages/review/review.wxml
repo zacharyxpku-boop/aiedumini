@@ -51,19 +51,26 @@
             <text class="{{reviewFlowStage === 'live' ? 'active' : ''}}" data-stage="live" bindtap="setReviewFlowStage">进行中</text>
             <text class="{{reviewFlowStage === 'finished' ? 'active' : ''}}" data-stage="finished" bindtap="setReviewFlowStage">一局结束</text>
           </text>
+          <view class="review-topic-search" wx:if="{{reviewFlowStage === 'topic'}}">
+            <text class="review-topic-search-icon">⌕</text>
+            <input value="{{topicSearchText}}" bindinput="onTopicSearchInput" placeholder="搜索知识点，如：小数乘法" />
+          </view>
+          <view class="review-topic-toolbar" wx:if="{{reviewFlowStage === 'topic'}}">
+            <text>推荐探索</text>
+            <text bindtap="shuffleKnowledgeStarterTopics">换一批</text>
+          </view>
           <view class="review-topic-row" wx:if="{{reviewFlowStage === 'topic'}}">
-            <text class="review-topic-card review-topic-chip {{selectedKnowledgeTopic === '小数乘法' ? 'active' : ''}}" data-topic="小数乘法" bindtap="selectKnowledgeStarterTopic">小数乘法&#10;消除易错点&#10;约 10 分钟</text>
-            <text class="review-topic-card review-topic-chip {{selectedKnowledgeTopic === '认识分数' ? 'active' : ''}}" data-topic="认识分数" bindtap="selectKnowledgeStarterTopic">认识分数&#10;色彩涂涂&#10;约 15 分钟</text>
-            <text class="review-topic-card review-topic-chip {{selectedKnowledgeTopic === '面积计算' ? 'active' : ''}}" data-topic="面积计算" bindtap="selectKnowledgeStarterTopic">面积计算&#10;拼图解谜&#10;约 12 分钟</text>
-            <text class="review-topic-card review-topic-chip {{selectedKnowledgeTopic === '混合运算' ? 'active' : ''}}" data-topic="混合运算" bindtap="selectKnowledgeStarterTopic">混合运算&#10;极速速算&#10;约 5 分钟</text>
-            <text class="review-topic-card review-topic-chip {{selectedKnowledgeTopic === '认识钟表' ? 'active' : ''}}" data-topic="认识钟表" bindtap="selectKnowledgeStarterTopic">认识钟表&#10;拨盘解密&#10;约 8 分钟</text>
-            <text class="review-topic-card review-topic-chip {{selectedKnowledgeTopic === '长度单位' ? 'active' : ''}}" data-topic="长度单位" bindtap="selectKnowledgeStarterTopic">长度单位&#10;魔法尺子&#10;约 10 分钟</text>
+            <view wx:for="{{knowledgeStarterTopicCards}}" wx:key="topic" class="review-topic-card review-topic-chip theme-{{item.theme}} {{selectedKnowledgeTopic === item.topic ? 'active' : ''}}" data-topic="{{item.topic}}" bindtap="selectKnowledgeStarterTopic">
+              <text>{{item.topic}}</text>
+              <text>{{item.tag}}</text>
+              <text>{{item.duration}}</text>
+            </view>
           </view>
           <text class="review-topic-cta" wx:if="{{reviewFlowStage === 'topic'}}" data-stage="tool" bindtap="setReviewFlowStage">用这个开一局</text>
           <view class="review-workshop-lead review-target-card" wx:if="{{reviewFlowStage !== 'topic'}}"><text>当前攻克目标</text><text>{{selectedKnowledgeTopic || '分数除法'}}</text><text>{{cards.length || 3}} 张卡 · 挑选开局方式，马上开始。</text></view>
           <view class="review-feedback-strip" wx:if="{{feedbackText}}"><text>{{feedbackText}}</text><text wx:if="{{activeReviewTool && activeReviewTool.repairFocus}}" bindtap="openReviewRepairFocus">修这一张</text></view>
           <view class="review-tool-grid" wx:if="{{reviewFlowStage === 'tool'}}">
-            <view wx:for="{{visiblePlayableReviewTools}}" wx:key="id" class="review-tool-card {{item.available ? 'ready' : 'locked'}} {{item.themeClass}}" data-id="{{item.id}}" bindtap="runPlayableReviewTool"><text class="review-tool-icon">{{item.icon}}</text><text>{{item.title}}</text><text>{{item.line}}</text><text>{{item.duration}}</text><text>{{item.status}} · {{item.count}} 张</text><text>{{item.mission}}</text></view>
+            <view wx:for="{{visiblePlayableReviewTools}}" wx:key="id" class="review-tool-card {{item.available ? 'ready' : 'locked'}} {{item.themeClass}} {{selectedPlayableReviewToolId === item.id ? 'selected' : ''}}" data-id="{{item.id}}" bindtap="selectPlayableReviewTool"><text class="review-tool-selected-mark"></text><text class="review-tool-icon">{{item.icon}}</text><text>{{item.title}}</text><text>{{item.line}}</text><text>{{item.duration}}</text><text>{{item.status}} · {{item.count}} 张</text><text>{{item.mission}}</text></view>
           </view>
           <view class="review-template-workbench" wx:if="{{reviewFlowStage === 'tool' && practiceTemplateWorkbench && practiceTemplateWorkbench.id}}">
             <text class="review-template-head"><text>{{practiceTemplateWorkbench.title}}</text><text>{{practiceTemplateWorkbench.status}}</text></text>
@@ -94,7 +101,7 @@
 
         <text class="review-main-cta" wx:if="{{reviewFlowStage === 'main'}}" data-stage="topic" bindtap="setReviewFlowStage">开始一局练习</text>
         <text class="review-main-cta" wx:if="{{reviewFlowStage === 'topic'}}" data-stage="tool" bindtap="setReviewFlowStage">用这个开一局</text>
-        <view class="review-main-cta" wx:if="{{reviewFlowStage === 'tool'}}" data-id="whack" bindtap="runPlayableReviewTool">开始错因地鼠</view>
+        <view class="review-main-cta" wx:if="{{reviewFlowStage === 'tool'}}" bindtap="startSelectedPlayableReviewTool">{{selectedPlayableReviewToolStartText}}</view>
       </view>
     </view>
   </scroll-view>

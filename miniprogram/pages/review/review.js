@@ -6,6 +6,15 @@ const gameLogic = require('../../utils/game-logic');
 const revisitEngine = require('../../utils/revisit-engine');
 const reviewViewModels = require('../../view-models/review-view-model');
 
+const KNOWLEDGE_STARTER_TOPIC_CARDS = [
+  { topic: '小数乘法', tag: '消除易错点', duration: '约 10 分钟', theme: 'teal' },
+  { topic: '认识分数', tag: '色彩涂涂', duration: '约 15 分钟', theme: 'rose' },
+  { topic: '面积计算', tag: '拼图解谜', duration: '约 12 分钟', theme: 'green' },
+  { topic: '混合运算', tag: '极速速算', duration: '约 5 分钟', theme: 'orange' },
+  { topic: '认识钟表', tag: '拨盘解密', duration: '约 8 分钟', theme: 'teal' },
+  { topic: '长度单位', tag: '魔法尺子', duration: '约 10 分钟', theme: 'rose' }
+];
+
 const DEFAULT_REVISIT_RUNWAY = {
   due: 0,
   level: 1,
@@ -114,14 +123,12 @@ Page({
     miniLessonReturnPanel: null,
     reviewFlowStage: 'main',
     selectedKnowledgeTopic: '小数乘法',
-    knowledgeStarterTopics: [
-      '小数乘法',
-      '认识分数',
-      '面积计算',
-      '混合运算',
-      '认识钟表',
-      '长度单位'
-    ]
+    topicSearchText: '',
+    knowledgeStarterTopicBatch: 0,
+    knowledgeStarterTopicCards: KNOWLEDGE_STARTER_TOPIC_CARDS,
+    selectedPlayableReviewToolId: 'whack',
+    selectedPlayableReviewToolTitle: '错因地鼠',
+    selectedPlayableReviewToolStartText: '开始错因地鼠'
   },
 
   onLoad(query = {}) {
@@ -171,9 +178,14 @@ Page({
     const cards = this.ensureKnowledgeStarterCards();
     const tools = this.buildPlayableReviewTools(cards);
     if (stage === 'tool') {
+      const visibleTools = this.buildVisiblePlayableReviewTools(tools);
+      const selectedTool = this.resolveSelectedPlayableReviewTool(visibleTools);
       this.setData({
         playableReviewTools: tools,
-        visiblePlayableReviewTools: this.buildVisiblePlayableReviewTools(tools),
+        visiblePlayableReviewTools: visibleTools,
+        selectedPlayableReviewToolId: selectedTool.id || 'whack',
+        selectedPlayableReviewToolTitle: selectedTool.title || '错因地鼠',
+        selectedPlayableReviewToolStartText: `开始${selectedTool.title || '错因地鼠'}`,
         reviewFlowStage: 'tool'
       });
       return;
@@ -188,6 +200,9 @@ Page({
     this.setData({
       playableReviewTools: tools,
       visiblePlayableReviewTools: this.buildVisiblePlayableReviewTools(tools),
+      selectedPlayableReviewToolId: tool.id || 'whack',
+      selectedPlayableReviewToolTitle: tool.title || '错因地鼠',
+      selectedPlayableReviewToolStartText: `开始${tool.title || '错因地鼠'}`,
       activeReviewTool: stage === 'finished'
         ? Object.assign({}, activeReviewTool, this.buildFinishReviewSummary(activeReviewTool, demoAttemptSummary, null, demoRoundAdvice), {
           attemptSummary: demoAttemptSummary,
@@ -537,6 +552,28 @@ Page({
       .filter(Boolean);
   },
 
+  resolveSelectedPlayableReviewTool(tools = []) {
+    const source = Array.isArray(tools) ? tools : [];
+    const selectedId = this.data.selectedPlayableReviewToolId || 'whack';
+    return source.find((item) => item && item.id === selectedId)
+      || source.find((item) => item && item.id === 'whack')
+      || source.find((item) => item && item.available)
+      || source[0]
+      || { id: 'whack', title: '错因地鼠' };
+  },
+
+  buildKnowledgeStarterTopicCards(options = {}) {
+    const query = String(options.query || this.data.topicSearchText || '').trim();
+    const batch = Number(options.batch == null ? this.data.knowledgeStarterTopicBatch : options.batch) || 0;
+    const source = KNOWLEDGE_STARTER_TOPIC_CARDS.filter((item) => {
+      if (!query) return true;
+      return item.topic.indexOf(query) >= 0 || item.tag.indexOf(query) >= 0;
+    });
+    if (!source.length) return KNOWLEDGE_STARTER_TOPIC_CARDS.slice(0, 6);
+    const offset = batch % source.length;
+    return source.slice(offset).concat(source.slice(0, offset)).slice(0, 6);
+  },
+
   buildKnowledgeStarterCards(topic = '') {
     const now = new Date().toISOString();
     const label = topic || this.data.selectedKnowledgeTopic || '小数乘法';
@@ -588,15 +625,58 @@ Page({
     });
   },
 
+  onTopicSearchInput(event) {
+    const value = event && event.detail ? event.detail.value || '' : '';
+    this.setData({
+      topicSearchText: value,
+      knowledgeStarterTopicBatch: 0,
+      knowledgeStarterTopicCards: this.buildKnowledgeStarterTopicCards({ query: value, batch: 0 })
+    });
+  },
+
+  shuffleKnowledgeStarterTopics() {
+    const nextBatch = Number(this.data.knowledgeStarterTopicBatch || 0) + 1;
+    const cards = this.buildKnowledgeStarterTopicCards({ batch: nextBatch });
+    this.setData({
+      knowledgeStarterTopicBatch: nextBatch,
+      knowledgeStarterTopicCards: cards,
+      selectedKnowledgeTopic: (cards[0] && cards[0].topic) || this.data.selectedKnowledgeTopic || '小数乘法'
+    });
+  },
+
+  selectPlayableReviewTool(event) {
+    const dataset = event && event.currentTarget ? event.currentTarget.dataset || {} : {};
+    const id = dataset.id || 'whack';
+    const tools = this.data.visiblePlayableReviewTools || this.data.playableReviewTools || [];
+    const tool = tools.find((item) => item && item.id === id) || this.resolveSelectedPlayableReviewTool(tools);
+    this.setData({
+      selectedPlayableReviewToolId: tool.id || id,
+      selectedPlayableReviewToolTitle: tool.title || '错因地鼠',
+      selectedPlayableReviewToolStartText: `开始${tool.title || '错因地鼠'}`,
+      feedbackText: ''
+    });
+  },
+
+  startSelectedPlayableReviewTool() {
+    const tools = this.data.visiblePlayableReviewTools || this.data.playableReviewTools || [];
+    const tool = this.resolveSelectedPlayableReviewTool(tools);
+    this.runPlayableReviewTool({ currentTarget: { dataset: { id: tool.id || 'whack' } } });
+  },
+
   setReviewFlowStage(event) {
     const stage = event && event.currentTarget ? event.currentTarget.dataset.stage || 'topic' : 'topic';
     const active = this.data.activeReviewTool || null;
     if (stage === 'tool') {
       const cards = this.ensureKnowledgeStarterCards();
       const tools = this.buildPlayableReviewTools(cards);
+      const visibleTools = this.buildVisiblePlayableReviewTools(tools);
+      const selectedTool = this.resolveSelectedPlayableReviewTool(visibleTools);
       this.setData({
         playableReviewTools: tools,
-        visiblePlayableReviewTools: this.buildVisiblePlayableReviewTools(tools),
+        visiblePlayableReviewTools: visibleTools,
+        selectedPlayableReviewToolId: selectedTool.id || 'whack',
+        selectedPlayableReviewToolTitle: selectedTool.title || '错因地鼠',
+        selectedPlayableReviewToolStartText: `开始${selectedTool.title || '错因地鼠'}`,
         reviewFlowStage: 'tool'
       });
       return;
@@ -2088,7 +2168,10 @@ Page({
         const nextTool = nextTools.find((item) => item.id === requestedToolId) || nextTools.find((item) => item.id === 'quiz') || {};
         this.setData({
           playableReviewTools: nextTools,
-          visiblePlayableReviewTools: this.buildVisiblePlayableReviewTools(nextTools)
+          visiblePlayableReviewTools: this.buildVisiblePlayableReviewTools(nextTools),
+          selectedPlayableReviewToolId: nextTool.id || requestedToolId || 'quiz',
+          selectedPlayableReviewToolTitle: nextTool.title || '快闪问答',
+          selectedPlayableReviewToolStartText: `开始${nextTool.title || '快闪问答'}`
         }, () => {
           this.runPlayableReviewTool({ currentTarget: { dataset: { id: nextTool.id || 'quiz' } } });
         });
