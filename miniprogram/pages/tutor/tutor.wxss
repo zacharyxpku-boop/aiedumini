@@ -904,10 +904,35 @@ page {
 }
 
 .tutor-stuck-lead {
+  display: grid;
+  gap: 2rpx;
   color: #1f2937;
   font-size: 56rpx;
   line-height: 72rpx;
   font-weight: 950;
+}
+
+.tutor-stuck-lead > text {
+  display: block;
+}
+
+.tutor-stuck-lead > text:last-child {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8rpx;
+}
+
+.tutor-stuck-lead > text:last-child > text {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 104rpx;
+  padding: 0 14rpx;
+  border-radius: 22rpx;
+  color: #ff7a45;
+  background: #fff2e8;
+  box-shadow: inset 0 -10rpx 0 rgba(255, 122, 69, 0.12);
 }
 
 .tutor-stuck-question {
@@ -918,8 +943,11 @@ page {
 }
 
 .tutor-stuck-action-card {
+  display: grid;
+  grid-template-columns: 64rpx minmax(0, 1fr) 44rpx;
+  gap: 18rpx;
+  align-items: center;
   min-height: 150rpx;
-  justify-content: flex-start;
   padding: 28rpx;
   border: 2rpx solid transparent;
   border-radius: 32rpx;
@@ -933,17 +961,69 @@ page {
   background: #fff5f0;
 }
 
-.tutor-stuck-action-card > text:first-child {
+.tutor-stuck-action-copy {
+  display: grid;
+  gap: 6rpx;
+  min-width: 0;
+}
+
+.tutor-stuck-action-copy text:first-child {
   color: #1f2937;
-  font-size: 32rpx;
+  font-size: 30rpx;
+  line-height: 38rpx;
+  font-weight: 950;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.tutor-stuck-action-copy text:last-child {
+  color: #9a3412;
+  font-size: 22rpx;
+  line-height: 30rpx;
+  font-weight: 760;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.tutor-stuck-action-icon,
+.tutor-stuck-action-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999rpx;
   font-weight: 950;
 }
 
-.tutor-stuck-action-card > text:last-child {
-  margin-top: 6rpx;
-  color: #9a3412;
-  font-size: 21rpx;
-  font-weight: 760;
+.tutor-stuck-action-icon {
+  width: 64rpx;
+  height: 64rpx;
+  color: #ffffff;
+  background: #ff7a45;
+  font-size: 32rpx;
+  line-height: 64rpx;
+  box-shadow: 0 8rpx 18rpx rgba(255, 122, 69, 0.2);
+}
+
+.tutor-stuck-action-icon.target {
+  color: #0d9488;
+  background: #e6f4f1;
+  box-shadow: 0 8rpx 18rpx rgba(13, 148, 136, 0.12);
+}
+
+.tutor-stuck-action-check {
+  width: 44rpx;
+  height: 44rpx;
+  border: 2rpx solid #e5e7eb;
+  color: transparent;
+  background: #ffffff;
+  font-size: 22rpx;
+  line-height: 44rpx;
+}
+
+.tutor-stuck-action-card.active .tutor-stuck-action-check {
+  border-color: #ff7a45;
+  color: #ffffff;
+  background: #ff7a45;
 }
 
 .tutor-stuck-journal {
@@ -1337,13 +1417,12 @@ page {
 }
 
 .tutor-reference-panel.dialogue .tutor-dialogue-actions {
-  position: fixed;
-  left: 32rpx;
-  right: 32rpx;
-  bottom: calc(248rpx + env(safe-area-inset-bottom));
-  z-index: 12;
+  position: relative;
+  z-index: 2;
   grid-template-columns: minmax(0, 1fr);
   gap: 12rpx;
+  max-width: 560rpx;
+  margin: -14rpx 32rpx 0 112rpx;
   pointer-events: auto;
 }
 
