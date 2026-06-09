@@ -181,12 +181,14 @@ Page({
       ? revisitEngine.buildWhackRound(cards, { limit: 4, holes: 4, timeLimit: 60 })
       : null;
     const activeReviewTool = this.buildActiveReviewTool(Object.assign({}, tool, { id: tool.engineId || tool.id || 'whack' }), round);
+    const demoAttemptSummary = { total: Math.max(1, Number(activeReviewTool.itemCount || 1)), correct: 1, wrong: 0 };
+    const demoRoundAdvice = { primary: '明天再换一张同类卡回忆第一步。', secondary: '家长只看孩子能不能说出原因。' };
     this.setData({
       playableReviewTools: tools,
       activeReviewTool: stage === 'finished'
-        ? Object.assign({}, activeReviewTool, {
-          attemptSummary: { total: Math.max(1, Number(activeReviewTool.itemCount || 1)), remembered: 1, wrong: 0 },
-          roundAdvice: { primary: '明天再换一张同类卡回忆第一步。', secondary: '家长只看孩子能不能说出原因。' },
+        ? Object.assign({}, activeReviewTool, this.buildFinishReviewSummary(activeReviewTool, demoAttemptSummary, null, demoRoundAdvice), {
+          attemptSummary: demoAttemptSummary,
+          roundAdvice: demoRoundAdvice,
           reportEvidenceReady: true
         })
         : activeReviewTool,
@@ -666,7 +668,46 @@ Page({
       roundSourceData: round,
       answers: [],
       attemptSummary: null,
-      repairFocus: null
+      repairFocus: null,
+      finishEvidenceLines: [],
+      finishEvidencePrimary: '',
+      finishEvidenceSecondary: '',
+      finishStuckLine: '',
+      finishTomorrowLine: ''
+    };
+  },
+
+  buildFinishReviewSummary(active = {}, attemptSummary = null, repairFocus = null, roundAdvice = null) {
+    const summary = attemptSummary || {};
+    const correct = Number(summary.correct || 0);
+    const total = Number(summary.total || active.itemCount || 0);
+    const wrong = Number(summary.wrong || 0);
+    const title = active.title || '知识练习';
+    const primaryPrompt = active.primary && active.primary.prompt ? active.primary.prompt : active.mission || '完成一轮主动回忆';
+    const secondPrompt = active.secondary && active.secondary.prompt ? active.secondary.prompt : '';
+    const evidenceLines = [
+      `${title}留下 ${correct}/${Math.max(total, 1)} 条可复盘证据。`,
+      primaryPrompt
+    ];
+    if (secondPrompt && correct > 1) {
+      evidenceLines.push(secondPrompt);
+    }
+    const focusText = repairFocus && (repairFocus.decision || repairFocus.title || repairFocus.wrongCause || repairFocus.knowledgeType)
+      ? (repairFocus.decision || repairFocus.title || repairFocus.wrongCause || repairFocus.knowledgeType)
+      : wrong
+        ? '这一轮还有错卡，先回到第一步说清楚。'
+        : '这一轮第一步能说出来，明天换同类卡再验证。';
+    const tomorrowText = roundAdvice && (roundAdvice.primary || roundAdvice.secondary)
+      ? (roundAdvice.primary || roundAdvice.secondary)
+      : wrong
+        ? '明天先回访这张错因卡，预计 2 分钟。'
+        : '明天做同类迁移回访，预计 2 分钟。';
+    return {
+      finishEvidenceLines: evidenceLines.slice(0, 3),
+      finishEvidencePrimary: evidenceLines[0] || '这一局留下了可复盘证据。',
+      finishEvidenceSecondary: evidenceLines[1] || '先说第一步，再做同类回访。',
+      finishStuckLine: focusText,
+      finishTomorrowLine: tomorrowText
     };
   },
 
@@ -2117,6 +2158,10 @@ Page({
         roundAdvice,
         repairFocus,
         reportEvidenceReady: true
+      }, this.buildFinishReviewSummary(active, attemptSummary, repairFocus, roundAdvice)),
+      practiceTemplateWorkbench: Object.assign({}, this.data.practiceTemplateWorkbench || {}, {
+        status: attemptSummary ? `${attemptSummary.correct}/${attemptSummary.total || active.itemCount || 1} 条证据` : '已记录',
+        line: roundAdvice && roundAdvice.body ? roundAdvice.body : '这一局已沉淀到成长报告证据。'
       }),
       feedbackText: result === 'remembered'
         ? `${active.title}已记录：明天只回看同一错因。`
