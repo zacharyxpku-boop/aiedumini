@@ -59,7 +59,7 @@
         </view>
 
         <view class="growth-report-preview" wx:if="{{growthActiveScene === 'preview'}}">
-          <view class="growth-report-preview-head"><text>成长线索初步发现</text><text>{{learningReportSummary.reportJobCaseId ? '初步报告 · 基于材料' : '初步报告 · 基于 2 份材料'}}</text></view>
+          <view class="growth-report-preview-head"><text>成长线索初步发现</text><text>{{learningReportSummary.reportJobCaseId ? '学习线索 · 初步报告 · 基于材料' : '学习线索 · 初步报告 · 基于 2 份材料'}}</text></view>
           <text class="growth-report-lead">我们从碎片中拼凑出了孩子的学习画像。</text>
           <view class="growth-report-preview-card"><text class="growth-report-corner"></text><view class="growth-report-card-head"><text class="growth-report-icon"></text><view><text>学习偏好线索</text><text><text>视觉型</text><text>来源：基础问卷</text></text></view></view><text class="growth-report-body">{{learningReportSummary.learningPreferenceLine || '孩子对图像、表格的敏感度远高于纯文字。建议在讲解抽象概念时，多使用手绘思维导图或实物辅助。'}}</text></view>
           <view class="growth-report-preview-card warn"><text class="growth-report-corner"></text><view class="growth-report-card-head"><text class="growth-report-icon"></text><view><text>当前卡点证据</text><text><text>计算粗心</text><text>来源：错题描述</text></text></view></view><text class="growth-report-body">{{learningReportSummary.diagnosisLine || '错题多集中在最后一步进位错误，这反映了由于基础计算熟练度不足导致的“工作记忆瓶颈”。'}}</text></view>
@@ -69,7 +69,7 @@
         </view>
 
         <view class="growth-parent-action-card" wx:if="{{growthActiveScene === 'action'}}">
-          <view class="growth-parent-action-head"><text>今晚行动已为你准备好</text><text>今晚行动指南 · 家长行动卡：不替孩子学习，只为成长提供更好的土壤。</text></view>
+          <view class="growth-parent-action-head"><text>今晚行动已为你准备好</text><text>学习线索 · 今晚行动指南 · 家长行动卡：不替孩子学习，只为成长提供更好的土壤。</text></view>
           <view class="growth-parent-action-item"><text></text><view><text><text>建立自信</text><text>预计 2 分钟</text></text><text>正向具体表扬</text><text>“我看到你刚才虽然算错了，但依然耐心地把草稿纸写得很整齐，这种态度很棒。”</text></view></view>
           <view class="growth-parent-action-item warm"><text></text><view><text><text>环境优化</text><text>持续进行</text></text><text>清空桌面非学习用品</text><text>将书桌上的玩具、漫画或零食移开。对于“视觉型”孩子，清爽的物理空间能显著降低分心。</text></view></view>
           <view class="growth-parent-action-item indigo"><text></text><view><text><text>激发思考</text><text>预计 5 分钟</text></text><text>只问问题，不讲答案</text><text>当孩子求助时，尝试问：“你觉得这一步和上一步的关系是什么？”引导孩子自己发现线索。</text></view></view>
