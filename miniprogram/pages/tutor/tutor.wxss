@@ -723,7 +723,7 @@ page {
   background: #14b8a6;
 }
 
-.tutor-pointing-lead text:last-child {
+.tutor-pointing-lead text:nth-child(3) {
   justify-self: start;
   padding: 8rpx 14rpx;
   border-radius: 999rpx;
@@ -733,7 +733,7 @@ page {
   font-weight: 900;
 }
 
-.tutor-pointing-lead text:nth-child(3) {
+.tutor-pointing-lead > text:nth-child(3) {
   color: #0f766e;
   font-size: 24rpx;
   font-weight: 920;
@@ -1349,28 +1349,48 @@ page {
 .tutor-dialogue-top view {
   display: grid;
   justify-items: center;
-  gap: 4rpx;
+  gap: 2rpx;
 }
 
-.tutor-dialogue-top view text:first-child {
-  width: 14rpx;
-  height: 14rpx;
-  border-radius: 999rpx;
-  background: #4ade80;
-}
-
-.tutor-dialogue-top view text:nth-child(2) {
+.tutor-dialogue-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
   color: #14b8a6;
   font-size: 22rpx;
   line-height: 28rpx;
   font-weight: 800;
 }
 
-.tutor-dialogue-top view text:last-child {
+.tutor-dialogue-status text:first-child {
+  display: inline-flex;
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 999rpx;
+  background: #4ade80;
+}
+
+.tutor-dialogue-status text:last-child {
+  display: inline-flex;
+  color: #14b8a6;
+  font-size: 22rpx;
+  line-height: 28rpx;
+  font-weight: 800;
+}
+
+.tutor-dialogue-title {
   color: #1f2937;
   font-size: 32rpx;
   line-height: 38rpx;
   font-weight: 800;
+}
+
+.tutor-dialogue-guide {
+  max-width: 0;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
 }
 
 .tutor-dialogue-time {
@@ -1732,23 +1752,23 @@ page {
 }
 
 .tutor-reference-panel.pointing .tutor-pointing-lead {
+  gap: 18rpx;
   padding: 8rpx 8rpx 0;
 }
 
 .tutor-reference-panel.pointing .tutor-pointing-lead text:nth-child(2) {
   max-width: 560rpx;
-  font-size: 46rpx;
-  line-height: 58rpx;
+  font-size: 50rpx;
+  line-height: 64rpx;
 }
 
-.tutor-reference-panel.pointing .tutor-pointing-lead text:nth-child(3),
-.tutor-reference-panel.pointing .tutor-pointing-lead text:last-child {
+.tutor-reference-panel.pointing .tutor-pointing-lead text:nth-child(3) {
   display: none;
 }
 
 .tutor-reference-panel.pointing .tutor-question-box {
-  min-height: 220rpx;
-  padding: 24rpx;
+  min-height: 214rpx;
+  padding: 26rpx;
   border-radius: 32rpx;
 }
 
