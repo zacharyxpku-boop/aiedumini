@@ -531,8 +531,13 @@ page {
 }
 
 .yd-parent-screen.scene-questionnaire .growth-questionnaire-panel {
+  position: relative;
   justify-content: flex-start;
   padding-top: 28rpx;
+}
+
+.yd-parent-screen.scene-questionnaire > .growth-flow-tabs {
+  display: none;
 }
 
 .yd-parent-screen.scene-upload .growth-upload-panel,
@@ -600,6 +605,19 @@ page {
   font-size: 28rpx;
 }
 
+.growth-subpage-nav.questionnaire {
+  grid-template-columns: 72rpx minmax(0, 1fr) 72rpx;
+  margin: 0 0 28rpx;
+}
+
+.growth-subpage-nav.questionnaire text:nth-child(2) {
+  display: none;
+}
+
+.growth-subpage-nav.questionnaire > text:last-child {
+  visibility: hidden;
+}
+
 .yd-parent-screen:not(.scene-main) .growth-questionnaire-head,
 .yd-parent-screen:not(.scene-main) .growth-upload-head,
 .yd-parent-screen:not(.scene-main) .growth-report-preview-head,
@@ -658,6 +676,16 @@ page {
   gap: 10rpx;
   width: 220rpx;
   justify-self: center;
+}
+
+.growth-questionnaire-progress.nav {
+  align-self: center;
+  justify-self: center;
+  width: 240rpx;
+  padding: 14rpx 18rpx;
+  border: 1rpx solid rgba(226, 232, 240, 0.72);
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.56);
 }
 
 .growth-questionnaire-progress text {
