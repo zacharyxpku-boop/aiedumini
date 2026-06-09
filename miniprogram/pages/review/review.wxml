@@ -31,6 +31,12 @@
           <view class="review-main-tool-card blue" data-stage="topic" bindtap="setReviewFlowStage"><view><text class="review-main-tool-icon">▣</text><text class="review-main-tool-time">约4分</text></view><text>拼图配对</text><text>把概念和例子配起来</text></view>
           <view class="review-main-tool-card teal" data-stage="topic" bindtap="setReviewFlowStage"><view><text class="review-main-tool-icon">⌁</text><text class="review-main-tool-time">约5分</text></view><text>路线接龙</text><text>逻辑推导解题练习</text></view>
         </view>
+        <text class="review-mini-play-row" wx:if="{{reviewFlowStage === 'main'}}">
+          <text data-stage="topic" bindtap="setReviewFlowStage">闪卡翻翻</text>
+          <text data-stage="topic" bindtap="setReviewFlowStage">UNO错因卡</text>
+          <text data-stage="topic" bindtap="setReviewFlowStage">变式三连</text>
+          <text data-stage="topic" bindtap="setReviewFlowStage">纸面复习包</text>
+        </text>
 
         <view class="review-record-panel" wx:if="{{reviewFlowStage !== 'main'}}">
           <view class="review-section-head"><text>{{reviewFlowStage === 'topic' ? '今天想练哪一块？' : reviewFlowStage === 'tool' ? '玩法选择' : reviewFlowStage === 'finished' ? '这一局探索结束啦' : '快闪问答'}}</text><text>{{reviewFlowStage === 'topic' ? '推荐探索 · 换一批 · 选个知识点，马上开局探索' : reviewFlowStage === 'tool' ? '选一个最适合现在的节奏，马上开始' : reviewFlowStage === 'finished' ? '档案袋留下证据 · 结算页' : '正在热身 · 找第一步'}}</text></view>
