@@ -1587,7 +1587,8 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
   const daySeven = sevenDayPlan[6] || sevenDayPlan[sevenDayPlan.length - 1] || {};
   const assessmentCount = Array.isArray(reportState.assessmentAnswers) ? reportState.assessmentAnswers.length : 0;
   const sourceCount = Array.isArray(reportState.sources) ? reportState.sources.length : 0;
-  const reportHasDraft = !!(reportState.reportDraft || reportState.reportJobCaseId || draft.id || overview.line || mainDiagnosis);
+  const draftHasContent = !!(draft.id || overview.line || mainDiagnosis || Object.keys(draft).length > 0);
+  const reportHasDraft = !!(draftHasContent || reportState.reportJobCaseId);
   const nextEvidence = Array.isArray(solutionMap.nextEvidenceRequired) && solutionMap.nextEvidenceRequired.length
     ? solutionMap.nextEvidenceRequired
     : ['child_first_step', 'focus_or_review_record', 'next_day_revisit'];
