@@ -600,6 +600,19 @@ Page({
     this.setData({ reviewFlowStage: ['topic', 'tool', 'live', 'finished'].includes(stage) ? stage : 'topic' });
   },
 
+  closeReviewSubpage() {
+    const stage = this.data.reviewFlowStage;
+    if (stage === 'live' || stage === 'finished') {
+      this.setData({ reviewFlowStage: 'tool' });
+      return;
+    }
+    if (stage === 'tool') {
+      this.setData({ reviewFlowStage: 'topic' });
+      return;
+    }
+    this.setData({ reviewFlowStage: 'main' });
+  },
+
   ensureKnowledgeStarterCards() {
     const existing = storage.loadReviewCards ? storage.loadReviewCards() : [];
     if (existing.length || !storage.saveReviewCards) return existing;

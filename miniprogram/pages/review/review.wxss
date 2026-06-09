@@ -435,11 +435,53 @@ page {
 
 .yd-review-screen:not(.stage-main) .review-record-panel {
   flex: 1;
-  min-height: calc(100vh - 268rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  min-height: calc(100vh - 96rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   padding: 0;
   border-radius: 0;
   background: transparent;
   box-shadow: none;
+}
+
+.review-subpage-top {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: 72rpx minmax(0, 1fr) 72rpx;
+  align-items: end;
+  min-height: 88rpx;
+  margin: 0 -8rpx 0;
+  padding: 0 0 12rpx;
+}
+
+.review-subpage-top text {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: center;
+  color: #2c2621;
+  font-weight: 860;
+}
+
+.review-subpage-top text:first-child,
+.review-subpage-top text:last-child {
+  width: 64rpx;
+  height: 64rpx;
+  border: 1rpx solid #f0ebe1;
+  border-radius: 50%;
+  color: #5c544d;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 4rpx 14rpx rgba(44, 38, 33, 0.045);
+  font-size: 38rpx;
+  line-height: 64rpx;
+}
+
+.review-subpage-top text:nth-child(2) {
+  overflow: hidden;
+  font-size: 31rpx;
+  line-height: 38rpx;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .yd-review-screen.stage-topic .review-record-panel {
@@ -460,7 +502,7 @@ page {
 .yd-review-screen:not(.stage-main) .review-section-head {
   display: grid;
   gap: 10rpx;
-  padding-top: 18rpx;
+  padding-top: 6rpx;
 }
 
 .review-section-head text:first-child {

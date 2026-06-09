@@ -2,7 +2,7 @@
   <scroll-view class="content-area" scroll-y enhanced show-scrollbar="{{false}}">
     <view class="content-inner">
       <view class="yd-review-screen yd-app-screen yd-review-app stage-{{reviewFlowStage}}">
-        <view class="yd-review-top">
+        <view class="yd-review-top" wx:if="{{reviewFlowStage === 'main'}}">
           <text class="yd-review-brand">原点智学 · 知识乐园</text>
           <text class="yd-review-pill">···</text>
         </view>
@@ -39,6 +39,11 @@
         </text>
 
         <view class="review-record-panel" wx:if="{{reviewFlowStage !== 'main'}}">
+          <text class="review-subpage-top">
+            <text bindtap="closeReviewSubpage">‹</text>
+            <text>{{reviewFlowStage === 'topic' ? '选知识点' : reviewFlowStage === 'tool' ? '玩法选择' : reviewFlowStage === 'finished' ? '结算页' : (activeReviewTool.title || '快闪问答')}}</text>
+            <text>···</text>
+          </text>
           <view class="review-section-head"><text>{{reviewFlowStage === 'topic' ? '今天想练哪一块？' : reviewFlowStage === 'tool' ? '玩法选择' : reviewFlowStage === 'finished' ? '这一局探索结束啦' : '快闪问答'}}</text><text>{{reviewFlowStage === 'topic' ? '推荐探索 · 换一批 · 选个知识点，马上开局探索' : reviewFlowStage === 'tool' ? '选一个最适合现在的节奏，马上开始' : reviewFlowStage === 'finished' ? '档案袋留下证据 · 结算页' : '正在热身 · 找第一步'}}</text></view>
           <text class="review-flow-tabs">
             <text class="{{reviewFlowStage === 'topic' ? 'active' : ''}}" data-stage="topic" bindtap="setReviewFlowStage">选知识点</text>
