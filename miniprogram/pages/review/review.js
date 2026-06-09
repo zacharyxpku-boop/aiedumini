@@ -190,28 +190,7 @@ Page({
       });
       return;
     }
-    const tool = tools.find((item) => item.id === 'whack') || tools.find((item) => item.available) || tools[0] || {};
-    const round = tool && tool.available && revisitEngine.buildWhackRound
-      ? revisitEngine.buildWhackRound(cards, { limit: 4, holes: 4, timeLimit: 60 })
-      : null;
-    const activeReviewTool = this.buildActiveReviewTool(Object.assign({}, tool, { id: tool.engineId || tool.id || 'whack' }), round);
-    const demoAttemptSummary = { total: Math.max(1, Number(activeReviewTool.itemCount || 1)), correct: 1, wrong: 0 };
-    const demoRoundAdvice = { primary: '明天再换一张同类卡回忆第一步。', secondary: '家长只看孩子能不能说出原因。' };
-    this.setData({
-      playableReviewTools: tools,
-      visiblePlayableReviewTools: this.buildVisiblePlayableReviewTools(tools),
-      selectedPlayableReviewToolId: tool.id || 'whack',
-      selectedPlayableReviewToolTitle: tool.title || '错因地鼠',
-      selectedPlayableReviewToolStartText: `开始${tool.title || '错因地鼠'}`,
-      activeReviewTool: stage === 'finished'
-        ? Object.assign({}, activeReviewTool, this.buildFinishReviewSummary(activeReviewTool, demoAttemptSummary, null, demoRoundAdvice), {
-          attemptSummary: demoAttemptSummary,
-          roundAdvice: demoRoundAdvice,
-          reportEvidenceReady: true
-        })
-        : activeReviewTool,
-      reviewFlowStage: stage
-    });
+    this.openPlayableReviewStage(stage, tools);
   },
 
   consumePublicK12ReviewContext() {
@@ -663,6 +642,47 @@ Page({
     this.runPlayableReviewTool({ currentTarget: { dataset: { id: tool.id || 'whack' } } });
   },
 
+  openPlayableReviewStage(stage = 'live', tools = null) {
+    const cards = this.ensureKnowledgeStarterCards();
+    const allTools = Array.isArray(tools) && tools.length ? tools : this.buildPlayableReviewTools(cards);
+    const visibleTools = this.buildVisiblePlayableReviewTools(allTools);
+    const selectedTool = this.resolveSelectedPlayableReviewTool(visibleTools);
+    const tool = selectedTool && selectedTool.id
+      ? selectedTool
+      : (visibleTools.find((item) => item.id === 'whack') || visibleTools[0] || {});
+    const toolId = tool.engineId || tool.id || 'whack';
+    const round = toolId === 'whack' && revisitEngine.buildWhackRound
+      ? revisitEngine.buildWhackRound(cards, { limit: 4, holes: 4, timeLimit: 60 })
+      : toolId === 'match' && revisitEngine.buildMatchRound
+      ? revisitEngine.buildMatchRound(cards, { limit: 4 })
+      : toolId === 'snake' && revisitEngine.buildSnakeRound
+        ? revisitEngine.buildSnakeRound(cards, { limit: 3 })
+        : revisitEngine.buildQuestRound
+          ? revisitEngine.buildQuestRound(cards, { limit: 3, timeLimit: 90 })
+          : null;
+    const activeReviewTool = this.buildActiveReviewTool(Object.assign({}, tool, { id: toolId }), round);
+    const attemptSummary = { total: Math.max(1, Number(activeReviewTool.itemCount || 1)), correct: 1, wrong: 0 };
+    const roundAdvice = { primary: '明天再换一张同类卡回忆第一步。', secondary: '家长只看孩子能不能说出原因。' };
+    this.setData({
+      playableReviewTools: allTools,
+      visiblePlayableReviewTools: visibleTools,
+      selectedPlayableReviewToolId: tool.id || 'whack',
+      selectedPlayableReviewToolTitle: tool.title || '错因地鼠',
+      selectedPlayableReviewToolStartText: `开始${tool.title || '错因地鼠'}`,
+      activeReviewTool: stage === 'finished'
+        ? Object.assign({}, activeReviewTool, this.buildFinishReviewSummary(activeReviewTool, attemptSummary, null, roundAdvice), {
+          attemptSummary,
+          roundAdvice,
+          reportEvidenceReady: true
+        })
+        : activeReviewTool,
+      reviewFlowStage: stage === 'finished' ? 'finished' : 'live',
+      feedbackText: stage === 'finished'
+        ? '已生成本局证据预览，继续一局会写入成长报告。'
+        : `已打开${tool.title || '知识玩法'}，先说第一步再点按钮。`
+    });
+  },
+
   setReviewFlowStage(event) {
     const dataset = event && event.currentTarget ? event.currentTarget.dataset || {} : {};
     const stage = dataset.stage || 'topic';
@@ -694,11 +714,11 @@ Page({
       return;
     }
     if (stage === 'live' && !(active && active.id)) {
-      this.setData({ reviewFlowStage: 'tool' });
+      this.openPlayableReviewStage('live');
       return;
     }
     if (stage === 'finished' && !(active && active.attemptSummary)) {
-      this.setData({ reviewFlowStage: active && active.id ? 'live' : 'tool' });
+      this.openPlayableReviewStage('finished');
       return;
     }
     this.setData({ reviewFlowStage: ['topic', 'tool', 'live', 'finished'].includes(stage) ? stage : 'topic' });
