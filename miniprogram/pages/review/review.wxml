@@ -93,7 +93,7 @@
               <view class="review-finish-section tomorrow"><view><text></text><text>明天回访什么</text></view><view><text></text><text>{{activeReviewTool.finishTomorrowLine}}</text><text>系统已安排 · 预计 2 分钟</text></view></view>
               <view class="review-finish-bottom"><button data-result="retry" bindtap="finishPlayableReviewTool">再练一局</button><button bindtap="openReviewParentEvidence">给家长看证据</button></view>
             </view>
-            <view class="review-live-actions grade" wx:if="{{reviewFlowStage === 'live' && activeReviewTool.gameType !== 'whack' && activeReviewTool.gameType !== 'match' && activeReviewTool.gameType !== 'snake'}}"><button data-rating="again" bindtap="rate">需要提示</button><button data-result="remembered" bindtap="finishPlayableReviewTool">我记得答案</button><button data-rating="hard" bindtap="rate">有点模糊</button><button data-rating="easy" bindtap="rate">先跳过</button></view>
+            <view class="review-live-actions grade" wx:if="{{reviewFlowStage === 'live' && activeReviewTool.gameType !== 'whack' && activeReviewTool.gameType !== 'match' && activeReviewTool.gameType !== 'snake'}}"><button data-rating="again" bindtap="rate">需要提示</button><button data-result="remembered" bindtap="finishPlayableReviewTool">我能说第一步</button><button data-rating="hard" bindtap="rate">有点模糊</button><button data-rating="easy" bindtap="rate">先跳过</button></view>
           </view>
         </view>
 
