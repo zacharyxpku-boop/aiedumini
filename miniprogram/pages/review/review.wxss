@@ -1248,7 +1248,7 @@ page {
 .review-live-tool.stage-live {
   min-height: calc(100vh - 168rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   justify-content: flex-start;
-  padding: 0 0 20rpx;
+  padding: 0 0 18rpx;
 }
 
 .review-play-top {
@@ -1276,9 +1276,9 @@ page {
 
 .review-play-top text:nth-child(2) {
   color: #1f2937;
-  font-size: 32rpx;
+  font-size: 34rpx;
   line-height: 38rpx;
-  font-weight: 800;
+  font-weight: 900;
 }
 
 .review-game-progress {
@@ -1342,16 +1342,16 @@ page {
 .review-live-reference {
   position: relative;
   display: grid;
-  gap: 30rpx;
-  min-height: 520rpx;
+  gap: 28rpx;
+  min-height: 560rpx;
   box-sizing: border-box;
-  padding: 50rpx 40rpx 0;
+  padding: 48rpx 38rpx 0;
   overflow: hidden;
-  border: 1rpx solid rgba(255, 237, 213, 0.6);
-  border-radius: 32rpx;
+  border: 1rpx solid rgba(255, 237, 213, 0.72);
+  border-radius: 34rpx;
   text-align: center;
   background: #ffffff;
-  box-shadow: 0 16rpx 48rpx rgba(15, 23, 42, 0.04);
+  box-shadow: 0 18rpx 52rpx rgba(44, 38, 33, 0.045);
 }
 
 .review-live-glow {
@@ -1362,11 +1362,11 @@ page {
 }
 
 .review-live-glow.top {
-  right: -64rpx;
-  top: -64rpx;
-  width: 256rpx;
-  height: 256rpx;
-  background: #fff7ed;
+  right: -72rpx;
+  top: -76rpx;
+  width: 300rpx;
+  height: 300rpx;
+  background: #ffedd5;
 }
 
 .review-live-glow.bottom {
@@ -1374,7 +1374,7 @@ page {
   bottom: -80rpx;
   width: 320rpx;
   height: 320rpx;
-  background: #ecfdf5;
+  background: #ccfbf1;
 }
 
 .review-live-reference view {
@@ -1383,6 +1383,7 @@ page {
   display: flex;
   align-items: center;
   gap: 12rpx;
+  justify-self: start;
   align-self: start;
 }
 
@@ -1414,29 +1415,57 @@ page {
   position: relative;
   z-index: 1;
   justify-self: center;
-  width: 128rpx;
-  height: 128rpx;
+  width: 150rpx;
+  height: 150rpx;
   border-radius: 999rpx;
-  background: linear-gradient(135deg, #fff7ed, rgba(255, 237, 213, 0.55));
-  box-shadow: inset 0 6rpx 18rpx rgba(251, 146, 60, 0.08);
+  background:
+    radial-gradient(circle at 52% 38%, #ffffff 0 20rpx, transparent 21rpx),
+    linear-gradient(135deg, #fff7ed, rgba(255, 237, 213, 0.72));
+  box-shadow:
+    inset 0 6rpx 18rpx rgba(251, 146, 60, 0.08),
+    0 14rpx 34rpx rgba(255, 138, 76, 0.12);
+}
+
+.review-live-brain::before {
+  content: "?";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -54%);
+  color: #ff8a4c;
+  font-size: 62rpx;
+  line-height: 1;
+  font-weight: 950;
+}
+
+.review-live-brain::after {
+  content: "";
+  position: absolute;
+  right: 14rpx;
+  top: 18rpx;
+  width: 24rpx;
+  height: 24rpx;
+  border-radius: 999rpx;
+  background: #2dd4bf;
+  box-shadow: -82rpx 70rpx 0 rgba(255, 138, 76, 0.5);
 }
 
 .review-live-reference > text:nth-of-type(4) {
   position: relative;
   z-index: 1;
-  color: #2d3748;
-  font-size: 40rpx;
-  line-height: 62rpx;
-  font-weight: 900;
+  color: #2c2621;
+  font-size: 44rpx;
+  line-height: 64rpx;
+  font-weight: 950;
 }
 
 .review-live-reference > text:nth-of-type(5) {
   position: relative;
   z-index: 1;
   color: #6b7280;
-  font-size: 28rpx;
+  font-size: 27rpx;
   line-height: 36rpx;
-  font-weight: 700;
+  font-weight: 760;
 }
 
 .review-live-bottom-line {
@@ -1451,16 +1480,16 @@ page {
 }
 
 .review-live-actions.grade {
-  grid-template-columns: 1fr 1.4fr;
-  gap: 18rpx;
+  grid-template-columns: 1fr 1.32fr;
+  gap: 16rpx;
   align-items: center;
 }
 
 .review-live-actions button {
-  min-height: 96rpx;
+  min-height: 98rpx;
   padding: 0;
   border: 2rpx solid #e2e8f0;
-  border-radius: 24rpx;
+  border-radius: 26rpx;
   background: #ffffff;
   color: #64748b;
   font-size: 28rpx;
@@ -1480,7 +1509,7 @@ page {
 .review-live-actions.grade button:nth-child(3),
 .review-live-actions.grade button:nth-child(4) {
   border-radius: 999rpx;
-  min-height: 72rpx;
+  min-height: 76rpx;
   background: rgba(243, 244, 246, 0.8);
   color: #6b7280;
   font-size: 24rpx;
@@ -1525,12 +1554,24 @@ page {
 }
 
 .review-finish-hero > text:first-child {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 128rpx;
   height: 128rpx;
   border: 1rpx solid #ffffff;
   border-radius: 999rpx;
   background: #eaf3ef;
   box-shadow: 0 6rpx 14rpx rgba(40, 150, 137, 0.08);
+}
+
+.review-finish-hero > text:first-child::before {
+  content: "✓";
+  color: #289689;
+  font-size: 58rpx;
+  line-height: 1;
+  font-weight: 950;
 }
 
 .review-finish-hero > text:nth-child(2) {
@@ -1572,10 +1613,22 @@ page {
 }
 
 .review-finish-section > view:first-child > text:first-child {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 48rpx;
   height: 48rpx;
   border-radius: 999rpx;
   background: #eaf3ef;
+}
+
+.review-finish-section > view:first-child > text:first-child::before {
+  content: "";
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 999rpx;
+  background: #289689;
 }
 
 .review-finish-section > view:first-child > text:last-child {
@@ -1618,6 +1671,10 @@ page {
   background: #fdf0eb;
 }
 
+.review-finish-section.stuck > view:first-child > text:first-child::before {
+  background: #f0714d;
+}
+
 .review-finish-section.stuck > text {
   position: relative;
   padding: 22rpx;
@@ -1639,6 +1696,10 @@ page {
 
 .review-finish-section.tomorrow > view:first-child > text:first-child {
   background: #f2f0ea;
+}
+
+.review-finish-section.tomorrow > view:first-child > text:first-child::before {
+  background: #8c837a;
 }
 
 .review-finish-section.tomorrow > view:nth-child(2) {
