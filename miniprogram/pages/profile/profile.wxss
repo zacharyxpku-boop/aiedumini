@@ -75,9 +75,12 @@ page {
 }
 
 .yd-parent-screen.scene-main .yd-parent-pill {
+  width: 168rpx;
+  padding: 0 18rpx;
   border-color: rgba(0, 0, 0, 0.05);
   background: rgba(255, 255, 255, 0.62);
   color: #111827;
+  letter-spacing: 1rpx;
 }
 
 .yd-parent-mark {

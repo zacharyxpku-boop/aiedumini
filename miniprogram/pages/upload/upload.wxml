@@ -14,12 +14,12 @@
         </view>
 
         <view class="yd-upload-heading">
-          <view class="yd-upload-title">上传一条真实材料</view>
-          <view class="yd-upload-sub">先放进成长报告，再决定去问咕点修卡点，还是去知识乐园练一局。</view>
+          <view class="yd-upload-title">收集线索碎片 🧩</view>
+          <view class="yd-upload-sub"><text>材料越真实，建议越具体。</text><text><text>直接拍照或打字都可以</text>，不必全部填满哦～</text></view>
         </view>
 
         <view class="upload-evidence-grid">
-          <view class="upload-evidence-card primary" data-type="wrong_question_paper" bindtap="openMaterialReportPanel"><image mode="aspectFit" src="/assets/reference/upload-folder-stack-transparent.png" /><text class="upload-evidence-copy"><text>错题/作业卡点</text><text>写下题型、孩子原想法和卡住的第一步。</text></text><text>优先添加</text></view>
+          <view class="upload-evidence-card primary" data-type="wrong_question_paper" bindtap="openMaterialReportPanel"><image mode="aspectFit" src="/assets/reference/upload-folder-stack-transparent.png" /><text class="upload-evidence-copy"><text>错题描述</text><text>记录孩子常卡住的题型</text></text><text>✓ 已添加 1 份</text></view>
           <view class="upload-evidence-card" data-type="score_sheet" bindtap="openMaterialReportPanel"><image mode="aspectFit" src="/assets/reference/report-radar-card-illustration.png" /><text class="upload-evidence-copy"><text>成绩/周测</text><text>只做私有线索，看波动和错题分布。</text></text><text>补充</text></view>
           <view class="upload-evidence-card" data-type="school_material" bindtap="openMaterialReportPanel"><image mode="aspectFit" src="/assets/reference/tutor-socratic-board-transparent.png" /><text class="upload-evidence-copy"><text>老师反馈</text><text>评语或聊天截图，定位课堂卡点。</text></text><text>补充</text></view>
           <view class="upload-evidence-card" data-type="parent_report" bindtap="openMaterialReportPanel"><image mode="aspectFit" src="/assets/reference/family-avatar-group-transparent.png" /><text class="upload-evidence-copy"><text>家长观察</text><text>写几句现状，记录开始难和抗挫。</text></text><text>补充</text></view>

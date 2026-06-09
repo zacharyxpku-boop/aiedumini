@@ -117,15 +117,26 @@ page {
 }
 
 .yd-upload-sub {
-  display: -webkit-box;
+  display: grid;
+  gap: 4rpx;
   margin-top: 14rpx;
   overflow: hidden;
   color: #6b7280;
   font-size: 28rpx;
   font-weight: 700;
   line-height: 1.46;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+}
+
+.yd-upload-sub text {
+  display: block;
+}
+
+.yd-upload-sub text text {
+  display: inline;
+  padding: 0 4rpx;
+  border-radius: 8rpx;
+  color: #c65a2e;
+  background: rgba(255, 237, 213, 0.58);
 }
 
 .upload-evidence-grid {
