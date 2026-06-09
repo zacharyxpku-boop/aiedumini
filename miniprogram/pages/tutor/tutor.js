@@ -1447,6 +1447,14 @@ Page({
     this.setData({ showTutorDetails: !this.data.showTutorDetails });
   },
 
+  closeTutorScene() {
+    this.setData({
+      showTutorDetails: false,
+      activeTutorScene: 'dialogue',
+      tutorReferenceScene: normalizeTutorReferenceScene(TUTOR_REFERENCE_SCENES.dialogue)
+    });
+  },
+
   onInput(event) {
     this.setData({ input: event.detail.value });
   },

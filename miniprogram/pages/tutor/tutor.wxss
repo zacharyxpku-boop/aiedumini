@@ -36,6 +36,10 @@ page {
   background: transparent;
 }
 
+.yd-tutor-screen.detail-on {
+  gap: 0;
+}
+
 .yd-tutor-top,
 .yd-tutor-brand,
 .tutor-chat-head,
@@ -453,7 +457,7 @@ page {
 }
 
 .tutor-reference-panel {
-  min-height: 604rpx;
+  min-height: calc(100vh - 196rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
 }
 
 .tutor-reference-head {
@@ -1100,18 +1104,56 @@ page {
 }
 
 .tutor-reference-panel.dialogue .tutor-dialogue-card {
-  min-height: 680rpx;
+  min-height: calc(100vh - 198rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   padding: 0 0 28rpx;
   gap: 24rpx;
   background: #f9fafb;
+}
+
+.tutor-subpage-top {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 72rpx minmax(0, 1fr) 72rpx;
+  align-items: end;
+  min-height: 88rpx;
+  margin: -8rpx -8rpx 6rpx;
+  padding: 0 0 12rpx;
+}
+
+.tutor-subpage-top text {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: center;
+  color: #1f2937;
+  font-weight: 860;
+}
+
+.tutor-subpage-top text:first-child,
+.tutor-subpage-top text:last-child {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  color: #5c544d;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4rpx 14rpx rgba(15, 23, 42, 0.045);
+  font-size: 38rpx;
+  line-height: 64rpx;
+}
+
+.tutor-subpage-top text:nth-child(2) {
+  font-size: 31rpx;
+  line-height: 38rpx;
+  text-align: center;
 }
 
 .tutor-dialogue-top {
   display: grid;
   grid-template-columns: 72rpx minmax(0, 1fr) 72rpx;
   align-items: center;
-  min-height: 92rpx;
-  padding: 0 8rpx;
+  min-height: 104rpx;
+  padding: 0 8rpx 8rpx;
   border-bottom: 1rpx solid rgba(0, 0, 0, 0.03);
   background: rgba(249, 250, 251, 0.92);
 }
@@ -1159,6 +1201,19 @@ page {
   font-size: 24rpx;
   line-height: 30rpx;
   font-weight: 700;
+}
+
+.tutor-reference-emptyline {
+  justify-self: center;
+  max-width: 520rpx;
+  padding: 8rpx 22rpx;
+  border-radius: 999rpx;
+  background: rgba(243, 244, 246, 0.72);
+  color: #9ca3af;
+  font-size: 24rpx;
+  line-height: 32rpx;
+  font-weight: 760;
+  text-align: center;
 }
 
 .tutor-chatline {
@@ -1225,7 +1280,7 @@ page {
   grid-template-columns: minmax(0, 1fr) 96rpx;
   gap: 18rpx;
   align-items: center;
-  margin: 16rpx 0 0;
+  margin: auto 0 0;
   padding: 18rpx;
   border-top: 1rpx solid rgba(243, 244, 246, 0.7);
   background: rgba(255, 255, 255, 0.95);
