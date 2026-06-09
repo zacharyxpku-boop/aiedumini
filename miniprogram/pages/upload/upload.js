@@ -2528,6 +2528,15 @@ Page({
     navigation.switchTab('/pages/tutor/tutor');
   },
 
+  goBack() {
+    const pages = typeof getCurrentPages === 'function' ? getCurrentPages() : [];
+    if (pages && pages.length > 1 && wx.navigateBack) {
+      wx.navigateBack({ delta: 1 });
+      return;
+    }
+    navigation.navigateLearningRoute('/pages/profile/profile?from=upload_back');
+  },
+
   openEntryDetail(event) {
     const scene = event && event.currentTarget && event.currentTarget.dataset
       ? event.currentTarget.dataset.scene

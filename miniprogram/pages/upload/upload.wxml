@@ -3,7 +3,7 @@
     <view class="upload-content">
       <view class="yd-upload-screen yd-app-screen yd-upload-app">
         <view class="yd-upload-top">
-          <view class="yd-upload-back" bindtap="viewLatestReport">‹</view>
+          <view class="yd-upload-back" bindtap="goBack">‹</view>
           <view class="yd-upload-titlebar">
             <text>完善信息</text>
           </view>
