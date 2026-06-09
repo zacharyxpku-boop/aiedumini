@@ -1555,7 +1555,7 @@ Page({
   openTutorScene(event) {
     const dataset = event && event.currentTarget && event.currentTarget.dataset ? event.currentTarget.dataset : {};
     const step = dataset.step || this.data.activeStep || 'read_problem';
-    const sceneMap = { read_problem: 'knowledge', explain_misconception: 'stuck', find_direction: 'pointing', review: 'recap', write_first_step: 'dialogue', fast_mode: 'stuck' };
+    const sceneMap = { read_problem: 'knowledge', explain_misconception: 'stuck', find_direction: 'pointing', review: 'recap', write_first_step: 'stuck', fast_mode: 'stuck' };
     const activeTutorScene = sceneMap[step] || 'dialogue';
     const prompt = this.buildTutorStepPrompt(step);
     const nextInput = String(this.data.input || '').trim() ? this.data.input : '';
