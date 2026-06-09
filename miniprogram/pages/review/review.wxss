@@ -485,8 +485,31 @@ page {
   white-space: nowrap;
 }
 
+.yd-review-screen.stage-topic .review-subpage-top {
+  align-items: center;
+  min-height: 86rpx;
+  padding-bottom: 0;
+}
+
+.yd-review-screen.stage-topic .review-subpage-top text:nth-child(2) {
+  color: transparent;
+  font-size: 0;
+  line-height: 0;
+}
+
+.yd-review-screen.stage-topic .review-subpage-top text:last-child {
+  justify-self: end;
+  border: 4rpx solid #ffffff;
+  color: #ff8a4c;
+  background: #ffe4d6;
+  font-size: 28rpx;
+  line-height: 58rpx;
+  box-shadow: 0 4rpx 14rpx rgba(44, 38, 33, 0.055);
+}
+
 .yd-review-screen.stage-topic .review-record-panel {
   gap: 28rpx;
+  padding-bottom: 196rpx;
 }
 
 .yd-review-screen.stage-tool .review-record-panel {
@@ -799,6 +822,36 @@ page {
   border-radius: 32rpx;
   background: #ff8a4c;
   box-shadow: 0 12rpx 34rpx rgba(255, 138, 76, 0.28);
+}
+
+.yd-review-screen.stage-topic .review-topic-cta {
+  display: none;
+}
+
+.yd-review-screen.stage-topic > .review-main-cta {
+  position: fixed;
+  left: 40rpx;
+  right: 40rpx;
+  bottom: calc(112rpx + env(safe-area-inset-bottom));
+  z-index: 22;
+  height: 108rpx;
+  min-height: 108rpx;
+  margin-top: 0;
+  border-radius: 32rpx;
+  box-shadow: 0 12rpx 34rpx rgba(255, 138, 76, 0.3);
+}
+
+.yd-review-screen.stage-topic > .review-main-cta::before {
+  content: "";
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  height: calc(210rpx + env(safe-area-inset-bottom));
+  border-top: 1rpx solid rgba(240, 235, 225, 0.8);
+  background: linear-gradient(180deg, rgba(253, 251, 247, 0), rgba(255, 255, 255, 0.9) 32%, rgba(255, 255, 255, 0.94));
+  pointer-events: none;
 }
 
 .review-target-card {

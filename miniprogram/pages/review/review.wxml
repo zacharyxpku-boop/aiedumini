@@ -43,7 +43,7 @@
           <text class="review-subpage-top" wx:if="{{reviewFlowStage !== 'finished'}}">
             <text bindtap="closeReviewSubpage">‹</text>
             <text>{{reviewFlowStage === 'topic' ? '选知识点' : reviewFlowStage === 'tool' ? '玩法选择' : reviewFlowStage === 'finished' ? '结算页' : (activeReviewTool.title || '快闪问答')}}</text>
-            <text>···</text>
+            <text>{{reviewFlowStage === 'topic' ? ':)' : '···'}}</text>
           </text>
           <view class="review-section-head" wx:if="{{reviewFlowStage === 'topic' || reviewFlowStage === 'tool'}}"><text>{{reviewFlowStage === 'topic' ? '今天想练哪一块？' : '玩法选择'}}</text><text>{{reviewFlowStage === 'topic' ? '推荐探索 · 换一批 · 选个知识点，马上开局探索' : '选一个最适合现在的节奏，马上开始'}}</text></view>
           <text class="review-flow-tabs" wx:if="{{reviewFlowStage === 'topic' || reviewFlowStage === 'tool'}}">
