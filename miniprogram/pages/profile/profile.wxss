@@ -37,7 +37,7 @@ page {
 .yd-parent-screen:not(.scene-main) {
   gap: 24rpx;
   min-height: calc(100vh - 96rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-  padding: 0 48rpx calc(132rpx + env(safe-area-inset-bottom));
+  padding: 0 48rpx calc(172rpx + env(safe-area-inset-bottom));
   background:
     radial-gradient(circle at 88% 0%, rgba(254, 243, 199, 0.64), transparent 26%),
     radial-gradient(circle at 0% 30%, rgba(204, 251, 241, 0.5), transparent 24%),
@@ -549,7 +549,7 @@ page {
 .yd-parent-screen:not(.scene-main) .growth-report-preview,
 .yd-parent-screen:not(.scene-main) .growth-parent-action-card {
   flex: 1;
-  min-height: calc(100vh - 252rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  min-height: calc(100vh - 286rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   padding: 0;
   border: 0;
   border-radius: 0;
@@ -586,12 +586,53 @@ page {
   gap: 14rpx;
 }
 
+.growth-subpage-nav {
+  display: grid;
+  grid-template-columns: 80rpx minmax(0, 1fr) 80rpx;
+  gap: 16rpx;
+  align-items: center;
+  min-height: 78rpx;
+  margin: -8rpx 0 8rpx;
+}
+
+.growth-subpage-nav text:first-child,
+.growth-subpage-nav text:last-child {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72rpx;
+  height: 72rpx;
+  border: 1rpx solid rgba(15, 23, 42, 0.06);
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.86);
+  color: #374151;
+  font-size: 34rpx;
+  line-height: 72rpx;
+  font-weight: 900;
+  box-shadow: 0 8rpx 18rpx rgba(15, 23, 42, 0.05);
+}
+
+.growth-subpage-nav text:nth-child(2) {
+  display: flex;
+  justify-content: center;
+  color: #1f2937;
+  font-size: 26rpx;
+  line-height: 32rpx;
+  font-weight: 950;
+}
+
+.growth-subpage-nav text:last-child {
+  justify-self: end;
+  color: #9ca3af;
+  font-size: 28rpx;
+}
+
 .yd-parent-screen:not(.scene-main) .growth-questionnaire-head,
 .yd-parent-screen:not(.scene-main) .growth-upload-head,
 .yd-parent-screen:not(.scene-main) .growth-report-preview-head,
 .yd-parent-screen:not(.scene-main) .growth-parent-action-head {
   display: grid;
-  gap: 10rpx;
+  gap: 12rpx;
 }
 
 .growth-questionnaire-head text:first-child,
@@ -605,15 +646,16 @@ page {
 }
 
 .yd-parent-screen:not(.scene-main) .growth-questionnaire-head text:first-child {
-  font-size: 52rpx;
-  line-height: 66rpx;
+  max-width: 560rpx;
+  font-size: 54rpx;
+  line-height: 70rpx;
 }
 
 .yd-parent-screen.scene-upload .growth-upload-head text:first-child,
 .yd-parent-screen.scene-preview .growth-report-preview-head text:first-child,
 .yd-parent-screen.scene-action .growth-parent-action-head text:first-child {
-  font-size: 46rpx;
-  line-height: 58rpx;
+  font-size: 48rpx;
+  line-height: 60rpx;
 }
 
 .growth-questionnaire-head text:last-child,
@@ -631,20 +673,24 @@ page {
 .yd-parent-screen:not(.scene-main) .growth-report-preview-head text:last-child,
 .yd-parent-screen:not(.scene-main) .growth-parent-action-head text:last-child {
   text-align: left;
-  font-size: 26rpx;
+  color: #6b7280;
+  font-size: 25rpx;
   line-height: 36rpx;
+  font-weight: 700;
 }
 
 .growth-questionnaire-progress {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 8rpx;
+  gap: 10rpx;
+  width: 220rpx;
+  justify-self: center;
 }
 
 .growth-questionnaire-progress text {
-  height: 10rpx;
+  height: 12rpx;
   border-radius: 999rpx;
-  background: #ccfbf1;
+  background: rgba(203, 213, 225, 0.72);
 }
 
 .growth-questionnaire-progress text:first-child {
@@ -664,14 +710,15 @@ page {
 
 .growth-question-card {
   display: grid;
-  gap: 20rpx;
-  padding: 10rpx 0 4rpx;
+  gap: 28rpx;
+  padding: 4rpx 0 16rpx;
 }
 
 .growth-question-card > text {
+  display: none;
   color: #1e293b;
-  font-size: 48rpx;
-  line-height: 58rpx;
+  font-size: 44rpx;
+  line-height: 56rpx;
   font-weight: 900;
   text-align: center;
 }
@@ -679,7 +726,7 @@ page {
 .growth-question-options {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18rpx;
+  gap: 20rpx;
 }
 
 .yd-parent-screen.scene-questionnaire .growth-question-options {
@@ -703,7 +750,7 @@ page {
 }
 
 .yd-parent-screen.scene-questionnaire .growth-question-option {
-  min-height: 238rpx;
+  min-height: 232rpx;
   border-radius: 48rpx;
 }
 
@@ -712,6 +759,16 @@ page {
   height: 84rpx;
   border-radius: 28rpx;
   background: #ccfbf1;
+}
+
+.growth-question-option-icon::before {
+  content: "";
+  display: block;
+  width: 34rpx;
+  height: 34rpx;
+  margin: 25rpx auto;
+  border-radius: 12rpx;
+  background: rgba(15, 118, 110, 0.72);
 }
 
 .growth-question-option:nth-child(2) .growth-question-option-icon {
@@ -736,7 +793,7 @@ page {
 
 .growth-question-option-label {
   color: #1e293b;
-  font-size: 28rpx;
+  font-size: 29rpx;
   line-height: 34rpx;
   font-weight: 900;
   text-align: center;
@@ -776,7 +833,7 @@ page {
 .growth-upload-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18rpx;
+  gap: 20rpx;
 }
 
 .yd-parent-screen.scene-upload .growth-upload-grid {
@@ -789,7 +846,7 @@ page {
   justify-items: center;
   align-content: center;
   gap: 14rpx;
-  min-height: 188rpx;
+  min-height: 196rpx;
   box-sizing: border-box;
   padding: 26rpx 20rpx;
   overflow: hidden;
@@ -805,7 +862,7 @@ page {
 }
 
 .yd-parent-screen.scene-upload .growth-upload-card.primary {
-  min-height: 210rpx;
+  min-height: 224rpx;
 }
 
 .growth-upload-card.primary {
@@ -955,7 +1012,7 @@ page {
 
 .growth-unlock-strip {
   display: grid;
-  gap: 18rpx;
+  gap: 16rpx;
   padding: 0;
   border-radius: 0;
   background: transparent;
@@ -973,8 +1030,8 @@ page {
   grid-template-columns: 80rpx minmax(0, 1fr);
   gap: 18rpx;
   align-items: center;
-  min-height: 92rpx;
-  padding: 22rpx;
+  min-height: 96rpx;
+  padding: 18rpx 22rpx;
   border: 1rpx solid rgba(255, 255, 255, 0.68);
   border-radius: 40rpx;
   background: rgba(255, 255, 255, 0.82);
@@ -1013,8 +1070,8 @@ page {
 .growth-report-preview-card {
   position: relative;
   display: grid;
-  gap: 22rpx;
-  padding: 40rpx;
+  gap: 20rpx;
+  padding: 34rpx;
   overflow: hidden;
   border: 1rpx solid #f3f4f6;
   border-radius: 56rpx;
@@ -1122,8 +1179,8 @@ page {
   z-index: 1;
   display: -webkit-box;
   color: #4b5563;
-  font-size: 28rpx;
-  line-height: 40rpx;
+  font-size: 27rpx;
+  line-height: 39rpx;
   overflow: hidden;
   -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
@@ -1131,39 +1188,35 @@ page {
 
 .growth-report-actions {
   grid-template-columns: 1fr 1fr;
-  padding: 28rpx 0 0;
-  border-top: 1rpx solid #f3f4f6;
+  gap: 18rpx;
+  padding: 0;
+  border-top: 0;
 }
 
 .growth-report-actions text {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 86rpx;
+  min-height: 104rpx;
   box-sizing: border-box;
   padding: 12rpx;
-  border-radius: 18rpx;
+  border-radius: 36rpx;
   background: #f8fafc;
   color: #1f2937;
-  font-size: 22rpx;
-  line-height: 28rpx;
+  font-size: 28rpx;
+  line-height: 34rpx;
   font-weight: 900;
   text-align: center;
 }
 
 .growth-report-actions text:first-child {
-  grid-column: 1 / -1;
-  border: 4rpx dashed rgba(20, 184, 166, 0.38);
-  background: #ffffff;
-  color: #0f766e;
-}
-
-.growth-report-actions text:nth-child(2) {
+  grid-column: auto;
+  border: 0;
   background: #14b8a6;
   color: #ffffff;
 }
 
-.growth-report-actions text:nth-child(3) {
+.growth-report-actions text:nth-child(2) {
   background: #fbbf24;
   color: #78350f;
 }
@@ -1173,7 +1226,7 @@ page {
   grid-template-columns: 48rpx minmax(0, 1fr);
   gap: 28rpx;
   align-items: start;
-  padding: 40rpx;
+  padding: 34rpx;
   border: 1rpx solid #f3f4f6;
   border-radius: 56rpx;
   background: #ffffff;
@@ -1237,16 +1290,74 @@ page {
 
 .growth-parent-action-card .growth-parent-action-item view > text:nth-child(3) {
   color: #64748b;
+  font-size: 27rpx;
+  line-height: 38rpx;
+}
+
+.growth-bottom-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: env(safe-area-inset-bottom);
+  z-index: 20;
+  box-sizing: border-box;
+  padding: 22rpx 48rpx calc(22rpx + env(safe-area-inset-bottom));
+  border-top: 1rpx solid rgba(226, 232, 240, 0.72);
+  background: rgba(248, 250, 245, 0.94);
+  box-shadow: 0 -18rpx 38rpx rgba(248, 250, 245, 0.86);
+}
+
+.growth-bottom-bar.question {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: 18rpx;
+}
+
+.growth-bottom-bar.single {
+  display: block;
+}
+
+.growth-bottom-bar.report {
+  display: grid;
+  gap: 18rpx;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.growth-bottom-bar.report > text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 96rpx;
+  border: 4rpx dashed rgba(20, 184, 166, 0.38);
+  border-radius: 36rpx;
+  background: #ffffff;
+  color: #0f766e;
   font-size: 28rpx;
-  line-height: 40rpx;
+  line-height: 34rpx;
+  font-weight: 900;
+  text-align: center;
+}
+
+.growth-bottom-bar.report > text.growth-report-action-card-link {
+  min-height: 42rpx;
+  border: 0;
+  background: transparent;
+  color: #64748b;
+  font-size: 23rpx;
+  line-height: 30rpx;
+  box-shadow: none;
+}
+
+.growth-bottom-bar.action {
+  background: rgba(255, 255, 255, 0.9);
 }
 
 .growth-parent-bottom-actions {
   display: grid;
   grid-template-columns: 1.2fr 1fr;
   gap: 18rpx;
-  padding-top: 12rpx;
-  border-top: 1rpx solid #f3f4f6;
+  padding-top: 0;
+  border-top: 0;
 }
 
 .growth-parent-bottom-actions text {

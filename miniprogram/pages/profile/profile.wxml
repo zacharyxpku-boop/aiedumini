@@ -29,12 +29,11 @@
         </view>
 
         <view class="growth-questionnaire-panel" wx:if="{{showLearningQuestionnaire}}">
-          <view class="growth-questionnaire-head"><text>{{growthQuestionIndex === 0 ? '1分钟问卷' : '孩子最近最常卡在哪里？'}}</text><text bindtap="toggleLearningQuestionnaire">收起</text></view>
+          <view class="growth-subpage-nav"><text data-panel="main" bindtap="setGrowthScene">‹</text><text>1分钟问卷</text><text bindtap="toggleLearningQuestionnaire">×</text></view>
+          <view class="growth-questionnaire-head"><text>孩子最近最常卡在哪里？</text><text>选出最符合的一项，帮我们建立初步画像</text></view>
           <view class="growth-questionnaire-progress"><text></text><text></text><text></text><text></text><text></text></view>
-          <text class="growth-question-intro">孩子最近最常卡在哪里？选出最符合的一项，帮我们建立初步画像。</text>
           <view class="growth-question-card" data-contract="questionIndex === 0" wx:for="{{learningReportQuestionnaire}}" wx:for-index="questionIndex" wx:key="id" wx:if="{{questionIndex === growthQuestionIndex}}"><text>{{item.prompt}}</text><view class="growth-question-options"><view wx:for="{{item.options}}" wx:for-item="option" wx:key="id" class="growth-question-option {{item.selectedOptionId === option.id ? 'active' : ''}}" data-id="{{item.id}}" data-option="{{option.id}}" bindtap="answerLearningQuestion"><text class="growth-question-option-icon"></text><text class="growth-question-option-label">{{option.label}}</text><text class="growth-question-option-check">✓</text></view></view></view>
-          <text class="growth-question-note">后续上传错题、成绩或老师反馈后，报告会继续变准。</text>
-          <view class="growth-action-row"><view class="yd-action-secondary" bindtap="nextGrowthQuestion">下一题</view><view class="yd-action-primary" bindtap="generateLearningReport">生成成长报告</view></view>
+          <view class="growth-bottom-bar question"><view class="yd-action-secondary" bindtap="nextGrowthQuestion">下一题</view><view class="yd-action-primary" bindtap="generateLearningReport">生成成长报告</view></view>
         </view>
 
         <view class="growth-progress-card" wx:if="{{growthActiveScene === 'main'}}">
@@ -45,6 +44,7 @@
         </view>
 
         <view class="growth-upload-panel" wx:if="{{growthActiveScene === 'upload'}}">
+          <view class="growth-subpage-nav"><text data-panel="main" bindtap="setGrowthScene">‹</text><text>完善信息</text><text data-action="reportPreview" bindtap="runParentReportAction">跳过</text></view>
           <view class="growth-upload-head"><text>收集线索碎片</text><text>材料越真实，建议越具体。</text></view>
           <text class="growth-upload-lead">直接拍照或打字都可以，不必全部填满哦～</text>
           <view class="growth-upload-grid">
@@ -55,26 +55,28 @@
             <view class="growth-upload-card purple" data-action="uploadPage" bindtap="runParentReportAction"><image mode="aspectFit" src="/assets/reference/learning-route-map-transparent.png" /><view><text>测评摘要</text><text>以往的诊断报告</text></view><text class="growth-upload-plus">+</text></view>
           </view>
           <view class="growth-unlock-strip"><text>生成报告后，将解锁：</text><view><text>专属学习偏好</text><text>如：视觉型 / 听觉型</text></view><view><text>深层卡点定位</text><text>如：工作记忆受限 / 概念脱节</text></view><view><text>今晚行动建议</text><text>如：睡前花 5 分钟复盘第一步</text></view></view>
-          <text class="growth-generate-cta" bindtap="generateLearningReport">生成成长报告</text>
+          <view class="growth-bottom-bar single"><text class="growth-generate-cta" bindtap="generateLearningReport">生成成长报告</text></view>
         </view>
 
         <view class="growth-report-preview" wx:if="{{growthActiveScene === 'preview'}}">
+          <view class="growth-subpage-nav"><text data-panel="main" bindtap="setGrowthScene">‹</text><text>初步报告</text><text>↗</text></view>
           <view class="growth-report-preview-head"><text>成长线索初步发现</text><text>{{learningReportSummary.reportJobCaseId ? '学习线索 · 初步报告 · 基于材料' : '学习线索 · 初步报告 · 基于 2 份材料'}}</text></view>
           <text class="growth-report-lead">我们从碎片中拼凑出了孩子的学习画像。</text>
           <view class="growth-report-preview-card"><text class="growth-report-corner"></text><view class="growth-report-card-head"><text class="growth-report-icon"></text><view><text>学习偏好线索</text><text><text>视觉型</text><text>来源：基础问卷</text></text></view></view><text class="growth-report-body">{{learningReportSummary.learningPreferenceLine || '孩子对图像、表格的敏感度远高于纯文字。建议在讲解抽象概念时，多使用手绘思维导图或实物辅助。'}}</text></view>
           <view class="growth-report-preview-card warn"><text class="growth-report-corner"></text><view class="growth-report-card-head"><text class="growth-report-icon"></text><view><text>当前卡点证据</text><text><text>计算粗心</text><text>来源：错题描述</text></text></view></view><text class="growth-report-body">{{learningReportSummary.diagnosisLine || '错题多集中在最后一步进位错误，这反映了由于基础计算熟练度不足导致的“工作记忆瓶颈”。'}}</text></view>
           <view class="growth-report-preview-card action"><text class="growth-report-corner"></text><view class="growth-report-card-head"><text class="growth-report-icon"></text><view><text>今晚建议</text><text><text>先练口算10分钟</text><text>来源：AI私教</text></text></view></view><text class="growth-report-body">在开始正式作业前，先进行10分钟口算热身。这能“激活”数学思维状态，显著降低后续大题的笔误率。</text></view>
           <text class="growth-report-more">想要更精准的画像？再补充一点信息吧。</text>
-          <view class="growth-report-actions"><text data-action="upload" bindtap="runParentReportAction">补充材料让报告更准</text><text data-action="tutor" bindtap="runParentReportAction">去AI私教</text><text data-action="review" bindtap="runParentReportAction">知识乐园</text><text data-action="action" bindtap="runParentReportAction">家长行动卡</text></view>
+          <view class="growth-bottom-bar report"><text data-action="upload" bindtap="runParentReportAction">补充材料让报告更准</text><view class="growth-report-actions"><text data-action="tutor" bindtap="runParentReportAction">去AI私教</text><text data-action="review" bindtap="runParentReportAction">知识乐园</text></view><text class="growth-report-action-card-link" data-action="action" bindtap="runParentReportAction">查看家长行动卡</text></view>
         </view>
 
         <view class="growth-parent-action-card" wx:if="{{growthActiveScene === 'action'}}">
+          <view class="growth-subpage-nav"><text data-panel="preview" bindtap="setGrowthScene">‹</text><text>今晚行动指南</text><text>…</text></view>
           <view class="growth-parent-action-head"><text>今晚行动已为你准备好</text><text>学习线索 · 今晚行动指南 · 家长行动卡：不替孩子学习，只为成长提供更好的土壤。</text></view>
           <view class="growth-parent-action-item"><text></text><view><text><text>建立自信</text><text>预计 2 分钟</text></text><text>正向具体表扬</text><text>“我看到你刚才虽然算错了，但依然耐心地把草稿纸写得很整齐，这种态度很棒。”</text></view></view>
           <view class="growth-parent-action-item warm"><text></text><view><text><text>环境优化</text><text>持续进行</text></text><text>清空桌面非学习用品</text><text>将书桌上的玩具、漫画或零食移开。对于“视觉型”孩子，清爽的物理空间能显著降低分心。</text></view></view>
           <view class="growth-parent-action-item indigo"><text></text><view><text><text>激发思考</text><text>预计 5 分钟</text></text><text>只问问题，不讲答案</text><text>当孩子求助时，尝试问：“你觉得这一步和上一步的关系是什么？”引导孩子自己发现线索。</text></view></view>
           <text class="growth-action-done">完成勾选后，系统将为您更新明日建议</text>
-          <view class="growth-parent-bottom-actions"><text bindtap="completeParentActionCard">我已完成行动</text><text bindtap="remindParentActionLater">稍后提醒</text></view>
+          <view class="growth-bottom-bar action"><view class="growth-parent-bottom-actions"><text bindtap="completeParentActionCard">我已完成行动</text><text bindtap="remindParentActionLater">稍后提醒</text></view></view>
         </view>
         <view class="growth-main-cta" wx:if="{{growthActiveScene === 'main'}}" bindtap="startGrowthQuestionnaire">开始了解孩子</view>
       </view>
