@@ -338,9 +338,33 @@ page {
   border-radius: 12rpx;
   color: #ef4444;
   background: #fef2f2;
-  font-size: 34rpx;
+  font-size: 0;
   line-height: 68rpx;
   font-weight: 900;
+}
+
+.review-main-tool-icon::before {
+  display: block;
+  color: currentColor;
+  font-size: 34rpx;
+  line-height: 68rpx;
+  font-weight: 950;
+}
+
+.review-main-tool-icon.hammer::before {
+  content: "!";
+}
+
+.review-main-tool-icon.lightning::before {
+  content: "⚡";
+}
+
+.review-main-tool-icon.puzzle::before {
+  content: "▣";
+}
+
+.review-main-tool-icon.path::before {
+  content: "⌁";
 }
 
 .review-main-tool-time {

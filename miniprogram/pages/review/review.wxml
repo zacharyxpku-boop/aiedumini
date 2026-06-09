@@ -27,17 +27,11 @@
           <view class="review-chip-row" wx:if="{{reviewFlowStage === 'main'}}"><text>分数</text><text>应用题</text><text>英语单词</text><text>阅读理解</text><text>计算检查</text><text>表达组织</text></view>
 
         <view class="review-main-tool-grid" wx:if="{{reviewFlowStage === 'main'}}">
-          <view class="review-main-tool-card warm" data-stage="topic" bindtap="setReviewFlowStage"><view><text class="review-main-tool-icon">×</text><text class="review-main-tool-time">约3分</text></view><text>错因地鼠</text><text>先选知识点，再找易错点</text></view>
-          <view class="review-main-tool-card yellow" data-stage="topic" bindtap="setReviewFlowStage"><view><text class="review-main-tool-icon">⚡</text><text class="review-main-tool-time">约2分</text></view><text>快闪问答</text><text>极速反应知识练习</text></view>
-          <view class="review-main-tool-card blue" data-stage="topic" bindtap="setReviewFlowStage"><view><text class="review-main-tool-icon">▣</text><text class="review-main-tool-time">约4分</text></view><text>拼图配对</text><text>把概念和例子配起来</text></view>
-          <view class="review-main-tool-card teal" data-stage="topic" bindtap="setReviewFlowStage"><view><text class="review-main-tool-icon">⌁</text><text class="review-main-tool-time">约5分</text></view><text>路线接龙</text><text>逻辑推导解题练习</text></view>
+          <view class="review-main-tool-card warm" data-stage="topic" bindtap="setReviewFlowStage"><view><text class="review-main-tool-icon hammer"></text><text class="review-main-tool-time">约3分</text></view><text>错因地鼠</text><text>揪出隐藏的易错点</text></view>
+          <view class="review-main-tool-card yellow" data-stage="topic" bindtap="setReviewFlowStage"><view><text class="review-main-tool-icon lightning"></text><text class="review-main-tool-time">约2分</text></view><text>快闪问答</text><text>极速反应知识快练</text></view>
+          <view class="review-main-tool-card blue" data-stage="topic" bindtap="setReviewFlowStage"><view><text class="review-main-tool-icon puzzle"></text><text class="review-main-tool-time">约4分</text></view><text>拼图配对</text><text>核心概念连连看</text></view>
+          <view class="review-main-tool-card teal" data-stage="topic" bindtap="setReviewFlowStage"><view><text class="review-main-tool-icon path"></text><text class="review-main-tool-time">约5分</text></view><text>路线接龙</text><text>逻辑推导解题练习</text></view>
         </view>
-        <text class="review-mini-play-row" wx:if="{{false}}">
-          <text data-stage="topic" bindtap="setReviewFlowStage">闪卡翻翻</text>
-          <text data-stage="topic" bindtap="setReviewFlowStage">UNO错因卡</text>
-          <text data-stage="topic" bindtap="setReviewFlowStage">变式三连</text>
-          <text data-stage="topic" bindtap="setReviewFlowStage">纸面复习包</text>
-        </text>
 
         <view class="review-record-panel" wx:if="{{reviewFlowStage !== 'main'}}">
           <text class="review-subpage-top" wx:if="{{reviewFlowStage !== 'finished'}}">
