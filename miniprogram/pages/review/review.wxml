@@ -85,10 +85,10 @@
           </view>
           <view class="review-empty-note" wx:if="{{reviewFlowStage !== 'topic' && activeReviewTool && activeReviewTool.empty}}"><text>还没有真实卡。先上传材料或完成一次 AI 点拨。</text></view>
           <view class="review-live-tool stage-{{reviewFlowStage}}" wx:elif="{{reviewFlowStage !== 'tool' && activeReviewTool && activeReviewTool.id}}">
-            <view class="review-play-top" wx:if="{{reviewFlowStage === 'live'}}"><text>×</text><text>{{activeReviewTool.title || '快闪问答'}}</text><text>Ⅱ</text></view>
-            <view class="review-game-progress" wx:if="{{reviewFlowStage === 'live'}}"><view><text>3</text><text>/ 10</text></view><text>正在热身</text></view>
+            <view class="review-play-top" wx:if="{{reviewFlowStage === 'live'}}"><text bindtap="closeReviewSubpage">×</text><text>{{activeReviewTool.title || '快闪问答'}}</text><text>Ⅱ</text></view>
+            <view class="review-game-progress" wx:if="{{reviewFlowStage === 'live'}}"><view><text>1</text><text>/ {{activeReviewTool.itemCount || 3}}</text></view><text>正在热身</text></view>
             <view class="review-game-bar" wx:if="{{reviewFlowStage === 'live'}}"><view></view></view>
-            <view class="review-live-reference" wx:if="{{reviewFlowStage === 'live'}}"><text class="review-live-glow top"></text><text class="review-live-glow bottom"></text><view><text>找第一步</text><text class="review-live-mission">{{activeReviewTool.mission}}</text></view><text class="review-live-brain"></text><text>遇到“相遇问题”时，脑海里跳出的第一个动作应该是什么？</text><text>先说出第一步，再点击下方按钮。</text><text class="review-live-bottom-line"></text></view>
+            <view class="review-live-reference" wx:if="{{reviewFlowStage === 'live'}}"><text class="review-live-glow top"></text><text class="review-live-glow bottom"></text><view><text>{{activeReviewTool.primary.label || '找第一步'}}</text><text class="review-live-mission">{{activeReviewTool.mission}}</text></view><text class="review-live-brain"></text><text>{{activeReviewTool.primary.prompt || '先说出这张卡的第一步。'}}</text><text>{{activeReviewTool.primary.check || '先说出第一步，再点击下方按钮。'}}</text><text class="review-live-bottom-line"></text></view>
             <view class="review-finish-card" wx:if="{{reviewFlowStage === 'finished' && activeReviewTool.attemptSummary}}">
               <view class="review-finish-hero"><text></text><text>这一局探索结束啦</text><text>档案袋留下了 <text>{{activeReviewTool.attemptSummary.correct}}</text> 条证据</text></view>
               <view class="review-finish-section remembered"><view><text></text><text>记住了什么</text></view><view><text></text><text>{{activeReviewTool.finishEvidencePrimary}}</text></view><view><text></text><text>{{activeReviewTool.finishEvidenceSecondary}}</text></view></view>
