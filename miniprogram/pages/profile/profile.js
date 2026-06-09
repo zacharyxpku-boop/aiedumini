@@ -4350,6 +4350,7 @@ Page({
       learningMap: '/pages/profile/profile?from=parent_learning_map',
       review: '/pages/review/review',
       upload: '/pages/upload/upload',
+      uploadPage: '/pages/upload/upload?from=growth_report',
       reportPreview: this.buildParentEvidenceRoute(this.data.learningReportSummary || {}, 'parent_report'),
       revisit: '/pages/review/review',
       tutor: '/pages/tutor/tutor'
@@ -4364,6 +4365,13 @@ Page({
     if (action === 'reportPreview') {
       this.setData({
         growthActiveScene: 'preview',
+        showLearningQuestionnaire: false
+      });
+      return;
+    }
+    if (action === 'action') {
+      this.setData({
+        growthActiveScene: 'action',
         showLearningQuestionnaire: false
       });
       return;
