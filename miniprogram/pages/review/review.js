@@ -474,10 +474,10 @@ Page({
       : [];
     const toolIds = ['whack', 'quiz', 'match', 'snake'];
     const fallback = {
-      whack: { title: '错因地鼠', pitch: '找出隐藏易错点，把错因变成下一张练习卡。', duration: '约3分', readyCount: sourceCards.length, available: !!sourceCards.length },
-      quiz: { title: '快闪问答', pitch: '极速反应知识练习。先说第一步，再核对线索。', duration: '约2分', readyCount: sourceCards.length, available: !!sourceCards.length },
-      match: { title: '拼图配对', pitch: '核心概念连连看，把概念、例子和第一步配起来。', duration: '约4分', readyCount: sourceCards.length, available: sourceCards.length >= 2 },
-      snake: { title: '路线接龙', pitch: '逻辑推导解题练习。一步一步接出完整思路。', duration: '约5分', readyCount: sourceCards.length, available: sourceCards.length >= 2 },
+      whack: { title: '错因地鼠', pitch: '揪出隐藏的易错点，打地鼠，灭错因，轻松找漏洞。', duration: '约3分', readyCount: sourceCards.length, available: !!sourceCards.length },
+      quiz: { title: '快闪问答', pitch: '快速判断，高频刺激极速练习。先说第一步，再核对线索。', duration: '约2分', readyCount: sourceCards.length, available: !!sourceCards.length },
+      match: { title: '拼图配对', pitch: '核心概念连连看。拼合线索，建立知识关联网络。', duration: '约4分', readyCount: sourceCards.length, available: sourceCards.length >= 2 },
+      snake: { title: '路线接龙', pitch: '步步推导，连通思路直达终点。', duration: '约5分', readyCount: sourceCards.length, available: sourceCards.length >= 2 },
     };
     const display = {
       whack: { icon: '地', themeClass: 'theme-whack', engineId: 'whack' },

@@ -1,11 +1,11 @@
 page {
-  background: #f7f8fa;
+  background: #fdfbf7;
 }
 
 .review-page {
   min-height: 100vh;
-  background: #f7f8fa;
-  color: #111827;
+  background: #fdfbf7;
+  color: #2c2621;
 }
 
 .content-area {
@@ -523,11 +523,11 @@ page {
 .review-tool-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16rpx;
+  gap: 28rpx;
 }
 
 .yd-review-screen.stage-topic .review-topic-row {
-  gap: 18rpx;
+  gap: 28rpx;
 }
 
 .review-topic-card {
@@ -535,9 +535,9 @@ page {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 188rpx;
+  min-height: 200rpx;
   box-sizing: border-box;
-  padding: 28rpx 24rpx 22rpx;
+  padding: 30rpx 28rpx 24rpx;
   border: 2rpx solid #f0ebe1;
   border-radius: 28rpx;
   background: #ffffff;
@@ -550,8 +550,8 @@ page {
 }
 
 .yd-review-screen.stage-topic .review-topic-card {
-  min-height: 210rpx;
-  padding: 30rpx 26rpx 24rpx;
+  min-height: 220rpx;
+  padding: 32rpx 28rpx 24rpx;
   border-radius: 28rpx;
   background: #ffffff;
   box-shadow: 0 4rpx 20rpx rgba(44, 38, 33, 0.04);
@@ -574,6 +574,19 @@ page {
   border: 5rpx solid #ffffff;
   border-radius: 999rpx;
   background: #ff8a4c;
+}
+
+.review-topic-card.active::before {
+  content: "";
+  position: absolute;
+  right: 6rpx;
+  top: 6rpx;
+  z-index: 1;
+  width: 14rpx;
+  height: 24rpx;
+  border-right: 4rpx solid #ffffff;
+  border-bottom: 4rpx solid #ffffff;
+  transform: rotate(45deg);
 }
 
 .review-topic-cta,
@@ -668,23 +681,24 @@ page {
 .review-tool-card {
   display: grid;
   gap: 10rpx;
-  min-height: 286rpx;
+  min-height: 328rpx;
   box-sizing: border-box;
-  padding: 24rpx;
+  padding: 32rpx;
   border: 2rpx solid transparent;
-  border-radius: 18rpx;
+  border-radius: 16rpx;
   background: #ffffff;
-  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.035);
+  box-shadow: 0 8rpx 28rpx rgba(15, 23, 42, 0.045);
 }
 
 .yd-review-screen.stage-tool .review-tool-card {
   min-height: 328rpx;
-  border-radius: 18rpx;
+  border-radius: 16rpx;
   box-shadow: 0 8rpx 28rpx rgba(15, 23, 42, 0.045);
 }
 
 .review-tool-card.ready {
-  border-color: rgba(255, 125, 64, 0.32);
+  border-color: rgba(255, 138, 76, 0.42);
+  background: #fff9f5;
 }
 
 .review-tool-card.locked {
@@ -700,8 +714,8 @@ page {
 
 .review-tool-card text:nth-child(2) {
   color: #111827;
-  font-size: 31rpx;
-  line-height: 36rpx;
+  font-size: 32rpx;
+  line-height: 38rpx;
   font-weight: 900;
 }
 
@@ -725,14 +739,15 @@ page {
 }
 
 .review-tool-icon {
-  width: 58rpx;
-  height: 58rpx;
-  border-radius: 14rpx;
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 16rpx;
   background: #fff5f0;
   color: #ff7d40;
   text-align: center;
-  line-height: 58rpx;
-  font-size: 30rpx;
+  line-height: 88rpx;
+  font-size: 34rpx;
+  box-shadow: 0 4rpx 14rpx rgba(15, 23, 42, 0.04);
 }
 
 .review-empty-note {

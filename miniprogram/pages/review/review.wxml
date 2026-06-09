@@ -78,7 +78,7 @@
           </view>
         </view>
 
-        <text class="review-main-cta" wx:if="{{reviewFlowStage === 'main'}}" data-stage="topic" bindtap="setReviewFlowStage">先选知识点</text>
+        <text class="review-main-cta" wx:if="{{reviewFlowStage === 'main'}}" data-stage="topic" bindtap="setReviewFlowStage">开始一局练习</text>
         <text class="review-main-cta" wx:if="{{reviewFlowStage === 'topic'}}" data-stage="tool" bindtap="setReviewFlowStage">用这个开一局</text>
         <view class="review-main-cta" wx:if="{{reviewFlowStage === 'tool'}}" data-id="whack" bindtap="runPlayableReviewTool">开始错因地鼠</view>
       </view>
