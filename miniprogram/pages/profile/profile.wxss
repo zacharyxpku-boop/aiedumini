@@ -811,30 +811,30 @@ page {
   display: grid;
   justify-items: center;
   align-content: center;
-  gap: 14rpx;
-  min-height: 196rpx;
+  gap: 12rpx;
+  min-height: 174rpx;
   box-sizing: border-box;
-  padding: 26rpx 20rpx;
+  padding: 24rpx 20rpx;
   overflow: hidden;
-  border: 4rpx dashed #e5e7eb;
+  border: 3rpx dashed #e5e7eb;
   border-radius: 48rpx;
   background: #ffffff;
   text-align: center;
 }
 
 .yd-parent-screen.scene-upload .growth-upload-card {
-  min-height: 188rpx;
+  min-height: 166rpx;
   border-radius: 48rpx;
 }
 
 .yd-parent-screen.scene-upload .growth-upload-card.primary {
-  min-height: 224rpx;
+  min-height: 204rpx;
 }
 
 .growth-upload-card.primary {
   grid-column: 1 / -1;
   justify-items: stretch;
-  min-height: 204rpx;
+  min-height: 196rpx;
   background: #e6f4f1;
   border: 2rpx solid rgba(20, 184, 166, 0.4);
   text-align: left;
@@ -854,15 +854,15 @@ page {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: 88rpx minmax(0, 1fr) auto;
-  gap: 20rpx;
+  grid-template-columns: 80rpx minmax(0, 1fr) auto;
+  gap: 18rpx;
   align-items: start;
 }
 
 .growth-upload-card.primary .growth-upload-title-row image,
 .growth-upload-card.primary > image {
-  width: 88rpx;
-  height: 88rpx;
+  width: 80rpx;
+  height: 80rpx;
   padding: 10rpx;
   border-radius: 36rpx;
   background: #ffffff;
@@ -890,7 +890,7 @@ page {
 }
 
 .growth-upload-added {
-  padding: 8rpx 14rpx;
+  padding: 7rpx 14rpx;
   border: 1rpx solid rgba(20, 184, 166, 0.24);
   border-radius: 999rpx;
   background: #ffffff;
@@ -905,7 +905,7 @@ page {
   position: relative;
   z-index: 1;
   margin-top: 4rpx;
-  padding: 18rpx;
+  padding: 16rpx;
   border: 1rpx solid #ffffff;
   border-radius: 24rpx;
   background: rgba(255, 255, 255, 0.62);
@@ -918,8 +918,8 @@ page {
 }
 
 .growth-upload-card:not(.primary) image {
-  width: 84rpx;
-  height: 84rpx;
+  width: 80rpx;
+  height: 80rpx;
   padding: 10rpx;
   border-radius: 36rpx;
   background: #eff6ff;
@@ -947,8 +947,8 @@ page {
 
 .growth-upload-card:not(.primary) view text:first-child {
   color: #1f2937;
-  font-size: 30rpx;
-  line-height: 36rpx;
+  font-size: 29rpx;
+  line-height: 34rpx;
   font-weight: 900;
 }
 
@@ -978,7 +978,7 @@ page {
 
 .growth-unlock-strip {
   display: grid;
-  gap: 16rpx;
+  gap: 14rpx;
   padding: 0;
   border-radius: 0;
   background: transparent;
@@ -993,11 +993,11 @@ page {
 
 .growth-unlock-strip view {
   display: grid;
-  grid-template-columns: 80rpx minmax(0, 1fr);
-  gap: 18rpx;
+  grid-template-columns: 72rpx minmax(0, 1fr);
+  gap: 16rpx;
   align-items: center;
-  min-height: 96rpx;
-  padding: 18rpx 22rpx;
+  min-height: 88rpx;
+  padding: 16rpx 20rpx;
   border: 1rpx solid rgba(255, 255, 255, 0.68);
   border-radius: 40rpx;
   background: rgba(255, 255, 255, 0.82);
@@ -1006,9 +1006,9 @@ page {
 
 .growth-unlock-strip view::before {
   content: "";
-  width: 80rpx;
-  height: 80rpx;
-  border-radius: 28rpx;
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 24rpx;
   background: #eef2ff;
 }
 
@@ -1036,8 +1036,8 @@ page {
 .growth-report-preview-card {
   position: relative;
   display: grid;
-  gap: 20rpx;
-  padding: 34rpx;
+  gap: 18rpx;
+  padding: 30rpx;
   overflow: hidden;
   border: 1rpx solid #f3f4f6;
   border-radius: 56rpx;
@@ -1073,14 +1073,14 @@ page {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: 80rpx minmax(0, 1fr);
-  gap: 24rpx;
+  grid-template-columns: 72rpx minmax(0, 1fr);
+  gap: 20rpx;
   align-items: center;
 }
 
 .growth-report-icon {
-  width: 80rpx;
-  height: 80rpx;
+  width: 72rpx;
+  height: 72rpx;
   border-radius: 24rpx;
   background: #eef2ff;
   box-shadow: 0 8rpx 18rpx rgba(15, 23, 42, 0.06);
@@ -1102,8 +1102,8 @@ page {
 
 .growth-report-card-head view > text:first-child {
   color: #1f2937;
-  font-size: 32rpx;
-  line-height: 38rpx;
+  font-size: 31rpx;
+  line-height: 37rpx;
   font-weight: 900;
 }
 
@@ -1146,7 +1146,7 @@ page {
   display: -webkit-box;
   color: #4b5563;
   font-size: 27rpx;
-  line-height: 39rpx;
+  line-height: 38rpx;
   overflow: hidden;
   -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
@@ -1163,7 +1163,7 @@ page {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 104rpx;
+  min-height: 96rpx;
   box-sizing: border-box;
   padding: 12rpx;
   border-radius: 36rpx;
@@ -1267,7 +1267,7 @@ page {
   bottom: env(safe-area-inset-bottom);
   z-index: 20;
   box-sizing: border-box;
-  padding: 22rpx 48rpx calc(22rpx + env(safe-area-inset-bottom));
+  padding: 18rpx 48rpx calc(18rpx + env(safe-area-inset-bottom));
   border-top: 1rpx solid rgba(226, 232, 240, 0.72);
   background: rgba(248, 250, 245, 0.94);
   box-shadow: 0 -18rpx 38rpx rgba(248, 250, 245, 0.86);
@@ -1285,7 +1285,7 @@ page {
 
 .growth-bottom-bar.report {
   display: grid;
-  gap: 18rpx;
+  gap: 16rpx;
   background: rgba(255, 255, 255, 0.9);
 }
 
@@ -1293,8 +1293,8 @@ page {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 96rpx;
-  border: 4rpx dashed rgba(20, 184, 166, 0.38);
+  min-height: 92rpx;
+  border: 3rpx dashed rgba(20, 184, 166, 0.38);
   border-radius: 36rpx;
   background: #ffffff;
   color: #0f766e;
