@@ -1288,20 +1288,20 @@ page {
   color: #9ca3af;
 }
 
-.review-game-progress view {
+.review-game-count {
   display: flex;
   align-items: baseline;
   gap: 6rpx;
 }
 
-.review-game-progress view text:first-child {
+.review-game-count text:first-child {
   color: #0d9488;
   font-size: 36rpx;
   line-height: 40rpx;
   font-weight: 900;
 }
 
-.review-game-progress view text:last-child {
+.review-game-count text:last-child {
   color: #9ca3af;
   font-size: 24rpx;
   line-height: 28rpx;
@@ -1377,7 +1377,7 @@ page {
   background: #ccfbf1;
 }
 
-.review-live-reference view {
+.review-live-labels {
   position: relative;
   z-index: 1;
   display: flex;
@@ -1387,7 +1387,7 @@ page {
   align-self: start;
 }
 
-.review-live-reference view text {
+.review-live-labels text {
   padding: 8rpx 20rpx;
   border-radius: 12rpx;
   background: #fff4ed;
@@ -1472,6 +1472,163 @@ page {
   height: 12rpx;
   margin: 20rpx -40rpx 0;
   background: linear-gradient(90deg, #ffedd5, #fed7aa, #ccfbf1);
+}
+
+.review-play-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 18rpx;
+  padding: 26rpx;
+  border: 1rpx solid rgba(226, 232, 240, 0.9);
+  border-radius: 30rpx;
+  background: #ffffff;
+  box-shadow: 0 18rpx 46rpx rgba(44, 38, 33, 0.045);
+}
+
+.review-play-panel.whack {
+  background: linear-gradient(180deg, #fff7ed, #ffffff 56%);
+}
+
+.review-play-panel.match {
+  background: linear-gradient(180deg, #ecfdf5, #ffffff 58%);
+}
+
+.review-play-panel.snake {
+  background: linear-gradient(180deg, #eff6ff, #ffffff 60%);
+}
+
+.review-play-question {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.review-play-question text:first-child {
+  color: #0f766e;
+  font-size: 23rpx;
+  line-height: 28rpx;
+  font-weight: 900;
+}
+
+.review-play-question text:last-child {
+  color: #1f2937;
+  font-size: 32rpx;
+  line-height: 43rpx;
+  font-weight: 900;
+}
+
+.review-play-choice-grid,
+.review-play-tile-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14rpx;
+}
+
+.review-play-choice-grid button,
+.review-play-done {
+  min-height: 82rpx;
+  margin: 0;
+  padding: 0 18rpx;
+  border: 2rpx solid rgba(251, 146, 60, 0.22);
+  border-radius: 22rpx;
+  background: #ffffff;
+  color: #374151;
+  font-size: 25rpx;
+  line-height: 31rpx;
+  font-weight: 850;
+}
+
+.review-play-choice-grid button::after,
+.review-play-done::after {
+  border: 0;
+}
+
+.review-play-choice-grid button:nth-child(1) {
+  background: #ffedd5;
+}
+
+.review-play-choice-grid button:nth-child(2) {
+  background: #ccfbf1;
+}
+
+.review-play-choice-grid button:nth-child(3) {
+  background: #fef3c7;
+}
+
+.review-play-choice-grid button:nth-child(4) {
+  background: #e0f2fe;
+}
+
+.review-play-tile,
+.review-play-step {
+  min-height: 76rpx;
+  box-sizing: border-box;
+  padding: 18rpx;
+  border: 2rpx solid rgba(148, 163, 184, 0.22);
+  border-radius: 20rpx;
+  background: rgba(255, 255, 255, 0.92);
+  color: #374151;
+  font-size: 24rpx;
+  line-height: 31rpx;
+  font-weight: 800;
+}
+
+.review-play-tile.selected {
+  border-color: #ff8a4c;
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.review-play-tile.matched {
+  border-color: rgba(20, 184, 166, 0.32);
+  background: #ccfbf1;
+  color: #0f766e;
+}
+
+.review-play-track {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+  counter-reset: routeStep;
+}
+
+.review-play-step {
+  position: relative;
+  padding-left: 70rpx;
+}
+
+.review-play-step::before {
+  counter-increment: routeStep;
+  content: counter(routeStep);
+  position: absolute;
+  left: 18rpx;
+  top: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34rpx;
+  height: 34rpx;
+  border-radius: 999rpx;
+  transform: translateY(-50%);
+  background: #dbeafe;
+  color: #2563eb;
+  font-size: 20rpx;
+  line-height: 34rpx;
+  font-weight: 900;
+}
+
+.review-play-step.picked {
+  border-color: rgba(37, 99, 235, 0.34);
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.review-play-done {
+  width: 100%;
+  border-color: #ff8a4c;
+  background: #ff8a4c;
+  color: #ffffff;
+  box-shadow: 0 12rpx 30rpx rgba(255, 138, 76, 0.24);
 }
 
 .review-live-actions {
