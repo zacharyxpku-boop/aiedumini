@@ -1527,10 +1527,7 @@ Page({
     this.setData({ activeStep: step, input: stepTextMap[step] || '带我做下一步。' });
   },
 
-  launchFirstStep(event) {
-    const dataset = event && event.currentTarget && event.currentTarget.dataset ? event.currentTarget.dataset : {};
-    const step = dataset.step || this.data.activeStep || 'read_problem';
-    const sceneMap = { read_problem: 'knowledge', explain_misconception: 'knowledge', find_direction: 'pointing', review: 'recap', write_first_step: 'stuck', fast_mode: 'stuck' };
+  buildTutorStepPrompt(step = 'read_problem') {
     const selected = this.data.selected;
     const stepTextMap = {
       read_problem: selected ? `先帮我读题：${selected.text}` : '先帮我读题。',
@@ -1544,8 +1541,33 @@ Page({
       transfer: '带我做一道小变式。',
       review: '带我做一句话复盘。'
     };
+    return stepTextMap[step] || '带我做下一步。';
+  },
+
+  openTutorScene(event) {
+    const dataset = event && event.currentTarget && event.currentTarget.dataset ? event.currentTarget.dataset : {};
+    const step = dataset.step || this.data.activeStep || 'read_problem';
+    const sceneMap = { read_problem: 'knowledge', explain_misconception: 'knowledge', find_direction: 'pointing', review: 'recap', write_first_step: 'dialogue', fast_mode: 'stuck' };
+    const activeTutorScene = sceneMap[step] || 'dialogue';
+    const prompt = this.buildTutorStepPrompt(step);
+    const nextInput = String(this.data.input || '').trim() ? this.data.input : '';
+    this.setData({
+      activeStep: step,
+      activeTutorScene,
+      coachStepLabel: (QUICK_ACTIONS.find((item) => item.id === step) || {}).label || this.data.coachStepLabel,
+      tutorReferenceScene: normalizeTutorReferenceScene(TUTOR_REFERENCE_SCENES[activeTutorScene] || TUTOR_REFERENCE_SCENES.dialogue),
+      showTutorDetails: true,
+      input: nextInput,
+      tutorHomeContext: Object.assign({}, this.data.tutorHomeContext || {}, { line: prompt })
+    });
+  },
+
+  launchFirstStep(event) {
+    const dataset = event && event.currentTarget && event.currentTarget.dataset ? event.currentTarget.dataset : {};
+    const step = dataset.step || this.data.activeStep || 'read_problem';
+    const sceneMap = { read_problem: 'knowledge', explain_misconception: 'knowledge', find_direction: 'pointing', review: 'recap', write_first_step: 'stuck', fast_mode: 'stuck' };
     const typedInput = String(this.data.input || '').trim();
-    const stepPrompt = stepTextMap[step] || '带我做下一步。';
+    const stepPrompt = this.buildTutorStepPrompt(step);
     const input = typedInput ? `${typedInput}\n${stepPrompt}` : stepPrompt;
     this.setData({
       activeStep: step,
