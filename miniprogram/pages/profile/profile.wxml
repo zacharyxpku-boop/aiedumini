@@ -9,7 +9,7 @@
 
         <view class="yd-parent-hero growth" wx:if="{{growthActiveScene === 'main'}}">
           <text class="yd-parent-copy">
-            <text class="yd-parent-title">先了解孩子，再安排怎么学</text>
+            <text class="yd-parent-title"><text>先了解孩子，</text><text>再安排怎么学</text></text>
             <text class="yd-parent-sub">可以先做 1 分钟问卷，也可以上传错题、成绩或测评。材料越多，报告越准。</text>
           </text>
           <image class="yd-parent-art" mode="aspectFit" src="/assets/reference/report-radar-card-illustration.png" />
