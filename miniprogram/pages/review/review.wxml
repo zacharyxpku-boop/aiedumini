@@ -39,13 +39,13 @@
         </text>
 
         <view class="review-record-panel" wx:if="{{reviewFlowStage !== 'main'}}">
-          <text class="review-subpage-top">
+          <text class="review-subpage-top" wx:if="{{reviewFlowStage !== 'finished'}}">
             <text bindtap="closeReviewSubpage">‹</text>
             <text>{{reviewFlowStage === 'topic' ? '选知识点' : reviewFlowStage === 'tool' ? '玩法选择' : reviewFlowStage === 'finished' ? '结算页' : (activeReviewTool.title || '快闪问答')}}</text>
             <text>···</text>
           </text>
-          <view class="review-section-head"><text>{{reviewFlowStage === 'topic' ? '今天想练哪一块？' : reviewFlowStage === 'tool' ? '玩法选择' : reviewFlowStage === 'finished' ? '这一局探索结束啦' : '快闪问答'}}</text><text>{{reviewFlowStage === 'topic' ? '推荐探索 · 换一批 · 选个知识点，马上开局探索' : reviewFlowStage === 'tool' ? '选一个最适合现在的节奏，马上开始' : reviewFlowStage === 'finished' ? '档案袋留下证据 · 结算页' : '正在热身 · 找第一步'}}</text></view>
-          <text class="review-flow-tabs">
+          <view class="review-section-head" wx:if="{{reviewFlowStage === 'topic' || reviewFlowStage === 'tool'}}"><text>{{reviewFlowStage === 'topic' ? '今天想练哪一块？' : '玩法选择'}}</text><text>{{reviewFlowStage === 'topic' ? '推荐探索 · 换一批 · 选个知识点，马上开局探索' : '选一个最适合现在的节奏，马上开始'}}</text></view>
+          <text class="review-flow-tabs" wx:if="{{reviewFlowStage === 'topic' || reviewFlowStage === 'tool'}}">
             <text class="{{reviewFlowStage === 'topic' ? 'active' : ''}}" data-stage="topic" bindtap="setReviewFlowStage">选知识点</text>
             <text class="{{reviewFlowStage === 'tool' ? 'active' : ''}}" data-stage="tool" bindtap="setReviewFlowStage">玩法选择</text>
             <text class="{{reviewFlowStage === 'live' ? 'active' : ''}}" data-stage="live" bindtap="setReviewFlowStage">进行中</text>
@@ -67,8 +67,8 @@
             </view>
           </view>
           <text class="review-topic-cta" wx:if="{{reviewFlowStage === 'topic'}}" data-stage="tool" bindtap="setReviewFlowStage">用这个开一局</text>
-          <view class="review-workshop-lead review-target-card" wx:if="{{reviewFlowStage !== 'topic'}}"><text>当前攻克目标</text><text>{{selectedKnowledgeTopic || '分数除法'}}</text><text>{{cards.length || 3}} 张卡 · 挑选开局方式，马上开始。</text></view>
-          <view class="review-feedback-strip" wx:if="{{feedbackText}}"><text>{{feedbackText}}</text><text wx:if="{{activeReviewTool && activeReviewTool.repairFocus}}" bindtap="openReviewRepairFocus">修这一张</text></view>
+          <view class="review-workshop-lead review-target-card" wx:if="{{reviewFlowStage === 'tool'}}"><text>当前攻克目标</text><text>{{selectedKnowledgeTopic || '分数除法'}}</text><text>{{cards.length || 3}} 张卡 · 挑选开局方式，马上开始。</text></view>
+          <view class="review-feedback-strip" wx:if="{{feedbackText && reviewFlowStage !== 'live' && reviewFlowStage !== 'finished'}}"><text>{{feedbackText}}</text><text wx:if="{{activeReviewTool && activeReviewTool.repairFocus}}" bindtap="openReviewRepairFocus">修这一张</text></view>
           <view class="review-tool-grid" wx:if="{{reviewFlowStage === 'tool'}}">
             <view wx:for="{{visiblePlayableReviewTools}}" wx:key="id" class="review-tool-card {{item.available ? 'ready' : 'locked'}} {{item.themeClass}} {{selectedPlayableReviewToolId === item.id ? 'selected' : ''}}" data-id="{{item.id}}" bindtap="selectPlayableReviewTool"><text class="review-tool-selected-mark"></text><text class="review-tool-icon">{{item.icon}}</text><text>{{item.title}}</text><text>{{item.line}}</text><text>{{item.duration}}</text><text>{{item.status}} · {{item.count}} 张</text><text>{{item.mission}}</text></view>
           </view>

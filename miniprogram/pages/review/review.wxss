@@ -1306,7 +1306,7 @@ page {
   box-shadow: none;
 }
 
-.review-live-actions.grade button:nth-child(3) {
+.review-live-actions.grade button:nth-child(2) {
   background: #ff8a4c;
   color: #ffffff;
   border-color: #ff8a4c;
@@ -1314,7 +1314,7 @@ page {
 }
 
 .review-live-actions.grade button:nth-child(1),
-.review-live-actions.grade button:nth-child(2),
+.review-live-actions.grade button:nth-child(3),
 .review-live-actions.grade button:nth-child(4) {
   border-radius: 999rpx;
   min-height: 72rpx;
@@ -1340,7 +1340,7 @@ page {
   flex: 1;
   display: grid;
   gap: 24rpx;
-  padding: 0;
+  padding: 0 0 244rpx;
   border-radius: 0;
   background: transparent;
 }
@@ -1495,9 +1495,15 @@ page {
 }
 
 .review-finish-bottom {
+  position: fixed;
+  left: 40rpx;
+  right: 40rpx;
+  bottom: calc(112rpx + env(safe-area-inset-bottom));
+  z-index: 12;
   display: grid;
   gap: 16rpx;
-  padding: 4rpx 0 20rpx;
+  padding: 20rpx 0 0;
+  background: linear-gradient(180deg, rgba(249, 248, 244, 0), #f9f8f4 24%, #f9f8f4);
 }
 
 .review-finish-bottom button {
