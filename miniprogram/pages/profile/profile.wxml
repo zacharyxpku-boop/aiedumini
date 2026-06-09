@@ -30,7 +30,7 @@
 
         <view class="growth-questionnaire-panel" wx:if="{{showLearningQuestionnaire}}">
           <view class="growth-subpage-nav questionnaire"><text data-panel="main" bindtap="setGrowthScene">×</text><view class="growth-questionnaire-progress nav"><text class="{{growthQuestionIndex === 0 ? 'active' : growthQuestionIndex > 0 ? 'done' : ''}}"></text><text class="{{growthQuestionIndex === 1 ? 'active' : growthQuestionIndex > 1 ? 'done' : ''}}"></text><text class="{{growthQuestionIndex === 2 ? 'active' : growthQuestionIndex > 2 ? 'done' : ''}}"></text><text class="{{growthQuestionIndex === 3 ? 'active' : growthQuestionIndex > 3 ? 'done' : ''}}"></text><text class="{{growthQuestionIndex === 4 ? 'active' : growthQuestionIndex > 4 ? 'done' : ''}}"></text></view><text></text></view>
-          <view class="growth-questionnaire-head"><text>{{growthQuestionPrompt}}</text><text>{{growthQuestionHint}}</text></view>
+          <view class="growth-questionnaire-head"><text wx:if="{{growthQuestionIndex === 0}}" class="growth-questionnaire-title-ref"><text>孩子最近最常</text><text>卡在哪里？</text></text><text wx:else>{{growthQuestionPrompt}}</text><text>{{growthQuestionHint}}</text></view>
           <view class="growth-questionnaire-progress body" wx:if="{{false}}"></view>
           <view class="growth-question-card" data-contract="questionIndex === 0" wx:for="{{learningReportQuestionnaire}}" wx:for-index="questionIndex" wx:key="id" wx:if="{{questionIndex === growthQuestionIndex}}"><view class="growth-question-options"><view wx:for="{{item.options}}" wx:for-item="option" wx:key="id" class="growth-question-option {{item.selectedOptionId === option.id ? 'active' : ''}}" data-id="{{item.id}}" data-option="{{option.id}}" bindtap="answerLearningQuestion"><text class="growth-question-option-icon"></text><text class="growth-question-option-label">{{option.label}}</text><text class="growth-question-option-check">✓</text></view></view></view>
           <view class="growth-bottom-bar question"><view class="yd-action-primary" bindtap="continueGrowthQuestionnaire">{{growthQuestionCtaText}}</view></view>
@@ -46,7 +46,7 @@
         <view class="growth-upload-panel" wx:if="{{growthActiveScene === 'upload'}}">
           <view class="growth-subpage-nav"><text data-panel="main" bindtap="setGrowthScene">‹</text><text>完善信息</text><text data-action="reportPreview" bindtap="runParentReportAction">跳过</text></view>
           <view class="growth-upload-head"><text>收集线索碎片 🧩</text><text>材料越真实，建议越具体。</text></view>
-          <text class="growth-upload-lead">直接拍照或打字都可以，不必全部填满哦～</text>
+          <text class="growth-upload-lead"><text>材料越真实，建议越具体。</text><text><text class="growth-upload-lead-highlight">直接拍照或打字都可以</text>，不必全部填满哦～</text></text>
           <view class="growth-upload-grid">
             <view class="growth-upload-card primary" data-action="uploadPage" bindtap="runParentReportAction"><text class="growth-upload-corner"></text><view class="growth-upload-title-row"><image mode="aspectFit" src="/assets/reference/upload-folder-stack-transparent.png" /><view><text>错题描述</text><text>记录孩子常卡住的题型</text></view><text class="growth-upload-added">✓ 已添加 1 份</text></view><text class="growth-upload-sample">“昨天数学卷子大题第二问，总是列错方程...”</text></view>
             <view class="growth-upload-card" data-action="uploadPage" bindtap="runParentReportAction"><image mode="aspectFit" src="/assets/reference/report-radar-card-illustration.png" /><view><text>成绩/周测</text><text>支持拍照识别</text></view><text class="growth-upload-plus">+</text></view>
@@ -59,8 +59,8 @@
         </view>
 
         <view class="growth-report-preview" wx:if="{{growthActiveScene === 'preview'}}">
-          <view class="growth-subpage-nav"><text data-panel="main" bindtap="setGrowthScene">‹</text><text>初步报告</text><text bindtap="shareGrowthReportPreview">↗</text></view>
-          <view class="growth-report-preview-head"><text>成长线索初步发现 ✨</text><text>{{learningReportSummary.reportJobCaseId ? '初步报告 · 基于材料' : '初步报告 · 基于 2 份材料'}}</text></view>
+          <view class="growth-subpage-nav preview"><text data-panel="main" bindtap="setGrowthScene">‹</text><text>{{learningReportSummary.reportJobCaseId ? '初步报告 · 基于材料' : '初步报告 · 基于 2 份材料'}}</text><text bindtap="shareGrowthReportPreview">↗</text></view>
+          <view class="growth-report-preview-head"><text>成长线索初步发现 ✨</text><text wx:if="{{false}}">{{learningReportSummary.reportJobCaseId ? '初步报告 · 基于材料' : '初步报告 · 基于 2 份材料'}}</text></view>
           <text class="growth-report-lead">我们从碎片中拼凑出了孩子的学习画像。</text>
           <view class="growth-report-preview-card"><text class="growth-report-corner"></text><view class="growth-report-card-head"><text class="growth-report-icon"></text><view><text>学习偏好线索</text><text><text>视觉型</text><text>来源：基础问卷</text></text></view></view><text class="growth-report-body">{{learningReportSummary.learningPreferenceLine || '孩子对图像、表格的敏感度远高于纯文字。建议在讲解抽象概念时，多使用手绘思维导图或实物辅助。'}}</text></view>
           <view class="growth-report-preview-card warn"><text class="growth-report-corner"></text><view class="growth-report-card-head"><text class="growth-report-icon"></text><view><text>当前卡点证据</text><text><text>计算粗心</text><text>来源：错题描述</text></text></view></view><text class="growth-report-body">{{learningReportSummary.diagnosisLine || '错题多集中在最后一步进位错误，这反映了由于基础计算熟练度不足导致的“工作记忆瓶颈”。'}}</text></view>
@@ -70,7 +70,7 @@
         </view>
 
         <view class="growth-parent-action-card" wx:if="{{growthActiveScene === 'action'}}">
-          <view class="growth-subpage-nav"><text data-panel="preview" bindtap="setGrowthScene">‹</text><text>今晚行动指南</text><text bindtap="remindParentActionLater">…</text></view>
+          <view class="growth-subpage-nav action"><text data-panel="preview" bindtap="setGrowthScene">‹</text><text>今晚行动指南</text><text bindtap="remindParentActionLater">…</text></view>
           <view class="growth-parent-action-head"><text>今晚行动已为你准备好 🎯</text><text>不替孩子学习，只为成长提供更好的土壤</text></view>
           <view class="growth-parent-action-item {{parentActionSelections.praise ? 'active' : ''}}" data-id="praise" bindtap="toggleParentActionItem"><text>{{parentActionSelections.praise ? '✓' : ''}}</text><view><text><text>建立自信</text><text>预计 2 分钟</text></text><text>正向具体表扬</text><text>“我看到你刚才虽然算错了，但依然耐心地把草稿纸写得很整齐，这种态度很棒。”</text></view></view>
           <view class="growth-parent-action-item warm {{parentActionSelections.environment ? 'active' : ''}}" data-id="environment" bindtap="toggleParentActionItem"><text>{{parentActionSelections.environment ? '✓' : ''}}</text><view><text><text>环境优化</text><text>持续进行</text></text><text>清空桌面非学习用品</text><text>将书桌上的玩具、漫画或零食移开。对于“视觉型”孩子，清爽的物理空间能显著降低分心。</text></view></view>
