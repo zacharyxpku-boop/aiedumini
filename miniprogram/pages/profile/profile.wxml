@@ -37,10 +37,10 @@
         </view>
 
         <view class="growth-progress-card" wx:if="{{growthActiveScene === 'main'}}">
-          <text class="growth-progress-head"><text>报告生成进度</text><text>{{learningReportSummary.reportJobCaseId ? '已接入材料' : '待收集信息'}}</text></text>
-          <view class="growth-progress-step done"><text></text><view><text>学习偏好线索</text><text>性格、习惯与抗挫力</text></view><text bindtap="startGrowthQuestionnaire">去收集</text></view>
-          <view class="growth-progress-step active"><text></text><view><text>当前卡点证据</text><text>薄弱知识点与常见错误</text></view><text data-action="upload" bindtap="runParentReportAction">去上传</text></view>
-          <view class="growth-progress-step"><text></text><view><text>今晚建议</text><text>基于分析生成专属方案</text></view><text data-action="reportPreview" bindtap="runParentReportAction">开始了解</text></view>
+          <text class="growth-progress-head"><text>报告生成进度</text><text>{{learningReportSummary.progressStatusLabel || '待收集信息'}}</text></text>
+          <view class="growth-progress-step {{learningReportSummary.preferenceProgressClass || 'active'}}"><text></text><view><text>学习偏好线索</text><text>性格、习惯与抗挫力</text></view><text bindtap="startGrowthQuestionnaire">{{learningReportSummary.preferenceProgressAction || '去收集'}}</text></view>
+          <view class="growth-progress-step {{learningReportSummary.materialProgressClass}}"><text></text><view><text>当前卡点证据</text><text>薄弱知识点与常见错误</text></view><text data-action="upload" bindtap="runParentReportAction">{{learningReportSummary.materialProgressAction || '去上传'}}</text></view>
+          <view class="growth-progress-step {{learningReportSummary.actionProgressClass}}"><text></text><view><text>今晚建议</text><text>基于分析生成专属方案</text></view><text data-action="reportPreview" bindtap="runParentReportAction">{{learningReportSummary.actionProgressAction || '开始了解'}}</text></view>
         </view>
 
         <view class="growth-upload-panel" wx:if="{{growthActiveScene === 'upload'}}">

@@ -436,6 +436,11 @@ page {
   font-weight: 900;
 }
 
+.growth-progress-step.done > text:last-child {
+  background: #e6f4f1;
+  color: #0d9488;
+}
+
 .growth-main-cta,
 .growth-generate-cta,
 .yd-action-primary,

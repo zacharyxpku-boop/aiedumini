@@ -1585,6 +1585,9 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
   const dayOne = sevenDayPlan[0] || {};
   const dayTwo = sevenDayPlan[1] || {};
   const daySeven = sevenDayPlan[6] || sevenDayPlan[sevenDayPlan.length - 1] || {};
+  const assessmentCount = Array.isArray(reportState.assessmentAnswers) ? reportState.assessmentAnswers.length : 0;
+  const sourceCount = Array.isArray(reportState.sources) ? reportState.sources.length : 0;
+  const reportHasDraft = !!(reportState.reportDraft || reportState.reportJobCaseId || draft.id || overview.line || mainDiagnosis);
   const nextEvidence = Array.isArray(solutionMap.nextEvidenceRequired) && solutionMap.nextEvidenceRequired.length
     ? solutionMap.nextEvidenceRequired
     : ['child_first_step', 'focus_or_review_record', 'next_day_revisit'];
@@ -1864,6 +1867,17 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
     modeLabel: reportState.reportProgress && reportState.reportProgress.label ? reportState.reportProgress.label : '0% · 快速版',
     statusLabel: reportState.reportStatus && reportState.reportStatus.label ? reportState.reportStatus.label : '可生成快速版',
     completeness: Number(reportState.reportCompleteness || 0),
+    assessmentCount,
+    questionnaireCollected: assessmentCount > 0,
+    materialCollected: sourceCount > 0 || !!uploadedMaterialDecisionDossier.sourceSchemaId || !!reportState.reportJobCaseId,
+    reportReady: reportHasDraft,
+    progressStatusLabel: reportHasDraft ? '已生成预览' : sourceCount > 0 || assessmentCount > 0 ? '已接入材料' : '待收集信息',
+    preferenceProgressClass: assessmentCount > 0 ? 'done' : 'active',
+    materialProgressClass: sourceCount > 0 || !!uploadedMaterialDecisionDossier.sourceSchemaId || !!reportState.reportJobCaseId ? 'done' : (assessmentCount > 0 ? 'active' : ''),
+    actionProgressClass: reportHasDraft ? 'done' : '',
+    preferenceProgressAction: assessmentCount > 0 ? '已收集' : '去收集',
+    materialProgressAction: sourceCount > 0 || !!uploadedMaterialDecisionDossier.sourceSchemaId || !!reportState.reportJobCaseId ? '已上传' : '去上传',
+    actionProgressAction: reportHasDraft ? '去查看' : '开始了解',
     overviewLine: overview.line || '先补一张成绩单或测评描述，咕点会先给出快速版画像。',
     evidenceLine: (overview.evidence || []).slice(0, 2).join(' · '),
     parentReportGenerationWorkflow,
