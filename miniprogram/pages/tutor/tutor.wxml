@@ -68,7 +68,7 @@
           </block>
 
           <view class="tutor-knowledge-board" wx:elif="{{activeTutorScene === 'knowledge'}}">
-            <text class="tutor-subpage-top"><text bindtap="closeTutorScene">‹</text><text>问知识点</text><text>···</text></text>
+            <text class="tutor-subpage-top"><text bindtap="closeTutorScene">‹</text><text>咕点讲解</text><text>···</text></text>
             <text class="tutor-knowledge-subject">{{tutorReferenceScene.row0.text}}</text>
             <text class="tutor-knowledge-title">{{tutorReferenceScene.row1.text}}</text>
             <view class="tutor-blackboard-hero"><view><text>咕点小黑板</text><text>“别怕，这其实是个变身魔法！”</text></view><image class="tutor-blackboard-hero-art" mode="aspectFit" src="/assets/reference/tutor-socratic-board-transparent.png" /></view>
@@ -110,7 +110,7 @@
           </view>
         </view>
 
-        <view class="tutor-result-stack" wx:if="{{showTutorDetails && activeTutorScene === 'dialogue' && (socraticBrief || tutorDiagnosticCard || socraticMicroChoices.length || socraticFeedbackNextAction || miniLessonFeedbackBridge)}}">
+        <view class="tutor-result-stack compact-dialogue-result" wx:if="{{showTutorDetails && activeTutorScene === 'dialogue' && (socraticBrief || tutorDiagnosticCard || socraticMicroChoices.length || socraticFeedbackNextAction || miniLessonFeedbackBridge)}}">
           <view class="tutor-socratic-brief" wx:if="{{socraticBrief}}"><text class="tutor-brief-head"><text>{{socraticBrief.label}}</text><text>{{socraticBrief.title}}</text></text><text class="tutor-brief-question">{{socraticBrief.nextQuestion}}</text><view class="tutor-brief-steps"><text class="tutor-brief-step">{{socraticBrief.steps[0].label}}：{{socraticBrief.steps[0].text}}</text><text class="tutor-brief-step">{{socraticBrief.steps[1].label}}：{{socraticBrief.steps[1].text}}</text><text class="tutor-brief-step">{{socraticBrief.steps[2].label}}：{{socraticBrief.steps[2].text}}</text></view><text class="tutor-brief-actions"><text>{{socraticBrief.boundary}}</text><text bindtap="requestSmallerTutorPrompt">再问小一点</text><text bindtap="goSocraticBriefRoute">{{socraticBrief.routeLabel}}</text></text></view>
           <text class="tutor-diagnostic-card" wx:if="{{tutorDiagnosticCard}}"><text>{{tutorDiagnosticCard.title}}</text><text>卡点：{{tutorDiagnosticCard.issue}}</text><text>下一步：{{tutorDiagnosticCard.firstStep}}</text><text>家长问：{{tutorDiagnosticCard.parentCheck}}</text><text class="tutor-diagnostic-action primary" data-id="diagnosis_review" data-label="{{tutorDiagnosticCard.reviewMove}}" data-route="{{tutorDiagnosticCard.reviewRoute}}" data-evidence="tutor_diagnostic_card" bindtap="runTutorHandoffAction">去知识乐园验证</text><text class="tutor-diagnostic-action" data-id="diagnosis_parent" data-label="{{tutorDiagnosticCard.parentCheck}}" data-route="{{tutorDiagnosticCard.parentRoute}}" data-evidence="tutor_diagnostic_parent_check" bindtap="runTutorHandoffAction">给家长看证据</text></text>
           <view class="tutor-micro-choice-row" wx:if="{{socraticMicroChoices && socraticMicroChoices.length}}"><text data-id="{{socraticMicroChoices[0].id}}" data-index="0" bindtap="selectSocraticMicroChoice">{{socraticMicroChoices[0].label}} {{socraticMicroChoices[0].text}}</text><text data-id="{{socraticMicroChoices[1].id}}" data-index="1" bindtap="selectSocraticMicroChoice">{{socraticMicroChoices[1].label}} {{socraticMicroChoices[1].text}}</text></view>
