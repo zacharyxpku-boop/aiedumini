@@ -54,7 +54,7 @@
             <view class="growth-upload-card warm" bindtap="startGrowthQuestionnaire"><image mode="aspectFit" src="/assets/reference/family-avatar-group-transparent.png" /><view><text>家长观察</text><text>随意写几句现状</text></view><text class="growth-upload-plus">+</text></view>
             <view class="growth-upload-card purple" data-action="uploadPage" bindtap="runParentReportAction"><image mode="aspectFit" src="/assets/reference/learning-route-map-transparent.png" /><view><text>测评摘要</text><text>以往的诊断报告</text></view><text class="growth-upload-plus">+</text></view>
           </view>
-          <view class="growth-unlock-strip"><text>生成报告后，将解锁：</text><view><text>专属学习偏好</text><text>如：视觉型 / 听觉型</text></view><view><text>深层卡点定位</text><text>如：工作记忆受限 / 概念脱节</text></view><view><text>今晚行动建议</text><text>如：睡前花 5 分钟复盘第一步</text></view></view>
+          <view class="growth-unlock-strip"><text>生成报告后，将解锁：</text><view><text>专属学习偏好</text><text>如：视觉型 听觉型...</text></view><view><text>深层卡点定位</text><text>如：工作记忆受限 概念脱节...</text></view><view><text>今晚行动建议</text><text>如：睡前花 5 分钟...</text></view></view>
           <view class="growth-bottom-bar single"><text class="growth-generate-cta" bindtap="generateLearningReport">生成成长报告</text></view>
         </view>
 

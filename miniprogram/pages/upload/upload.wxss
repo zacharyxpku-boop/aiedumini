@@ -191,6 +191,15 @@ page {
   box-shadow: 0 8rpx 18rpx rgba(15, 23, 42, 0.06);
 }
 
+.upload-evidence-sample {
+  margin-top: 8rpx;
+  color: #0f766e;
+  font-size: 24rpx;
+  line-height: 34rpx;
+  font-weight: 760;
+  white-space: normal;
+}
+
 .upload-evidence-copy {
   display: block;
   min-width: 0;

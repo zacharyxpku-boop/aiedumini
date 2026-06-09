@@ -49,7 +49,7 @@
 
           <block wx:if="{{activeTutorScene === 'dialogue'}}">
             <view class="tutor-dialogue-card">
-              <view class="tutor-dialogue-top"><text bindtap="closeTutorScene">‹</text><view><text></text><text>咕点在线</text><text>正在陪你想第一步</text></view><text>•••</text></view>
+              <view class="tutor-dialogue-top"><text bindtap="closeTutorScene">‹</text><view><text></text><text>AI私教在线 · 咕点在线</text><text>正在陪你想第一步</text></view><text>•••</text></view>
               <text class="tutor-dialogue-time">今天 15:30</text>
               <block wx:if="{{messages && messages.length}}">
                 <view wx:for="{{messages}}" wx:key="index" class="tutor-chatline {{item.role === 'user' ? 'me' : ''}}"><text class="tutor-chatline-bubble">{{item.text}}</text><text class="tutor-chatline-avatar">{{item.role === 'user' ? '童' : 'AI'}}</text></view>
