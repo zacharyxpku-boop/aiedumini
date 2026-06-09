@@ -284,11 +284,11 @@ const TUTOR_REFERENCE_SCENES = {
       { id: 'd1', role: 'user', text: '小原，这道物理题我完全没思路，怎么做呀？' },
       { id: 'd2', text: '别着急，遇到难题不知道怎么下手很正常哦！拍拍肩膀~ 仔细看看题目，最开始提到的小车速度是多少呢？' },
       { id: 'd3', role: 'user', text: '是 5米/秒。' },
-      { id: 'd4', text: '找得很准！那第二步，根据“刹车后2秒停下”，你能想到要用哪个公式来算加速度吗？' }
+      { id: 'd4', text: '找得很准！👍 那么第二步，根据“刹车后2秒停下”，你能想到要用哪个公式来算加速度吗？' }
     ],
     actions: [
       { id: 'smaller', label: '再问小一点', action: 'smaller' },
-      { id: 'review', label: '去知识乐园练一局', action: 'review' }
+      { id: 'review', label: '去知识乐园练一下', action: 'review' }
     ]
   },
   knowledge: {
@@ -322,7 +322,7 @@ const TUTOR_REFERENCE_SCENES = {
       { id: 's2', text: '还是卡住时，接下来想先试哪一个？' },
       { id: 's3', text: '先圈已知条件：找找题目里给出的数字和关键信息；先说题目问什么：理清最后需要我们求出什么结果。' },
       { id: 's4', text: '刚才的思考小记' },
-      { id: 's5', text: '起步很棒：正确列出了算式 4/5 ÷ 2。' },
+      { id: 's5', text: '起步很棒：正确列出了算式：4/5 ÷ 2。' },
       { id: 's6', text: '在这里卡住了一小下：忘记把后面的整数变成倒数了。' }
     ],
     actions: [

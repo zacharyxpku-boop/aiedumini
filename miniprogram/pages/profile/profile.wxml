@@ -10,14 +10,14 @@
         <view class="yd-parent-hero growth" wx:if="{{growthActiveScene === 'main'}}">
           <text class="yd-parent-copy">
             <text class="yd-parent-title">先了解孩子，再安排怎么学</text>
-            <text class="yd-parent-sub">可以先做 1 分钟问卷，也可以上传错题、成绩或测评。材料越真实，报告越具体；材料越多，报告越准。</text>
+            <text class="yd-parent-sub">可以先做 1 分钟问卷，也可以上传错题、成绩或测评。材料越多，报告越准。</text>
           </text>
           <image class="yd-parent-art" mode="aspectFit" src="/assets/reference/report-radar-card-illustration.png" />
         </view>
 
         <view class="growth-choice-grid" wx:if="{{growthActiveScene === 'main'}}">
-          <view class="growth-choice-card warm" bindtap="startGrowthQuestionnaire"><image mode="aspectFit" src="/assets/reference/family-avatar-group-transparent.png" /><view><text>做 1 分钟小问卷</text><text>快速勾选，建立初步画像</text></view><text>开始</text></view>
-          <view class="growth-choice-card" data-action="upload" bindtap="runParentReportAction"><image mode="aspectFit" src="/assets/reference/upload-folder-stack-transparent.png" /><view><text>上传错题/测评</text><text>拍照上传，形成学习线索</text></view><text>上传</text></view>
+          <view class="growth-choice-card warm" bindtap="startGrowthQuestionnaire"><image mode="aspectFit" src="/assets/reference/family-avatar-group-transparent.png" /><view><text>做 1 分钟小问卷</text><text>快速勾选，建立初像</text></view><text>开始</text></view>
+          <view class="growth-choice-card" data-action="upload" bindtap="runParentReportAction"><image mode="aspectFit" src="/assets/reference/upload-folder-stack-transparent.png" /><view><text>上传错题/测评</text><text>拍照上传，深度诊断</text></view><text>上传</text></view>
         </view>
 
         <view class="growth-flow-tabs" wx:if="{{growthActiveScene !== 'main'}}">
@@ -39,7 +39,7 @@
 
         <view class="growth-progress-card" wx:if="{{growthActiveScene === 'main'}}">
           <text class="growth-progress-head"><text>报告生成进度</text><text>{{learningReportSummary.reportJobCaseId ? '已接入材料' : '待收集信息'}}</text></text>
-          <view class="growth-progress-step done"><text></text><view><text>学习偏好线索</text><text>性格、习惯与抗挫方式</text></view><text bindtap="startGrowthQuestionnaire">去收集</text></view>
+          <view class="growth-progress-step done"><text></text><view><text>学习偏好线索</text><text>性格、习惯与抗挫力</text></view><text bindtap="startGrowthQuestionnaire">去收集</text></view>
           <view class="growth-progress-step active"><text></text><view><text>当前卡点证据</text><text>薄弱知识点与常见错误</text></view><text data-action="upload" bindtap="runParentReportAction">去上传</text></view>
           <view class="growth-progress-step"><text></text><view><text>今晚建议</text><text>基于分析生成专属方案</text></view><text data-action="reportPreview" bindtap="runParentReportAction">待生成</text></view>
         </view>
@@ -60,19 +60,19 @@
 
         <view class="growth-report-preview" wx:if="{{growthActiveScene === 'preview'}}">
           <view class="growth-report-preview-head"><text>成长线索初步发现</text><text>{{learningReportSummary.reportJobCaseId ? '初步报告 · 基于材料' : '初步报告 · 基于 2 份材料'}}</text></view>
-          <text class="growth-report-lead">我们从碎片中拼出了孩子的学习线索。</text>
-          <view class="growth-report-preview-card"><text class="growth-report-corner"></text><view class="growth-report-card-head"><text class="growth-report-icon"></text><view><text>学习偏好线索</text><text><text>视觉型</text><text>来源：基础问卷</text></text></view></view><text class="growth-report-body">{{learningReportSummary.learningPreferenceLine || '孩子对图像、表格的敏感度高于纯文字。讲抽象概念时，先用手绘图、表格或实物辅助，再回到文字表达。'}}</text></view>
-          <view class="growth-report-preview-card warn"><text class="growth-report-corner"></text><view class="growth-report-card-head"><text class="growth-report-icon"></text><view><text>当前卡点证据</text><text><text>计算粗心</text><text>来源：错题描述</text></text></view></view><text class="growth-report-body">{{learningReportSummary.diagnosisLine || '错题集中在最后一步进位错误，先按“列式是否对、单位是否对、最后一步是否抄对”三格检查，不把一次错误写成长期标签。'}}</text></view>
-          <view class="growth-report-preview-card action"><text class="growth-report-corner"></text><view class="growth-report-card-head"><text class="growth-report-icon"></text><view><text>今晚建议</text><text><text>先练口算10分钟</text><text>来源：AI私教</text></text></view></view><text class="growth-report-body">在开始正式作业前，先进行 10 分钟口算热身；做完只回看一道错题的第一步，确认孩子能自己说出入口。</text></view>
+          <text class="growth-report-lead">我们从碎片中拼凑出了孩子的学习画像。</text>
+          <view class="growth-report-preview-card"><text class="growth-report-corner"></text><view class="growth-report-card-head"><text class="growth-report-icon"></text><view><text>学习偏好线索</text><text><text>视觉型</text><text>来源：基础问卷</text></text></view></view><text class="growth-report-body">{{learningReportSummary.learningPreferenceLine || '孩子对图像、表格的敏感度远高于纯文字。建议在讲解抽象概念时，多使用手绘思维导图或实物辅助。'}}</text></view>
+          <view class="growth-report-preview-card warn"><text class="growth-report-corner"></text><view class="growth-report-card-head"><text class="growth-report-icon"></text><view><text>当前卡点证据</text><text><text>计算粗心</text><text>来源：错题描述</text></text></view></view><text class="growth-report-body">{{learningReportSummary.diagnosisLine || '错题多集中在最后一步进位错误，这反映了由于基础计算熟练度不足导致的“工作记忆瓶颈”。'}}</text></view>
+          <view class="growth-report-preview-card action"><text class="growth-report-corner"></text><view class="growth-report-card-head"><text class="growth-report-icon"></text><view><text>今晚建议</text><text><text>先练口算10分钟</text><text>来源：AI私教</text></text></view></view><text class="growth-report-body">在开始正式作业前，先进行10分钟口算热身。这能“激活”数学思维状态，显著降低后续大题的笔误率。</text></view>
           <text class="growth-report-more">想要更精准的画像？再补充一点信息吧。</text>
           <view class="growth-report-actions"><text data-action="upload" bindtap="runParentReportAction">补充材料让报告更准</text><text data-action="tutor" bindtap="runParentReportAction">去AI私教</text><text data-action="review" bindtap="runParentReportAction">知识乐园</text><text data-action="action" bindtap="runParentReportAction">家长行动卡</text></view>
         </view>
 
         <view class="growth-parent-action-card" wx:if="{{growthActiveScene === 'action'}}">
-          <view class="growth-parent-action-head"><text>今晚行动已为你准备好</text><text>家长行动卡：不替孩子学习，只为成长提供更好的土壤。</text></view>
+          <view class="growth-parent-action-head"><text>今晚行动已为你准备好</text><text>今晚行动指南 · 家长行动卡：不替孩子学习，只为成长提供更好的土壤。</text></view>
           <view class="growth-parent-action-item"><text></text><view><text><text>建立自信</text><text>预计 2 分钟</text></text><text>正向具体表扬</text><text>“我看到你刚才虽然算错了，但依然耐心地把草稿纸写得很整齐，这种态度很棒。”</text></view></view>
-          <view class="growth-parent-action-item warm"><text></text><view><text><text>环境优化</text><text>持续进行</text></text><text>清空桌面非学习用品</text><text>将桌上的玩具、漫画或零食移开。对于视觉型孩子，清爽空间能降低分心。</text></view></view>
-          <view class="growth-parent-action-item indigo"><text></text><view><text><text>激发思考</text><text>预计 5 分钟</text></text><text>只问问题，不讲答案</text><text>当孩子求助时，尝试问：“你觉得这一步和上一步的关系是什么？”</text></view></view>
+          <view class="growth-parent-action-item warm"><text></text><view><text><text>环境优化</text><text>持续进行</text></text><text>清空桌面非学习用品</text><text>将书桌上的玩具、漫画或零食移开。对于“视觉型”孩子，清爽的物理空间能显著降低分心。</text></view></view>
+          <view class="growth-parent-action-item indigo"><text></text><view><text><text>激发思考</text><text>预计 5 分钟</text></text><text>只问问题，不讲答案</text><text>当孩子求助时，尝试问：“你觉得这一步和上一步的关系是什么？”引导孩子自己发现线索。</text></view></view>
           <text class="growth-action-done">完成勾选后，系统将为您更新明日建议</text>
           <view class="growth-parent-bottom-actions"><text bindtap="completeParentActionCard">我已完成行动</text><text bindtap="remindParentActionLater">稍后提醒</text></view>
         </view>
