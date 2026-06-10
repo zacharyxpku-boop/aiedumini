@@ -363,7 +363,7 @@ page {
   display: flex;
   flex-direction: column;
   gap: 24rpx;
-  padding: 0 0 0 44rpx;
+  padding: 0 0 0 52rpx;
   border: 0;
   background: transparent;
   box-shadow: none;
@@ -396,7 +396,7 @@ page {
   gap: 16rpx;
   align-items: center;
   min-height: 112rpx;
-  padding: 20rpx 24rpx;
+  padding: 24rpx 32rpx;
   border: 1rpx solid #f9fafb;
   border-radius: 36rpx;
   background: #ffffff;
@@ -406,7 +406,7 @@ page {
 .growth-progress-step::before {
   content: "";
   position: absolute;
-  left: -28rpx;
+  left: -30rpx;
   top: -26rpx;
   width: 4rpx;
   height: 28rpx;
@@ -420,20 +420,20 @@ page {
 
 .growth-progress-step > text:first-child {
   position: absolute;
-  left: -42rpx;
-  top: 28rpx;
-  width: 28rpx;
-  height: 28rpx;
+  left: -52rpx;
+  top: 24rpx;
+  width: 48rpx;
+  height: 48rpx;
   box-sizing: border-box;
   border: 4rpx solid #fed7aa;
   border-radius: 999rpx;
-  background: #ffffff;
+  background: radial-gradient(circle, #fdba74 0, #fdba74 8rpx, #ffffff 8rpx);
 }
 
 .growth-progress-step.done > text:first-child,
 .growth-progress-step.active > text:first-child {
   border-color: #99f6e4;
-  background: #14b8a6;
+  background: radial-gradient(circle, #14b8a6 0, #14b8a6 8rpx, #ffffff 8rpx);
   box-shadow: none;
 }
 
@@ -445,7 +445,7 @@ page {
 
 .growth-progress-step.locked > text:first-child {
   border-color: #e5e7eb;
-  background: #ffffff;
+  background: radial-gradient(circle, #e5e7eb 0, #e5e7eb 8rpx, #ffffff 8rpx);
 }
 
 .growth-progress-step.locked view,
@@ -461,24 +461,24 @@ page {
 
 .growth-progress-step view text:first-child {
   color: #1f2937;
-  font-size: 25rpx;
-  line-height: 30rpx;
+  font-size: 28rpx;
+  line-height: 34rpx;
   font-weight: 900;
 }
 
 .growth-progress-step view text:last-child {
   color: #64748b;
-  font-size: 21rpx;
-  line-height: 27rpx;
+  font-size: 24rpx;
+  line-height: 30rpx;
 }
 
 .growth-progress-step > text:last-child {
-  padding: 8rpx 12rpx;
+  padding: 8rpx 20rpx;
   border-radius: 999rpx;
   background: #fef3c7;
   color: #f59e0b;
-  font-size: 21rpx;
-  line-height: 25rpx;
+  font-size: 22rpx;
+  line-height: 26rpx;
   font-weight: 900;
 }
 
@@ -518,6 +518,8 @@ page {
   right: 40rpx;
   bottom: calc(114rpx + env(safe-area-inset-bottom));
   z-index: 18;
+  border-radius: 40rpx;
+  font-size: 34rpx;
   min-height: 104rpx;
   border-radius: 40rpx;
   background: #fbbf24;

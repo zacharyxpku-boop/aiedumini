@@ -363,7 +363,7 @@ page {
 .tutor-mode-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 16rpx;
+  gap: 20rpx;
 }
 
 .tutor-mode-card {
@@ -376,11 +376,11 @@ page {
   gap: 14rpx;
   padding: 24rpx 8rpx;
   border: 1rpx solid #f3f4f6;
-  border-radius: 24rpx;
+  border-radius: 28rpx;
   color: #374151;
   background: #ffffff;
   box-shadow: 0 6rpx 18rpx rgba(17, 24, 39, 0.045);
-  font-size: 22rpx;
+  font-size: 24rpx;
   font-weight: 860;
   line-height: 1.15;
   text-align: center;
@@ -403,7 +403,7 @@ page {
 .tutor-mode-card > text:last-child {
   display: block;
   color: #374151;
-  font-size: 22rpx;
+  font-size: 24rpx;
   font-weight: 880;
   line-height: 1.15;
 }
