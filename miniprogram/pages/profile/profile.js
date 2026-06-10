@@ -4641,7 +4641,7 @@ Page({
       : {};
     const scene = dataset.scene || 'parent';
     if (scene === 'parent') {
-      wx.navigateTo({ url: this.buildParentEvidenceRoute(this.data.learningReportSummary || {}, dataset.source || 'profile_parent_card') });
+      navigation.navigateLearningRoute(this.buildParentEvidenceRoute(this.data.learningReportSummary || {}, dataset.source || 'profile_parent_card'));
       return;
     }
     wx.navigateTo({ url: `/pages/entry-detail/entry-detail?scene=${scene || 'parent'}` });
