@@ -289,6 +289,16 @@ page {
   font-weight: 880;
 }
 
+.tutor-thinking-line.dialogue {
+  justify-self: start;
+  margin-left: 8rpx;
+  padding: 12rpx 16rpx;
+  border-radius: 18rpx;
+  color: #0d9488;
+  background: #e6f4f1;
+  font-size: 22rpx;
+}
+
 .tutor-input-bar {
   position: relative;
   display: block;

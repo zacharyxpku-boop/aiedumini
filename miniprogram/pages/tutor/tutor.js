@@ -336,7 +336,7 @@ const TUTOR_REFERENCE_SCENES = {
     title: '刚才学了什么',
     status: '正在陪你复盘',
     rows: [{ id: 'r1', text: '用一句话复盘：我刚才卡在哪里、第一步是什么、下次先检查什么。' }],
-    actions: [{ id: 'smaller', label: '再问小一点', action: 'smaller' }]
+    actions: [{ id: 'recap_submit', label: '收进档案袋', action: 'send' }]
   }
 };
 
@@ -1585,7 +1585,12 @@ Page({
     const step = dataset.step || this.data.activeStep || 'read_problem';
     const sceneMap = { read_problem: 'knowledge', explain_misconception: 'knowledge', find_direction: 'pointing', review: 'recap', write_first_step: 'stuck', fast_mode: 'stuck' };
     const typedInput = String(this.data.input || '').trim();
-    const stepPrompt = this.buildTutorStepPrompt(step);
+    const knowledgeTopic = this.data.activeTutorScene === 'knowledge' && this.data.tutorReferenceScene && this.data.tutorReferenceScene.row1
+      ? String(this.data.tutorReferenceScene.row1.text || '').trim()
+      : '';
+    const stepPrompt = !typedInput && knowledgeTopic
+      ? `请换个说法再讲一遍「${knowledgeTopic}」：先说这是什么，再说容易卡在哪里，最后只问我第一步。`
+      : this.buildTutorStepPrompt(step);
     const input = typedInput ? `${typedInput}\n${stepPrompt}` : stepPrompt;
     this.setData({
       activeStep: step,
@@ -1654,6 +1659,14 @@ Page({
       this.requestSmallerTutorPrompt();
       return;
     }
+    if (action === 'send') {
+      if (!String(this.data.input || '').trim()) {
+        if (typeof wx !== 'undefined' && wx.showToast) wx.showToast({ title: '先写一句刚才卡在哪里', icon: 'none' });
+        return;
+      }
+      this.setData({ activeStep: 'review' }, () => { this.send(); });
+      return;
+    }
     if (action === 'step') {
       this.launchFirstStep({ currentTarget: { dataset: { step: dataset.step || 'read_problem' } } });
     }
@@ -1668,7 +1681,13 @@ Page({
     const misconceptionText = this.data.misconceptionTags.map((item) => item.label || item.axis).filter(Boolean).join('、');
     const step = this.data.activeStep || 'read_problem';
     const messages = this.data.messages.concat([{ role: 'user', text: input }]);
-    this.setData({ messages, input: '', loading: true, hasUserTutorTurn: true, showTutorDetails: true });
+    const dialogueScenePatch = this.data.activeTutorScene === 'dialogue'
+      ? {}
+      : {
+        activeTutorScene: 'dialogue',
+        tutorReferenceScene: normalizeTutorReferenceScene(TUTOR_REFERENCE_SCENES.dialogue)
+      };
+    this.setData(Object.assign({ messages, input: '', loading: true, hasUserTutorTurn: true, showTutorDetails: true }, dialogueScenePatch));
     this.setTutorTabbarHidden(true);
     if (storage.saveTodayFocusFromThought && (selected || input.length >= 4)) {
       storage.saveTodayFocusFromThought(selected && selected.text ? selected.text : input, {

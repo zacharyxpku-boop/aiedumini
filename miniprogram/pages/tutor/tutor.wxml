@@ -62,6 +62,7 @@
                 <view wx:if="{{tutorReferenceScene.row3}}" class="tutor-chatline {{tutorReferenceScene.row3.role === 'user' ? 'me' : ''}}"><text class="tutor-chatline-bubble">{{tutorReferenceScene.row3.text}}</text><text class="tutor-chatline-avatar">{{tutorReferenceScene.row3.role === 'user' ? '童' : 'AI'}}</text></view>
                 <view wx:if="{{tutorReferenceScene.row4}}" class="tutor-chatline {{tutorReferenceScene.row4.role === 'user' ? 'me' : ''}}"><text class="tutor-chatline-bubble">{{tutorReferenceScene.row4.text}}</text><text class="tutor-chatline-avatar">{{tutorReferenceScene.row4.role === 'user' ? '童' : 'AI'}}</text></view>
               </block>
+              <text class="tutor-thinking-line dialogue" wx:if="{{loading}}">咕点正在思考你的第一步...</text>
               <view class="tutor-dialogue-composer"><input value="{{input}}" bindinput="onInput" bindconfirm="send" confirm-type="send" placeholder="跟小原说点什么..." /><text bindtap="send">↗</text></view>
             </view>
             <view class="tutor-dialogue-actions"><text wx:if="{{tutorReferenceScene.action0}}" data-action="{{tutorReferenceScene.action0.action}}" data-step="{{tutorReferenceScene.action0.step}}" bindtap="runTutorReferenceAction">{{tutorReferenceScene.action0.label}}</text><text wx:if="{{tutorReferenceScene.action1}}" data-action="{{tutorReferenceScene.action1.action}}" data-step="{{tutorReferenceScene.action1.step}}" bindtap="runTutorReferenceAction">{{tutorReferenceScene.action1.label}}</text></view>
