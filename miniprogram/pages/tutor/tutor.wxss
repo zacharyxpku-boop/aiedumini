@@ -1341,12 +1341,10 @@ page {
   display: grid;
   grid-template-columns: 72rpx minmax(0, 1fr) 72rpx;
   align-items: center;
-  box-sizing: content-box;
-  padding-top: calc(16rpx + env(safe-area-inset-top));
-  background: rgba(251, 249, 247, 0.96);
-  min-height: 112rpx;
+  box-sizing: border-box;
   margin: 0;
-  padding: calc(18rpx + env(safe-area-inset-top)) 32rpx 10rpx;
+  min-height: calc(132rpx + env(safe-area-inset-top));
+  padding: calc(20rpx + env(safe-area-inset-top)) 32rpx 12rpx;
   border-bottom: 1rpx solid rgba(0, 0, 0, 0.03);
   background: rgba(251, 249, 247, 0.94);
   z-index: 6;
@@ -1492,26 +1490,41 @@ page {
 
 .tutor-reference-panel.dialogue .tutor-dialogue-actions {
   position: fixed;
-  left: 112rpx;
-  right: 32rpx;
+  left: 40rpx;
+  right: 40rpx;
   bottom: calc(126rpx + env(safe-area-inset-bottom));
   z-index: 11;
   grid-template-columns: minmax(0, 1fr);
-  gap: 10rpx;
+  gap: 16rpx;
   max-width: none;
   margin: 0;
   pointer-events: auto;
 }
 
 .tutor-reference-panel.dialogue .tutor-dialogue-actions > text {
-  min-height: 76rpx;
-  justify-content: space-between;
-  padding: 0 28rpx;
+  position: relative;
+  min-height: 96rpx;
+  justify-content: flex-start;
+  padding: 0 56rpx 0 28rpx;
   border: 1rpx solid rgba(207, 241, 243, 0.8);
-  border-radius: 22rpx;
+  border-radius: 28rpx;
   color: #1a818e;
   background: rgba(234, 249, 250, 0.96);
+  font-size: 28rpx;
+  font-weight: 800;
   box-shadow: 0 8rpx 24rpx rgba(26, 129, 142, 0.08);
+}
+
+.tutor-reference-panel.dialogue .tutor-dialogue-actions > text::after {
+  content: "›";
+  position: absolute;
+  right: 28rpx;
+  top: 50%;
+  transform: translateY(-50%);
+  color: currentColor;
+  font-size: 40rpx;
+  font-weight: 600;
+  opacity: 0.7;
 }
 
 .tutor-reference-panel.dialogue .tutor-dialogue-actions > text:first-child {
