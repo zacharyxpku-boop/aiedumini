@@ -1309,6 +1309,7 @@ Page({
     socraticMicroChoices: [],
     tutorServiceStatus: null,
     tutorReferenceScene: normalizeTutorReferenceScene(TUTOR_REFERENCE_SCENES.dialogue),
+    tutorDialogueTime: '',
     knowledgeBoardLoading: false,
     knowledgeBoardTopic: '',
     knowledgeBoardSource: '',
@@ -1445,6 +1446,8 @@ Page({
       unifiedNextAction: storage.buildUnifiedNextActionController ? storage.buildUnifiedNextActionController({ surface: 'tutor' }) : null
     });
     this.setTutorTabbarHidden(hasExplicitTutorScene || hasUserTutorTurn || activeTutorScene !== 'dialogue');
+    const now = new Date();
+    this.setData({ tutorDialogueTime: `今天 ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}` });
     this.trackedMasteryStatus = '';
   },
 
@@ -1647,7 +1650,7 @@ Page({
     };
     const scene = Object.assign({}, TUTOR_REFERENCE_SCENES.knowledge, {
       rows: [
-        { id: 'k1', text: '咕点讲解 · 为你定制' },
+        { id: 'k1', text: board && board.subject ? `${board.subject} · 咕点讲解` : '咕点讲解 · 为你定制' },
         { id: 'k2', text: topic },
         { id: 'k3', text: `“${filled.quote || '别怕，先把它切成三小块。'}”` },
         { id: 'k4', text: filled.what },
