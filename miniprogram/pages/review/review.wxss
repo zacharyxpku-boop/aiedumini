@@ -110,6 +110,8 @@ page {
   overflow: hidden;
   border-radius: 0 0 48rpx 48rpx;
   background:
+    radial-gradient(circle at 66% 46%, rgba(245, 158, 11, 0.1), transparent 15%),
+    radial-gradient(circle at 22% 68%, rgba(20, 184, 166, 0.12), transparent 14%),
     linear-gradient(180deg, rgba(230, 244, 241, 0.72), rgba(247, 248, 250, 0) 82%);
   box-shadow: none;
 }
@@ -125,6 +127,19 @@ page {
   background: #f59e0b;
 }
 
+.yd-review-hero::after {
+  content: "";
+  position: absolute;
+  left: 68rpx;
+  top: 230rpx;
+  z-index: 0;
+  width: 520rpx;
+  height: 96rpx;
+  border-top: 5rpx dashed rgba(20, 184, 166, 0.24);
+  border-radius: 50%;
+  transform: rotate(-13deg);
+}
+
 .yd-review-copy {
   position: relative;
   z-index: 1;
@@ -132,6 +147,22 @@ page {
   flex-direction: column;
   gap: 18rpx;
   min-width: 0;
+}
+
+.yd-review-copy::after {
+  content: "";
+  position: absolute;
+  left: 68rpx;
+  top: 162rpx;
+  width: 12rpx;
+  height: 12rpx;
+  border: 4rpx solid rgba(255, 255, 255, 0.92);
+  border-radius: 999rpx;
+  background: #14b8a6;
+  box-shadow:
+    248rpx -62rpx 0 2rpx #f59e0b,
+    440rpx -88rpx 0 0 rgba(20, 184, 166, 0.5);
+  opacity: 0.78;
 }
 
 .yd-review-title {
@@ -183,12 +214,13 @@ page {
 
 .yd-review-art {
   position: absolute;
-  right: 8rpx;
-  bottom: 0;
-  width: 176rpx;
-  height: 164rpx;
+  right: -18rpx;
+  bottom: 10rpx;
+  z-index: 0;
+  width: 252rpx;
+  height: 210rpx;
   object-fit: contain;
-  opacity: 0.14;
+  opacity: 0.34;
 }
 
 .review-chip-row {
@@ -224,7 +256,7 @@ page {
 .review-main-tool-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 28rpx;
+  gap: 24rpx;
   margin-top: 0;
 }
 
@@ -235,11 +267,11 @@ page {
   flex-direction: column;
   justify-content: flex-start;
   gap: 8rpx;
-  padding: 28rpx;
+  padding: 24rpx;
   border: 1rpx solid #e5e7eb;
-  border-radius: 22rpx;
+  border-radius: 20rpx;
   background: #ffffff;
-  box-shadow: 0 4rpx 16rpx rgba(17, 24, 39, 0.04);
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
 }
 
 .review-main-tool-card view {
