@@ -650,7 +650,7 @@ page {
   flex: 1;
   min-height: 48rpx;
   color: #2c2621;
-  font-size: 28rpx;
+  font-size: 30rpx;
   font-weight: 600;
 }
 
@@ -703,8 +703,8 @@ page {
 
 .review-topic-card > text:first-child {
   color: #2c2621;
-  font-size: 31rpx;
-  line-height: 38rpx;
+  font-size: 34rpx;
+  line-height: 42rpx;
   font-weight: 900;
 }
 
@@ -762,10 +762,10 @@ page {
 .review-topic-card.active::after {
   content: "";
   position: absolute;
-  right: -8rpx;
-  top: -8rpx;
-  width: 42rpx;
-  height: 42rpx;
+  right: -16rpx;
+  top: -16rpx;
+  width: 52rpx;
+  height: 52rpx;
   border: 5rpx solid #ffffff;
   border-radius: 999rpx;
   background: #ff8a4c;
@@ -774,8 +774,8 @@ page {
 .review-topic-card.active::before {
   content: "";
   position: absolute;
-  right: 6rpx;
-  top: 6rpx;
+  right: 0;
+  top: -2rpx;
   z-index: 1;
   width: 14rpx;
   height: 24rpx;
@@ -789,9 +789,9 @@ page {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100rpx;
+  height: 108rpx;
   margin-top: 8rpx;
-  border-radius: 28rpx;
+  border-radius: 32rpx;
   background: #ff8a4c;
   color: #ffffff;
   font-size: 31rpx;

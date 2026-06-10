@@ -685,6 +685,12 @@ page {
   gap: 12rpx;
 }
 
+.yd-parent-screen:not(.scene-main) .growth-report-preview-head text:first-child,
+.yd-parent-screen:not(.scene-main) .growth-parent-action-head text:first-child {
+  font-size: 48rpx;
+  line-height: 60rpx;
+}
+
 .growth-questionnaire-head text:first-child,
 .growth-upload-head text:first-child,
 .growth-report-preview-head text:first-child,
@@ -1261,8 +1267,8 @@ page {
 
 .growth-report-card-head view > text:first-child {
   color: #1f2937;
-  font-size: 28rpx;
-  line-height: 34rpx;
+  font-size: 32rpx;
+  line-height: 40rpx;
   font-weight: 900;
 }
 
@@ -1320,16 +1326,17 @@ page {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 88rpx;
+  min-height: 108rpx;
   box-sizing: border-box;
   padding: 12rpx;
-  border-radius: 32rpx;
-  background: #f8fafc;
-  color: #1f2937;
-  font-size: 26rpx;
-  line-height: 32rpx;
+  border-radius: 40rpx;
+  background: #14b8a6;
+  color: #ffffff;
+  font-size: 30rpx;
+  line-height: 36rpx;
   font-weight: 900;
   text-align: center;
+  box-shadow: 0 8rpx 24rpx rgba(20, 184, 166, 0.25);
 }
 
 .growth-report-actions text:first-child {
@@ -1470,9 +1477,9 @@ page {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 86rpx;
-  border: 3rpx dashed rgba(20, 184, 166, 0.38);
-  border-radius: 32rpx;
+  min-height: 108rpx;
+  border: 3rpx dashed rgba(20, 184, 166, 0.4);
+  border-radius: 40rpx;
   background: #ffffff;
   color: #0f766e;
   font-size: 26rpx;
@@ -1497,17 +1504,19 @@ page {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 96rpx;
-  border-radius: 36rpx;
+  min-height: 108rpx;
+  border-radius: 40rpx;
   color: #ffffff;
   background: #14b8a6;
-  font-size: 28rpx;
-  line-height: 34rpx;
+  font-size: 30rpx;
+  line-height: 36rpx;
   font-weight: 900;
+  box-shadow: 0 8rpx 24rpx rgba(20, 184, 166, 0.25);
 }
 
 .growth-parent-bottom-actions text:last-child {
   border: 1rpx solid #e5e7eb;
   background: #ffffff;
   color: #1f2937;
+  box-shadow: none;
 }
