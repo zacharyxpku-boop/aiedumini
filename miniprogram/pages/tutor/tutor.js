@@ -1438,7 +1438,7 @@ Page({
       tutorHomeContext,
       tutorTurnState,
       activeTutorScene,
-      tutorReferenceScene: normalizeTutorReferenceScene(TUTOR_REFERENCE_SCENES[activeTutorScene]),
+      tutorReferenceScene: normalizeTutorReferenceScene(this.resolveTutorScene(activeTutorScene, messages, null, misconceptionTags)),
       showTutorDetails: hasExplicitTutorScene || hasUserTutorTurn || activeTutorScene !== 'dialogue',
       surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('tutor') : null,
       unifiedNextAction: storage.buildUnifiedNextActionController ? storage.buildUnifiedNextActionController({ surface: 'tutor' }) : null
@@ -1564,6 +1564,36 @@ Page({
     return stepTextMap[step] || '带我做下一步。';
   },
 
+  buildStuckSceneRows(messages, diagnosticCard, misconceptionTags) {
+    const base = TUTOR_REFERENCE_SCENES.stuck;
+    const turns = Array.isArray(messages) ? messages : [];
+    const lastUser = turns.slice().reverse().find((item) => item && item.role === 'user' && String(item.text || '').trim().length >= 4);
+    const tagLabel = (Array.isArray(misconceptionTags) ? misconceptionTags : [])
+      .map((item) => item && (item.label || item.axis))
+      .filter(Boolean)[0] || '';
+    const startLine = lastUser ? `起步很棒：你刚才说到「${String(lastUser.text).trim().slice(0, 40)}」。` : '';
+    const stuckLine = diagnosticCard && diagnosticCard.issue
+      ? `在这里卡住了一小下：${diagnosticCard.issue}`
+      : (tagLabel ? `在这里卡住了一小下：容易混在「${tagLabel}」上。` : '');
+    if (!startLine && !stuckLine) return base;
+    const rows = base.rows.slice();
+    if (startLine) rows[4] = { id: 's5', text: startLine };
+    if (stuckLine) rows[5] = { id: 's6', text: stuckLine };
+    return Object.assign({}, base, { rows });
+  },
+
+  resolveTutorScene(key, messages, diagnosticCard, misconceptionTags) {
+    const sceneKey = TUTOR_REFERENCE_SCENES[key] ? key : 'dialogue';
+    if (sceneKey === 'stuck') {
+      return this.buildStuckSceneRows(
+        messages || this.data.messages,
+        diagnosticCard || this.data.tutorDiagnosticCard,
+        misconceptionTags || this.data.misconceptionTags
+      );
+    }
+    return TUTOR_REFERENCE_SCENES[sceneKey];
+  },
+
   openTutorScene(event) {
     const dataset = event && event.currentTarget && event.currentTarget.dataset ? event.currentTarget.dataset : {};
     const step = dataset.step || this.data.activeStep || 'read_problem';
@@ -1576,7 +1606,7 @@ Page({
       activeStep: step,
       activeTutorScene,
       coachStepLabel: (QUICK_ACTIONS.find((item) => item.id === step) || {}).label || this.data.coachStepLabel,
-      tutorReferenceScene: normalizeTutorReferenceScene(TUTOR_REFERENCE_SCENES[activeTutorScene] || TUTOR_REFERENCE_SCENES.dialogue),
+      tutorReferenceScene: normalizeTutorReferenceScene(this.resolveTutorScene(activeTutorScene)),
       showTutorDetails: true,
       input: nextInput,
       knowledgeBoardTopic: typedTopic,
