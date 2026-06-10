@@ -1,4 +1,4 @@
-<view class="yd-tabbar">
+<view class="yd-tabbar {{hidden ? 'hidden' : ''}}">
   <view
     class="yd-tab-item {{selected === 0 ? 'active' : ''}}"
     data-index="0"

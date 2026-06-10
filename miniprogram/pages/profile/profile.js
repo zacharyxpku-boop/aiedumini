@@ -3126,7 +3126,7 @@ Page({
 
   onShow() {
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
-      this.getTabBar().setData({ selected: 2 });
+      this.getTabBar().setData({ selected: 2, hidden: this.data.growthActiveScene !== 'main' });
     }
     if (this._profileRefreshTimer) {
       clearTimeout(this._profileRefreshTimer);
@@ -3899,6 +3899,7 @@ Page({
       showLearningQuestionnaire: next,
       growthActiveScene: next ? 'questionnaire' : 'main'
     });
+    this.setGrowthTabbarHidden(next);
   },
 
   setGrowthScene(event) {
@@ -3916,6 +3917,7 @@ Page({
         growthActiveScene: 'preview',
         showLearningQuestionnaire: false
       });
+      this.setGrowthTabbarHidden(true);
       return;
     }
     if (scene === 'upload') {
@@ -3923,6 +3925,7 @@ Page({
         growthActiveScene: 'upload',
         showLearningQuestionnaire: false
       });
+      this.setGrowthTabbarHidden(true);
       return;
     }
     if (scene === 'action') {
@@ -3930,12 +3933,20 @@ Page({
         growthActiveScene: 'action',
         showLearningQuestionnaire: false
       });
+      this.setGrowthTabbarHidden(true);
       return;
     }
     this.setData({
       growthActiveScene: 'main',
       showLearningQuestionnaire: false
     });
+    this.setGrowthTabbarHidden(false);
+  },
+
+  setGrowthTabbarHidden(hidden = false) {
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().setData({ hidden: !!hidden, selected: 2 });
+    }
   },
 
   answerLearningQuestion(event) {
@@ -3999,6 +4010,7 @@ Page({
       growthActiveScene: 'preview',
       showLearningQuestionnaire: false
     });
+    this.setGrowthTabbarHidden(true);
     wx.showToast({ title, icon: 'none' });
   },
 
@@ -4222,6 +4234,7 @@ Page({
       profilePanel: 'assessment',
       profilePanelTitle: '1分钟学习问卷'
     });
+    this.setGrowthTabbarHidden(true);
   },
 
   buildParentEvidenceItems(state) {
@@ -4474,6 +4487,7 @@ Page({
         growthActiveScene: 'upload',
         showLearningQuestionnaire: false
       });
+      this.setGrowthTabbarHidden(true);
       return;
     }
     if (action === 'reportPreview') {
@@ -4481,6 +4495,7 @@ Page({
         growthActiveScene: 'preview',
         showLearningQuestionnaire: false
       });
+      this.setGrowthTabbarHidden(true);
       return;
     }
     if (action === 'action') {
@@ -4488,6 +4503,7 @@ Page({
         growthActiveScene: 'action',
         showLearningQuestionnaire: false
       });
+      this.setGrowthTabbarHidden(true);
       return;
     }
     if (routeTargets[action]) {
@@ -4529,6 +4545,7 @@ Page({
     }
     wx.showToast({ title: '已记录，明天回看', icon: 'none' });
     this.setData({ growthActiveScene: 'preview', showLearningQuestionnaire: false });
+    this.setGrowthTabbarHidden(true);
   },
 
   remindParentActionLater() {

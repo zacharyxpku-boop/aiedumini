@@ -1265,7 +1265,7 @@ page {
 
 .tutor-reference-panel.dialogue .tutor-dialogue-card {
   min-height: calc(100vh - 150rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-  padding: calc(128rpx + env(safe-area-inset-top)) 0 360rpx;
+  padding: calc(128rpx + env(safe-area-inset-top)) 0 252rpx;
   gap: 24rpx;
   background: #fbf9f7;
 }
@@ -1481,7 +1481,7 @@ page {
   position: fixed;
   left: 112rpx;
   right: 32rpx;
-  bottom: calc(220rpx + env(safe-area-inset-bottom));
+  bottom: calc(126rpx + env(safe-area-inset-bottom));
   z-index: 11;
   grid-template-columns: minmax(0, 1fr);
   gap: 10rpx;
@@ -1511,7 +1511,7 @@ page {
   position: fixed;
   left: 0;
   right: 0;
-  bottom: calc(108rpx + env(safe-area-inset-bottom));
+  bottom: env(safe-area-inset-bottom);
   z-index: 12;
   display: grid;
   grid-template-columns: minmax(0, 1fr) 96rpx;

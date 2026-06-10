@@ -140,7 +140,7 @@ Page({
 
   onShow() {
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
-      this.getTabBar().setData({ selected: 1 });
+      this.getTabBar().setData({ selected: 1, hidden: this.data.reviewFlowStage !== 'main' });
     }
     const pendingRoute = navigation.consumePendingTabRouteContext
       ? navigation.consumePendingTabRouteContext('/pages/review/review')
@@ -169,10 +169,12 @@ Page({
     if (!['main', 'topic', 'tool', 'live', 'finished'].includes(stage)) return;
     if (stage === 'main') {
       this.setData({ reviewFlowStage: 'main' });
+      this.setReviewTabbarHidden(false);
       return;
     }
     if (stage === 'topic') {
       this.setData({ reviewFlowStage: 'topic' });
+      this.setReviewTabbarHidden(true);
       return;
     }
     const cards = this.ensureKnowledgeStarterCards();
@@ -188,9 +190,16 @@ Page({
         selectedPlayableReviewToolStartText: `开始${selectedTool.title || '错因地鼠'}`,
         reviewFlowStage: 'tool'
       });
+      this.setReviewTabbarHidden(true);
       return;
     }
     this.openPlayableReviewStage(stage, tools);
+  },
+
+  setReviewTabbarHidden(hidden = false) {
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().setData({ hidden: !!hidden, selected: 1 });
+    }
   },
 
   consumePublicK12ReviewContext() {
@@ -696,6 +705,7 @@ Page({
         ? '已生成本局证据预览，继续一局会写入成长报告。'
         : `已打开${tool.title || '知识玩法'}，先说第一步再点按钮。`
     });
+    this.setReviewTabbarHidden(true);
   },
 
   setReviewFlowStage(event) {
@@ -709,6 +719,7 @@ Page({
         selectedPlayableReviewToolId: requestedToolId || this.data.selectedPlayableReviewToolId || 'whack',
         feedbackText: ''
       });
+      this.setReviewTabbarHidden(true);
       return;
     }
     if (stage === 'tool') {
@@ -726,6 +737,7 @@ Page({
         selectedPlayableReviewToolStartText: `开始${selectedTool.title || '错因地鼠'}`,
         reviewFlowStage: 'tool'
       });
+      this.setReviewTabbarHidden(true);
       return;
     }
     if (stage === 'live' && !(active && active.id)) {
@@ -737,19 +749,23 @@ Page({
       return;
     }
     this.setData({ reviewFlowStage: ['topic', 'tool', 'live', 'finished'].includes(stage) ? stage : 'topic' });
+    this.setReviewTabbarHidden(true);
   },
 
   closeReviewSubpage() {
     const stage = this.data.reviewFlowStage;
     if (stage === 'live' || stage === 'finished') {
       this.setData({ reviewFlowStage: 'tool' });
+      this.setReviewTabbarHidden(true);
       return;
     }
     if (stage === 'tool') {
       this.setData({ reviewFlowStage: 'topic' });
+      this.setReviewTabbarHidden(true);
       return;
     }
     this.setData({ reviewFlowStage: 'main' });
+    this.setReviewTabbarHidden(false);
   },
 
   ensureKnowledgeStarterCards() {
@@ -2208,6 +2224,7 @@ Page({
         reviewFlowStage: 'tool',
         feedbackText: `${tool.title || '练习包'} 已打开，下面使用真实卡点生成可复用材料。`
       });
+      this.setReviewTabbarHidden(true);
       return;
     }
     if (!tool.available) {
@@ -2237,6 +2254,7 @@ Page({
         }), null),
         feedbackText: '先生成一张真实学习卡，再打开知识玩法。'
       });
+      this.setReviewTabbarHidden(true);
       return;
     }
     const cards = this.data.cards || [];
@@ -2275,6 +2293,7 @@ Page({
       }),
       feedbackText: `已打开${tool.title || '知识玩法'}，本轮使用 ${round && round.total ? round.total : tool.count || 0} 张真实卡。`
     });
+    this.setReviewTabbarHidden(true);
   },
 
   finishPlayableReviewTool(event) {
@@ -2397,6 +2416,7 @@ Page({
         activeReviewTool: nextTool,
         feedbackText: '已重开一局：这次先凭记忆完成，再看反馈。'
       });
+      this.setReviewTabbarHidden(true);
       return;
     }
     this.setData({
@@ -2415,6 +2435,7 @@ Page({
         ? `${active.title}已记录：明天只回看同一错因。`
         : `${active.title}已记录：保留到下一轮回看。`
     });
+    this.setReviewTabbarHidden(true);
   },
 
   openReviewRepairFocus() {

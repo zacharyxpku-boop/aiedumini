@@ -1330,7 +1330,7 @@ Page({
 
   onShow() {
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
-      this.getTabBar().setData({ selected: 0 });
+      this.getTabBar().setData({ selected: 0, hidden: !!this.data.showTutorDetails });
     }
     const pendingRoute = navigation.consumePendingTabRouteContext
       ? navigation.consumePendingTabRouteContext('/pages/tutor/tutor')
@@ -1444,7 +1444,15 @@ Page({
   },
 
   toggleTutorDetails() {
-    this.setData({ showTutorDetails: !this.data.showTutorDetails });
+    const next = !this.data.showTutorDetails;
+    this.setData({ showTutorDetails: next });
+    this.setTutorTabbarHidden(next);
+  },
+
+  setTutorTabbarHidden(hidden = false) {
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().setData({ hidden: !!hidden, selected: 0 });
+    }
   },
 
   closeTutorScene() {
@@ -1453,6 +1461,7 @@ Page({
       activeTutorScene: 'dialogue',
       tutorReferenceScene: normalizeTutorReferenceScene(TUTOR_REFERENCE_SCENES.dialogue)
     });
+    this.setTutorTabbarHidden(false);
   },
 
   onInput(event) {
@@ -1568,6 +1577,7 @@ Page({
       input: nextInput,
       tutorHomeContext: Object.assign({}, this.data.tutorHomeContext || {}, { line: prompt })
     });
+    this.setTutorTabbarHidden(true);
   },
 
   launchFirstStep(event) {
@@ -1583,7 +1593,7 @@ Page({
       tutorReferenceScene: normalizeTutorReferenceScene(TUTOR_REFERENCE_SCENES[sceneMap[step] || 'dialogue'] || TUTOR_REFERENCE_SCENES.dialogue),
       showTutorDetails: true,
       input
-    }, () => { this.send(); });
+    }, () => { this.setTutorTabbarHidden(true); this.send(); });
   },
 
   attachTutorPhoto() {
@@ -1591,6 +1601,7 @@ Page({
       const existing = String(this.data.input || '').trim();
       const nextInput = existing || '我已经上传题图留档，请先让我用自己的话说题目问什么，再只问我第一步。';
       this.setData({ input: nextInput, activeStep: 'find_direction', activeTutorScene: 'pointing', tutorReferenceScene: normalizeTutorReferenceScene(TUTOR_REFERENCE_SCENES.pointing), showTutorDetails: true });
+      this.setTutorTabbarHidden(true);
       if (storage.recordSurfaceDepthAction) {
         storage.recordSurfaceDepthAction({ surface: 'tutor', action: 'attach_tutor_photo', source: 'tutor_question_pointing', hasLocalPath: !!path });
       }
@@ -1658,6 +1669,7 @@ Page({
     const step = this.data.activeStep || 'read_problem';
     const messages = this.data.messages.concat([{ role: 'user', text: input }]);
     this.setData({ messages, input: '', loading: true, hasUserTutorTurn: true, showTutorDetails: true });
+    this.setTutorTabbarHidden(true);
     if (storage.saveTodayFocusFromThought && (selected || input.length >= 4)) {
       storage.saveTodayFocusFromThought(selected && selected.text ? selected.text : input, {
         source: 'tutor',
