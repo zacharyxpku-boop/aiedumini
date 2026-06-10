@@ -18,10 +18,10 @@
           <view class="review-chip-row" wx:if="{{reviewFlowStage === 'main'}}"><text>分数</text><text>应用题</text><text>英语单词</text><text>阅读理解</text><text>计算检查</text><text>表达组织</text></view>
 
         <view class="review-main-tool-grid" wx:if="{{reviewFlowStage === 'main'}}">
-          <view class="review-main-tool-card warm" data-stage="topic" data-tool-id="whack" bindtap="setReviewFlowStage"><view><text class="review-main-tool-icon hammer"></text><text class="review-main-tool-time">约3分</text></view><text>错因地鼠</text><text>揪出隐藏的易错点，轻松找漏洞</text></view>
-          <view class="review-main-tool-card yellow" data-stage="topic" data-tool-id="quiz" bindtap="setReviewFlowStage"><view><text class="review-main-tool-icon lightning"></text><text class="review-main-tool-time">约2分</text></view><text>快闪问答</text><text>快速判断，极速反应知识快练</text></view>
-          <view class="review-main-tool-card blue" data-stage="topic" data-tool-id="match" bindtap="setReviewFlowStage"><view><text class="review-main-tool-icon puzzle"></text><text class="review-main-tool-time">约4分</text></view><text>拼图配对</text><text>核心概念连连看，拼合线索</text></view>
-          <view class="review-main-tool-card teal" data-stage="topic" data-tool-id="snake" bindtap="setReviewFlowStage"><view><text class="review-main-tool-icon path"></text><text class="review-main-tool-time">约5分</text></view><text>路线接龙</text><text>逻辑推导解题路线，步步推导</text></view>
+          <view class="review-main-tool-card warm" data-stage="topic" data-tool-id="whack" bindtap="setReviewFlowStage"><view><text class="review-main-tool-icon hammer"></text><text class="review-main-tool-time">约3分</text></view><text>错因地鼠</text><text>揪出隐藏的易错点</text></view>
+          <view class="review-main-tool-card yellow" data-stage="topic" data-tool-id="quiz" bindtap="setReviewFlowStage"><view><text class="review-main-tool-icon lightning"></text><text class="review-main-tool-time">约2分</text></view><text>快闪问答</text><text>极速反应知识快练</text></view>
+          <view class="review-main-tool-card blue" data-stage="topic" data-tool-id="match" bindtap="setReviewFlowStage"><view><text class="review-main-tool-icon puzzle"></text><text class="review-main-tool-time">约4分</text></view><text>拼图配对</text><text>核心概念连连看</text></view>
+          <view class="review-main-tool-card teal" data-stage="topic" data-tool-id="snake" bindtap="setReviewFlowStage"><view><text class="review-main-tool-icon path"></text><text class="review-main-tool-time">约5分</text></view><text>路线接龙</text><text>逻辑推导解题路线</text></view>
         </view>
 
         <view class="review-record-panel" wx:if="{{reviewFlowStage !== 'main'}}">

@@ -473,11 +473,11 @@ Page({
       : [];
     const toolIds = ['whack', 'quiz', 'flashcard', 'match', 'snake', 'uno', 'variant', 'print'];
     const fallback = {
-      whack: { title: '错因地鼠', pitch: '揪出隐藏的易错点，轻松找漏洞。', duration: '约3分', readyCount: sourceCards.length, available: !!sourceCards.length, engineId: 'whack' },
-      quiz: { title: '快闪问答', pitch: '快速判断，极速反应知识快练。', duration: '约2分', readyCount: sourceCards.length, available: !!sourceCards.length, engineId: 'quiz' },
+      whack: { title: '错因地鼠', pitch: '打地鼠，灭错因，轻松找漏洞。', duration: '2-3 分钟', readyCount: sourceCards.length, available: !!sourceCards.length, engineId: 'whack' },
+      quiz: { title: '快闪问答', pitch: '快速判断，高频刺激极速练习。', duration: '1-2 分钟', readyCount: sourceCards.length, available: !!sourceCards.length, engineId: 'quiz' },
       flashcard: { title: '闪卡翻翻', pitch: '先主动回忆，再翻开看线索。', duration: '约2分', readyCount: sourceCards.length, available: !!sourceCards.length, engineId: 'quiz' },
-      match: { title: '拼图配对', pitch: '核心概念连连看，拼合线索，建立知识关联网络。', duration: '约4分', readyCount: sourceCards.length, available: sourceCards.length >= 2, engineId: 'match' },
-      snake: { title: '路线接龙', pitch: '逻辑推导解题路线，步步推导，连通思路直达终点。', duration: '约5分', readyCount: sourceCards.length, available: sourceCards.length >= 2, engineId: 'snake' },
+      match: { title: '拼图配对', pitch: '拼合线索，建立知识关联网络。', duration: '3-5 分钟', readyCount: sourceCards.length, available: sourceCards.length >= 2, engineId: 'match' },
+      snake: { title: '路线接龙', pitch: '步步推导，连通思路直达终点。', duration: '4-6 分钟', readyCount: sourceCards.length, available: sourceCards.length >= 2, engineId: 'snake' },
       uno: { title: 'UNO错因卡', pitch: '把同类错因归到一组再复述。', duration: '约3分', readyCount: sourceCards.length, available: !!sourceCards.length, engineId: 'match', templateOnly: true },
       variant: { title: '变式三连', pitch: '同一方法换条件，练迁移。', duration: '约5分', readyCount: sourceCards.length, available: !!sourceCards.length, engineId: 'snake', templateOnly: true },
       print: { title: '打印练习单', pitch: '生成本机纸面复习包。', duration: '纸面', readyCount: sourceCards.length, available: !!sourceCards.length, engineId: 'print', templateOnly: true },

@@ -1,10 +1,10 @@
 page {
-  background: #fdfbf7;
+  background: #f7f8fa;
 }
 
 .review-page {
   min-height: 100vh;
-  background: #fdfbf7;
+  background: #f7f8fa;
   color: #2c2621;
 }
 
