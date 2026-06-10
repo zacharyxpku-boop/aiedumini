@@ -1738,11 +1738,13 @@ page {
 }
 
 .review-finish-hero > text:first-child::before {
-  content: "✓";
-  color: #289689;
-  font-size: 58rpx;
-  line-height: 1;
-  font-weight: 950;
+  content: "";
+  width: 64rpx;
+  height: 64rpx;
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMjg5Njg5IiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTI0IDQyIFYyNiIvPjxwYXRoIGQ9Ik0yNCAyNiBDMjQgMTcgMTggMTIgOSAxMiBDOSAyMSAxNSAyNiAyNCAyNiBaIi8+PHBhdGggZD0iTTI0IDIyIEMyNCAxNCAyOSAxMCAzNyAxMCBDMzcgMTggMzIgMjIgMjQgMjIgWiIvPjwvc3ZnPg==");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
 }
 
 .review-finish-hero > text:nth-child(2) {
@@ -1796,10 +1798,24 @@ page {
 
 .review-finish-section > view:first-child > text:first-child::before {
   content: "";
-  width: 16rpx;
-  height: 16rpx;
-  border-radius: 999rpx;
-  background: #289689;
+  width: 28rpx;
+  height: 28rpx;
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMjg5Njg5IiBzdHJva2Utd2lkdGg9IjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTEyIDI1IEwyMSAzNCBMMzcgMTYiLz48L3N2Zz4=");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.review-finish-section.stuck > view:first-child > text:first-child {
+  background: #fdf0ec;
+}
+
+.review-finish-section.stuck > view:first-child > text:first-child::before {
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZjA3MTRkIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PGNpcmNsZSBjeD0iMjEiIGN5PSIyMSIgcj0iMTEiLz48bGluZSB4MT0iMzAiIHkxPSIzMCIgeDI9IjQwIiB5Mj0iNDAiLz48L3N2Zz4=");
+}
+
+.review-finish-section.tomorrow > view:first-child > text:first-child::before {
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMjg5Njg5IiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHJlY3QgeD0iOCIgeT0iMTEiIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMCIgcng9IjQiLz48bGluZSB4MT0iOCIgeTE9IjE5IiB4Mj0iNDAiIHkyPSIxOSIvPjxsaW5lIHgxPSIxNiIgeTE9IjciIHgyPSIxNiIgeTI9IjEzIi8+PGxpbmUgeDE9IjMyIiB5MT0iNyIgeDI9IjMyIiB5Mj0iMTMiLz48Y2lyY2xlIGN4PSIyNCIgY3k9IjI5IiByPSIyIiBmaWxsPSIjMjg5Njg5IiBzdHJva2U9Im5vbmUiLz48L3N2Zz4=");
 }
 
 .review-finish-section > view:first-child > text:last-child {
