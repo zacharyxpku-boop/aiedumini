@@ -297,7 +297,7 @@ const TUTOR_REFERENCE_SCENES = {
     rows: [
       { id: 'k1', text: '小学数学 · 五年级' },
       { id: 'k2', text: '分数除法' },
-      { id: 'k3', text: '咕点小黑板：别怕，这其实是一个先变乘号，再翻底朝天的方法。' },
+      { id: 'k3', text: '“别怕，这其实是个变身魔法！”' },
       { id: 'k4', text: '除以一个分数，等于乘以这个分数的倒数。' },
       { id: 'k5', text: '光顾着把除号变成乘号，却忘了把后面的分数颠倒过来。' },
       { id: 'k6', text: '默念口诀：先变乘号，再翻个底朝天！' }
@@ -1309,6 +1309,9 @@ Page({
     socraticMicroChoices: [],
     tutorServiceStatus: null,
     tutorReferenceScene: normalizeTutorReferenceScene(TUTOR_REFERENCE_SCENES.dialogue),
+    knowledgeBoardLoading: false,
+    knowledgeBoardTopic: '',
+    knowledgeBoardSource: '',
     tutorDiagnosticCard: null,
     socraticFeedbackStatus: '',
     socraticFeedbackRecordedAt: '',
@@ -1567,7 +1570,8 @@ Page({
     const sceneMap = { read_problem: 'knowledge', explain_misconception: 'stuck', find_direction: 'pointing', review: 'recap', write_first_step: 'stuck', fast_mode: 'stuck' };
     const activeTutorScene = sceneMap[step] || 'dialogue';
     const prompt = this.buildTutorStepPrompt(step);
-    const nextInput = String(this.data.input || '').trim() ? this.data.input : '';
+    const typedTopic = activeTutorScene === 'knowledge' ? String(this.data.input || '').trim().slice(0, 60) : '';
+    const nextInput = typedTopic ? '' : (String(this.data.input || '').trim() ? this.data.input : '');
     this.setData({
       activeStep: step,
       activeTutorScene,
@@ -1575,9 +1579,59 @@ Page({
       tutorReferenceScene: normalizeTutorReferenceScene(TUTOR_REFERENCE_SCENES[activeTutorScene] || TUTOR_REFERENCE_SCENES.dialogue),
       showTutorDetails: true,
       input: nextInput,
+      knowledgeBoardTopic: typedTopic,
       tutorHomeContext: Object.assign({}, this.data.tutorHomeContext || {}, { line: prompt })
     });
     this.setTutorTabbarHidden(true);
+    if (typedTopic) this.requestKnowledgeBoard(typedTopic, { rephrase: false });
+  },
+
+  requestKnowledgeBoard(topic, opts = {}) {
+    const boardTopic = String(topic || '').trim().slice(0, 60);
+    if (!boardTopic || this.data.knowledgeBoardLoading) return;
+    this.setData({ knowledgeBoardLoading: true });
+    api.sendTutorMessage({
+      mode: 'explain',
+      message: opts.rephrase ? `请换个说法讲解「${boardTopic}」` : `请讲解知识点「${boardTopic}」`,
+      knowledge_topic: boardTopic,
+      rephrase: !!opts.rephrase,
+      context: { coach_step: 'read_problem', help_mode: 'knowledge_board' }
+    }).then((res) => {
+      this.applyKnowledgeBoard(boardTopic, res && res.knowledge_board ? res.knowledge_board : null);
+      return null;
+    }).catch(() => {
+      this.applyKnowledgeBoard(boardTopic, null);
+      return null;
+    });
+  },
+
+  applyKnowledgeBoard(topic, board) {
+    const filled = board && board.what && board.stuck && board.firstStep ? board : {
+      quote: '别怕，先把它切成三小块。',
+      what: `「${topic}」可以先用自己的话说一遍它在讲什么，再看课本定义对不对。`,
+      stuck: `多数同学卡在概念和题目对不上号：看到题时想不起「${topic}」该登场。`,
+      firstStep: `先圈出题目里和「${topic}」有关的条件，再说出你的第一步。`,
+      source: 'local_rules'
+    };
+    const scene = Object.assign({}, TUTOR_REFERENCE_SCENES.knowledge, {
+      rows: [
+        { id: 'k1', text: '咕点讲解 · 为你定制' },
+        { id: 'k2', text: topic },
+        { id: 'k3', text: `“${filled.quote || '别怕，先把它切成三小块。'}”` },
+        { id: 'k4', text: filled.what },
+        { id: 'k5', text: filled.stuck },
+        { id: 'k6', text: filled.firstStep }
+      ]
+    });
+    this.setData({
+      knowledgeBoardLoading: false,
+      knowledgeBoardTopic: topic,
+      knowledgeBoardSource: filled.source || 'local_rules',
+      tutorReferenceScene: normalizeTutorReferenceScene(scene)
+    });
+    if (storage.recordSurfaceDepthAction) {
+      storage.recordSurfaceDepthAction({ surface: 'tutor', action: 'knowledge_board_filled', source: filled.source || 'local_rules', topic });
+    }
   },
 
   launchFirstStep(event) {
@@ -1585,6 +1639,10 @@ Page({
     const step = dataset.step || this.data.activeStep || 'read_problem';
     const sceneMap = { read_problem: 'knowledge', explain_misconception: 'knowledge', find_direction: 'pointing', review: 'recap', write_first_step: 'stuck', fast_mode: 'stuck' };
     const typedInput = String(this.data.input || '').trim();
+    if (this.data.activeTutorScene === 'knowledge' && this.data.knowledgeBoardTopic && step === 'read_problem' && !typedInput) {
+      this.requestKnowledgeBoard(this.data.knowledgeBoardTopic, { rephrase: true });
+      return;
+    }
     const knowledgeTopic = this.data.activeTutorScene === 'knowledge' && this.data.tutorReferenceScene && this.data.tutorReferenceScene.row1
       ? String(this.data.tutorReferenceScene.row1.text || '').trim()
       : '';
