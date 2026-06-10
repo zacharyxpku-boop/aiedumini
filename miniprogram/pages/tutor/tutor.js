@@ -1441,11 +1441,11 @@ Page({
       tutorTurnState,
       activeTutorScene,
       tutorReferenceScene: normalizeTutorReferenceScene(this.resolveTutorScene(activeTutorScene, messages, null, misconceptionTags)),
-      showTutorDetails: hasExplicitTutorScene || hasUserTutorTurn || activeTutorScene !== 'dialogue',
+      showTutorDetails: hasExplicitTutorScene || activeTutorScene !== 'dialogue',
       surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('tutor') : null,
       unifiedNextAction: storage.buildUnifiedNextActionController ? storage.buildUnifiedNextActionController({ surface: 'tutor' }) : null
     });
-    this.setTutorTabbarHidden(hasExplicitTutorScene || hasUserTutorTurn || activeTutorScene !== 'dialogue');
+    this.setTutorTabbarHidden(hasExplicitTutorScene || activeTutorScene !== 'dialogue');
     const now = new Date();
     this.setData({ tutorDialogueTime: `今天 ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}` });
     this.trackedMasteryStatus = '';

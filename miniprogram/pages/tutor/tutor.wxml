@@ -14,7 +14,7 @@
         </view>
 
         <view class="yd-tutor-hero" wx:if="{{!showTutorDetails}}">
-          <image class="yd-tutor-mascot" mode="aspectFit" src="/assets/reference/gudian-sticker.png" />
+          <image class="yd-tutor-mascot" mode="aspectFit" src="/assets/icons/graduation.svg" />
           <view class="yd-tutor-bubble">
             <text class="yd-tutor-bubble-title">和咕点聊聊</text>
             <text>可以直接聊天、问知识点、说卡住了、发题目；咕点会追问第一步，不代写答案。</text>
@@ -23,22 +23,19 @@
         <view class="tutor-chat-card" wx:if="{{!showTutorDetails}}">
           <text class="tutor-chat-head"><text class="tutor-chat-title">把题目、卡点发给 AI私教</text><text class="tutor-chat-online">在线</text></text>
           <view class="tutor-message-row">
-            <text class="tutor-avatar-dot">AI</text>
-            <block wx:if="{{messages && messages.length}}">
-              <block wx:for="{{messages}}" wx:key="index"><view class="tutor-bubble {{item.role === 'user' ? 'me' : ''}}">{{item.text}}</view></block>
-            </block>
-            <block wx:else><view class="tutor-bubble">先告诉我：你现在是看不懂题、不会第一步，还是心里有点急？</view></block>
+            <text class="tutor-avatar-dot">🤖</text>
+            <view class="tutor-bubble">先告诉我：你现在是看不懂题、不会第一步，还是心里有点急？</view>
           </view>
           <view class="tutor-thinking-line" wx:if="{{loading}}">咕点正在思考你的第一步...</view>
-          <view class="tutor-input-bar"><textarea value="{{input}}" bindinput="onInput" auto-height maxlength="-1" placeholder="先发一句话，我帮你切小问题" /><text bindtap="send">↗</text></view>
+          <view class="tutor-input-bar"><textarea value="{{input}}" bindinput="onInput" auto-height maxlength="-1" placeholder="想聊什么都可以..." /><text bindtap="send">↗</text></view>
         </view>
 
         <view class="tutor-socratic-panel" wx:if="{{!showTutorDetails}}">
           <view class="tutor-mode-grid">
-            <text class="tutor-mode-card" data-step="read_problem" bindtap="openTutorScene"><text class="tutor-mode-icon">?</text><text>问知识点</text></text>
-            <text class="tutor-mode-card" data-step="explain_misconception" bindtap="openTutorScene"><text class="tutor-mode-icon">!</text><text>我听不懂</text></text>
-            <text class="tutor-mode-card" data-step="find_direction" bindtap="openTutorScene"><text class="tutor-mode-icon">→</text><text>题目点拨</text></text>
-            <text class="tutor-mode-card" data-step="review" bindtap="openTutorScene"><text class="tutor-mode-icon">✓</text><text>学了什么</text></text>
+            <text class="tutor-mode-card" data-step="read_problem" bindtap="openTutorScene"><image class="tutor-mode-icon" mode="aspectFit" src="/assets/icons/lightbulb.svg" /><text>问知识点</text></text>
+            <text class="tutor-mode-card" data-step="explain_misconception" bindtap="openTutorScene"><image class="tutor-mode-icon" mode="aspectFit" src="/assets/icons/question.svg" /><text>我听不懂</text></text>
+            <text class="tutor-mode-card" data-step="find_direction" bindtap="openTutorScene"><image class="tutor-mode-icon" mode="aspectFit" src="/assets/icons/target.svg" /><text>题目点拨</text></text>
+            <text class="tutor-mode-card" data-step="review" bindtap="openTutorScene"><image class="tutor-mode-icon" mode="aspectFit" src="/assets/icons/calendar-check.svg" /><text>学了什么</text></text>
           </view>
           <view class="tutor-start-cta" data-step="write_first_step" bindtap="openTutorScene">开始问咕点</view>
           <text class="tutor-usage-note">每天都有同学在这里说出自己的第一步</text>
