@@ -244,6 +244,28 @@ page {
   background: #e6f4f1;
 }
 
+.growth-choice-card::after {
+  content: "";
+  position: absolute;
+  right: -32rpx;
+  top: -32rpx;
+  z-index: 0;
+  width: 128rpx;
+  height: 128rpx;
+  border-radius: 50%;
+  background: #fff7ed;
+}
+
+.growth-choice-card:not(.warm)::after {
+  background: #f0fdfa;
+}
+
+.growth-choice-card image,
+.growth-choice-card view {
+  position: relative;
+  z-index: 1;
+}
+
 .growth-choice-card view {
   display: flex;
   flex-direction: column;
@@ -413,6 +435,22 @@ page {
   border-color: #99f6e4;
   background: #14b8a6;
   box-shadow: none;
+}
+
+.growth-progress-step.locked {
+  border: 2rpx dashed #e5e7eb;
+  background: rgba(255, 255, 255, 0.6);
+  box-shadow: none;
+}
+
+.growth-progress-step.locked > text:first-child {
+  border-color: #e5e7eb;
+  background: #ffffff;
+}
+
+.growth-progress-step.locked view,
+.growth-progress-step.locked > text:last-child {
+  opacity: 0.6;
 }
 
 .growth-progress-step view {

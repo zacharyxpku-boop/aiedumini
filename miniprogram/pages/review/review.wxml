@@ -10,12 +10,13 @@
         <view class="yd-review-hero" wx:if="{{reviewFlowStage === 'main'}}">
             <view class="yd-review-copy">
               <text class="yd-review-title"><text>选个知识点，</text><text>开一局</text></text>
+              <text class="yd-review-accent-bar"></text>
               <text class="yd-review-sub route-note short"><text>没有错题也能先玩；</text><text>有错题后会变成你的<text class="review-sub-highlight">专属练习</text></text></text>
             </view>
             <image class="yd-review-art" mode="aspectFit" src="/assets/reference/review-world-map-transparent.png" />
           </view>
 
-          <view class="review-chip-row" wx:if="{{reviewFlowStage === 'main'}}"><text>分数</text><text>应用题</text><text>英语单词</text><text>阅读理解</text><text>计算检查</text><text>表达组织</text></view>
+          <view class="review-chip-row" wx:if="{{reviewFlowStage === 'main'}}"><text wx:for="{{knowledgeChipTopics}}" wx:key="*this" class="{{selectedKnowledgeTopic === item ? 'active' : ''}}" data-topic="{{item}}" bindtap="selectKnowledgeStarterTopic">{{selectedKnowledgeTopic === item ? '✓ ' : ''}}{{item}}</text></view>
 
         <view class="review-main-tool-grid" wx:if="{{reviewFlowStage === 'main'}}">
           <view class="review-main-tool-card warm" data-stage="topic" data-tool-id="whack" bindtap="setReviewFlowStage"><view><text class="review-main-tool-icon hammer"></text><text class="review-main-tool-time">约3分</text></view><text>错因地鼠</text><text>揪出隐藏的易错点</text></view>

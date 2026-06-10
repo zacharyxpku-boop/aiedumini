@@ -246,11 +246,20 @@ page {
   box-shadow: 0 3rpx 10rpx rgba(17, 24, 39, 0.04);
 }
 
-.review-chip-row text:first-child {
+.review-chip-row text.active {
   border-color: #14b8a6;
   background: #14b8a6;
   color: #ffffff;
   font-weight: 900;
+}
+
+.yd-review-accent-bar {
+  display: block;
+  width: 56rpx;
+  height: 8rpx;
+  margin: 6rpx 0 14rpx;
+  border-radius: 999rpx;
+  background: #fb923c;
 }
 
 .review-main-tool-grid {
