@@ -1,5 +1,5 @@
 page {
-  background: #f9f8f4;
+  background: #f8fafc;
 }
 
 .upload-page {
@@ -8,7 +8,7 @@ page {
   background:
     radial-gradient(circle at 92% 0%, rgba(255, 237, 213, 0.56), transparent 30%),
     radial-gradient(circle at 0% 28%, rgba(204, 251, 241, 0.46), transparent 28%),
-    #f9f8f4;
+    #f8fafc;
 }
 
 .upload-scroll {
@@ -518,6 +518,6 @@ page {
   bottom: 0;
   z-index: -1;
   height: 170rpx;
-  background: linear-gradient(180deg, rgba(249, 248, 244, 0), #f9f8f4 48%, #f9f8f4);
+  background: linear-gradient(180deg, rgba(248, 250, 252, 0), #f8fafc 48%, #f8fafc);
   pointer-events: none;
 }

@@ -310,7 +310,7 @@ const TUTOR_REFERENCE_SCENES = {
   pointing: {
     title: '题目点拨',
     status: '只问第一步',
-    rows: [{ id: 'p1', text: '把题目发来，咕点只问第一步。拍题、打字都可以，系统只保存安全摘要，不代写答案。' }],
+    rows: [{ id: 'p1', text: '把题目文字或题图发来，咕点只问第一步。题图只做本轮临时留档，不代写答案。' }],
     modes: ['看懂题意', '理清条件', '找准问题', '找第一步', '毫无头绪', '找突破口', '检查错因', '算错不对', '定位错因'],
     actions: [{ id: 'find_direction', label: '开始点拨', action: 'step', step: 'find_direction' }]
   },
@@ -1589,12 +1589,12 @@ Page({
   attachTutorPhoto() {
     const finish = (path = '') => {
       const existing = String(this.data.input || '').trim();
-      const nextInput = existing || '我已经拍题留档，请先让我用自己的话说题目问什么，再只问我第一步。';
+      const nextInput = existing || '我已经上传题图留档，请先让我用自己的话说题目问什么，再只问我第一步。';
       this.setData({ input: nextInput, activeStep: 'find_direction', activeTutorScene: 'pointing', tutorReferenceScene: normalizeTutorReferenceScene(TUTOR_REFERENCE_SCENES.pointing), showTutorDetails: true });
       if (storage.recordSurfaceDepthAction) {
         storage.recordSurfaceDepthAction({ surface: 'tutor', action: 'attach_tutor_photo', source: 'tutor_question_pointing', hasLocalPath: !!path });
       }
-      if (typeof wx !== 'undefined' && wx.showToast) wx.showToast({ title: '已留档，请补一句卡点', icon: 'none' });
+      if (typeof wx !== 'undefined' && wx.showToast) wx.showToast({ title: '已临时留档，请补一句卡点', icon: 'none' });
     };
     if (typeof wx === 'undefined') { finish(''); return; }
     if (wx.chooseMedia) {

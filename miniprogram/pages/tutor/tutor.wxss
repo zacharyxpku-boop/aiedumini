@@ -1,12 +1,12 @@
 page {
-  background: #f9f8f4;
+  background: #f6f8f3;
 }
 
 .tutor-page {
   min-height: 100vh;
   overflow: hidden;
   color: #1f2937;
-  background: #f9f8f4;
+  background: #f6f8f3;
 }
 
 .tutor-main {
@@ -54,7 +54,7 @@ page {
   min-height: 64rpx;
   margin: 0 -32rpx;
   padding: 0 32rpx 4rpx;
-  background: rgba(249, 248, 244, 0.98);
+  background: rgba(246, 248, 243, 0.96);
 }
 
 .yd-tutor-brand {
@@ -140,8 +140,8 @@ page {
   padding: 34rpx 32rpx;
   overflow: hidden;
   border-radius: 40rpx;
-  background: #ffffff;
-  box-shadow: 0 14rpx 32rpx rgba(15, 23, 42, 0.055);
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 10rpx 24rpx rgba(15, 23, 42, 0.04);
 }
 
 .yd-tutor-hero::after {
@@ -203,12 +203,12 @@ page {
   align-content: start;
   gap: 24rpx;
   flex: 0 0 auto;
-  min-height: 322rpx;
+  min-height: 306rpx;
   padding: 32rpx;
   border: 1rpx solid rgba(240, 235, 225, 0.9);
   border-radius: 34rpx;
   background: #ffffff;
-  box-shadow: 0 14rpx 34rpx rgba(15, 23, 42, 0.05);
+  box-shadow: 0 10rpx 26rpx rgba(15, 23, 42, 0.04);
 }
 
 .tutor-chat-card.compact {

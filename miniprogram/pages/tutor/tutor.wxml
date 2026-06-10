@@ -3,25 +3,25 @@
     <view class="main-inner">
       <view class="yd-tutor-screen yd-app-screen yd-tutor-app detail-{{showTutorDetails ? 'on' : 'off'}}">
         <view class="yd-tutor-top">
-          <text class="yd-tutor-brand">
+          <view class="yd-tutor-brand">
             <image class="yd-tutor-mark" mode="aspectFit" src="/assets/reference/gudian-sticker.png" />
             <text class="yd-tutor-brand-lines">
               <text>原点 · 咕点</text>
               <text>先问第一步 不代写答案</text>
             </text>
-          </text>
+          </view>
           <text class="yd-tutor-pill">••• ｜ ○</text>
         </view>
 
         <view class="yd-tutor-hero" wx:if="{{!showTutorDetails}}">
           <image class="yd-tutor-mascot" mode="aspectFit" src="/assets/reference/gudian-sticker.png" />
-          <text class="yd-tutor-bubble">
+          <view class="yd-tutor-bubble">
             <text class="yd-tutor-bubble-title">和咕点聊聊</text>
             <text>可以直接聊天、问知识点、说卡住了、发题目；咕点会追问第一步，不代写答案。</text>
-          </text>
+          </view>
         </view>
         <view class="tutor-chat-card" wx:if="{{!showTutorDetails}}">
-          <view class="tutor-chat-head"><text class="tutor-chat-title">把题目、卡点发给 AI私教</text><text class="tutor-chat-online">在线</text></view>
+          <text class="tutor-chat-head"><text class="tutor-chat-title">把题目、卡点发给 AI私教</text><text class="tutor-chat-online">在线</text></text>
           <view class="tutor-message-row">
             <text class="tutor-avatar-dot">AI</text>
             <block wx:if="{{messages && messages.length}}">
@@ -81,8 +81,8 @@
             <text class="tutor-subpage-top"><text bindtap="closeTutorScene">‹</text><text>题目点拨</text><text>···</text></text>
             <text class="tutor-pointing-lead"><text>AI 专属私教</text><text>把题目发来，<text>咕点</text>只问第一步</text></text>
             <view class="tutor-question-box">
-              <textarea value="{{input}}" bindinput="onInput" auto-height maxlength="-1" placeholder="这道题有些搞不懂，在这里输入题目文字，或直接点击下方拍题..." />
-              <view class="tutor-question-media-row"><text class="tutor-question-thumb"></text><text class="tutor-question-camera" bindtap="attachTutorPhoto">拍题</text><text class="tutor-question-safe">自动保存</text></view>
+              <textarea value="{{input}}" bindinput="onInput" auto-height maxlength="-1" placeholder="这道题有些搞不懂，在这里输入题目文字，或上传一张题图..." />
+              <view class="tutor-question-media-row"><text class="tutor-question-thumb"></text><text class="tutor-question-camera" bindtap="attachTutorPhoto">上传题图</text><text class="tutor-question-safe">临时留档</text></view>
             </view>
             <text class="tutor-pointing-section-title">选择点拨模式</text>
             <view class="tutor-pointing-mode-row">
