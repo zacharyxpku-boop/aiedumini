@@ -1803,7 +1803,7 @@ page {
   position: fixed;
   left: 0;
   right: 0;
-  bottom: calc(108rpx + env(safe-area-inset-bottom));
+  bottom: 0;
   z-index: 8;
   grid-template-columns: 220rpx minmax(0, 1fr);
   gap: 24rpx;
@@ -2073,7 +2073,7 @@ page {
   position: fixed;
   left: 32rpx;
   right: 32rpx;
-  bottom: calc(108rpx + env(safe-area-inset-bottom));
+  bottom: 0;
   z-index: 8;
   display: grid;
   grid-template-columns: 220rpx minmax(0, 1fr);
