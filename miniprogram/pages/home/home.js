@@ -448,6 +448,14 @@ Page({
         incomingShare: incoming,
         incomingShareRelay: this.buildIncomingShareRelay(incoming)
       });
+      const receiverRoute = (query.mode === 'parent_recap' || query.from === 'parent_card')
+        ? '/pages/profile/profile?from=share_relay&panel=report'
+        : (query.challenge === 'review' || query.from === 'peer_challenge')
+          ? '/pages/review/review?from=share_relay'
+          : '/pages/tutor/tutor?from=share_relay';
+      setTimeout(() => {
+        navigation.navigateLearningRoute(receiverRoute);
+      }, 400);
     }
   },
 

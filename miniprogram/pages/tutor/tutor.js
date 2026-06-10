@@ -1451,6 +1451,14 @@ Page({
     this.trackedMasteryStatus = '';
   },
 
+  onShareAppMessage() {
+    const board = this.data.knowledgeBoardTopic ? String(this.data.knowledgeBoardTopic).slice(0, 18) : '';
+    return {
+      title: board ? `咕点刚给我讲了「${board}」，你也来问一个` : '和咕点聊聊，先想清第一步再动笔',
+      path: '/pages/tutor/tutor?from=share_relay'
+    };
+  },
+
   toggleTutorDetails() {
     const next = !this.data.showTutorDetails;
     this.setData({ showTutorDetails: next });

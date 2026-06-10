@@ -24,7 +24,7 @@ App({
     const name = profile.name || '我家孩子';
     return {
       title: `${name} 今晚确认了第一步`,
-      path: `/pages/home/home?ref=${storage.getLocalUserId ? storage.getLocalUserId() : ''}`
+      path: `/pages/tutor/tutor?from=share_relay&ref=${storage.getLocalUserId ? storage.getLocalUserId() : ''}`
     };
   }
 });

@@ -133,10 +133,23 @@ Page({
   },
 
   onLoad(query = {}) {
+    const sharedTopic = query && query.topic ? decodeURIComponent(String(query.topic)).trim().slice(0, 30) : '';
+    if (sharedTopic) {
+      this.setData({ selectedKnowledgeTopic: sharedTopic });
+    }
     this.setData({
       reportSourceContext: this.buildReportSourceContext(query) || this.buildTemplateRouteContext(query)
     });
     this.applyReferenceStageRoute(query);
+  },
+
+  onShareAppMessage() {
+    const topic = String(this.data.selectedKnowledgeTopic || '').slice(0, 18);
+    const tool = this.data.selectedPlayableReviewToolTitle || '错因地鼠';
+    return {
+      title: topic ? `我在知识乐园用「${tool}」练「${topic}」，来开一局` : '来知识乐园开一局，错题会变成你的专属练习',
+      path: `/pages/review/review?from=share_relay${topic ? `&topic=${encodeURIComponent(topic)}` : ''}`
+    };
   },
 
   onShow() {
