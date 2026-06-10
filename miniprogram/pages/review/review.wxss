@@ -309,28 +309,26 @@ page {
   font-weight: 900;
 }
 
-.review-main-tool-icon::before {
-  display: block;
-  color: currentColor;
-  font-size: 40rpx;
-  line-height: 72rpx;
-  font-weight: 950;
+.review-main-tool-icon {
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 40rpx 40rpx;
 }
 
-.review-main-tool-icon.hammer::before {
-  content: "!";
+.review-main-tool-icon.hammer {
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZWY0NDQ0IiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTE0IDE4IEwyNCA4IEMzMCA0IDM4IDggNDAgMTQgTDM0IDE0IEwzMCAxOCBMMjAgMjggWiIvPjxwYXRoIGQ9Ik0xOSAyMyBMOCAzNiBDNiAzOCA4IDQyIDExIDQwIEwyNCAyOCIvPjwvc3ZnPgo=");
 }
 
-.review-main-tool-icon.lightning::before {
-  content: "⚡";
+.review-main-tool-icon.lightning {
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZjU5ZTBiIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTI2IDYgTDEyIDI3IEwyMiAyNyBMMjAgNDIgTDM2IDIwIEwyNSAyMCBaIi8+PC9zdmc+Cg==");
 }
 
-.review-main-tool-icon.puzzle::before {
-  content: "▣";
+.review-main-tool-icon.puzzle {
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjM2I4MmY2IiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTE4IDEwIEgyNiBDMjUgNiAzMSA0IDMyIDggQzMzIDEwIDMxIDEwIDMxIDEwIEgzOCBWMTggQzQyIDE3IDQ0IDIzIDQwIDI0IEMzOCAyNSAzOCAyMyAzOCAyMyBWMzAgSDMwIEMzMSAzNCAyNSAzNiAyNCAzMiBDMjMgMzAgMjUgMzAgMjUgMzAgSDE4IFYyMiBDMTQgMjMgMTIgMTcgMTYgMTYgQzE4IDE1IDE4IDE3IDE4IDE3IFoiLz48L3N2Zz4K");
 }
 
-.review-main-tool-icon.path::before {
-  content: "⌁";
+.review-main-tool-icon.path {
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTRiOGE2IiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PGNpcmNsZSBjeD0iMTAiIGN5PSIzOCIgcj0iNCIvPjxjaXJjbGUgY3g9IjM4IiBjeT0iMTAiIHI9IjQiLz48cGF0aCBkPSJNMTQgMzggSDI4IEMzMiAzOCAzMiAzMCAyOCAzMCBIMTggQzE0IDMwIDE0IDIyIDE4IDIyIEgzNCIvPjwvc3ZnPgo=");
 }
 
 .review-main-tool-time {
