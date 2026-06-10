@@ -31,6 +31,7 @@
             <text>{{reviewFlowStage === 'topic' ? ':)' : '···'}}</text>
           </text>
           <view class="review-section-head" wx:if="{{reviewFlowStage === 'topic' || reviewFlowStage === 'tool'}}"><text>{{reviewFlowStage === 'topic' ? '今天想练哪一块？' : '挑选开局方式'}}</text><text>{{reviewFlowStage === 'topic' ? '选个知识点，马上开局探索' : '选一个最适合现在的节奏，马上开始'}}</text></view>
+          <view class="review-topic-search" wx:if="{{reviewFlowStage === 'topic'}}"><text class="review-topic-search-icon">⌕</text><input value="{{topicSearchText}}" bindinput="onTopicSearchInput" bindconfirm="confirmTopicSearch" confirm-type="search" placeholder="搜索知识点，如：小数乘法" /></view>
           <text class="review-flow-tabs" wx:if="{{reviewFlowStage === 'topic' || reviewFlowStage === 'tool'}}">
             <text class="{{reviewFlowStage === 'topic' ? 'active' : ''}}" data-stage="topic" bindtap="setReviewFlowStage">选知识点</text>
             <text class="{{reviewFlowStage === 'tool' ? 'active' : ''}}" data-stage="tool" bindtap="setReviewFlowStage">玩法选择</text>

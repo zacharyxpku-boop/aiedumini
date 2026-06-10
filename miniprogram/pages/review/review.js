@@ -622,6 +622,17 @@ Page({
     });
   },
 
+  confirmTopicSearch(event) {
+    const value = String(event && event.detail ? event.detail.value || '' : '').trim().slice(0, 30);
+    if (!value) return;
+    const cards = this.buildKnowledgeStarterTopicCards({ query: value, batch: 0 });
+    const matched = cards.find((item) => item.topic.indexOf(value) >= 0 || value.indexOf(item.topic) >= 0);
+    this.setData({
+      topicSearchText: value,
+      selectedKnowledgeTopic: matched ? matched.topic : value
+    });
+  },
+
   shuffleKnowledgeStarterTopics() {
     const nextBatch = Number(this.data.knowledgeStarterTopicBatch || 0) + 1;
     const cards = this.buildKnowledgeStarterTopicCards({ batch: nextBatch });

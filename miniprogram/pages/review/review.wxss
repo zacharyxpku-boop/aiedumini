@@ -619,6 +619,32 @@ page {
   gap: 28rpx;
 }
 
+.review-topic-search {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  margin: 2rpx 0 10rpx;
+  padding: 16rpx 24rpx;
+  border-radius: 32rpx;
+  background: #ffffff;
+  border: 2rpx solid #f0ebe1;
+  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.03);
+}
+
+.review-topic-search-icon {
+  color: #a89f93;
+  font-size: 32rpx;
+  font-weight: 900;
+}
+
+.review-topic-search input {
+  flex: 1;
+  min-height: 48rpx;
+  color: #2c2621;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
 .review-topic-toolbar {
   display: flex;
   align-items: center;
