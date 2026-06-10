@@ -872,12 +872,39 @@ page {
   gap: 18rpx;
 }
 
+.tutor-pointing-mode-row > text::before {
+  content: "";
+  display: block;
+  width: 76rpx;
+  height: 76rpx;
+  border-radius: 999rpx;
+  background-color: #fff4ee;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 40rpx 40rpx;
+}
+
+.tutor-pointing-mode-row > text:nth-child(1)::before {
+  background-color: #fff4ee;
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmY3YTQ1IiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTI0IDEyIEMyMCA4IDEyIDggOCAxMSBWMzggQzEyIDM1IDIwIDM1IDI0IDM5IEMyOCAzNSAzNiAzNSA0MCAzOCBWMTEgQzM2IDggMjggOCAyNCAxMiBaIi8+PGxpbmUgeDE9IjI0IiB5MT0iMTIiIHgyPSIyNCIgeTI9IjM5Ii8+PC9zdmc+");
+}
+
+.tutor-pointing-mode-row > text:nth-child(2)::before {
+  background-color: #e0f2f1;
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTRiOGE2IiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PGNpcmNsZSBjeD0iMjQiIGN5PSIyNCIgcj0iMTUiLz48Y2lyY2xlIGN4PSIyNCIgY3k9IjI0IiByPSI5Ii8+PGNpcmNsZSBjeD0iMjQiIGN5PSIyNCIgcj0iMyIgZmlsbD0iIzE0YjhhNiIgc3Ryb2tlPSJub25lIi8+PC9zdmc+");
+}
+
+.tutor-pointing-mode-row > text:nth-child(3)::before {
+  background-color: #fef3c7;
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZjU5ZTBiIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PGNpcmNsZSBjeD0iMjEiIGN5PSIyMSIgcj0iMTEiLz48bGluZSB4MT0iMzAiIHkxPSIzMCIgeDI9IjQwIiB5Mj0iNDAiLz48L3N2Zz4=");
+}
+
 .tutor-pointing-mode-row > text {
   position: relative;
   display: grid;
   justify-items: center;
   align-content: center;
-  min-height: 164rpx;
+  min-height: 196rpx;
   gap: 12rpx;
   padding: 28rpx 18rpx;
   border: 2rpx solid transparent;
