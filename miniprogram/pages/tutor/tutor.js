@@ -1391,11 +1391,12 @@ Page({
       ? `我已接住这个卡点：「${selected.text}」。先说你的第一步，我只处理关键错因。`
       : '把题目、材料、家长担心或孩子卡住的地方发来。我不代写答案，只追问下一小步。';
     const savedMessages = storage.get(storage.KEYS.tutorMessages, null);
-    const messages = entryTutorIntent && entryTutorIntent.resetMessages ? [
+    const restoredMessages = entryTutorIntent && entryTutorIntent.resetMessages ? [
       { role: 'assistant', text: intro }
     ] : (savedMessages || [
       { role: 'assistant', text: intro }
     ]);
+    const messages = restoredMessages.filter((item) => item && String(item.text || '').trim());
     const hasUserTutorTurn = messages.some((item) => item && item.role === 'user');
 
     const pasteRisk = pasteRiskSignal(messages);
@@ -1443,6 +1444,7 @@ Page({
       surfaceDepthPack: storage.buildSurfaceDepthPack ? storage.buildSurfaceDepthPack('tutor') : null,
       unifiedNextAction: storage.buildUnifiedNextActionController ? storage.buildUnifiedNextActionController({ surface: 'tutor' }) : null
     });
+    this.setTutorTabbarHidden(hasExplicitTutorScene || hasUserTutorTurn || activeTutorScene !== 'dialogue');
     this.trackedMasteryStatus = '';
   },
 

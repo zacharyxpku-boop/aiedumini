@@ -103,7 +103,7 @@ page {
 
 .yd-tutor-pill {
   flex: 0 0 auto;
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
   width: 168rpx;
@@ -1341,6 +1341,9 @@ page {
   display: grid;
   grid-template-columns: 72rpx minmax(0, 1fr) 72rpx;
   align-items: center;
+  box-sizing: content-box;
+  padding-top: calc(16rpx + env(safe-area-inset-top));
+  background: rgba(251, 249, 247, 0.96);
   min-height: 112rpx;
   margin: 0;
   padding: calc(18rpx + env(safe-area-inset-top)) 32rpx 10rpx;

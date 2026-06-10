@@ -83,7 +83,7 @@ page {
 
 .yd-review-pill {
   flex: 0 0 auto;
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
   width: 160rpx;
@@ -804,7 +804,7 @@ page {
   position: fixed;
   left: 32rpx;
   right: 32rpx;
-  bottom: calc(100rpx + env(safe-area-inset-bottom));
+  bottom: calc(148rpx + env(safe-area-inset-bottom));
   z-index: 22;
   height: 92rpx;
   margin-top: 0;
@@ -819,9 +819,9 @@ page {
   position: fixed;
   left: 0;
   right: 0;
-  bottom: calc(80rpx + env(safe-area-inset-bottom));
+  bottom: calc(116rpx + env(safe-area-inset-bottom));
   z-index: -1;
-  height: 148rpx;
+  height: 196rpx;
   background: linear-gradient(180deg, rgba(247, 248, 250, 0), #f7f8fa 42%, #f7f8fa);
   pointer-events: none;
 }
