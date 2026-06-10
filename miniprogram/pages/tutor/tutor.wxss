@@ -1514,8 +1514,12 @@ page {
   height: 80rpx;
   border: 4rpx solid #ffffff;
   border-radius: 999rpx;
-  background: linear-gradient(180deg, #5eead4, #14b8a6);
-  color: #ffffff;
+  background-color: #f97316;
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmZmZmIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHJlY3QgeD0iMTAiIHk9IjE3IiB3aWR0aD0iMjgiIGhlaWdodD0iMjEiIHJ4PSI2Ii8+PGNpcmNsZSBjeD0iMTkiIGN5PSIyNyIgcj0iMiIgZmlsbD0iI2ZmZmZmZiIgc3Ryb2tlPSJub25lIi8+PGNpcmNsZSBjeD0iMjkiIGN5PSIyNyIgcj0iMiIgZmlsbD0iI2ZmZmZmZiIgc3Ryb2tlPSJub25lIi8+PHBhdGggZD0iTTE5IDMzIEMyMSAzNSAyNyAzNSAyOSAzMyIvPjxsaW5lIHgxPSIyNCIgeTE9IjE3IiB4Mj0iMjQiIHkyPSIxMCIvPjxjaXJjbGUgY3g9IjI0IiBjeT0iOCIgcj0iMiIgZmlsbD0iI2ZmZmZmZiIgc3Ryb2tlPSJub25lIi8+PC9zdmc+");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 48rpx 48rpx;
+  color: transparent;
   font-size: 24rpx;
   line-height: 80rpx;
   font-weight: 900;
@@ -1524,7 +1528,8 @@ page {
 
 .tutor-chatline.me .tutor-chatline-avatar {
   grid-column: 2;
-  background: #cff1f3;
+  background-color: #cff1f3;
+  background-image: none;
   color: #1a818e;
 }
 
@@ -1554,7 +1559,7 @@ page {
 
 .tutor-reference-panel.dialogue .tutor-dialogue-actions {
   position: fixed;
-  left: 40rpx;
+  left: 130rpx;
   right: 40rpx;
   bottom: calc(126rpx + env(safe-area-inset-bottom));
   z-index: 11;
@@ -1631,10 +1636,11 @@ page {
   width: 88rpx;
   height: 88rpx;
   border-radius: 999rpx;
-  background: #14b8a6;
+  background: #f97316;
   color: #ffffff;
   font-size: 34rpx;
   font-weight: 900;
+  box-shadow: 0 8rpx 20rpx rgba(249, 115, 22, 0.3);
   box-shadow: 0 12rpx 24rpx rgba(20, 184, 166, 0.24);
 }
 
