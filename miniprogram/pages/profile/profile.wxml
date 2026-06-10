@@ -46,7 +46,7 @@
         <view class="growth-upload-panel" wx:if="{{growthActiveScene === 'upload'}}">
           <view class="growth-subpage-nav"><text data-panel="main" bindtap="setGrowthScene">‹</text><text>完善信息</text><text data-action="reportPreview" bindtap="runParentReportAction">跳过</text></view>
           <view class="growth-upload-head"><text>收集线索碎片 🧩</text><text>材料越真实，建议越具体。</text></view>
-          <text class="growth-upload-lead"><text>材料越真实，建议越具体。</text><text><text class="growth-upload-lead-highlight">直接拍照或打字都可以</text>，不必全部填满哦～</text></text>
+          <text class="growth-upload-lead"><text><text class="growth-upload-lead-highlight">直接拍照或打字都可以</text>，不必全部填满哦～</text><text>优先补最近一次错题、周测或老师反馈。</text></text>
           <view class="growth-upload-grid">
             <view class="growth-upload-card primary" data-action="uploadPage" bindtap="runParentReportAction"><text class="growth-upload-corner"></text><view class="growth-upload-title-row"><image mode="aspectFit" src="/assets/reference/upload-folder-stack-transparent.png" /><view><text>错题描述</text><text>记录孩子常卡住的题型</text></view><text class="growth-upload-added">✓ 已添加 1 份</text></view><text class="growth-upload-sample">“昨天数学卷子大题第二问，总是列错方程...”</text></view>
             <view class="growth-upload-card" data-action="uploadPage" bindtap="runParentReportAction"><image mode="aspectFit" src="/assets/reference/report-radar-card-illustration.png" /><view><text>成绩/周测</text><text>拍照留存/手动摘录</text></view><text class="growth-upload-plus">+</text></view>
@@ -72,9 +72,9 @@
         <view class="growth-parent-action-card" wx:if="{{growthActiveScene === 'action'}}">
           <view class="growth-subpage-nav action"><text data-panel="preview" bindtap="setGrowthScene">‹</text><text>今晚行动指南</text><text bindtap="remindParentActionLater">…</text></view>
           <view class="growth-parent-action-head"><text>今晚行动已为你准备好 🎯</text><text>不替孩子学习，只为成长提供更好的土壤</text></view>
-          <view class="growth-parent-action-item {{parentActionSelections.praise ? 'active' : ''}}" data-id="praise" bindtap="toggleParentActionItem"><text>{{parentActionSelections.praise ? '✓' : ''}}</text><view><text><text>建立自信</text><text>预计 2 分钟</text></text><text>正向具体表扬</text><text>“我看到你刚才虽然算错了，但依然耐心地把草稿纸写得很整齐，这种态度很棒。”</text></view></view>
-          <view class="growth-parent-action-item warm {{parentActionSelections.environment ? 'active' : ''}}" data-id="environment" bindtap="toggleParentActionItem"><text>{{parentActionSelections.environment ? '✓' : ''}}</text><view><text><text>环境优化</text><text>持续进行</text></text><text>清空桌面非学习用品</text><text>将书桌上的玩具、漫画或零食移开。对于“视觉型”孩子，清爽的物理空间能显著降低分心。</text></view></view>
-          <view class="growth-parent-action-item indigo {{parentActionSelections.question ? 'active' : ''}}" data-id="question" bindtap="toggleParentActionItem"><text>{{parentActionSelections.question ? '✓' : ''}}</text><view><text><text>激发思考</text><text>预计 5 分钟</text></text><text>只问问题，不讲答案</text><text>当孩子求助时，尝试问：“你觉得这一步和上一步的关系是什么？”引导孩子自己发现线索。</text></view></view>
+          <view class="growth-parent-action-item {{parentActionSelections.praise ? 'active' : ''}}" data-id="praise" bindtap="toggleParentActionItem"><text>{{parentActionSelections.praise ? '✓' : ''}}</text><view><text><text>建立自信</text><text>预计 2 分钟</text></text><text>正向具体表扬</text><text>看到孩子坚持、整理草稿或说出思路时，只表扬这个具体动作。</text></view></view>
+          <view class="growth-parent-action-item warm {{parentActionSelections.environment ? 'active' : ''}}" data-id="environment" bindtap="toggleParentActionItem"><text>{{parentActionSelections.environment ? '✓' : ''}}</text><view><text><text>环境优化</text><text>持续进行</text></text><text>清空桌面非学习用品</text><text>把玩具、漫画和零食移开，让孩子先进入一个更清爽的学习场。</text></view></view>
+          <view class="growth-parent-action-item indigo {{parentActionSelections.question ? 'active' : ''}}" data-id="question" bindtap="toggleParentActionItem"><text>{{parentActionSelections.question ? '✓' : ''}}</text><view><text><text>激发思考</text><text>预计 5 分钟</text></text><text>只问问题，不讲答案</text><text>孩子求助时先问：“这一步和上一步有什么关系？”让他自己找线索。</text></view></view>
           <text class="growth-action-done">完成勾选后，系统将为您更新明日建议</text>
           <view class="growth-bottom-bar action"><view class="growth-parent-bottom-actions"><text bindtap="completeParentActionCard">我已完成行动</text><text bindtap="remindParentActionLater">稍后提醒</text></view></view>
         </view>

@@ -45,6 +45,14 @@ page {
     #f8fafc;
 }
 
+.yd-parent-screen.scene-preview {
+  padding-bottom: calc(312rpx + env(safe-area-inset-bottom));
+}
+
+.yd-parent-screen.scene-action {
+  padding-bottom: calc(226rpx + env(safe-area-inset-bottom));
+}
+
 .yd-parent-app {
   display: flex;
   flex-direction: column;
@@ -758,7 +766,8 @@ page {
 
 .growth-upload-lead {
   display: grid;
-  gap: 2rpx;
+  gap: 6rpx;
+  padding: 0 2rpx;
 }
 
 .growth-upload-lead text {
@@ -1146,8 +1155,8 @@ page {
 .growth-report-preview-card {
   position: relative;
   display: grid;
-  gap: 16rpx;
-  padding: 28rpx;
+  gap: 14rpx;
+  padding: 24rpx;
   overflow: hidden;
   border: 1rpx solid rgba(240, 235, 225, 0.9);
   border-radius: 34rpx;
@@ -1183,15 +1192,15 @@ page {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: 64rpx minmax(0, 1fr);
-  gap: 18rpx;
+  grid-template-columns: 58rpx minmax(0, 1fr);
+  gap: 16rpx;
   align-items: center;
 }
 
 .growth-report-icon {
-  width: 64rpx;
-  height: 64rpx;
-  border-radius: 22rpx;
+  width: 58rpx;
+  height: 58rpx;
+  border-radius: 20rpx;
   background: #ccfbf1;
   box-shadow: 0 8rpx 18rpx rgba(15, 23, 42, 0.06);
 }
@@ -1212,8 +1221,8 @@ page {
 
 .growth-report-card-head view > text:first-child {
   color: #1f2937;
-  font-size: 30rpx;
-  line-height: 36rpx;
+  font-size: 28rpx;
+  line-height: 34rpx;
   font-weight: 900;
 }
 
@@ -1255,8 +1264,8 @@ page {
   z-index: 1;
   display: block;
   color: #4b5563;
-  font-size: 26rpx;
-  line-height: 38rpx;
+  font-size: 24rpx;
+  line-height: 34rpx;
   overflow: visible;
 }
 
@@ -1271,14 +1280,14 @@ page {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 96rpx;
+  min-height: 88rpx;
   box-sizing: border-box;
   padding: 12rpx;
-  border-radius: 36rpx;
+  border-radius: 32rpx;
   background: #f8fafc;
   color: #1f2937;
-  font-size: 28rpx;
-  line-height: 34rpx;
+  font-size: 26rpx;
+  line-height: 32rpx;
   font-weight: 900;
   text-align: center;
 }
@@ -1297,10 +1306,10 @@ page {
 
 .growth-parent-action-card > .growth-parent-action-item {
   display: grid;
-  grid-template-columns: 52rpx minmax(0, 1fr);
-  gap: 24rpx;
+  grid-template-columns: 48rpx minmax(0, 1fr);
+  gap: 20rpx;
   align-items: start;
-  padding: 30rpx;
+  padding: 24rpx;
   border: 1rpx solid rgba(240, 235, 225, 0.92);
   border-radius: 34rpx;
   background: #ffffff;
@@ -1317,8 +1326,8 @@ page {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 52rpx;
-  height: 52rpx;
+  width: 48rpx;
+  height: 48rpx;
   margin-top: 4rpx;
   border: 4rpx solid rgba(20, 184, 166, 0.3);
   border-radius: 16rpx;
@@ -1337,7 +1346,7 @@ page {
 .growth-parent-action-card .growth-parent-action-item view {
   display: flex;
   flex-direction: column;
-  gap: 12rpx;
+  gap: 10rpx;
 }
 
 .growth-parent-action-card .growth-parent-action-item view > text:first-child {
@@ -1375,8 +1384,8 @@ page {
 
 .growth-parent-action-card .growth-parent-action-item view > text:nth-child(2) {
   color: #1f2937;
-  font-size: 32rpx;
-  line-height: 38rpx;
+  font-size: 30rpx;
+  line-height: 36rpx;
   font-weight: 900;
 }
 
@@ -1384,8 +1393,8 @@ page {
   display: block;
   overflow: visible;
   color: #64748b;
-  font-size: 25rpx;
-  line-height: 36rpx;
+  font-size: 24rpx;
+  line-height: 34rpx;
 }
 
 .growth-bottom-bar {
@@ -1413,7 +1422,7 @@ page {
 
 .growth-bottom-bar.report {
   display: grid;
-  gap: 16rpx;
+  gap: 14rpx;
   background: rgba(255, 255, 255, 0.9);
 }
 
@@ -1421,13 +1430,13 @@ page {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 92rpx;
+  min-height: 86rpx;
   border: 3rpx dashed rgba(20, 184, 166, 0.38);
-  border-radius: 36rpx;
+  border-radius: 32rpx;
   background: #ffffff;
   color: #0f766e;
-  font-size: 28rpx;
-  line-height: 34rpx;
+  font-size: 26rpx;
+  line-height: 32rpx;
   font-weight: 900;
   text-align: center;
 }
@@ -1448,12 +1457,12 @@ page {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 108rpx;
-  border-radius: 40rpx;
+  min-height: 96rpx;
+  border-radius: 36rpx;
   color: #ffffff;
   background: #14b8a6;
-  font-size: 30rpx;
-  line-height: 36rpx;
+  font-size: 28rpx;
+  line-height: 34rpx;
   font-weight: 900;
 }
 
