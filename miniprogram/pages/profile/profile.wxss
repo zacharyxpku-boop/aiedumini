@@ -527,13 +527,13 @@ page {
   box-shadow: 0 16rpx 36rpx rgba(251, 191, 36, 0.32);
 }
 
-.yd-parent-screen.scene-main .growth-main-cta::before {
+.yd-parent-screen.scene-main::after {
   content: "";
   position: fixed;
   left: 0;
   right: 0;
   bottom: calc(88rpx + env(safe-area-inset-bottom));
-  z-index: -1;
+  z-index: 17;
   height: 156rpx;
   background: linear-gradient(180deg, rgba(248, 250, 245, 0), #f8faf5 46%, #f8faf5);
   pointer-events: none;
