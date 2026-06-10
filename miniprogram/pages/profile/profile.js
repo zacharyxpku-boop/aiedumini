@@ -1863,8 +1863,31 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
   const workflowImageLine = workflowImagePlan.requiresServerSideKey || workflowApiKey.requiredForImageRender
     ? '报告预览可先查看，完整图稿稍后补齐'
     : '完整报告图稿已可查看';
+  const preferenceScoring = learningReport.scoreAssessmentAnswers
+    ? learningReport.scoreAssessmentAnswers(reportState.assessmentAnswers || [], '')
+    : { scores: {}, answered: 0 };
+  const preferenceStyles = [
+    { key: 'visual', tag: '视觉型', line: '孩子对图像、表格的敏感度更高，讲抽象概念时多用手绘示意图、思维导图或实物演示。' },
+    { key: 'auditory', tag: '听觉型', line: '孩子靠听和说理解更快，让他把思路讲出来，比闷头看书更有效。' },
+    { key: 'kinesthetic', tag: '动手型', line: '孩子动手操作时学得最快，先用实物摆一摆、画一画，再回到题目。' },
+    { key: 'reading', tag: '读写型', line: '孩子适合边读边写，鼓励他把步骤一条条写下来，再口头复述。' }
+  ];
+  const topPreference = preferenceScoring.answered
+    ? preferenceStyles.reduce((best, item) => {
+      const score = Number((preferenceScoring.scores && preferenceScoring.scores[item.key]) || 0);
+      return !best || score > best.score ? { item, score } : best;
+    }, null)
+    : null;
   return {
     title: draft.title || '学习画像',
+    learningPreferenceTag: topPreference ? topPreference.item.tag : '',
+    learningPreferenceLine: topPreference ? topPreference.item.line : '',
+    learningPreferenceSource: preferenceScoring.answered ? `来源：1 分钟问卷 · 已答 ${preferenceScoring.answered} 题` : '',
+    diagnosisTag: mainDiagnosis && mainDiagnosis.subject ? mainDiagnosis.subject : '',
+    diagnosisSource: sourceCount > 0 ? '来源：上传材料' : (assessmentCount > 0 ? '来源：1 分钟问卷' : ''),
+    tonightActionLine: dayOne && dayOne.task ? dayOne.task : (plan.parentLine || ''),
+    tonightActionTag: dayOne && dayOne.minutes ? `今晚 ${dayOne.minutes} 分钟` : '',
+    tonightActionSource: dayOne && dayOne.task ? '来源：成长报告计划' : '',
     modeLabel: reportState.reportProgress && reportState.reportProgress.label ? reportState.reportProgress.label : '0% · 快速版',
     statusLabel: reportState.reportStatus && reportState.reportStatus.label ? reportState.reportStatus.label : '可生成快速版',
     completeness: Number(reportState.reportCompleteness || 0),
