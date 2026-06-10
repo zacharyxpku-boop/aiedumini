@@ -1570,7 +1570,7 @@ page {
   position: fixed;
   left: 40rpx;
   right: 40rpx;
-  bottom: calc(108rpx + env(safe-area-inset-bottom));
+  bottom: env(safe-area-inset-bottom);
   z-index: 12;
   grid-template-columns: 1fr 1.32fr;
   gap: 16rpx;
@@ -1634,9 +1634,51 @@ page {
   flex: 1;
   display: grid;
   gap: 24rpx;
-  padding: 0 0 244rpx;
+  padding: 0 0 170rpx;
   border-radius: 0;
   background: transparent;
+}
+
+.review-finish-top {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: 72rpx minmax(0, 1fr) 72rpx;
+  align-items: center;
+  min-height: 96rpx;
+  margin: 0 -8rpx 4rpx;
+}
+
+.review-finish-top text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2c2621;
+  font-weight: 860;
+}
+
+.review-finish-top text:first-child,
+.review-finish-top text:last-child {
+  width: 64rpx;
+  height: 64rpx;
+  border: 1rpx solid #f0ebe1;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.86);
+  color: #5c544d;
+  font-size: 34rpx;
+  line-height: 64rpx;
+  box-shadow: 0 4rpx 14rpx rgba(44, 38, 33, 0.045);
+}
+
+.review-finish-top text:nth-child(2) {
+  min-width: 0;
+  overflow: hidden;
+  color: #2c3e50;
+  font-size: 31rpx;
+  line-height: 38rpx;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .review-finish-hero {
@@ -1858,7 +1900,7 @@ page {
   position: fixed;
   left: 40rpx;
   right: 40rpx;
-  bottom: calc(112rpx + env(safe-area-inset-bottom));
+  bottom: env(safe-area-inset-bottom);
   z-index: 12;
   display: grid;
   gap: 16rpx;
