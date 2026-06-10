@@ -13,7 +13,9 @@ App({
     storage.archiveYesterdaySession && storage.archiveYesterdaySession();
     setTimeout(() => {
       const profile = storage.loadProfile();
-      api.initSession(profile).catch(() => {});
+      api.initSession(profile)
+        .then(() => (api.flushLocalSyncQueue ? api.flushLocalSyncQueue() : null))
+        .catch(() => {});
     }, 800);
   },
 
