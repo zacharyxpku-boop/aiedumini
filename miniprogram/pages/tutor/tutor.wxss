@@ -1904,7 +1904,11 @@ page {
 }
 
 .tutor-reference-panel.pointing .tutor-start-cta::before {
-  content: "⚡";
+  content: "";
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0iI2ZmZmZmZiI+PHBhdGggZD0iTTI2IDYgTDEyIDI3IEwyMiAyNyBMMjAgNDIgTDM2IDIwIEwyNSAyMCBaIi8+PC9zdmc+");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 40rpx 40rpx;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2100,4 +2104,11 @@ page {
   color: #ffffff;
   background: #14b8a6;
   box-shadow: 0 14rpx 28rpx rgba(20, 184, 166, 0.2);
+}
+
+.tutor-send-btn {
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0iI2ZmZmZmZiI+PHBhdGggZD0iTTYgMjQgTDQyIDggTDM0IDQyIEwyNCAzMCBMMTYgMzYgTDE4IDI2IFoiLz48L3N2Zz4=");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 36rpx 36rpx;
 }

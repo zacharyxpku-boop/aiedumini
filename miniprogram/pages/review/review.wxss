@@ -1393,7 +1393,13 @@ page {
 }
 
 .review-live-brain::before {
-  content: "?";
+  content: "";
+  width: 44rpx;
+  height: 44rpx;
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmI5MjNjIiBzdHJva2Utd2lkdGg9IjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTE3IDE4IEMxNyAxMiAzMSAxMiAzMSAxOSBDMzEgMjUgMjQgMjUgMjQgMzAiLz48Y2lyY2xlIGN4PSIyNCIgY3k9IjM4IiByPSIyLjIiIGZpbGw9IiNmYjkyM2MiIHN0cm9rZT0ibm9uZSIvPjwvc3ZnPg==");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
   position: absolute;
   left: 50%;
   top: 50%;
