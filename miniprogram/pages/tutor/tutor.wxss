@@ -1113,7 +1113,7 @@ page {
 
 .tutor-stuck-action-icon.target {
   color: #0d9488;
-  background: #e6f4f1;
+  background-color: #e6f4f1;
   box-shadow: 0 8rpx 18rpx rgba(13, 148, 136, 0.12);
 }
 

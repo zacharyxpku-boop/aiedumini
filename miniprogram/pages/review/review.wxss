@@ -387,22 +387,22 @@ page {
 
 .review-main-tool-card.warm .review-main-tool-icon {
   color: #ef4444;
-  background: #fef2f2;
+  background-color: #fef2f2;
 }
 
 .review-main-tool-card.yellow .review-main-tool-icon {
   color: #f59e0b;
-  background: #fffbeb;
+  background-color: #fffbeb;
 }
 
 .review-main-tool-card.blue .review-main-tool-icon {
   color: #3b82f6;
-  background: #eff6ff;
+  background-color: #eff6ff;
 }
 
 .review-main-tool-card.teal .review-main-tool-icon {
   color: #14b8a6;
-  background: #e6f4f1;
+  background-color: #e6f4f1;
 }
 
 .review-record-panel,
@@ -1872,7 +1872,7 @@ page {
 }
 
 .review-finish-section.stuck > view:first-child > text:first-child::before {
-  background: #f0714d;
+  background-color: transparent;
 }
 
 .review-finish-section.stuck > text {
@@ -1899,7 +1899,7 @@ page {
 }
 
 .review-finish-section.tomorrow > view:first-child > text:first-child::before {
-  background: #8c837a;
+  background-color: transparent;
 }
 
 .review-finish-section.tomorrow > view:nth-child(2) {
