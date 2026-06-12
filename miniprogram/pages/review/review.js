@@ -1746,6 +1746,8 @@ Page({
           created_at: new Date().toISOString()
         });
       }
+      this.gameHaptic(correct);
+      this.showStreakMilestone(quizStreak);
     }
     if (current.type === 'three_minute_mini_lesson_return' && storage.recordMiniLessonReviewResult) {
       storage.recordMiniLessonReviewResult({
@@ -2508,6 +2510,8 @@ Page({
         bestStreak
       })
     });
+    this.gameHaptic(correct);
+    this.showStreakMilestone(streak);
     if (storage.appendReviewEvent) {
       storage.appendReviewEvent({
         kind: 'playable_whack_choice_selected',
@@ -2598,6 +2602,24 @@ Page({
   onHide() {
     this.stopLiveCountdown();
     this.stopMissFlash();
+  },
+
+  gameHaptic(correct) {
+    if (!wx.vibrateShort) return;
+    try {
+      wx.vibrateShort({ type: correct ? 'light' : 'heavy' });
+    } catch (error) {
+      // 部分机型不支持 type 参数，静默降级
+    }
+  },
+
+  showStreakMilestone(streak = 0) {
+    if (streak !== 3 && streak !== 5) return;
+    wx.showToast({
+      title: streak === 3 ? '连对 x3，手感来了' : '连对 x5，火力全开',
+      icon: 'none',
+      duration: 800
+    });
   },
 
   stopMissFlash() {
@@ -2691,6 +2713,10 @@ Page({
       }),
       feedbackText: record.correct ? '配对成功，继续完成下一组。' : '这组不对应，换一个配对项再试。'
     });
+    if (record.recordable) {
+      this.gameHaptic(record.correct);
+      this.showStreakMilestone(matchStreak);
+    }
     if (!record.correct) {
       this.flashMissThenClear({ matchMissIds: [] });
     }
@@ -2747,6 +2773,7 @@ Page({
         }),
         feedbackText: '顺序不对，回到第一块重新排。'
       });
+      this.gameHaptic(false);
       this.flashMissThenClear({ snakeMissTileId: '' });
       return;
     }
@@ -2796,6 +2823,10 @@ Page({
         ? (nextTrackIndex >= tracks.length ? '步骤排序完成，可以记录本轮。' : '这一组排好了，进入下一组。')
         : '顺序正确，继续点下一块。'
     });
+    this.gameHaptic(true);
+    if (trackDone) {
+      this.showStreakMilestone(snakeStreak);
+    }
   },
 
   runTemplateDeliverable(event) {
