@@ -1986,11 +1986,11 @@ page {
 }
 
 .tutor-reference-panel.stuck .tutor-stuck-footer text:first-child {
-  min-height: 96rpx;
+  min-height: 104rpx;
   border-radius: 32rpx;
   color: #ffffff;
-  background: #14b8a6;
-  box-shadow: 0 14rpx 28rpx rgba(20, 184, 166, 0.2);
+  background: #f0714d;
+  box-shadow: 0 14rpx 28rpx rgba(240, 113, 77, 0.22);
 }
 
 .tutor-reference-panel.stuck .tutor-stuck-footer text:last-child {
