@@ -14,7 +14,7 @@
         </view>
 
         <view class="yd-tutor-hero" wx:if="{{!showTutorDetails}}">
-          <image class="yd-tutor-mascot" mode="aspectFit" src="/assets/brand/gudian-mascot.png" />
+          <image class="yd-tutor-mascot" mode="aspectFit" src="/assets/reference/hero-mascot.png" />
           <view class="yd-tutor-bubble">
             <text class="yd-tutor-bubble-title">和咕点聊聊</text>
             <text>可以直接聊天、问知识点、说卡住了、发题目；咕点会追问第一步，不代写答案。</text>
