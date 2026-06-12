@@ -551,7 +551,7 @@ page {
 .growth-parent-action-card {
   display: flex;
   flex-direction: column;
-  gap: 22rpx;
+  gap: 40rpx;
   padding: 28rpx;
   border: 1rpx solid #f0ebe1;
 }
@@ -1231,18 +1231,18 @@ page {
 .growth-report-preview-card {
   position: relative;
   display: grid;
-  gap: 14rpx;
-  padding: 24rpx;
+  gap: 16rpx;
+  padding: 40rpx;
   overflow: hidden;
   border: 1rpx solid rgba(240, 235, 225, 0.9);
-  border-radius: 34rpx;
+  border-radius: 56rpx;
   background: #ffffff;
   box-shadow: 0 10rpx 28rpx rgba(15, 23, 42, 0.055);
 }
 
 .yd-parent-screen.scene-preview .growth-report-preview-card,
 .yd-parent-screen.scene-action .growth-parent-action-card > .growth-parent-action-item {
-  border-radius: 28rpx;
+  border-radius: 56rpx;
   box-shadow: 0 4rpx 22rpx rgba(15, 23, 42, 0.045);
 }
 
@@ -1340,7 +1340,7 @@ page {
   z-index: 1;
   display: block;
   color: #4b5563;
-  font-size: 24rpx;
+  font-size: 28rpx;
   line-height: 34rpx;
   overflow: visible;
 }
@@ -1386,9 +1386,9 @@ page {
   grid-template-columns: 48rpx minmax(0, 1fr);
   gap: 20rpx;
   align-items: start;
-  padding: 24rpx;
+  padding: 40rpx;
   border: 1rpx solid rgba(240, 235, 225, 0.92);
-  border-radius: 34rpx;
+  border-radius: 56rpx;
   background: #ffffff;
   box-shadow: 0 10rpx 28rpx rgba(15, 23, 42, 0.055);
 }
