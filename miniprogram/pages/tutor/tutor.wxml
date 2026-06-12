@@ -48,6 +48,7 @@
             <view class="tutor-dialogue-card">
               <view class="tutor-dialogue-top"><text bindtap="closeTutorScene">‹</text><view><view class="tutor-dialogue-status"><text></text><text>AI私教在线</text></view><text class="tutor-dialogue-title">正在陪你想第一步</text><text class="tutor-dialogue-guide">咕点在线</text></view><text>•••</text></view>
               <text class="tutor-dialogue-time">{{tutorDialogueTime}}</text>
+              <view class="tutor-hint-ladder"><text class="{{currentHintLevel >= 1 ? 'on' : ''}}"></text><text class="{{currentHintLevel >= 2 ? 'on' : ''}}"></text><text class="{{currentHintLevel >= 3 ? 'on' : ''}}"></text><text class="{{currentHintLevel >= 4 ? 'on' : ''}}"></text><text class="{{currentHintLevel >= 5 ? 'on' : ''}}"></text><text class="tutor-hint-ladder-label">提示力度 {{currentHintLevel}}/5 · {{hintLadderTitle}}</text></view>
               <block wx:if="{{messages && messages.length}}">
                 <view wx:for="{{messages}}" wx:key="index" class="tutor-chatline {{item.role === 'user' ? 'me' : ''}}"><text class="tutor-chatline-bubble">{{item.text}}</text><text class="tutor-chatline-avatar">{{item.role === 'user' ? '童' : 'AI'}}</text></view>
               </block>

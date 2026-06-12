@@ -276,6 +276,15 @@ const TUTOR_GUARDRAILS = [
   '发现抄答案风险会收紧提示'
 ];
 
+const TUTOR_ENCOURAGEMENTS = [
+  '卡住不是坏事，说明你正站在要学会的那一步上。',
+  '刚才你把条件说出来了，这一步走得很扎实。',
+  '慢一点没关系，咕点陪你把问题切小。',
+  '你愿意再试一次，这件事本身就很了不起。',
+  '错的那一步也有用，它告诉我们下次先检查哪里。',
+  '想不出来就先说出你知道的，第一步常常藏在里面。'
+];
+
 const TUTOR_REFERENCE_SCENES = {
   dialogue: {
     title: '自由对话',
@@ -1293,6 +1302,7 @@ Page({
     activeTutorScene: 'dialogue',
     coachStepLabel: '提示 1/5',
     currentHintLevel: 1,
+    hintLadderTitle: '读清问题',
     nextAction: '先用一句话说清题目真正问什么。',
     masterySignal: null,
     tutorTurnState: null,
@@ -1872,6 +1882,7 @@ Page({
     const masterySignal = result && result.mastery_signal ? result.mastery_signal : null;
     const coachStep = result && result.coach_step ? result.coach_step : this.data.activeStep;
     const currentHintLevel = result && result.hint_level ? Number(result.hint_level) : this.data.currentHintLevel;
+    const ladderInfo = tutorLadder.HINT_LADDER[(Math.max(1, Math.min(5, Number(currentHintLevel) || 1))) - 1] || tutorLadder.HINT_LADDER[0];
     const mergedTurnState = result && (result.tutor_turn_state || result.tutorTurnState) ? (result.tutor_turn_state || result.tutorTurnState) : turnState;
     storage.set(storage.KEYS.tutorMessages, next.slice(-20));
     const pasteRisk = pasteRiskSignal(next);
@@ -2185,6 +2196,7 @@ Page({
       loading: false,
       activeStep: coachStep,
       currentHintLevel,
+      hintLadderTitle: ladderInfo.title || '读清问题',
       tutorTurnState: mergedTurnState,
       coachStepLabel: result && (result.hint_label || result.coach_step_label) ? (result.hint_label || result.coach_step_label) : this.data.coachStepLabel,
       nextAction: result && result.next_action ? result.next_action : this.data.nextAction,
@@ -2370,7 +2382,9 @@ Page({
     this.setData({
       socraticFeedbackStatus: item.status,
       socraticFeedbackRecordedAt: item.createdAt,
-      socraticFeedbackNextAction: adjustment.nextAction,
+      socraticFeedbackNextAction: (status === 'still_blocked'
+        ? TUTOR_ENCOURAGEMENTS[Math.floor(Math.random() * TUTOR_ENCOURAGEMENTS.length)] + ' '
+        : '') + (adjustment.nextAction || ''),
       currentHintLevel: adjustment.nextHintLevel,
       activeStep: adjustment.activeStep,
       coachStepLabel: adjustment.coachStepLabel,

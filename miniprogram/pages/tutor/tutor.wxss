@@ -1494,6 +1494,35 @@ page {
   text-align: center;
 }
 
+.tutor-hint-ladder {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  justify-content: center;
+  margin: 4rpx 0 8rpx;
+}
+
+.tutor-hint-ladder > text {
+  width: 36rpx;
+  height: 10rpx;
+  border-radius: 999rpx;
+  background: #e5e7eb;
+}
+
+.tutor-hint-ladder > text.on {
+  background: #14b8a6;
+}
+
+.tutor-hint-ladder-label {
+  width: auto !important;
+  height: auto !important;
+  margin-left: 8rpx;
+  background: transparent !important;
+  color: #6b7280;
+  font-size: 22rpx;
+  font-weight: 700;
+}
+
 .tutor-chatline {
   display: grid;
   grid-template-columns: 80rpx minmax(0, 1fr);
