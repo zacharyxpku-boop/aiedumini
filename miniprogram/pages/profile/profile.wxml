@@ -1,5 +1,5 @@
 <view class="page safe-bottom profile-page">
-  <scroll-view class="profile-scroll" scroll-y enhanced show-scrollbar="{{false}}">
+  <scroll-view class="profile-scroll" scroll-y enhanced bounces="{{false}}" show-scrollbar="{{false}}">
     <view class="profile-shell">
       <view class="yd-parent-screen yd-app-screen yd-parent-app scene-{{growthActiveScene}}">
         <view class="yd-parent-top" wx:if="{{growthActiveScene === 'main'}}">

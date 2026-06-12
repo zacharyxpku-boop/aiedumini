@@ -1,5 +1,5 @@
 <view class="review-page">
-  <scroll-view class="content-area" scroll-y enhanced show-scrollbar="{{false}}">
+  <scroll-view class="content-area" scroll-y enhanced bounces="{{false}}" show-scrollbar="{{false}}">
     <view class="content-inner">
       <view class="yd-review-screen yd-app-screen yd-review-app stage-{{reviewFlowStage}}">
         <view class="yd-review-top" wx:if="{{reviewFlowStage === 'main'}}">

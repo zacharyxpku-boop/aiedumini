@@ -1,5 +1,5 @@
 ﻿<view class="upload-page">
-  <scroll-view class="upload-scroll" scroll-y enhanced show-scrollbar="{{false}}">
+  <scroll-view class="upload-scroll" scroll-y enhanced bounces="{{false}}" show-scrollbar="{{false}}">
     <view class="upload-content">
       <view class="yd-upload-screen yd-app-screen yd-upload-app">
         <view class="yd-upload-top">

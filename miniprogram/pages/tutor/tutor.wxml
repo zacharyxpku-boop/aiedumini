@@ -1,5 +1,5 @@
 <view class="tutor-page safe-bottom">
-  <scroll-view class="tutor-main" scroll-y enhanced show-scrollbar="{{false}}">
+  <scroll-view class="tutor-main" scroll-y enhanced bounces="{{false}}" show-scrollbar="{{false}}">
     <view class="main-inner">
       <view class="yd-tutor-screen yd-app-screen yd-tutor-app detail-{{showTutorDetails ? 'on' : 'off'}}">
         <view class="yd-tutor-top">

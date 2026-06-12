@@ -17,7 +17,7 @@
         </view>
   </view>
 
-  <scroll-view scroll-y enhanced show-scrollbar="{{false}}" class="home-scroll">
+  <scroll-view scroll-y enhanced bounces="{{false}}" show-scrollbar="{{false}}" class="home-scroll">
     <view class="yd-home-screen yd-app-screen yd-home-app">
       <view class="yd-home-hero-card">
           <view class="yd-home-hero-copy">
