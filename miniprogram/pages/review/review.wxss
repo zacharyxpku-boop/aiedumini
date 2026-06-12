@@ -2204,6 +2204,12 @@ page {
   box-shadow: 0 12rpx 32rpx rgba(240, 113, 77, 0.25);
 }
 
+.review-finish-bottom button.review-finish-share {
+  min-height: 96rpx;
+  background-color: #0f766e;
+  box-shadow: 0 12rpx 32rpx rgba(15, 118, 110, 0.22);
+}
+
 .review-finish-bottom button:last-child {
   min-height: 96rpx;
   border: 1rpx solid #fde2d9;

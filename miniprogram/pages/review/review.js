@@ -152,6 +152,15 @@ Page({
   onShareAppMessage() {
     const topic = String(this.data.selectedKnowledgeTopic || '').slice(0, 18);
     const tool = this.data.selectedPlayableReviewToolTitle || '错因地鼠';
+    const active = this.data.activeReviewTool || {};
+    if (this.data.reviewFlowStage === 'finished' && active.attemptSummary) {
+      const score = Number(active.score || 0);
+      const accuracy = Number(active.finishAccuracy || 0);
+      return {
+        title: `我刚用「${tool}」拿了 ${score} 分${accuracy ? `，正确率 ${accuracy}%` : ''}${topic ? `（${topic}）` : ''}，敢来比一局吗`,
+        path: `/pages/review/review?from=share_result${topic ? `&topic=${encodeURIComponent(topic)}` : ''}`
+      };
+    }
     return {
       title: topic ? `我在知识乐园用「${tool}」练「${topic}」，来开一局` : '来知识乐园开一局，错题会变成你的专属练习',
       path: `/pages/review/review?from=share_relay${topic ? `&topic=${encodeURIComponent(topic)}` : ''}`
