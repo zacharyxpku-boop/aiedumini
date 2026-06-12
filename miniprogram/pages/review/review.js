@@ -129,6 +129,7 @@ Page({
     knowledgeStarterTopicBatch: 0,
     knowledgeStarterTopicCards: KNOWLEDGE_STARTER_TOPIC_CARDS,
     selectedPlayableReviewToolId: 'whack',
+    deckCompositionText: '',
     selectedPlayableReviewToolTitle: '错因地鼠',
     selectedPlayableReviewToolStartText: '开始错因地鼠'
   },
@@ -717,6 +718,7 @@ Page({
       const selectedTool = visibleTools.find((item) => item && item.id === preferredToolId)
         || this.resolveSelectedPlayableReviewTool(visibleTools);
       this.setData({
+        deckCompositionText: this.buildDeckCompositionText(cards),
         playableReviewTools: tools,
         visiblePlayableReviewTools: visibleTools,
         selectedPlayableReviewToolId: selectedTool.id || 'whack',
@@ -755,6 +757,17 @@ Page({
     }
     this.setData({ reviewFlowStage: 'main' });
     this.setReviewTabbarHidden(false);
+  },
+
+  buildDeckCompositionText(cards = []) {
+    const list = Array.isArray(cards) ? cards.filter((card) => card && card.id) : [];
+    const topicCount = list.filter((card) => card.source === 'k12_topic_bank').length;
+    const mineCount = list.length - topicCount;
+    if (!list.length) return '牌组准备中 · 挑选开局方式，马上开始。';
+    const parts = [];
+    if (mineCount > 0) parts.push(`我的错题 ${mineCount} 张`);
+    if (topicCount > 0) parts.push(`主题题库 ${topicCount} 张`);
+    return `${parts.join(' + ')} · 挑选开局方式，马上开始。`;
   },
 
   ensureKnowledgeStarterCards() {
