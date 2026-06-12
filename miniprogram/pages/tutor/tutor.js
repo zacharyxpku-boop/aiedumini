@@ -210,7 +210,10 @@ function buildTutorServiceStatus(result = {}, receipt = {}) {
     rate_limited: ['已切本地带学', '今天对话较多，本轮先用本地带学规则，稍后可再试模型点拨。'],
     content_check_unavailable: ['安全预检离线', '安全预检暂时不可用，本轮只做本地最小提示。'],
     network_error: ['网络不稳', '网络不稳，本轮用本地带学规则，仍不直接给答案。'],
-    client_network_error: ['网络不稳', '网络不稳，本轮用本地带学规则，仍不直接给答案。']
+    client_network_error: ['网络不稳', '网络不稳，本轮用本地带学规则，仍不直接给答案。'],
+    missing_model_key: ['未配置模型', '服务端还没配置模型 key，本轮全程本地带学规则，不直接给答案。'],
+    upstream_timeout: ['模型超时', '模型响应超时，本轮先用本地带学规则，稍后可再试。'],
+    server_upstream_error: ['模型暂不可用', '模型服务暂时不可用，本轮用本地带学规则，仍不直接给答案。']
   };
   const copy = statusCopy[source] || ['本地带学', '本轮用本地带学规则，仍不直接给答案。'];
   return {
