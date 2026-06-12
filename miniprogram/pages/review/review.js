@@ -2328,6 +2328,12 @@ Page({
       : 'remembered';
     const active = this.data.activeReviewTool || {};
     if (!active.id || active.empty) return;
+    if (this._finishBusy) return;
+    this._finishBusy = true;
+    this._finishBusyTimer = setTimeout(() => {
+      this._finishBusy = false;
+      this._finishBusyTimer = null;
+    }, 800);
     let answers = Array.isArray(active.answers) ? active.answers.slice() : [];
     if (!answers.length) {
       const primary = active.primary || {};
@@ -2627,6 +2633,11 @@ Page({
       clearTimeout(this._missFlashTimer);
       this._missFlashTimer = null;
     }
+    if (this._finishBusyTimer) {
+      clearTimeout(this._finishBusyTimer);
+      this._finishBusyTimer = null;
+    }
+    this._finishBusy = false;
   },
 
   flashMissThenClear(patch = {}) {
@@ -2644,6 +2655,7 @@ Page({
     const tileId = dataset.id || '';
     const active = this.data.activeReviewTool || {};
     if (active.gameType !== 'match' || !tileId) return;
+    if (Array.isArray(active.matchMissIds) && active.matchMissIds.length) return;
     const tiles = Array.isArray(active.tiles) ? active.tiles.slice() : [];
     const tile = tiles.find((item) => item.id === tileId);
     if (!tile || tile.matched) return;
@@ -2727,6 +2739,7 @@ Page({
     const tileId = dataset.id || '';
     const active = this.data.activeReviewTool || {};
     if (active.gameType !== 'snake' || !tileId) return;
+    if (active.snakeMissTileId) return;
     const tracks = Array.isArray(active.tracks) ? active.tracks.slice() : [];
     const currentTrackIndex = Number(active.currentTrackIndex || 0);
     const currentTrack = tracks[currentTrackIndex] || null;
