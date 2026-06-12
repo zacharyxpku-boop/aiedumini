@@ -2,7 +2,7 @@
   "sourceRepo": "zacharyxpku-boop/ai-edu-platform",
   "sourcePath": "miniprogram",
   "sourceCommit": "fe3f331",
-  "syncedAt": "2026-06-12T18:49:30.344Z",
+  "syncedAt": "2026-06-12T19:44:05.253Z",
   "files": [
     "miniprogram/app.js",
     "miniprogram/app.json",
@@ -99,6 +99,7 @@
     "miniprogram/utils/personalized-report-template.js",
     "miniprogram/utils/privacy.js",
     "miniprogram/utils/product-readiness.js",
+    "miniprogram/utils/qbank-starter.js",
     "miniprogram/utils/real-homework-coverage.js",
     "miniprogram/utils/review-cards.js",
     "miniprogram/utils/revisit-engine.js",

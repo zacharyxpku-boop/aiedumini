@@ -85,10 +85,19 @@ const TOPIC_BANK = {
   ]
 };
 
+const qbankStarter = require('./qbank-starter.js');
+const STARTER_BANK = (qbankStarter && qbankStarter.STARTER_BANK) || {};
+
+function topicRows(key) {
+  // 手写卡 + curated 真题精选包合并：真题在后，干扰项池更厚
+  return (TOPIC_BANK[key] || []).concat(STARTER_BANK[key] || []);
+}
+
 function normalizeTopic(topic = '') {
   const value = String(topic || '').trim();
-  if (TOPIC_BANK[value]) return value;
-  const hit = Object.keys(TOPIC_BANK).find((key) => value.indexOf(key) >= 0 || key.indexOf(value) >= 0);
+  if (TOPIC_BANK[value] || STARTER_BANK[value]) return value;
+  const keys = Object.keys(TOPIC_BANK).concat(Object.keys(STARTER_BANK));
+  const hit = keys.find((key) => value.indexOf(key) >= 0 || key.indexOf(value) >= 0);
   return hit || '';
 }
 
@@ -105,7 +114,7 @@ function genericDeck(topic) {
 
 function buildTopicDeck(topic = '') {
   const key = normalizeTopic(topic);
-  const rows = key ? TOPIC_BANK[key] : genericDeck(topic);
+  const rows = key ? topicRows(key) : genericDeck(topic);
   const label = key || String(topic || '基础练习').slice(0, 12);
   const now = new Date().toISOString();
   const baseId = `topic_${label.replace(/[^a-zA-Z0-9_一-龥]/g, '_')}`;
