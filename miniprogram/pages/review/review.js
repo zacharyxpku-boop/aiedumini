@@ -1727,6 +1727,7 @@ Page({
         weakEvidence: rating === 'again' || rating === 'hard'
       }]);
       ratedActiveReviewTool = Object.assign({}, activeReviewTool, {
+        quizProgressIndex: Math.min(nextQuizAnswers.length, Math.max(1, Number(activeReviewTool.itemCount || 3)) - 1),
         score: quizScore,
         streak: quizStreak,
         bestStreak: Math.max(Number(activeReviewTool.bestStreak || 0), quizStreak),
@@ -2730,6 +2731,7 @@ Page({
         tiles: nextTiles,
         selectedTileId: '',
         matchedPairIds,
+        matchProgressIndex: Math.min(matchedPairIds.length, Math.max(1, Number(active.itemCount || 3)) - 1),
         matchMissIds: record.correct ? [] : [selectedTileId, tileId],
         answers,
         attemptSummary: revisitEngine.summarizeAttempt

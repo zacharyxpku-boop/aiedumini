@@ -1412,6 +1412,13 @@ page {
   color: #b91c1c;
 }
 
+.review-live-actions button.button-hover,
+.review-play-choice-grid button.button-hover,
+.review-play-done.button-hover {
+  transform: scale(0.96);
+  opacity: 0.85;
+}
+
 .review-play-tile.miss,
 .review-play-step.miss {
   border-color: #ef4444;
