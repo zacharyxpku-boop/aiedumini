@@ -1097,7 +1097,7 @@ page {
   color: #ff7d40;
   text-align: center;
   line-height: 88rpx;
-  font-size: 34rpx;
+  font-size: 48rpx;
   box-shadow: 0 4rpx 14rpx rgba(15, 23, 42, 0.04);
 }
 
