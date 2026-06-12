@@ -695,6 +695,11 @@ Page({
         : `已打开${tool.title || '知识玩法'}，先说第一步再点按钮。`
     });
     this.setReviewTabbarHidden(true);
+    if (stage === 'finished') {
+      this.stopLiveCountdown();
+    } else {
+      this.startLiveCountdown(60);
+    }
   },
 
   setReviewFlowStage(event) {
@@ -2578,6 +2583,7 @@ Page({
   startLiveCountdown(seconds = 60) {
     this.stopLiveCountdown();
     this.setData({ liveCountdown: seconds });
+    if (typeof setInterval !== 'function') return;
     this._liveTimer = setInterval(() => {
       const left = Number(this.data.liveCountdown || 0) - 1;
       if (left <= 0) {
