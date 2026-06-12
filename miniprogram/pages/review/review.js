@@ -892,7 +892,19 @@ Page({
       : wrong
         ? '明天先回访这张错因卡，预计 2 分钟。'
         : '明天做同类迁移回访，预计 2 分钟。';
+    const reviewItems = (Array.isArray(active.answers) ? active.answers : [])
+      .filter((item) => item && item.recordable !== false)
+      .slice(0, 6)
+      .map((item, index) => ({
+        id: `finish_item_${index}`,
+        question: item.question || (item.knowledgeType ? `${item.knowledgeType} · 步骤排序` : `第 ${index + 1} 题`),
+        selected: item.selected || '',
+        answer: item.answer || '',
+        correct: !!item.correct
+      }));
     return {
+      finishAccuracy: total > 0 ? Math.round((correct / total) * 100) : 0,
+      finishReviewItems: reviewItems,
       finishEvidenceLines: evidenceLines.slice(0, 3),
       finishEvidenceCount: evidenceCount,
       finishEvidencePrimary: evidenceLines[0] || '这一局留下了可复盘证据。',
@@ -2510,6 +2522,7 @@ Page({
       cardId: question.cardId || question.id || '',
       correct,
       recordable: true,
+      question: question.question || '',
       selected: choice.text || '',
       answer: question.answer || '',
       gameType: 'whack',

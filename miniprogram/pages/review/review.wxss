@@ -1920,6 +1920,81 @@ page {
   font-weight: 900;
 }
 
+.review-finish-accuracy {
+  padding: 6rpx 20rpx;
+  border-radius: 999rpx;
+  background-color: #e6f4f1;
+  color: #0f766e;
+  font-size: 23rpx;
+  font-weight: 900;
+}
+
+.review-finish-replay {
+  display: grid;
+  gap: 12rpx;
+  padding: 24rpx;
+  border: 1rpx solid #eaf3ef;
+  border-radius: 24rpx;
+  background-color: #ffffff;
+}
+
+.review-finish-replay-title {
+  color: #111827;
+  font-size: 24rpx;
+  line-height: 30rpx;
+  font-weight: 900;
+}
+
+.review-finish-replay-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14rpx;
+  padding: 14rpx;
+  border-radius: 16rpx;
+  background-color: #f8fafc;
+}
+
+.review-finish-replay-item.wrong {
+  background-color: #fef2f2;
+}
+
+.review-finish-replay-mark {
+  flex-shrink: 0;
+  width: 44rpx;
+  height: 44rpx;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 44rpx;
+  background-color: #0f766e;
+  color: #ffffff;
+  font-size: 22rpx;
+  font-weight: 900;
+}
+
+.review-finish-replay-item.wrong .review-finish-replay-mark {
+  background-color: #ef4444;
+}
+
+.review-finish-replay-body {
+  display: grid;
+  gap: 4rpx;
+  min-width: 0;
+}
+
+.review-finish-replay-body text:first-child {
+  color: #111827;
+  font-size: 23rpx;
+  line-height: 30rpx;
+  font-weight: 800;
+}
+
+.review-finish-replay-body text {
+  color: #64748b;
+  font-size: 21rpx;
+  line-height: 28rpx;
+  font-weight: 700;
+}
+
 .review-finish-section {
   display: grid;
   gap: 16rpx;
