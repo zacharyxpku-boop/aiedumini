@@ -737,9 +737,11 @@ Page({
     }
     this.setData({ reviewFlowStage: ['topic', 'tool', 'live', 'finished'].includes(stage) ? stage : 'topic' });
     this.setReviewTabbarHidden(true);
+    if (stage === 'live') { this.startLiveCountdown(60); } else { this.stopLiveCountdown(); }
   },
 
   closeReviewSubpage() {
+    this.stopLiveCountdown();
     const stage = this.data.reviewFlowStage;
     if (stage === 'live' || stage === 'finished') {
       this.setData({ reviewFlowStage: 'tool' });
@@ -2447,7 +2449,7 @@ Page({
     const dataset = event && event.currentTarget ? event.currentTarget.dataset || {} : {};
     const choiceIndex = Number(dataset.index || 0);
     const active = this.data.activeReviewTool || {};
-    if (active.gameType !== 'whack') return;
+    if (active.gameType !== 'whack' || active.whackLock || active.whackComplete) return;
     const questions = Array.isArray(active.items) ? active.items : [];
     const engineQuestions = active.whackQuestion && active.whackQuestion.id
       ? (active.roundQuestions || [])
@@ -2459,6 +2461,30 @@ Page({
     const choice = choices[choiceIndex] || {};
     if (!question || !choice.text) return;
     const correct = String(choice.text || '') === String(question.answer || '');
+    const prevStreak = Number(active.streak || 0);
+    const streak = correct ? prevStreak + 1 : 0;
+    const gained = correct ? 100 + Math.min(prevStreak, 5) * 20 : 0;
+    const score = Number(active.score || 0) + gained;
+    const bestStreak = Math.max(Number(active.bestStreak || 0), streak);
+    this.setData({
+      activeReviewTool: Object.assign({}, active, {
+        whackLock: true,
+        whackFeedback: { index: choiceIndex, correct },
+        score,
+        streak,
+        bestStreak
+      })
+    });
+    if (storage.appendReviewEvent) {
+      storage.appendReviewEvent({
+        kind: 'playable_whack_choice_selected',
+        tool_id: active.id,
+        correct,
+        card_id: question.cardId || question.id || '',
+        source: 'review_tab_live_tool',
+        created_at: new Date().toISOString()
+      });
+    }
     const record = {
       cardId: question.cardId || question.id || '',
       correct,
@@ -2468,16 +2494,13 @@ Page({
       gameType: 'whack',
       knowledgeType: question.knowledgeType || ''
     };
-    if (storage.appendReviewEvent) {
-      storage.appendReviewEvent({
-        kind: 'playable_whack_choice_selected',
-        tool_id: active.id,
-        correct,
-        card_id: record.cardId,
-        source: 'review_tab_live_tool',
-        created_at: new Date().toISOString()
-      });
-    }
+    setTimeout(() => {
+      this.advanceWhackRound(record, whackQuestions, currentIndex, question, choices);
+    }, 550);
+  },
+
+  advanceWhackRound(record, whackQuestions, currentIndex, question, choices) {
+    const active = this.data.activeReviewTool || {};
     const answers = (Array.isArray(active.answers) ? active.answers.slice() : []).concat([record]);
     const sourceQuestions = whackQuestions.length ? whackQuestions : (question ? [question] : []);
     const nextIndex = currentIndex + 1;
@@ -2491,8 +2514,11 @@ Page({
       }))
       : [];
     const whackComplete = nextIndex >= sourceQuestions.length;
+    if (whackComplete) this.stopLiveCountdown();
     this.setData({
       activeReviewTool: Object.assign({}, active, {
+        whackLock: false,
+        whackFeedback: null,
         whackQuestionIndex: whackComplete ? currentIndex : nextIndex,
         whackQuestion: nextQuestion,
         whackChoices: nextChoices.length ? nextChoices : choices,
@@ -2501,9 +2527,41 @@ Page({
         attemptSummary: revisitEngine.summarizeAttempt
           ? revisitEngine.summarizeAttempt({ gameType: 'whack', answers, expectedTotal: active.itemCount || answers.length })
           : null
-      }),
-      feedbackText: correct ? '快选命中，继续下一张。' : '这张没对上，完成后会进入错因修复。'
+      })
     });
+  },
+
+  startLiveCountdown(seconds = 60) {
+    this.stopLiveCountdown();
+    this.setData({ liveCountdown: seconds });
+    this._liveTimer = setInterval(() => {
+      const left = Number(this.data.liveCountdown || 0) - 1;
+      if (left <= 0) {
+        this.stopLiveCountdown();
+        this.setData({ liveCountdown: 0 });
+        const active = this.data.activeReviewTool || {};
+        if (this.data.reviewFlowStage === 'live' && active.id) {
+          this.openPlayableReviewStage('finished');
+        }
+        return;
+      }
+      this.setData({ liveCountdown: left });
+    }, 1000);
+  },
+
+  stopLiveCountdown() {
+    if (this._liveTimer) {
+      clearInterval(this._liveTimer);
+      this._liveTimer = null;
+    }
+  },
+
+  onUnload() {
+    this.stopLiveCountdown();
+  },
+
+  onHide() {
+    this.stopLiveCountdown();
   },
 
   selectMatchTile(event) {

@@ -1330,6 +1330,44 @@ page {
   font-weight: 800;
 }
 
+
+.review-game-score {
+  margin-left: auto;
+  margin-right: 14rpx;
+  padding: 6rpx 18rpx;
+  border-radius: 999rpx;
+  background: #fff7ed;
+  color: #ea580c;
+  font-size: 24rpx;
+  font-weight: 900;
+}
+
+.review-game-clock {
+  padding: 6rpx 16rpx;
+  border-radius: 999rpx;
+  background: #e6f4f1;
+  color: #0d9488;
+  font-size: 24rpx;
+  font-weight: 900;
+}
+
+.review-game-clock.low {
+  background: #fef2f2;
+  color: #ef4444;
+}
+
+.review-play-choice-grid button.hit {
+  border-color: #14b8a6;
+  background: #e6f4f1;
+  color: #0f766e;
+}
+
+.review-play-choice-grid button.miss {
+  border-color: #ef4444;
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
 .review-game-bar {
   height: 12rpx;
   overflow: hidden;
