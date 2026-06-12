@@ -519,4 +519,6 @@ const STARTER_BANK = {
   ]
 };
 
-module.exports = { STARTER_BANK };
+const STARTER_TOPICS = ["小数乘法","认识分数","面积计算","混合运算","认识钟表","行程问题","百分数应用","平均数","倍数关系","和差问题","工程问题","比例与比"];
+
+module.exports = { STARTER_BANK, STARTER_TOPICS };

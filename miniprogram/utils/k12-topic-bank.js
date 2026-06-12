@@ -139,8 +139,19 @@ function buildTopicDeck(topic = '') {
   }));
 }
 
+function listPlayableTopics(limit = 12) {
+  // 内置真题主题在前（每个都有牌组+云端大池），手写主题补位，去重
+  const starter = (qbankStarter && qbankStarter.STARTER_TOPICS) || [];
+  const merged = [];
+  starter.concat(Object.keys(TOPIC_BANK)).forEach((topic) => {
+    if (merged.indexOf(topic) < 0) merged.push(topic);
+  });
+  return merged.slice(0, limit);
+}
+
 module.exports = {
   TOPIC_BANK,
   buildTopicDeck,
-  normalizeTopic
+  normalizeTopic,
+  listPlayableTopics
 };

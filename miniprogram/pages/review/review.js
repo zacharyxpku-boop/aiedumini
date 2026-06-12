@@ -141,7 +141,10 @@ Page({
       this.setData({ selectedKnowledgeTopic: sharedTopic });
     }
     this.setData({
-      reportSourceContext: this.buildReportSourceContext(query) || this.buildTemplateRouteContext(query)
+      reportSourceContext: this.buildReportSourceContext(query) || this.buildTemplateRouteContext(query),
+      knowledgeChipTopics: k12TopicBank.listPlayableTopics
+        ? k12TopicBank.listPlayableTopics(8)
+        : this.data.knowledgeChipTopics
     });
     this.applyReferenceStageRoute(query);
   },
