@@ -130,6 +130,7 @@ Page({
     knowledgeStarterTopicCards: KNOWLEDGE_STARTER_TOPIC_CARDS,
     selectedPlayableReviewToolId: 'whack',
     deckCompositionText: '',
+    savedPracticeTemplates: [],
     selectedPlayableReviewToolTitle: '错因地鼠',
     selectedPlayableReviewToolStartText: '开始错因地鼠'
   },
@@ -719,6 +720,7 @@ Page({
         || this.resolveSelectedPlayableReviewTool(visibleTools);
       this.setData({
         deckCompositionText: this.buildDeckCompositionText(cards),
+        savedPracticeTemplates: this.loadSavedPracticeTemplates(),
         playableReviewTools: tools,
         visiblePlayableReviewTools: visibleTools,
         selectedPlayableReviewToolId: selectedTool.id || 'whack',
@@ -2791,6 +2793,81 @@ Page({
       feedbackText: dataset.label
         ? `${dataset.label} 已打开，本机只使用错因卡和第一步证据。`
         : '知识乐园练习已打开，本机只使用错因卡和第一步证据。'
+    });
+  },
+
+  loadSavedPracticeTemplates() {
+    const list = storage.get ? storage.get('review.practice.templates.v1', []) : [];
+    return Array.isArray(list) ? list.filter((item) => item && item.id) : [];
+  },
+
+  saveCurrentPracticeTemplate() {
+    const workbench = this.data.practiceTemplateWorkbench || {};
+    if (!workbench.id) {
+      this.setData({ feedbackText: '先生成练习单，再保存为模板。' });
+      return;
+    }
+    const topic = this.data.selectedKnowledgeTopic || '基础练习';
+    const template = {
+      id: `tpl_${workbench.id}_${topic}`,
+      toolId: workbench.id,
+      title: workbench.title || '错因地鼠',
+      topic,
+      line: workbench.line || '',
+      count: workbench.count || 0,
+      savedAt: new Date().toISOString()
+    };
+    const existing = this.loadSavedPracticeTemplates().filter((item) => item.id !== template.id);
+    const merged = [template].concat(existing).slice(0, 6);
+    if (storage.set) {
+      storage.set('review.practice.templates.v1', merged);
+    }
+    if (storage.appendReviewEvent) {
+      storage.appendReviewEvent({
+        kind: 'practice_template_saved',
+        template_id: template.id,
+        tool_id: template.toolId,
+        topic: template.topic
+      });
+    }
+    this.setData({
+      savedPracticeTemplates: merged,
+      feedbackText: `模板「${template.title} · ${template.topic}」已保存，下次一键套用。`
+    });
+  },
+
+  applySavedPracticeTemplate(event) {
+    const dataset = event && event.currentTarget ? event.currentTarget.dataset || {} : {};
+    const templates = this.data.savedPracticeTemplates && this.data.savedPracticeTemplates.length
+      ? this.data.savedPracticeTemplates
+      : this.loadSavedPracticeTemplates();
+    const template = templates.find((item) => item && item.id === dataset.id);
+    if (!template) {
+      this.setData({ feedbackText: '这个模板不在了，重新保存一个吧。' });
+      return;
+    }
+    this.setData({ selectedKnowledgeTopic: template.topic }, () => {
+      const cards = this.ensureKnowledgeStarterCards();
+      const pack = this.buildPracticeTemplatePack(this.data.practiceTemplateWorkshop, cards);
+      const deliverable = (pack.deliverables || []).find((item) => item.id === template.toolId)
+        || { id: template.toolId, label: template.title, ready: true, count: template.count };
+      if (storage.appendReviewEvent) {
+        storage.appendReviewEvent({
+          kind: 'practice_template_applied',
+          template_id: template.id,
+          tool_id: template.toolId,
+          topic: template.topic
+        });
+      }
+      this.setData({
+        practiceTemplatePack: pack,
+        practiceTemplateWorkbench: this.buildPracticeTemplateWorkbench(deliverable, pack),
+        selectedPlayableReviewToolId: template.toolId,
+        selectedPlayableReviewToolTitle: template.title,
+        selectedPlayableReviewToolStartText: `开始${template.title}`,
+        deckCompositionText: this.buildDeckCompositionText(cards),
+        feedbackText: `模板「${template.title} · ${template.topic}」已套用，直接开始。`
+      });
     });
   },
 

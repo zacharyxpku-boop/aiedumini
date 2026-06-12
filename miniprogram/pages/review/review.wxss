@@ -1203,6 +1203,50 @@ page {
   line-height: 30rpx;
 }
 
+.review-template-actions text {
+  display: inline-block;
+  margin-top: 8rpx;
+  padding: 12rpx 24rpx;
+  border-radius: 999rpx;
+  background-color: #0f766e;
+  color: #ffffff;
+  font-size: 22rpx;
+  line-height: 28rpx;
+  font-weight: 900;
+}
+
+.review-template-saved {
+  display: grid;
+  gap: 10rpx;
+  margin-top: 10rpx;
+  padding-top: 12rpx;
+  border-top: 1rpx dashed #cbd5e1;
+}
+
+.review-template-saved-title {
+  color: #64748b;
+  font-size: 20rpx;
+  line-height: 26rpx;
+  font-weight: 800;
+}
+
+.review-template-saved-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+}
+
+.review-template-saved-row text {
+  padding: 10rpx 18rpx;
+  border-radius: 999rpx;
+  background-color: rgba(15, 118, 110, 0.08);
+  border: 1rpx solid rgba(15, 118, 110, 0.28);
+  color: #0f766e;
+  font-size: 21rpx;
+  line-height: 26rpx;
+  font-weight: 800;
+}
+
 
 .review-empty-actions {
   display: grid;

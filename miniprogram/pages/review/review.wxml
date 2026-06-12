@@ -65,6 +65,13 @@
               <view class="review-template-sample"><text>{{practiceTemplateWorkbench.samples[2].label}}</text><text>{{practiceTemplateWorkbench.samples[2].source}}</text></view>
             </view>
             <text class="review-template-safe">{{practiceTemplateWorkbench.safetyLine}}</text>
+            <view class="review-template-actions"><text bindtap="saveCurrentPracticeTemplate">保存为我的模板</text></view>
+            <view class="review-template-saved" wx:if="{{savedPracticeTemplates.length}}">
+              <text class="review-template-saved-title">已存模板 · 点一下直接套用</text>
+              <view class="review-template-saved-row">
+                <text wx:for="{{savedPracticeTemplates}}" wx:key="id" data-id="{{item.id}}" bindtap="applySavedPracticeTemplate">{{item.title}} · {{item.topic}}</text>
+              </view>
+            </view>
           </view>
           <view class="review-empty-note" wx:if="{{reviewFlowStage !== 'topic' && activeReviewTool && activeReviewTool.empty}}"><text>还没有真实卡。先上传材料或完成一次 AI私教。</text><view class="review-empty-actions"><text bindtap="goUpload">去上传材料</text><text bindtap="closeReviewSubpage">返回乐园</text></view></view>
           <view class="review-live-tool stage-{{reviewFlowStage}}" wx:elif="{{reviewFlowStage !== 'tool' && activeReviewTool && activeReviewTool.id}}">
