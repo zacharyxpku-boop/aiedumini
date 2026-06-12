@@ -2579,10 +2579,29 @@ Page({
 
   onUnload() {
     this.stopLiveCountdown();
+    this.stopMissFlash();
   },
 
   onHide() {
     this.stopLiveCountdown();
+    this.stopMissFlash();
+  },
+
+  stopMissFlash() {
+    if (this._missFlashTimer) {
+      clearTimeout(this._missFlashTimer);
+      this._missFlashTimer = null;
+    }
+  },
+
+  flashMissThenClear(patch = {}) {
+    this.stopMissFlash();
+    this._missFlashTimer = setTimeout(() => {
+      this._missFlashTimer = null;
+      const active = this.data.activeReviewTool || {};
+      if (!active.id) return;
+      this.setData({ activeReviewTool: Object.assign({}, active, patch) });
+    }, 550);
   },
 
   selectMatchTile(event) {
@@ -2651,6 +2670,7 @@ Page({
         tiles: nextTiles,
         selectedTileId: '',
         matchedPairIds,
+        matchMissIds: record.correct ? [] : [selectedTileId, tileId],
         answers,
         attemptSummary: revisitEngine.summarizeAttempt
           ? revisitEngine.summarizeAttempt({ gameType: 'match', answers, expectedTotal: active.itemCount || answers.length })
@@ -2658,6 +2678,9 @@ Page({
       }),
       feedbackText: record.correct ? '配对成功，继续完成下一组。' : '这组不对应，换一个配对项再试。'
     });
+    if (!record.correct) {
+      this.flashMissThenClear({ matchMissIds: [] });
+    }
   },
 
   pickSnakeTile(event) {
@@ -2703,6 +2726,7 @@ Page({
             tiles: currentTrack.tiles.map((item) => Object.assign({}, item, { picked: false }))
           }),
           snakePickedIds: [],
+          snakeMissTileId: tileId,
           answers,
           attemptSummary: revisitEngine.summarizeAttempt
             ? revisitEngine.summarizeAttempt({ gameType: 'snake', answers, expectedTotal: active.itemCount || answers.length })
@@ -2710,6 +2734,7 @@ Page({
         }),
         feedbackText: '顺序不对，回到第一块重新排。'
       });
+      this.flashMissThenClear({ snakeMissTileId: '' });
       return;
     }
     const nextPicked = picked.concat(tileId);

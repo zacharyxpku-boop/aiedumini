@@ -1412,6 +1412,13 @@ page {
   color: #b91c1c;
 }
 
+.review-play-tile.miss,
+.review-play-step.miss {
+  border-color: #ef4444;
+  background-color: #fef2f2;
+  color: #b91c1c;
+}
+
 .review-game-bar {
   height: 12rpx;
   overflow: hidden;
