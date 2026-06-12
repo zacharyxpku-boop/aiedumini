@@ -1203,6 +1203,32 @@ page {
   line-height: 30rpx;
 }
 
+
+.review-empty-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16rpx;
+  margin-top: 20rpx;
+}
+
+.review-empty-actions text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 88rpx;
+  border-radius: 28rpx;
+  background: #f0714d;
+  color: #ffffff;
+  font-size: 28rpx;
+  font-weight: 800;
+}
+
+.review-empty-actions text:last-child {
+  border: 1rpx solid #e5e7eb;
+  background: #ffffff;
+  color: #1f2937;
+}
+
 .review-empty-note {
   padding: 18rpx;
   color: #6b7280;

@@ -26,7 +26,7 @@
         </view>
 
         <view class="review-record-panel" wx:if="{{reviewFlowStage !== 'main'}}">
-          <view class="review-subpage-top" wx:if="{{reviewFlowStage !== 'finished'}}">
+          <view class="review-subpage-top" wx:if="{{reviewFlowStage !== 'finished' || !activeReviewTool || !activeReviewTool.attemptSummary}}">
             <text bindtap="closeReviewSubpage">‹</text>
             <text>{{reviewFlowStage === 'topic' ? '选知识点' : reviewFlowStage === 'tool' ? '玩法选择' : reviewFlowStage === 'finished' ? '结算页' : (activeReviewTool.title || '快闪问答')}}</text>
             <text>{{reviewFlowStage === 'topic' ? ':)' : '···'}}</text>
@@ -66,7 +66,7 @@
             </view>
             <text class="review-template-safe">{{practiceTemplateWorkbench.safetyLine}}</text>
           </view>
-          <view class="review-empty-note" wx:if="{{reviewFlowStage !== 'topic' && activeReviewTool && activeReviewTool.empty}}"><text>还没有真实卡。先上传材料或完成一次 AI私教。</text></view>
+          <view class="review-empty-note" wx:if="{{reviewFlowStage !== 'topic' && activeReviewTool && activeReviewTool.empty}}"><text>还没有真实卡。先上传材料或完成一次 AI私教。</text><view class="review-empty-actions"><text bindtap="goUpload">去上传材料</text><text bindtap="closeReviewSubpage">返回乐园</text></view></view>
           <view class="review-live-tool stage-{{reviewFlowStage}}" wx:elif="{{reviewFlowStage !== 'tool' && activeReviewTool && activeReviewTool.id}}">
             <view class="review-play-top" wx:if="{{reviewFlowStage === 'live'}}"><text bindtap="closeReviewSubpage">×</text><text>{{activeReviewTool.title || '快闪问答'}}</text><text>Ⅱ</text></view>
             <view class="review-game-progress" wx:if="{{reviewFlowStage === 'live'}}"><view class="review-game-count"><text>{{(activeReviewTool.whackQuestionIndex || activeReviewTool.currentTrackIndex || 0) + 1}}</text><text>/ {{activeReviewTool.itemCount || 3}}</text></view><text>正在热身</text></view>
