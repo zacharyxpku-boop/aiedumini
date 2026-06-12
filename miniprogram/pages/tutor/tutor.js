@@ -2379,12 +2379,24 @@ Page({
       shouldUseTwoChoice: adjustment.shouldUseTwoChoice,
       evidenceLine: adjustment.releaseLine
     });
+    const encouragement = status === 'still_blocked'
+      ? TUTOR_ENCOURAGEMENTS[Math.floor(Math.random() * TUTOR_ENCOURAGEMENTS.length)]
+      : '';
+    const encouragedMessages = encouragement
+      ? this.data.messages.concat([{
+        role: 'assistant',
+        text: `${encouragement} ${adjustment.nextQuestion || adjustment.nextAction || '我们把上一步再说小一点。'}`,
+        hint_label: '鼓励'
+      }])
+      : this.data.messages;
+    if (encouragement) {
+      storage.set(storage.KEYS.tutorMessages, encouragedMessages.slice(-20));
+    }
     this.setData({
+      messages: encouragedMessages,
       socraticFeedbackStatus: item.status,
       socraticFeedbackRecordedAt: item.createdAt,
-      socraticFeedbackNextAction: (status === 'still_blocked'
-        ? TUTOR_ENCOURAGEMENTS[Math.floor(Math.random() * TUTOR_ENCOURAGEMENTS.length)] + ' '
-        : '') + (adjustment.nextAction || ''),
+      socraticFeedbackNextAction: adjustment.nextAction || '',
       currentHintLevel: adjustment.nextHintLevel,
       activeStep: adjustment.activeStep,
       coachStepLabel: adjustment.coachStepLabel,
