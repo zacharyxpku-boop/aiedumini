@@ -2466,6 +2466,48 @@ Page({
     this.updatePreview(homeworkText, this.data.minutes);
   },
 
+  uploadMaterialImages() {
+    const paths = (this.data.imagePaths || []).slice(0, 3);
+    if (!paths.length || !api.uploadMaterialImage || typeof wx === 'undefined' || !wx.getFileSystemManager) return;
+    const fsm = wx.getFileSystemManager();
+    paths.forEach((path, index) => {
+      fsm.readFile({
+        filePath: path,
+        encoding: 'base64',
+        success: (res) => {
+          const ext = (String(path).split('.').pop() || 'jpg').toLowerCase();
+          api.uploadMaterialImage({
+            image_base64: res.data,
+            ext,
+            material_type: this.data.materialType || 'material'
+          }).then((result) => {
+            if (storage.appendSyncMutation) {
+              storage.appendSyncMutation('material_image_uploaded', {
+                id: `material_image_${Date.now()}_${index}`,
+                stored: result && result.stored ? result.stored : 'unknown',
+                remote_path: result && result.path ? result.path : '',
+                material_type: this.data.materialType || 'material'
+              });
+            }
+            if (result && result.stored === 'local_only' && wx.showToast) {
+              wx.showToast({ title: '图片已本机留档，云端待配置', icon: 'none' });
+            }
+            return null;
+          }).catch(() => {
+            if (storage.appendSyncMutation) {
+              storage.appendSyncMutation('material_image_uploaded', {
+                id: `material_image_${Date.now()}_${index}`,
+                stored: 'failed_retry_later',
+                remote_path: '',
+                material_type: this.data.materialType || 'material'
+              });
+            }
+          });
+        }
+      });
+    });
+  },
+
   submit() {
     if (this.data.submitting) return;
     const text = String(this.data.homeworkText || '').trim();
@@ -2495,6 +2537,7 @@ Page({
 
     this.setData({ submitting: true });
     wx.showLoading({ title: '分类中' });
+    this.uploadMaterialImages();
 
     api.buildPriority(payload).then((state) => {
       const nextState = Object.assign({}, current, state, {

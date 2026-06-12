@@ -349,9 +349,11 @@ function selectCardsForGame(cards = [], gameId = 'whack', limit = 8) {
         : game.id === 'snake'
           ? list.filter((card) => isSequenceCard(card))
           : list.filter((card) => game.fit.includes(detectKnowledgeType(card).id));
-  return filtered
-    .filter((card) => card && card.id && card.question && card.answer)
-    .slice(0, Math.max(1, Math.min(12, Number(limit || 8))));
+  const valid = (list) => list.filter((card) => card && card.id && card.question && card.answer);
+  const picked = valid(filtered);
+  // 降低门槛：类型过滤后为空时回退到全量有效卡，保证任何知识点都开得了局
+  const pool = picked.length ? picked : valid(list);
+  return pool.slice(0, Math.max(1, Math.min(12, Number(limit || 8))));
 }
 
 function buildDistractors(card = {}, pool = []) {

@@ -2,7 +2,7 @@
   "sourceRepo": "zacharyxpku-boop/ai-edu-platform",
   "sourcePath": "miniprogram",
   "sourceCommit": "fe3f331",
-  "syncedAt": "2026-06-12T16:07:29.977Z",
+  "syncedAt": "2026-06-12T16:21:29.407Z",
   "files": [
     "miniprogram/app.js",
     "miniprogram/app.json",
@@ -85,6 +85,7 @@
     "miniprogram/utils/focus-cabin.js",
     "miniprogram/utils/game-logic.js",
     "miniprogram/utils/import-intake.js",
+    "miniprogram/utils/k12-topic-bank.js",
     "miniprogram/utils/learning-assessment.js",
     "miniprogram/utils/learning-modules.js",
     "miniprogram/utils/learning-priority.js",

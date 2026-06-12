@@ -5,6 +5,7 @@ const api = require('../../utils/api');
 const gameLogic = require('../../utils/game-logic');
 const revisitEngine = require('../../utils/revisit-engine');
 const reviewViewModels = require('../../view-models/review-view-model');
+const k12TopicBank = require('../../utils/k12-topic-bank');
 
 const KNOWLEDGE_STARTER_TOPIC_CARDS = [
   { topic: '小数乘法', tag: '消除大练习', duration: '约 10 分钟', theme: 'teal' },
@@ -577,47 +578,8 @@ Page({
   },
 
   buildKnowledgeStarterCards(topic = '') {
-    const now = new Date().toISOString();
     const label = topic || this.data.selectedKnowledgeTopic || '小数乘法';
-    const baseId = `starter_${String(label).replace(/[^a-zA-Z0-9_\u4e00-\u9fa5]/g, '_')}`;
-    return [
-      {
-        id: `${baseId}_first_step`,
-        type: 'knowledge_starter_first_step',
-        source: 'knowledge_starter_topic',
-        state: 'new',
-        due: now,
-        created_at: now,
-        question: `${label}：先说题目在问什么？`,
-        answer: '先圈出已知条件，再说第一步要找的量。',
-        subject: label,
-        taskType: 'first_step',
-        weakPoint: '第一步入口',
-        wrongCauseBucket: 'condition_to_step',
-        parentPrompt: '家长只问：你第一步为什么先这样做？',
-        checkpoint: '能说出已知条件和第一步',
-        prompt: '先说已知条件，再说第一步',
-        noFullAnswer: true
-      },
-      {
-        id: `${baseId}_trap`,
-        type: 'knowledge_starter_trap',
-        source: 'knowledge_starter_topic',
-        state: 'new',
-        due: now,
-        created_at: now,
-        question: `${label}：最容易看错哪一处？`,
-        answer: '把关键词和单位先读准，再决定方法。',
-        subject: label,
-        taskType: 'wrong_cause',
-        weakPoint: '关键词和条件',
-        wrongCauseBucket: 'key_signal_missed',
-        parentPrompt: '家长只问：这题最容易漏掉哪一个词？',
-        checkpoint: '能指出一个易错信号',
-        prompt: '先找易错信号',
-        noFullAnswer: true
-      }
-    ];
+    return k12TopicBank.buildTopicDeck(label);
   },
 
   selectKnowledgeStarterTopic(event) {
@@ -795,10 +757,12 @@ Page({
 
   ensureKnowledgeStarterCards() {
     const existing = storage.loadReviewCards ? storage.loadReviewCards() : [];
-    if (existing.length || !storage.saveReviewCards) return existing;
-    const starterCards = this.buildKnowledgeStarterCards(this.data.selectedKnowledgeTopic);
-    storage.saveReviewCards(starterCards);
-    return starterCards;
+    if (existing.length >= 3 || !storage.saveReviewCards) return existing;
+    const starterCards = this.buildKnowledgeStarterCards(this.data.selectedKnowledgeTopic)
+      .filter((card) => !existing.some((item) => item && item.id === card.id));
+    const merged = existing.concat(starterCards);
+    storage.saveReviewCards(merged);
+    return merged;
   },
 
   buildActiveReviewTool(tool = {}, round = null) {

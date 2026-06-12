@@ -119,6 +119,16 @@ function sendTutorMessage(payload) {
   });
 }
 
+function uploadMaterialImage(payload) {
+  const session = storage.get(storage.KEYS.session, {});
+  return request('/api/mini/material-image', {
+    method: 'POST',
+    data: payload || {},
+    header: session.session_id ? { 'x-mini-session': session.session_id } : {},
+    timeout: 20000
+  });
+}
+
 function buildPriority(payload) {
   const session = storage.get(storage.KEYS.session, {});
   return request('/api/mini/priority', {
@@ -403,6 +413,7 @@ module.exports = {
   request,
   initSession,
   buildPriority,
+  uploadMaterialImage,
   buildWeekly,
   submitFeedback,
   submitEvent,
