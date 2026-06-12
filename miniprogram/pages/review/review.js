@@ -2327,6 +2327,19 @@ Page({
     this.setReviewTabbarHidden(true);
   },
 
+  restartPlayableReviewRound() {
+    if (storage.appendReviewEvent) {
+      storage.appendReviewEvent({
+        kind: 'playable_review_round_restarted',
+        tool_id: (this.data.activeReviewTool || {}).id || '',
+        source: 'review_tab_finished_screen',
+        created_at: new Date().toISOString()
+      });
+    }
+    this.openPlayableReviewStage('live');
+    this.setData({ feedbackText: '已重开一局：新一组卡，先凭记忆完成再看反馈。' });
+  },
+
   finishPlayableReviewTool(event) {
     const result = event && event.currentTarget && event.currentTarget.dataset
       ? event.currentTarget.dataset.result
@@ -2446,14 +2459,8 @@ Page({
         source: 'playable_review_round'
       });
     }
-    if (result === 'retry' && active.roundSourceTool) {
-      const nextTool = this.buildActiveReviewTool(active.roundSourceTool, active.roundSourceData || null);
-      this.setData({
-        reviewFlowStage: 'live',
-        activeReviewTool: nextTool,
-        feedbackText: '已重开一局：这次先凭记忆完成，再看反馈。'
-      });
-      this.setReviewTabbarHidden(true);
+    if (result === 'retry') {
+      this.restartPlayableReviewRound();
       return;
     }
     this.setData({
