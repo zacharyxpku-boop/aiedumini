@@ -1241,10 +1241,24 @@ page {
 }
 
 .review-play-top text:nth-child(2) {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
   color: #1f2937;
   font-size: 34rpx;
   line-height: 38rpx;
   font-weight: 900;
+}
+
+.review-play-top text:nth-child(2)::before {
+  content: "";
+  display: inline-block;
+  width: 34rpx;
+  height: 34rpx;
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0iI2Y1OWUwYiI+PHBhdGggZD0iTTI2IDYgTDEyIDI3IEwyMiAyNyBMMjAgNDIgTDM2IDIwIEwyNSAyMCBaIi8+PC9zdmc+");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
 }
 
 .review-game-progress {
