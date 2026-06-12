@@ -30,6 +30,12 @@ page {
   border-radius: 0;
 }
 
+.yd-review-screen.stage-main {
+  height: calc(100vh - 96rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  min-height: 0;
+  overflow: hidden;
+}
+
 .yd-review-screen:not(.stage-main) {
   gap: 24rpx;
   min-height: calc(100vh - 96rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));

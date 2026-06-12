@@ -32,6 +32,9 @@ page {
 
 .yd-parent-screen.scene-main {
   gap: 20rpx;
+  height: calc(100vh - 96rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  min-height: 0;
+  overflow: hidden;
   padding-bottom: calc(286rpx + env(safe-area-inset-bottom));
 }
 

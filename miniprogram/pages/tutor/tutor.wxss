@@ -26,7 +26,7 @@ page {
   flex: 0 0 auto;
   flex-direction: column;
   justify-content: flex-start;
-  gap: 40rpx;
+  gap: 24rpx;
   min-height: calc(100vh - 190rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   overflow: visible;
   border-radius: 0;
@@ -35,6 +35,13 @@ page {
 
 .yd-tutor-screen.detail-on {
   gap: 0;
+}
+
+.yd-tutor-screen:not(.detail-on) {
+  height: calc(100vh - 262rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  min-height: 0;
+  overflow: hidden;
+  justify-content: space-between;
 }
 
 .yd-tutor-top,
@@ -136,7 +143,7 @@ page {
   grid-template-columns: 144rpx minmax(0, 1fr);
   align-items: center;
   gap: 28rpx;
-  min-height: 240rpx;
+  min-height: 220rpx;
   padding: 34rpx 32rpx;
   overflow: hidden;
   border-radius: 40rpx;
@@ -382,7 +389,7 @@ page {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  min-height: 190rpx;
+  min-height: 170rpx;
   align-items: center;
   justify-content: center;
   gap: 14rpx;
