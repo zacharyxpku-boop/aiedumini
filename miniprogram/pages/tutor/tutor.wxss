@@ -26,7 +26,7 @@ page {
   flex: 0 0 auto;
   flex-direction: column;
   justify-content: flex-start;
-  gap: 20rpx;
+  gap: 32rpx;
   min-height: calc(100vh - 190rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   overflow: visible;
   border-radius: 0;
@@ -370,7 +370,6 @@ page {
   padding: 0 18rpx;
   border-radius: 50%;
   color: #ffffff;
-  background: #ff7a45;
   font-size: 30rpx;
   font-weight: 950;
   line-height: 72rpx;
@@ -2128,8 +2127,14 @@ page {
 }
 
 .tutor-send-btn {
-  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0iI2ZmZmZmZiI+PHBhdGggZD0iTTYgMjQgTDQyIDggTDM0IDQyIEwyNCAzMCBMMTYgMzYgTDE4IDI2IFoiLz48L3N2Zz4=");
+  background-color: #f3f4f6;
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0iIzljYTNhZiI+PHBhdGggZD0iTTYgMjQgTDQyIDggTDM0IDQyIEwyNCAzMCBMMTYgMzYgTDE4IDI2IFoiLz48L3N2Zz4=");
   background-position: center;
   background-repeat: no-repeat;
   background-size: 36rpx 36rpx;
+}
+
+.tutor-send-btn.active {
+  background-color: #ff7a45;
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0iI2ZmZmZmZiI+PHBhdGggZD0iTTYgMjQgTDQyIDggTDM0IDQyIEwyNCAzMCBMMTYgMzYgTDE4IDI2IFoiLz48L3N2Zz4=");
 }

@@ -21,13 +21,13 @@
           </view>
         </view>
         <view class="tutor-chat-card" wx:if="{{!showTutorDetails}}">
-          <text class="tutor-chat-head"><text class="tutor-chat-title">把题目、卡点发给 AI私教</text><text class="tutor-chat-online">在线</text></text>
+          <text class="tutor-chat-head"><text class="tutor-chat-title">把题目、卡点发给 AI私教</text></text>
           <view class="tutor-message-row">
             <text class="tutor-avatar-dot">🤖</text>
             <view class="tutor-bubble">先告诉我：你现在是看不懂题、不会第一步，还是心里有点急？</view>
           </view>
           <view class="tutor-thinking-line" wx:if="{{loading}}">咕点正在思考你的第一步...</view>
-          <view class="tutor-input-bar"><textarea value="{{input}}" bindinput="onInput" auto-height maxlength="-1" placeholder="想聊什么都可以..." /><text class="tutor-send-btn" bindtap="send"></text></view>
+          <view class="tutor-input-bar"><textarea value="{{input}}" bindinput="onInput" auto-height maxlength="-1" placeholder="想聊什么都可以..." /><text class="tutor-send-btn {{input ? 'active' : ''}}" bindtap="send"></text></view>
         </view>
 
         <view class="tutor-socratic-panel" wx:if="{{!showTutorDetails}}">
