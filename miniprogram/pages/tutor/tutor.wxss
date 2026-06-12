@@ -26,7 +26,7 @@ page {
   flex: 0 0 auto;
   flex-direction: column;
   justify-content: flex-start;
-  gap: 32rpx;
+  gap: 40rpx;
   min-height: calc(100vh - 190rpx - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   overflow: visible;
   border-radius: 0;
@@ -136,7 +136,7 @@ page {
   grid-template-columns: 144rpx minmax(0, 1fr);
   align-items: center;
   gap: 28rpx;
-  min-height: 184rpx;
+  min-height: 240rpx;
   padding: 34rpx 32rpx;
   overflow: hidden;
   border-radius: 40rpx;
@@ -167,31 +167,6 @@ page {
   border-radius: 32rpx;
   background: linear-gradient(135deg, #e6f4f1, #ccfbf1);
   overflow: hidden;
-}
-
-.yd-tutor-screen:not(.detail-on) .tutor-socratic-panel {
-  flex: 1;
-}
-
-.tutor-bottom-mascot {
-  position: absolute;
-  right: -8rpx;
-  bottom: -16rpx;
-  z-index: 0;
-  width: 312rpx;
-  height: 312rpx;
-}
-
-.yd-tutor-screen:not(.detail-on)::after {
-  content: "";
-  position: absolute;
-  left: -56rpx;
-  bottom: -40rpx;
-  z-index: 0;
-  width: 280rpx;
-  height: 280rpx;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(204, 251, 241, 0.85), rgba(204, 251, 241, 0));
 }
 
 .yd-tutor-hero::before {
@@ -407,7 +382,7 @@ page {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  min-height: 146rpx;
+  min-height: 190rpx;
   align-items: center;
   justify-content: center;
   gap: 14rpx;
@@ -460,7 +435,7 @@ page {
 
 .tutor-start-cta {
   display: flex;
-  min-height: 104rpx;
+  min-height: 112rpx;
   align-items: center;
   justify-content: center;
   border-radius: 36rpx;

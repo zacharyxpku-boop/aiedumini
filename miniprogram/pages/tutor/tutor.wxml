@@ -39,7 +39,6 @@
           </view>
           <view class="tutor-start-cta" data-step="write_first_step" bindtap="openTutorScene">开始问咕点</view>
           <text class="tutor-usage-note">每天都有同学在这里说出自己的第一步</text>
-          <image class="tutor-bottom-mascot" mode="aspectFit" src="/assets/reference/gudian-fullbody-transparent.png" />
         </view>
 
         <view class="tutor-reference-panel {{activeTutorScene}}" wx:if="{{showTutorDetails}}">
