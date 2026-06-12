@@ -208,6 +208,7 @@ Page({
         reviewFlowStage: 'tool'
       });
       this.setReviewTabbarHidden(true);
+      this.refreshQbankTopicDeck(this.data.selectedKnowledgeTopic);
       return;
     }
     this.openPlayableReviewStage(stage, tools);
@@ -734,6 +735,7 @@ Page({
         reviewFlowStage: 'tool'
       });
       this.setReviewTabbarHidden(true);
+      this.refreshQbankTopicDeck(this.data.selectedKnowledgeTopic);
       return;
     }
     if (stage === 'live' && !(active && active.id)) {
@@ -768,7 +770,7 @@ Page({
 
   buildDeckCompositionText(cards = []) {
     const list = Array.isArray(cards) ? cards.filter((card) => card && card.id) : [];
-    const topicCount = list.filter((card) => card.source === 'k12_topic_bank').length;
+    const topicCount = list.filter((card) => card.source === 'k12_topic_bank' || card.source === 'qbank_remote').length;
     const mineCount = list.length - topicCount;
     if (!list.length) return '牌组准备中 · 挑选开局方式，马上开始。';
     const parts = [];
@@ -777,14 +779,63 @@ Page({
     return `${parts.join(' + ')} · 挑选开局方式，马上开始。`;
   },
 
+  buildRemoteQbankCards(topic = '') {
+    const label = String(topic || '').trim();
+    if (!label || !storage.get) return [];
+    const rows = storage.get(`review.qbank.deck.${label}`, []);
+    if (!Array.isArray(rows) || !rows.length) return [];
+    const now = new Date().toISOString();
+    return rows.map((row, index) => ({
+      id: `qbr_${label}_${index}`,
+      type: 'topic_quiz_card',
+      source: 'qbank_remote',
+      state: 'new',
+      due: now,
+      created_at: now,
+      question: row.q || '',
+      answer: row.a || '',
+      hint: row.hint || '',
+      subject: label,
+      taskType: 'first_step',
+      weakPoint: label,
+      wrongCauseBucket: 'topic_practice',
+      parentPrompt: `家长只问：${row.q || ''}`,
+      checkpoint: row.hint || '能说出第一步',
+      prompt: row.hint || '先回忆再核对',
+      noFullAnswer: false
+    })).filter((card) => card.question && card.answer);
+  },
+
   ensureKnowledgeStarterCards() {
     const existing = storage.loadReviewCards ? storage.loadReviewCards() : [];
-    if (existing.length >= 3 || !storage.saveReviewCards) return existing;
-    const starterCards = this.buildKnowledgeStarterCards(this.data.selectedKnowledgeTopic)
+    if (!storage.saveReviewCards) return existing;
+    const topic = this.data.selectedKnowledgeTopic;
+    const starterCards = (existing.length >= 3 ? [] : this.buildKnowledgeStarterCards(topic))
+      .concat(this.buildRemoteQbankCards(topic))
       .filter((card) => !existing.some((item) => item && item.id === card.id));
+    if (!starterCards.length) return existing;
     const merged = existing.concat(starterCards);
     storage.saveReviewCards(merged);
     return merged;
+  },
+
+  refreshQbankTopicDeck(topic) {
+    const label = String(topic || '').trim();
+    if (!label || !api.fetchQbankTopicDeck) return;
+    this._qbankFetched = this._qbankFetched || {};
+    if (this._qbankFetched[label]) return;
+    this._qbankFetched[label] = true;
+    api.fetchQbankTopicDeck({ topic: label, limit: 8 }).then((result) => {
+      if (!result || result.fallback !== false || !Array.isArray(result.deck) || !result.deck.length) return;
+      if (storage.set) storage.set(`review.qbank.deck.${label}`, result.deck);
+      const cards = this.ensureKnowledgeStarterCards();
+      if (this.data.reviewFlowStage === 'tool') {
+        this.setData({
+          deckCompositionText: this.buildDeckCompositionText(cards),
+          feedbackText: `云端题库已取来 ${result.deck.length} 道「${result.topic || label}」真题，开局就能用。`
+        });
+      }
+    }).catch(() => {});
   },
 
   buildActiveReviewTool(tool = {}, round = null) {

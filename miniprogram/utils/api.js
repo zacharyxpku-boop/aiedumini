@@ -129,6 +129,16 @@ function uploadMaterialImage(payload) {
   });
 }
 
+function fetchQbankTopicDeck(payload) {
+  const session = storage.get(storage.KEYS.session, {});
+  return request('/api/mini/qbank-topic', {
+    method: 'POST',
+    data: payload || {},
+    header: session.session_id ? { 'x-mini-session': session.session_id } : {},
+    timeout: 10000
+  });
+}
+
 function buildPriority(payload) {
   const session = storage.get(storage.KEYS.session, {});
   return request('/api/mini/priority', {
@@ -414,6 +424,7 @@ module.exports = {
   initSession,
   buildPriority,
   uploadMaterialImage,
+  fetchQbankTopicDeck,
   buildWeekly,
   submitFeedback,
   submitEvent,
