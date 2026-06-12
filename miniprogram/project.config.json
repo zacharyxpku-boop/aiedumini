@@ -39,7 +39,7 @@
     "disableSWC": true
   },
   "compileType": "miniprogram",
-  "libVersion": "3.16.0",
+  "libVersion": "3.15.2",
   "appid": "wx7c5021e01c98ebae",
   "projectname": "yuandianzhixue-miniapp",
   "condition": {},
