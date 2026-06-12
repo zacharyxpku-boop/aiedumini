@@ -1683,6 +1683,9 @@ Page({
         ? activeReviewTool.answers.filter((item) => item.cardId !== current.id)
         : [];
       const correct = rating === 'good' || rating === 'easy';
+      const quizPrevStreak = Number(activeReviewTool.streak || 0);
+      const quizStreak = correct ? quizPrevStreak + 1 : 0;
+      const quizScore = Number(activeReviewTool.score || 0) + (correct ? 100 + Math.min(quizPrevStreak, 5) * 20 : 0);
       const nextQuizAnswers = quizAnswers.concat([{
         cardId: current.id,
         correct,
@@ -1692,6 +1695,9 @@ Page({
         weakEvidence: rating === 'again' || rating === 'hard'
       }]);
       ratedActiveReviewTool = Object.assign({}, activeReviewTool, {
+        score: quizScore,
+        streak: quizStreak,
+        bestStreak: Math.max(Number(activeReviewTool.bestStreak || 0), quizStreak),
         answers: nextQuizAnswers,
         attemptSummary: revisitEngine.summarizeAttempt
           ? revisitEngine.summarizeAttempt({
@@ -2619,8 +2625,14 @@ Page({
     }
     const answers = Array.isArray(active.answers) ? active.answers.slice() : [];
     if (record.recordable) answers.push(record);
+    const matchPrevStreak = Number(active.streak || 0);
+    const matchStreak = record.recordable ? (record.correct ? matchPrevStreak + 1 : 0) : matchPrevStreak;
+    const matchScore = Number(active.score || 0) + (record.recordable && record.correct ? 100 + Math.min(matchPrevStreak, 5) * 20 : 0);
     this.setData({
       activeReviewTool: Object.assign({}, active, {
+        score: matchScore,
+        streak: matchStreak,
+        bestStreak: Math.max(Number(active.bestStreak || 0), matchStreak),
         tiles: nextTiles,
         selectedTileId: '',
         matchedPairIds,
@@ -2671,6 +2683,7 @@ Page({
       const answers = (Array.isArray(active.answers) ? active.answers.slice() : []).concat([wrongRecord]);
       this.setData({
         activeReviewTool: Object.assign({}, active, {
+          streak: 0,
           currentTrack: Object.assign({}, currentTrack, {
             tiles: currentTrack.tiles.map((item) => Object.assign({}, item, { picked: false }))
           }),
@@ -2691,6 +2704,9 @@ Page({
       }))
     });
     const trackDone = nextPicked.length >= currentTrack.tiles.length;
+    const snakePrevStreak = Number(active.streak || 0);
+    const snakeStreak = trackDone ? snakePrevStreak + 1 : snakePrevStreak;
+    const snakeScore = Number(active.score || 0) + 40 + (trackDone ? 100 + Math.min(snakePrevStreak, 5) * 20 : 0);
     const nextTrackIndex = trackDone ? currentTrackIndex + 1 : currentTrackIndex;
     const nextTrack = trackDone ? (tracks[nextTrackIndex] || nextCurrentTrack) : nextCurrentTrack;
     const answers = Array.isArray(active.answers) ? active.answers.slice() : [];
@@ -2711,6 +2727,9 @@ Page({
     }
     this.setData({
       activeReviewTool: Object.assign({}, active, {
+        score: snakeScore,
+        streak: snakeStreak,
+        bestStreak: Math.max(Number(active.bestStreak || 0), snakeStreak),
         currentTrackIndex: nextTrackIndex,
         currentTrack: nextTrack,
         snakePickedIds: trackDone ? [] : nextPicked,
