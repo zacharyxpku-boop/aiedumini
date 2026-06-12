@@ -45,7 +45,7 @@
             <text class="upload-report-flow">{{parentReportWorkflowView.reasoningLine}}</text>
             <text class="upload-report-flow">{{parentReportWorkflowView.imageLine}}</text>
           </block>
-          <text class="upload-workflow-actions" wx:if="{{parentReportWorkflowView}}"><text data-workflow="source" bindtap="openReportWorkflowRoute">资料包</text><text data-workflow="modules" bindtap="openReportWorkflowRoute">模块路线</text><text data-workflow="preview" bindtap="openReportWorkflowRoute">报告预览</text></text>
+          <view class="upload-workflow-actions" wx:if="{{parentReportWorkflowView}}"><text data-workflow="source" bindtap="openReportWorkflowRoute">资料包</text><text data-workflow="modules" bindtap="openReportWorkflowRoute">模块路线</text><text data-workflow="preview" bindtap="openReportWorkflowRoute">报告预览</text></view>
           <view class="upload-report-actions"><text bindtap="viewLatestReport">查看成长报告</text><text bindtap="runReportFollowupAction">{{lastReportCta.actionLabel}}</text></view>
         </view>
 

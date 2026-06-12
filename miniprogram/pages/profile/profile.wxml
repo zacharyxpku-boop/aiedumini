@@ -3,15 +3,15 @@
     <view class="profile-shell">
       <view class="yd-parent-screen yd-app-screen yd-parent-app scene-{{growthActiveScene}}">
         <view class="yd-parent-top" wx:if="{{growthActiveScene === 'main'}}">
-          <view class="yd-parent-brand"><image class="yd-parent-mark" mode="aspectFit" src="/assets/reference/brand-house.png" /><text class="yd-parent-brand-copy"><text>成长报告</text><text>看懂孩子，再安排怎么学</text></text></view>
+          <view class="yd-parent-brand"><image class="yd-parent-mark" mode="aspectFit" src="/assets/reference/brand-house.png" /><view class="yd-parent-brand-copy"><text>成长报告</text><text>看懂孩子，再安排怎么学</text></view></view>
           <text class="yd-parent-pill">••• ｜ ○</text>
         </view>
 
         <view class="yd-parent-hero growth" wx:if="{{growthActiveScene === 'main'}}">
-          <text class="yd-parent-copy">
-            <text class="yd-parent-title"><text>先了解孩子，</text><text>再安排怎么学</text></text>
+          <view class="yd-parent-copy">
+            <view class="yd-parent-title"><text>先了解孩子，</text><text>再安排怎么学</text></view>
             <text class="yd-parent-sub">可以先做 1 分钟问卷，也可以上传错题、成绩或测评。材料越多，报告越准。</text>
-          </text>
+          </view>
           <image class="yd-parent-art" mode="aspectFit" src="/assets/reference/report-radar-card-illustration.png" />
         </view>
 
@@ -37,7 +37,7 @@
         </view>
 
         <view class="growth-progress-card" wx:if="{{growthActiveScene === 'main'}}">
-          <text class="growth-progress-head"><text>报告生成进度</text><text>{{learningReportSummary.progressStatusLabel || '待收集信息'}}</text></text>
+          <view class="growth-progress-head"><text>报告生成进度</text><text>{{learningReportSummary.progressStatusLabel || '待收集信息'}}</text></view>
           <view class="growth-progress-step {{learningReportSummary.preferenceProgressClass || 'active'}}"><text></text><view><text>学习偏好线索</text><text>性格、习惯与抗挫力</text></view><text bindtap="startGrowthQuestionnaire">{{learningReportSummary.preferenceProgressAction || '去收集'}}</text></view>
           <view class="growth-progress-step {{learningReportSummary.materialProgressClass}}"><text></text><view><text>当前卡点证据</text><text>薄弱知识点与常见错误</text></view><text data-action="upload" bindtap="runParentReportAction">{{learningReportSummary.materialProgressAction || '去上传'}}</text></view>
           <view class="growth-progress-step {{learningReportSummary.actionProgressClass}}"><text></text><view><text>今晚建议</text><text>基于分析生成专属方案</text></view><text data-action="reportPreview" bindtap="runParentReportAction">{{learningReportSummary.actionProgressAction || '开始了解'}}</text></view>
@@ -46,7 +46,7 @@
         <view class="growth-upload-panel" wx:if="{{growthActiveScene === 'upload'}}">
           <view class="growth-subpage-nav"><text data-panel="main" bindtap="setGrowthScene">‹</text><text>完善信息</text><text data-action="reportPreview" bindtap="runParentReportAction">跳过</text></view>
           <view class="growth-upload-head"><text>收集线索碎片 🧩</text><text>材料越真实，建议越具体。</text></view>
-          <text class="growth-upload-lead"><text><text class="growth-upload-lead-highlight">直接拍照或打字都可以</text>，不必全部填满哦～</text><text>优先补最近一次错题、周测或老师反馈。</text></text>
+          <view class="growth-upload-lead"><text><text class="growth-upload-lead-highlight">直接拍照或打字都可以</text>，不必全部填满哦～</text><text>优先补最近一次错题、周测或老师反馈。</text></view>
           <view class="growth-upload-grid">
             <view class="growth-upload-card primary" data-action="uploadPage" bindtap="runParentReportAction"><text class="growth-upload-corner"></text><view class="growth-upload-title-row"><text class="growth-upload-tile info"></text><view><text>错题描述</text><text>记录孩子常卡住的题型</text></view><text class="growth-upload-added">✓ 已添加 1 份</text></view><text class="growth-upload-sample">“昨天数学卷子大题第二问，总是列错方程...”</text></view>
             <view class="growth-upload-card" data-action="uploadPage" bindtap="runParentReportAction"><text class="growth-upload-tile score"></text><view><text>成绩/周测</text><text>拍照留存/手动摘录</text></view><text class="growth-upload-plus">+</text></view>

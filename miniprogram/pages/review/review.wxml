@@ -9,9 +9,9 @@
 
         <view class="yd-review-hero" wx:if="{{reviewFlowStage === 'main'}}">
             <view class="yd-review-copy">
-              <text class="yd-review-title"><text>选个知识点，</text><text>开一局</text></text>
+              <view class="yd-review-title"><text>选个知识点，</text><text>开一局</text></view>
               <text class="yd-review-accent-bar"></text>
-              <text class="yd-review-sub route-note short"><text>没有错题也能先玩；</text><text>有错题后会变成你的<text class="review-sub-highlight">专属练习</text></text></text>
+              <view class="yd-review-sub route-note short"><text>没有错题也能先玩；</text><text>有错题后会变成你的<text class="review-sub-highlight">专属练习</text></text></view>
             </view>
             <image class="yd-review-art" mode="aspectFit" src="/assets/reference/review-world-map-transparent.png" />
           </view>
@@ -26,19 +26,19 @@
         </view>
 
         <view class="review-record-panel" wx:if="{{reviewFlowStage !== 'main'}}">
-          <text class="review-subpage-top" wx:if="{{reviewFlowStage !== 'finished'}}">
+          <view class="review-subpage-top" wx:if="{{reviewFlowStage !== 'finished'}}">
             <text bindtap="closeReviewSubpage">‹</text>
             <text>{{reviewFlowStage === 'topic' ? '选知识点' : reviewFlowStage === 'tool' ? '玩法选择' : reviewFlowStage === 'finished' ? '结算页' : (activeReviewTool.title || '快闪问答')}}</text>
             <text>{{reviewFlowStage === 'topic' ? ':)' : '···'}}</text>
-          </text>
+          </view>
           <view class="review-section-head" wx:if="{{reviewFlowStage === 'topic' || reviewFlowStage === 'tool'}}"><text>{{reviewFlowStage === 'topic' ? '今天想练哪一块？' : '挑选开局方式'}}</text><text>{{reviewFlowStage === 'topic' ? '选个知识点，马上开局探索' : '选一个最适合现在的节奏，马上开始'}}</text></view>
           <view class="review-topic-search" wx:if="{{reviewFlowStage === 'topic'}}"><text class="review-topic-search-icon">⌕</text><input value="{{topicSearchText}}" bindinput="onTopicSearchInput" bindconfirm="confirmTopicSearch" confirm-type="search" placeholder="搜索知识点，如：小数乘法" /></view>
-          <text class="review-flow-tabs" wx:if="{{reviewFlowStage === 'topic' || reviewFlowStage === 'tool'}}">
+          <view class="review-flow-tabs" wx:if="{{reviewFlowStage === 'topic' || reviewFlowStage === 'tool'}}">
             <text class="{{reviewFlowStage === 'topic' ? 'active' : ''}}" data-stage="topic" bindtap="setReviewFlowStage">选知识点</text>
             <text class="{{reviewFlowStage === 'tool' ? 'active' : ''}}" data-stage="tool" bindtap="setReviewFlowStage">玩法选择</text>
             <text class="{{reviewFlowStage === 'live' ? 'active' : ''}}" data-stage="live" bindtap="setReviewFlowStage">进行中</text>
             <text class="{{reviewFlowStage === 'finished' ? 'active' : ''}}" data-stage="finished" bindtap="setReviewFlowStage">一局结束</text>
-          </text>
+          </view>
           <view class="review-topic-toolbar" wx:if="{{reviewFlowStage === 'topic'}}">
             <text>推荐探索</text>
             <text bindtap="shuffleKnowledgeStarterTopics">换一批</text>
@@ -57,24 +57,24 @@
             <view wx:for="{{visiblePlayableReviewTools}}" wx:key="id" class="review-tool-card {{item.available ? 'ready' : 'locked'}} {{item.themeClass}} {{selectedPlayableReviewToolId === item.id ? 'selected' : ''}}" data-id="{{item.id}}" bindtap="selectPlayableReviewTool"><text class="review-tool-selected-mark"></text><text class="review-tool-icon">{{item.icon}}</text><text>{{item.title}}</text><text>{{item.line}}</text><text>{{item.duration}}</text><text>{{item.status}} · {{item.count}} 张</text><text>{{item.mission}}</text></view>
           </view>
           <view class="review-template-workbench" wx:if="{{reviewFlowStage === 'tool' && practiceTemplateWorkbench && practiceTemplateWorkbench.id}}">
-            <text class="review-template-head"><text>{{practiceTemplateWorkbench.title}}</text><text>{{practiceTemplateWorkbench.status}}</text></text>
+            <view class="review-template-head"><text>{{practiceTemplateWorkbench.title}}</text><text>{{practiceTemplateWorkbench.status}}</text></view>
             <text class="review-template-line">{{practiceTemplateWorkbench.line}}</text>
-            <text class="review-template-samples">
-              <text class="review-template-sample"><text>{{practiceTemplateWorkbench.samples[0].label}}</text><text>{{practiceTemplateWorkbench.samples[0].source}}</text></text>
-              <text class="review-template-sample"><text>{{practiceTemplateWorkbench.samples[1].label}}</text><text>{{practiceTemplateWorkbench.samples[1].source}}</text></text>
-              <text class="review-template-sample"><text>{{practiceTemplateWorkbench.samples[2].label}}</text><text>{{practiceTemplateWorkbench.samples[2].source}}</text></text>
-            </text>
+            <view class="review-template-samples">
+              <view class="review-template-sample"><text>{{practiceTemplateWorkbench.samples[0].label}}</text><text>{{practiceTemplateWorkbench.samples[0].source}}</text></view>
+              <view class="review-template-sample"><text>{{practiceTemplateWorkbench.samples[1].label}}</text><text>{{practiceTemplateWorkbench.samples[1].source}}</text></view>
+              <view class="review-template-sample"><text>{{practiceTemplateWorkbench.samples[2].label}}</text><text>{{practiceTemplateWorkbench.samples[2].source}}</text></view>
+            </view>
             <text class="review-template-safe">{{practiceTemplateWorkbench.safetyLine}}</text>
           </view>
           <view class="review-empty-note" wx:if="{{reviewFlowStage !== 'topic' && activeReviewTool && activeReviewTool.empty}}"><text>还没有真实卡。先上传材料或完成一次 AI私教。</text></view>
           <view class="review-live-tool stage-{{reviewFlowStage}}" wx:elif="{{reviewFlowStage !== 'tool' && activeReviewTool && activeReviewTool.id}}">
             <view class="review-play-top" wx:if="{{reviewFlowStage === 'live'}}"><text bindtap="closeReviewSubpage">×</text><text>{{activeReviewTool.title || '快闪问答'}}</text><text>Ⅱ</text></view>
-            <view class="review-game-progress" wx:if="{{reviewFlowStage === 'live'}}"><text class="review-game-count"><text>{{(activeReviewTool.whackQuestionIndex || activeReviewTool.currentTrackIndex || 0) + 1}}</text><text>/ {{activeReviewTool.itemCount || 3}}</text></text><text>正在热身</text></view>
+            <view class="review-game-progress" wx:if="{{reviewFlowStage === 'live'}}"><view class="review-game-count"><text>{{(activeReviewTool.whackQuestionIndex || activeReviewTool.currentTrackIndex || 0) + 1}}</text><text>/ {{activeReviewTool.itemCount || 3}}</text></view><text>正在热身</text></view>
             <view class="review-game-bar" wx:if="{{reviewFlowStage === 'live'}}"><view style="width: {{ ((activeReviewTool.whackQuestionIndex || activeReviewTool.currentTrackIndex || 0) + 1) * 100 / (activeReviewTool.itemCount || 3) }}%"></view></view>
-            <view class="review-live-reference" wx:if="{{reviewFlowStage === 'live'}}"><text class="review-live-glow top"></text><text class="review-live-glow bottom"></text><text class="review-live-labels"><text>{{activeReviewTool.primary.label || '找第一步'}}</text><text class="review-live-mission">{{activeReviewTool.mission}}</text></text><text class="review-live-brain"></text><text>{{activeReviewTool.primary.prompt || '遇到“相遇问题”时，脑海里跳出的第一个动作应该是什么？'}}</text><text>{{activeReviewTool.primary.check || '先在心里想好第一步，再点击下方按钮'}}</text><text class="review-live-bottom-line"></text></view>
-            <view class="review-play-panel whack" wx:if="{{reviewFlowStage === 'live' && activeReviewTool.gameType === 'whack' && activeReviewTool.whackQuestion}}"><text class="review-play-question"><text>快选错因</text><text>{{activeReviewTool.whackQuestion.question}}</text></text><view class="review-play-choice-grid"><button wx:for="{{activeReviewTool.whackChoices}}" wx:key="id" data-index="{{item.index}}" bindtap="selectWhackChoice">{{item.text}}</button></view><button class="review-play-done" wx:if="{{activeReviewTool.whackComplete}}" data-result="remembered" bindtap="finishPlayableReviewTool">记录本局证据</button></view>
-            <view class="review-play-panel match" wx:if="{{reviewFlowStage === 'live' && activeReviewTool.gameType === 'match' && activeReviewTool.tiles.length}}"><text class="review-play-question"><text>拼图配对</text><text>把卡点和对应的第一步拼在一起。</text></text><view class="review-play-tile-grid"><text wx:for="{{activeReviewTool.tiles}}" wx:key="id" class="review-play-tile {{item.selected ? 'selected' : ''}} {{item.matched ? 'matched' : ''}}" data-id="{{item.id}}" bindtap="selectMatchTile">{{item.text}}</text></view><button class="review-play-done" wx:if="{{activeReviewTool.attemptSummary && activeReviewTool.attemptSummary.correct >= activeReviewTool.itemCount}}" data-result="remembered" bindtap="finishPlayableReviewTool">记录本局证据</button></view>
-            <view class="review-play-panel snake" wx:if="{{reviewFlowStage === 'live' && activeReviewTool.gameType === 'snake' && activeReviewTool.currentTrack}}"><text class="review-play-question"><text>路线接龙</text><text>{{activeReviewTool.currentTrack.question || '按第一步顺序接起来。'}}</text></text><view class="review-play-track"><text wx:for="{{activeReviewTool.currentTrack.tiles}}" wx:key="id" class="review-play-step {{item.picked ? 'picked' : ''}}" data-id="{{item.id}}" bindtap="pickSnakeTile">{{item.text}}</text></view><button class="review-play-done" wx:if="{{activeReviewTool.snakeComplete}}" data-result="remembered" bindtap="finishPlayableReviewTool">记录本局证据</button></view>
+            <view class="review-live-reference" wx:if="{{reviewFlowStage === 'live'}}"><text class="review-live-glow top"></text><text class="review-live-glow bottom"></text><view class="review-live-labels"><text>{{activeReviewTool.primary.label || '找第一步'}}</text><text class="review-live-mission">{{activeReviewTool.mission}}</text></view><text class="review-live-brain"></text><text>{{activeReviewTool.primary.prompt || '遇到“相遇问题”时，脑海里跳出的第一个动作应该是什么？'}}</text><text>{{activeReviewTool.primary.check || '先在心里想好第一步，再点击下方按钮'}}</text><text class="review-live-bottom-line"></text></view>
+            <view class="review-play-panel whack" wx:if="{{reviewFlowStage === 'live' && activeReviewTool.gameType === 'whack' && activeReviewTool.whackQuestion}}"><view class="review-play-question"><text>快选错因</text><text>{{activeReviewTool.whackQuestion.question}}</text></view><view class="review-play-choice-grid"><button wx:for="{{activeReviewTool.whackChoices}}" wx:key="id" data-index="{{item.index}}" bindtap="selectWhackChoice">{{item.text}}</button></view><button class="review-play-done" wx:if="{{activeReviewTool.whackComplete}}" data-result="remembered" bindtap="finishPlayableReviewTool">记录本局证据</button></view>
+            <view class="review-play-panel match" wx:if="{{reviewFlowStage === 'live' && activeReviewTool.gameType === 'match' && activeReviewTool.tiles.length}}"><view class="review-play-question"><text>拼图配对</text><text>把卡点和对应的第一步拼在一起。</text></view><view class="review-play-tile-grid"><text wx:for="{{activeReviewTool.tiles}}" wx:key="id" class="review-play-tile {{item.selected ? 'selected' : ''}} {{item.matched ? 'matched' : ''}}" data-id="{{item.id}}" bindtap="selectMatchTile">{{item.text}}</text></view><button class="review-play-done" wx:if="{{activeReviewTool.attemptSummary && activeReviewTool.attemptSummary.correct >= activeReviewTool.itemCount}}" data-result="remembered" bindtap="finishPlayableReviewTool">记录本局证据</button></view>
+            <view class="review-play-panel snake" wx:if="{{reviewFlowStage === 'live' && activeReviewTool.gameType === 'snake' && activeReviewTool.currentTrack}}"><view class="review-play-question"><text>路线接龙</text><text>{{activeReviewTool.currentTrack.question || '按第一步顺序接起来。'}}</text></view><view class="review-play-track"><text wx:for="{{activeReviewTool.currentTrack.tiles}}" wx:key="id" class="review-play-step {{item.picked ? 'picked' : ''}}" data-id="{{item.id}}" bindtap="pickSnakeTile">{{item.text}}</text></view><button class="review-play-done" wx:if="{{activeReviewTool.snakeComplete}}" data-result="remembered" bindtap="finishPlayableReviewTool">记录本局证据</button></view>
             <view class="review-finish-top" wx:if="{{reviewFlowStage === 'finished'}}"><text bindtap="closeReviewSubpage">×</text><text>结算页</text><text>···</text></view>
             <view class="review-finish-card" wx:if="{{reviewFlowStage === 'finished' && activeReviewTool.attemptSummary}}">
               <view class="review-finish-hero"><text></text><text>这一局探索结束啦</text><text>档案袋留下了 <text>{{activeReviewTool.finishEvidenceCount || activeReviewTool.attemptSummary.correct}}</text> 条证据</text></view>
