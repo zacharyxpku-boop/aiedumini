@@ -143,7 +143,7 @@ Page({
     this.setData({
       reportSourceContext: this.buildReportSourceContext(query) || this.buildTemplateRouteContext(query),
       knowledgeChipTopics: k12TopicBank.listPlayableTopics
-        ? k12TopicBank.listPlayableTopics(14)
+        ? k12TopicBank.listPlayableTopics(18)
         : this.data.knowledgeChipTopics
     });
     this.applyReferenceStageRoute(query);
