@@ -34,7 +34,7 @@
 
       <view class="mini-relay-card" wx:if="{{incomingShareRelay}}">
         <view class="mini-relay-head">
-          <text>同伴接力</text>
+          <text>回访卡</text>
           <text bindtap="continueShareRelay">继续</text>
         </view>
         <view wx:for="{{incomingShareRelay.relayPackCards}}" wx:key="id">{{item.title}} {{item.line}}</view>
