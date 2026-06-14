@@ -127,10 +127,44 @@ function latestPlayableRound(input = {}) {
   }) || null;
 }
 
+function summarizePlayableRound(round = {}) {
+  const summary = round.summary || round.attempt_summary || {};
+  const repairFocus = round.repair_focus || {};
+  const toolId = String(round.tool_id || round.playable_review_tool || round.toolId || '').trim();
+  const total = Number(summary.total || round.count || 0);
+  const correct = Number(summary.correct || 0);
+  const wrong = Number(summary.wrong || Math.max(total - correct, 0));
+  const accuracy = summary.accuracy !== undefined
+    ? `${Number(summary.accuracy)}%`
+    : (total ? `${Math.round((correct / total) * 100)}%` : '');
+  const toolLabel = toolId ? `知识乐园·${toolId}` : '知识乐园本局';
+  const resultLine = total
+    ? `${toolLabel} 这一局 ${correct}/${total}${accuracy ? `，${accuracy}` : ''}`
+    : `${toolLabel} 已记录一局回看练习`;
+  const focusTitle = repairFocus.title || repairFocus.knowledgeType || repairFocus.decision || '';
+  const focusCause = repairFocus.wrongCause || repairFocus.wrongCauseLabel || repairFocus.reason || '';
+  const focusLine = [focusTitle, focusCause].filter(Boolean).join('：') || '错因已记录';
+  const nextLine = round.round_advice && round.round_advice.primary
+    ? round.round_advice.primary
+    : (round.round_advice && round.round_advice.secondary) || '明天再回看同类卡';
+  return {
+    toolLabel,
+    resultLine,
+    focusLine,
+    nextLine,
+    total,
+    correct,
+    wrong,
+    accuracy,
+    hasEvidence: !!(total || focusTitle || focusCause || toolId)
+  };
+}
+
 function buildFamilyDecisionCard(input = {}) {
   const evidence = firstStepEvidence(input);
   const diagnostic = latestTutorDiagnostic(input);
   const round = latestPlayableRound(input);
+  const roundSummary = round ? summarizePlayableRound(round) : null;
   const materialReady = !!(evidence.latestReviewCard && (
     evidence.latestReviewCard.reportId ||
     evidence.latestReviewCard.sourceSchemaId ||
@@ -139,7 +173,7 @@ function buildFamilyDecisionCard(input = {}) {
     /^material_/.test(String(evidence.latestReviewCard.source || ''))
   ));
   const tutorReady = !!diagnostic || /tutor_/.test(String(evidence.latestReviewCard && evidence.latestReviewCard.source || ''));
-  const revisitReady = !!round;
+  const revisitReady = !!roundSummary;
   const sourceLabels = [
     materialReady ? '材料' : '',
     tutorReady ? 'AI诊断' : '',
@@ -162,13 +196,19 @@ function buildFamilyDecisionCard(input = {}) {
     parentQuestion: safeText(parentCheck, '家长只问：刚才第一步先看哪里？'),
     tomorrowCheck: safeText(reviewMove, '明天只回访同一张卡'),
     evidenceSources: sourceLabels.length ? sourceLabels.join(' / ') : '待补证据',
-    ready: sourceLabels.length >= 2 || !!evidence.hasChildStep
+    practiceResultLine: roundSummary ? roundSummary.resultLine : '',
+    repairFocusLine: roundSummary ? roundSummary.focusLine : '',
+    revisitNextLine: roundSummary ? roundSummary.nextLine : '',
+    revisitToolLine: roundSummary ? roundSummary.toolLabel : '',
+    ready: sourceLabels.length >= 2 || !!evidence.hasChildStep || !!(roundSummary && roundSummary.hasEvidence)
   };
 }
 
 function buildParentRecap(input = {}) {
   const evidence = firstStepEvidence(input);
   const proof = proofSummary(input);
+  const round = latestPlayableRound(input);
+  const roundSummary = round ? summarizePlayableRound(round) : null;
   const interrupted = evidence.latestFocusSession && evidence.latestFocusSession.completionType === 'interrupted';
   const focusLine = evidence.latestFocusSession
     ? (interrupted ? '中途停下也算开始过。' : '已经围绕这一小步坐过一段。')
@@ -179,6 +219,9 @@ function buildParentRecap(input = {}) {
     firstStepLine: `他先迈出的第一步是：${evidence.displayStep}`,
     recentFirstStepCount: proof.recentFirstStepCount,
     recentFocusEvidence: focusLine,
+    playableEvidenceLine: roundSummary ? `${roundSummary.resultLine}${roundSummary.focusLine ? `，${roundSummary.focusLine}` : ''}` : '',
+    playableNextLine: roundSummary ? roundSummary.nextLine : '',
+    playableToolLine: roundSummary ? roundSummary.toolLabel : '',
     recentRevisitEvidence: proof.recentRevisitEvidence ? `已留下 ${proof.recentRevisitEvidence} 次回看练习痕迹。` : '明天回看练习后会留下记录。',
     trustBoundaryNote: evidence.hasChildStep
       ? '咕点没有给答案，也没有直接给结果，只记录孩子自己说出的第一步。'
@@ -213,7 +256,7 @@ function buildParentEvidenceStrip(input = {}) {
         id: 'revisit_trace',
         label: '回看练习',
         value: recap.recentRevisitEvidence.indexOf('已留下') >= 0 ? recap.recentRevisitEvidence.replace(/^已留下\s*/, '').replace(/痕迹。$/, '') : '明天看',
-        line: recap.recentRevisitEvidence
+        line: recap.playableEvidenceLine || recap.recentRevisitEvidence
       }
     ]
   };
@@ -261,6 +304,12 @@ function buildPrimaryCard(input) {
         className: '',
         label: '专注证据',
         text: recap.recentFocusEvidence
+      },
+      {
+        id: 'playableEvidence',
+        className: '',
+        label: '知识乐园证据',
+        text: recap.playableEvidenceLine ? `${recap.playableEvidenceLine}${recap.playableNextLine ? `；${recap.playableNextLine}` : ''}` : recap.recentRevisitEvidence
       },
       {
         id: 'trustBoundary',
