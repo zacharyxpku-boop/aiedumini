@@ -1652,7 +1652,7 @@ function buildRealTrialRevisitRelayBridge(options = {}) {
     count: revisitRelayCards.length,
     reportLine: revisitRelayCards.length
       ? `已把 ${revisitRelayCards.length} 张真实试用回访卡接到回看练习验证：只练第一步、错因和明天回访。`
-      : '真实试用回访卡生成后，会自动接到回看练习验证和安全分享接力。',
+    : '真实试用回访卡生成后，会自动接到回看练习验证和安全回访卡。',
     revisitMode: 'first_step_revisit',
     localRuleLine: '本地代码决定哪些真实试用卡能进入回访验证、分享和回访；AI 只负责把追问改得更自然。',
     shareBoundary: '分享只带第一步、错因、家长检查和回访路线；不带原题、答案、照片、分数、排名和完整对话。',
@@ -6576,12 +6576,12 @@ function buildSafeRelayChallengePacket(input = {}) {
   return {
     id: 'safe_relay_challenge_packet',
     relayId,
-    title: '安全接力包',
+    title: '安全回访包',
     starterAction: `发起者只留下第一步：${firstStep}`,
     receiverAction,
     parentCheck,
     nextDayRevisit,
-    evidenceContract: '接力成立要留下：自己的第一步、一次错因回退、一次明日回访预约。',
+    evidenceContract: '回访闭环要留下：自己的第一步、一次错因回退、一次明日回访预约。',
     allowedFields,
     blockedFields,
     returnPath: route,
@@ -6685,11 +6685,11 @@ function buildPeerRelayChallengeLadder(input = {}) {
       : 'parent_only',
     requiredEvidence: stages.map((item) => item.localReleaseGate),
     blockedFields,
-    rule: '只有第一步、错因、回访和隐私字段全部通过本地门禁，才允许同伴接力；AI 只能改写表达，不能决定放行。'
+    rule: '只有第一步、错因、回访和隐私字段全部通过本地门禁，才允许生成家庭回访卡；AI 只能改写表达，不能决定放行。'
   };
   return {
     id: 'peer_relay_challenge_ladder',
-    title: '同伴接力练习阶梯',
+    title: '同类回访练习阶梯',
     stages,
     copyableChallengeTemplates,
     localSpreadReleaseGate,
@@ -6748,7 +6748,7 @@ function buildPeerRelaySeasonArc(input = {}) {
   ];
   return {
     id: 'peer_relay_season_arc',
-    title: '7 天安全接力赛季',
+    title: '7 天安全回访计划',
     localDeterministic: true,
     status: ready ? 'season_ready' : 'parent_only_until_evidence',
     route,
@@ -6789,7 +6789,7 @@ function buildWrongCauseViralChallengePack(input = {}) {
     },
     {
       id: 'ninety_second_wrong_cause',
-      title: '90 秒错因接力',
+      title: '90 秒错因回访',
       copy: `90 秒内只做一件事：说清「${wrongCause}」这类题第一步，不比谁做得快。`,
       whyItSpreads: '低门槛、可复制、无排名压力。',
       proof: 'wrong_cause_echo'
@@ -6875,11 +6875,11 @@ function buildShareChallengePlan(input = {}) {
     { id: 'day_7', label: '第 7 天', text: '用 1 道小变式确认能不能迁移。' }
   ];
   const privacyBoundary = '分享只带回看练习验证、第一步、能力缺口和回访动作，不带孩子完整对话、分数、原题照片。';
-  const peerSafeLine = '同伴只接同类动作，不比较速度、不比较正确率。';
+  const peerSafeLine = '接收者只做同类动作，不比较速度、不比较正确率。';
   const returnPathContract = [
     { id: 'land', label: '落地页', text: '先解释这不是外部排名，而是一张可复用的学习动作卡。' },
     { id: 'choose', label: '选动作', text: '从修卡点、回看练习、给家长看三条路里选一条。' },
-    { id: 'persist', label: '留证据', text: '完成后写入分享接力、统一下一步和页面能力账本。' }
+    { id: 'persist', label: '留证据', text: '完成后写入回访证据、统一下一步和页面能力账本。' }
   ];
   const relayChain = [
     { id: 'sender', label: '发起者', text: `留下「${subjectLabel}」的第一步证据。` },
@@ -6887,7 +6887,7 @@ function buildShareChallengePlan(input = {}) {
     { id: 'parent', label: '家长', text: '只检查今晚动作和明天回访，不追排名。' }
   ];
   const communityChallengeCard = {
-    title: '家庭轻接力卡',
+    title: '家庭回访卡',
     promise: '把一次分享变成一次可复用的学习动作，而不是邀请链接。',
     firstStep,
     noRankingLine: '不排行、不晒分、不暴露原题，只留行动证据。',
@@ -6905,7 +6905,7 @@ function buildShareChallengePlan(input = {}) {
       id: 'wrong_cause_snap',
       title: '错因快照',
       visibleLine: actionLabel || '今天只修同一个错因。',
-      receiverPrompt: '接力者只找自己的同类错因，不比较谁做得快。',
+      receiverPrompt: '接收者只找自己的同类错因，不比较谁做得快。',
       proofSignal: '留下错因标签和明天回访卡。'
     },
     {
@@ -6923,14 +6923,14 @@ function buildShareChallengePlan(input = {}) {
   ];
   const naturalSpreadLoop = {
     id: 'privacy_safe_growth_loop',
-    title: '安全接力裂变',
+    title: '安全回访流转',
     inviteLine: `我只发一个可复用的第一步：${firstStep}`,
     receiverPrompt: '你不用看我的题，用自己的作业复刻同类第一步。',
     parentReassuranceLine: '这张卡不带原题、照片、答案、分数、排名或完整对话，家长只看行动证据。',
     day7ReturnLine: '第 7 天回到同一错因，用一道小变式确认是否真的会迁移。',
-    proofOfLifeSignal: '接收者留下自己的第一步、错因回退和明日回访预约，才算接力完成。',
+    proofOfLifeSignal: '接收者留下自己的第一步、错因回退和明日回访预约，才算回访闭环完成。',
     oneTapAction: {
-      label: '接力这一小步',
+      label: '做这一小步',
       route,
       evidence: 'privacy_safe_growth_relay'
     },
@@ -6974,7 +6974,7 @@ function buildShareChallengePlan(input = {}) {
     {
       id: 'return',
       label: '明天回访',
-      visibleLine: '明天还能说出来，才算接力完成。',
+      visibleLine: '明天还能说出来，才算回访完成。',
       receiverAction: '预约明天同一错因回访。',
       evidence: 'receiver_next_day_revisit'
     }
@@ -7088,13 +7088,13 @@ function buildShareChallengePlan(input = {}) {
   };
   return {
     id: 'share_challenge_plan',
-    title: '同伴回看练习',
+    title: '同类回看练习',
     goal,
     route,
     noRankingLine: '不排行、不晒分，只看有没有说清第一步。',
     modeLine: input.mode === 'parent_recap'
       ? '家庭模式：另一位家长只照着一句话追问。'
-      : '同伴模式：对方用自己的材料做同一类第一步。',
+      : '同类练习：对方用自己的材料做同一类第一步。',
     steps,
     reviewCadence,
     relayChain,
@@ -7122,7 +7122,7 @@ function buildShareChallengePlan(input = {}) {
     sevenDayReviewPayload,
     safeRelayChallengePacket,
     spreadReadinessGate,
-    evidenceContractLine: '接力成立必须同时有：第一步、错因回退、明天回访；缺一项就只算邀请，不算学习闭环。',
+    evidenceContractLine: '回访闭环必须同时有：第一步、错因回退、明天回访；缺一项就只算邀请，不算学习闭环。',
     shareRelayActions,
     parentEvidenceLine: '家长只看三件事：孩子是否自己说第一步、错因是否回到卡片、明天是否还能复述。',
     successRule: '完成 3 张主动回忆卡，并留下孩子自己的第一步。',
@@ -7249,9 +7249,9 @@ function buildShareSpreadReadinessGate(input = {}) {
   const missing = signals.filter((item) => !item.ready).map((item) => item.reason);
   const status = score >= 80 ? 'peer_relay_ready' : score >= 60 ? 'needs_evidence' : 'parent_only';
   const shareModeLine = status === 'peer_relay_ready'
-    ? `可发同伴接力：只传${subjectLabel}的第一步、错因回访和明天动作。`
+    ? `可生成家庭回访卡：只传${subjectLabel}的第一步、错因回访和明天动作。`
     : status === 'needs_evidence'
-      ? '先补齐第一步、错因回退和回访证据，再开放同伴接力。'
+      ? '先补齐第一步、错因回退和回访证据，再生成家庭回访卡。'
       : '当前只建议家长内用，不做同伴传播。';
   const fallbackLine = status === 'peer_relay_ready'
     ? '如果接收者要答案，自动退回小黑板第一步，不展示完整解法。'
@@ -7360,9 +7360,9 @@ function buildCommunityShareRelayBoard(input = {}) {
   ];
   return {
     id: 'community_share_relay_board',
-    title: '社区轻接力看板',
+    title: '家庭回访看板',
     summary: relayEvidenceCount
-      ? `已有 ${relayEvidenceCount} 条分享或回流证据，继续按第一步接力，不比较分数。`
+      ? `已有 ${relayEvidenceCount} 条分享或回流证据，继续按第一步回访，不比较分数。`
       : '先把分享做成学习动作卡，不做邀请链接和外部排名。',
     ready: relayEvidenceCount > 0 || !!(incoming && incoming.share_code),
     noRankingLine: plan.noRankingLine || '不排行、不晒分，只看有没有说清第一步。',
@@ -7406,7 +7406,7 @@ function buildCommunityShareRelayBoard(input = {}) {
     returnRateLabel,
     receiverCompletionLine: receiverCompletionCount
       ? `接收者已用自己的材料完成 ${receiverCompletionCount} 次第一步回写，已写入分享/回流证据。`
-      : '接收者还需用自己的材料完成 1 次第一步回写，才算接力闭环。',
+      : '接收者还需用自己的材料完成 1 次第一步回写，才算回访闭环。',
     lanes,
     recentRuns: recentRuns.map((item) => ({
       id: item.id || item.share_code || item.code,
@@ -7443,7 +7443,7 @@ function buildQuestionBankShareRelayDeck(options = {}) {
   ];
   const relayCards = sourceCards.slice(0, 5).map((card, index) => ({
     id: card.id || `question_bank_share_${index + 1}`,
-    label: card.label || `题型接力卡 ${index + 1}`,
+    label: card.label || `题型回访卡 ${index + 1}`,
     subjectLabel: card.subjectLabel || '',
     type: card.type || 'active_recall',
     challengePrompt: card.prompt || card.sampleStem || '用自己的材料说出第一步。',
@@ -7452,7 +7452,7 @@ function buildQuestionBankShareRelayDeck(options = {}) {
     parentCheck: card.progression && card.progression.masteryGate
       ? card.progression.masteryGate
       : '家长只看孩子能否自己说出第一步。',
-    shareCopy: `接力「${card.label || '题型卡'}」：用自己的材料说第一步，不晒原题和答案。`,
+    shareCopy: `回访「${card.label || '题型卡'}」：用自己的材料说第一步，不晒原题和答案。`,
     route: '/pages/review/review?from=question_bank_relay',
     evidenceRequired: [card.evidenceRequired || 'child_first_step', 'active_recall_done', 'next_day_revisit']
   }));
@@ -7460,7 +7460,7 @@ function buildQuestionBankShareRelayDeck(options = {}) {
   const blockedFields = ['original_photo', 'full_dialogue', 'score', 'ranking', 'private_comment', 'original_answer'];
   return {
     id: 'question_bank_share_relay_deck',
-    title: '题型题库接力牌组',
+    title: '题型回访牌组',
     status: relayCards.length >= 3 ? 'ready' : 'waiting_question_bank',
     questionCardCount: Number(courseUnitQuestionBank && (courseUnitQuestionBank.questionCount || courseUnitQuestionBank.cards && courseUnitQuestionBank.cards.length) || 0),
     activeRelayCount: relayCards.length,
@@ -7468,11 +7468,11 @@ function buildQuestionBankShareRelayDeck(options = {}) {
     reviewWindows,
     gameRule: '游戏只抽题型卡做主动回忆、错因回放和近迁移；没有第一步证据不发 XP。',
     parentDecisionLine: '家长只判断三件事：第一步是否能说出、错因是否复现、明天是否能回访。',
-    reportLine: `报告把 ${relayCards.length} 张题型接力卡写入本周证据，不用单次分数更新长期画像。`,
+    reportLine: `报告把 ${relayCards.length} 张题型回访卡写入本周证据，不用单次分数更新长期画像。`,
     shareLine: '分享只带题型、第一步、回访窗口和家长检查句，不带原题照片、完整对话、分数或排名。',
     communityLine: communityShareRelayBoard && communityShareRelayBoard.noRankingLine
       ? communityShareRelayBoard.noRankingLine
-      : '社区接力不排行、不晒分，只复用学习动作。',
+      : '回访分享不排行、不晒分，只复用学习动作。',
     weeklyLine: weeklyEvidenceFlywheel && weeklyEvidenceFlywheel.memoryLine
       ? weeklyEvidenceFlywheel.memoryLine
       : '主动回忆、错因回放、间隔回看形成记忆反馈。',
@@ -7596,7 +7596,7 @@ function buildReceiverOwnMaterialAction(incoming = {}) {
   const route = `/pages/tutor/tutor?from=receiver_own_material&share=${encodeURIComponent(shareCode)}&task_type=${encodeURIComponent(taskType)}&relay_label=${encodeURIComponent(label)}&receiver_action=${encodeURIComponent(receiverAction)}&parent_check=${encodeURIComponent(parentCheck)}&next_revisit=${encodeURIComponent(nextRevisit)}`;
   return {
     id: 'receiver_own_material_action',
-    title: '用自己的题接力',
+    title: '用自己的题回访',
     status: shareCode ? 'ready' : 'waiting_share_code',
     taskType,
     label,
@@ -10176,7 +10176,7 @@ function buildCourseUnitDepthExpansionAtlas(options = {}) {
       reportLine: `${unit.subjectLabel}/${unit.unitLabel} 已拆成 ${archetypes.length} 类原型题、${archetypes.length * 3} 条误区变体和第一步小黑板。`,
       parentLine: `家长今晚只检查 ${unit.unitLabel} 的一类原型题，不扩成整科刷题。`,
       gameLine: `游戏只抽 ${unit.unitLabel} 的主动回忆、错因修复和近迁移，不按刷题数量奖励。`,
-      shareBoundary: `分享只带 ${unit.unitLabel} 的题型动作、回访计划和安全接力口径。`
+    shareBoundary: `分享只带 ${unit.unitLabel} 的题型动作、回访计划和安全回访口径。`
     };
   });
   const activeUnitIds = active && Array.isArray(active.units)
@@ -10378,7 +10378,7 @@ function buildWeeklyEvidenceFlywheel(options = {}) {
       : '本周家长只盯第一步、错因、隔天回看三类证据。',
     portraitLine: '长期画像来自连续证据，不来自一次测评或一次聊天。',
     memoryLine: commercialDepthRunway.gameLine || '主动回忆、错因回放、间隔回看形成记忆反馈。',
-    shareLine: communityShareRelayBoard.noRankingLine || '分享只做行动接力，不做排名比较。',
+    shareLine: communityShareRelayBoard.noRankingLine || '分享只做行动回访，不做排名比较。',
     privacyBoundary: '不分享原题照片、完整对话、孩子分数、排名或隐私评价。',
     sharePayload: {
       flywheel_id: 'weekly_evidence_flywheel',
@@ -10460,7 +10460,7 @@ function buildSevenSubjectMasterySprint(options = {}) {
       { id: 'ai_depth', label: 'AI私教深度', target: '题型轴 + 第一问 + 小黑板第一笔 + 失败兜底，不走直接答案。' },
       { id: 'memory_game', label: '游戏记忆反馈', target: '主动回忆、错因回放、隔天回看、近迁移练习进入同一条 quest。' },
       { id: 'parent_trust', label: '家长报告可信度', target: '报告只给家庭动作、证据是否足够、是否需要陪做，不给排名焦虑。' },
-      { id: 'safe_share', label: '安全分享接力', target: '分享只传行动、证据、下一步，屏蔽原图、完整对话、分数、排名和私密评论。' }
+    { id: 'safe_share', label: '安全分享回访', target: '分享只传行动、证据、下一步，屏蔽原图、完整对话、分数、排名和私密评论。' }
     ],
     parentDecisionLine: '家长看到的是“今晚陪不陪、问哪一句、明天看什么证据”，不是一堵数据墙。',
     gameIntensityLine: '游戏强度按 3 张回忆卡、1 张错因卡、1 个近迁移动作推进，避免空刷 XP。',
@@ -12505,7 +12505,7 @@ function buildCompetitiveMoatWorkbench(options = {}) {
     },
     {
       id: 'safe_share_relay',
-      label: '安全分享接力',
+      label: '安全分享回访',
       target: '分享只带第一步、错因、回访窗口和接收者动作，不带原题、答案、照片、分数、排名。',
       currentEvidence: '分享回流已接 home/profile/review 路由和 blockedFields。',
       localCodeOwns: ['allowlist_payload', 'denylist_payload', 'return_route', 'relay_completion'],

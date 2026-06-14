@@ -468,7 +468,7 @@ function buildParentLoopProof(reviewSummary, moduleSummary, tutorSummary, thinki
     label: '只展示孩子已经产生的真实记录，不展示模拟排行或未上线的社交玩法。',
     cards: [
       { id: 'material', label: '材料生成', value: safeNumber(factory.imported, 0), body: '真实材料导入复习卡' },
-      { id: 'tomorrow_check', label: '明天验证', value: safeNumber(review.due, 0), body: '需要家长明天再看的卡点' },
+      { id: 'tomorrow_check', label: '明天回访', value: safeNumber(review.due, 0), body: '需要家长明天再看的卡点' },
       { id: 'xp', label: '回访', value: safeNumber(progress.xp, 0), body: `连续 ${safeNumber(loop.currentStreak || progress.streak, 0)} 天有记录` },
       { id: 'repair', label: '卡点修复', value: safeNumber(review.leeches, 0), body: '反复卡点会优先回访' },
       { id: 'thinking', label: '思路记录', value: safeNumber(thinking.total, 0), body: '点拨留下的卡点和下一步' },
@@ -602,7 +602,7 @@ function buildDailyShareCard(profile, reviewSummary, revisitEvidenceCard, wrongC
   const title = todayFocus && todayFocus.repairStatus === 'completed'
     ? `今天修过一处：${todayFocus.title}`
     : evidencePoints || streak || total
-    ? `我今天完成了一次真实明天验证：${identityTag}`
+    ? `我今天完成了一次真实明天回访：${identityTag}`
     : '我整理了一张原点智学复盘卡';
   const shareVariant = repaired > 0 ? 'wrong_cause' : streak >= 7 ? 'streak' : total >= 10 ? 'thinking' : 'starter';
   const parentNextAction = repaired > 0 ? 'wrong_cause_revisit' : due > 0 ? 'due_card_revisit' : 'first_step_revisit';
@@ -658,7 +658,7 @@ function buildDailyShareCard(profile, reviewSummary, revisitEvidenceCard, wrongC
     : '';
   const socraticMemoryRelay = learningReportSummary && learningReportSummary.socraticMemoryReportBridge
     ? {
-      title: learningReportSummary.socraticMemoryReportTitle || '点拨质量接力',
+      title: learningReportSummary.socraticMemoryReportTitle || 'AI私教点拨证据',
       status: learningReportSummary.socraticMemoryReportStatus || '',
       action: learningReportSummary.socraticMemoryReportPrimaryAction || '',
       decision: learningReportSummary.socraticMemoryReportDecisionLine || '',
@@ -695,7 +695,7 @@ function buildDailyShareCard(profile, reviewSummary, revisitEvidenceCard, wrongC
   const parentShareTitle = todayFocus && todayFocus.title
     ? `家长看这一处证据：${storage.formatIssueType(todayFocus.issueType || '卡点')} · ${todayFocus.title}`
     : '给家里看的今日学习复盘';
-  const peerShareTitle = `今天明天验证 5 分钟：${identityTag}`;
+  const peerShareTitle = `明天回访 5 分钟：${identityTag}`;
   const shareCount = storage.loadShareRuns ? storage.loadShareRuns().length : 0;
   const reportAction = reportDailyActionQueue && reportDailyActionQueue.ready
     ? reportDailyActionQueue
@@ -826,9 +826,9 @@ function buildDailyShareCard(profile, reviewSummary, revisitEvidenceCard, wrongC
     peerShareTitle,
     shareIntents: [
       { id: 'parent_card', label: '发给家长看', path: parentPath, title: parentShareTitle },
-      { id: 'peer_challenge', label: '继续明天验证', path: peerPath, title: peerShareTitle }
+      { id: 'peer_challenge', label: '生成回访卡', path: peerPath, title: peerShareTitle }
     ],
-    inviteLine: `复盘码 ${code}：记录今天的 5 分钟明天验证；不排行，只看有没有说清第一步。`,
+    inviteLine: `复盘码 ${code}：记录今天的 5 分钟回访；不排行，只看有没有说清第一步。`,
     shareButton: total ? '发给家长看' : '整理复盘卡',
     shareArchiveLabel: shareCount ? `本机已沉淀 ${shareCount} 条分享记录` : '首次分享会记录在本机，后续可接多设备连续性',
     payload: {
@@ -1773,7 +1773,7 @@ function buildLearningReportSummary(reportState = {}, capabilityEvidenceLedger, 
         id: 'source',
         label: '公开资料',
         owner: '本地代码 + 人工校验',
-        action: '抽取课程结构、题型簇、常见错因和明天验证验证，不复制原题、答案或受限内容。',
+      action: '抽取课程结构、题型簇、常见错因和明天回访验证，不复制原题、答案或受限内容。',
         route: '/pages/upload/upload?from=openmaic_k12_workbench&type=school_material'
       },
       {
@@ -2816,9 +2816,9 @@ function buildFamilyDecisionActionBridge(input = {}) {
       },
       {
         id: 'practice',
-        label: '5分钟明天验证',
+    label: '5分钟明天回访',
         route: courseUnitRoute,
-        reason: courseUnit ? courseUnit.sevenDayReviewLine : (active.task || nextCapability.nextAction || '用一局明天验证确认不是当场会、转身忘。'),
+    reason: courseUnit ? courseUnit.sevenDayReviewLine : (active.task || nextCapability.nextAction || '用一局明天回访确认不是当场会、转身忘。'),
         evidence: courseUnit ? courseUnit.classroomObservationLine : (evidence[1] || '留下错因卡')
       },
       {
@@ -2872,15 +2872,15 @@ function buildCommercialUnlockCard(reviewSummary, tutorSummary, thinkingSummary,
   const hasReview = repaired > 0 || (safeNumber(review.total, 0) > 0 && safeNumber(review.due, 0) === 0);
   const steps = [
     { id: 'tutor', label: 'AI私教', done: hasTutor },
-    { id: 'challenge', label: '明天验证', done: hasChallenge },
+    { id: 'challenge', label: '明天回访', done: hasChallenge },
     { id: 'review', label: '复习回访', done: hasReview }
   ];
   const done = steps.filter((item) => item.done).length;
   return {
     title: done >= 3 ? '本周复盘已可整理' : '先跑通一次完整闭环',
     body: done >= 3
-      ? '你已经完成一次带学、一次明天验证和一次家长回访，可以整理成本周复盘。'
-      : '完成 1 次AI私教 + 1 次明天验证 + 1 次家长回访后，就能整理成本周复盘。',
+      ? '你已经完成一次带学、一次明天回访和一次家长回看，可以整理成本周复盘。'
+      : '完成 1 次AI私教 + 1 次明天回访 + 1 次家长回看后，就能整理成本周复盘。',
     done,
     total: steps.length,
     steps,
@@ -2916,7 +2916,7 @@ function buildProfileReadinessSnapshot(input = {}) {
     : '还有本地闭环待补齐，先按下一步把证据补上。';
   const flowLine = compass && compass.readyCount !== undefined
     ? `${compass.readyCount} / ${compass.totalCount || 0} 个环节已接上：${compass.summary || '先跑通一次完整学习回路'}`
-    : '先从AI私教、错题修复、明天验证和家长复盘跑通一次。';
+    : '先从AI私教、错题修复、明天回访和家长复盘跑通一次。';
   const evidenceLine = evidence.reportLine || evidence.shareLine || surface.familyLine || depth.summary || '目前先看本机学习记录，资料越完整，建议越具体。';
   const boundaryLine = localPassed
     ? (externalBlocked ? '当前适合小范围家庭试用；公开分发前再完成正式小程序身份。' : '当前可以用真实材料做一轮家庭试用。')

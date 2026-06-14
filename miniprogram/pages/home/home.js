@@ -79,7 +79,7 @@ Page({
     weaknessVerdict: null,
     revisitEntry: {
       body: '没有材料时先生成第一步验证，有真实卡片后再进入回访验证。',
-      cta: '明天验证',
+    cta: '明天回访',
       action: 'goLearningMap'
     },
     wrongbookEntry: {
@@ -1124,7 +1124,7 @@ Page({
       : '';
     const questionBankRelayRoute = navigation.normalizeRoute(incoming.question_bank_relay_route || unitRoute);
     const questionBankRelayLine = incoming.question_bank_relay_label
-      ? `题型接力：${incoming.question_bank_relay_label}。先说第一步，不看原题答案。`
+    ? `题型回访：${incoming.question_bank_relay_label}。先说第一步，不看原题答案。`
       : '';
     const visualBoardRelayRoute = navigation.normalizeRoute(incoming.visual_board_relay_route || questionBankRelayRoute);
     const visualBoardRelayLine = incoming.visual_board_relay_title
@@ -1231,11 +1231,11 @@ Page({
       spreadFallbackLine: spreadReadinessGate ? `不足时：${spreadReadinessGate.fallbackLine}` : '',
       spreadEvidenceLine: spreadReadinessGate ? `需要证据：${spreadReadinessGate.requiredEvidence}` : '',
       peerRelayLadder,
-      peerRelayLadderLine: peerRelayLadder ? `同伴接力阶梯：${peerRelayLadder.stageLine}` : '',
+      peerRelayLadderLine: peerRelayLadder ? `同类回访阶梯：${peerRelayLadder.stageLine}` : '',
       peerRelayAttractionLine: peerRelayLadder && peerRelayLadder.attractionHook ? `可复制回访：${peerRelayLadder.attractionHook}` : '',
       peerRelayLocalGateLine: peerRelayLadder && peerRelayLadder.localGate ? `本地放行门禁：${peerRelayLadder.localGate}` : '',
       peerRelaySeasonArc,
-      peerRelaySeasonLine: peerRelaySeasonArc ? `7天接力赛季：${peerRelaySeasonArc.seasonLine || peerRelaySeasonArc.status}` : '',
+      peerRelaySeasonLine: peerRelaySeasonArc ? `7天回访计划：${peerRelaySeasonArc.seasonLine || peerRelaySeasonArc.status}` : '',
       peerRelaySeasonDayLine: peerRelaySeasonArc ? `赛季节点：${peerRelaySeasonArc.days}` : '',
       peerRelaySeasonGateLine: peerRelaySeasonArc ? `赛季门禁：${peerRelaySeasonArc.localGate}` : '',
       sourceChallengeDeck,
@@ -2119,7 +2119,7 @@ Page({
       storage.recordSurfaceDepthAction({
         surface: 'home',
         dimensionId: (firstCard && firstCard.id) || 'incoming_share_relay_continue',
-        label: (firstCard && firstCard.title) || '同伴接力继续',
+      label: (firstCard && firstCard.title) || '同类回访继续',
         route,
         readiness: 'incoming_share_relay'
       });
