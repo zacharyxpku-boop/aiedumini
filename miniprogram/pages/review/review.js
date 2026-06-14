@@ -7,14 +7,16 @@ const revisitEngine = require('../../utils/revisit-engine');
 const reviewViewModels = require('../../view-models/review-view-model');
 const k12TopicBank = require('../../utils/k12-topic-bank');
 
-const KNOWLEDGE_STARTER_TOPIC_CARDS = [
-  { topic: '小数乘法', tag: '云端真题 · 小数运算', duration: '约 3 分钟', theme: 'teal' },
-  { topic: '认识分数', tag: '云端真题 · 分数运算', duration: '约 3 分钟', theme: 'rose' },
-  { topic: '面积计算', tag: '云端真题 · 面积计算', duration: '约 4 分钟', theme: 'green' },
-  { topic: '行程问题', tag: '云端真题 · 路线推理', duration: '约 5 分钟', theme: 'orange' },
-  { topic: '百分数应用', tag: '云端真题 · 百分数', duration: '约 4 分钟', theme: 'teal' },
-  { topic: '平均数', tag: '云端真题 · 统计感', duration: '约 3 分钟', theme: 'rose' }
-];
+const KNOWLEDGE_STARTER_TOPIC_CARDS = k12TopicBank.listTopicCards
+  ? k12TopicBank.listTopicCards(18)
+  : [
+    { topic: '小数乘法', tag: '云端真题 · 小数运算', duration: '约 3 分钟', theme: 'teal' },
+    { topic: '认识分数', tag: '云端真题 · 分数运算', duration: '约 3 分钟', theme: 'rose' },
+    { topic: '面积计算', tag: '云端真题 · 面积计算', duration: '约 4 分钟', theme: 'green' },
+    { topic: '行程问题', tag: '云端真题 · 路线推理', duration: '约 5 分钟', theme: 'orange' },
+    { topic: '百分数应用', tag: '云端真题 · 百分数', duration: '约 4 分钟', theme: 'teal' },
+    { topic: '平均数', tag: '云端真题 · 统计感', duration: '约 3 分钟', theme: 'rose' }
+  ];
 
 const DEFAULT_REVISIT_RUNWAY = {
   due: 0,
@@ -143,7 +145,7 @@ Page({
     this.setData({
       reportSourceContext: this.buildReportSourceContext(query) || this.buildTemplateRouteContext(query),
       knowledgeChipTopics: k12TopicBank.listPlayableTopics
-        ? k12TopicBank.listPlayableTopics(18)
+        ? k12TopicBank.listPlayableTopics(24)
         : this.data.knowledgeChipTopics
     });
     this.applyReferenceStageRoute(query);
@@ -583,9 +585,12 @@ Page({
   buildKnowledgeStarterTopicCards(options = {}) {
     const query = String(options.query || this.data.topicSearchText || '').trim();
     const batch = Number(options.batch == null ? this.data.knowledgeStarterTopicBatch : options.batch) || 0;
+    const normalizedQuery = k12TopicBank.normalizeTopic ? k12TopicBank.normalizeTopic(query) : '';
     const source = KNOWLEDGE_STARTER_TOPIC_CARDS.filter((item) => {
       if (!query) return true;
-      return item.topic.indexOf(query) >= 0 || item.tag.indexOf(query) >= 0;
+      return item.topic.indexOf(query) >= 0
+        || item.tag.indexOf(query) >= 0
+        || (normalizedQuery && item.topic === normalizedQuery);
     });
     if (!source.length) return KNOWLEDGE_STARTER_TOPIC_CARDS.slice(0, 6);
     const offset = batch % source.length;
@@ -617,10 +622,11 @@ Page({
     const value = String(event && event.detail ? event.detail.value || '' : '').trim().slice(0, 30);
     if (!value) return;
     const cards = this.buildKnowledgeStarterTopicCards({ query: value, batch: 0 });
-    const matched = cards.find((item) => item.topic.indexOf(value) >= 0 || value.indexOf(item.topic) >= 0);
+    const normalized = k12TopicBank.normalizeTopic ? k12TopicBank.normalizeTopic(value) : '';
+    const matched = cards.find((item) => item.topic.indexOf(value) >= 0 || value.indexOf(item.topic) >= 0 || item.topic === normalized);
     this.setData({
       topicSearchText: value,
-      selectedKnowledgeTopic: matched ? matched.topic : value
+      selectedKnowledgeTopic: matched ? matched.topic : (normalized || value)
     });
   },
 
@@ -824,7 +830,15 @@ Page({
     const existing = storage.loadReviewCards ? storage.loadReviewCards() : [];
     if (!storage.saveReviewCards) return existing;
     const topic = this.data.selectedKnowledgeTopic;
-    const starterCards = (existing.length >= 3 ? [] : this.buildKnowledgeStarterCards(topic))
+    const topicKey = String(topic || '').trim();
+    const topicExistingCount = topicKey
+      ? existing.filter((card) => {
+        const weakPoint = String(card && card.weakPoint || '');
+        const subject = String(card && card.subject || '');
+        return weakPoint === topicKey || subject === topicKey;
+      }).length
+      : 0;
+    const starterCards = (topicExistingCount >= 3 ? [] : this.buildKnowledgeStarterCards(topic))
       .concat(this.buildRemoteQbankCards(topic))
       .filter((card) => !existing.some((item) => item && item.id === card.id));
     if (!starterCards.length) return existing;

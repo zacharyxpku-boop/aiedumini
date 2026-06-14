@@ -85,8 +85,44 @@ const TOPIC_BANK = {
   ]
 };
 
-const qbankStarter = require('./qbank-starter.js');
+const qbankStarter = (() => {
+  try {
+    return require('./qbank-starter.js');
+  } catch (error) {
+    // Node contract tests may load this module through stdin; fall back to an absolute module path.
+    const cwd = typeof process !== 'undefined' && process.cwd ? process.cwd() : '';
+    return require(`${cwd}/miniprogram/utils/qbank-starter.js`);
+  }
+})();
 const STARTER_BANK = (qbankStarter && qbankStarter.STARTER_BANK) || {};
+const STARTER_TOPICS = (qbankStarter && qbankStarter.STARTER_TOPICS) || [];
+
+const TOPIC_PROFILES = {
+  小数乘法: { tag: '真题 · 小数运算', duration: '约 3 分钟', theme: 'teal', aliases: ['小数运算', '小数点移动', '小数计算'] },
+  认识分数: { tag: '真题 · 分数运算', duration: '约 3 分钟', theme: 'rose', aliases: ['分数', '分数运算', '约分', '通分'] },
+  面积计算: { tag: '真题 · 面积图形', duration: '约 4 分钟', theme: 'green', aliases: ['面积', '图形面积', '组合图形'] },
+  混合运算: { tag: '真题 · 运算顺序', duration: '约 3 分钟', theme: 'orange', aliases: ['计算检查', '运算顺序', '四则混合运算'] },
+  认识钟表: { tag: '真题 · 时间计算', duration: '约 3 分钟', theme: 'teal', aliases: ['钟表', '时间', '时间计算'] },
+  行程问题: { tag: '真题 · 路线推理', duration: '约 5 分钟', theme: 'orange', aliases: ['路程速度时间', '相遇追及', '速度问题'] },
+  百分数应用: { tag: '真题 · 百分数', duration: '约 4 分钟', theme: 'teal', aliases: ['百分数', '折扣', '增长率'] },
+  平均数: { tag: '真题 · 统计感', duration: '约 3 分钟', theme: 'rose', aliases: ['统计', '平均值'] },
+  倍数关系: { tag: '真题 · 倍数关系', duration: '约 4 分钟', theme: 'green', aliases: ['倍数', '倍比'] },
+  和差问题: { tag: '真题 · 和差关系', duration: '约 4 分钟', theme: 'orange', aliases: ['和差', '差倍'] },
+  工程问题: { tag: '真题 · 工作效率', duration: '约 5 分钟', theme: 'teal', aliases: ['工程', '效率'] },
+  比例与比: { tag: '真题 · 比例关系', duration: '约 4 分钟', theme: 'rose', aliases: ['比例', '比', '比例应用'] },
+  七年级计算: { tag: '真题 · 初一计算', duration: '约 3 分钟', theme: 'green', aliases: ['七年级数学计算', '初一计算'] },
+  八年级计算: { tag: '真题 · 初二计算', duration: '约 3 分钟', theme: 'orange', aliases: ['八年级数学计算', '初二计算'] },
+  九年级计算: { tag: '真题 · 初三计算', duration: '约 3 分钟', theme: 'teal', aliases: ['九年级数学计算', '初三计算'] },
+  古诗词接句: { tag: '真题 · 古诗背诵', duration: '约 2 分钟', theme: 'rose', aliases: ['古诗词背诵', '诗词接句'] },
+  古诗词作者: { tag: '真题 · 作者记忆', duration: '约 2 分钟', theme: 'green', aliases: ['诗人作者', '诗词作者'] },
+  英语单词: { tag: '真题 · 单词记忆', duration: '约 3 分钟', theme: 'orange', aliases: ['单词', '英文单词', '词汇'] }
+};
+
+const TOPIC_ALIAS_LOOKUP = Object.keys(TOPIC_PROFILES).reduce((map, topic) => {
+  map[topic] = topic;
+  (TOPIC_PROFILES[topic].aliases || []).forEach((alias) => { map[alias] = topic; });
+  return map;
+}, {});
 
 function topicRows(key) {
   // 手写卡 + curated 真题精选包合并：真题在后，干扰项池更厚
@@ -95,9 +131,15 @@ function topicRows(key) {
 
 function normalizeTopic(topic = '') {
   const value = String(topic || '').trim();
+  if (TOPIC_ALIAS_LOOKUP[value]) return TOPIC_ALIAS_LOOKUP[value];
   if (TOPIC_BANK[value] || STARTER_BANK[value]) return value;
   const keys = Object.keys(TOPIC_BANK).concat(Object.keys(STARTER_BANK));
-  const hit = keys.find((key) => value.indexOf(key) >= 0 || key.indexOf(value) >= 0);
+  const hit = keys.find((key) => {
+    const aliases = (TOPIC_PROFILES[key] && TOPIC_PROFILES[key].aliases) || [];
+    return value.indexOf(key) >= 0
+      || key.indexOf(value) >= 0
+      || aliases.some((alias) => value.indexOf(alias) >= 0 || alias.indexOf(value) >= 0);
+  });
   return hit || '';
 }
 
@@ -141,17 +183,32 @@ function buildTopicDeck(topic = '') {
 
 function listPlayableTopics(limit = 12) {
   // 内置真题主题在前（每个都有牌组+云端大池），手写主题补位，去重
-  const starter = (qbankStarter && qbankStarter.STARTER_TOPICS) || [];
   const merged = [];
-  starter.concat(Object.keys(TOPIC_BANK)).forEach((topic) => {
+  STARTER_TOPICS.concat(Object.keys(TOPIC_BANK)).forEach((topic) => {
     if (merged.indexOf(topic) < 0) merged.push(topic);
   });
   return merged.slice(0, limit);
+}
+
+function listTopicCards(limit = 12) {
+  return listPlayableTopics(limit).map((topic, index) => {
+    const profile = TOPIC_PROFILES[topic] || {};
+    const rows = topicRows(topic);
+    return {
+      topic,
+      tag: profile.tag || '本地题库 · 第一轮',
+      duration: profile.duration || (rows.length >= 8 ? '约 3 分钟' : '约 2 分钟'),
+      theme: profile.theme || ['teal', 'rose', 'green', 'orange'][index % 4],
+      cardCount: rows.length
+    };
+  });
 }
 
 module.exports = {
   TOPIC_BANK,
   buildTopicDeck,
   normalizeTopic,
-  listPlayableTopics
+  listPlayableTopics,
+  listTopicCards,
+  TOPIC_PROFILES
 };
