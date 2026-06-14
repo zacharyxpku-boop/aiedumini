@@ -3027,10 +3027,91 @@ Page({
     }
     this.setData({
       practiceTemplatePack: pack,
-      practiceTemplateWorkbench: workbench,
+      practiceTemplateWorkbench: Object.assign({}, workbench, {
+        reportEvidenceReady: false,
+        completeAction: '记录到成长报告'
+      }),
       feedbackText: dataset.label
         ? `${dataset.label} 已打开，本机只使用错因卡和第一步证据。`
         : '知识乐园练习已打开，本机只使用错因卡和第一步证据。'
+    });
+  },
+
+  finishTemplateDeliverable() {
+    const workbench = this.data.practiceTemplateWorkbench || {};
+    if (!workbench.id) {
+      this.setData({ feedbackText: '先打开一个练习模板，再记录证据。' });
+      return;
+    }
+    const samples = Array.isArray(workbench.samples) ? workbench.samples : [];
+    const total = Math.max(1, Number(workbench.count || samples.length || 1));
+    const correct = Math.max(1, Math.min(total, samples.length || total));
+    const attemptSummary = {
+      total,
+      correct,
+      wrong: Math.max(0, total - correct),
+      accuracy: Math.round((correct / total) * 100),
+      evidenceCount: correct
+    };
+    const primarySample = samples[0] || {};
+    const repairFocus = {
+      title: primarySample.source || workbench.sampleTitle || workbench.title || '今日卡点',
+      wrongCause: primarySample.label || workbench.title || '同类错因',
+      decision: primarySample.firstStep || primarySample.source || workbench.line || '先说第一步'
+    };
+    const roundAdvice = {
+      primary: workbench.id === 'variant'
+        ? '明天换一个条件，再说同一个第一步。'
+        : workbench.id === 'print'
+          ? '明天用纸面练习单复述错因和第一步。'
+          : '明天再把同类错因归一次组。',
+      secondary: '家长只看孩子能不能说出第一步和错因。'
+    };
+    const reportSourceContext = this.data.reportSourceContext || this.buildReportSourceContext();
+    const reportId = reportSourceContext && (reportSourceContext.reportId || reportSourceContext.sourceReportId || reportSourceContext.id);
+    if (storage.appendReviewEvent) {
+      storage.appendReviewEvent({
+        kind: 'playable_review_tool_finished',
+        tool_id: workbench.id,
+        result: 'template_completed',
+        count: total,
+        attempt_summary: attemptSummary,
+        repair_focus: repairFocus,
+        source: 'practice_template_workbench',
+        created_at: new Date().toISOString()
+      });
+      storage.appendReviewEvent({
+        kind: 'playable_review_attempt_summary',
+        tool_id: workbench.id,
+        result: 'template_completed',
+        summary: attemptSummary,
+        round_advice: roundAdvice,
+        repair_focus: repairFocus,
+        source: 'practice_template_workbench',
+        created_at: new Date().toISOString()
+      });
+    }
+    if (storage.recordReportRevisitEvidence) {
+      storage.recordReportRevisitEvidence(reportId || '', {
+        id: `template_revisit_${workbench.id}_${Date.now()}`,
+        status: 'template_completed',
+        route: `/pages/review/review?from=template_${workbench.id}`,
+        firstStep: repairFocus.decision,
+        wrongCause: repairFocus.wrongCause,
+        parentCheck: roundAdvice.secondary,
+        nextDayRevisit: true,
+        attemptSummary,
+        repairFocus,
+        source: 'practice_template_workbench'
+      });
+    }
+    this.setData({
+      practiceTemplateWorkbench: Object.assign({}, workbench, {
+        status: `${attemptSummary.correct}/${attemptSummary.total} 条证据`,
+        reportEvidenceReady: true,
+        completeAction: '已写入成长报告'
+      }),
+      feedbackText: `${workbench.title || '练习模板'} 已写入成长报告：明天只回看同一错因。`
     });
   },
 

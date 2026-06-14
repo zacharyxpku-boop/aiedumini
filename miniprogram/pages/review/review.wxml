@@ -65,7 +65,7 @@
               <view class="review-template-sample"><text>{{practiceTemplateWorkbench.samples[2].label}}</text><text>{{practiceTemplateWorkbench.samples[2].source}}</text></view>
             </view>
             <text class="review-template-safe">{{practiceTemplateWorkbench.safetyLine}}</text>
-            <view class="review-template-actions"><text bindtap="saveCurrentPracticeTemplate">保存为我的模板</text></view>
+            <view class="review-template-actions"><text bindtap="saveCurrentPracticeTemplate">保存为我的模板</text><text bindtap="finishTemplateDeliverable">{{practiceTemplateWorkbench.completeAction || '记录到成长报告'}}</text></view>
             <view class="review-template-saved" wx:if="{{savedPracticeTemplates.length}}">
               <text class="review-template-saved-title">已存模板 · 点一下直接套用</text>
               <view class="review-template-saved-row">
