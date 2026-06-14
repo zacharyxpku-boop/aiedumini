@@ -146,6 +146,76 @@ function buildSocraticBrief(result = {}, receipt = {}, promptWorkflow = {}) {
   };
 }
 
+function buildTutorFallbackDiagnosticProbe(receipt = {}, result = {}, selected = {}, activeStep = 'read_problem') {
+  const existing = result.diagnostic_probe || receipt.diagnostic_probe;
+  if (existing && (existing.prompt || existing.goal || existing.focus || existing.axis || existing.misconception)) {
+    return existing;
+  }
+  const signal = result.real_homework_pressure_signal
+    || receipt.real_homework_pressure_signal
+    || receipt.pressureSignal
+    || {};
+  const contract = result.socratic_contract || receipt.socratic_contract || {};
+  const fallback = result.socratic_fallback_plan || receipt.socratic_fallback_plan || {};
+  const subjectSkill = receipt.subjectSkillDepth || {};
+  const stepMap = {
+    read_problem: {
+      axis: 'understand_question',
+      prompt: '这题真正问的是什么？先用一句话说清。',
+      goal: '先读清题目',
+      focus: '审题入口'
+    },
+    find_conditions: {
+      axis: 'known_conditions',
+      prompt: '题目给了哪些条件？先圈一个最有用的。',
+      goal: '先找已知条件',
+      focus: '条件遗漏'
+    },
+    write_first_step: {
+      axis: 'first_step',
+      prompt: '如果只写第一步，你会先动哪里？',
+      goal: '先说第一步',
+      focus: '起步不清'
+    },
+    find_direction: {
+      axis: 'method_direction',
+      prompt: '你觉得这题更像哪一类方法？先说方向。',
+      goal: '先选方法方向',
+      focus: '方法选择'
+    },
+    explain_misconception: {
+      axis: 'wrong_cause',
+      prompt: '刚才最可能错在审题、建模、计算还是表达？',
+      goal: '先说错因',
+      focus: '错因不明'
+    },
+    review: {
+      axis: 'recap_transfer',
+      prompt: '下次遇到同类题，你第一眼先检查什么？',
+      goal: '先复述检查点',
+      focus: '迁移复盘'
+    },
+    fast_mode: {
+      axis: 'first_step',
+      prompt: '不讲完整过程，只说你准备先做哪一步。',
+      goal: '先说第一步',
+      focus: '起步不清'
+    }
+  };
+  const base = stepMap[activeStep] || stepMap.read_problem;
+  return {
+    axis: signal.axis || subjectSkill.taskType || base.axis,
+    prompt: contract.nextQuestion || fallback.childFriendlyLine || signal.parentQuestion || signal.parentCheck || base.prompt,
+    goal: signal.firstStep || result.next_action || base.goal,
+    focus: signal.wrongCause || signal.reportSignal || selected.issueType || base.focus,
+    misconception: signal.wrongCause || selected.issueType || base.focus,
+    evidenceNeeded: (result.mastery_signal && result.mastery_signal.evidence_needed)
+      || (receipt.mastery_signal && receipt.mastery_signal.evidence_needed)
+      || '孩子说出第一步、依据和下一次检查点',
+    source: result && result.fallback === false ? 'model_diagnostic_probe' : 'local_fallback_diagnostic_probe'
+  };
+}
+
 function buildTutorDiagnosticCard(result = {}, receipt = {}, selected = {}) {
   const probe = result.diagnostic_probe || receipt.diagnostic_probe || {};
   const signal = result.real_homework_pressure_signal || receipt.real_homework_pressure_signal || receipt.pressureSignal || {};
@@ -1892,7 +1962,6 @@ Page({
     const receipt = buildThinkingReceipt(next, masterySignal, pasteRisk, coachStep, this.data.selected, result && result.real_homework_pressure_signal ? result.real_homework_pressure_signal : null);
     const reviewRoute = result && result.next_review_route ? result.next_review_route : '/pages/review/review?from=socratic_prompt_workflow';
     const promptWorkflow = buildSocraticPromptWorkflow(receipt, result || {}, this.data.selected, reviewRoute);
-    const modelBackedDiagnosis = !!(result && result.fallback === false && result.diagnostic_probe);
     const apiSocraticRuntime = result && result.socratic_runtime ? result.socratic_runtime : null;
     const apiThreeRoundProtocol = result && result.three_round_protocol
       ? result.three_round_protocol
@@ -1906,13 +1975,19 @@ Page({
     const apiAllowedMoves = result && result.allowed_moves
       ? result.allowed_moves
       : (apiSocraticRuntime && apiSocraticRuntime.allowedMoves ? apiSocraticRuntime.allowedMoves : []);
+    const diagnosticProbe = buildTutorFallbackDiagnosticProbe(
+      receipt,
+      result || {},
+      this.data.selected || {},
+      result && result.coach_step ? result.coach_step : this.data.activeStep
+    );
     const diagnosticReceipt = Object.assign({}, receipt, {
       turnId: makeReceiptId('tutor_turn'),
       socratic_prompt_workflow: promptWorkflow,
       socraticPromptWorkflow: promptWorkflow,
       tutor_turn_state: mergedTurnState,
       tutorTurnState: mergedTurnState,
-      diagnostic_probe: result && result.diagnostic_probe ? result.diagnostic_probe : null,
+      diagnostic_probe: diagnosticProbe,
       question_type_socratic_path: result && result.question_type_socratic_path ? result.question_type_socratic_path : null,
       socratic_contract: result && result.socratic_contract ? result.socratic_contract : null,
       socratic_fallback_plan: result && result.socratic_fallback_plan ? result.socratic_fallback_plan : null,
@@ -1941,9 +2016,7 @@ Page({
     diagnosticReceipt.socraticPromptWorkflow.turnId = diagnosticReceipt.turnId;
     const socraticBrief = buildSocraticBrief(result || {}, diagnosticReceipt, promptWorkflow);
     const socraticMicroChoices = buildSocraticMicroChoices(result || {}, diagnosticReceipt);
-    const tutorDiagnosticCard = modelBackedDiagnosis
-      ? buildTutorDiagnosticCard(result || {}, diagnosticReceipt, this.data.selected || {})
-      : null;
+    const tutorDiagnosticCard = buildTutorDiagnosticCard(result || {}, diagnosticReceipt, this.data.selected || {});
     const tutorServiceStatus = buildTutorServiceStatus(result || {}, diagnosticReceipt);
     if (storage.appendThinkingReceipt) {
       storage.appendThinkingReceipt(Object.assign({}, diagnosticReceipt, {
@@ -2107,12 +2180,14 @@ Page({
         coach_step: coachStep
       });
     }
-    if (storage.trackTutorEvent && result && result.diagnostic_probe) {
+    if (storage.trackTutorEvent && result && diagnosticReceipt.diagnostic_probe) {
       storage.trackTutorEvent('tutor_diagnostic_probe', {
         coach_step: coachStep,
         hint_level: currentHintLevel,
-        probe_prompt: result.diagnostic_probe.prompt || '',
-        probe_goal: result.diagnostic_probe.goal || '',
+        probe_prompt: diagnosticReceipt.diagnostic_probe.prompt || '',
+        probe_goal: diagnosticReceipt.diagnostic_probe.goal || '',
+        probe_focus: diagnosticReceipt.diagnostic_probe.focus || diagnosticReceipt.diagnostic_probe.misconception || '',
+        probe_source: diagnosticReceipt.diagnostic_probe.source || (result && result.diagnostic_probe ? 'model_diagnostic_probe' : 'local_fallback_diagnostic_probe'),
         question_type_socratic_path: result.question_type_socratic_path || null,
         question_type_axis: result.question_type_socratic_path && result.question_type_socratic_path.activeAxis,
         question_type_probe_count: result.question_type_socratic_path && Array.isArray(result.question_type_socratic_path.probeBank)
