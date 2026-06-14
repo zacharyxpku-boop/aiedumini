@@ -8,12 +8,12 @@ const reviewViewModels = require('../../view-models/review-view-model');
 const k12TopicBank = require('../../utils/k12-topic-bank');
 
 const KNOWLEDGE_STARTER_TOPIC_CARDS = [
-  { topic: '小数乘法', tag: '消除大练习', duration: '约 10 分钟', theme: 'teal' },
-  { topic: '认识分数', tag: '色彩涂涂', duration: '约 15 分钟', theme: 'rose' },
-  { topic: '面积计算', tag: '拼图解谜', duration: '约 12 分钟', theme: 'green' },
-  { topic: '混合运算', tag: '极速速算', duration: '约 5 分钟', theme: 'orange' },
-  { topic: '认识钟表', tag: '拨盘解密', duration: '约 8 分钟', theme: 'teal' },
-  { topic: '长度单位', tag: '魔法尺子', duration: '约 10 分钟', theme: 'rose' }
+  { topic: '小数乘法', tag: '云端真题 · 小数运算', duration: '约 3 分钟', theme: 'teal' },
+  { topic: '认识分数', tag: '云端真题 · 分数运算', duration: '约 3 分钟', theme: 'rose' },
+  { topic: '面积计算', tag: '云端真题 · 面积计算', duration: '约 4 分钟', theme: 'green' },
+  { topic: '行程问题', tag: '云端真题 · 路线推理', duration: '约 5 分钟', theme: 'orange' },
+  { topic: '百分数应用', tag: '云端真题 · 百分数', duration: '约 4 分钟', theme: 'teal' },
+  { topic: '平均数', tag: '云端真题 · 统计感', duration: '约 3 分钟', theme: 'rose' }
 ];
 
 const DEFAULT_REVISIT_RUNWAY = {
@@ -123,8 +123,8 @@ Page({
     reportSourcePanel: null,
     miniLessonReturnPanel: null,
     reviewFlowStage: 'main',
-    selectedKnowledgeTopic: '分数',
-    knowledgeChipTopics: ['分数', '应用题', '英语单词', '阅读理解', '计算检查', '表达组织'],
+    selectedKnowledgeTopic: '小数乘法',
+    knowledgeChipTopics: ['小数乘法', '认识分数', '面积计算', '行程问题', '百分数应用', '英语单词'],
     topicSearchText: '',
     knowledgeStarterTopicBatch: 0,
     knowledgeStarterTopicCards: KNOWLEDGE_STARTER_TOPIC_CARDS,
@@ -794,11 +794,13 @@ Page({
   buildRemoteQbankCards(topic = '') {
     const label = String(topic || '').trim();
     if (!label || !storage.get) return [];
-    const rows = storage.get(`review.qbank.deck.${label}`, []);
+    const pack = storage.get(`review.qbank.deck.${label}`, []);
+    const rows = Array.isArray(pack) ? pack : pack.deck;
+    const meta = Array.isArray(pack) ? {} : pack.meta || {};
     if (!Array.isArray(rows) || !rows.length) return [];
     const now = new Date().toISOString();
     return rows.map((row, index) => ({
-      id: `qbr_${label}_${index}`,
+      id: `qbr_${label}_${meta.topic || row.source_topic || 'remote'}_${index}`,
       type: 'topic_quiz_card',
       source: 'qbank_remote',
       state: 'new',
@@ -807,9 +809,9 @@ Page({
       question: row.q || '',
       answer: row.a || '',
       hint: row.hint || '',
-      subject: label,
+      subject: meta.topic || row.source_topic || label,
       taskType: 'first_step',
-      weakPoint: label,
+      weakPoint: meta.requestedTopic || label,
       wrongCauseBucket: 'topic_practice',
       parentPrompt: `家长只问：${row.q || ''}`,
       checkpoint: row.hint || '能说出第一步',
@@ -839,12 +841,25 @@ Page({
     this._qbankFetched[label] = true;
     api.fetchQbankTopicDeck({ topic: label, limit: 8 }).then((result) => {
       if (!result || result.fallback !== false || !Array.isArray(result.deck) || !result.deck.length) return;
-      if (storage.set) storage.set(`review.qbank.deck.${label}`, result.deck);
+      if (storage.set) {
+        storage.set(`review.qbank.deck.${label}`, {
+          deck: result.deck,
+          meta: {
+            requestedTopic: result.requested_topic || label,
+            topic: result.topic || label,
+            matchType: result.match_type || 'unknown',
+            source: result.source || 'qbank_curated_v1'
+          },
+          cachedAt: new Date().toISOString()
+        });
+      }
       const cards = this.ensureKnowledgeStarterCards();
       if (this.data.reviewFlowStage === 'tool') {
         this.setData({
           deckCompositionText: this.buildDeckCompositionText(cards),
-          feedbackText: `云端题库已取来 ${result.deck.length} 道「${result.topic || label}」真题，开局就能用。`
+          feedbackText: result.topic && result.topic !== label
+            ? `已把「${label}」匹配到「${result.topic}」，取来 ${result.deck.length} 道真题。`
+            : `云端题库已取来 ${result.deck.length} 道「${result.topic || label}」真题，开局就能用。`
         });
       }
     }).catch(() => {});
