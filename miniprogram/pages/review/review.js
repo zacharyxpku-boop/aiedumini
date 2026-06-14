@@ -2163,7 +2163,52 @@ Page({
         rule: '只保存本机练习证据。'
       },
       sourceCards,
+      templateOutputs: this.buildPracticeTemplateOutputs(sourceCards),
       safetyLine: safeWorkshop.safetyLine || '只做错因练习、主动回忆和迁移验证，不做排名、比较刺激或答案代写。'
+    };
+  },
+
+  buildPracticeTemplateOutputs(sourceCards = []) {
+    const cards = Array.isArray(sourceCards) ? sourceCards : [];
+    const safeCards = cards.length ? cards : [{
+      id: 'starter_card',
+      weakPoint: '今日卡点',
+      firstStep: '先说出第一步',
+      wrongCause: '待孩子复述错因'
+    }];
+    const unoGroups = safeCards.slice(0, 6).map((card, index) => ({
+      id: `uno_group_${card.id || index}`,
+      label: card.wrongCause || card.weakPoint || '待复述错因',
+      format: 'wrong-cause-group',
+      source: card.weakPoint || '今日卡点',
+      renderMode: 'uno',
+      firstStep: card.firstStep || '先说出第一步',
+      parentPrompt: `为什么这一张也属于「${card.wrongCause || card.weakPoint || '这个错因'}」？`
+    }));
+    const variantChain = safeCards.slice(0, 3).map((card, index) => ({
+      id: `variant_${card.id || index}`,
+      label: `变式 ${index + 1}`,
+      format: 'near-transfer',
+      source: card.weakPoint || '今日卡点',
+      renderMode: 'variant',
+      firstStep: card.firstStep || '先说出第一步',
+      variantPrompt: `换一个数字或条件后，第一步还要先检查：${card.firstStep || card.weakPoint || '题目问什么'}`
+    }));
+    const printSheets = safeCards.slice(0, 6).map((card, index) => ({
+      id: `print_${card.id || index}`,
+      label: `纸面 ${index + 1}`,
+      format: 'print-row',
+      source: card.weakPoint || '今日卡点',
+      renderMode: 'worksheet',
+      firstStep: card.firstStep || '先说出第一步',
+      wrongCause: card.wrongCause || '待孩子复述错因',
+      parentCheck: '家长只看孩子能不能说出第一步和错因。'
+    }));
+    return {
+      unoGroups,
+      variantChain,
+      printSheets,
+      evidenceRequired: ['wrong_cause_group', 'near_transfer_first_step', 'paper_review_parent_check']
     };
   },
 
@@ -2216,7 +2261,7 @@ Page({
         line: '把同类错因归到一组，孩子只需要说出分类理由。',
         primaryAction: '开始UNO错因卡',
         sampleTitle: '错因归类',
-        samples: (pack.engineCatalog || []).filter((item) => item.id === 'uno')
+        samples: (pack.templateOutputs && pack.templateOutputs.unoGroups) || []
       },
       variant: {
         title: '变式三连',
@@ -2224,7 +2269,7 @@ Page({
         line: '同一方法换三个条件，检查能不能迁移到新题。',
         primaryAction: '开始变式三连',
         sampleTitle: '迁移练习',
-        samples: (pack.engineCatalog || []).filter((item) => item.id === 'variant')
+        samples: (pack.templateOutputs && pack.templateOutputs.variantChain) || []
       },
       print: {
         title: '打印练习单',
@@ -2232,7 +2277,7 @@ Page({
         line: '把本机卡点整理成纸面复习包，适合离屏复看。',
         primaryAction: '生成打印练习单',
         sampleTitle: '纸面练习',
-        samples: (pack.engineCatalog || []).filter((item) => item.id === 'print')
+        samples: (pack.templateOutputs && pack.templateOutputs.printSheets) || []
       }
     };
     const lane = laneMap[id] || laneMap.whack;
@@ -2257,7 +2302,11 @@ Page({
         label: item.label || lane.title,
         format: item.format || item.renderMode || 'card',
         source: item.source || '今日卡点',
-        renderMode: item.renderMode || item.format || 'card'
+        renderMode: item.renderMode || item.format || 'card',
+        firstStep: item.firstStep || '',
+        wrongCause: item.wrongCause || '',
+        parentPrompt: item.parentPrompt || item.parentCheck || '',
+        variantPrompt: item.variantPrompt || ''
       })),
       safetyLine: pack.safetyLine || '只用错因卡和第一步证据，不做答案代写、比较刺激或排名。'
     };
